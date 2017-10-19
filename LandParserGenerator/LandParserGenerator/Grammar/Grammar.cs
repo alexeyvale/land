@@ -23,9 +23,6 @@ namespace LandParserGenerator
 
 	public class Grammar
 	{
-		private static Grammar _instance = new Grammar();
-		public static Grammar Instance { get { return _instance; } }
-
 		public string StartSymbol { get; private set; }
 
 		public Dictionary<string, Rule> Rules { get; private set; } = new Dictionary<string, Rule>();
@@ -148,7 +145,7 @@ namespace LandParserGenerator
 
 					foreach (var alt in nt.Value)
 					{
-						first[nt.Key].UnionWith(alt.First());
+						first[nt.Key].UnionWith(alt.First(this));
 					}
 
 					if (!changed)
@@ -195,7 +192,7 @@ namespace LandParserGenerator
 								var oldCount = follow[elem].Count;
 
 								/// Добавляем в его FOLLOW всё, что может идти после него
-								follow[elem].UnionWith(alt.Subsequence(i + 1).First());
+								follow[elem].UnionWith(alt.Subsequence(i + 1).First(this));
 
 								/// Если в FIRST(подпоследовательность) была пустая строка
 								if (follow[elem].Contains(Tokens[Token.EmptyTokenName]))
@@ -244,7 +241,7 @@ namespace LandParserGenerator
 
 					foreach (var alt in nt)
 					{
-						foreach (var t in sequenceAfterNt.First())
+						foreach (var t in sequenceAfterNt.First(this))
 						{
 							closedMarkers.Add(new Marker(alt, 0, t));
 						}
@@ -254,23 +251,6 @@ namespace LandParserGenerator
 			while (oldCount != closedMarkers.Count);
 
 			return closedMarkers;
-		}
-
-
-		/// <summary>
-		/// Построение таблиц LL1-анализа
-		/// </summary>
-		public static void BuildLL1()
-		{
-
-		}
-
-		/// <summary>
-		/// Построение таблиц LR1-анализа
-		/// </summary>
-		public static void BuildLR1()
-		{
-
 		}
 	}
 }

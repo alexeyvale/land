@@ -46,6 +46,7 @@
     <Compile Include="Grammar\Alternative.cs" />
     <Compile Include="Grammar\Interfaces\IFirstSupporting.cs" />
     <Compile Include="Grammar\Interfaces\IGrammarElement.cs" />
+    <Compile Include="Grammar\LL\TableLL1.cs" />
     <Compile Include="Grammar\LR\Marker.cs" />
     <Compile Include="Grammar\Token.cs" />
     <Compile Include="Program.cs" />
@@ -55,9 +56,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Grammar\LL\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

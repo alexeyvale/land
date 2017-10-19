@@ -28,13 +28,13 @@ namespace LandParserGenerator
 			return Alternatives.GetEnumerator();
 		}
 
-		public HashSet<Token> First()
+		public HashSet<Token> First(Grammar g)
 		{
 			var result = new HashSet<Token>();
 
 			foreach(var alt in Alternatives)
 			{
-				result.UnionWith(alt.First());
+				result.UnionWith(alt.First(g));
 			}
 
 			return result;

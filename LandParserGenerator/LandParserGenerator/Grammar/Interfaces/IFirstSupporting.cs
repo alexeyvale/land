@@ -8,6 +8,6 @@ namespace LandParserGenerator
 {
 	public interface IFirstSupporting
 	{
-		HashSet<Token> First();
+		HashSet<Token> First(Grammar g);
 	}
 }

@@ -17,9 +17,9 @@ namespace LandParserGenerator
 			Pattern = pattern;
 		}
 
-		public HashSet<Token> First()
+		public HashSet<Token> First(Grammar g)
 		{
-			return new HashSet<Token>() { this };
+			return new HashSet<Token>() { g.Tokens[this.Name] };
 		}
 
 		public override bool Equals(object obj)

@@ -29,13 +29,13 @@ namespace LandParserGenerator
 			return Elements.GetEnumerator();
 		}
 
-		public HashSet<Token> First()
+		public HashSet<Token> First(Grammar g)
 		{
 			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
 			/// либо, если альтернатива пустая, соответствующий токен
 			if (this.Count > 0)
 			{
-				return Grammar.Instance[this[0]].First();
+				return g[this[0]].First(g);
 			}
 			else
 			{
