@@ -151,7 +151,10 @@ namespace LandParserGenerator
 						first[nt.Key].UnionWith(alt.First());
 					}
 
-					changed = oldCount == first[nt.Key].Count;
+					if (!changed)
+					{
+						changed = oldCount == first[nt.Key].Count;
+					}
 				}
 			}
 
@@ -170,30 +173,47 @@ namespace LandParserGenerator
 				follow[nt.Key] = new HashSet<Token>();
 			}
 
-			follow[StartSymbol] = new HashSet<string>() { Token.EOF };
+			follow[StartSymbol].Add(Tokens[EofTokenName]);
 
 			var changed = true;
 
-			/// Пока итеративно вносятся изменения
 			while (changed)
 			{
 				changed = false;
 
+				/// Проходим по всем продукциям и по всем элементам веток
 				foreach (var nt in this.Rules)
-				{
-					var oldCount = follow[nt.Key].Count;
-
 					foreach (var alt in nt.Value)
-						foreach(var elem in alt)
+					{
+						for (var i = 0; i < alt.Count; ++i)
 						{
-							if(elem is Rule)
-							{
+							var elem = alt[i];
 
+							/// Если встретили в ветке нетерминал
+							if (Rules.ContainsKey(elem))
+							{
+								var oldCount = follow[elem].Count;
+
+								/// Добавляем в его FOLLOW всё, что может идти после него
+								follow[elem].UnionWith(alt.Subsequence(i + 1).First());
+
+								/// Если в FIRST(подпоследовательность) была пустая строка
+								if (follow[elem].Contains(Tokens[Token.EmptyTokenName]))
+								{
+									/// Исключаем пустую строку из FOLLOW
+									follow[elem].Remove(Tokens[Token.EmptyTokenName]);
+									/// Объединяем FOLLOW текущего нетерминала
+									/// с FOLLOW определяемого данной веткой
+									follow[elem].UnionWith(follow[nt.Key]);
+								}
+
+								if (!changed)
+								{
+									changed = oldCount == follow[nt.Key].Count;
+								}
 							}
 						}
-
-					changed = oldCount == Follow[nt.Key].Count;
-				}
+					}
 			}
 
 			return follow;
@@ -202,18 +222,38 @@ namespace LandParserGenerator
 		/// <summary>
 		/// Построение замыкания множества пунктов
 		/// </summary>
-		public static HashSet<Marker> BuildClosure(HashSet<Marker> markers)
+		public HashSet<Marker> BuildClosure(HashSet<Marker> markers)
 		{
-			var changed = true;
+			var closedMarkers = new HashSet<Marker>(markers);
 
-			while(changed)
+			int oldCount;
+
+			do
 			{
-				changed = false;
+				oldCount = closedMarkers.Count;
 
-				
+				/// Проходим по всем пунктам, которые предшествуют нетерминалам
+				foreach (var marker in markers
+					.Where(m => Rules.ContainsKey(m.Next)))
+				{
+					var nt = Rules[marker.Next];
+					/// Будем брать FIRST от того, что идёт после этого нетерминала + символ предпросмотра
+					var sequenceAfterNt = marker.Alternative
+						.Subsequence(marker.Position)
+						.Add(marker.Lookahead.Name);
+
+					foreach (var alt in nt)
+					{
+						foreach (var t in sequenceAfterNt.First())
+						{
+							closedMarkers.Add(new Marker(alt, 0, t));
+						}
+					}
+				}
 			}
+			while (oldCount != closedMarkers.Count);
 
-			return markers;
+			return closedMarkers;
 		}
 
 

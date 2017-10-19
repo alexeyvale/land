@@ -12,9 +12,11 @@ namespace LandParserGenerator
 
 		public int Count { get { return Elements.Count; } }
 
-		public void Add(string elem)
+		public Alternative Add(string elem)
 		{
 			Elements.Add(elem);
+
+			return this;
 		}
 
 		public string this[int i]
@@ -39,6 +41,21 @@ namespace LandParserGenerator
 			{
 				return new HashSet<Token>() { Token.Empty };
 			}
+		}
+
+		/// <summary>
+		/// Получение подпоследовательности элементов альтернативы
+		/// </summary>
+		/// <param name="pos">Позиция, с которой начинается подпоследовательность</param>
+		/// <returns></returns>
+		public Alternative Subsequence(int pos)
+		{
+			return new Alternative()
+			{
+				Elements = pos < Elements.Count ?
+					this.Elements.GetRange(pos, this.Elements.Count - pos) :
+					new List<string>()
+			};
 		}
 	}
 }
