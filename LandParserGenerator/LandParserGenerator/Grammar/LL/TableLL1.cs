@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +58,27 @@ namespace LandParserGenerator
 			get { return Table[NonterminalSymbols[nt], Lookaheads[lookahead]]; }
 
 			private set { Table[NonterminalSymbols[nt], Lookaheads[lookahead]] = value; }
+		}
+
+		public void ExportToCsv(string filename)
+		{
+			var output = new StreamWriter(filename);
+
+			var orderedLookaheads = Lookaheads.OrderBy(l => l.Value);
+			output.WriteLine("," + String.Join(",", orderedLookaheads.Select(l => l.Key)));
+
+			foreach (var nt in NonterminalSymbols.Keys)
+			{
+				output.Write($"{nt},");
+
+				output.Write(String.Join(",",
+					orderedLookaheads.Select(l=>this[nt, l.Key])
+					.Select(alts => alts.Count == 0 ? "" : alts.Count == 1 ? alts[0].ToString() : String.Join("/", alts))));
+
+				output.WriteLine();
+			}
+
+			output.Close();
 		}
 	}
 }

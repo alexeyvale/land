@@ -43,5 +43,10 @@ namespace LandParserGenerator
 					new List<string>()
 			};
 		}
+
+		public override string ToString()
+		{
+			return String.Join(" ", Elements);
+		}
 	}
 }

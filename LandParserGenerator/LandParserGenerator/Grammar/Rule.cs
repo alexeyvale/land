@@ -66,5 +66,10 @@ namespace LandParserGenerator
 		{
 			return Name.GetHashCode();
 		}
+
+		public override string ToString()
+		{
+			return $"{Name} :\n\r{String.Join("\n\r| ", Alternatives)}\n\r;";
+		}
 	}
 }

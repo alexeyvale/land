@@ -9,14 +9,14 @@ namespace LandParserGenerator
 	public class GrammarActionResponse
 	{
 		public bool Success { get; set; }
-		public string ErrorMessage { get; set; }
+		public List<string> ErrorMessages { get; set; }
 
 		public static GrammarActionResponse GetSuccess()
 		{
 			return new GrammarActionResponse()
 			{
 				Success = true,
-				ErrorMessage = String.Empty
+				ErrorMessages = null
 			};
 		}
 	}
@@ -57,6 +57,8 @@ namespace LandParserGenerator
 		public const string EofTokenName = "EOF";
 		public const string TextTokenName = "TEXT";
 
+		#region Создание грамматики
+
 		public Grammar()
 		{
 			/// Заводим токены, определённые по умолчанию
@@ -71,7 +73,7 @@ namespace LandParserGenerator
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessage = String.Format($"Повторное определение нетерминала {rule.Name}"),
+					ErrorMessages = new List<string>() { String.Format($"Повторное определение нетерминала {rule.Name}") },
 					Success = false
 				};
 			}
@@ -80,11 +82,15 @@ namespace LandParserGenerator
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessage = String.Format($"Символ {rule.Name} определён как терминальный"),
+					ErrorMessages = new List<string>() { String.Format($"Символ {rule.Name} определён как терминальный") },
 					Success = false
 				};
 			}
-			
+
+#if DEBUG
+			Console.WriteLine(rule);
+#endif
+
 			Rules[rule.Name] = rule;
 			return GrammarActionResponse.GetSuccess();
 		}
@@ -94,7 +100,7 @@ namespace LandParserGenerator
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessage = String.Format($"Повторное определение терминала {token.Name}"),
+					ErrorMessages = new List<string>() { ($"Повторное определение терминала {token.Name}") },
 					Success = false
 				};
 			}
@@ -103,7 +109,7 @@ namespace LandParserGenerator
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessage = String.Format($"Символ {token.Name} определён как нетерминальный"),
+					ErrorMessages = new List<string>() { ($"Символ {token.Name} определён как нетерминальный") },
 					Success = false
 				};
 			}
@@ -117,7 +123,7 @@ namespace LandParserGenerator
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessage = String.Format($"Символ {symbol} не определён как нетерминальный"),
+					ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
 					Success = false
 				};
 			}
@@ -125,6 +131,29 @@ namespace LandParserGenerator
 			StartSymbol = symbol;
 			return GrammarActionResponse.GetSuccess();
 		}
+		public GrammarActionResponse CheckConsistency()
+		{
+			var ErrorMessages = new List<string>();
+
+			foreach(var rule in Rules.Values)
+				foreach(var alt in rule)
+					foreach(var smb in alt)
+					{
+						if(this[smb] == null)
+							ErrorMessages.Add($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
+					}
+
+			if(String.IsNullOrEmpty(StartSymbol))
+				ErrorMessages.Add($"Не задан стартовый символ");
+
+			return new GrammarActionResponse()
+			{
+				Success = ErrorMessages.Count > 0,
+				ErrorMessages = ErrorMessages.Count > 0 ? ErrorMessages : null
+			};
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Построение множеств FIRST для нетерминалов
@@ -158,10 +187,17 @@ namespace LandParserGenerator
 
 					if (!changed)
 					{
-						changed = oldCount == First[nt.Key].Count;
+						changed = oldCount != First[nt.Key].Count;
 					}
 				}
 			}
+
+#if DEBUG
+			foreach(var set in First)
+			{
+				Console.WriteLine($"FIRST({set.Key}) = {String.Join(" ", set.Value)}");
+            }
+#endif
 
 			return First;
 		}
@@ -236,12 +272,19 @@ namespace LandParserGenerator
 
 								if (!changed)
 								{
-									changed = oldCount == follow[nt.Key].Count;
+									changed = oldCount != follow[elem].Count;
 								}
 							}
 						}
 					}
 			}
+
+#if DEBUG
+			foreach (var set in follow)
+			{
+				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value)}");
+			}
+#endif
 
 			return follow;
 		}

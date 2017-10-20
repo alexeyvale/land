@@ -12,6 +12,20 @@ namespace LandParserGenerator
 		{
 			Grammar yaccGrammar = new Grammar();
 
+			yaccGrammar.DeclareTerminal(new Token("BORDER", "%%"));
+			yaccGrammar.DeclareTerminal(new Token("DECLARATION_NAME", null));
+			yaccGrammar.DeclareTerminal(new Token("CORNER_LEFT", "<"));
+			yaccGrammar.DeclareTerminal(new Token("ID", null));
+			yaccGrammar.DeclareTerminal(new Token("CORNER_RIGHT", ">"));
+			yaccGrammar.DeclareTerminal(new Token("RULE_NAME", null));
+			yaccGrammar.DeclareTerminal(new Token("COLON", ":"));
+			yaccGrammar.DeclareTerminal(new Token("SEMICOLON", ";"));
+			yaccGrammar.DeclareTerminal(new Token("LITERAL", null));
+			yaccGrammar.DeclareTerminal(new Token("LBRACE", "{"));
+			yaccGrammar.DeclareTerminal(new Token("RBRACE", "}"));
+			yaccGrammar.DeclareTerminal(new Token("PIPE", "|"));
+
+
 			yaccGrammar.DeclareNonterminal(new Rule("grammar", new string[][]
 			{
 				new string[]{ "declarations", "BORDER", "rules", "grammar_ending" }
@@ -32,11 +46,26 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new Rule("declaration", new string[][]
 			{
-				new string[]{ "DECLARATION_NAME", "declaration_body" },
-				new string[]{ "declaration_code" }
+				new string[]{ "DECLARATION_NAME", "optional_type", "declaration_body" }
 			}));
 
+			yaccGrammar.DeclareNonterminal(new Rule("optional_type", new string[][]
+			{
+				new string[]{ "CORNER_LEFT", "ID", "CORNER_RIGHT" },
+				new string[]{ }
+			}));
 
+			yaccGrammar.DeclareNonterminal(new Rule("declaration_body", new string[][]
+			{
+				new string[]{ "identifiers" },
+				new string[]{ "TEXT" }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new Rule("identifiers", new string[][]
+			{
+				new string[]{ "ID", "identifiers" },
+				new string[]{ "ID" }
+			}));
 
 			yaccGrammar.DeclareNonterminal(new Rule("rules", new string[][]
 			{
@@ -51,7 +80,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new Rule("alternatives", new string[][]
 			{
-				new string[]{ "alternative", "alternatives" },
+				new string[]{ "alternative", "PIPE", "alternatives" },
 				new string[]{ "alternative" }
 			}));
 
@@ -64,9 +93,16 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new Rule("alternative_component", new string[][]
 			{
 				new string[]{ "ID" },
-				new string[]{ "TEXT" },
+				new string[]{ "LBRACE", "TEXT", "RBRACE" },
 				new string[] {"LITERAL" }
 			}));
+
+			yaccGrammar.SetStartSymbol("grammar");
+
+			TableLL1 table = new TableLL1(yaccGrammar);
+			table.ExportToCsv("yacc_table.csv");
+
+			Console.ReadLine();
 		}
 	}
 }
