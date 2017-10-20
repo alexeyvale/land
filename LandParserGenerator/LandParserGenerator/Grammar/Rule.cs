@@ -13,6 +13,35 @@ namespace LandParserGenerator
 
 		public int Count { get { return Alternatives.Count; } }
 
+		public Rule(string name, string[][] alts)
+		{
+			Name = name;
+
+			for(int i=0; i< alts.Length; ++i)
+			{
+				var newAlt = new Alternative();
+
+				for (int j = 0; j < alts[i].Length; ++j)
+				{
+					newAlt.Add(alts[i][j]);
+				}
+
+				Alternatives.Add(newAlt);
+			}
+		}
+
+		public void Add(string[] altContent)
+		{
+			var alt = new Alternative();
+
+			foreach (var smb in altContent)
+			{
+				alt.Add(smb);
+			}
+
+			this.Add(alt);
+		}
+
 		public void Add(Alternative alt)
 		{
 			Alternatives.Add(alt);
