@@ -39,7 +39,7 @@ namespace LandParserGenerator
 					
 					foreach(var alt in g.Rules[nt])
 					{
-						var altFirst = alt.First(g);
+						var altFirst = g.GetFirst(alt);
 
 						/// Добавляем альтернативу в ячейку таблицы, если
 						/// она начинается с lookahead-символа

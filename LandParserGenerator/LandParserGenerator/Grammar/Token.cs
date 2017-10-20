@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public class Token: IGrammarElement, IFirstSupporting
+	public class Token: IGrammarElement
 	{
 		public string Name { get; private set; }
 		public string Pattern { get; private set; }
@@ -15,11 +15,6 @@ namespace LandParserGenerator
 		{
 			Name = name;
 			Pattern = pattern;
-		}
-
-		public HashSet<Token> First(Grammar g)
-		{
-			return new HashSet<Token>() { g.Tokens[this.Name] };
 		}
 
 		public override bool Equals(object obj)

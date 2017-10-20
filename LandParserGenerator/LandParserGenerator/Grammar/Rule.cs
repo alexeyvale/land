@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public class Rule: IGrammarElement, IFirstSupporting
+	public class Rule: IGrammarElement
 	{
 		public string Name { get; private set; }
 		private List<Alternative> Alternatives { get; set; } = new List<Alternative>();
@@ -26,18 +26,6 @@ namespace LandParserGenerator
 		public List<Alternative>.Enumerator GetEnumerator()
 		{
 			return Alternatives.GetEnumerator();
-		}
-
-		public HashSet<Token> First(Grammar g)
-		{
-			var result = new HashSet<Token>();
-
-			foreach(var alt in Alternatives)
-			{
-				result.UnionWith(alt.First(g));
-			}
-
-			return result;
 		}
 
 		public override bool Equals(object obj)

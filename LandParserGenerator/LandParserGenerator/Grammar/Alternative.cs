@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public class Alternative: IFirstSupporting
+	public class Alternative
 	{
 		private List<string> Elements { get; set; } = new List<string>();
 
@@ -27,20 +27,6 @@ namespace LandParserGenerator
 		public List<string>.Enumerator GetEnumerator()
 		{
 			return Elements.GetEnumerator();
-		}
-
-		public HashSet<Token> First(Grammar g)
-		{
-			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
-			/// либо, если альтернатива пустая, соответствующий токен
-			if (this.Count > 0)
-			{
-				return g[this[0]].First(g);
-			}
-			else
-			{
-				return new HashSet<Token>() { Token.Empty };
-			}
 		}
 
 		/// <summary>

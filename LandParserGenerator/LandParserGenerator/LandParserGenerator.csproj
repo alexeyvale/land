@@ -44,7 +44,6 @@
   <ItemGroup>
     <Compile Include="Grammar\Grammar.cs" />
     <Compile Include="Grammar\Alternative.cs" />
-    <Compile Include="Grammar\Interfaces\IFirstSupporting.cs" />
     <Compile Include="Grammar\Interfaces\IGrammarElement.cs" />
     <Compile Include="Grammar\LL\TableLL1.cs" />
     <Compile Include="Grammar\LR\Marker.cs" />

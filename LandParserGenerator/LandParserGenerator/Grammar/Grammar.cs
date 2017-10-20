@@ -21,12 +21,20 @@ namespace LandParserGenerator
 		}
 	}
 
+	public class GrammarActionResponse<T> where T: class
+	{
+		public T Result { get; set; }
+		public string ErrorMessage { get; set; }
+	}
+
 	public class Grammar
 	{
 		public string StartSymbol { get; private set; }
 
 		public Dictionary<string, Rule> Rules { get; private set; } = new Dictionary<string, Rule>();
 		public Dictionary<string, Token> Tokens { get; private set; } = new Dictionary<string, Token>();
+
+		public Dictionary<string, HashSet<Token>> First { get; private set; }
 
 		public IGrammarElement this[string key]
 		{
@@ -123,12 +131,12 @@ namespace LandParserGenerator
 		/// </summary>
 		public Dictionary<string, HashSet<Token>> BuildFirst()
 		{
-			var first = new Dictionary<string, HashSet<Token>>();
+			First = new Dictionary<string, HashSet<Token>>();
 
 			/// Изначально множества пустые
 			foreach (var nt in Rules)
 			{
-				first[nt.Key] = new HashSet<Token>();
+				First[nt.Key] = new HashSet<Token>();
 			}
 
 			var changed = true;
@@ -141,21 +149,43 @@ namespace LandParserGenerator
 				/// Проходим по всем альтернативам и пересчитываем FIRST 
 				foreach (var nt in Rules)
 				{
-					var oldCount = first[nt.Key].Count;
+					var oldCount = First[nt.Key].Count;
 
 					foreach (var alt in nt.Value)
 					{
-						first[nt.Key].UnionWith(alt.First(this));
+						First[nt.Key].UnionWith(GetFirst(alt));
 					}
 
 					if (!changed)
 					{
-						changed = oldCount == first[nt.Key].Count;
+						changed = oldCount == First[nt.Key].Count;
 					}
 				}
 			}
 
-			return first;
+			return First;
+		}
+
+		public HashSet<Token> GetFirst(Alternative alt)
+		{
+			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
+			/// либо, если альтернатива пустая, соответствующий токен
+			if (alt.Count > 0)
+			{
+				return GetFirst(this[alt[0]]);
+			}
+			else
+			{
+				return new HashSet<Token>() { Token.Empty };
+			}
+		}
+
+		public HashSet<Token> GetFirst(IGrammarElement symbol)
+		{
+			if (symbol is Rule)
+				return First[symbol.Name];
+			else
+				return new HashSet<Token>() { (Token)symbol };
 		}
 
 		/// <summary>
@@ -192,7 +222,7 @@ namespace LandParserGenerator
 								var oldCount = follow[elem].Count;
 
 								/// Добавляем в его FOLLOW всё, что может идти после него
-								follow[elem].UnionWith(alt.Subsequence(i + 1).First(this));
+								follow[elem].UnionWith(GetFirst(alt.Subsequence(i + 1)));
 
 								/// Если в FIRST(подпоследовательность) была пустая строка
 								if (follow[elem].Contains(Tokens[Token.EmptyTokenName]))
@@ -241,7 +271,7 @@ namespace LandParserGenerator
 
 					foreach (var alt in nt)
 					{
-						foreach (var t in sequenceAfterNt.First(this))
+						foreach (var t in GetFirst(sequenceAfterNt))
 						{
 							closedMarkers.Add(new Marker(alt, 0, t));
 						}
