@@ -36,7 +36,7 @@ namespace LandParserGenerator
 			Stack.Push(grammar.StartSymbol);
 
 			/// Читаем первую лексему из входного потока
-			var lexeme = Lexer.NextLexeme();
+			var token = Lexer.NextLexeme();
 
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
@@ -54,27 +54,27 @@ namespace LandParserGenerator
 						/// нужно организовать пропуск, пока не встретим FIRST(то, что идёт после текста) ///////////////
 						/////////////////////////////////////////////////////////////////////////////////////////////////
 					}
-					else if (stackTop == lexeme)
+					else if (stackTop == token)
 					{
 						Stack.Pop();
 					}
 					else
 					{
 						errorMessage = String.Format(
-							$"Неожиданный символ {lexeme}, ожидалось {stackTop}");
+							$"Неожиданный символ {token}, ожидалось {stackTop}");
 						return false;
 					}
 				}
 				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
 				else if(grammar[stackTop] is Rule)
 				{
-					var alternatives = Table[stackTop, lexeme];
+					var alternatives = Table[stackTop, token];
 
 					/// Сообщаем об ошибке в случае неоднозначной грамматики
 					if(alternatives.Count > 1)
 					{
 						errorMessage = String.Format(
-							$"Неоднозначная грамматика: для нетерминала {stackTop} и входного символа {lexeme} допустимо несколько альтернатив");
+							$"Неоднозначная грамматика: для нетерминала {stackTop} и входного символа {token} допустимо несколько альтернатив");
 						return false;
 					}
 
@@ -93,7 +93,7 @@ namespace LandParserGenerator
 						else
 						{
 							errorMessage = String.Format(
-								$"Неожиданный символ {lexeme}");
+								$"Неожиданный символ {token}");
 							return false;
 						}
 					}
@@ -109,7 +109,7 @@ namespace LandParserGenerator
 					}
 				}
 
-				lexeme = Lexer.NextLexeme();
+				token = Lexer.NextLexeme();
 			}
 
 			return true;
