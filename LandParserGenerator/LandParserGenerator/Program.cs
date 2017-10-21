@@ -8,7 +8,7 @@ namespace LandParserGenerator
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void BuildYacc()
 		{
 			Grammar yaccGrammar = new Grammar();
 
@@ -101,6 +101,55 @@ namespace LandParserGenerator
 
 			TableLL1 table = new TableLL1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
+		}
+
+		static void BuildExpressionGrammar()
+		{
+			Grammar exprGrammar = new Grammar();
+
+			exprGrammar.DeclareTerminal(new Token("PLUS", "+"));
+			exprGrammar.DeclareTerminal(new Token("MULT", "*"));
+			exprGrammar.DeclareTerminal(new Token("LPAR", "("));
+			exprGrammar.DeclareTerminal(new Token("RPAR", ")"));
+			exprGrammar.DeclareTerminal(new Token("ID", null));
+
+			exprGrammar.DeclareNonterminal(new Rule("E", new string[][]
+			{
+				new string[]{ "T", "E'" }
+			}));
+
+			exprGrammar.DeclareNonterminal(new Rule("E'", new string[][]
+			{
+				new string[]{ "PLUS", "T","E'" },
+				new string[]{ }
+			}));
+
+			exprGrammar.DeclareNonterminal(new Rule("T", new string[][]
+			{
+				new string[]{ "F", "T'" },
+			}));
+
+			exprGrammar.DeclareNonterminal(new Rule("T'", new string[][]
+			{
+				new string[]{ "MULT", "F","T'" },
+				new string[]{ }
+			}));
+
+			exprGrammar.DeclareNonterminal(new Rule("F", new string[][]
+			{
+				new string[]{ "LPAR", "E","RPAR" },
+				new string[]{ "ID" }
+			}));
+
+			exprGrammar.SetStartSymbol("E");
+
+			TableLL1 table = new TableLL1(exprGrammar);
+			table.ExportToCsv("expr_table.csv");
+		}
+
+		static void Main(string[] args)
+		{
+			BuildExpressionGrammar();
 
 			Console.ReadLine();
 		}
