@@ -254,7 +254,24 @@ namespace LandParserGenerator
 			/// либо, если альтернатива пустая, соответствующий токен
 			if (alt.Count > 0)
 			{
-				return First(this[alt[0]]);
+				var first = First(this[alt[0]]);
+
+				/// Если первый элемент альтернативы - нетерминал,
+				/// из которого выводится пустая строка
+				for (var i=1; i < alt.Count; ++i)
+				{
+					/// Если из очередного элемента ветки
+					/// выводится пустая строка
+					if (first.Contains(Token.Empty))
+					{
+						first.Remove(Token.Empty);
+						first.UnionWith(First(this[alt[i]]));
+					}
+					else
+						break;
+				}
+
+				return first;
 			}
 			else
 			{
@@ -265,7 +282,7 @@ namespace LandParserGenerator
 		public HashSet<Token> First(IGrammarElement symbol)
 		{
 			if (symbol is Rule)
-				return FirstCache[symbol.Name];
+				return new HashSet<Token>(FirstCache[symbol.Name]);
 			else
 				return new HashSet<Token>() { (Token)symbol };
 		}
