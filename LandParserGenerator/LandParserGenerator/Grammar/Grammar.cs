@@ -27,14 +27,16 @@ namespace LandParserGenerator
 		public string ErrorMessage { get; set; }
 	}
 
+	public enum GrammarState { Unknown, Valid, Invalid }
+
 	public class Grammar
 	{
+		public GrammarState State { get; private set; }
+
 		public string StartSymbol { get; private set; }
 
 		public Dictionary<string, Rule> Rules { get; private set; } = new Dictionary<string, Rule>();
 		public Dictionary<string, Token> Tokens { get; private set; } = new Dictionary<string, Token>();
-
-		public Dictionary<string, HashSet<Token>> First { get; private set; }
 
 		public IGrammarElement this[string key]
 		{
@@ -65,6 +67,18 @@ namespace LandParserGenerator
 			Tokens[EofTokenName] = new Token(EofTokenName, String.Empty);
 			Tokens[Token.EmptyTokenName] = Token.Empty;
 			Tokens[TextTokenName] = new Token(TextTokenName, String.Empty);
+
+			State = GrammarState.Valid;
+		}
+
+		private void OnGrammarUpdate()
+		{
+			/// Если грамматика была изменена,
+			/// её корректность нужно перепроверить,
+			/// а множества FIRST и FOLLOW - перестроить
+			State = GrammarState.Unknown;
+			FirstCacheConsistent = false;
+			FollowCacheConsistent = false;
 		}
 
 		public GrammarActionResponse DeclareNonterminal(Rule rule)
@@ -90,6 +104,7 @@ namespace LandParserGenerator
 #if DEBUG
 			Console.WriteLine(rule);
 #endif
+			OnGrammarUpdate();
 
 			Rules[rule.Name] = rule;
 			return GrammarActionResponse.GetSuccess();
@@ -114,6 +129,8 @@ namespace LandParserGenerator
 				};
 			}
 
+			OnGrammarUpdate();
+
 			Tokens[token.Name] = token;
 			return GrammarActionResponse.GetSuccess();
 		}
@@ -131,7 +148,7 @@ namespace LandParserGenerator
 			StartSymbol = symbol;
 			return GrammarActionResponse.GetSuccess();
 		}
-		public GrammarActionResponse CheckConsistency()
+		public GrammarActionResponse CheckValidity()
 		{
 			var ErrorMessages = new List<string>();
 
@@ -146,6 +163,9 @@ namespace LandParserGenerator
 			if(String.IsNullOrEmpty(StartSymbol))
 				ErrorMessages.Add($"Не задан стартовый символ");
 
+			/// Грамматика валидна или невалидна в зависимости от результатов проверки
+			State = ErrorMessages.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
+
 			return new GrammarActionResponse()
 			{
 				Success = ErrorMessages.Count > 0,
@@ -155,17 +175,45 @@ namespace LandParserGenerator
 
 		#endregion
 
+		#region Построение FIRST
+
+		private bool FirstCacheConsistent { get; set; } = false;
+		private Dictionary<string, HashSet<Token>> _first;
+		private Dictionary<string, HashSet<Token>> FirstCache
+		{
+			get
+			{
+				if (_first == null || !FirstCacheConsistent)
+				{
+					FirstCacheConsistent = true;
+					try
+					{
+						BuildFirst();
+					}
+					catch
+					{
+						FirstCacheConsistent = false;
+						throw;
+					}
+				}
+
+				return _first;
+			}
+
+			set { _first = value; }
+		}
+
 		/// <summary>
 		/// Построение множеств FIRST для нетерминалов
 		/// </summary>
-		public Dictionary<string, HashSet<Token>> BuildFirst()
+		private void BuildFirst()
 		{
-			First = new Dictionary<string, HashSet<Token>>();
+			_first = new Dictionary<string, HashSet<Token>>();
 
 			/// Изначально множества пустые
 			foreach (var nt in Rules)
 			{
-				First[nt.Key] = new HashSet<Token>();
+				_first[nt.Key] = new HashSet<Token>();
 			}
 
 			var changed = true;
@@ -178,37 +226,35 @@ namespace LandParserGenerator
 				/// Проходим по всем альтернативам и пересчитываем FIRST 
 				foreach (var nt in Rules)
 				{
-					var oldCount = First[nt.Key].Count;
+					var oldCount = _first[nt.Key].Count;
 
 					foreach (var alt in nt.Value)
 					{
-						First[nt.Key].UnionWith(GetFirst(alt));
+						_first[nt.Key].UnionWith(First(alt));
 					}
 
 					if (!changed)
 					{
-						changed = oldCount != First[nt.Key].Count;
+						changed = oldCount != _first[nt.Key].Count;
 					}
 				}
 			}
 
 #if DEBUG
-			foreach(var set in First)
+			foreach(var set in _first)
 			{
 				Console.WriteLine($"FIRST({set.Key}) = {String.Join(" ", set.Value)}");
             }
 #endif
-
-			return First;
 		}
 
-		public HashSet<Token> GetFirst(Alternative alt)
+		public HashSet<Token> First(Alternative alt)
 		{
 			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
 			/// либо, если альтернатива пустая, соответствующий токен
 			if (alt.Count > 0)
 			{
-				return GetFirst(this[alt[0]]);
+				return First(this[alt[0]]);
 			}
 			else
 			{
@@ -216,27 +262,56 @@ namespace LandParserGenerator
 			}
 		}
 
-		public HashSet<Token> GetFirst(IGrammarElement symbol)
+		public HashSet<Token> First(IGrammarElement symbol)
 		{
 			if (symbol is Rule)
-				return First[symbol.Name];
+				return FirstCache[symbol.Name];
 			else
 				return new HashSet<Token>() { (Token)symbol };
+		}
+
+		#endregion
+
+		#region Построение FOLLOW
+		private bool FollowCacheConsistent { get; set; } = false;
+		private Dictionary<string, HashSet<Token>> _follow;
+		private Dictionary<string, HashSet<Token>> FollowCache
+		{
+			get
+			{
+				if (_follow == null || !FollowCacheConsistent)
+				{
+					FollowCacheConsistent = true;
+					try
+					{
+						BuildFollow();
+					}
+					catch
+					{
+						FollowCacheConsistent = false;
+						throw;
+					}
+				}
+
+				return _follow;
+			}
+
+			set { _follow = value; }
 		}
 
 		/// <summary>
 		/// Построение FOLLOW
 		/// </summary>
-		public Dictionary<string, HashSet<Token>> BuildFollow()
+		private void BuildFollow()
 		{
-			var follow = new Dictionary<string, HashSet<Token>>();
+			_follow = new Dictionary<string, HashSet<Token>>();
 
 			foreach (var nt in Rules)
 			{
-				follow[nt.Key] = new HashSet<Token>();
+				_follow[nt.Key] = new HashSet<Token>();
 			}
 
-			follow[StartSymbol].Add(Tokens[EofTokenName]);
+			_follow[StartSymbol].Add(Tokens[EofTokenName]);
 
 			var changed = true;
 
@@ -255,24 +330,24 @@ namespace LandParserGenerator
 							/// Если встретили в ветке нетерминал
 							if (Rules.ContainsKey(elem))
 							{
-								var oldCount = follow[elem].Count;
+								var oldCount = _follow[elem].Count;
 
 								/// Добавляем в его FOLLOW всё, что может идти после него
-								follow[elem].UnionWith(GetFirst(alt.Subsequence(i + 1)));
+								_follow[elem].UnionWith(First(alt.Subsequence(i + 1)));
 
 								/// Если в FIRST(подпоследовательность) была пустая строка
-								if (follow[elem].Contains(Tokens[Token.EmptyTokenName]))
+								if (_follow[elem].Contains(Tokens[Token.EmptyTokenName]))
 								{
 									/// Исключаем пустую строку из FOLLOW
-									follow[elem].Remove(Tokens[Token.EmptyTokenName]);
+									_follow[elem].Remove(Tokens[Token.EmptyTokenName]);
 									/// Объединяем FOLLOW текущего нетерминала
 									/// с FOLLOW определяемого данной веткой
-									follow[elem].UnionWith(follow[nt.Key]);
+									_follow[elem].UnionWith(_follow[nt.Key]);
 								}
 
 								if (!changed)
 								{
-									changed = oldCount != follow[elem].Count;
+									changed = oldCount != _follow[elem].Count;
 								}
 							}
 						}
@@ -280,14 +355,19 @@ namespace LandParserGenerator
 			}
 
 #if DEBUG
-			foreach (var set in follow)
+			foreach (var set in _follow)
 			{
 				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value)}");
 			}
 #endif
-
-			return follow;
 		}
+
+		public HashSet<Token> Follow(string nonterminal)
+		{
+			return FollowCache[nonterminal];
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Построение замыкания множества пунктов
@@ -314,7 +394,7 @@ namespace LandParserGenerator
 
 					foreach (var alt in nt)
 					{
-						foreach (var t in GetFirst(sequenceAfterNt))
+						foreach (var t in First(sequenceAfterNt))
 						{
 							closedMarkers.Add(new Marker(alt, 0, t));
 						}

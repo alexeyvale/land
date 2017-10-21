@@ -18,10 +18,6 @@ namespace LandParserGenerator
 
 		public TableLL1(Grammar g)
 		{
-			/// Строим одноимённые множества
-			var First = g.BuildFirst();
-			var Follow = g.BuildFollow();
-
 			Table = new List<Alternative>[g.Rules.Count, g.Tokens.Count];
 
 			NonterminalSymbols = g.Rules
@@ -40,14 +36,14 @@ namespace LandParserGenerator
 					
 					foreach(var alt in g.Rules[nt])
 					{
-						var altFirst = g.GetFirst(alt);
+						var altFirst = g.First(alt);
 
 						/// Добавляем альтернативу в ячейку таблицы, если
 						/// она начинается с lookahead-символа
 						/// или может быть пустой, а после данного нетерминала
 						/// может идти lookahead
 						if (altFirst.Contains(tk.Value) ||
-							altFirst.Contains(Token.Empty) && Follow[nt].Contains(tk.Value))
+							altFirst.Contains(Token.Empty) && g.Follow(nt).Contains(tk.Value))
 							this[nt, tk.Key].Add(alt);
 					}
 				}
