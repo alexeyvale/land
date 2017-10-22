@@ -28,25 +28,40 @@ namespace LandParserGenerator
 				.ToDictionary(e => e.smb, e => e.idx);
 
 			/// Заполняем ячейки таблицы
-			foreach(var nt in g.Rules.Keys)
-				foreach(var tk in g.Tokens)
+			foreach (var nt in g.Rules.Keys)
+			{
+				foreach (var tk in g.Tokens)
 				{
 					/// Список, потому что могут быть неоднозначности
 					this[nt, tk.Key] = new List<Alternative>();
-					
-					foreach(var alt in g.Rules[nt])
-					{
-						var altFirst = g.First(alt);
+				}
 
-						/// Добавляем альтернативу в ячейку таблицы, если
-						/// она начинается с lookahead-символа
-						/// или может быть пустой, а после данного нетерминала
-						/// может идти lookahead
-						if (altFirst.Contains(tk.Value) ||
-							altFirst.Contains(Token.Empty) && g.Follow(nt).Contains(tk.Value))
-							this[nt, tk.Key].Add(alt);
+				/// Проходим по всем продукциям
+				foreach (var alt in g.Rules[nt])
+				{
+					var altFirst = g.First(alt);
+					var containsEmpty = altFirst.Remove(Grammar.EmptyToken);
+
+					/// Для каждого токена, с которого может начинаться альтернатива
+					foreach(var tk in altFirst)
+					{
+						this[nt, tk.Name].Add(alt);
+					}
+
+					/// Если альтернатива может быть пустой
+					if(containsEmpty)
+					{
+						var ntFollow = g.Follow(nt);
+
+						/// её следует выбрать, если встретили то, что может идти
+						/// после текущего нетерминала
+						foreach (var tk in ntFollow)
+						{
+							this[nt, tk.Name].Add(alt);
+						}
 					}
 				}
+			}
 		}
 
 		public List<Alternative> this[string nt, string lookahead]

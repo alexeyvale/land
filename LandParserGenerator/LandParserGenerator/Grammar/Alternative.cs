@@ -46,7 +46,7 @@ namespace LandParserGenerator
 
 		public override string ToString()
 		{
-			return String.Join(" ", Elements);
+			return Count > 0 ? String.Join(" ", Elements) : "\u03b5";
 		}
 	}
 }

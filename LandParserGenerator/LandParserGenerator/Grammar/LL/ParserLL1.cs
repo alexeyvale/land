@@ -47,14 +47,14 @@ namespace LandParserGenerator
 				if (grammar[stackTop] is Token)
 				{
 					/// Если в текущем месте возможен пропуск текста
-					if(stackTop == Grammar.TextTokenName)
-					{
-						Stack.Pop();
+					//if(stackTop == Grammar.TextTokenName)
+					//{
+					//	Stack.Pop();
 						/////////////////////////////////////////////////////////////////////////////////////////////////
 						/// нужно организовать пропуск, пока не встретим FIRST(то, что идёт после текста) ///////////////
 						/////////////////////////////////////////////////////////////////////////////////////////////////
-					}
-					else if (stackTop == token)
+					//}
+					if (stackTop == token)
 					{
 						Stack.Pop();
 					}
@@ -82,7 +82,7 @@ namespace LandParserGenerator
 					if (alternatives.Count == 0)
 					{
 						/// Если в правиле есть пустая ветка
-						alternatives = Table[stackTop, Token.EmptyTokenName];
+						alternatives = Table[stackTop, Grammar.EmptyTokenName];
 
 						if (alternatives.Count == 1)
 						{

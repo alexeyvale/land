@@ -56,18 +56,18 @@ namespace LandParserGenerator
 			}
 		}
 
+		public const string EmptyTokenName = "EMPTY";
+		public static Token EmptyToken { get; private set; } = new Token(EmptyTokenName, null);
+
 		public const string EofTokenName = "EOF";
-		public const string TextTokenName = "TEXT";
+		public static Token EofToken { get; private set; } = new Token(EofTokenName, null);
 
 		#region Создание грамматики
 
 		public Grammar()
 		{
-			/// Заводим токены, определённые по умолчанию
-			Tokens[EofTokenName] = new Token(EofTokenName, String.Empty);
-			Tokens[Token.EmptyTokenName] = Token.Empty;
-			Tokens[TextTokenName] = new Token(TextTokenName, String.Empty);
-
+			/// Добавляем к определённым токены, определённые по умолчанию
+			Tokens[EofTokenName] = EofToken;
 			State = GrammarState.Valid;
 		}
 
@@ -262,9 +262,9 @@ namespace LandParserGenerator
 				{
 					/// Если из очередного элемента ветки
 					/// выводится пустая строка
-					if (first.Contains(Token.Empty))
+					if (first.Contains(EmptyToken))
 					{
-						first.Remove(Token.Empty);
+						first.Remove(EmptyToken);
 						first.UnionWith(First(this[alt[i]]));
 					}
 					else
@@ -275,7 +275,7 @@ namespace LandParserGenerator
 			}
 			else
 			{
-				return new HashSet<Token>() { Token.Empty };
+				return new HashSet<Token>() { EmptyToken };
 			}
 		}
 
@@ -353,10 +353,10 @@ namespace LandParserGenerator
 								_follow[elem].UnionWith(First(alt.Subsequence(i + 1)));
 
 								/// Если в FIRST(подпоследовательность) была пустая строка
-								if (_follow[elem].Contains(Tokens[Token.EmptyTokenName]))
+								if (_follow[elem].Contains(EmptyToken))
 								{
 									/// Исключаем пустую строку из FOLLOW
-									_follow[elem].Remove(Tokens[Token.EmptyTokenName]);
+									_follow[elem].Remove(EmptyToken);
 									/// Объединяем FOLLOW текущего нетерминала
 									/// с FOLLOW определяемого данной веткой
 									_follow[elem].UnionWith(_follow[nt.Key]);

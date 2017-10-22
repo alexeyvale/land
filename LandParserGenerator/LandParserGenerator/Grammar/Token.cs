@@ -27,9 +27,6 @@ namespace LandParserGenerator
 			return Name.GetHashCode();
 		}
 
-		public const string EmptyTokenName = "EMPTY";
-		public static Token Empty { get { return new Token(EmptyTokenName, String.Empty); } }
-
 		public override string ToString()
 		{
 			return Name;
