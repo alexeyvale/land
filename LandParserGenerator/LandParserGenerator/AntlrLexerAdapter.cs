@@ -20,7 +20,15 @@ namespace LandParserGenerator
 
 		public string Text { get { return Token.Text; } }
 
-		public string Name { get { return NameTypeMap.Where(m => m.Value == Token.Type).First().Key; } }
+		public string Name
+		{
+			get
+			{
+				return NameTypeMap
+					.Where(m => m.Value == Token.Type && m.Key.All(c=>Char.IsLetterOrDigit(c)))
+					.First().Key;
+			}
+		}
 
 		public AntlrTokenAdapter(IToken token, IDictionary<string, int> mapping)
 		{
