@@ -31,15 +31,13 @@ namespace LandParserGenerator
 		
 	}
 
-	public class AntlrLexerAdapter<T>: 
-		LandParserGenerator.Lexing.ILexer
-		where T : Lexer
+	public class AntlrLexerAdapter: LandParserGenerator.Lexing.ILexer
 	{
-		private T Lexer { get; set; }
+		private Lexer Lexer { get; set; }
 
-		private Func<ICharStream, T> LexerConstructor { get; set; }
+		private Func<ICharStream, Lexer> LexerConstructor { get; set; }
 
-		public AntlrLexerAdapter(Func<ICharStream, T> constructor)
+		public AntlrLexerAdapter(Func<ICharStream, Lexer> constructor)
 		{
 			LexerConstructor = constructor;
 		}

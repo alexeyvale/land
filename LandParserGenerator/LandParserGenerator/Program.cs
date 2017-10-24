@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.CSharp;
+
 using LandParserGenerator.Parsing.LL;
 
 namespace LandParserGenerator
@@ -16,18 +18,18 @@ namespace LandParserGenerator
 		{
 			Grammar yaccGrammar = new Grammar();
 
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "%%"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_NAME", null));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_LEFT", "<"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_LEFT", "'<'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("ID", null));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_RIGHT", ">"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_RIGHT", "'>'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("RULE_NAME", null));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("COLON", ":"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("SEMICOLON", ";"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COLON", "':'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("SEMICOLON", "';'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("LITERAL", null));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "{"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "}"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "|"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "'|'"));
 
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar", new string[][]
@@ -117,7 +119,7 @@ namespace LandParserGenerator
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("LPAR", "'('"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("RPAR", "')'"));
-			exprGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]"));
+			exprGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]*"));
 
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E", new string[][]
 			{
@@ -185,17 +187,30 @@ namespace LandParserGenerator
 				System.Threading.Thread.Sleep(0);
 			}
 
-			/// Перемещаем файл в каталог проекта
+			/// Компилируем .cs-файл лексера
 
-			File.Copy("ExpressionGrammarLexer.cs", "../../ExpressionGrammarLexer.cs", true);
+			var codeProvider = new CSharpCodeProvider();
+
+			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+			compilerParams.GenerateInMemory = true;
+			compilerParams.ReferencedAssemblies.Add("../../Components/Antlr/Antlr4.Runtime.Standard.dll");
+			compilerParams.ReferencedAssemblies.Add("System.dll");
+
+			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, "ExpressionGrammarLexer.cs");
+			var lexerType = compilationResult.CompiledAssembly.GetType("ExpressionGrammarLexer");
 
 			/// Создаём парсер
 
 			var parser = new Parser(exprGrammar,
-				new AntlrLexerAdapter<ExpressionGrammarLexer>(
-					(Antlr4.Runtime.ICharStream stream) => new ExpressionGrammarLexer(stream)
+				new AntlrLexerAdapter(
+					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
 				)
 			);
+
+			/// Пробуем парсить
+
+			var errorMessage = String.Empty;
+			parser.Parse("test.txt", out errorMessage);
 		}
 
 		static void Main(string[] args)

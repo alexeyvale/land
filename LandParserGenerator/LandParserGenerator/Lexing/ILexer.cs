@@ -9,6 +9,8 @@ namespace LandParserGenerator.Lexing
 	public interface ILexer
 	{
 		IToken NextToken();
+
+		void SetSource(string filename);
 	}
 
 }

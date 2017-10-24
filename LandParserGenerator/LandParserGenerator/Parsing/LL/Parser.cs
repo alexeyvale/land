@@ -29,6 +29,9 @@ namespace LandParserGenerator.Parsing.LL
 		{
 			errorMessage = String.Empty;
 
+			/// Готовим лексер
+			Lexer.SetSource(filename);
+
 			/// Кладём на стек стартовый символ
 			Stack = new Stack<string>();
 			Stack.Push(grammar.StartSymbol);
@@ -104,6 +107,8 @@ namespace LandParserGenerator.Parsing.LL
 						{
 							Stack.Push(alternatives[0][i]);
 						}
+
+						continue;
 					}
 				}
 
