@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using LandParserGenerator.Parsing.LR;
+
 namespace LandParserGenerator
 {
 	public class GrammarActionResponse
@@ -35,10 +37,10 @@ namespace LandParserGenerator
 
 		public string StartSymbol { get; private set; }
 
-		public Dictionary<string, Rule> Rules { get; private set; } = new Dictionary<string, Rule>();
-		public Dictionary<string, Token> Tokens { get; private set; } = new Dictionary<string, Token>();
+		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
+		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 
-		public IGrammarElement this[string key]
+		public ISymbol this[string key]
 		{
 			get
 			{
@@ -57,10 +59,10 @@ namespace LandParserGenerator
 		}
 
 		public const string EmptyTokenName = "EMPTY";
-		public static Token EmptyToken { get; private set; } = new Token(EmptyTokenName, null);
+		public static TerminalSymbol EmptyToken { get; private set; } = new TerminalSymbol(EmptyTokenName, null);
 
 		public const string EofTokenName = "EOF";
-		public static Token EofToken { get; private set; } = new Token(EofTokenName, null);
+		public static TerminalSymbol EofToken { get; private set; } = new TerminalSymbol(EofTokenName, null);
 
 		#region Создание грамматики
 
@@ -81,7 +83,7 @@ namespace LandParserGenerator
 			FollowCacheConsistent = false;
 		}
 
-		public GrammarActionResponse DeclareNonterminal(Rule rule)
+		public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
 		{
 			if (Rules.ContainsKey(rule.Name))
 			{
@@ -109,7 +111,7 @@ namespace LandParserGenerator
 			Rules[rule.Name] = rule;
 			return GrammarActionResponse.GetSuccess();
 		}
-		public GrammarActionResponse DeclareTerminal(Token token)
+		public GrammarActionResponse DeclareTerminal(TerminalSymbol token)
 		{
 			if (Tokens.ContainsKey(token.Name))
 			{
@@ -178,8 +180,8 @@ namespace LandParserGenerator
 		#region Построение FIRST
 
 		private bool FirstCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<Token>> _first;
-		private Dictionary<string, HashSet<Token>> FirstCache
+		private Dictionary<string, HashSet<TerminalSymbol>> _first;
+		private Dictionary<string, HashSet<TerminalSymbol>> FirstCache
 		{
 			get
 			{
@@ -208,12 +210,12 @@ namespace LandParserGenerator
 		/// </summary>
 		private void BuildFirst()
 		{
-			_first = new Dictionary<string, HashSet<Token>>();
+			_first = new Dictionary<string, HashSet<TerminalSymbol>>();
 
 			/// Изначально множества пустые
 			foreach (var nt in Rules)
 			{
-				_first[nt.Key] = new HashSet<Token>();
+				_first[nt.Key] = new HashSet<TerminalSymbol>();
 			}
 
 			var changed = true;
@@ -248,7 +250,7 @@ namespace LandParserGenerator
 #endif
 		}
 
-		public HashSet<Token> First(Alternative alt)
+		public HashSet<TerminalSymbol> First(Alternative alt)
 		{
 			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
 			/// либо, если альтернатива пустая, соответствующий токен
@@ -275,24 +277,24 @@ namespace LandParserGenerator
 			}
 			else
 			{
-				return new HashSet<Token>() { EmptyToken };
+				return new HashSet<TerminalSymbol>() { EmptyToken };
 			}
 		}
 
-		public HashSet<Token> First(IGrammarElement symbol)
+		public HashSet<TerminalSymbol> First(ISymbol symbol)
 		{
-			if (symbol is Rule)
-				return new HashSet<Token>(FirstCache[symbol.Name]);
+			if (symbol is NonterminalSymbol)
+				return new HashSet<TerminalSymbol>(FirstCache[symbol.Name]);
 			else
-				return new HashSet<Token>() { (Token)symbol };
+				return new HashSet<TerminalSymbol>() { (TerminalSymbol)symbol };
 		}
 
 		#endregion
 
 		#region Построение FOLLOW
 		private bool FollowCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<Token>> _follow;
-		private Dictionary<string, HashSet<Token>> FollowCache
+		private Dictionary<string, HashSet<TerminalSymbol>> _follow;
+		private Dictionary<string, HashSet<TerminalSymbol>> FollowCache
 		{
 			get
 			{
@@ -321,11 +323,11 @@ namespace LandParserGenerator
 		/// </summary>
 		private void BuildFollow()
 		{
-			_follow = new Dictionary<string, HashSet<Token>>();
+			_follow = new Dictionary<string, HashSet<TerminalSymbol>>();
 
 			foreach (var nt in Rules)
 			{
-				_follow[nt.Key] = new HashSet<Token>();
+				_follow[nt.Key] = new HashSet<TerminalSymbol>();
 			}
 
 			_follow[StartSymbol].Add(Tokens[EofTokenName]);
@@ -379,7 +381,7 @@ namespace LandParserGenerator
 #endif
 		}
 
-		public HashSet<Token> Follow(string nonterminal)
+		public HashSet<TerminalSymbol> Follow(string nonterminal)
 		{
 			return FollowCache[nonterminal];
 		}

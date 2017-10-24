@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public class Rule: IGrammarElement
+	public class NonterminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
 		private List<Alternative> Alternatives { get; set; } = new List<Alternative>();
 
 		public int Count { get { return Alternatives.Count; } }
 
-		public Rule(string name, string[][] alts)
+		public NonterminalSymbol(string name, string[][] alts)
 		{
 			Name = name;
 
@@ -59,7 +59,7 @@ namespace LandParserGenerator
 
 		public override bool Equals(object obj)
 		{
-			return obj is Rule && ((Rule)obj).Name == Name;
+			return obj is NonterminalSymbol && ((NonterminalSymbol)obj).Name == Name;
 		}
 
 		public override int GetHashCode()

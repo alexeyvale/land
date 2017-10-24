@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public class Token: IGrammarElement
+	public class TerminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
 		public string Pattern { get; private set; }
 
-		public Token(string name, string pattern)
+		public TerminalSymbol(string name, string pattern)
 		{
 			Name = name;
 			Pattern = pattern;
@@ -19,7 +19,7 @@ namespace LandParserGenerator
 
 		public override bool Equals(object obj)
 		{
-			return obj is Token && ((Token)obj).Name == Name;
+			return obj is TerminalSymbol && ((TerminalSymbol)obj).Name == Name;
 		}
 
 		public override int GetHashCode()

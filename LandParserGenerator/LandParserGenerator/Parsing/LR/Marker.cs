@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator
+namespace LandParserGenerator.Parsing.LR
 {
 	public class Marker
 	{
 		public Alternative Alternative { get; private set; }
 		public int Position { get; private set; }
 
-		public Token Lookahead { get; private set; }
+		public TerminalSymbol Lookahead { get; private set; }
 
-		public Marker(Alternative alt, int pos, Token lookahead)
+		public Marker(Alternative alt, int pos, TerminalSymbol lookahead)
 		{
 			Alternative = alt;
 			Position = pos;

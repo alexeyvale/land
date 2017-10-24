@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public interface IGrammarElement
+	public interface ISymbol
 	{
 		string Name { get; }
 	}

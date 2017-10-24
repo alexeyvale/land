@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator
+namespace LandParserGenerator.Lexing
 {
-	public interface IFirstSupporting
+	public interface ILexer
 	{
-		HashSet<Token> First(Grammar g);
+		IToken NextToken();
 	}
+
 }

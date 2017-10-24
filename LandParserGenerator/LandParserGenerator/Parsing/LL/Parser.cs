@@ -4,24 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator
-{
-	public interface ILexer
-	{
-		string NextLexeme();
-	}
+using LandParserGenerator.Lexing;
 
-	public class ParserLL1
+namespace LandParserGenerator.Parsing.LL
+{
+	public class Parser
 	{
 		private Grammar grammar { get; set; }
 		private TableLL1 Table { get; set; }
 		private Stack<string> Stack { get; set; }
 		private ILexer Lexer { get; set; }
 
-		public ParserLL1(Grammar g)
+		public Parser(Grammar g, ILexer lexer)
 		{
 			grammar = g;
 			Table = new TableLL1(g);
+			Lexer = lexer;
 		}
 
 		/// <summary>
@@ -36,7 +34,7 @@ namespace LandParserGenerator
 			Stack.Push(grammar.StartSymbol);
 
 			/// Читаем первую лексему из входного потока
-			var token = Lexer.NextLexeme();
+			var token = Lexer.NextToken();
 
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
@@ -44,7 +42,7 @@ namespace LandParserGenerator
 				var stackTop = Stack.Peek();
 
 				/// Если на вершине стека терминал, сопоставляем его с текущей лексемой
-				if (grammar[stackTop] is Token)
+				if (grammar[stackTop] is TerminalSymbol)
 				{
 					/// Если в текущем месте возможен пропуск текста
 					//if(stackTop == Grammar.TextTokenName)
@@ -54,7 +52,7 @@ namespace LandParserGenerator
 						/// нужно организовать пропуск, пока не встретим FIRST(то, что идёт после текста) ///////////////
 						/////////////////////////////////////////////////////////////////////////////////////////////////
 					//}
-					if (stackTop == token)
+					if (stackTop == token.Name)
 					{
 						Stack.Pop();
 					}
@@ -66,9 +64,9 @@ namespace LandParserGenerator
 					}
 				}
 				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
-				else if(grammar[stackTop] is Rule)
+				else if(grammar[stackTop] is NonterminalSymbol)
 				{
-					var alternatives = Table[stackTop, token];
+					var alternatives = Table[stackTop, token.Name];
 
 					/// Сообщаем об ошибке в случае неоднозначной грамматики
 					if(alternatives.Count > 1)
@@ -109,7 +107,7 @@ namespace LandParserGenerator
 					}
 				}
 
-				token = Lexer.NextLexeme();
+				token = Lexer.NextToken();
 			}
 
 			return true;
