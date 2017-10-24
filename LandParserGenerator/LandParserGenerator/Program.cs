@@ -161,8 +161,9 @@ namespace LandParserGenerator
 			var lexerGrammarOutput = new StreamWriter("ExpressionGrammarLexer.g4");
 
 			lexerGrammarOutput.WriteLine("lexer grammar ExpressionGrammarLexer;");
+			lexerGrammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
 
-			foreach(var token in exprGrammar.Tokens.Values)
+			foreach (var token in exprGrammar.Tokens.Values)
 			{
 				if(token.Name != Grammar.EofTokenName)
 					lexerGrammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");

@@ -83,19 +83,14 @@ namespace LandParserGenerator.Parsing.LL
 					if (alternatives.Count == 0)
 					{
 						/// Если в правиле есть пустая ветка
-						alternatives = Table[stackTop, Grammar.EmptyTokenName];
-
-						if (alternatives.Count == 1)
+						foreach(var alt in grammar.Rules[stackTop])
 						{
-							/// Выталкиваем нетерминал со стека без прочтения следующей лексемы
-							Stack.Pop();
-							continue;
-						}
-						else
-						{
-							errorMessage = String.Format(
-								$"Неожиданный символ {token}");
-							return false;
+							if(alt.Count == 0)
+							{
+								/// Выталкиваем нетерминал со стека без прочтения следующей лексемы
+								Stack.Pop();
+								continue;
+							}
 						}
 					}
 					/// снимаем со стека нетерминал и кладём содержимое его альтернативы
