@@ -48,13 +48,14 @@ namespace LandParserGenerator.Parsing.LL
 				if (grammar[stackTop] is TerminalSymbol)
 				{
 					/// Если в текущем месте возможен пропуск текста
-					//if(stackTop == Grammar.TextTokenName)
-					//{
-					//	Stack.Pop();
-						/////////////////////////////////////////////////////////////////////////////////////////////////
-						/// нужно организовать пропуск, пока не встретим FIRST(то, что идёт после текста) ///////////////
-						/////////////////////////////////////////////////////////////////////////////////////////////////
-					//}
+					if(stackTop == "TEXT")
+					{
+						/// Снимаем со стека символ TEXT
+						Stack.Pop();
+						/// Пропускаем текст и переходим к новой итерации
+						token = SkipText();
+						continue;
+					}
 					if (stackTop == token.Name)
 					{
 						Stack.Pop();
@@ -111,6 +112,33 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Пропуск токенов в позиции, задаваемой символом TEXT
+		/// </summary>
+		/// <returns>
+		/// Токен, найденный сразу после символа TEXT
+		/// </returns>
+		private IToken SkipText()
+		{
+			/// Создаём последовательность символов, идущих в стеке после TEXT
+			var alt = new Alternative();
+			foreach (var elem in Stack)
+				alt.Add(elem);
+
+			/// Определяем множество токенов, которые могут идти после TEXT
+			var tokensAfterText = grammar.First(alt).Select(t=>t.Name);
+
+			/// Пропускаем
+			IToken token;
+			do
+			{
+				token = Lexer.NextToken();
+			}
+			while (!tokensAfterText.Contains(token.Name));
+
+			return token;
 		}
 	}
 }

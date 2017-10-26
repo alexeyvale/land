@@ -40,7 +40,7 @@ namespace LandParserGenerator.Parsing.LL
 				foreach (var alt in g.Rules[nt])
 				{
 					var altFirst = g.First(alt);
-					var containsEmpty = altFirst.Remove(Grammar.EmptyToken);
+					var containsEmpty = altFirst.Remove(null);
 
 					/// Для каждого токена, с которого может начинаться альтернатива
 					foreach(var tk in altFirst)

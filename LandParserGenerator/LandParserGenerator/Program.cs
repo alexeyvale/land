@@ -14,19 +14,68 @@ namespace LandParserGenerator
 {
 	class Program
 	{
+		private static Type BuildLexer(Grammar grammar, string lexerName)
+		{
+			/// Генерируем по грамматике файл для ANTLR
+
+			var grammarOutput = new StreamWriter($"{lexerName}.g4");
+
+			grammarOutput.WriteLine($"lexer grammar {lexerName};");
+			grammarOutput.WriteLine();
+			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
+
+			foreach (var token in grammar.Tokens.Values)
+			{
+				if(!grammar.SpecialTokens.Contains(token.Name))
+					grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
+			}
+
+			grammarOutput.Close();
+
+			/// Запускаем ANTLR и получаем файл лексера
+
+			Process process = new Process();
+			ProcessStartInfo startInfo = new ProcessStartInfo()
+			{
+				FileName = "cmd.exe",
+				Arguments = $"/C java -jar \"../../Components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
+				WindowStyle = ProcessWindowStyle.Hidden
+			};
+			process.StartInfo = startInfo;
+			process.Start();
+
+			while (!process.HasExited)
+			{
+				System.Threading.Thread.Sleep(0);
+			}
+
+			/// Компилируем .cs-файл лексера
+
+			var codeProvider = new CSharpCodeProvider();
+
+			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+			compilerParams.GenerateInMemory = true;
+			compilerParams.ReferencedAssemblies.Add("../../Components/Antlr/Antlr4.Runtime.Standard.dll");
+			compilerParams.ReferencedAssemblies.Add("System.dll");
+
+			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{lexerName}.cs");
+			return compilationResult.CompiledAssembly.GetType(lexerName);
+		}
+
 		static void BuildYacc()
 		{
 			Grammar yaccGrammar = new Grammar();
 
+			yaccGrammar.DeclareSpecialTokens("ERROR", "TEXT");
+
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_NAME", null));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_NAME", "'%' ID"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_LEFT", "'<'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("ID", null));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]*"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_RIGHT", "'>'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("RULE_NAME", null));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COLON", "':'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("SEMICOLON", "';'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("LITERAL", null));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("LITERAL", @"'\''(.|'\\\'')*?'\''"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "'|'"));
@@ -81,7 +130,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rule", new string[][]
 			{
-				new string[]{ "RULE_NAME", "COLON", "alternatives", "SEMICOLON" },
+				new string[]{ "ID", "COLON", "alternatives", "SEMICOLON" },
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternatives", new string[][]
@@ -107,6 +156,21 @@ namespace LandParserGenerator
 
 			TableLL1 table = new TableLL1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
+
+			var lexerType = BuildLexer(yaccGrammar, "YaccGrammarLexer");
+
+			/// Создаём парсер
+
+			var parser = new Parser(yaccGrammar,
+				new AntlrLexerAdapter(
+					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+				)
+			);
+
+			/// Пробуем парсить
+
+			var errorMessage = String.Empty;
+			parser.Parse("yacc_test.txt", out errorMessage);
 		}
 
 		static void BuildExpressionGrammar()
@@ -114,6 +178,8 @@ namespace LandParserGenerator
 			/// Формируем грамматику
 
 			Grammar exprGrammar = new Grammar();
+
+			exprGrammar.DeclareSpecialTokens("ERROR", "TEXT");
 
 			exprGrammar.DeclareTerminal(new TerminalSymbol("PLUS", "'+'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));
@@ -152,56 +218,13 @@ namespace LandParserGenerator
 			exprGrammar.SetStartSymbol("E");
 
 			/// Строим таблицу парсинга
-
 			TableLL1 table = new TableLL1(exprGrammar);
 			table.ExportToCsv("expr_table.csv");
 
-			/// Генерируем по грамматике файл для ANTLR
-
-			var lexerGrammarOutput = new StreamWriter("ExpressionGrammarLexer.g4");
-
-			lexerGrammarOutput.WriteLine("lexer grammar ExpressionGrammarLexer;");
-			lexerGrammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
-
-			foreach (var token in exprGrammar.Tokens.Values)
-			{
-				if(token.Name != Grammar.EofTokenName)
-					lexerGrammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
-			}
-
-			lexerGrammarOutput.Close();
-
-			/// Запускаем ANTLR и получаем файл лексера
-
-			Process process = new Process();
-			ProcessStartInfo startInfo = new ProcessStartInfo()
-			{
-				FileName = "cmd.exe",
-				Arguments = "/C java -jar \"../../Components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp ExpressionGrammarLexer.g4",
-				WindowStyle = ProcessWindowStyle.Hidden
-			};
-			process.StartInfo = startInfo;
-			process.Start();
-
-			while(!process.HasExited)
-			{
-				System.Threading.Thread.Sleep(0);
-			}
-
-			/// Компилируем .cs-файл лексера
-
-			var codeProvider = new CSharpCodeProvider();
-
-			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
-			compilerParams.GenerateInMemory = true;
-			compilerParams.ReferencedAssemblies.Add("../../Components/Antlr/Antlr4.Runtime.Standard.dll");
-			compilerParams.ReferencedAssemblies.Add("System.dll");
-
-			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, "ExpressionGrammarLexer.cs");
-			var lexerType = compilationResult.CompiledAssembly.GetType("ExpressionGrammarLexer");
+			/// Получаем тип лексера
+			var lexerType = BuildLexer(exprGrammar, "ExpressionGrammarLexer");
 
 			/// Создаём парсер
-
 			var parser = new Parser(exprGrammar,
 				new AntlrLexerAdapter(
 					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
@@ -209,14 +232,13 @@ namespace LandParserGenerator
 			);
 
 			/// Пробуем парсить
-
 			var errorMessage = String.Empty;
 			parser.Parse("test.txt", out errorMessage);
 		}
 
 		static void Main(string[] args)
 		{
-			BuildExpressionGrammar();
+			BuildYacc();
 
 			Console.ReadLine();
 		}

@@ -8,13 +8,13 @@ namespace LandParserGenerator
 {
 	public class Alternative
 	{
-		private List<string> Elements { get; set; } = new List<string>();
+		private List<Entry> Elements { get; set; } = new List<Entry>();
 
 		public int Count { get { return Elements.Count; } }
 
 		public Alternative Add(string elem)
 		{
-			Elements.Add(elem);
+			Elements.Add(new Entry(elem));
 
 			return this;
 		}
@@ -24,7 +24,7 @@ namespace LandParserGenerator
 			get { return Elements[i]; }
 		}
 
-		public List<string>.Enumerator GetEnumerator()
+		public List<Entry>.Enumerator GetEnumerator()
 		{
 			return Elements.GetEnumerator();
 		}
@@ -40,13 +40,13 @@ namespace LandParserGenerator
 			{
 				Elements = pos < Elements.Count ?
 					this.Elements.GetRange(pos, this.Elements.Count - pos) :
-					new List<string>()
+					new List<Entry>()
 			};
 		}
 
 		public override string ToString()
 		{
-			return Count > 0 ? String.Join(" ", Elements) : "\u03b5";
+			return Count > 0 ? String.Join(" ", Elements) : "eps";
 		}
 	}
 }

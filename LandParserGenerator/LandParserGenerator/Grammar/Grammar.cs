@@ -39,6 +39,9 @@ namespace LandParserGenerator
 
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
+		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
+
+		public const string EOF_SPECIAL_TOKEN_NAME = "EOF";
 
 		public ISymbol this[string key]
 		{
@@ -58,18 +61,11 @@ namespace LandParserGenerator
 			}
 		}
 
-		public const string EmptyTokenName = "EMPTY";
-		public static TerminalSymbol EmptyToken { get; private set; } = new TerminalSymbol(EmptyTokenName, null);
-
-		public const string EofTokenName = "EOF";
-		public static TerminalSymbol EofToken { get; private set; } = new TerminalSymbol(EofTokenName, null);
-
 		#region Создание грамматики
 
 		public Grammar()
 		{
-			/// Добавляем к определённым токены, определённые по умолчанию
-			Tokens[EofTokenName] = EofToken;
+			DeclareSpecialTokens(EOF_SPECIAL_TOKEN_NAME);
 			State = GrammarState.Valid;
 		}
 
@@ -83,22 +79,59 @@ namespace LandParserGenerator
 			FollowCacheConsistent = false;
 		}
 
-		public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
+		private string AlreadyDeclaredCheck(ISymbol smb)
 		{
-			if (Rules.ContainsKey(rule.Name))
+			if (Rules.ContainsKey(smb.Name))
 			{
-				return new GrammarActionResponse()
-				{
-					ErrorMessages = new List<string>() { String.Format($"Повторное определение нетерминала {rule.Name}") },
-					Success = false
-				};
+				return smb is NonterminalSymbol ?
+					$"Повторное определение нетерминала {smb.Name}" :
+					$"Символ {smb.Name} определён как нетерминальный";
 			}
 
-			if (Tokens.ContainsKey(rule.Name))
+			if (Tokens.ContainsKey(smb.Name))
+			{
+				return smb is TerminalSymbol ?
+					$"Повторное определение терминала {smb.Name}" :
+					$"Символ {smb.Name} определён как нетерминальный";
+			}
+
+			return String.Empty;
+		}
+
+		public GrammarActionResponse DeclareSpecialTokens(params string[] tokens)
+		{
+			foreach (var token in tokens)
+			{
+				var terminal = new TerminalSymbol(token, null);
+
+				var checkingResult = AlreadyDeclaredCheck(terminal);
+
+				if (!String.IsNullOrEmpty(checkingResult))
+				{
+					return new GrammarActionResponse()
+					{
+						ErrorMessages = new List<string>() { checkingResult },
+						Success = false
+					};
+				}
+
+				SpecialTokens.Add(token);
+				Tokens.Add(token, terminal);
+			}
+
+			OnGrammarUpdate();
+
+			return GrammarActionResponse.GetSuccess();
+		}
+		public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
+		{
+			var checkingResult = AlreadyDeclaredCheck(rule);
+
+			if (!String.IsNullOrEmpty(checkingResult))
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessages = new List<string>() { String.Format($"Символ {rule.Name} определён как терминальный") },
+					ErrorMessages = new List<string>() { checkingResult },
 					Success = false
 				};
 			}
@@ -113,20 +146,13 @@ namespace LandParserGenerator
 		}
 		public GrammarActionResponse DeclareTerminal(TerminalSymbol token)
 		{
-			if (Tokens.ContainsKey(token.Name))
-			{
-				return new GrammarActionResponse()
-				{
-					ErrorMessages = new List<string>() { ($"Повторное определение терминала {token.Name}") },
-					Success = false
-				};
-			}
+			var checkingResult = AlreadyDeclaredCheck(token);
 
-			if (Rules.ContainsKey(token.Name))
+			if (!String.IsNullOrEmpty(checkingResult))
 			{
 				return new GrammarActionResponse()
 				{
-					ErrorMessages = new List<string>() { ($"Символ {token.Name} определён как нетерминальный") },
+					ErrorMessages = new List<string>() { checkingResult },
 					Success = false
 				};
 			}
@@ -245,7 +271,7 @@ namespace LandParserGenerator
 #if DEBUG
 			foreach(var set in _first)
 			{
-				Console.WriteLine($"FIRST({set.Key}) = {String.Join(" ", set.Value)}");
+				Console.WriteLine($"FIRST({set.Key}) = {String.Join(" ", set.Value.Select(v=> v?.ToString() ?? "eps"))}");
             }
 #endif
 		}
@@ -264,9 +290,9 @@ namespace LandParserGenerator
 				{
 					/// Если из очередного элемента ветки
 					/// выводится пустая строка
-					if (first.Contains(EmptyToken))
+					if (first.Contains(null))
 					{
-						first.Remove(EmptyToken);
+						first.Remove(null);
 						first.UnionWith(First(this[alt[i]]));
 					}
 					else
@@ -277,7 +303,7 @@ namespace LandParserGenerator
 			}
 			else
 			{
-				return new HashSet<TerminalSymbol>() { EmptyToken };
+				return new HashSet<TerminalSymbol>() { null };
 			}
 		}
 
@@ -330,7 +356,7 @@ namespace LandParserGenerator
 				_follow[nt.Key] = new HashSet<TerminalSymbol>();
 			}
 
-			_follow[StartSymbol].Add(Tokens[EofTokenName]);
+			_follow[StartSymbol].Add(Tokens[EOF_SPECIAL_TOKEN_NAME]);
 
 			var changed = true;
 
@@ -355,10 +381,10 @@ namespace LandParserGenerator
 								_follow[elem].UnionWith(First(alt.Subsequence(i + 1)));
 
 								/// Если в FIRST(подпоследовательность) была пустая строка
-								if (_follow[elem].Contains(EmptyToken))
+								if (_follow[elem].Contains(null))
 								{
 									/// Исключаем пустую строку из FOLLOW
-									_follow[elem].Remove(EmptyToken);
+									_follow[elem].Remove(null);
 									/// Объединяем FOLLOW текущего нетерминала
 									/// с FOLLOW определяемого данной веткой
 									_follow[elem].UnionWith(_follow[nt.Key]);
@@ -376,7 +402,7 @@ namespace LandParserGenerator
 #if DEBUG
 			foreach (var set in _follow)
 			{
-				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value)}");
+				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value.Select(v => v?.ToString() ?? "eps"))}");
 			}
 #endif
 		}

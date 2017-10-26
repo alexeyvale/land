@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammar\Entry.cs" />
     <Compile Include="Grammar\Grammar.cs" />
     <Compile Include="Grammar\Alternative.cs" />
     <Compile Include="Grammar\ISymbol.cs" />
