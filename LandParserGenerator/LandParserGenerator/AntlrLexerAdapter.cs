@@ -25,7 +25,7 @@ namespace LandParserGenerator
 			get
 			{
 				return NameTypeMap
-					.Where(m => m.Value == Token.Type && m.Key.All(c=>Char.IsLetterOrDigit(c)))
+					.Where(m => m.Value == Token.Type && m.Key.All(c=>Char.IsLetterOrDigit(c) || c == '_'))
 					.First().Key;
 			}
 		}
@@ -50,9 +50,19 @@ namespace LandParserGenerator
 			LexerConstructor = constructor;
 		}
 
-		public void SetSource(string filename)
+		public void SetSourceFile(string filename)
 		{
 			var stream = new UnbufferedCharStream(new StreamReader(filename));
+			Lexer = LexerConstructor(stream);
+		}
+
+		public void SetSourceText(string text)
+		{
+			byte[] textBuffer = Encoding.Default.GetBytes(text);
+			MemoryStream memStream = new MemoryStream(textBuffer);
+
+			var stream = new UnbufferedCharStream(memStream);
+
 			Lexer = LexerConstructor(stream);
 		}
 

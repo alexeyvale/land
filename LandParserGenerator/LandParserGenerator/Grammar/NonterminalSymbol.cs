@@ -69,7 +69,8 @@ namespace LandParserGenerator
 
 		public override string ToString()
 		{
-			return $"{Name} :\n\r{String.Join("\n\r| ", Alternatives)}\n\r;";
+			var newLine = System.Environment.NewLine;
+			return $"{Name} :{newLine}{String.Join($"{newLine}| ", Alternatives)}{newLine};";
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace LandParserGenerator.Parsing.LL
 	{
 		private Grammar grammar { get; set; }
 		private TableLL1 Table { get; set; }
-		private Stack<string> Stack { get; set; }
+		private Stack<Node> Stack { get; set; }
 		private ILexer Lexer { get; set; }
 
 		public Parser(Grammar g, ILexer lexer)
@@ -25,16 +25,20 @@ namespace LandParserGenerator.Parsing.LL
 		/// <summary>
 		/// LL(1) разбор
 		/// </summary>
-		public bool Parse(string filename, out string errorMessage)
+		/// <returns>
+		/// Корень дерева разбора
+		/// </returns>
+		public Node Parse(string text, out string errorMessage)
 		{
 			errorMessage = String.Empty;
 
 			/// Готовим лексер
-			Lexer.SetSource(filename);
+			Lexer.SetSourceText(text);
 
 			/// Кладём на стек стартовый символ
-			Stack = new Stack<string>();
-			Stack.Push(grammar.StartSymbol);
+			Stack = new Stack<Node>();
+			var root = new Node(grammar.StartSymbol);
+			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
 			var token = Lexer.NextToken();
@@ -45,46 +49,49 @@ namespace LandParserGenerator.Parsing.LL
 				var stackTop = Stack.Peek();
 
 				/// Если на вершине стека терминал, сопоставляем его с текущей лексемой
-				if (grammar[stackTop] is TerminalSymbol)
+				if (grammar[stackTop.Symbol] is TerminalSymbol)
 				{
 					/// Если в текущем месте возможен пропуск текста
-					if(stackTop == "TEXT")
+					if(stackTop.Symbol == "TEXT")
 					{
 						/// Снимаем со стека символ TEXT
+						stackTop.SetAnchor(token.Line, token.Column);
 						Stack.Pop();
+
 						/// Пропускаем текст и переходим к новой итерации
 						token = SkipText();
 						continue;
 					}
-					if (stackTop == token.Name)
+					if (stackTop.Symbol == token.Name)
 					{
+						stackTop.SetAnchor(token.Line, token.Column);
 						Stack.Pop();
 					}
 					else
 					{
 						errorMessage = String.Format(
 							$"Неожиданный символ {token}, ожидалось {stackTop}");
-						return false;
+						return root;
 					}
 				}
 				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
-				else if(grammar[stackTop] is NonterminalSymbol)
+				else if(grammar[stackTop.Symbol] is NonterminalSymbol)
 				{
-					var alternatives = Table[stackTop, token.Name];
+					var alternatives = Table[stackTop.Symbol, token.Name];
 
 					/// Сообщаем об ошибке в случае неоднозначной грамматики
 					if(alternatives.Count > 1)
 					{
 						errorMessage = String.Format(
 							$"Неоднозначная грамматика: для нетерминала {stackTop} и входного символа {token} допустимо несколько альтернатив");
-						return false;
+						return root;
 					}
 
 					/// В случае, если нет альтернативы, начинающейся с текущей лексемы
 					if (alternatives.Count == 0)
 					{
 						/// Если в правиле есть пустая ветка
-						foreach(var alt in grammar.Rules[stackTop])
+						foreach(var alt in grammar.Rules[stackTop.Symbol])
 						{
 							if(alt.Count == 0)
 							{
@@ -101,7 +108,10 @@ namespace LandParserGenerator.Parsing.LL
 
 						for (var i = alternatives[0].Count - 1; i >= 0; --i)
 						{
-							Stack.Push(alternatives[0][i]);
+							var newNode = new Node(alternatives[0][i]);
+
+							stackTop.AddChildFirst(newNode);
+							Stack.Push(newNode);
 						}
 
 						continue;
@@ -111,7 +121,7 @@ namespace LandParserGenerator.Parsing.LL
 				token = Lexer.NextToken();
 			}
 
-			return true;
+			return root;
 		}
 
 		/// <summary>
@@ -125,7 +135,7 @@ namespace LandParserGenerator.Parsing.LL
 			/// Создаём последовательность символов, идущих в стеке после TEXT
 			var alt = new Alternative();
 			foreach (var elem in Stack)
-				alt.Add(elem);
+				alt.Add(elem.Symbol);
 
 			/// Определяем множество токенов, которые могут идти после TEXT
 			var tokensAfterText = grammar.First(alt).Select(t=>t.Name);

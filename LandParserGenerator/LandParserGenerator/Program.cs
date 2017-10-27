@@ -12,7 +12,7 @@ using LandParserGenerator.Parsing.LL;
 
 namespace LandParserGenerator
 {
-	class Program
+	public static class Builder
 	{
 		private static Type BuildLexer(Grammar grammar, string lexerName)
 		{
@@ -38,7 +38,7 @@ namespace LandParserGenerator
 			ProcessStartInfo startInfo = new ProcessStartInfo()
 			{
 				FileName = "cmd.exe",
-				Arguments = $"/C java -jar \"../../Components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
+				Arguments = $"/C java -jar \"../../../components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
 				WindowStyle = ProcessWindowStyle.Hidden
 			};
 			process.StartInfo = startInfo;
@@ -55,19 +55,32 @@ namespace LandParserGenerator
 
 			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
 			compilerParams.GenerateInMemory = true;
-			compilerParams.ReferencedAssemblies.Add("../../Components/Antlr/Antlr4.Runtime.Standard.dll");
+			compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
 			compilerParams.ReferencedAssemblies.Add("System.dll");
 
 			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{lexerName}.cs");
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
-		static void BuildYacc()
+		public static Parser BuildYacc()
 		{
 			Grammar yaccGrammar = new Grammar();
 
 			yaccGrammar.DeclareSpecialTokens("ERROR", "TEXT");
 
+			/// Пропускаемые сущности
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
+
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\"' | '\\\\'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'/*' .*? '*/'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' [^\"]* '\"'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
+
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_CODE", "'%{' (STRING|COMMENT|.)*? '%}'"));
+
+			/// Нужные штуки
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_NAME", "'%' ID"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_LEFT", "'<'"));
@@ -167,13 +180,10 @@ namespace LandParserGenerator
 				)
 			);
 
-			/// Пробуем парсить
-
-			var errorMessage = String.Empty;
-			parser.Parse("yacc_test.txt", out errorMessage);
+			return parser;
 		}
 
-		static void BuildExpressionGrammar()
+		public static Parser BuildExpressionGrammar()
 		{
 			/// Формируем грамматику
 
@@ -231,16 +241,7 @@ namespace LandParserGenerator
 				)
 			);
 
-			/// Пробуем парсить
-			var errorMessage = String.Empty;
-			parser.Parse("test.txt", out errorMessage);
-		}
-
-		static void Main(string[] args)
-		{
-			BuildYacc();
-
-			Console.ReadLine();
+			return parser;
 		}
 	}
 }

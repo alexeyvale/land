@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F1276A3B-A504-47A3-B858-8224EF265795}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LandParserGenerator</RootNamespace>
     <AssemblyName>LandParserGenerator</AssemblyName>
@@ -31,9 +31,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr4.Runtime.Standard">
-      <HintPath>Components\Antlr4.Runtime.Standard.dll</HintPath>
+    <Reference Include="Antlr4.Runtime.Standard, Version=4.7.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\components\Antlr\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,6 +55,7 @@
     <Compile Include="Grammar\ISymbol.cs" />
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
+    <Compile Include="Parsing\LL\Node.cs" />
     <Compile Include="Parsing\LL\Parser.cs" />
     <Compile Include="Parsing\LL\TableLL1.cs" />
     <Compile Include="Parsing\LR\Marker.cs" />
