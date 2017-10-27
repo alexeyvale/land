@@ -132,7 +132,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers", new string[][]
 			{
 				new string[]{ "ID", "identifiers" },
-				new string[]{ "ID" }
+				new string[]{ }
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rules", new string[][]

@@ -35,8 +35,6 @@ namespace LandParserGenerator
 			Token = token;
 			NameTypeMap = mapping;
 		}
-
-		
 	}
 
 	public class AntlrLexerAdapter: LandParserGenerator.Lexing.ILexer

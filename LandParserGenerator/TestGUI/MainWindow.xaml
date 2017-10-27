@@ -49,6 +49,7 @@
 
             <ListBox
                 Name="OutputList"
+                FontSize="14pt"
                 Grid.Row="1">
             </ListBox>
         </Grid>
@@ -61,6 +62,8 @@
 
             <TreeView
                 Name="ParseTreeView"
+                FontFamily="Courier New"
+                FontSize="14pt"
                 Grid.Row="0"
                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
             </TreeView>
@@ -74,6 +77,7 @@
         </Grid>
 
         <TextBox Grid.Column="2" 
+                 FontSize="14pt"
                  Grid.Row="1"
                  Name="ConsoleOutputText">
         </TextBox>
