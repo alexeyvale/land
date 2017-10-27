@@ -57,6 +57,7 @@ namespace TestGUI
 				var errorMessage = String.Empty;
 				var root = parser.Parse(Editor.Text, out errorMessage);
 
+				ProgramStatusLabel.Content = errorMessage;
 				ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
 
 				if (root != null)
@@ -64,7 +65,7 @@ namespace TestGUI
 					TreeRoot = root;
 					ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
 				}
-				// OutputList.ItemsSource = log;
+				OutputList.ItemsSource = parser.Log;
 			}
 			else if (LanguageYaccRadio.IsChecked == true)
 			{
@@ -73,6 +74,7 @@ namespace TestGUI
 				var errorMessage = String.Empty;
 				var root = parser.Parse(Editor.Text, out errorMessage);
 
+				ProgramStatusLabel.Content = errorMessage;
 				ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
 
 				if (root != null)
@@ -80,6 +82,7 @@ namespace TestGUI
 					TreeRoot = root;
 					ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
 				}
+				OutputList.ItemsSource = parser.Log;
 			}
 		}
 

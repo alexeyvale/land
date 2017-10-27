@@ -15,6 +15,8 @@ namespace LandParserGenerator.Parsing.LL
 		private Stack<Node> Stack { get; set; }
 		private ILexer Lexer { get; set; }
 
+		public List<string> Log { get; private set; }
+
 		public Parser(Grammar g, ILexer lexer)
 		{
 			grammar = g;
@@ -30,6 +32,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// </returns>
 		public Node Parse(string text, out string errorMessage)
 		{
+			Log = new List<string>();
 			errorMessage = String.Empty;
 
 			/// Готовим лексер
@@ -47,6 +50,8 @@ namespace LandParserGenerator.Parsing.LL
 			while (Stack.Count > 0)
 			{
 				var stackTop = Stack.Peek();
+
+				Log.Add($"Текущий токен: {token.Name}; символ на вершине стека: {stackTop.Symbol}");
 
 				/// Если на вершине стека терминал, сопоставляем его с текущей лексемой
 				if (grammar[stackTop.Symbol] is TerminalSymbol)
