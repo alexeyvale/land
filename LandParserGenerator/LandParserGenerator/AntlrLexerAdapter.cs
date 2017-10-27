@@ -13,10 +13,13 @@ namespace LandParserGenerator
 	public class AntlrTokenAdapter: LandParserGenerator.Lexing.IToken
 	{
 		private IToken Token { get; set; }
-		private IDictionary<string, int> NameTypeMap { get; set; }
+		private Lexer Lexer { get; set; }
 
 		public int Column { get { return Token.Column; } }
 		public int Line { get { return Token.Line; } }
+
+		public int StartOffset { get { return Token.StartIndex; } }
+		public int EndOffset { get { return Token.StopIndex; } }
 
 		public string Text { get { return Token.Text; } }
 
@@ -24,16 +27,14 @@ namespace LandParserGenerator
 		{
 			get
 			{
-				return NameTypeMap
-					.Where(m => m.Value == Token.Type && m.Key.All(c=>Char.IsLetterOrDigit(c) || c == '_'))
-					.First().Key;
+				return Lexer.Vocabulary.GetSymbolicName(Token.Type);
 			}
 		}
 
-		public AntlrTokenAdapter(IToken token, IDictionary<string, int> mapping)
+		public AntlrTokenAdapter(IToken token, Lexer lexer)
 		{
 			Token = token;
-			NameTypeMap = mapping;
+			Lexer = lexer;
 		}
 	}
 
@@ -66,7 +67,7 @@ namespace LandParserGenerator
 
 		public LandParserGenerator.Lexing.IToken NextToken()
 		{
-			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer.TokenTypeMap);
+			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer);
 		}
 	}
 }

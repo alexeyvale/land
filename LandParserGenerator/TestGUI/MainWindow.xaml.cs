@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Microsoft.Win32;
 
-using LandParserGenerator.Parsing.LL;
+using LandParserGenerator.Parsing.Tree;
 
 namespace TestGUI
 {
@@ -91,12 +91,12 @@ namespace TestGUI
 			var treeView = (TreeView)sender;
 			var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
 
-			if (node.Line == 0)
-				node.SetAnchor(1, 1);
-
-			var start = Editor.Document.GetOffset(node.Line, node.Column);
-			var end = Editor.Document.GetOffset(node.Line, node.Column);
-			Editor.Select(start, end - start + 1);
+			if (node.StartOffset.HasValue && node.EndOffset.HasValue)
+			{
+				var start = node.StartOffset.Value;
+				var end = node.EndOffset.Value;
+				Editor.Select(start, end - start + 1);
+			}
 		}
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)

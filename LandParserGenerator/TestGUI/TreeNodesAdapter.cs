@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-using LandParserGenerator.Parsing.LL;
+using LandParserGenerator.Parsing.Tree;
 
 namespace TestGUI
 {

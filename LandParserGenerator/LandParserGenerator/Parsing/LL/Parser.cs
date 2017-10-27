@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using LandParserGenerator.Lexing;
+using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Parsing.LL
 {
@@ -60,7 +61,7 @@ namespace LandParserGenerator.Parsing.LL
 					if(stackTop.Symbol == "TEXT")
 					{
 						/// Снимаем со стека символ TEXT
-						stackTop.SetAnchor(token.Line, token.Column);
+						stackTop.SetAnchor(token.StartOffset, token.EndOffset);
 						Stack.Pop();
 
 						/// Пропускаем текст и переходим к новой итерации
@@ -69,7 +70,7 @@ namespace LandParserGenerator.Parsing.LL
 					}
 					if (stackTop.Symbol == token.Name)
 					{
-						stackTop.SetAnchor(token.Line, token.Column);
+						stackTop.SetAnchor(token.StartOffset, token.EndOffset);
 						Stack.Pop();
 					}
 					else

@@ -10,6 +10,8 @@ namespace LandParserGenerator.Lexing
 	{
 		int Column { get; }
 		int Line { get; }
+		int StartOffset { get; }
+		int EndOffset { get; }
 		string Text { get; }
 		string Name { get; }
 	}
