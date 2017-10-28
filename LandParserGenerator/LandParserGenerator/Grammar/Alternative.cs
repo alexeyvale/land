@@ -48,5 +48,10 @@ namespace LandParserGenerator
 		{
 			return Count > 0 ? String.Join(" ", Elements) : "eps";
 		}
+
+		public bool Contains(string symbol)
+		{
+			return Elements.Any(e => e.Value == symbol);
+		}
 	}
 }

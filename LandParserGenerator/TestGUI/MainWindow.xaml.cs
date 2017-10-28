@@ -97,6 +97,10 @@ namespace TestGUI
 				var end = node.EndOffset.Value;
 				Editor.Select(start, end - start + 1);
 			}
+			else
+			{
+				Editor.Select(0, 0);
+			}
 		}
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)

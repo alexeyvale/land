@@ -75,9 +75,18 @@ namespace LandParserGenerator.Parsing.LL
 					}
 					else
 					{
-						errorMessage = String.Format(
-							$"Неожиданный символ {token.Name}, ожидалось {stackTop.Symbol}");
-						return root;
+						/// Если встретился неожиданный токен, но он в списке пропускаемых
+						if (grammar.SkipTokens.Contains(token.Name))
+						{
+							token = Lexer.NextToken();
+							continue;
+						}
+						else
+						{
+							errorMessage = String.Format(
+								$"Неожиданный символ {token.Name}, ожидалось {stackTop.Symbol}");
+							return root;
+						}
 					}
 				}
 				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
@@ -93,35 +102,35 @@ namespace LandParserGenerator.Parsing.LL
 						return root;
 					}
 
-					/// В случае, если нет альтернативы, начинающейся с текущей лексемы
+					/// Сообщаем об ошибке в случае, если непонятно, что делать
 					if (alternatives.Count == 0)
 					{
-						/// Если в правиле есть пустая ветка
-						foreach(var alt in grammar.Rules[stackTop.Symbol])
+						/// Если встретился неожиданный токен, но он в списке пропускаемых
+						if (grammar.SkipTokens.Contains(token.Name))
 						{
-							if(alt.Count == 0)
-							{
-								/// Выталкиваем нетерминал со стека без прочтения следующей лексемы
-								Stack.Pop();
-								continue;
-							}
+							token = Lexer.NextToken();
+							continue;
+						}
+						else
+						{
+							errorMessage = String.Format(
+								$"Неожиданный символ {token.Name}");
+							return root;
 						}
 					}
+
 					/// снимаем со стека нетерминал и кладём содержимое его альтернативы
-					else
+					Stack.Pop();
+
+					for (var i = alternatives[0].Count - 1; i >= 0; --i)
 					{
-						Stack.Pop();
+						var newNode = new Node(alternatives[0][i]);
 
-						for (var i = alternatives[0].Count - 1; i >= 0; --i)
-						{
-							var newNode = new Node(alternatives[0][i]);
-
-							stackTop.AddChildFirst(newNode);
-							Stack.Push(newNode);
-						}
-
-						continue;
+						stackTop.AddChildFirst(newNode);
+						Stack.Push(newNode);
 					}
+
+					continue;
 				}
 
 				token = Lexer.NextToken();

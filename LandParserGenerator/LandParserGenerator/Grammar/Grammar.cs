@@ -40,6 +40,7 @@ namespace LandParserGenerator
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
+		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 
 		public const string EOF_SPECIAL_TOKEN_NAME = "EOF";
 
@@ -160,6 +161,22 @@ namespace LandParserGenerator
 			OnGrammarUpdate();
 
 			Tokens[token.Name] = token;
+			return GrammarActionResponse.GetSuccess();
+		}
+		public GrammarActionResponse SetSkipTokens(params string[] tokens)
+		{
+			foreach(var token in tokens)
+				if(!Tokens.ContainsKey(token))
+				{
+					return new GrammarActionResponse()
+					{
+						ErrorMessages = new List<string>() { $"Отсутствует описание токена {token}" },
+						Success = false
+					};
+				}
+
+			SkipTokens = new HashSet<string>(tokens);
+
 			return GrammarActionResponse.GetSuccess();
 		}
 		public GrammarActionResponse SetStartSymbol(string symbol)

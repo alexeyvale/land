@@ -9,7 +9,7 @@ namespace LandParserGenerator
 	public class NonterminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
-		private List<Alternative> Alternatives { get; set; } = new List<Alternative>();
+		public List<Alternative> Alternatives { get; private set; } = new List<Alternative>();
 
 		public int Count { get { return Alternatives.Count; } }
 
