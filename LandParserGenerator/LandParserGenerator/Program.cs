@@ -137,16 +137,28 @@ namespace LandParserGenerator
 				new string[]{ "TEXT" }
 			}));
 
+
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers", new string[][]
 			{
-				new string[]{ "ID", "identifiers" },
+				new string[]{ "ID", "identifiers_list" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers_list", new string[][]
+			{
+				new string[]{ "ID", "identifiers_list" },
 				new string[]{ }
 			}));
 
+
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rules", new string[][]
 			{
-				new string[]{ "rule", "rules" },
-				new string[]{ "rule" }
+				new string[]{ "rule", "rules_list" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rules_list", new string[][]
+			{
+				new string[]{ "rule", "rules_list" },
+				new string[]{ },
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rule", new string[][]
@@ -154,10 +166,16 @@ namespace LandParserGenerator
 				new string[]{ "ID", "COLON", "alternatives", "SEMICOLON" },
 			}));
 
+
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternatives", new string[][]
 			{
-				new string[]{ "alternative", "PIPE", "alternatives" },
-				new string[]{ "alternative" }
+				new string[]{ "alternative", "alternatives_list" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternatives_list", new string[][]
+			{
+				new string[]{ "PIPE", "alternative", "alternatives_list" },
+				new string[]{ },
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative", new string[][]
@@ -165,6 +183,7 @@ namespace LandParserGenerator
 				new string[]{ "alternative_component", "alternative" },
 				new string[]{ }
 			}));
+
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative_component", new string[][]
 			{

@@ -13,7 +13,7 @@ namespace LandParserGenerator.Parsing.LL
 	{
 		private Grammar grammar { get; set; }
 		private TableLL1 Table { get; set; }
-		private Stack<Node> Stack { get; set; }
+		private ParseStack Stack { get; set; }
 		private ILexer Lexer { get; set; }
 
 		public List<string> Log { get; private set; }
@@ -40,7 +40,7 @@ namespace LandParserGenerator.Parsing.LL
 			Lexer.SetSourceText(text);
 
 			/// Кладём на стек стартовый символ
-			Stack = new Stack<Node>();
+			Stack = new ParseStack();
 			var root = new Node(grammar.StartSymbol);
 			Stack.Push(root);
 
@@ -102,7 +102,7 @@ namespace LandParserGenerator.Parsing.LL
 						return root;
 					}
 
-					/// Сообщаем об ошибке в случае, если непонятно, что делать
+					/// Отдельно обрабатываем случай, когда нет записи в таблице
 					if (alternatives.Count == 0)
 					{
 						/// Если встретился неожиданный токен, но он в списке пропускаемых
@@ -113,9 +113,36 @@ namespace LandParserGenerator.Parsing.LL
 						}
 						else
 						{
-							errorMessage = String.Format(
-								$"Неожиданный символ {token.Name}");
-							return root;
+							/// Проверяем, есть ли альтернатива, начинающаяся с TEXT
+							if (Table[stackTop.Symbol, "TEXT"].Count == 1)
+							{
+								alternatives = Table[stackTop.Symbol, "TEXT"];
+							}
+							else
+							{
+								var emptyFound = false;
+
+								/// Иначе, если есть пустая альтернатива, считаем, что это она
+								foreach (var alt in grammar.Rules[stackTop.Symbol])
+								{
+									if (alt.Count == 0)
+									{
+										/// Выталкиваем нетерминал со стека без прочтения следующей лексемы
+										Stack.Pop();
+										emptyFound = true;
+										break;
+									}
+								}
+
+								if (emptyFound)
+									continue;
+								else
+								{
+									errorMessage = String.Format(
+										$"Неожиданный символ {token.Name}");
+									return root;
+								}
+							}
 						}
 					}
 

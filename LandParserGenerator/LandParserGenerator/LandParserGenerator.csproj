@@ -55,6 +55,9 @@
     <Compile Include="Grammar\ISymbol.cs" />
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
+    <Compile Include="Parsing\LL\TokenStack.cs" />
+    <Compile Include="Parsing\LL\ParseAction.cs" />
+    <Compile Include="Parsing\LL\ParseStack.cs" />
     <Compile Include="Parsing\Tree\Location.cs" />
     <Compile Include="Parsing\Tree\Node.cs" />
     <Compile Include="Parsing\LL\Parser.cs" />
