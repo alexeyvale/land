@@ -8,11 +8,11 @@ using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Parsing.LL
 {
-	public class ParseAction
+	public class ParsingStackAction
 	{
-		public enum ParseActionType { Push, Pop }
+		public enum ParsingStackActionType { Push, Pop }
 
-		public ParseActionType Type { get; set; }
+		public ParsingStackActionType Type { get; set; }
 		public Node Value { get; set; }
 	}
 }
