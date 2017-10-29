@@ -184,20 +184,23 @@ namespace LandParserGenerator.Parsing.LL
 			/// Определяем множество токенов, которые могут идти после TEXT
 			var tokensAfterText = grammar.First(alt).Select(t=>t.Name);
 
-			/// Смещения для участка, подобранного как текст
-			var startOffset = LexingStream.CurrentToken().StartOffset;
-			var endOffset = LexingStream.CurrentToken().EndOffset;
-
-			/// Пропускаем
 			IToken token = LexingStream.CurrentToken();
 
-			while(!tokensAfterText.Contains(token.Name))
+			/// Если TEXT пустой и текущий токен - это токен после TEXT
+			if (!tokensAfterText.Contains(token.Name))
 			{
-				endOffset = token.EndOffset;
-				token = LexingStream.NextToken();
-			}
+				/// Смещения для участка, подобранного как текст
+				int startOffset = token.StartOffset;
+				int endOffset = token.EndOffset;
 
-			textNode.SetAnchor(startOffset, endOffset);
+				while (!tokensAfterText.Contains(token.Name))
+				{
+					endOffset = token.EndOffset;
+					token = LexingStream.NextToken();
+				}
+
+				textNode.SetAnchor(startOffset, endOffset);
+			}		
 
 			return token;
 		}

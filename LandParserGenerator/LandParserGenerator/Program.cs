@@ -229,14 +229,36 @@ namespace LandParserGenerator
 			sharpGrammar.SetSkipTokens("COMMENT", "STRING");
 
 			/// Нужные штуки
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "@?[_a-zA-Z][_0-9a-zA-Z]*"));
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("NAMESPACE", "'namespace'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("CLASS", "'class'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "'@'?[_a-zA-Z][_0-9a-zA-Z]*"));
+
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("LCBRACE", "'{'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("DOT", "'.'"));
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("RCBRACE", "'}'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'('"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "')'"));
+			
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("program", new string[][]
 			{
-				new string[]{ "TEXT", "NAMESPACE", "full_name", "LBRACE", "namespace_content", "RBRACE" }
+				new string[]{ "TEXT", "NAMESPACE", "full_name", "LCBRACE", "namespace_content", "RCBRACE" }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("namespace_content", new string[][]
+			{
+				new string[]{ "class", "class_list" },
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_list", new string[][]
+			{
+				new string[]{ "class", "class_list" },
+				new string[]{ }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class", new string[][]
+			{
+				new string[]{ "TEXT", "CLASS", "full_name", "TEXT", "LCBRACE", "TEXT", "RCBRACE" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
