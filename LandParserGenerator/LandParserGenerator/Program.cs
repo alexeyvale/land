@@ -210,6 +210,76 @@ namespace LandParserGenerator
 			return parser;
 		}
 
+		public static Parser BuildSharp()
+		{
+			Grammar sharpGrammar = new Grammar();
+
+			sharpGrammar.DeclareSpecialTokens("ERROR", "TEXT");
+
+			/// Пропускаемые сущности
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
+
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\"' | '\\\\'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'/*' .*? '*/'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' [^\"]* '\"'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
+
+			sharpGrammar.SetSkipTokens("COMMENT", "STRING");
+
+			/// Нужные штуки
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "@?[_a-zA-Z][_0-9a-zA-Z]*"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("DOT", "'.'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("program", new string[][]
+			{
+				new string[]{ "TEXT", "NAMESPACE", "full_name", "LBRACE", "namespace_content", "RBRACE" }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
+			{
+				new string[]{ "ID", "full_name_list" },
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name_list", new string[][]
+			{
+				new string[]{ "DOT", "ID", "identifiers_list" },
+				new string[]{ }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers", new string[][]
+			{
+				new string[]{ "ID", "identifiers_list" },
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers_list", new string[][]
+			{
+				new string[]{ "ID", "identifiers_list" },
+				new string[]{ }
+			}));
+
+
+			sharpGrammar.SetStartSymbol("program");
+
+			TableLL1 table = new TableLL1(sharpGrammar);
+			table.ExportToCsv("sharp_table.csv");
+
+			var lexerType = BuildLexer(sharpGrammar, "SharpGrammarLexer");
+
+			/// Создаём парсер
+
+			var parser = new Parser(sharpGrammar,
+				new AntlrLexerAdapter(
+					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+				)
+			);
+
+			return parser;
+		}
+
 		public static Parser BuildExpressionGrammar()
 		{
 			/// Формируем грамматику

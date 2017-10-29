@@ -50,40 +50,34 @@ namespace TestGUI
 
 		private void ParseButton_Click(object sender, RoutedEventArgs e)
 		{
+			LandParserGenerator.Parsing.LL.Parser parser = null;
+
 			if (LanguageSharpRadio.IsChecked == true)
 			{
-				var parser = LandParserGenerator.Builder.BuildExpressionGrammar();
-
-				var errorMessage = String.Empty;
-				var root = parser.Parse(Editor.Text, out errorMessage);
-
-				ProgramStatusLabel.Content = errorMessage;
-				ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
-
-				if (root != null)
-				{
-					TreeRoot = root;
-					ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
-				}
-				OutputList.ItemsSource = parser.Log;
+				parser = LandParserGenerator.Builder.BuildSharp();
 			}
 			else if (LanguageYaccRadio.IsChecked == true)
 			{
-				var parser = LandParserGenerator.Builder.BuildYacc();
+				parser = LandParserGenerator.Builder.BuildYacc();
 
-				var errorMessage = String.Empty;
-				var root = parser.Parse(Editor.Text, out errorMessage);
-
-				ProgramStatusLabel.Content = errorMessage;
-				ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
-
-				if (root != null)
-				{
-					TreeRoot = root;
-					ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
-				}
-				OutputList.ItemsSource = parser.Log;
 			}
+			else if (LanguageExprRadio.IsChecked == true)
+			{
+				parser = LandParserGenerator.Builder.BuildExpressionGrammar();
+			}
+
+			var errorMessage = String.Empty;
+			var root = parser.Parse(Editor.Text, out errorMessage);
+
+			ProgramStatusLabel.Content = errorMessage;
+			ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
+
+			if (root != null)
+			{
+				TreeRoot = root;
+				ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
+			}
+			OutputList.ItemsSource = parser.Log;
 		}
 
 		private void ParseTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

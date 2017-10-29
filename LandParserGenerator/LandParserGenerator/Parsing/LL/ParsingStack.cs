@@ -17,39 +17,83 @@ namespace LandParserGenerator.Parsing.LL
 		private Stack<Node> Stack { get; set; } = new Stack<Node>();
 
 		/// <summary>
+		/// Поток токенов, используемый при разборе
+		/// </summary>
+		private TokenStream TokenStream { get; set; }
+
+		public ParsingStack(TokenStream stream)
+		{
+			TokenStream = stream;
+		}
+
+		/// <summary>
 		/// Стек действий, которые предпринимаются по мере разбора
 		/// </summary>
 		private Stack<List<ParsingStackAction>> Actions { get; set; } = new Stack<List<ParsingStackAction>>();
 
+		/// <summary>
+		/// Признак активного пакетного режима
+		/// В пакетном режиме действия со стеком рассматриваются как одна транзакция
+		/// </summary>
+		private bool BatchMode { get; set; } = false;
+		private List<ParsingStackAction> Batch { get; set; }
+
+		/// <summary>
+		/// Установка начала пакета
+		/// </summary>
+		public void InitBatch()
+		{
+			BatchMode = true;
+			Batch = new List<ParsingStackAction>();
+		}
+
+		/// <summary>
+		/// Завершение пакета
+		/// </summary>
+		public void FinBatch()
+		{
+			BatchMode = false;
+			Actions.Push(Batch);
+		}
+
 		public void Push(Node node)
 		{
 			Stack.Push(node);
-			Actions.Push(new List<ParsingStackAction>() { new ParsingStackAction()
+
+			var action = new ParsingStackAction()
 			{
 				Type = ParsingStackAction.ParsingStackActionType.Push,
-				Value = node
-			}});
-		}
+				Value = node,
+				TokenStreamIndex = TokenStream.CurrentTokenIndex
+			};
 
-		public void PushBatch(params Node[] nodes)
-		{
-			foreach(var node in nodes)
-				Stack.Push(node);
-
-			Actions.Push(nodes.Select(n => new ParsingStackAction()
+			if (BatchMode)
 			{
-				Value = n,
-				Type = ParsingStackAction.ParsingStackActionType.Push
-			}).ToList());
+				Batch.Add(action);
+			}
+			else
+			{
+				Actions.Push(new List<ParsingStackAction>() { action });
+			}
 		}
 
 		public Node Pop()
 		{
-			Actions.Push(new List<ParsingStackAction>() { new ParsingStackAction()
+			var action = new ParsingStackAction()
 			{
 				Type = ParsingStackAction.ParsingStackActionType.Pop,
-				Value = Stack.Peek()
-			}});
+				Value = Stack.Peek(),
+				TokenStreamIndex = TokenStream.CurrentTokenIndex
+			};
+
+			if (BatchMode)
+			{
+				Batch.Add(action);
+			}
+			else
+			{
+				Actions.Push(new List<ParsingStackAction>() { action });
+			}
 
 			return Stack.Pop();
 		}
@@ -61,19 +105,26 @@ namespace LandParserGenerator.Parsing.LL
 
 		public void Undo()
 		{
+			/// При отмене действий обратные нужно производить, 
+			/// начиная с последнего действия
 			var lastActionsBatch = Actions.Pop();
+			lastActionsBatch.Reverse();
 			
 			foreach(var a in lastActionsBatch)
 			{
 				switch(a.Type)
 				{
 					case ParsingStackAction.ParsingStackActionType.Pop:
+						/// Убираем дочерние элементы для заново добавляемого узла
+						a.Value.ResetChildren();
 						Stack.Push(a.Value);
 						break;
 					case ParsingStackAction.ParsingStackActionType.Push:
 						Stack.Pop();
 						break;
 				}
+
+				TokenStream.BackToToken(a.TokenStreamIndex);
 			}
 		}
 

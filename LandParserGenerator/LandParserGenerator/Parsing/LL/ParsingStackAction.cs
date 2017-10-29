@@ -12,7 +12,17 @@ namespace LandParserGenerator.Parsing.LL
 	{
 		public enum ParsingStackActionType { Push, Pop }
 
+		/// <summary>
+		/// Тип действия со стеком
+		/// </summary>
 		public ParsingStackActionType Type { get; set; }
+		/// <summary>
+		/// Значение, которое помещается на стек или снимается с него
+		/// </summary>
 		public Node Value { get; set; }
+		/// <summary>
+		/// Индекс токена, являющегося текущим на момент совершения действия
+		/// </summary>
+		public int TokenStreamIndex { get; set; }
 	}
 }

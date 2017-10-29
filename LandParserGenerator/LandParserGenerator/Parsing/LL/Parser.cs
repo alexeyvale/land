@@ -42,7 +42,7 @@ namespace LandParserGenerator.Parsing.LL
 			LexingStream = new TokenStream(Lexer, text);
 
 			/// Кладём на стек стартовый символ
-			Stack = new ParsingStack();
+			Stack = new ParsingStack(LexingStream);
 			var root = new Node(grammar.StartSymbol);
 			Stack.Push(root);
 
@@ -63,9 +63,10 @@ namespace LandParserGenerator.Parsing.LL
 					if(stackTop.Symbol == "TEXT")
 					{
 						/// Пропускаем и переходим к новой итерации
-						token = SkipText(token);
+						token = SkipText();
 						continue;
 					}
+
 					/// Если текущий токен совпадает с ожидаемым
 					if (stackTop.Symbol == token.Name)
 					{
@@ -130,6 +131,9 @@ namespace LandParserGenerator.Parsing.LL
 										$"Неожиданный символ {token.Name}");
 									return root;
 								}
+
+								token = LexingStream.CurrentToken();
+								stackTop = Stack.Peek();
 							}
 						}
 					}
@@ -138,6 +142,8 @@ namespace LandParserGenerator.Parsing.LL
 						alternativeToApply = alternatives[0];
 					}
 
+					Stack.InitBatch();
+
 					/// снимаем со стека нетерминал и кладём содержимое его альтернативы
 					Stack.Pop();
 
@@ -145,9 +151,11 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						var newNode = new Node(alternativeToApply[i]);
 
-						stackTop.AddChildFirst(newNode);
+						stackTop.AddFirstChild(newNode);
 						Stack.Push(newNode);
 					}
+
+					Stack.FinBatch();
 
 					continue;
 				}
@@ -164,7 +172,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// <returns>
 		/// Токен, найденный сразу после символа TEXT
 		/// </returns>
-		private IToken SkipText(IToken current)
+		private IToken SkipText()
 		{
 			var textNode = Stack.Pop();
 
@@ -177,15 +185,16 @@ namespace LandParserGenerator.Parsing.LL
 			var tokensAfterText = grammar.First(alt).Select(t=>t.Name);
 
 			/// Смещения для участка, подобранного как текст
-			var startOffset = current.StartOffset;
-			var endOffset = current.EndOffset;
+			var startOffset = LexingStream.CurrentToken().StartOffset;
+			var endOffset = LexingStream.CurrentToken().EndOffset;
 
 			/// Пропускаем
-			IToken token = current;
+			IToken token = LexingStream.CurrentToken();
+
 			while(!tokensAfterText.Contains(token.Name))
 			{
 				endOffset = token.EndOffset;
-				token = Lexer.NextToken();
+				token = LexingStream.NextToken();
 			}
 
 			textNode.SetAnchor(startOffset, endOffset);
@@ -198,7 +207,11 @@ namespace LandParserGenerator.Parsing.LL
 		/// если очередной токен не соответствует ожидаемому,
 		/// или не нашли запись в таблице
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>
+		/// Альтернатива, по которой нужно пойти для некоторого из нетерминалов,
+		/// которые ранее были в стеке. Указатель потока токенов смещается в позицию, 
+		/// в которой он был перед переходом по неправильной ветке для этого нетерминала
+		/// </returns>
 		private Alternative ErrorRecovery()
 		{
 			while (Stack.Count > 0)

@@ -60,14 +60,19 @@ namespace LandParserGenerator.Parsing.Tree
 			Children = new LinkedList<Node>();
 		}
 
-		public void AddChildLast(Node child)
+		public void AddLastChild(Node child)
 		{
 			Children.AddLast(child);
 		}
 
-		public void AddChildFirst(Node child)
+		public void AddFirstChild(Node child)
 		{
 			Children.AddFirst(child);
+		}
+
+		public void ResetChildren()
+		{
+			Children = new LinkedList<Node>();
 		}
 
 		public void SetAnchor(int start, int end)
