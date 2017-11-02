@@ -42,7 +42,9 @@ namespace LandParserGenerator
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
 		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 
-		public const string EOF_SPECIAL_TOKEN_NAME = "EOF";
+		public const string EOF_TOKEN_NAME = "EOF";
+		public const string TEXT_TOKEN_NAME = "TEXT";
+
 
 		public ISymbol this[string key]
 		{
@@ -66,7 +68,9 @@ namespace LandParserGenerator
 
 		public Grammar()
 		{
-			DeclareSpecialTokens(EOF_SPECIAL_TOKEN_NAME);
+			DeclareSpecialTokens(TEXT_TOKEN_NAME);
+			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
+
 			State = GrammarState.Valid;
 		}
 
@@ -117,7 +121,7 @@ namespace LandParserGenerator
 				}
 
 				SpecialTokens.Add(token);
-				Tokens.Add(token, terminal);
+				//Tokens.Add(token, terminal);
 			}
 
 			OnGrammarUpdate();
@@ -223,8 +227,8 @@ namespace LandParserGenerator
 		#region Построение FIRST
 
 		private bool FirstCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<TerminalSymbol>> _first;
-		private Dictionary<string, HashSet<TerminalSymbol>> FirstCache
+		private Dictionary<string, HashSet<string>> _first;
+		private Dictionary<string, HashSet<string>> FirstCache
 		{
 			get
 			{
@@ -253,12 +257,12 @@ namespace LandParserGenerator
 		/// </summary>
 		private void BuildFirst()
 		{
-			_first = new Dictionary<string, HashSet<TerminalSymbol>>();
+			_first = new Dictionary<string, HashSet<string>>();
 
 			/// Изначально множества пустые
 			foreach (var nt in Rules)
 			{
-				_first[nt.Key] = new HashSet<TerminalSymbol>();
+				_first[nt.Key] = new HashSet<string>();
 			}
 
 			var changed = true;
@@ -293,13 +297,13 @@ namespace LandParserGenerator
 #endif
 		}
 
-		public HashSet<TerminalSymbol> First(Alternative alt)
+		public HashSet<string> First(Alternative alt)
 		{
 			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
 			/// либо, если альтернатива пустая, соответствующий токен
 			if (alt.Count > 0)
 			{
-				var first = First(this[alt[0]]);
+				var first = First(alt[0]);
 
 				/// Если первый элемент альтернативы - нетерминал,
 				/// из которого выводится пустая строка
@@ -310,7 +314,7 @@ namespace LandParserGenerator
 					if (first.Contains(null))
 					{
 						first.Remove(null);
-						first.UnionWith(First(this[alt[i]]));
+						first.UnionWith(First(alt[i]));
 					}
 					else
 						break;
@@ -320,24 +324,31 @@ namespace LandParserGenerator
 			}
 			else
 			{
-				return new HashSet<TerminalSymbol>() { null };
+				return new HashSet<string>() { null };
 			}
 		}
 
-		public HashSet<TerminalSymbol> First(ISymbol symbol)
+		public HashSet<string> First(string symbol)
 		{
-			if (symbol is NonterminalSymbol)
-				return new HashSet<TerminalSymbol>(FirstCache[symbol.Name]);
+            /// Если переданный символ является специальным
+            /// и не находится в числе определённых пользователем
+            if (this.SpecialTokens.Contains(symbol))
+                return new HashSet<string>() { symbol };
+
+            var gramSymbol = this[symbol];
+
+            if (gramSymbol is NonterminalSymbol)
+				return new HashSet<string>(FirstCache[gramSymbol.Name]);
 			else
-				return new HashSet<TerminalSymbol>() { (TerminalSymbol)symbol };
+				return new HashSet<string>() { gramSymbol.Name };
 		}
 
 		#endregion
 
 		#region Построение FOLLOW
 		private bool FollowCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<TerminalSymbol>> _follow;
-		private Dictionary<string, HashSet<TerminalSymbol>> FollowCache
+		private Dictionary<string, HashSet<string>> _follow;
+		private Dictionary<string, HashSet<string>> FollowCache
 		{
 			get
 			{
@@ -366,14 +377,14 @@ namespace LandParserGenerator
 		/// </summary>
 		private void BuildFollow()
 		{
-			_follow = new Dictionary<string, HashSet<TerminalSymbol>>();
+			_follow = new Dictionary<string, HashSet<string>>();
 
 			foreach (var nt in Rules)
 			{
-				_follow[nt.Key] = new HashSet<TerminalSymbol>();
+				_follow[nt.Key] = new HashSet<string>();
 			}
 
-			_follow[StartSymbol].Add(Tokens[EOF_SPECIAL_TOKEN_NAME]);
+			_follow[StartSymbol].Add(EOF_TOKEN_NAME);
 
 			var changed = true;
 
@@ -419,12 +430,12 @@ namespace LandParserGenerator
 #if DEBUG
 			foreach (var set in _follow)
 			{
-				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value.Select(v => v?.ToString() ?? "eps"))}");
+				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value.Select(v => v ?? "eps"))}");
 			}
 #endif
 		}
 
-		public HashSet<TerminalSymbol> Follow(string nonterminal)
+		public HashSet<string> Follow(string nonterminal)
 		{
 			return FollowCache[nonterminal];
 		}
@@ -452,7 +463,7 @@ namespace LandParserGenerator
 					/// Будем брать FIRST от того, что идёт после этого нетерминала + символ предпросмотра
 					var sequenceAfterNt = marker.Alternative
 						.Subsequence(marker.Position)
-						.Add(marker.Lookahead.Name);
+						.Add(marker.Lookahead);
 
 					foreach (var alt in nt)
 					{

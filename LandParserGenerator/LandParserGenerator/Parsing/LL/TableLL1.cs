@@ -12,63 +12,103 @@ namespace LandParserGenerator.Parsing.LL
 	/// </summary>
 	public class TableLL1
 	{
-		private List<Alternative>[,] Table { get; set; }
+		private HashSet<Alternative>[,] Table { get; set; }
 		private Dictionary<string, int> Lookaheads { get; set; }
 		private Dictionary<string, int> NonterminalSymbols { get; set; }
 
 		public TableLL1(Grammar g)
 		{
-			Table = new List<Alternative>[g.Rules.Count, g.Tokens.Count];
+			Table = new HashSet<Alternative>[g.Rules.Count, g.Tokens.Count];
 
 			NonterminalSymbols = g.Rules
 				.Zip(Enumerable.Range(0, g.Rules.Count), (a, b) => new { smb = a.Key, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
-			Lookaheads = g.Tokens
-				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a.Key, idx = b })
+			Lookaheads = g.Tokens.Keys
+				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
 
-			/// Заполняем ячейки таблицы
 			foreach (var nt in g.Rules.Keys)
 			{
 				foreach (var tk in g.Tokens)
 				{
 					/// Список, потому что могут быть неоднозначности
-					this[nt, tk.Key] = new List<Alternative>();
+					this[nt, tk.Key] = new HashSet<Alternative>();
 				}
 
 				/// Проходим по всем продукциям
 				foreach (var alt in g.Rules[nt])
 				{
 					var altFirst = g.First(alt);
-					var containsEmpty = altFirst.Remove(null);
 
-					/// Для каждого токена, с которого может начинаться альтернатива
-					foreach(var tk in altFirst)
+					var containsEmpty = altFirst.Remove(null);
+					var containsText = altFirst.Any(t => t == Grammar.TEXT_TOKEN_NAME);
+
+					/// Для каждого реально возвращаемого лексером токена, 
+                    /// с которого может начинаться альтернатива
+					foreach (var tk in altFirst.Where(t=>!g.SpecialTokens.Contains(t)))
 					{
-						this[nt, tk.Name].Add(alt);
+						/// добавляем эту альтернативу в соответствующую ячейку таблицы
+						this[nt, tk].Add(alt);
 					}
 
 					/// Если альтернатива может быть пустой
-					if(containsEmpty)
+					if (containsEmpty)
 					{
 						var ntFollow = g.Follow(nt);
 
+						var followContainsText = ntFollow.Contains(Grammar.TEXT_TOKEN_NAME);
+
 						/// её следует выбрать, если встретили то, что может идти
 						/// после текущего нетерминала
-						foreach (var tk in ntFollow)
+						foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
 						{
-							this[nt, tk.Name].Add(alt);
+							this[nt, tk].Add(alt);
 						}
+
+						if(followContainsText)
+						{
+                            foreach (var tk in g.Tokens.Keys
+                                .Except(ntFollow).Except(g.First(nt)))
+                            {
+                                this[nt, tk].Add(alt);
+                            }
+                        }
+					}
+
+					/// Если альтернатива может начинаться с ANY,
+                    /// переход к этой альтернативе должен происходить
+                    /// по любому символу, с которого не может начинаться
+                    /// правило для текущего нетерминала
+					if (containsText)
+					{
+                        foreach (var tk in g.Tokens.Keys
+                            .Except(g.First(nt)))
+                        {
+                            this[nt, tk].Add(alt);
+                        }
 					}
 				}
 			}
 		}
 
-		public List<Alternative> this[string nt, string lookahead]
+		public HashSet<Alternative> this[string nt, string lookahead]
 		{
 			get { return Table[NonterminalSymbols[nt], Lookaheads[lookahead]]; }
 
 			private set { Table[NonterminalSymbols[nt], Lookaheads[lookahead]] = value; }
+		}
+
+		public Dictionary<string, HashSet<Alternative>> this[string nt]
+		{
+			get
+			{
+				var allRecords = new Dictionary<string, HashSet<Alternative>>();
+
+				foreach (var lookahead in Lookaheads.Keys)
+					allRecords[lookahead] = this[nt, lookahead];
+
+				return allRecords;
+			}
 		}
 
 		public void ExportToCsv(string filename)
@@ -84,7 +124,7 @@ namespace LandParserGenerator.Parsing.LL
 
 				output.Write(String.Join(",",
 					orderedLookaheads.Select(l=>this[nt, l.Key])
-					.Select(alts => alts.Count == 0 ? "" : alts.Count == 1 ? alts[0].ToString() : String.Join("/", alts))));
+					.Select(alts => alts.Count == 0 ? "" : alts.Count == 1 ? alts.Single().ToString() : String.Join("/", alts))));
 
 				output.WriteLine();
 			}

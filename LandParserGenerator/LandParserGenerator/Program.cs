@@ -72,17 +72,15 @@ namespace LandParserGenerator
 		{
 			Grammar yaccGrammar = new Grammar();
 
-			yaccGrammar.DeclareSpecialTokens("ERROR", "TEXT");
-
 			/// Пропускаемые сущности
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
 
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\"' | '\\\\'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'/*' .*? '*/'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' [^\"]* '\"'"));
-			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
+            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\\\"' | '\\\\\\\\'"));
+            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
+            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
+            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
 
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_CODE", "'%{' (STRING|COMMENT|.)*? '%}'"));
 
@@ -214,16 +212,14 @@ namespace LandParserGenerator
 		{
 			Grammar sharpGrammar = new Grammar();
 
-			sharpGrammar.DeclareSpecialTokens("ERROR", "TEXT");
-
 			/// Пропускаемые сущности
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
 
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\"' | '\\\\'"));
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'/*' .*? '*/'"));
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' [^\"]* '\"'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\\\"' | '\\\\\\\\'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
 
 			sharpGrammar.SetSkipTokens("COMMENT", "STRING");
@@ -258,7 +254,7 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class", new string[][]
 			{
-				new string[]{ "TEXT", "CLASS", "full_name", "TEXT", "LCBRACE", "TEXT", "RCBRACE" }
+				new string[]{ "TEXT", "CLASS", "full_name", "TEXT", "other_code" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
@@ -283,8 +279,13 @@ namespace LandParserGenerator
 				new string[]{ }
 			}));
 
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("other_code", new string[][]
+            {
+                new string[]{ "TEXT" },
+                new string[]{ "LCBRACE", "other_code", "RCBRACE" }
+            }));
 
-			sharpGrammar.SetStartSymbol("program");
+            sharpGrammar.SetStartSymbol("program");
 
 			TableLL1 table = new TableLL1(sharpGrammar);
 			table.ExportToCsv("sharp_table.csv");

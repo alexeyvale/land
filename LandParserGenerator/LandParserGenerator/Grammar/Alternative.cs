@@ -44,6 +44,23 @@ namespace LandParserGenerator
 			};
 		}
 
+		public override bool Equals(object obj)
+		{
+			if (obj is Alternative)
+			{
+				var b = (Alternative)obj;
+
+				return b.Elements.SequenceEqual(this.Elements);
+			}
+			else
+				return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return Elements.GetHashCode();
+		}
+
 		public override string ToString()
 		{
 			return Count > 0 ? String.Join(" ", Elements) : "eps";

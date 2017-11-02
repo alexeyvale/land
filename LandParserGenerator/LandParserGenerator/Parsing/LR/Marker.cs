@@ -11,9 +11,9 @@ namespace LandParserGenerator.Parsing.LR
 		public Alternative Alternative { get; private set; }
 		public int Position { get; private set; }
 
-		public TerminalSymbol Lookahead { get; private set; }
+		public string Lookahead { get; private set; }
 
-		public Marker(Alternative alt, int pos, TerminalSymbol lookahead)
+		public Marker(Alternative alt, int pos, string lookahead)
 		{
 			Alternative = alt;
 			Position = pos;
