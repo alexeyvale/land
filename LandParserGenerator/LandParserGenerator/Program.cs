@@ -24,7 +24,7 @@ namespace LandParserGenerator
 			grammarOutput.WriteLine();
 			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
 
-			foreach (var token in grammar.Tokens.Values)
+			foreach (var token in grammar.Tokens.Values.Where(v=>!String.IsNullOrEmpty(v.Pattern)))
 			{
 				/// На уровне лексера распознаём только лексемы для обычных токенов
 				if (!grammar.SpecialTokens.Contains(token.Name))
@@ -35,6 +35,8 @@ namespace LandParserGenerator
 					grammarOutput.WriteLine($"{isFragment}{token.Name}: {token.Pattern} ;");
                 }
 			}
+
+			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
 
 			grammarOutput.Close();
 
@@ -77,7 +79,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
 
-            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\\\"' | '\\\\\\\\'"));
+            yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\"' | '\\\\\\\\'"));
             yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
             yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
             yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
@@ -217,7 +219,7 @@ namespace LandParserGenerator
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
 
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\\\"' | '\\\\\\\\'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\"' | '\\\\\\\\'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
@@ -279,11 +281,18 @@ namespace LandParserGenerator
 				new string[]{ }
 			}));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("other_code", new string[][]
-            {
-                new string[]{ "TEXT" },
-                new string[]{ "LCBRACE", "other_code", "RCBRACE" }
-            }));
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("other_code", new string[][]
+			{
+				new string[]{ "TEXT" },
+				new string[]{ "LCBRACE", "code_content", "RCBRACE" },
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("code_content", new string[][]
+			{
+				new string[]{ "other_code", "code_content" },
+				new string[] { }
+			}));
+
 
             sharpGrammar.SetStartSymbol("program");
 
@@ -353,6 +362,50 @@ namespace LandParserGenerator
 
 			/// Получаем тип лексера
 			var lexerType = BuildLexer(exprGrammar, "ExpressionGrammarLexer");
+
+			/// Создаём парсер
+			var parser = new Parser(exprGrammar,
+				new AntlrLexerAdapter(
+					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+				)
+			);
+
+			return parser;
+		}
+
+		public static Parser BuildTestCase()
+		{
+			/// Формируем грамматику
+
+			Grammar exprGrammar = new Grammar();
+
+			exprGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
+			exprGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
+			exprGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
+			exprGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
+			exprGrammar.DeclareTerminal(new TerminalSymbol("E", "'e'"));
+
+			exprGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
+			{
+				new string[]{ "a", "TEXT", "B" },
+				new string[]{ "A" },
+				new string[]{ "C" }
+			}));
+
+			exprGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
+			{
+				new string[]{ "D", "E" },
+				new string[] { }
+			}));
+
+			exprGrammar.SetStartSymbol("b");
+
+			/// Строим таблицу парсинга
+			TableLL1 table = new TableLL1(exprGrammar);
+			table.ExportToCsv("test_table.csv");
+
+			/// Получаем тип лексера
+			var lexerType = BuildLexer(exprGrammar, "TestGrammarLexer");
 
 			/// Создаём парсер
 			var parser = new Parser(exprGrammar,

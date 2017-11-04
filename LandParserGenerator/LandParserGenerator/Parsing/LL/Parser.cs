@@ -115,7 +115,7 @@ namespace LandParserGenerator.Parsing.LL
 						}
 						else
 						{
-							alternativeToApply = null; //ErrorRecovery();
+							alternativeToApply = ErrorRecovery();
 
 							if (alternativeToApply == null)
 							{
@@ -165,7 +165,14 @@ namespace LandParserGenerator.Parsing.LL
 		/// </returns>
 		private IToken SkipText()
 		{
-			var textNode = Stack.Pop();
+			/// В ситуации, когда на стеке друг за другом идёт несколько TEXT,
+			/// доходим до самого последнего
+			Node textNode;
+			do
+			{
+				textNode = Stack.Pop();
+			}
+			while (Stack.Peek().Symbol == Grammar.TEXT_TOKEN_NAME);
 
 			/// Создаём последовательность символов, идущих в стеке после TEXT
 			var alt = new Alternative();
@@ -218,19 +225,22 @@ namespace LandParserGenerator.Parsing.LL
 				{
 					var alternativesStartsWithText = Table[Stack.Peek().Symbol].Values
 						.SelectMany(e => e)
+						.Distinct()
 						.Where(alt => alt.Count > 0 && alt[0] == Grammar.TEXT_TOKEN_NAME)
 						.ToList();
 
-					/// Проверяем, есть ли у него ветка для TEXT или ERROR
-					if (alternativesStartsWithText.Count == 1)
+					/// Проверяем, есть ли у него ветка для TEXT
+					/// и является ли она приоритетной для текущего lookahead-а
+					if (alternativesStartsWithText.Count == 1 && 
+						!Table[Stack.Peek().Symbol, LexingStream.CurrentToken().Name].Contains(alternativesStartsWithText[0]))
 					{
 						return alternativesStartsWithText[0];
 					}
 
-					if (Table[Stack.Peek().Symbol, "ERROR"].Count == 1)
-					{
-						return Table[Stack.Peek().Symbol, "ERROR"].Single();
-					}
+					//if (Table[Stack.Peek().Symbol, "ERROR"].Count == 1)
+					//{
+					//	return Table[Stack.Peek().Symbol, "ERROR"].Single();
+					//}
 				}
 			}
 

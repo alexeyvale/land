@@ -50,6 +50,8 @@ namespace TestGUI
 
 		private void ParseButton_Click(object sender, RoutedEventArgs e)
 		{
+			//var test = LandParserGenerator.Builder.BuildTestCase();
+
 			LandParserGenerator.Parsing.LL.Parser parser = null;
 
 			if (LanguageSharpRadio.IsChecked == true)

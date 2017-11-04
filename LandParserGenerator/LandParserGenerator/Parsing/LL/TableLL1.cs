@@ -40,8 +40,8 @@ namespace LandParserGenerator.Parsing.LL
 				{
 					var altFirst = g.First(alt);
 
-					var containsEmpty = altFirst.Remove(null);
-					var containsText = altFirst.Any(t => t == Grammar.TEXT_TOKEN_NAME);
+					var altContainsEmpty = altFirst.Remove(null);
+					var altContainsText = altFirst.Any(t => t == Grammar.TEXT_TOKEN_NAME);
 
 					/// Для каждого реально возвращаемого лексером токена, 
                     /// с которого может начинаться альтернатива
@@ -52,7 +52,7 @@ namespace LandParserGenerator.Parsing.LL
 					}
 
 					/// Если альтернатива может быть пустой
-					if (containsEmpty)
+					if (altContainsEmpty)
 					{
 						var ntFollow = g.Follow(nt);
 
@@ -65,27 +65,30 @@ namespace LandParserGenerator.Parsing.LL
 							this[nt, tk].Add(alt);
 						}
 
-						if(followContainsText)
+						if (followContainsText || altContainsText)
 						{
-                            foreach (var tk in g.Tokens.Keys
-                                .Except(ntFollow).Except(g.First(nt)))
-                            {
-                                this[nt, tk].Add(alt);
-                            }
-                        }
+							foreach (var tk in g.Tokens.Keys.Except(ntFollow).Except(g.First(nt)))
+							{
+								this[nt, tk].Add(alt);
+							}
+						}
 					}
-
-					/// Если альтернатива может начинаться с ANY,
-                    /// переход к этой альтернативе должен происходить
-                    /// по любому символу, с которого не может начинаться
-                    /// правило для текущего нетерминала
-					if (containsText)
+					else
 					{
-                        foreach (var tk in g.Tokens.Keys
-                            .Except(g.First(nt)))
-                        {
-                            this[nt, tk].Add(alt);
-                        }
+						/// Если альтернатива может начинаться с ANY,
+						/// переход к этой альтернативе должен происходить
+						/// по любому символу, с которого не может начинаться
+						/// правило для текущего нетерминала
+						if (altContainsText)
+						{
+							var ntFirst = g.First(nt);
+							var exceptTokens = ntFirst.Contains(null) ? ntFirst.Union(g.Follow(nt)) : ntFirst;
+
+							foreach (var tk in g.Tokens.Keys.Except(exceptTokens))
+							{
+								this[nt, tk].Add(alt);
+							}
+						}
 					}
 				}
 			}
