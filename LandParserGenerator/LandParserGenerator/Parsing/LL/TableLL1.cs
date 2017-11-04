@@ -58,20 +58,20 @@ namespace LandParserGenerator.Parsing.LL
 
 						var followContainsText = ntFollow.Contains(Grammar.TEXT_TOKEN_NAME);
 
-						/// её следует выбрать, если встретили то, что может идти
-						/// после текущего нетерминала
-						foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
-						{
-							this[nt, tk].Add(alt);
-						}
-
 						if (followContainsText || altContainsText)
 						{
-							foreach (var tk in g.Tokens.Keys.Except(ntFollow).Except(g.First(nt)))
+							foreach (var tk in g.Tokens.Keys.Except(g.First(nt)))
 							{
 								this[nt, tk].Add(alt);
 							}
 						}
+						else
+							/// её следует выбрать, если встретили то, что может идти
+							/// после текущего нетерминала
+							foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
+							{
+								this[nt, tk].Add(alt);
+							}
 					}
 					else
 					{

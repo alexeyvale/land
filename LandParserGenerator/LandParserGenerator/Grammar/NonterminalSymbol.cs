@@ -19,7 +19,10 @@ namespace LandParserGenerator
 
 			for(int i=0; i< alts.Length; ++i)
 			{
-				var newAlt = new Alternative();
+				var newAlt = new Alternative()
+				{
+					NonterminalSymbolName = name
+				};
 
 				for (int j = 0; j < alts[i].Length; ++j)
 				{
@@ -32,7 +35,10 @@ namespace LandParserGenerator
 
 		public void Add(string[] altContent)
 		{
-			var alt = new Alternative();
+			var alt = new Alternative()
+			{
+				NonterminalSymbolName = this.Name
+			};
 
 			foreach (var smb in altContent)
 			{

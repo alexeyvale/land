@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuilderLR.cs" />
     <Compile Include="Grammar\Entry.cs" />
     <Compile Include="Grammar\Grammar.cs" />
     <Compile Include="Grammar\Alternative.cs" />
@@ -58,6 +59,9 @@
     <Compile Include="Parsing\LL\TokenStream.cs" />
     <Compile Include="Parsing\LL\ParsingStackAction.cs" />
     <Compile Include="Parsing\LL\ParsingStack.cs" />
+    <Compile Include="Parsing\LR\Action.cs" />
+    <Compile Include="Parsing\LR\Parser.cs" />
+    <Compile Include="Parsing\LR\TableLR1.cs" />
     <Compile Include="Parsing\Tree\Location.cs" />
     <Compile Include="Parsing\Tree\Node.cs" />
     <Compile Include="Parsing\LL\Parser.cs" />
@@ -65,7 +69,7 @@
     <Compile Include="Parsing\LR\Marker.cs" />
     <Compile Include="Grammar\TerminalSymbol.cs" />
     <Compile Include="AntlrLexerAdapter.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="BuilderLL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammar\NonterminalSymbol.cs" />
   </ItemGroup>

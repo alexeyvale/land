@@ -8,6 +8,8 @@ namespace LandParserGenerator
 {
 	public class Alternative
 	{
+		public string NonterminalSymbolName { get; set; } = null;
+
 		private List<Entry> Elements { get; set; } = new List<Entry>();
 
 		public int Count { get { return Elements.Count; } }
@@ -50,7 +52,8 @@ namespace LandParserGenerator
 			{
 				var b = (Alternative)obj;
 
-				return b.Elements.SequenceEqual(this.Elements);
+				return NonterminalSymbolName == b.NonterminalSymbolName
+					&& b.Elements.SequenceEqual(this.Elements);
 			}
 			else
 				return false;

@@ -50,22 +50,22 @@ namespace TestGUI
 
 		private void ParseButton_Click(object sender, RoutedEventArgs e)
 		{
-			//var test = LandParserGenerator.Builder.BuildTestCase();
+			var test = LandParserGenerator.BuilderLR.BuildTestCase();
 
 			LandParserGenerator.Parsing.LL.Parser parser = null;
 
 			if (LanguageSharpRadio.IsChecked == true)
 			{
-				parser = LandParserGenerator.Builder.BuildSharp();
+				parser = LandParserGenerator.BuilderLL.BuildSharp();
 			}
 			else if (LanguageYaccRadio.IsChecked == true)
 			{
-				parser = LandParserGenerator.Builder.BuildYacc();
+				parser = LandParserGenerator.BuilderLL.BuildYacc();
 
 			}
 			else if (LanguageExprRadio.IsChecked == true)
 			{
-				parser = LandParserGenerator.Builder.BuildExpressionGrammar();
+				parser = LandParserGenerator.BuilderLL.BuildExpressionGrammar();
 			}
 
 			var errorMessage = String.Empty;

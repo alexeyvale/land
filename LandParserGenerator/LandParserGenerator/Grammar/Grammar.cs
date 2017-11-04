@@ -478,5 +478,17 @@ namespace LandParserGenerator
 
 			return closedMarkers;
 		}
+
+		public HashSet<Marker> Goto(HashSet<Marker> I, string smb)
+		{
+			var res = new HashSet<Marker>();
+
+			foreach(var marker in I.Where(m=>m.Next == smb))
+			{
+				res.Add(marker.ShiftNext());
+			}
+
+			return BuildClosure(res);
+		}
 	}
 }

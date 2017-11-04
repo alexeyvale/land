@@ -43,15 +43,31 @@ namespace LandParserGenerator.Parsing.LR
 		/// Сдвиг пункта к следующему символу в альтернативе
 		/// </summary>
 		/// <returns>Признак достижения конца альтернативы</returns>
-		public bool ShiftNext()
+		public Marker ShiftNext()
 		{
-			/// Если есть куда сдвигаться
-			if(Position < Alternative.Count)
-			{
-				++Position;
-			}
+			return new Marker(
+				Alternative,
+				Position < Alternative.Count ? ++Position : Position,
+				Lookahead
+			);
+		}
 
-			return Position == Alternative.Count;
+		public override bool Equals(object obj)
+		{
+			if (obj is Marker)
+			{
+				var b = (Marker)obj;
+				return b.Alternative.Equals(Alternative) 
+					&& b.Position == Position 
+					&& b.Lookahead == Lookahead;
+			}
+			else
+				return false;
+		}
+
+		public override int GetHashCode()
+		{
+			return this.Alternative.GetHashCode();
 		}
 	}
 }

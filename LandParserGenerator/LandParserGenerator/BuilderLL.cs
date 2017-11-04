@@ -12,7 +12,7 @@ using LandParserGenerator.Parsing.LL;
 
 namespace LandParserGenerator
 {
-	public static class Builder
+	public static class BuilderLL
 	{
 		private static Type BuildLexer(Grammar grammar, string lexerName)
 		{
