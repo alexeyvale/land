@@ -12,14 +12,16 @@ namespace LandParserGenerator.Parsing.LR
 	/// </summary>
 	public class TableLR1
 	{
-		private HashSet<Action>[,] Table { get; set; }
 		private Dictionary<string, int> Lookaheads { get; set; }
-		private Dictionary<string, int> NonterminalSymbols { get; set; }
 
 		/// <summary>
 		/// Множества состояний (множество множеств пунктов)
 		/// </summary>
 		private List<HashSet<Marker>> Items { get; set; }
+		/// <summary>
+		/// Действия, которые надо совершать при встрече различных терминалов
+		/// </summary>
+		private HashSet<Action>[,] Actions { get; set; }
 		/// <summary>
 		/// Переходы между состояниями
 		/// </summary>
@@ -34,7 +36,7 @@ namespace LandParserGenerator.Parsing.LR
 			/// Строим набор множеств пунктов
 			BuildItems(g);
 
-			Table = new HashSet<Action>[Items.Count, Lookaheads.Count];
+			Actions = new HashSet<Action>[Items.Count, Lookaheads.Count];
 
 			for(var i=0; i<Items.Count;++i)
 			{
@@ -131,30 +133,30 @@ namespace LandParserGenerator.Parsing.LR
 
 		public HashSet<Action> this[int i, string lookahead]
 		{
-			get { return Table[i, Lookaheads[lookahead]]; }
+			get { return Actions[i, Lookaheads[lookahead]]; }
 
-			private set { Table[i, Lookaheads[lookahead]] = value; }
+			private set { Actions[i, Lookaheads[lookahead]] = value; }
 		}
 
 		public void ExportToCsv(string filename)
 		{
-			//var output = new StreamWriter(filename);
+			var output = new StreamWriter(filename);
 
-			//var orderedLookaheads = Lookaheads.OrderBy(l => l.Value);
-			//output.WriteLine("," + String.Join(",", orderedLookaheads.Select(l => l.Key)));
+			var orderedLookaheads = Lookaheads.OrderBy(l => l.Value);
+			output.WriteLine("," + String.Join(",", orderedLookaheads.Select(l => l.Key)));
 
-			//foreach (var nt in NonterminalSymbols.Keys)
-			//{
-			//	output.Write($"{nt},");
+			for(var i=0; i< Items.Count; ++i)
+			{
+				output.Write($"{i},");
 
-			//	output.Write(String.Join(",",
-			//		orderedLookaheads.Select(l=>this[nt, l.Key])
-			//		.Select(alts => alts.Count == 0 ? "" : alts.Count == 1 ? alts.Single().ToString() : String.Join("/", alts))));
+				output.Write(String.Join(",",
+					orderedLookaheads.Select(l => this[i, l.Key])
+					.Select(alts => alts.Count == 0 ? "" : alts.Count == 1 ? alts.Single().ToString() : String.Join("/", alts))));
 
-			//	output.WriteLine();
-			//}
+				output.WriteLine();
+			}
 
-			//output.Close();
+			output.Close();
 		}
 	}
 }

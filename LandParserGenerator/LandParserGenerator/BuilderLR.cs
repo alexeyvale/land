@@ -140,6 +140,11 @@ namespace LandParserGenerator
 			exprGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
 
+			exprGrammar.DeclareNonterminal(new NonterminalSymbol("s'", new string[][]
+			{
+				new string[]{ "s" }
+			}));
+
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("s", new string[][]
 			{
 				new string[]{ "c", "c" }
@@ -151,7 +156,7 @@ namespace LandParserGenerator
 				new string[] { "D" }
 			}));
 
-			exprGrammar.SetStartSymbol("s");
+			exprGrammar.SetStartSymbol("s'");
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);

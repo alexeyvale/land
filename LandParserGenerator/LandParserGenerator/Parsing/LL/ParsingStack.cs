@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 
 using LandParserGenerator.Parsing.Tree;
+using LandParserGenerator.Lexing;
 
 namespace LandParserGenerator.Parsing.LL
 {

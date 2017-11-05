@@ -455,24 +455,28 @@ namespace LandParserGenerator
 			{
 				oldCount = closedMarkers.Count;
 
+				var newMarkers = new HashSet<Marker>();
+
 				/// Проходим по всем пунктам, которые предшествуют нетерминалам
-				foreach (var marker in markers
+				foreach (var marker in closedMarkers
 					.Where(m => Rules.ContainsKey(m.Next)))
 				{
 					var nt = Rules[marker.Next];
 					/// Будем брать FIRST от того, что идёт после этого нетерминала + символ предпросмотра
 					var sequenceAfterNt = marker.Alternative
-						.Subsequence(marker.Position)
+						.Subsequence(marker.Position + 1)
 						.Add(marker.Lookahead);
 
 					foreach (var alt in nt)
 					{
 						foreach (var t in First(sequenceAfterNt))
 						{
-							closedMarkers.Add(new Marker(alt, 0, t));
+							newMarkers.Add(new Marker(alt, 0, t));
 						}
 					}
 				}
+
+				closedMarkers.UnionWith(newMarkers);
 			}
 			while (oldCount != closedMarkers.Count);
 

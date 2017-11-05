@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Lexing;
-
-namespace LandParserGenerator.Parsing.LL
+namespace LandParserGenerator.Lexing
 {
 	public class TokenStream
 	{

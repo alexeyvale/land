@@ -14,8 +14,9 @@ namespace LandParserGenerator.Parsing.LR
 		private Grammar grammar { get; set; }
 		private TableLR1 Table { get; set; }
 
-		//private ParsingStack Stack { get; set; }
-		//private TokenStream LexingStream { get; set; }
+		private Stack<int> StatesStack { get; set; }
+		private Stack<string> SymbolsStack { get; set; }
+		private TokenStream LexingStream { get; set; }
 
 		private ILexer Lexer { get; set; }
 
@@ -33,6 +34,13 @@ namespace LandParserGenerator.Parsing.LR
 			Log = new List<string>();
 			errorMessage = String.Empty;
 
+			StatesStack = new Stack<int>();
+			SymbolsStack = new Stack<string>();
+
+			while(true)
+			{
+
+			}
 
 			return null;
 		}

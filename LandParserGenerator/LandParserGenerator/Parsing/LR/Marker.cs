@@ -47,7 +47,7 @@ namespace LandParserGenerator.Parsing.LR
 		{
 			return new Marker(
 				Alternative,
-				Position < Alternative.Count ? ++Position : Position,
+				Position < Alternative.Count ? Position + 1 : Position,
 				Lookahead
 			);
 		}
