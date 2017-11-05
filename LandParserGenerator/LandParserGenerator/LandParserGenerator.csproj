@@ -61,6 +61,8 @@
     <Compile Include="Parsing\LL\ParsingStack.cs" />
     <Compile Include="Parsing\LR\Action.cs" />
     <Compile Include="Parsing\LR\Parser.cs" />
+    <Compile Include="Parsing\LR\ParsingStack.cs" />
+    <Compile Include="Parsing\LR\ParsingStackAction.cs" />
     <Compile Include="Parsing\LR\TableLR1.cs" />
     <Compile Include="Parsing\BaseParser.cs" />
     <Compile Include="Parsing\Tree\Location.cs" />
