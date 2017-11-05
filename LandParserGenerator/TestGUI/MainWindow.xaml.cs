@@ -50,7 +50,7 @@ namespace TestGUI
 
 		private void ParseButton_Click(object sender, RoutedEventArgs e)
 		{
-			var test = LandParserGenerator.BuilderLR.BuildTestCase();
+			// var test = LandParserGenerator.BuilderLR.BuildTestCase();
 
 			LandParserGenerator.Parsing.BaseParser parser = null;
 

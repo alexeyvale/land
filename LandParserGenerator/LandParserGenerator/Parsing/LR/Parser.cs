@@ -42,8 +42,10 @@ namespace LandParserGenerator.Parsing.LR
 			{
 				var currentState = StatesStack.Peek();
 
-				if(SymbolsStack.Count > 0)
+				if (SymbolsStack.Count > 0)
 					Log.Add($"Текущий токен: {token.Name}; символ на вершине стека: {SymbolsStack.Peek()}");
+				else
+					Log.Add($"Текущий токен: {token.Name}");
 
 				if (Table[currentState, token.Name].Count == 1)
 				{
@@ -67,11 +69,16 @@ namespace LandParserGenerator.Parsing.LR
 						var action = (ReduceAction)Table[currentState, token.Name].Single();
 						/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
 						for (var i = 0; i < action.ReductionAlternative.Count; ++i)
+						{
 							SymbolsStack.Pop();
+							StatesStack.Pop();
+						}
 						currentState = StatesStack.Peek();
+
 						/// Кладём на стек состояние, в которое нужно произвести переход
 						StatesStack.Push(Table.Transitions[currentState]
 							[action.ReductionAlternative.NonterminalSymbolName]);
+						SymbolsStack.Push(action.ReductionAlternative.NonterminalSymbolName);
 
 						Log.Add($"Свёртка по правилу {action.ReductionAlternative}");
 
