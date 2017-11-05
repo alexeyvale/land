@@ -52,20 +52,34 @@ namespace TestGUI
 		{
 			var test = LandParserGenerator.BuilderLR.BuildTestCase();
 
-			LandParserGenerator.Parsing.LL.Parser parser = null;
+			LandParserGenerator.Parsing.BaseParser parser = null;
 
-			if (LanguageSharpRadio.IsChecked == true)
+			if (ParsingLL.IsChecked == true)
 			{
-				parser = LandParserGenerator.BuilderLL.BuildSharp();
-			}
-			else if (LanguageYaccRadio.IsChecked == true)
-			{
-				parser = LandParserGenerator.BuilderLL.BuildYacc();
+				if (LanguageSharpRadio.IsChecked == true)
+				{
+					parser = LandParserGenerator.BuilderLL.BuildSharp();
+				}
+				else if (LanguageYaccRadio.IsChecked == true)
+				{
+					parser = LandParserGenerator.BuilderLL.BuildYacc();
 
+				}
+				else if (LanguageExprRadio.IsChecked == true)
+				{
+					parser = LandParserGenerator.BuilderLL.BuildExpressionGrammar();
+				}
 			}
-			else if (LanguageExprRadio.IsChecked == true)
+			else if (ParsingLR.IsChecked == true)
 			{
-				parser = LandParserGenerator.BuilderLL.BuildExpressionGrammar();
+				if (LanguageYaccRadio.IsChecked == true)
+				{
+					parser = LandParserGenerator.BuilderLR.BuildYacc();
+				}
+				else if (LanguageExprRadio.IsChecked == true)
+				{
+					parser = LandParserGenerator.BuilderLR.BuildExpressionGrammar();
+				}
 			}
 
 			var errorMessage = String.Empty;

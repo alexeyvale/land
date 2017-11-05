@@ -33,6 +33,9 @@
             <RadioButton GroupName="LanguageRadioButton" Name="LanguageSharpRadio" Content="C#" IsChecked="True"/>
             <RadioButton GroupName="LanguageRadioButton" Name="LanguageYaccRadio" Content="YACC" />
             <RadioButton GroupName="LanguageRadioButton" Name="LanguageExprRadio" Content="Expr" />
+            <Separator></Separator>
+            <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLL" Content="LL" IsChecked="True"/>
+            <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLR" Content="LR" />
         </ToolBar>
 
         <Grid Grid.Column="1" Grid.Row="1">

@@ -25,7 +25,7 @@ namespace LandParserGenerator.Parsing.LR
 		/// <summary>
 		/// Переходы между состояниями
 		/// </summary>
-		private List<Dictionary<string, int>> Transitions { get; set; }
+		public List<Dictionary<string, int>> Transitions { get; private set; }
 
 		public TableLR1(Grammar g)
 		{

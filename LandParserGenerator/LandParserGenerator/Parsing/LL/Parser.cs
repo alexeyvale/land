@@ -9,22 +9,15 @@ using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Parsing.LL
 {
-	public class Parser
+	public class Parser: BaseParser
 	{
-		private Grammar grammar { get; set; }
 		private TableLL1 Table { get; set; }
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
-		private ILexer Lexer { get; set; }
-
-		public List<string> Log { get; private set; }
-
-		public Parser(Grammar g, ILexer lexer)
+		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
-			grammar = g;
 			Table = new TableLL1(g);
-			Lexer = lexer;
 		}
 
 		/// <summary>
@@ -33,7 +26,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		public Node Parse(string text, out string errorMessage)
+		public override Node Parse(string text, out string errorMessage)
 		{
 			Log = new List<string>();
 			errorMessage = String.Empty;

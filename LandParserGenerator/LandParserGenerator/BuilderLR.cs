@@ -86,29 +86,19 @@ namespace LandParserGenerator
 
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E", new string[][]
 			{
-				new string[]{ "T", "E'" }
-			}));
-
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E'", new string[][]
-			{
-				new string[]{ "PLUS", "T","E'" },
-				new string[]{ }
+				new string[]{ "E", "PLUS", "T" },
+				new string[]{ "T" }
 			}));
 
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("T", new string[][]
 			{
-				new string[]{ "F", "T'" },
-			}));
-
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("T'", new string[][]
-			{
-				new string[]{ "MULT", "F","T'" },
-				new string[]{ }
+				new string[]{ "T", "MULT", "F" },
+				new string[]{ "F" }
 			}));
 
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("F", new string[][]
 			{
-				new string[]{ "LPAR", "E","RPAR" },
+				new string[]{ "LPAR", "E", "RPAR" },
 				new string[]{ "ID" }
 			}));
 
@@ -167,6 +157,127 @@ namespace LandParserGenerator
 
 			/// Создаём парсер
 			var parser = new Parser(exprGrammar,
+				new AntlrLexerAdapter(
+					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+				)
+			);
+
+			return parser;
+		}
+
+		public static Parser BuildYacc()
+		{
+			Grammar yaccGrammar = new Grammar();
+
+			/// Пропускаемые сущности
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_ML", "'/*' .*? '*/'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
+
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\"' | '\\\\\\\\'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
+
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_CODE", "'%{' (STRING|COMMENT|.)*? '%}'"));
+
+			yaccGrammar.SetSkipTokens("COMMENT", "STRING", "DECLARATION_CODE");
+
+			/// Нужные штуки
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_NAME", "'%' ID"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_LEFT", "'<'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]*"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("CORNER_RIGHT", "'>'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("COLON", "':'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("SEMICOLON", "';'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("LITERAL", @"'\''(.|'\\\'')*?'\''"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
+			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "'|'"));
+
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar", new string[][]
+			{
+				new string[]{ "declarations", "BORDER", "rules", "grammar_ending" }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar_ending", new string[][]
+			{
+				new string[]{ "BORDER", "TEXT" },
+				new string[]{ "BORDER" },
+				new string[]{ }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("declarations", new string[][]
+			{
+				new string[]{ "declarations", "declaration" },
+				new string[]{ },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("declaration", new string[][]
+			{
+				new string[]{ "DECLARATION_NAME", "optional_type", "declaration_body" }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("optional_type", new string[][]
+			{
+				new string[]{ "CORNER_LEFT", "ID", "CORNER_RIGHT" },
+				new string[]{ }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("declaration_body", new string[][]
+			{
+				new string[]{ "identifiers" },
+				new string[]{ "TEXT" }
+			}));
+
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("identifiers", new string[][]
+			{
+				new string[]{ "identifiers", "ID" },
+				new string[]{ },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rules", new string[][]
+			{
+				new string[]{ "rules", "rule" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rule", new string[][]
+			{
+				new string[]{ "ID", "COLON", "alternatives", "SEMICOLON" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternatives", new string[][]
+			{
+				new string[]{ "alternatives", "alternative" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative", new string[][]
+			{
+				new string[]{ "alternative", "alternative_component" },
+				new string[]{ }
+			}));
+
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative_component", new string[][]
+			{
+				new string[]{ "ID" },
+				new string[]{ "LBRACE", "TEXT", "RBRACE" },
+				new string[] {"LITERAL" }
+			}));
+
+			yaccGrammar.SetStartSymbol("grammar");
+
+			TableLR1 table = new TableLR1(yaccGrammar);
+			table.ExportToCsv("yacc_table.csv");
+
+			var lexerType = BuildLexer(yaccGrammar, "YaccGrammarLexer");
+
+			/// Создаём парсер
+
+			var parser = new Parser(yaccGrammar,
 				new AntlrLexerAdapter(
 					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
 				)
