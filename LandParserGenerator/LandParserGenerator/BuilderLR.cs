@@ -84,6 +84,11 @@ namespace LandParserGenerator
 			exprGrammar.DeclareTerminal(new TerminalSymbol("RPAR", "')'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]*"));
 
+			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E'", new string[][]
+			{
+				new string[]{ "E" }
+			}));
+
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E", new string[][]
 			{
 				new string[]{ "E", "PLUS", "T" },
@@ -102,7 +107,7 @@ namespace LandParserGenerator
 				new string[]{ "ID" }
 			}));
 
-			exprGrammar.SetStartSymbol("E");
+			exprGrammar.SetStartSymbol("E'");
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);
