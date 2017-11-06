@@ -201,6 +201,10 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "'|'"));
 
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar'", new string[][]
+			{
+				new string[]{ "grammar" }
+			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar", new string[][]
 			{
@@ -281,7 +285,7 @@ namespace LandParserGenerator
 				new string[] {"LITERAL" }
 			}));
 
-			yaccGrammar.SetStartSymbol("grammar");
+			yaccGrammar.SetStartSymbol("grammar'");
 
 			TableLR1 table = new TableLR1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
