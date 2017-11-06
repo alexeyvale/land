@@ -247,6 +247,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rules", new string[][]
 			{
 				new string[]{ "rules", "rule" },
+				new string[]{ "rule" },
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("rule", new string[][]
@@ -256,13 +257,20 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternatives", new string[][]
 			{
-				new string[]{ "alternatives", "alternative" },
+				new string[]{ "alternatives", "PIPE" , "alternative" },
+				new string[]{ "alternative" }
 			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative", new string[][]
 			{
-				new string[]{ "alternative", "alternative_component" },
+				new string[]{ "alternative_components" },
 				new string[]{ }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative_components", new string[][]
+			{
+				new string[]{ "alternative_components", "alternative_component" },
+				new string[]{ "alternative_component" }
 			}));
 
 

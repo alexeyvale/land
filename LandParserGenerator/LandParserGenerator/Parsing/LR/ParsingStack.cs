@@ -69,7 +69,8 @@ namespace LandParserGenerator.Parsing.LR
 		{
 			if(state.HasValue)
 				StatesStack.Push(state.Value);
-			SymbolsStack.Push(smb);
+			if(smb != null)
+				SymbolsStack.Push(smb);
 
 			var action = new ParsingStackAction()
 			{
