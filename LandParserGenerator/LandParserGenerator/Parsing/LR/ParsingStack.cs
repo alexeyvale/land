@@ -127,25 +127,29 @@ namespace LandParserGenerator.Parsing.LR
 		{
 			///// При отмене действий обратные нужно производить, 
 			///// начиная с последнего действия
-			//var lastActionsBatch = Actions.Pop();
-			//lastActionsBatch.Reverse();
-			
-			//foreach(var a in lastActionsBatch)
-			//{
-			//	switch(a.Type)
-			//	{
-			//		case ParsingStackAction.ParsingStackActionType.Pop:
-			//			/// Убираем дочерние элементы для заново добавляемого узла
-			//			a.Value.ResetChildren();
-			//			Stack.Push(a.Value);
-			//			break;
-			//		case ParsingStackAction.ParsingStackActionType.Push:
-			//			Stack.Pop();
-			//			break;
-			//	}
+			var lastActionsBatch = Actions.Pop();
+			lastActionsBatch.Reverse();
 
-			//	TokenStream.BackToToken(a.TokenStreamIndex);
-			//}
+			foreach (var a in lastActionsBatch)
+			{
+				switch (a.Type)
+				{
+					case ParsingStackAction.ParsingStackActionType.Pop:
+						if(a.State.HasValue)
+							StatesStack.Push(a.State.Value);
+						if (a.Symbol != null)
+							SymbolsStack.Push(a.Symbol);
+						break;
+					case ParsingStackAction.ParsingStackActionType.Push:
+						if (a.State.HasValue)
+							StatesStack.Pop();
+						if (a.Symbol != null)
+							SymbolsStack.Pop();
+						break;
+				}
+
+				TokenStream.BackToToken(a.TokenStreamIndex);
+			}
 		}
 
 		public int CountSymbols { get { return SymbolsStack.Count; } }

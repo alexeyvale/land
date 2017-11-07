@@ -113,8 +113,15 @@ namespace LandParserGenerator.Parsing.LR
 						continue;
 					}
 
-					errorMessage = String.Format($"Неожиданный символ {token.Name}");
-					return root;
+					token = ErrorRecovery();
+
+					if (token == null)
+					{
+						errorMessage = String.Format($"Неожиданный символ {token.Name}");
+						return root;
+					}
+					else
+						continue;
 				}
 			}
 
@@ -177,6 +184,27 @@ namespace LandParserGenerator.Parsing.LR
 			textNode.SetAnchor(startOffset, endOffset);
 
 			return token;
+		}
+
+		private IToken ErrorRecovery()
+		{
+			while (Stack.CountStates > 0)
+			{
+				Stack.Undo();
+
+				var currentTokenActions = Table[Stack.PeekState(), LexingStream.CurrentToken().Name];
+				var textTokenActions = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME];
+
+				/// Если в текущем состоянии есть приоритетные действия 
+				/// и действия для TEXT,
+				/// 
+				if (currentTokenActions.Count == 1 && textTokenActions.Count == 1)
+				{
+					return SkipText();
+				}
+			}
+
+			return null;
 		}
 	}
 }
