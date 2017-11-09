@@ -106,6 +106,7 @@ namespace TestGUI
 				var start = node.StartOffset.Value;
 				var end = node.EndOffset.Value;
 				Editor.Select(start, end - start + 1);
+				Editor.ScrollToLine(Editor.Document.GetLocation(start).Line);
 			}
 			else
 			{
