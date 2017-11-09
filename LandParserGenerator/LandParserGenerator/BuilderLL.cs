@@ -110,7 +110,6 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar_ending", new string[][]
 			{
 				new string[]{ "BORDER", "TEXT" },
-				new string[]{ "BORDER" },
 				new string[]{ }
 			}));
 
@@ -188,15 +187,27 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative_component", new string[][]
 			{
 				new string[]{ "ID" },
-				new string[]{ "LBRACE", "TEXT", "RBRACE" },
+				new string[]{ "LBRACE", "code_content", "RBRACE" },
 				new string[] {"LITERAL" }
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("code_content_element", new string[][]
+			{
+				new string[]{ "TEXT" },
+				new string[]{ "LBRACE", "code_content", "RBRACE" },
+			}));
+
+			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("code_content", new string[][]
+			{
+				new string[]{ "code_content_element", "code_content" },
+				new string[] { }
 			}));
 
 			yaccGrammar.SetStartSymbol("grammar");
 
-			yaccGrammar.SetListSymbols("alternatives_list", "alternative", "rules_list", "declarations");
+			yaccGrammar.SetListSymbols("alternatives_list", "alternative", "rules_list", "declarations", "identifiers_list", "code_content");
 
-			yaccGrammar.SetGhostSymbols("alternatives_list", "rules_list");
+			yaccGrammar.SetGhostSymbols("alternatives_list", "rules_list", "code_content_element");
 
 			TableLL1 table = new TableLL1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
@@ -244,7 +255,7 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("program", new string[][]
 			{
-				new string[]{ "TEXT", "NAMESPACE", "full_name", "LCBRACE", "namespace_content", "RCBRACE" }
+				new string[]{ "TEXT", "NAMESPACE", "full_name", "TEXT", "LCBRACE", "namespace_content", "RCBRACE" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("namespace_content", new string[][]
@@ -260,7 +271,29 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class", new string[][]
 			{
-				new string[]{ "TEXT", "CLASS_STRUCT_INTERFACE", "full_name", "TEXT", "other_code" }
+				new string[]{ "TEXT", "CLASS_STRUCT_INTERFACE", "full_name", "TEXT", "LCBRACE", "class_content", "RCBRACE" }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_content", new string[][]
+			{
+				new string[] { "method_or_text", "class_content_elements" },
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_content_elements", new string[][]
+			{
+				new string[]{ "method_or_text", "class_content_elements" },
+				new string[]{ }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("method_or_text", new string[][]
+			{
+				new string[]{ "method" },
+				new string[]{ "TEXT" }
+			}));
+
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("method", new string[][]
+			{
+				new string[]{ "identifiers", "TEXT", "LBRACE", "TEXT", "RBRACE", "other_code" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
@@ -299,8 +332,10 @@ namespace LandParserGenerator
 
 
             sharpGrammar.SetStartSymbol("program");
-
-			sharpGrammar.SetListSymbols("class_list, identifiers");
+			/// Символы, которые не должны рекурсивно быть детьми самих себя
+			sharpGrammar.SetListSymbols("class_list, identifiers", "class_content_elements");
+			/// Символы, которые не должны порождать узел дерева
+			sharpGrammar.SetGhostSymbols("class_list", "identifiers", "class_content_elements", "method_or_text");
 
 			TableLL1 table = new TableLL1(sharpGrammar);
 			table.ExportToCsv("sharp_table.csv");
