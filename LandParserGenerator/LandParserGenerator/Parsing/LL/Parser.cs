@@ -37,6 +37,7 @@ namespace LandParserGenerator.Parsing.LL
 			/// Кладём на стек стартовый символ
 			Stack = new ParsingStack(LexingStream);
 			var root = new Node(grammar.StartSymbol);
+			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
