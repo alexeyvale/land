@@ -9,7 +9,7 @@ namespace LandParserGenerator.Parsing.Tree
 	public class Node
 	{
 		public string Symbol { get; private set; }
-		public LinkedList<Node> Children { get; private set; }
+		public List<Node> Children { get; private set; }
 
 		private Location Anchor { get; set; }
 		private bool AnchorReady { get; set; }
@@ -37,7 +37,7 @@ namespace LandParserGenerator.Parsing.Tree
 		{
 			if (Children.Count > 0)
 			{
-				Anchor = Children.First.Value.Anchor;
+				Anchor = Children[0].Anchor;
 
 				foreach (var child in Children)
 				{
@@ -57,22 +57,22 @@ namespace LandParserGenerator.Parsing.Tree
 		public Node(string smb)
 		{
 			Symbol = smb;
-			Children = new LinkedList<Node>();
+			Children = new List<Node>();
 		}
 
 		public void AddLastChild(Node child)
 		{
-			Children.AddLast(child);
+			Children.Add(child);
 		}
 
 		public void AddFirstChild(Node child)
 		{
-			Children.AddFirst(child);
+			Children.Insert(0, child);
 		}
 
 		public void ResetChildren()
 		{
-			Children = new LinkedList<Node>();
+			Children = new List<Node>();
 		}
 
 		public void SetAnchor(int start, int end)
@@ -84,6 +84,11 @@ namespace LandParserGenerator.Parsing.Tree
 				StartOffset = start,
 				EndOffset = end
 			};
+		}
+
+		public void Accept(BaseVisitor visitor)
+		{
+			visitor.Visit(this);
 		}
 	}
 }

@@ -36,6 +36,8 @@ namespace LandParserGenerator
 		public GrammarState State { get; private set; }
 
 		public string StartSymbol { get; private set; }
+		public HashSet<string> ListSymbols { get; private set; } = new HashSet<string>();
+		public HashSet<string> GhostSymbols { get; private set; } = new HashSet<string>();
 
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
@@ -195,6 +197,40 @@ namespace LandParserGenerator
 			}
 
 			StartSymbol = symbol;
+			return GrammarActionResponse.GetSuccess();
+		}
+		public GrammarActionResponse SetListSymbols(params string[] symbols)
+		{
+			ListSymbols = new HashSet<string>(symbols);
+
+			foreach (var symbol in symbols)
+			{
+				if (!this.Rules.ContainsKey(symbol))
+				{
+					return new GrammarActionResponse()
+					{
+						ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
+						Success = false
+					};
+				}
+			}
+			return GrammarActionResponse.GetSuccess();
+		}
+		public GrammarActionResponse SetGhostSymbols(params string[] symbols)
+		{
+			GhostSymbols = new HashSet<string>(symbols);
+
+			foreach (var symbol in symbols)
+			{
+				if (!this.Rules.ContainsKey(symbol))
+				{
+					return new GrammarActionResponse()
+					{
+						ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
+						Success = false
+					};
+				}
+			}
 			return GrammarActionResponse.GetSuccess();
 		}
 		public GrammarActionResponse CheckValidity()

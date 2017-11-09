@@ -194,6 +194,10 @@ namespace LandParserGenerator
 
 			yaccGrammar.SetStartSymbol("grammar");
 
+			yaccGrammar.SetListSymbols("alternatives_list", "alternative", "rules_list", "declarations");
+
+			yaccGrammar.SetGhostSymbols("alternatives_list", "rules_list");
+
 			TableLL1 table = new TableLL1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
 
@@ -228,7 +232,7 @@ namespace LandParserGenerator
 
 			/// Нужные штуки
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("NAMESPACE", "'namespace'"));
-			sharpGrammar.DeclareTerminal(new TerminalSymbol("CLASS", "'class'"));
+			sharpGrammar.DeclareTerminal(new TerminalSymbol("CLASS_STRUCT_INTERFACE", "'class' | 'struct' | 'interface'"));
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "'@'?[_a-zA-Z][_0-9a-zA-Z]*"));
 
 			sharpGrammar.DeclareTerminal(new TerminalSymbol("LCBRACE", "'{'"));
@@ -256,7 +260,7 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class", new string[][]
 			{
-				new string[]{ "TEXT", "CLASS", "full_name", "TEXT", "other_code" }
+				new string[]{ "TEXT", "CLASS_STRUCT_INTERFACE", "full_name", "TEXT", "other_code" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
@@ -295,6 +299,8 @@ namespace LandParserGenerator
 
 
             sharpGrammar.SetStartSymbol("program");
+
+			sharpGrammar.SetListSymbols("class_list, identifiers");
 
 			TableLL1 table = new TableLL1(sharpGrammar);
 			table.ExportToCsv("sharp_table.csv");

@@ -147,7 +147,15 @@ namespace LandParserGenerator.Parsing.LL
 				}
 			}
 
+			TreePostproc(root);
+
 			return root;
+		}
+
+		private void TreePostproc(Node root)
+		{
+			ListVisitor visitor = new ListVisitor(grammar);
+			root.Accept(visitor);
 		}
 
 		/// <summary>
