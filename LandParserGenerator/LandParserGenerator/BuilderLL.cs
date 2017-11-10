@@ -293,7 +293,7 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("method", new string[][]
 			{
-				new string[]{ "identifiers", "TEXT", "LBRACE", "TEXT", "RBRACE", "other_code" }
+				new string[]{ "identifiers", "TEXT", "LBRACE", "TEXT", "RBRACE", "LCBRACE", "code_content", "RCBRACE" }
 			}));
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("full_name", new string[][]
@@ -318,7 +318,7 @@ namespace LandParserGenerator
 				new string[]{ }
 			}));
 
-			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("other_code", new string[][]
+			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("code_content_element", new string[][]
 			{
 				new string[]{ "TEXT" },
 				new string[]{ "LCBRACE", "code_content", "RCBRACE" },
@@ -326,14 +326,14 @@ namespace LandParserGenerator
 
 			sharpGrammar.DeclareNonterminal(new NonterminalSymbol("code_content", new string[][]
 			{
-				new string[]{ "other_code", "code_content" },
+				new string[]{ "code_content_element", "code_content" },
 				new string[] { }
 			}));
 
 
-            sharpGrammar.SetStartSymbol("program");
+			sharpGrammar.SetStartSymbol("program");
 			/// Символы, которые не должны рекурсивно быть детьми самих себя
-			sharpGrammar.SetListSymbols("class_list, identifiers", "class_content_elements");
+			sharpGrammar.SetListSymbols("class_list, identifiers", "class_content_elements", "code_content");
 			/// Символы, которые не должны порождать узел дерева
 			sharpGrammar.SetGhostSymbols("class_list", "identifiers", "class_content_elements", "method_or_text");
 
