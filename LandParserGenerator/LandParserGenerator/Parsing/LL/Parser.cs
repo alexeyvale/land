@@ -11,7 +11,7 @@ namespace LandParserGenerator.Parsing.LL
 {
 	public class Parser: BaseParser
 	{
-		private const int MAX_RECOVERY_ATTEMPTS = 2;
+		private const int MAX_RECOVERY_ATTEMPTS = 5;
 
 		private TableLL1 Table { get; set; }
 		private ParsingStack Stack { get; set; }
@@ -52,7 +52,7 @@ namespace LandParserGenerator.Parsing.LL
 			{
 				var stackTop = Stack.Peek();
 
-				Log.Add($"Текущий токен: {token.Name}; символ на вершине стека: {stackTop.Symbol}");
+				Log.Add($"Текущий токен: {token.Name}: '{token.Text}'; символ на вершине стека: {stackTop.Symbol}");
 
                 /// Если в текущем месте должен быть пропуск текста
 			    if (stackTop.Symbol == "TEXT")
@@ -199,10 +199,12 @@ namespace LandParserGenerator.Parsing.LL
 			do
 			{
 				textNode = Stack.Pop();
-				if (!textNode.StartOffset.HasValue)
-					textNode.SetAnchor(token.StartOffset, token.EndOffset);
 			}
 			while (Stack.Peek().Symbol == Grammar.TEXT_TOKEN_NAME);
+
+			/// Проверка на случай, если допропускаем текст в процессе восстановления
+			if (!textNode.StartOffset.HasValue)
+				textNode.SetAnchor(token.StartOffset, token.EndOffset);
 
 			/// Создаём последовательность символов, идущих в стеке после TEXT
 			var alt = new Alternative();
@@ -334,6 +336,7 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						textEnd = currentToken.EndOffset;
 						currentToken = LexingStream.NextToken();
+						break; /// Пока попробуем пропускать не цепочку токенов, а один токен
 					}
 
 					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.Value, textEnd);
