@@ -60,7 +60,7 @@ namespace LandParserGenerator
 			byte[] textBuffer = Encoding.Default.GetBytes(text);
 			MemoryStream memStream = new MemoryStream(textBuffer);
 
-			var stream = new UnbufferedCharStream(memStream);
+			var stream = CharStreams.fromStream(memStream);
 
 			Lexer = LexerConstructor(stream);
 		}
