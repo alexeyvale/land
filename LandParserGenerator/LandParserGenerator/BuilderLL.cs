@@ -209,20 +209,31 @@ namespace LandParserGenerator
 
 			yaccGrammar.SetGhostSymbols("alternatives_list", "rules_list", "code_content_element");
 
-			TableLL1 table = new TableLL1(yaccGrammar);
-			table.ExportToCsv("yacc_table.csv");
 
-			var lexerType = BuildLexer(yaccGrammar, "YaccGrammarLexer");
+            var errors = yaccGrammar.CheckValidity();
 
-			/// Создаём парсер
+            if (errors.Count() == 0)
+            {
+                TableLL1 table = new TableLL1(yaccGrammar);
+                table.ExportToCsv("yacc_table.csv");
 
-			var parser = new Parser(yaccGrammar,
-				new AntlrLexerAdapter(
-					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-				)
-			);
+                var lexerType = BuildLexer(yaccGrammar, "YaccGrammarLexer");
 
-			return parser;
+                /// Создаём парсер
+                var parser = new Parser(yaccGrammar,
+                    new AntlrLexerAdapter(
+                        (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+                    )
+                );
+
+                return parser;
+            }
+            else
+            {
+                foreach (var error in errors)
+                    Console.WriteLine(error);
+                return null;
+            }
 		}
 
 		public static Parser BuildSharp()
@@ -337,20 +348,30 @@ namespace LandParserGenerator
 			/// Символы, которые не должны порождать узел дерева
 			sharpGrammar.SetGhostSymbols("class_list", "identifiers", "class_content_elements", "method_or_text");
 
-			TableLL1 table = new TableLL1(sharpGrammar);
-			table.ExportToCsv("sharp_table.csv");
+            var errors = sharpGrammar.CheckValidity();
 
-			var lexerType = BuildLexer(sharpGrammar, "SharpGrammarLexer");
+            if (errors.Count() == 0)
+            {
+                TableLL1 table = new TableLL1(sharpGrammar);
+                table.ExportToCsv("sharp_table.csv");
 
-			/// Создаём парсер
+                var lexerType = BuildLexer(sharpGrammar, "SharpGrammarLexer");
+                /// Создаём парсер
+                var parser = new Parser(sharpGrammar,
+                    new AntlrLexerAdapter(
+                        (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+                    )
+                );
 
-			var parser = new Parser(sharpGrammar,
-				new AntlrLexerAdapter(
-					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-				)
-			);
+                return parser;
+            }
+            else
+            {
+                foreach(var error in errors)
+                    Console.WriteLine(error);
 
-			return parser;
+                return null;
+            }
 		}
 
 		public static Parser BuildExpressionGrammar()
@@ -397,65 +418,83 @@ namespace LandParserGenerator
 
 			exprGrammar.SetStartSymbol("E");
 
-			/// Строим таблицу парсинга
-			TableLL1 table = new TableLL1(exprGrammar);
-			table.ExportToCsv("expr_table.csv");
+            var errors = exprGrammar.CheckValidity();
 
-			/// Получаем тип лексера
-			var lexerType = BuildLexer(exprGrammar, "ExpressionGrammarLexer");
+            if (errors.Count() == 0)
+            {
+                TableLL1 table = new TableLL1(exprGrammar);
+                table.ExportToCsv("expr_table.csv");
 
-			/// Создаём парсер
-			var parser = new Parser(exprGrammar,
-				new AntlrLexerAdapter(
-					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-				)
-			);
+                var lexerType = BuildLexer(exprGrammar, "ExprGrammarLexer");
 
-			return parser;
-		}
+                /// Создаём парсер
+                var parser = new Parser(exprGrammar,
+                    new AntlrLexerAdapter(
+                        (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+                    )
+                );
+
+                return parser;
+            }
+            else
+            {
+                foreach (var error in errors)
+                    Console.WriteLine(error);
+                return null;
+            }
+        }
 
 		public static Parser BuildTestCase()
 		{
 			/// Формируем грамматику
 
-			Grammar exprGrammar = new Grammar();
+			Grammar testGrammar = new Grammar();
 
-			exprGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-			exprGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-			exprGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
-			exprGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
-			exprGrammar.DeclareTerminal(new TerminalSymbol("E", "'e'"));
+			testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
+			testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
+			testGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
+			testGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
+			testGrammar.DeclareTerminal(new TerminalSymbol("E", "'e'"));
 
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
+			testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
 			{
 				new string[]{ "a", "TEXT", "B" },
 				new string[]{ "A" },
 				new string[]{ "C" }
 			}));
 
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
+			testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
 			{
 				new string[]{ "D", "E" },
 				new string[] { }
 			}));
 
-			exprGrammar.SetStartSymbol("b");
+			testGrammar.SetStartSymbol("b");
 
-			/// Строим таблицу парсинга
-			TableLL1 table = new TableLL1(exprGrammar);
-			table.ExportToCsv("test_table.csv");
+            var errors = testGrammar.CheckValidity();
 
-			/// Получаем тип лексера
-			var lexerType = BuildLexer(exprGrammar, "TestGrammarLexer");
+            if (errors.Count() == 0)
+            {
+                TableLL1 table = new TableLL1(testGrammar);
+                table.ExportToCsv("test_table.csv");
 
-			/// Создаём парсер
-			var parser = new Parser(exprGrammar,
-				new AntlrLexerAdapter(
-					(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-				)
-			);
+                var lexerType = BuildLexer(testGrammar, "TestGrammarLexer");
 
-			return parser;
-		}
+                /// Создаём парсер
+                var parser = new Parser(testGrammar,
+                    new AntlrLexerAdapter(
+                        (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+                    )
+                );
+
+                return parser;
+            }
+            else
+            {
+                foreach (var error in errors)
+                    Console.WriteLine(error);
+                return null;
+            }
+        }
 	}
 }

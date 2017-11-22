@@ -82,18 +82,26 @@ namespace TestGUI
 				}
 			}
 
-			var errorMessage = String.Empty;
-			var root = parser.Parse(Editor.Text, out errorMessage);
+            if (parser != null)
+            {
+                var errorMessage = String.Empty;
+                var root = parser.Parse(Editor.Text, out errorMessage);
 
-			ProgramStatusLabel.Content = errorMessage;
-			ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
+                ProgramStatusLabel.Content = errorMessage;
+                ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
 
-			if (root != null)
-			{
-				TreeRoot = root;
-				ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
-			}
-			OutputList.ItemsSource = parser.Log;
+                if (root != null)
+                {
+                    TreeRoot = root;
+                    ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
+                }
+                OutputList.ItemsSource = parser.Log;
+            }
+            else
+            {
+                ProgramStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
+                ProgramStatus.Background = Brushes.Red;
+            }
 		}
 
 		private void ParseTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

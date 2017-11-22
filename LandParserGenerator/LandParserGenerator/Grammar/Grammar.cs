@@ -8,34 +8,14 @@ using LandParserGenerator.Parsing.LR;
 
 namespace LandParserGenerator
 {
-	public class GrammarActionResponse
-	{
-		public bool Success { get; set; }
-		public List<string> ErrorMessages { get; set; }
-
-		public static GrammarActionResponse GetSuccess()
-		{
-			return new GrammarActionResponse()
-			{
-				Success = true,
-				ErrorMessages = null
-			};
-		}
-	}
-
-	public class GrammarActionResponse<T> where T: class
-	{
-		public T Result { get; set; }
-		public string ErrorMessage { get; set; }
-	}
-
 	public enum GrammarState { Unknown, Valid, Invalid }
 
 	public class Grammar
 	{
 		public GrammarState State { get; private set; }
+        private LinkedList<string> ConstructionErrors { get; set; } = new LinkedList<string>();
 
-		public string StartSymbol { get; private set; }
+        public string StartSymbol { get; private set; }
 		public HashSet<string> ListSymbols { get; private set; } = new HashSet<string>();
 		public HashSet<string> GhostSymbols { get; private set; } = new HashSet<string>();
 
@@ -105,125 +85,83 @@ namespace LandParserGenerator
 			return String.Empty;
 		}
 
-		public GrammarActionResponse DeclareSpecialTokens(params string[] tokens)
+		public void DeclareSpecialTokens(params string[] tokens)
 		{
 			foreach (var token in tokens)
 			{
 				var terminal = new TerminalSymbol(token, null);
-
 				var checkingResult = AlreadyDeclaredCheck(terminal);
 
 				if (!String.IsNullOrEmpty(checkingResult))
-				{
-					return new GrammarActionResponse()
-					{
-						ErrorMessages = new List<string>() { checkingResult },
-						Success = false
-					};
-				}
-
-				SpecialTokens.Add(token);
-				//Tokens.Add(token, terminal);
+                    ConstructionErrors.AddLast(checkingResult);
+                else
+                    SpecialTokens.Add(token);			
 			}
 
 			OnGrammarUpdate();
-
-			return GrammarActionResponse.GetSuccess();
 		}
-        public GrammarActionResponse RemoveSpecialToken(string token)
+        public void RemoveSpecialToken(string token)
         {
             SpecialTokens.Remove(token);
             OnGrammarUpdate();
-
-            return GrammarActionResponse.GetSuccess();
         }
-        public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
+        public void DeclareNonterminal(NonterminalSymbol rule)
 		{
 			var checkingResult = AlreadyDeclaredCheck(rule);
 
 			if (!String.IsNullOrEmpty(checkingResult))
-			{
-				return new GrammarActionResponse()
-				{
-					ErrorMessages = new List<string>() { checkingResult },
-					Success = false
-				};
-			}
+                ConstructionErrors.AddLast(checkingResult);
+            else
+                Rules[rule.Name] = rule;
 
-#if DEBUG
-			Console.WriteLine(rule);
-#endif
-			OnGrammarUpdate();
-
-			Rules[rule.Name] = rule;
-			return GrammarActionResponse.GetSuccess();
+            OnGrammarUpdate();
 		}
-		public GrammarActionResponse DeclareTerminal(TerminalSymbol token)
+		public void DeclareTerminal(TerminalSymbol token)
 		{
 			var checkingResult = AlreadyDeclaredCheck(token);
 
-			if (!String.IsNullOrEmpty(checkingResult))
-			{
-				return new GrammarActionResponse()
-				{
-					ErrorMessages = new List<string>() { checkingResult },
-					Success = false
-				};
-			}
+            if (!String.IsNullOrEmpty(checkingResult))
+                ConstructionErrors.AddLast(checkingResult);
+            else
+                Tokens[token.Name] = token;
 
-			OnGrammarUpdate();
-
-			Tokens[token.Name] = token;
-			return GrammarActionResponse.GetSuccess();
+            OnGrammarUpdate();
 		}
-		public GrammarActionResponse SetSkipTokens(params string[] tokens)
+
+		public void SetSkipTokens(params string[] tokens)
 		{
 			foreach(var token in tokens)
 				if(!Tokens.ContainsKey(token))
 				{
-					return new GrammarActionResponse()
-					{
-						ErrorMessages = new List<string>() { $"Отсутствует описание токена {token}" },
-						Success = false
-					};
+                    throw new IncorrectGrammarException($"Отсутствует описание токена { token }");
 				}
 
 			SkipTokens = new HashSet<string>(tokens);
-
-			return GrammarActionResponse.GetSuccess();
 		}
-		public GrammarActionResponse SetStartSymbol(string symbol)
+		public void SetStartSymbol(string symbol)
 		{
 			if (!this.Rules.ContainsKey(symbol))
-			{
-				return new GrammarActionResponse()
-				{
-					ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
-					Success = false
-				};
-			}
+            {
+                throw new IncorrectGrammarException(
+                    String.Format($"Символ {symbol} не определён как нетерминальный"));
+            }
 
-			StartSymbol = symbol;
-			return GrammarActionResponse.GetSuccess();
+            StartSymbol = symbol;
 		}
-		public GrammarActionResponse SetListSymbols(params string[] symbols)
+		public void SetListSymbols(params string[] symbols)
 		{
 			ListSymbols = new HashSet<string>(symbols);
 
-			foreach (var symbol in symbols)
-			{
-				if (!this.Rules.ContainsKey(symbol))
-				{
-					return new GrammarActionResponse()
-					{
-						ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
-						Success = false
-					};
-				}
-			}
-			return GrammarActionResponse.GetSuccess();
+            foreach (var symbol in symbols)
+            {
+                if (!this.Rules.ContainsKey(symbol))
+                {
+                    throw new IncorrectGrammarException(
+                        String.Format($"Символ {symbol} не определён как нетерминальный"));
+                }
+            }
 		}
-		public GrammarActionResponse SetGhostSymbols(params string[] symbols)
+		public void SetGhostSymbols(params string[] symbols)
 		{
 			GhostSymbols = new HashSet<string>(symbols);
 
@@ -231,38 +169,36 @@ namespace LandParserGenerator
 			{
 				if (!this.Rules.ContainsKey(symbol))
 				{
-					return new GrammarActionResponse()
-					{
-						ErrorMessages = new List<string>() { String.Format($"Символ {symbol} не определён как нетерминальный") },
-						Success = false
-					};
+					throw new IncorrectGrammarException(
+                        String.Format($"Символ {symbol} не определён как нетерминальный"));
 				}
 			}
-			return GrammarActionResponse.GetSuccess();
 		}
-		public GrammarActionResponse CheckValidity()
+		public IEnumerable<string> CheckValidity()
 		{
-			var ErrorMessages = new List<string>();
+            var ErrorMessages = ConstructionErrors;
 
-			foreach(var rule in Rules.Values)
-				foreach(var alt in rule)
-					foreach(var smb in alt)
-					{
-						if(this[smb] == null)
-							ErrorMessages.Add($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
-					}
+            foreach (var rule in Rules.Values)
+            {
+#if DEBUG
+                Console.WriteLine(rule);
+#endif
+                foreach (var alt in rule)
+                    foreach (var smb in alt)
+                    {
+                        if (this[smb] == null && !SpecialTokens.Contains(smb))
+                            ErrorMessages.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
+                    }
+            }
 
 			if(String.IsNullOrEmpty(StartSymbol))
-				ErrorMessages.Add($"Не задан стартовый символ");
+                ErrorMessages.AddLast($"Не задан стартовый символ");
 
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = ErrorMessages.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
+            ConstructionErrors = new LinkedList<string>();
 
-			return new GrammarActionResponse()
-			{
-				Success = ErrorMessages.Count > 0,
-				ErrorMessages = ErrorMessages.Count > 0 ? ErrorMessages : null
-			};
+            return ErrorMessages;
 		}
 
 		#endregion
