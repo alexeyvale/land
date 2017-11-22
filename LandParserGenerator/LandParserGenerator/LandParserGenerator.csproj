@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuilderLR.cs" />
+    <Compile Include="Grammar\IncorrectGrammarException.cs" />
     <Compile Include="Grammar\Entry.cs" />
     <Compile Include="Grammar\Grammar.cs" />
     <Compile Include="Grammar\Alternative.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Parsing\LL\TableLL1_ver1.cs" />
     <Compile Include="Parsing\RecoveryAction.cs" />
     <Compile Include="Parsing\BaseVisitor.cs" />
     <Compile Include="Parsing\ListVisitor.cs" />

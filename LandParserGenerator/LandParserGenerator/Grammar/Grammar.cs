@@ -130,7 +130,14 @@ namespace LandParserGenerator
 
 			return GrammarActionResponse.GetSuccess();
 		}
-		public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
+        public GrammarActionResponse RemoveSpecialToken(string token)
+        {
+            SpecialTokens.Remove(token);
+            OnGrammarUpdate();
+
+            return GrammarActionResponse.GetSuccess();
+        }
+        public GrammarActionResponse DeclareNonterminal(NonterminalSymbol rule)
 		{
 			var checkingResult = AlreadyDeclaredCheck(rule);
 

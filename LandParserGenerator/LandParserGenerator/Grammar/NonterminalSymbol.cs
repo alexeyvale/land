@@ -13,7 +13,12 @@ namespace LandParserGenerator
 
 		public int Count { get { return Alternatives.Count; } }
 
-		public NonterminalSymbol(string name, string[][] alts)
+        public NonterminalSymbol(string name)
+        {
+            Name = name;
+        }
+
+        public NonterminalSymbol(string name, string[][] alts)
 		{
 			Name = name;
 
@@ -33,7 +38,7 @@ namespace LandParserGenerator
 			}
 		}
 
-		public void Add(string[] altContent)
+		public void Add(params string[] altContent)
 		{
 			var alt = new Alternative()
 			{

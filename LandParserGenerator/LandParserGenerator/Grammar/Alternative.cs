@@ -10,7 +10,7 @@ namespace LandParserGenerator
 	{
 		public string NonterminalSymbolName { get; set; } = null;
 
-		private List<Entry> Elements { get; set; } = new List<Entry>();
+		public List<Entry> Elements { get; private set; } = new List<Entry>();
 
 		public int Count { get { return Elements.Count; } }
 
@@ -73,5 +73,18 @@ namespace LandParserGenerator
 		{
 			return Elements.Any(e => e.Value == symbol);
 		}
-	}
+
+        public bool ReplaceFirst(string smb1, string smb2)
+        {
+            var idx = Elements.FindIndex(e => e.Value == smb1);
+
+            if (idx > -1)
+            {
+                Elements[idx] = new Entry(smb2, Elements[idx].AdditionalInfo);
+                return true;
+            }
+            else
+                return false;
+        }
+    }
 }
