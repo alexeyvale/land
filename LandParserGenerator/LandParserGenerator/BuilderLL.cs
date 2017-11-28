@@ -344,9 +344,9 @@ namespace LandParserGenerator
 
 			sharpGrammar.SetStartSymbol("program");
 			/// Символы, которые не должны рекурсивно быть детьми самих себя
-			sharpGrammar.SetListSymbols("class_list, identifiers", "class_content_elements", "code_content");
+			sharpGrammar.SetListSymbols("class_list", "identifiers", "identifiers_list", "class_content_elements", "code_content");
 			/// Символы, которые не должны порождать узел дерева
-			sharpGrammar.SetGhostSymbols("class_list", "identifiers", "class_content_elements", "method_or_text");
+			sharpGrammar.SetGhostSymbols("class_list", "identifiers_list", "class_content_elements", "method_or_text");
 
             var errors = sharpGrammar.CheckValidity();
 

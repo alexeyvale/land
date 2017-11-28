@@ -172,10 +172,6 @@ namespace LandParserGenerator.Parsing.LL
 		{
 			IToken token = LexingStream.CurrentToken();
 
-			/// Проверка на случай, если допропускаем текст в процессе восстановления
-			if (!textNode.StartOffset.HasValue)
-				textNode.SetAnchor(token.StartOffset, token.EndOffset);
-
 			/// Создаём последовательность символов, идущих в стеке после TEXT
 			var alt = new Alternative();
 			foreach (var elem in Stack)
@@ -188,8 +184,11 @@ namespace LandParserGenerator.Parsing.LL
 			/// который может идти после TEXT)
 			if (!tokensAfterText.Contains(token.Name))
 			{
-				/// Смещения для участка, подобранного как текст
-				int startOffset = token.StartOffset;
+                /// Проверка на случай, если допропускаем текст в процессе восстановления
+                if (!textNode.StartOffset.HasValue)
+                    textNode.SetAnchor(token.StartOffset, token.EndOffset);
+
+                /// Смещение для участка, подобранного как текст
 				int endOffset = token.EndOffset;
 
 				while (!tokensAfterText.Contains(token.Name) 
