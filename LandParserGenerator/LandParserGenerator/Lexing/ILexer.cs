@@ -10,6 +10,8 @@ namespace LandParserGenerator.Lexing
 	{
 		IToken NextToken();
 
+        IToken CreateToken(string name);
+
 		void SetSourceFile(string filename);
 
 		void SetSourceText(string text);

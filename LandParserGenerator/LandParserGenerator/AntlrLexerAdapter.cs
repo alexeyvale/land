@@ -69,5 +69,10 @@ namespace LandParserGenerator
 		{
 			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer);
 		}
-	}
+
+        public LandParserGenerator.Lexing.IToken CreateToken(string name)
+        {
+            return new LandParserGenerator.Lexing.StubToken(name);
+        }
+    }
 }

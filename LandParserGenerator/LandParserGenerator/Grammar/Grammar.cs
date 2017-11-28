@@ -50,7 +50,7 @@ namespace LandParserGenerator
 
 		public Grammar()
 		{
-			DeclareSpecialTokens(TEXT_TOKEN_NAME);
+			DeclareTerminal(new TerminalSymbol(TEXT_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
@@ -201,10 +201,26 @@ namespace LandParserGenerator
             return ErrorMessages;
 		}
 
-		#endregion
+        #endregion
 
-		#region Построение FIRST
+        #region Построение FIRST
 
+        /// Нужно ли использовать модифицированный алгоритм First
+        /// (с учётом пустого TEXT)
+        private bool _useModifiedFirst = false;
+        public bool UseModifiedFirst
+        {
+            get { return _useModifiedFirst; }
+            set
+            {
+                if(value != _useModifiedFirst)
+                {
+                    FirstCacheConsistent = false;
+                    FollowCacheConsistent = false;
+                    _useModifiedFirst = value;
+                }
+            }
+        }
 		private bool FirstCacheConsistent { get; set; } = false;
 		private Dictionary<string, HashSet<string>> _first;
 		private Dictionary<string, HashSet<string>> FirstCache
@@ -279,25 +295,31 @@ namespace LandParserGenerator
 		public HashSet<string> First(Alternative alt)
 		{
 			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
-			/// либо, если альтернатива пустая, соответствующий токен
+			/// либо, если альтернатива пустая, null
 			if (alt.Count > 0)
 			{
-				var first = First(alt[0]);
+                var first = new HashSet<string>();
+                var elementsCounter = 0;
 
-				/// Если первый элемент альтернативы - нетерминал,
-				/// из которого выводится пустая строка
-				for (var i=1; i < alt.Count; ++i)
-				{
-					/// Если из очередного элемента ветки
-					/// выводится пустая строка
-					if (first.Contains(null))
-					{
-						first.Remove(null);
-						first.UnionWith(First(alt[i]));
-					}
-					else
-						break;
-				}
+                /// Если первый элемент альтернативы - нетерминал,
+                /// из которого выводится пустая строка,
+                /// нужно взять first от следующего элемента
+                for (; elementsCounter < alt.Count; ++elementsCounter)
+                {
+                    var elemFirst = First(alt[elementsCounter]);
+                    var containsEmpty = elemFirst.Remove(null);
+
+                    first.UnionWith(elemFirst);
+
+                    /// Если из текущего элемента нельзя вывести пустую строку
+                    /// и (для модифицированной версии First) он не равен ANY
+                    if (!containsEmpty 
+                        && (!UseModifiedFirst || alt[elementsCounter] != TEXT_TOKEN_NAME))
+                        break;
+                }
+
+                if (elementsCounter == alt.Count)
+                    first.Add(null);
 
 				return first;
 			}

@@ -39,9 +39,7 @@ namespace LandParserGenerator.Parsing.LL
 				foreach (var alt in g.Rules[nt])
 				{
 					var altFirst = g.First(alt);
-
 					var altContainsEmpty = altFirst.Remove(null);
-					var altContainsText = altFirst.Any(t => t == Grammar.TEXT_TOKEN_NAME);
 
 					/// Для каждого реально возвращаемого лексером токена, 
                     /// с которого может начинаться альтернатива
@@ -56,42 +54,15 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						var ntFollow = g.Follow(nt);
 
-						var followContainsText = ntFollow.Contains(Grammar.TEXT_TOKEN_NAME);
-
-						if (followContainsText || altContainsText)
+						/// её следует выбрать, если встретили то, что может идти
+						/// после текущего нетерминала
+						foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
 						{
-							foreach (var tk in g.Tokens.Keys.Except(g.First(nt)))
-							{
-								this[nt, tk].Add(alt);
-							}
-						}
-						else
-							/// её следует выбрать, если встретили то, что может идти
-							/// после текущего нетерминала
-							foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
-							{
-								this[nt, tk].Add(alt);
-							}
-					}
-					else
-					{
-						/// Если альтернатива может начинаться с ANY,
-						/// переход к этой альтернативе должен происходить
-						/// по любому символу, с которого не может начинаться
-						/// правило для текущего нетерминала
-						if (altContainsText)
-						{
-							var ntFirst = g.First(nt);
-							var exceptTokens = ntFirst.Contains(null) ? ntFirst.Union(g.Follow(nt)) : ntFirst;
-
-							foreach (var tk in g.Tokens.Keys.Except(exceptTokens))
-							{
-								this[nt, tk].Add(alt);
-							}
+							this[nt, tk].Add(alt);
 						}
 					}
 				}
-			}
+            }
 		}
 
 		public HashSet<Alternative> this[string nt, string lookahead]

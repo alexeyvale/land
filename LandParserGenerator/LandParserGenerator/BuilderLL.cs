@@ -380,7 +380,7 @@ namespace LandParserGenerator
 
 			Grammar exprGrammar = new Grammar();
 
-			exprGrammar.DeclareSpecialTokens("ERROR", "TEXT");
+			exprGrammar.DeclareSpecialTokens("ERROR");
 
 			exprGrammar.DeclareTerminal(new TerminalSymbol("PLUS", "'+'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));
