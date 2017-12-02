@@ -87,9 +87,7 @@ namespace LandParserGenerator.Parsing.LL
                     if (alternatives.Count > 1)
                     {
                         errorMessage =
-                            String.Format(
-                                $"Неоднозначная грамматика: для нетерминала {stackTop.Symbol} и входного символа {token.Name} допустимо несколько альтернатив"
-                            );
+                                $"Неоднозначная грамматика: для нетерминала {stackTop.Symbol} и входного символа {token.Name} допустимо несколько альтернатив";
                         return root;
                     }
                     /// Если же в ячейке ровно одна альтернатива
@@ -133,8 +131,8 @@ namespace LandParserGenerator.Parsing.LL
 
                         if (!ErrorRecovery())
                         {
-                            errorMessage =
-                                String.Format($"Неожиданный символ {errorToken.Name}: '{errorToken.Text}', ожидалось {errorStackTop}");
+                            errorMessage = 
+                                $"Неожиданный символ {errorToken.Name}: '{errorToken.Text}', символ на вершине стека - {errorStackTop}";
                             return root;
                         }
                         else

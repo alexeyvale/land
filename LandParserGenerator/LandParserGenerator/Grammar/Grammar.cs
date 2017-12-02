@@ -143,7 +143,8 @@ namespace LandParserGenerator
 			if (!this.Rules.ContainsKey(symbol))
             {
                 throw new IncorrectGrammarException(
-                    String.Format($"Символ {symbol} не определён как нетерминальный"));
+                   $"Символ {symbol} не определён как нетерминальный"
+                );
             }
 
             StartSymbol = symbol;
@@ -156,8 +157,7 @@ namespace LandParserGenerator
             {
                 if (!this.Rules.ContainsKey(symbol))
                 {
-                    throw new IncorrectGrammarException(
-                        String.Format($"Символ {symbol} не определён как нетерминальный"));
+                    throw new IncorrectGrammarException($"Символ {symbol} не определён как нетерминальный");
                 }
             }
 		}

@@ -36,7 +36,9 @@ namespace TestGUI
 				consoleWriter.WriteLineEvent += consoleWriter_WriteLineEvent;
 				Console.SetOut(consoleWriter);
 			}
-		}
+
+            //LandParserGenerator.BuilderLL.BuildTestCases();
+        }
 
 		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
 		{
