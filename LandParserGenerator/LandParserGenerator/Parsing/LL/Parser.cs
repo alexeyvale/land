@@ -197,6 +197,13 @@ namespace LandParserGenerator.Parsing.LL
 				}
 
 				textNode.SetAnchor(textNode.StartOffset.Value, endOffset);
+
+                /// Если дошли до конца входной строки, и это было не по плану
+                if(token.Name == Grammar.EOF_TOKEN_NAME 
+                    && !tokensAfterText.Contains(token.Name))
+                {
+                    token = Lexer.CreateToken(Grammar.TEXT_TOKEN_NAME);
+                }
 			}		
 
 			return token;
