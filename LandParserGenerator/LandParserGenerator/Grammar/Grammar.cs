@@ -24,6 +24,8 @@ namespace LandParserGenerator
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
 		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 
+        public List<string> TokenOrder { get; private set; } = new List<string>();
+
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string TEXT_TOKEN_NAME = "TEXT";
 
@@ -123,7 +125,10 @@ namespace LandParserGenerator
             if (!String.IsNullOrEmpty(checkingResult))
                 ConstructionErrors.AddLast(checkingResult);
             else
+            {
+                TokenOrder.Add(token.Name);
                 Tokens[token.Name] = token;
+            }
 
             OnGrammarUpdate();
 		}
