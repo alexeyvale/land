@@ -19,6 +19,8 @@ namespace LandParserGenerator.Parsing.LL
 
 		private RecoveryAction LastRecoveryAction { get; set; }
 
+        public int ErrorRecoveriesCounter { get; private set; }
+
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
 			Table = new TableLL1(g);
@@ -38,9 +40,11 @@ namespace LandParserGenerator.Parsing.LL
 		{
 			Log = new List<string>();
 			errorMessage = String.Empty;
+            LastRecoveryAction = null;
+            ErrorRecoveriesCounter = 0;
 
-			/// Готовим лексер
-			LexingStream = new TokenStream(Lexer, text);
+            /// Готовим лексер
+            LexingStream = new TokenStream(Lexer, text);
 
 			/// Кладём на стек стартовый символ
 			Stack = new ParsingStack(LexingStream);
@@ -66,7 +70,15 @@ namespace LandParserGenerator.Parsing.LL
 
                     /// Если текущий токен - признак пропуска символов, запускаем алгоритм
                     if (token.Name == Grammar.TEXT_TOKEN_NAME)
+                    {
                         token = SkipText(node);
+                        if(token.Name == Grammar.ERROR_TOKEN_NAME)
+                        {
+                            errorMessage =
+                                    $"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {stackTop.Symbol}";
+                            return root;
+                        }
+                    }
                     /// иначе читаем следующий токен
                     else
                     {
@@ -202,7 +214,7 @@ namespace LandParserGenerator.Parsing.LL
                 if(token.Name == Grammar.EOF_TOKEN_NAME 
                     && !tokensAfterText.Contains(token.Name))
                 {
-                    token = Lexer.CreateToken(Grammar.TEXT_TOKEN_NAME);
+                    return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
                 }
 			}		
 
@@ -214,7 +226,9 @@ namespace LandParserGenerator.Parsing.LL
 		/// </summary>
 		private bool ErrorRecovery()
 		{
-			Log.Add($"Запущен алгоритм восстановления...");
+            ErrorRecoveriesCounter += 1;
+
+            Log.Add($"Запущен алгоритм восстановления...");
 
 			var errorTokenIndex = LexingStream.CurrentTokenIndex;
 
@@ -305,7 +319,10 @@ namespace LandParserGenerator.Parsing.LL
 					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.Value, textEnd);
 
 					/// Пропускаем текст дальше
-					SkipText(Stack.Pop());
+					if(SkipText(Stack.Pop()).Name == Grammar.ERROR_TOKEN_NAME)
+                    {
+                        return false;
+                    }
 
 					LastRecoveryAction = new RecoveryAction()
 					{

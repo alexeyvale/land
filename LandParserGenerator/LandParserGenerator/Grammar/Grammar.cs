@@ -28,9 +28,9 @@ namespace LandParserGenerator
 
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string TEXT_TOKEN_NAME = "TEXT";
+        public const string ERROR_TOKEN_NAME = "ERROR";
 
-
-		public ISymbol this[string key]
+        public ISymbol this[string key]
 		{
 			get
 			{
