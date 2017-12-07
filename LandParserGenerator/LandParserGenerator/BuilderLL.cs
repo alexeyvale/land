@@ -243,6 +243,7 @@ namespace LandParserGenerator
 
             /// Пропускаемые сущности
             sharpGrammar.DeclareTerminal(new TerminalSymbol("DIRECTIVE", @"'#' ~[\n\r]*"));
+            sharpGrammar.DeclareTerminal(new TerminalSymbol("DIRECTIVE_ELSE", @"'#else' (COMMENT|STRING|CHAR|DIRECTIVE|DIRECTIVE_ELSE|NAMESPACE|CLASS_STRUCT_INTERFACE|ENUM|USING|EXTERN|OPERATOR|KEYWORD|ID|SEMICOLON|DOT|DOUBLE_COLON|COMMA|COLON|LCBRACE|RCBRACE|LBRACE|RBRACE|LSBRACE|RSBRACE|LABRACE|RABRACE|EQUALS|ARROW|.)*? '#endif'"));
 
             sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT", "COMMENT_L|COMMENT_ML"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
@@ -254,7 +255,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("CHAR", "'\\''('\\\\\\''|'\\\\\\\\'|.)*? '\\''"));
 
-            sharpGrammar.SetSkipTokens("COMMENT", "STRING", "CHAR", "DIRECTIVE");
+            sharpGrammar.SetSkipTokens("COMMENT", "STRING", "CHAR", "DIRECTIVE", "DIRECTIVE_ELSE");
 
             /// Нужные штуки
             sharpGrammar.DeclareTerminal(new TerminalSymbol("NAMESPACE", "'namespace'"));
@@ -263,7 +264,6 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("USING", "'using'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("EXTERN", "'extern'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("OPERATOR", "'operator'"));
-            sharpGrammar.DeclareTerminal(new TerminalSymbol("WHERE", "'where'"));
 
             sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'"));
 
@@ -348,7 +348,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum_member_tail", new string[][]
             {
-                new string[]{ "CLASS_STRUCT_INTERFACE", "full_name", "before_body", "LCBRACE", "entities", "RCBRACE" },
+                new string[]{ "CLASS_STRUCT_INTERFACE", "full_name", "before_body", "LCBRACE", "entities", "RCBRACE", "opt_semicolon" },
                 new string[] { "ENUM", "full_name", "TEXT", "block", "opt_semicolon" },
                 new string[] { "full_name", "member_tail"  }
             }));
@@ -381,8 +381,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("before_body", new string[][]
            {
-                new string[]{ "COLON", "bracket_structure" },
-                new string[]{ "WHERE", "bracket_structure" },
+                new string[]{ "TEXT", "COLON", "bracket_structure" },
                 new string[]{ },
            }));
 
