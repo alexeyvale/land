@@ -39,6 +39,7 @@ namespace PackageTestGUI
                 var parser = LandParserGenerator.BuilderLL.BuildSharp();
 
                 var errorCounter = 0;
+                var errorFiles = new List<string>();
 
                 foreach(var filePath in files)
                 {
@@ -51,16 +52,23 @@ namespace PackageTestGUI
                         FilesListText.Text += $"{filePath} - {parser.ErrorRecoveriesCounter} - {errorMessage} {Environment.NewLine}";
 
                         if (!String.IsNullOrEmpty(errorMessage) || parser.ErrorRecoveriesCounter > 0)
+                        {
                             ++errorCounter;
+                            errorFiles.Add(filePath);
+                        }
                     }
                     catch(Exception ex)
                     {
                         ++errorCounter;
+                        errorFiles.Add(filePath);
                         FilesListText.Text += $"{filePath} - {parser.ErrorRecoveriesCounter} -  {ex.ToString()}";
                     }
                 }
 
                 FilesListText.Text += $"Разобрано: {files.Length}; С ошибками: {errorCounter} {Environment.NewLine}";
+
+                foreach(var filePath in errorFiles)
+                    FilesListText.Text += $"{filePath}{Environment.NewLine}";
             }
         }
     }

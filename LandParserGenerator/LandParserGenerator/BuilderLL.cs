@@ -264,6 +264,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("USING", "'using'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("EXTERN", "'extern'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("OPERATOR", "'operator'"));
+            sharpGrammar.DeclareTerminal(new TerminalSymbol("DELEGATE", "'delegate'"));
 
             sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'|'volatile'"));
 
@@ -290,7 +291,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("namespace_content", new string[][]
             {
-                new string[]{ "opening_directives", "entities" }
+                new string[]{ "opening_directives", "namespace_entities" }
             }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("opening_directive", new string[][]
@@ -305,17 +306,17 @@ namespace LandParserGenerator
                 new string[]{}
             }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("entities", new string[][]
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("namespace_entities", new string[][]
             {
-                new string[]{ "entity", "entities" },
+                new string[]{ "namespace_entity", "namespace_entities" },
                 new string[]{ }
             }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("entity", new string[][]
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("namespace_entity", new string[][]
             {
                 new string[]{ "attribute" },
                 new string[]{ "namespace" },
-                new string[]{ "class_member" }
+                new string[]{ "class_enum" }
             }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("attribute", new string[][]
@@ -335,23 +336,48 @@ namespace LandParserGenerator
                 new string[]{ "NAMESPACE", "full_name", "LCBRACE", "namespace_content", "RCBRACE" }
             }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_member", new string[][]
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum", new string[][]
             {
-                new string[]{"keywords", "class_enum_member_tail" }
+                new string[]{ "class_enum_keywords", "class_enum_tail" }
             }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("keywords", new string[][]
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum_tail", new string[][]
+            {
+                new string[]{ "CLASS_STRUCT_INTERFACE", "full_name", "before_body", "LCBRACE", "class_entities", "RCBRACE", "opt_semicolon" },
+                new string[] { "ENUM", "full_name", "TEXT", "block", "opt_semicolon" },
+                new string[] { "DELEGATE", "full_name", "arguments", "SEMICOLON" }
+            }));
+
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_entities", new string[][]
+            {
+                new string[]{ "class_entity", "class_entities" },
+                new string[]{ }
+            }));
+
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_entity", new string[][]
+            {
+                new string[]{ "attribute" },
+                new string[]{ "class_member_keywords", "class_entity_tail" },
+            }));
+
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_entity_tail", new string[][]
+            {
+                new string[]{ "full_name", "class_member_tail" },
+                new string[]{ "class_enum_tail" }
+            }));
+
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum_keywords", new string[][]
            {
-                 new string[]{ "KEYWORD", "keywords" },
+                 new string[]{ "KEYWORD", "class_enum_keywords" },
                  new string[]{ }
            }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum_member_tail", new string[][]
-            {
-                new string[]{ "CLASS_STRUCT_INTERFACE", "full_name", "before_body", "LCBRACE", "entities", "RCBRACE", "opt_semicolon" },
-                new string[] { "ENUM", "full_name", "TEXT", "block", "opt_semicolon" },
-                new string[] { "full_name", "member_tail"  }
-            }));
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_member_keywords", new string[][]
+           {
+                 new string[]{ "KEYWORD", "class_member_keywords" },
+                 new string[]{ "EXTERN", "class_member_keywords" },
+                 new string[]{ }
+           }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("opt_semicolon", new string[][]
             {
@@ -359,10 +385,10 @@ namespace LandParserGenerator
                 new string[]{ }
             }));
 
-            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("member_tail", new string[][]
+            sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_member_tail", new string[][]
             {
-                new string[] { "OPERATOR", "TEXT", "arguments", "opt_method_body" },
-                new string[] { "arguments", "opt_method_body" },
+                new string[] { "OPERATOR", "TEXT", "arguments", "before_body", "opt_method_body" },
+                new string[] { "arguments", "before_body", "opt_method_body" },
                 new string[] { "block", "opt_initializer_code" },
                 new string[] { "initializer_code" }
             }));
@@ -394,7 +420,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("opt_method_body", new string[][]
             {
-                new string[]{ "before_body", "block" },
+                new string[]{ "block" },
                 new string[]{ "initializer_code" }
             }));
 
@@ -463,7 +489,8 @@ namespace LandParserGenerator
             /// Символы, которые не должны рекурсивно быть детьми самих себя
             sharpGrammar.SetListSymbols(
                 "opening_directives",
-                "entities",
+                "namespace_entities",
+                "class_entities",
                 "full_name_list",
                 "full_name",
                 "block_content",
@@ -471,12 +498,15 @@ namespace LandParserGenerator
             );
             /// Символы, которые не должны порождать узел дерева
             sharpGrammar.SetGhostSymbols(
+                "namespace_entities",
+                "class_entities",
+                "namespace_entity",
+                "class_entity",
                 "opt_initializer_code",
                 "full_name_list",
                 "full_name_element",
-                "class_enum_member_tail",
-                "member_tail",
-                "entity",
+                "class_member_tail",
+                "class_enum_tail",
                 "opt_name"
             );
 
