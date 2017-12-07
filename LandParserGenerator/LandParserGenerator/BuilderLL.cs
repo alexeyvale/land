@@ -265,7 +265,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("EXTERN", "'extern'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("OPERATOR", "'operator'"));
 
-            sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'"));
+            sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'|'volatile'"));
 
             sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "'@'?[_a-zA-Z][_0-9a-zA-Z]*"));
 

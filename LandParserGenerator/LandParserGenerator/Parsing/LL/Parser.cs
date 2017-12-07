@@ -129,35 +129,34 @@ namespace LandParserGenerator.Parsing.LL
                 if(token.Name == Grammar.TEXT_TOKEN_NAME)
                 {
                     token = LexingStream.CurrentToken();
+                                
+                    var errorToken = token;
+                    var errorStackTop = stackTop.Symbol;
 
-                    /// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.SkipTokens.Contains(token.Name))
+                    if (!ErrorRecovery())
                     {
-                        token = LexingStream.NextToken();
+                        errorMessage = 
+                            $"Неожиданный символ {errorToken.Name}: '{errorToken.Text}', символ на вершине стека - {errorStackTop}";
+                        return root;
                     }
-                    /// Иначе запускаем восстановление от ошибок
                     else
                     {
-                        var errorToken = token;
-                        var errorStackTop = stackTop.Symbol;
-
-                        if (!ErrorRecovery())
-                        {
-                            errorMessage = 
-                                $"Неожиданный символ {errorToken.Name}: '{errorToken.Text}', символ на вершине стека - {errorStackTop}";
-                            return root;
-                        }
-                        else
-                        {
-                            token = LexingStream.CurrentToken();
-                        }
+                        token = LexingStream.CurrentToken();
                     }
                 }
                 /// Если непонятно, что делать с текущим токеном, и он конкретный
                 /// (не TEXT), заменяем его на TEXT
                 else
                 {
-                    token = Lexer.CreateToken(Grammar.TEXT_TOKEN_NAME);
+                    /// Если встретился неожиданный токен, но он в списке пропускаемых
+					if (grammar.SkipTokens.Contains(token.Name))
+                    {
+                        token = LexingStream.NextToken();
+                    }
+                    else
+                    {
+                        token = Lexer.CreateToken(Grammar.TEXT_TOKEN_NAME);
+                    }
                 }
 			}
 
