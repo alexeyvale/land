@@ -306,6 +306,8 @@ namespace LandParserGenerator.Parsing.LL
 					/// на которых ранее прекратили подбор текста
 					var tokenToSkip = LexingStream.CurrentToken();
 					var currentToken = tokenToSkip;
+
+                    var textStart = currentToken.StartOffset;
 					var textEnd = currentToken.EndOffset;
 
 					while (currentToken.Name == tokenToSkip.Name)
@@ -315,7 +317,7 @@ namespace LandParserGenerator.Parsing.LL
 						break; /// Пока попробуем пропускать не цепочку токенов, а один токен
 					}
 
-					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.Value, textEnd);
+					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.HasValue ? Stack.Peek().StartOffset.Value : textStart, textEnd);
 
 					/// Пропускаем текст дальше
 					if(SkipText(Stack.Pop()).Name == Grammar.ERROR_TOKEN_NAME)
