@@ -252,7 +252,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING", "STRING_STD|STRING_ESC"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_SKIP", "'\\\\\"' | '\\\\\\\\'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_STD", "'\"' (STRING_SKIP|.)*? '\"'"));
-            sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@\"' ~[\"]* '\"'"));
+            sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@'('\"' ~[\"]* '\"')+"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("CHAR", "'\\''('\\\\\\''|'\\\\\\\\'|.)*? '\\''"));
 
             sharpGrammar.SetSkipTokens("COMMENT", "STRING", "CHAR", "DIRECTIVE", "DIRECTIVE_ELSE");
@@ -266,7 +266,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("OPERATOR", "'operator'"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("DELEGATE", "'delegate'"));
 
-            sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'|'volatile'"));
+            sharpGrammar.DeclareTerminal(new TerminalSymbol("KEYWORD", "'public'|'private'|'internal'|'protected'|'partial'|'static'|'abstract'|'sealed'|'override'|'virtual'|'readonly'|'new'|'unsafe'|'volatile'|'async'"));
 
             sharpGrammar.DeclareTerminal(new TerminalSymbol("ID", "'@'?[_a-zA-Z][_0-9a-zA-Z]*"));
 
