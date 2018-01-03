@@ -20,4 +20,3 @@ block			=	'{' (Any|block)+ '}'
 
 
 %skip COMMENT STRING DECLARATION_CODE
-%start grammar

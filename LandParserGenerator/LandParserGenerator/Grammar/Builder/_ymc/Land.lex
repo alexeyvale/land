@@ -73,7 +73,7 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 ^{ID}[" "\t]*: {
-	yylval.strVal = yytext.Split(' ')[0].TrimEnd(':');
+	yylval.strVal = yytext.Split(' ')[0].TrimEnd(':').Trim();
 	BEGIN(in_terminal_declaration);
 	return (int)Tokens.ENTITY_NAME;
 }
@@ -98,7 +98,7 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 		var optionName = yytext.ToLower().Trim('%');
 		switch(optionName)
 		{
-			case "itemslist":
+			case "list":
 				return (int)Tokens.OPTION_ITEMSLIST;
 			case "skip":
 				return (int)Tokens.OPTION_SKIP;

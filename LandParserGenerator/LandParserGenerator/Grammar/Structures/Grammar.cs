@@ -31,7 +31,7 @@ namespace LandParserGenerator
 
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
-		public const string TEXT_TOKEN_NAME = "TEXT";
+		public const string TEXT_TOKEN_NAME = "Any";
         public const string ERROR_TOKEN_NAME = "ERROR";
 
 		// Префиксы и счётчики для анонимных токенов и правил
@@ -144,7 +144,7 @@ namespace LandParserGenerator
 		{
 			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
 			foreach (var token in Tokens.Values)
-				if (token.Pattern.Equals(regex))
+				if (token.Pattern != null && token.Pattern.Equals(regex))
 					return token.Name;
 
 			var newName = AUTO_TOKEN_PREFIX + AutoTokenCounter++;
@@ -283,7 +283,7 @@ namespace LandParserGenerator
         #region Построение FIRST
 
         /// Нужно ли использовать модифицированный алгоритм First
-        /// (с учётом пустого TEXT)
+        /// (с учётом пустого Any)
         private bool _useModifiedFirst = false;
         public bool UseModifiedFirst
         {
@@ -383,7 +383,16 @@ namespace LandParserGenerator
                 /// нужно взять first от следующего элемента
                 for (; elementsCounter < alt.Count; ++elementsCounter)
                 {
-                    var elemFirst = First(alt[elementsCounter]);
+					var elemFirst = new HashSet<string>();
+
+					/// Из элемента выводится пустая строка, если он опциональный
+					if(alt.Elements[elementsCounter].Quantifier == Quantifier.ZERO_OR_MORE 
+						|| alt.Elements[elementsCounter].Quantifier == Quantifier.ZERO_OR_ONE)
+					{
+						elemFirst.Add(null);
+					}
+
+					elemFirst.UnionWith(First(alt[elementsCounter]));
                     var containsEmpty = elemFirst.Remove(null);
 
                     first.UnionWith(elemFirst);

@@ -8,3 +8,5 @@ LandParserGenerator/PackageTestGUI/bin/
 *.lst
 *.back
 *.suo
+LandParserGenerator/LandParserGenerator/Grammar/Builder/LandScanner.cs
+LandParserGenerator/LandParserGenerator/Grammar/Builder/LandParser.cs

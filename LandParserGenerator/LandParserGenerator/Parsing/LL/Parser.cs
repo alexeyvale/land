@@ -145,7 +145,7 @@ namespace LandParserGenerator.Parsing.LL
                     }
                 }
                 /// Если непонятно, что делать с текущим токеном, и он конкретный
-                /// (не TEXT), заменяем его на TEXT
+                /// (не Any), заменяем его на Any
                 else
                 {
                     /// Если встретился неожиданный токен, но он в списке пропускаемых
@@ -172,25 +172,25 @@ namespace LandParserGenerator.Parsing.LL
 		}
 
 		/// <summary>
-		/// Пропуск токенов в позиции, задаваемой символом TEXT
+		/// Пропуск токенов в позиции, задаваемой символом Any
 		/// </summary>
 		/// <returns>
-		/// Токен, найденный сразу после символа TEXT
+		/// Токен, найденный сразу после символа Any
 		/// </returns>
 		private IToken SkipText(Node textNode)
 		{
 			IToken token = LexingStream.CurrentToken();
 
-			/// Создаём последовательность символов, идущих в стеке после TEXT
+			/// Создаём последовательность символов, идущих в стеке после Any
 			var alt = new Alternative();
 			foreach (var elem in Stack)
 				alt.Add(elem.Symbol);
 
-			/// Определяем множество токенов, которые могут идти после TEXT
+			/// Определяем множество токенов, которые могут идти после Any
 			var tokensAfterText = grammar.First(alt);
 
-			/// Если TEXT непустой (текущий токен - это не токен,
-			/// который может идти после TEXT)
+			/// Если Any непустой (текущий токен - это не токен,
+			/// который может идти после Any)
 			if (!tokensAfterText.Contains(token.Name))
 			{
                 /// Проверка на случай, если допропускаем текст в процессе восстановления
@@ -239,7 +239,7 @@ namespace LandParserGenerator.Parsing.LL
 				/// Если на вершине стека оказался нетерминал
 				if (grammar[Stack.Peek().Symbol] is NonterminalSymbol)
 				{
-					/// Проверяем, есть ли у него ветка для TEXT
+					/// Проверяем, есть ли у него ветка для Any
 					/// и является ли она приоритетной для текущего lookahead-а
 					if (Table[Stack.Peek().Symbol, LexingStream.CurrentToken().Name].Count == 1 
 						&& Table[Stack.Peek().Symbol, Grammar.TEXT_TOKEN_NAME].Count == 1)
@@ -268,7 +268,7 @@ namespace LandParserGenerator.Parsing.LL
 						Stack.FinBatch();
 
 						/// Выполнили восстановление "переход на неприоритетную альтернативу,
-						/// начинающуюся с символа TEXT"
+						/// начинающуюся с символа Any"
 						LastRecoveryAction = new RecoveryAction()
 						{
 							ActionType = RecoveryActionType.UseSecondaryTextAlt,
@@ -285,7 +285,7 @@ namespace LandParserGenerator.Parsing.LL
 					}
 				}
 
-				/// Если на вершине стека оказался символ TEXT
+				/// Если на вершине стека оказался символ Any
 				if (Stack.Peek().Symbol == Grammar.TEXT_TOKEN_NAME)
 				{
 					var prevAttemptsCount = LastRecoveryAction != null 
@@ -334,7 +334,7 @@ namespace LandParserGenerator.Parsing.LL
 						AttemptsCount = prevAttemptsCount + 1
 					};
 
-					Log.Add($"Восстановление: пропуск большего количества токенов в качестве TEXT");
+					Log.Add($"Восстановление: пропуск большего количества токенов в качестве Any");
 					Log.Add($"Разбор продолжен с символа {LexingStream.CurrentToken().Name}: '{LexingStream.CurrentToken().Text}'");
 
 					return true;

@@ -23,9 +23,9 @@ class_member_tail	=	class_enum_tail
 initializer			=	('='|'=>') (Any|block)* ';'
 before_body			=	Any ':' (arguments|Any)*
 name				=	(ID|arguments) name_tail_element*
-name_tail_element	=	ID|arguments|'.'|'?'|'<' name_tail '>'|'[' Any ']'|','|'::'
+name_tail_element	=	ID|arguments|'.'|'?'|'<' name_tail_element* '>'|'[' Any ']'|','|'::'
 name_w_extern		=	(ID|arguments|'extern') name_w_extern_tail_element*
-name_w_extern_tail_element	=	ID|arguments|'extern'|'.'|'?'|'<' name_tail '>'|'[' Any ']'|','|'::'
+name_w_extern_tail_element	=	ID|arguments|'extern'|'.'|'?'|'<' name_tail_element* '>'|'[' Any ']'|','|'::'
 attribute			=	'[' attribute_content ']'
 attribute_content	=	(Any|attribute)*
 block				=	'{' block_content '}'
@@ -33,5 +33,7 @@ block_content		=	(Any|block)*
 arguments			=	'(' arguments_content ')'
 arguments_content	=	(Any|arguments)*
  
+
+%skip COMMENT STRING 
 %list block_content
 %ghost class_enum_tail class_member_tail name_w_extern_tail name_tail

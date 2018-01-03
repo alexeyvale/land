@@ -106,7 +106,7 @@ namespace LandParserGenerator.Parsing.LR
 						continue;
 					}
 
-					/// Если в текущем состоянии есть переход по TEXT
+					/// Если в текущем состоянии есть переход по Any
 					if (Table[currentState, Grammar.TEXT_TOKEN_NAME].Count == 1)
 					{
 						token = SkipText();
@@ -135,7 +135,7 @@ namespace LandParserGenerator.Parsing.LR
 			var textNode = new Node(Grammar.TEXT_TOKEN_NAME);
 			var rawAction = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME].Single();
 
-			/// Пока по TEXT нужно производить свёртки
+			/// Пока по Any нужно производить свёртки
 			while(rawAction is ReduceAction)
 			{
 				Stack.InitBatch();
@@ -196,7 +196,7 @@ namespace LandParserGenerator.Parsing.LR
 				var textTokenActions = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME];
 
 				/// Если в текущем состоянии есть приоритетные действия 
-				/// и действия для TEXT,
+				/// и действия для Any,
 				/// 
 				if (currentTokenActions.Count == 1 && textTokenActions.Count == 1)
 				{

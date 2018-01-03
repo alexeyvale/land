@@ -76,7 +76,7 @@ namespace LandParserGenerator
 
 			Grammar exprGrammar = new Grammar();
 
-			exprGrammar.DeclareSpecialTokens("ERROR", "TEXT");
+			exprGrammar.DeclareSpecialTokens("ERROR", "Any");
 
 			exprGrammar.DeclareTerminal(new TerminalSymbol("PLUS", "'+'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));
@@ -213,7 +213,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar_ending", new string[][]
 			{
-				new string[]{ "BORDER", "TEXT" },
+				new string[]{ "BORDER", "Any" },
 				new string[]{ "BORDER" },
 				new string[]{ }
 			}));
@@ -238,7 +238,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("declaration_body", new string[][]
 			{
 				new string[]{ "identifiers" },
-				new string[]{ "TEXT" }
+				new string[]{ "Any" }
 			}));
 
 
@@ -281,7 +281,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("alternative_component", new string[][]
 			{
 				new string[]{ "ID" },
-				new string[]{ "LBRACE", "TEXT", "RBRACE" },
+				new string[]{ "LBRACE", "Any", "RBRACE" },
 				new string[] {"LITERAL" }
 			}));
 

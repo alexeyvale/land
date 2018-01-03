@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.CSharp;
 
+using SpecParsing = LandParserGenerator.Builder;
 using LandParserGenerator.Parsing.LL;
 
 namespace LandParserGenerator
@@ -110,7 +109,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar_ending", new string[][]
 			{
-				new string[]{ "BORDER", "TEXT" },
+				new string[]{ "BORDER", "Any" },
 				new string[]{ }
 			}));
 
@@ -134,7 +133,7 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("declaration_body", new string[][]
 			{
 				new string[]{ "identifiers" },
-				new string[]{ "TEXT" }
+				new string[]{ "Any" }
 			}));
 
 
@@ -194,7 +193,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("code_content_element", new string[][]
 			{
-				new string[]{ "TEXT" },
+				new string[]{ "Any" },
 				new string[]{ "LBRACE", "code_content", "RBRACE" },
 			}));
 
@@ -237,7 +236,45 @@ namespace LandParserGenerator
             }
 		}
 
-        public static Parser BuildSharp()
+		public static Parser BuildSharp()
+		{
+			string Text = File.ReadAllText("../../../LandParserGenerator/Grammar/Builder/Specifications/sharp.land");
+
+			var scanner = new SpecParsing.Scanner();
+			scanner.SetSource(Text, 0);
+
+			var specParser = new SpecParsing.Parser(scanner);
+
+			specParser.Parse();
+			var sharpGrammar = specParser.ConstructedGrammar;
+
+			var errors = sharpGrammar.CheckValidity();
+
+			if (errors.Count() == 0)
+			{
+				TableLL1 table = new TableLL1(sharpGrammar);
+				table.ExportToCsv("sharp_table.csv");
+
+				var lexerType = BuildLexer(sharpGrammar, "SharpGrammarLexer");
+				/// Создаём парсер
+				var parser = new Parser(sharpGrammar,
+					new AntlrLexerAdapter(
+						(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+					)
+				);
+
+				return parser;
+			}
+			else
+			{
+				foreach (var error in errors)
+					Console.WriteLine(error);
+
+				return null;
+			}
+		}
+
+        public static Parser BuildSharp2()
         {
             Grammar sharpGrammar = new Grammar();
 
@@ -295,8 +332,8 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("opening_directive", new string[][]
             {
-                new string[]{ "USING", "TEXT", "SEMICOLON" },
-                new string[]{ "EXTERN", "TEXT", "SEMICOLON" }
+                new string[]{ "USING", "Any", "SEMICOLON" },
+                new string[]{ "EXTERN", "Any", "SEMICOLON" }
             }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("opening_directives", new string[][]
@@ -325,7 +362,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("attributes_code", new string[][]
             {
-                new string[]{ "TEXT", "attributes_code" },
+                new string[]{ "Any", "attributes_code" },
                 new string[]{ "attribute", "attributes_code" },
                 new string[]{ },
             }));
@@ -344,7 +381,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_enum_tail", new string[][]
             {
                 new string[]{ "CLASS_STRUCT_INTERFACE", "full_name", "before_body", "LCBRACE", "class_entities", "RCBRACE", "opt_semicolon" },
-                new string[] { "ENUM", "full_name", "TEXT", "block", "opt_semicolon" },
+                new string[] { "ENUM", "full_name", "Any", "block", "opt_semicolon" },
                 new string[] { "DELEGATE", "full_name", "before_body", "SEMICOLON" }
             }));
 
@@ -375,7 +412,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("class_member_tail", new string[][]
             {
-                new string[] { "OPERATOR", "TEXT", "arguments", "before_body", "body_initializer_permutations" },
+                new string[] { "OPERATOR", "Any", "arguments", "before_body", "body_initializer_permutations" },
                 new string[] { "before_body", "body_initializer_permutations" }
             }));
 
@@ -392,21 +429,21 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("arguments_code", new string[][]
             {
-                new string[]{ "TEXT", "arguments_code" },
+                new string[]{ "Any", "arguments_code" },
                 new string[]{ "arguments", "arguments_code" },
                 new string[]{ },
             }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("before_body", new string[][]
            {
-                new string[]{ "TEXT", "COLON", "bracket_structure" },
+                new string[]{ "Any", "COLON", "bracket_structure" },
                 new string[]{ },
            }));
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("bracket_structure", new string[][]
             {
                 new string[]{ "arguments", "bracket_structure" },
-                new string[]{ "TEXT", "bracket_structure" },
+                new string[]{ "Any", "bracket_structure" },
                 new string[]{ },
             }));
 
@@ -423,7 +460,7 @@ namespace LandParserGenerator
                 new string[]{ "DOUBLE_COLON" },
                 new string[]{ "COMMA" },
                 new string[]{ "LABRACE", "full_name_list", "RABRACE" },
-                new string[]{ "LSBRACE", "TEXT", "RSBRACE" },
+                new string[]{ "LSBRACE", "Any", "RSBRACE" },
                 new string[]{ "QUESTION" },
                 new string[]{ "arguments" },
             }));
@@ -449,7 +486,7 @@ namespace LandParserGenerator
                 new string[]{ "DOUBLE_COLON" },
                 new string[]{ "COMMA" },
                 new string[]{ "LABRACE", "full_name_list", "RABRACE" },
-                new string[]{ "LSBRACE", "TEXT", "RSBRACE" },
+                new string[]{ "LSBRACE", "Any", "RSBRACE" },
                 new string[]{ "QUESTION" },
                 new string[]{ "arguments" },
             }));
@@ -475,7 +512,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("initializer_content", new string[][]
             {
-                new string[]{ "TEXT", "initializer_content" },
+                new string[]{ "Any", "initializer_content" },
                 new string[]{ "block", "initializer_content" },
                 new string[]{ }
             }));
@@ -487,7 +524,7 @@ namespace LandParserGenerator
 
             sharpGrammar.DeclareNonterminal(new NonterminalSymbol("block_content", new string[][]
             {
-                new string[]{ "TEXT", "block_content" },
+                new string[]{ "Any", "block_content" },
                 new string[]{ "block", "block_content" },
                 new string[]{ }
             }));
@@ -625,7 +662,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "A", "TEXT", "B" }
+                new string[]{ "A", "Any", "B" }
             }));
 
             testGrammar.SetStartSymbol("a");
@@ -647,7 +684,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "A", "TEXT" }
+                new string[]{ "A", "Any" }
             }));
 
             testGrammar.SetStartSymbol("a");
@@ -669,7 +706,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "TEXT", "B" }
+                new string[]{ "Any", "B" }
             }));
 
             testGrammar.SetStartSymbol("a");
@@ -692,7 +729,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "A", "TEXT", "b" }
+                new string[]{ "A", "Any", "b" }
             }));
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
@@ -720,7 +757,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "A", "TEXT", "b" }
+                new string[]{ "A", "Any", "b" }
             }));
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
@@ -749,7 +786,7 @@ namespace LandParserGenerator
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
             {
-                new string[]{ "b", "TEXT", "C" }
+                new string[]{ "b", "Any", "C" }
             }));
 
             testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
@@ -783,7 +820,7 @@ namespace LandParserGenerator
 
 			testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
 			{
-				new string[]{ "a", "TEXT", "B" },
+				new string[]{ "a", "Any", "B" },
 				new string[]{ "A" },
 				new string[]{ "C" }
 			}));

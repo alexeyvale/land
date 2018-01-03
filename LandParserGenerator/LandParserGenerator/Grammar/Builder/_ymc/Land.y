@@ -67,7 +67,7 @@ body
 	: body body_element 
 		{ 
 			$$ = $1; 
-			$$[$$.Count].Add($2); 	
+			$$[$$.Count-1].Add($2); 	
 		}
 	| body OR 
 		{ 

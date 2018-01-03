@@ -53,9 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuilderLR.cs" />
-    <Compile Include="Grammar\Builder\LandBuilder.cs" />
     <Compile Include="Grammar\Builder\LandParser.cs" />
-    <Compile Include="Grammar\Builder\LandParseTree.cs" />
     <Compile Include="Grammar\Builder\LandScanner.cs" />
     <Compile Include="Grammar\Structures\IncorrectGrammarException.cs" />
     <Compile Include="Grammar\Structures\Entry.cs" />
