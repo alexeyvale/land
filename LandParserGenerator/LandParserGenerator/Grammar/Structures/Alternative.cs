@@ -80,7 +80,7 @@ namespace LandParserGenerator
 
             if (idx > -1)
             {
-                Elements[idx] = new Entry(smb2, Elements[idx].AdditionalInfo);
+                Elements[idx] = new Entry(smb2, Elements[idx].Quantifier);
                 return true;
             }
             else

@@ -38,6 +38,12 @@ namespace LandParserGenerator
 			}
 		}
 
+		public NonterminalSymbol(string name, List<Alternative> alts)
+		{
+			Name = name;
+			Alternatives = alts;
+		}
+
 		public void Add(params string[] altContent)
 		{
 			var alt = new Alternative()

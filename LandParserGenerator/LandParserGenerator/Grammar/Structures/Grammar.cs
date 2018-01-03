@@ -12,25 +12,38 @@ namespace LandParserGenerator
 
 	public class Grammar
 	{
+		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
         private LinkedList<string> ConstructionErrors { get; set; } = new LinkedList<string>();
 
+		// Особые символы, задаваемые опциями
         public string StartSymbol { get; private set; }
 		public HashSet<string> ListSymbols { get; private set; } = new HashSet<string>();
 		public HashSet<string> GhostSymbols { get; private set; } = new HashSet<string>();
+		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 
+		// Содержание грамматики
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
-		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 
         public List<string> TokenOrder { get; private set; } = new List<string>();
 
+		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string TEXT_TOKEN_NAME = "TEXT";
         public const string ERROR_TOKEN_NAME = "ERROR";
 
-        public ISymbol this[string key]
+		// Префиксы и счётчики для анонимных токенов и правил
+		private const string AUTO_RULE_PREFIX = "_auto";
+		private int AutoRuleCounter { get; set; } = 0;
+		private const string AUTO_TOKEN_PREFIX = "_AUTO";
+		private int AutoTokenCounter { get; set; } = 0;
+
+		// Для корректных сообщений об ошибках
+		public Dictionary<string, string> AutoRuleOrigin { get; private set; } = new Dictionary<string, string>();
+
+		public ISymbol this[string key]
 		{
 			get
 			{
@@ -68,20 +81,18 @@ namespace LandParserGenerator
 			FollowCacheConsistent = false;
 		}
 
-		private string AlreadyDeclaredCheck(ISymbol smb)
+		#region Описание символов
+
+		private string AlreadyDeclaredCheck(string name)
 		{
-			if (Rules.ContainsKey(smb.Name))
+			if (Rules.ContainsKey(name))
 			{
-				return smb is NonterminalSymbol ?
-					$"Повторное определение нетерминала {smb.Name}" :
-					$"Символ {smb.Name} определён как нетерминальный";
+				return $"Повторное определение: символ {name} определён как нетерминальный";
 			}
 
-			if (Tokens.ContainsKey(smb.Name))
+			if (Tokens.ContainsKey(name))
 			{
-				return smb is TerminalSymbol ?
-					$"Повторное определение терминала {smb.Name}" :
-					$"Символ {smb.Name} определён как нетерминальный";
+				return $"Повторное определение: символ {name} определён как терминальный";
 			}
 
 			return String.Empty;
@@ -92,7 +103,7 @@ namespace LandParserGenerator
 			foreach (var token in tokens)
 			{
 				var terminal = new TerminalSymbol(token, null);
-				var checkingResult = AlreadyDeclaredCheck(terminal);
+				var checkingResult = AlreadyDeclaredCheck(token);
 
 				if (!String.IsNullOrEmpty(checkingResult))
                     ConstructionErrors.AddLast(checkingResult);
@@ -102,14 +113,10 @@ namespace LandParserGenerator
 
 			OnGrammarUpdate();
 		}
-        public void RemoveSpecialToken(string token)
-        {
-            SpecialTokens.Remove(token);
-            OnGrammarUpdate();
-        }
+
         public void DeclareNonterminal(NonterminalSymbol rule)
 		{
-			var checkingResult = AlreadyDeclaredCheck(rule);
+			var checkingResult = AlreadyDeclaredCheck(rule.Name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
                 ConstructionErrors.AddLast(checkingResult);
@@ -118,20 +125,55 @@ namespace LandParserGenerator
 
             OnGrammarUpdate();
 		}
-		public void DeclareTerminal(TerminalSymbol token)
+
+		public void DeclareNonterminal(string name, List<Alternative> alternatives)
 		{
-			var checkingResult = AlreadyDeclaredCheck(token);
-
-            if (!String.IsNullOrEmpty(checkingResult))
-                ConstructionErrors.AddLast(checkingResult);
-            else
-            {
-                TokenOrder.Add(token.Name);
-                Tokens[token.Name] = token;
-            }
-
-            OnGrammarUpdate();
+			var rule = new NonterminalSymbol(name, alternatives);
+			DeclareNonterminal(rule);
 		}
+
+		public string GenerateNonterminal(List<Alternative> alternatives)
+		{
+			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
+			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
+			return newName;
+		}
+
+		//Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
+		public string GenerateTerminal(string regex)
+		{
+			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
+			foreach (var token in Tokens.Values)
+				if (token.Pattern.Equals(regex))
+					return token.Name;
+
+			var newName = AUTO_TOKEN_PREFIX + AutoTokenCounter++;
+			Tokens.Add(newName, new TerminalSymbol(newName, regex));
+			return newName;
+		}
+
+		public void DeclareTerminal(TerminalSymbol terminal)
+		{
+			var checkingResult = AlreadyDeclaredCheck(terminal.Name);
+
+			if (!String.IsNullOrEmpty(checkingResult))
+				ConstructionErrors.AddLast(checkingResult);
+			else
+			{
+				TokenOrder.Add(terminal.Name);
+				Tokens[terminal.Name] = terminal;
+			}
+
+			OnGrammarUpdate();
+		}
+
+		public void DeclareTerminal(string name,  string pattern)
+		{
+			var terminal = new TerminalSymbol(name, pattern);
+			DeclareTerminal(terminal);
+		}
+
+		#endregion
 
 		public void SetSkipTokens(params string[] tokens)
 		{
@@ -143,6 +185,7 @@ namespace LandParserGenerator
 
 			SkipTokens = new HashSet<string>(tokens);
 		}
+
 		public void SetStartSymbol(string symbol)
 		{
 			if (!this.Rules.ContainsKey(symbol))
@@ -179,6 +222,35 @@ namespace LandParserGenerator
 				}
 			}
 		}
+
+		/// <summary>
+		/// Замена символа во всех правилах
+		/// </summary>
+		/// <param name="from">Заменяемый символ</param>
+		/// <param name="to">Символ, на который заменяем</param>
+		private void ChangeSymbol(string from, string to)
+		{
+			foreach (var rule in Rules.Values)
+				foreach (var alt in rule.Alternatives)
+					foreach (var elem in alt.Elements)
+						if (elem.Value == from)
+							elem.Value = to;
+
+			if (Rules.ContainsKey(from))
+			{
+				var body = Rules[from];
+				Rules.Remove(from);
+				Rules.Add(to, body);
+			}
+			else if (Tokens.ContainsKey(from))
+			{
+				var body = Tokens[from];
+				Tokens.Remove(from);
+				Tokens.Add(to, body);
+			}
+
+		}
+
 		public IEnumerable<string> CheckValidity()
 		{
             var ErrorMessages = ConstructionErrors;
@@ -448,6 +520,8 @@ namespace LandParserGenerator
 
 		#endregion
 
+		#region For LR Parsing
+
 		/// <summary>
 		/// Построение замыкания множества пунктов
 		/// </summary>
@@ -500,5 +574,7 @@ namespace LandParserGenerator
 
 			return BuildClosure(res);
 		}
+
+		#endregion
 	}
 }

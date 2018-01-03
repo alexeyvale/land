@@ -6,22 +6,18 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
+	public enum Quantifier { ONE, ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE }
+
 	public class Entry
 	{
-		public string Value { get; private set; }
+		public string Value { get; set; }
 
-		public EntryAdditionalInfo AdditionalInfo { get; private set; }
+		public Quantifier Quantifier { get; set; }
 
-		public Entry(string val)
+		public Entry(string val, Quantifier quant = Quantifier.ONE)
 		{
 			Value = val;
-			AdditionalInfo = null;
-		}
-
-		public Entry(string val, EntryAdditionalInfo info)
-		{
-			Value = val;
-			AdditionalInfo = info;
+			Quantifier = quant;
 		}
 
 		public static implicit operator String(Entry entry)
@@ -34,8 +30,4 @@ namespace LandParserGenerator
 			return Value;
 		}
 	}
-
-	public abstract class EntryAdditionalInfo
-	{ }
-
 }

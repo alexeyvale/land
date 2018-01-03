@@ -5,3 +5,6 @@ LandParserGenerator/TestGUI/obj/
 LandParserGenerator/TestGUI/bin/
 LandParserGenerator/PackageTestGUI/obj/
 LandParserGenerator/PackageTestGUI/bin/
+*.lst
+*.back
+*.suo

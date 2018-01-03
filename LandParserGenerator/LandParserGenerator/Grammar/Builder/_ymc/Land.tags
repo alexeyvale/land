@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<tags>
+  <tag value="Элемент правила">
+    <name value="group" />
+    <name value="ID" />
+    <name value="REGEX" />
+    <name value="STRING" />
+  </tag>
+  <tag value="Высокоуровневый элемент">
+    <name value="terminal" />
+    <name value="nonterminal" />
+  </tag>
+</tags>
