@@ -17,9 +17,9 @@ class_enum			=	name? class_enum_tail
 class_enum_tail		=	('class'|'struct'|'interface') name Any '{' class_content_elem* '}' ';'?
 					|	'enum' name Any '{' Any '}' ';'?	
 					|	'delegate' name before_body? ';'			
-class_content_elem	=	attribute | class_enum_tail | name_w_extern? class_member_tail
+class_content_elem	=	attribute | class_enum_tail | name_w_extern class_member_tail
 class_member_tail	=	class_enum_tail 
-					|	('operator' Any arguments)? before_body? (block initializer? | initializer)
+					|	('operator' Any arguments)? before_body? (block initializer? | initializer | ';')
 initializer			=	('='|'=>') (Any|block)* ';'
 before_body			=	Any ':' (arguments|Any)*
 name				=	(ID|arguments) name_tail_element*
@@ -36,5 +36,5 @@ arguments_content	=	(Any|arguments)*
 %%
 
 %start namespace_content
-%skip COMMENT STRING
+%skip COMMENT STRING DIRECTIVE
 %ghost class_enum_tail class_member_tail name_w_extern_tail_element name_tail_element

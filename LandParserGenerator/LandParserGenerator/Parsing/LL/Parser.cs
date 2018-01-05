@@ -76,7 +76,7 @@ namespace LandParserGenerator.Parsing.LL
                         {
                             errorMessage =
                                     $"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {grammar.Userify(stackTop.Symbol)}";
-                            return root;
+							break;
                         }
                     }
                     /// иначе читаем следующий токен
@@ -100,7 +100,7 @@ namespace LandParserGenerator.Parsing.LL
                     {
                         errorMessage =
                                 $"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив";
-                        return root;
+						break;
                     }
                     /// Если же в ячейке ровно одна альтернатива
                     else if (alternatives.Count == 1)
@@ -137,7 +137,7 @@ namespace LandParserGenerator.Parsing.LL
                     {
                         errorMessage = 
                             $"Неожиданный символ {grammar.Userify(errorToken.Name)}: '{errorToken.Text}', символ на вершине стека - {grammar.Userify(errorStackTop)}";
-                        return root;
+						break;
                     }
                     else
                     {
@@ -278,8 +278,8 @@ namespace LandParserGenerator.Parsing.LL
 							AttemptsCount = 1
 						};
 
-						Log.Add($"Восстановление: переход на неприоритетную ветку для {alternativeToApply.NonterminalSymbolName}");
-						Log.Add($"Разбор продолжен с символа {LexingStream.CurrentToken().Name}: '{LexingStream.CurrentToken().Text}'");
+						Log.Add($"Восстановление: переход на неприоритетную ветку для {grammar.Userify(alternativeToApply.NonterminalSymbolName)}");
+						Log.Add($"Разбор продолжен с символа {grammar.Userify(LexingStream.CurrentToken().Name)}: '{LexingStream.CurrentToken().Text}'");
 
 						return true;
 					}

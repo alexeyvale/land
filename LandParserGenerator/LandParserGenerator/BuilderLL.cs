@@ -13,7 +13,7 @@ namespace LandParserGenerator
 {
 	public static class BuilderLL
 	{
-		private static Type BuildLexer(Grammar grammar, string lexerName)
+		private static Type BuildLexer(Grammar grammar, string lexerName, List<string> errors = null)
 		{
 			/// Генерируем по грамматике файл для ANTLR
 
@@ -65,6 +65,9 @@ namespace LandParserGenerator
 
 			process.WaitForExit();
 
+			if(errors!=null && !String.IsNullOrEmpty(antlrErrors.Result))
+				errors.Add(antlrErrors.Result);
+
 			/// Компилируем .cs-файл лексера
 
 			var codeProvider = new CSharpCodeProvider();
@@ -76,6 +79,49 @@ namespace LandParserGenerator
 
 			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{lexerName}.cs");
 			return compilationResult.CompiledAssembly.GetType(lexerName);
+		}
+
+		public static Parser BuildParser(string text, List<string> errors)
+		{
+			var scanner = new SpecParsing.Scanner();
+			scanner.SetSource(text, 0);
+
+			var specParser = new SpecParsing.Parser(scanner);
+			specParser.ConstructedGrammar = new Grammar(GrammarType.LL);
+
+			var success = specParser.Parse();
+			if(!success)
+			{
+				errors.Add($"При генерации парсера произошла ошибка: строка {scanner.yylloc.StartLine}, столбец {scanner.yylloc.StartColumn}, последовательность {scanner.yytext}");
+				return null;
+			}
+
+			var builtGrammar = specParser.ConstructedGrammar;
+
+			errors.AddRange(builtGrammar.CheckValidity());
+
+			if (errors.Count() == 0)
+			{
+				TableLL1 table = new TableLL1(builtGrammar);
+				//table.ExportToCsv("sharp_table.csv");
+
+				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", errors);
+				/// Создаём парсер
+				var parser = new Parser(builtGrammar,
+					new AntlrLexerAdapter(
+						(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+					)
+				);
+
+				return parser;
+			}
+			else
+			{
+				foreach (var error in errors)
+					Console.WriteLine(error);
+
+				return null;
+			}
 		}
 
 		public static Parser BuildYacc()
@@ -244,46 +290,7 @@ namespace LandParserGenerator
             }
 		}
 
-		public static Parser BuildSharp()
-		{
-			string Text = File.ReadAllText("../../../LandParserGenerator/Grammar/Builder/Specifications/sharp.land");
-
-			var scanner = new SpecParsing.Scanner();
-			scanner.SetSource(Text, 0);
-
-			var specParser = new SpecParsing.Parser(scanner);
-			specParser.ConstructedGrammar = new Grammar(GrammarType.LL);
-
-			var success = specParser.Parse();
-			var sharpGrammar = specParser.ConstructedGrammar;
-
-			var errors = sharpGrammar.CheckValidity();
-
-			if (errors.Count() == 0)
-			{
-				TableLL1 table = new TableLL1(sharpGrammar);
-				table.ExportToCsv("sharp_table.csv");
-
-				var lexerType = BuildLexer(sharpGrammar, "SharpGrammarLexer");
-				/// Создаём парсер
-				var parser = new Parser(sharpGrammar,
-					new AntlrLexerAdapter(
-						(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-					)
-				);
-
-				return parser;
-			}
-			else
-			{
-				foreach (var error in errors)
-					Console.WriteLine(error);
-
-				return null;
-			}
-		}
-
-        public static Parser BuildSharp2()
+        public static Parser BuildSharp()
         {
             Grammar sharpGrammar = new Grammar(GrammarType.LL);
 
@@ -643,216 +650,6 @@ namespace LandParserGenerator
 
                 /// Создаём парсер
                 var parser = new Parser(exprGrammar,
-                    new AntlrLexerAdapter(
-                        (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-                    )
-                );
-
-                return parser;
-            }
-            else
-            {
-                foreach (var error in errors)
-                    Console.WriteLine(error);
-                return null;
-            }
-        }
-
-        public static void BuildTestCases()
-        {
-            Grammar testGrammar;
-
-            /// 1
-            
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "A", "Any", "B" }
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            var errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("1.csv");
-            }
-
-            /// 2
-
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "A", "Any" }
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("2.csv");
-            }
-
-            /// 3
-
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "Any", "B" }
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("3.csv");
-            }
-
-            /// 4
-
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "A", "Any", "b" }
-            }));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
-            {
-                 new string[]{ "B", "C" }
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("4.csv");
-            }
-
-            /// 5
-
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "A", "Any", "b" }
-            }));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
-            {
-                 new string[]{ "B", "C" },
-                 new string[]{ },
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("5.csv");
-            }
-
-            /// 5
-
-            testGrammar = new Grammar(GrammarType.LL);
-
-            testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-            testGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-            {
-                new string[]{ "b", "Any", "C" }
-            }));
-
-            testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
-            {
-                 new string[]{ "A", "B" },
-                 new string[]{ },
-            }));
-
-            testGrammar.SetStartSymbol("a");
-
-            errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("6.csv");
-            }
-        }
-
-        public static Parser BuildTestCase()
-		{
-			/// Формируем грамматику
-
-			Grammar testGrammar = new Grammar(GrammarType.LL);
-
-			testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
-			testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
-			testGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
-			testGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
-			testGrammar.DeclareTerminal(new TerminalSymbol("E", "'e'"));
-
-			testGrammar.DeclareNonterminal(new NonterminalSymbol("b", new string[][]
-			{
-				new string[]{ "a", "Any", "B" },
-				new string[]{ "A" },
-				new string[]{ "C" }
-			}));
-
-			testGrammar.DeclareNonterminal(new NonterminalSymbol("a", new string[][]
-			{
-				new string[]{ "D", "E" },
-				new string[] { }
-			}));
-
-			testGrammar.SetStartSymbol("b");
-
-            var errors = testGrammar.CheckValidity();
-
-            if (errors.Count() == 0)
-            {
-                TableLL1 table = new TableLL1(testGrammar);
-                table.ExportToCsv("test_table.csv");
-
-                var lexerType = BuildLexer(testGrammar, "TestGrammarLexer");
-
-                /// Создаём парсер
-                var parser = new Parser(testGrammar,
                     new AntlrLexerAdapter(
                         (Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
                     )

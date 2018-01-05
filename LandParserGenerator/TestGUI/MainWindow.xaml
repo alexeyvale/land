@@ -6,84 +6,123 @@
         xmlns:local="clr-namespace:TestGUI"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="LanD Test IDE" Height="477.801" Width="712.931">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
-            <ColumnDefinition Width="50*"></ColumnDefinition>
-            <ColumnDefinition Width="25*"></ColumnDefinition>
+            <ColumnDefinition Width="30*"></ColumnDefinition>
+            <ColumnDefinition Width="70*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="28"></RowDefinition>
             <RowDefinition></RowDefinition>
-            <RowDefinition Height="31"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <StatusBar 
-            Name="ProgramStatus"
-            Grid.Row="2" 
-            Grid.ColumnSpan="3">
-            <Label Name="ProgramStatusLabel"></Label>
-        </StatusBar>
-
         <ToolBar Grid.Row="0" Grid.ColumnSpan="3">
-            <Button Name="OpenFileButton" Content="Открыть" Click="OpenFileButton_Click"/>
-            <Separator></Separator>
-            <RadioButton GroupName="LanguageRadioButton" Name="LanguageSharpRadio" Content="C#" IsChecked="True"/>
-            <RadioButton GroupName="LanguageRadioButton" Name="LanguageYaccRadio" Content="YACC" />
-            <RadioButton GroupName="LanguageRadioButton" Name="LanguageExprRadio" Content="Expr" />
-            <Separator></Separator>
             <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLL" Content="LL" IsChecked="True"/>
-            <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLR" Content="LR" />
+            <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLR" Content="LR" IsEnabled="False" />
         </ToolBar>
 
-        <Grid Grid.Column="1" Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="70*"></RowDefinition>
-                <RowDefinition Height="30*"></RowDefinition>
-            </Grid.RowDefinitions>
+        <TabControl Grid.Column="1" Grid.Row="1">
+            <TabItem>
+                <TabItem.Header>
+                    <Span>
+                        <Label>Грамматика .land</Label>
+                    </Span>
+                </TabItem.Header>
 
-            <avalonedit:TextEditor
-                Name="Editor"
-                Grid.Row="0"
-                FontFamily="Consolas"
-                FontSize="12pt">
-            </avalonedit:TextEditor>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="75*"></RowDefinition>
+                        <RowDefinition Height="31"></RowDefinition>
+                        <RowDefinition Height="25*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ToolBar Grid.Row="0">
+                        <Button Name="LoadGrammarButton" Content="Загрузить грамматику" Click="LoadGrammarButton_Click"/>
+                        <Separator></Separator>
+                        <Button Name="SaveGrammarButton" Click="SaveGrammarButton_Click">Сохранить</Button>
+                        <Separator></Separator>
+                        <Button Name="NewGrammarButton" Click="NewGrammarButton_Click">Новая</Button>
+                        <Separator></Separator>
+                        <Button Name="BuildParserButton" Click="BuildParserButton_Click">Сгенерировать парсер</Button>
+                        <Separator></Separator>
+                        <Separator></Separator>
+                        <Label Name="GrammarFileName"></Label>
+                    </ToolBar>
+                    <avalonedit:TextEditor
+                        Name="GrammarEditor"
+                        Grid.Row="1"
+                        FontFamily="Consolas"
+                        TextChanged="GrammarEditor_TextChanged"
+                        FontSize="12pt">
+                    </avalonedit:TextEditor>
+                    <StatusBar Name="ParserStatus" Grid.Row="2">
+                        <Label Name="ParserStatusLabel"></Label>
+                    </StatusBar>
+                    <ListBox
+                        Name="ParserBuidingOutput"
+                        FontSize="14pt"
+                        Grid.Row="3">
+                    </ListBox>
+                </Grid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <Span>
+                        <Label>Тестовый файл</Label>
+                    </Span>
+                </TabItem.Header>
 
-            <ListBox
-                Name="OutputList"
-                FontSize="14pt"
-                Grid.Row="1">
-            </ListBox>
-        </Grid>
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="65*"></RowDefinition>
+                        <RowDefinition Height="31"></RowDefinition>
+                        <RowDefinition Height="45*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ToolBar Grid.Row="0">
+                        <Button Name="OpenFileButton" Content="Открыть файл" Click="OpenFileButton_Click"/>
+                        <Separator></Separator>
+                        <Button Name="ClearFileButton" Content="Очистить" Click="ClearFileButton_Click"/>
+                        <Separator></Separator>
+                        <Button Name="ParseButton" Click="ParseButton_Click">Разобрать файл</Button>
+                        <Separator></Separator>
+                        <Separator></Separator>
+                        <Label Name="TestFileName"></Label>
+                    </ToolBar>
+                    <avalonedit:TextEditor
+                        Name="FileEditor"
+                        Grid.Row="1"
+                        FontFamily="Consolas"
+                        FontSize="12pt">
+                    </avalonedit:TextEditor>
+                    <StatusBar Name="ProgramStatus" Grid.Row="2">
+                        <Label Name="ProgramStatusLabel"></Label>
+                    </StatusBar>
+                    <ListBox
+                        Name="FileParsingOutput"
+                        FontSize="14pt"
+                        Grid.Row="3">
+                    </ListBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Консоль">
+                <TextBox 
+                     FontSize="14pt"
+                     Grid.Row="1"
+                     Name="ConsoleOutputText">
+                </TextBox>
+            </TabItem>
+        </TabControl>
 
         <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="90*"></RowDefinition>
-                <RowDefinition Height="10*"></RowDefinition>
-            </Grid.RowDefinitions>
-
             <TreeView
                 Name="ParseTreeView"
                 FontFamily="Courier New"
                 FontSize="14pt"
-                Grid.Row="0"
                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
             </TreeView>
-
-            <Button
-                Name="ParseButton"
-                Grid.Row="1"
-                Click="ParseButton_Click">
-                Разобрать текст
-            </Button>
         </Grid>
-
-        <TextBox Grid.Column="2" 
-                 FontSize="14pt"
-                 Grid.Row="1"
-                 Name="ConsoleOutputText">
-        </TextBox>
     </Grid>
 </Window>

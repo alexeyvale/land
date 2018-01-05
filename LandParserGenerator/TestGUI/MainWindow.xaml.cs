@@ -25,6 +25,7 @@ namespace TestGUI
 	public partial class MainWindow : Window
 	{
 		private Node TreeRoot { get; set; }
+		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
 
 		public MainWindow()
 		{
@@ -37,8 +38,10 @@ namespace TestGUI
 				Console.SetOut(consoleWriter);
 			}
 
-            //LandParserGenerator.BuilderLL.BuildTestCases();
-        }
+			GrammarEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
+				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
+				ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
+		}
 
 		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
 		{
@@ -50,59 +53,50 @@ namespace TestGUI
 			ConsoleOutputText.Text += e.Value;
 		}
 
-		private void ParseButton_Click(object sender, RoutedEventArgs e)
+		private void BuildParserButton_Click(object sender, RoutedEventArgs e)
 		{
-			// var test = LandParserGenerator.BuilderLR.BuildTestCase();
-
-			LandParserGenerator.Parsing.BaseParser parser = null;
+			Parser = null;
+			List<string> errors = new List<string>();
 
 			if (ParsingLL.IsChecked == true)
 			{
-				if (LanguageSharpRadio.IsChecked == true)
-				{
-					parser = LandParserGenerator.BuilderLL.BuildSharp();
-				}
-				else if (LanguageYaccRadio.IsChecked == true)
-				{
-					parser = LandParserGenerator.BuilderLL.BuildYacc();
-
-				}
-				else if (LanguageExprRadio.IsChecked == true)
-				{
-					parser = LandParserGenerator.BuilderLL.BuildExpressionGrammar();
-				}
+				Parser = LandParserGenerator.BuilderLL.BuildParser(GrammarEditor.Text, errors);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
-				if (LanguageYaccRadio.IsChecked == true)
-				{
-					parser = LandParserGenerator.BuilderLR.BuildYacc();
-				}
-				else if (LanguageExprRadio.IsChecked == true)
-				{
-					parser = LandParserGenerator.BuilderLR.BuildExpressionGrammar();
-				}
+
 			}
 
-            if (parser != null)
+			ParserBuidingOutput.ItemsSource = errors;
+
+			if (Parser == null || errors.Count > 0)
+			{
+				ParserStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
+				ParserStatus.Background = Brushes.Red;
+			}
+			else
+			{
+				ParserStatusLabel.Content = "Парсер успешно сгенерирован";
+				ParserStatus.Background = Brushes.LightGreen;
+			}
+		}
+
+		private void ParseButton_Click(object sender, RoutedEventArgs e)
+		{
+            if (Parser != null)
             {
                 var errorMessage = String.Empty;
-                var root = parser.Parse(Editor.Text, out errorMessage);
+                var root = Parser.Parse(FileEditor.Text, out errorMessage);
 
                 ProgramStatusLabel.Content = errorMessage;
-                ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.Green : Brushes.Red;
+                ProgramStatus.Background = String.IsNullOrEmpty(errorMessage) ? Brushes.LightGreen : Brushes.Red;
 
                 if (root != null)
                 {
                     TreeRoot = root;
                     ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
                 }
-                OutputList.ItemsSource = parser.Log;
-            }
-            else
-            {
-                ProgramStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
-                ProgramStatus.Background = Brushes.Red;
+                FileParsingOutput.ItemsSource = Parser.Log;
             }
 		}
 
@@ -115,12 +109,12 @@ namespace TestGUI
 			{
 				var start = node.StartOffset.Value;
 				var end = node.EndOffset.Value;
-				Editor.Select(start, end - start + 1);
-				Editor.ScrollToLine(Editor.Document.GetLocation(start).Line);
+				FileEditor.Select(start, end - start + 1);
+				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
 			}
 			else
 			{
-				Editor.Select(0, 0);
+				FileEditor.Select(0, 0);
 			}
 		}
 
@@ -128,7 +122,59 @@ namespace TestGUI
 		{
 			var openFileDialog = new OpenFileDialog();
 			if (openFileDialog.ShowDialog() == true)
-				Editor.Text = File.ReadAllText(openFileDialog.FileName);
+			{
+				FileEditor.Text = File.ReadAllText(openFileDialog.FileName);
+				TestFileName.Content = openFileDialog.FileName;
+			}
+		}
+
+		private void LoadGrammarButton_Click(object sender, RoutedEventArgs e)
+		{
+			var openFileDialog = new OpenFileDialog();
+			if (openFileDialog.ShowDialog() == true)
+			{
+				GrammarFileName.Content = openFileDialog.FileName;
+				GrammarEditor.Text = File.ReadAllText(openFileDialog.FileName);
+				SaveGrammarButton.IsEnabled = false;
+			}
+		}
+
+		private void SaveGrammarButton_Click(object sender, RoutedEventArgs e)
+		{
+			if(GrammarFileName.Content != null)
+			{
+				File.WriteAllText(GrammarFileName.Content.ToString(), GrammarEditor.Text);
+				SaveGrammarButton.IsEnabled = false;
+			}
+			else
+			{
+				var saveFileDialog = new SaveFileDialog();
+				if (saveFileDialog.ShowDialog() == true)
+				{
+					GrammarFileName.Content = saveFileDialog.FileName;
+					File.WriteAllText(saveFileDialog.FileName, GrammarEditor.Text);
+					SaveGrammarButton.IsEnabled = false;
+				}
+			}
+		}
+
+		private void NewGrammarButton_Click(object sender, RoutedEventArgs e)
+		{
+			GrammarFileName.Content = null;
+			GrammarEditor.Text = String.Empty;
+		}
+
+		private void ClearFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			TestFileName.Content = null;
+			FileEditor.Text = String.Empty;
+		}
+
+		private void GrammarEditor_TextChanged(object sender, EventArgs e)
+		{
+			ParserStatus.Background = Brushes.Yellow;
+			ParserStatusLabel.Content = "Текст грамматики изменился со времени последней генерации парсера";
+			SaveGrammarButton.IsEnabled = true;
 		}
 	}
 }
