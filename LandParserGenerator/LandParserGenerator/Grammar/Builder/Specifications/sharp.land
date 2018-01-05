@@ -1,13 +1,13 @@
 DIRECTIVE	: '#' ~[\n\r]*
-DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'"
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
 COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
 STRING		: STRING_STD|STRING_ESC
-STRING_SKIP	: '\\\"' | '\\\\'
-STRING_STD	: '\"' (STRING_SKIP|.)*? '\"'
-STRING_ESC	: '@'('\"' ~[\"]* '\"')+
-CHAR		: '\\'' ('\\\''|'\\\\'|.)*? '\\''
+STRING_SKIP	: '\\"' | '\\\\'
+STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+STRING_ESC	: '@'('"' ~["]* '"')+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
  
 namespace_content	=	opening_directive? (attribute|namespace|class_enum)*
@@ -32,8 +32,9 @@ block				=	'{' block_content '}'
 block_content		=	(Any|block)*
 arguments			=	'(' arguments_content ')'
 arguments_content	=	(Any|arguments)*
- 
 
-%skip COMMENT STRING 
-%list block_content
-%ghost class_enum_tail class_member_tail name_w_extern_tail name_tail
+%%
+
+%start namespace_content
+%skip COMMENT STRING
+%ghost class_enum_tail class_member_tail name_w_extern_tail_element name_tail_element

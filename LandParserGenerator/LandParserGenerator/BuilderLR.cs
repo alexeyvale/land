@@ -74,7 +74,7 @@ namespace LandParserGenerator
 		{
 			/// Формируем грамматику
 
-			Grammar exprGrammar = new Grammar();
+			Grammar exprGrammar = new Grammar(GrammarType.LR);
 
 			exprGrammar.DeclareSpecialTokens("ERROR", "Any");
 
@@ -130,7 +130,7 @@ namespace LandParserGenerator
 		{
 			/// Формируем грамматику
 
-			Grammar exprGrammar = new Grammar();
+			Grammar exprGrammar = new Grammar(GrammarType.LR);
 
 			exprGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
@@ -172,7 +172,7 @@ namespace LandParserGenerator
 
 		public static Parser BuildYacc()
 		{
-			Grammar yaccGrammar = new Grammar();
+			Grammar yaccGrammar = new Grammar(GrammarType.LR);
 
 			/// Пропускаемые сущности
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));

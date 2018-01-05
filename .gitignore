@@ -10,3 +10,4 @@ LandParserGenerator/PackageTestGUI/bin/
 *.suo
 LandParserGenerator/LandParserGenerator/Grammar/Builder/LandScanner.cs
 LandParserGenerator/LandParserGenerator/Grammar/Builder/LandParser.cs
+*.user

@@ -60,6 +60,8 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 "|" return (int)Tokens.OR;
 
+"~" return (int)Tokens.IS_LIST_NODE;
+
 // Элементы правила
 
 {ID} {
@@ -83,7 +85,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 		BEGIN(0);
 		
 		yylval.strVal = yytext.Trim();
-		Log.Add("Regexp found: " + yylval.strVal);
 		return (int)Tokens.REGEX;
 	}
 }
@@ -98,12 +99,12 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 		var optionName = yytext.ToLower().Trim('%');
 		switch(optionName)
 		{
-			case "list":
-				return (int)Tokens.OPTION_ITEMSLIST;
+			case "start":
+				return (int)Tokens.OPTION_START;
 			case "skip":
 				return (int)Tokens.OPTION_SKIP;
-			case "noitems":
-				return (int)Tokens.OPTION_NOITEMS;
+			case "ghost":
+				return (int)Tokens.OPTION_GHOST;
 			default:
 				return (int)Tokens.error;
 		}

@@ -36,6 +36,11 @@ namespace LandParserGenerator
                 }
 			}
 
+			foreach(var token in grammar.Tokens.Values.Where(t=>t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+			{
+				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
+			}
+
 			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
 
 			grammarOutput.Close();
@@ -47,15 +52,18 @@ namespace LandParserGenerator
 			{
 				FileName = "cmd.exe",
 				Arguments = $"/C java -jar \"../../../components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
-				WindowStyle = ProcessWindowStyle.Hidden
+				WindowStyle = ProcessWindowStyle.Hidden,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				UseShellExecute = false
 			};
 			process.StartInfo = startInfo;
 			process.Start();
 
-			while (!process.HasExited)
-			{
-				System.Threading.Thread.Sleep(0);
-			}
+			var antlrOutput = process.StandardOutput.ReadToEndAsync();
+			var antlrErrors = process.StandardError.ReadToEndAsync();
+
+			process.WaitForExit();
 
 			/// Компилируем .cs-файл лексера
 
@@ -72,7 +80,7 @@ namespace LandParserGenerator
 
 		public static Parser BuildYacc()
 		{
-			Grammar yaccGrammar = new Grammar();
+			Grammar yaccGrammar = new Grammar(GrammarType.LL);
 
 			/// Пропускаемые сущности
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("COMMENT_L", @"'//' ~[\n\r]*"));
@@ -244,8 +252,9 @@ namespace LandParserGenerator
 			scanner.SetSource(Text, 0);
 
 			var specParser = new SpecParsing.Parser(scanner);
+			specParser.ConstructedGrammar = new Grammar(GrammarType.LL);
 
-			specParser.Parse();
+			var success = specParser.Parse();
 			var sharpGrammar = specParser.ConstructedGrammar;
 
 			var errors = sharpGrammar.CheckValidity();
@@ -276,7 +285,7 @@ namespace LandParserGenerator
 
         public static Parser BuildSharp2()
         {
-            Grammar sharpGrammar = new Grammar();
+            Grammar sharpGrammar = new Grammar(GrammarType.LL);
 
             /// Пропускаемые сущности
             sharpGrammar.DeclareTerminal(new TerminalSymbol("DIRECTIVE", @"'#' ~[\n\r]*"));
@@ -583,7 +592,7 @@ namespace LandParserGenerator
 		{
 			/// Формируем грамматику
 
-			Grammar exprGrammar = new Grammar();
+			Grammar exprGrammar = new Grammar(GrammarType.LL);
 
 			exprGrammar.DeclareSpecialTokens("ERROR");
 
@@ -655,7 +664,7 @@ namespace LandParserGenerator
 
             /// 1
             
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -677,7 +686,7 @@ namespace LandParserGenerator
 
             /// 2
 
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -699,7 +708,7 @@ namespace LandParserGenerator
 
             /// 3
 
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -721,7 +730,7 @@ namespace LandParserGenerator
 
             /// 4
 
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -749,7 +758,7 @@ namespace LandParserGenerator
 
             /// 5
 
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -778,7 +787,7 @@ namespace LandParserGenerator
 
             /// 5
 
-            testGrammar = new Grammar();
+            testGrammar = new Grammar(GrammarType.LL);
 
             testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
             testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));
@@ -810,7 +819,7 @@ namespace LandParserGenerator
 		{
 			/// Формируем грамматику
 
-			Grammar testGrammar = new Grammar();
+			Grammar testGrammar = new Grammar(GrammarType.LL);
 
 			testGrammar.DeclareTerminal(new TerminalSymbol("A", "'a'"));
 			testGrammar.DeclareTerminal(new TerminalSymbol("B", "'b'"));

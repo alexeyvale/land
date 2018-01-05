@@ -6,18 +6,15 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
-	public enum Quantifier { ONE, ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE }
+	public enum Quantifier { ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE }
 
 	public class Entry
 	{
 		public string Value { get; set; }
 
-		public Quantifier Quantifier { get; set; }
-
-		public Entry(string val, Quantifier quant = Quantifier.ONE)
+		public Entry(string val)
 		{
 			Value = val;
-			Quantifier = quant;
 		}
 
 		public static implicit operator String(Entry entry)

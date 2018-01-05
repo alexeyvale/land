@@ -10,8 +10,12 @@ namespace LandParserGenerator
 {
 	public enum GrammarState { Unknown, Valid, Invalid }
 
+	public enum GrammarType { LL, LR }
+
 	public class Grammar
 	{
+		private GrammarType Type { get; set; }
+
 		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
         private LinkedList<string> ConstructionErrors { get; set; } = new LinkedList<string>();
@@ -26,6 +30,7 @@ namespace LandParserGenerator
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
+		public Dictionary<string, string> AutoRulesUserWrittenForm = new Dictionary<string, string>();
 
         public List<string> TokenOrder { get; private set; } = new List<string>();
 
@@ -35,9 +40,9 @@ namespace LandParserGenerator
         public const string ERROR_TOKEN_NAME = "ERROR";
 
 		// Префиксы и счётчики для анонимных токенов и правил
-		private const string AUTO_RULE_PREFIX = "_auto";
+		public const string AUTO_RULE_PREFIX = "auto__";
 		private int AutoRuleCounter { get; set; } = 0;
-		private const string AUTO_TOKEN_PREFIX = "_AUTO";
+		public const string AUTO_TOKEN_PREFIX = "AUTO__";
 		private int AutoTokenCounter { get; set; } = 0;
 
 		// Для корректных сообщений об ошибках
@@ -63,8 +68,12 @@ namespace LandParserGenerator
 
 		#region Создание грамматики
 
-		public Grammar()
+		public Grammar(GrammarType type)
 		{
+			Type = type;
+
+			ListSymbols = new HashSet<string>();
+
 			DeclareTerminal(new TerminalSymbol(TEXT_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 
@@ -136,6 +145,83 @@ namespace LandParserGenerator
 		{
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
+			AutoRulesUserWrittenForm[newName] = "(" + String.Join("|", alternatives
+				.Select(a=>a.Elements.Select(e=>Userify(e.Value)))) + ")";
+			return newName;
+		}
+
+		private string Userify(string name)
+		{
+			return name.StartsWith(AUTO_TOKEN_PREFIX) ? Tokens[name].Pattern :
+				name.StartsWith(AUTO_RULE_PREFIX) ? AutoRulesUserWrittenForm[name] :
+				name;
+		}
+
+		//Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
+		public string GenerateNonterminal(string elemName, Quantifier quantifier)
+		{
+			string newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
+
+			switch (quantifier)
+			{
+				case Quantifier.ONE_OR_MORE:
+					switch(Type)
+					{
+						case GrammarType.LL:
+							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+								new string[]{ },
+								new string[]{ elemName, newName }
+							});
+							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+
+							var oldName = newName;
+							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
+							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+								new string[]{ elemName, oldName }
+							});
+							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+							break;
+						case GrammarType.LR:
+							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+								new string[]{ elemName },
+								new string[]{ newName, elemName }
+							});
+							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+							break;
+						default:
+							break;
+					}
+					break;
+				case Quantifier.ZERO_OR_MORE:			
+					switch (Type)
+					{
+						case GrammarType.LL:						
+							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+								new string[]{ },
+								new string[]{ elemName, newName }
+							});
+							break;
+						case GrammarType.LR:
+							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
+							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+								new string[]{ },
+								new string[]{ newName, elemName }
+							});
+							break;
+						default:
+							break;
+					}
+					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "*";
+					break;
+				case Quantifier.ZERO_OR_ONE:
+					Rules[newName] = new NonterminalSymbol(newName, new string[][]{
+						new string[]{ },
+						new string[]{ elemName }
+					});
+					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "?";
+					break;
+			}
+
 			return newName;
 		}
 
@@ -197,6 +283,7 @@ namespace LandParserGenerator
 
             StartSymbol = symbol;
 		}
+
 		public void SetListSymbols(params string[] symbols)
 		{
 			ListSymbols = new HashSet<string>(symbols);
@@ -209,6 +296,19 @@ namespace LandParserGenerator
                 }
             }
 		}
+
+		public void SetListSymbol(string smb)
+		{
+			if (!this.Rules.ContainsKey(smb))
+			{
+				throw new IncorrectGrammarException($"Символ {smb} не определён как нетерминальный");
+			}
+			else
+			{
+				ListSymbols.Add(smb);
+			}
+		}
+
 		public void SetGhostSymbols(params string[] symbols)
 		{
 			GhostSymbols = new HashSet<string>(symbols);
@@ -383,16 +483,7 @@ namespace LandParserGenerator
                 /// нужно взять first от следующего элемента
                 for (; elementsCounter < alt.Count; ++elementsCounter)
                 {
-					var elemFirst = new HashSet<string>();
-
-					/// Из элемента выводится пустая строка, если он опциональный
-					if(alt.Elements[elementsCounter].Quantifier == Quantifier.ZERO_OR_MORE 
-						|| alt.Elements[elementsCounter].Quantifier == Quantifier.ZERO_OR_ONE)
-					{
-						elemFirst.Add(null);
-					}
-
-					elemFirst.UnionWith(First(alt[elementsCounter]));
+					var elemFirst = First(alt[elementsCounter]);
                     var containsEmpty = elemFirst.Remove(null);
 
                     first.UnionWith(elemFirst);

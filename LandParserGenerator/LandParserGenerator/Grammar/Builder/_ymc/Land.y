@@ -1,7 +1,7 @@
 %{
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
-    public Grammar ConstructedGrammar = new Grammar();
+    public Grammar ConstructedGrammar;
 %}
 
 %using System.Linq;
@@ -13,12 +13,13 @@
 
 %union { 
 	public int intVal; 
+	public bool boolVal;
 	public string strVal;
 	public List<string> strList;
 	
 	public List<Alternative> altList;
 	// Информация о количестве повторений
-	public Quantifier quantVal;
+	public Nullable<Quantifier> quantVal;
 }
 
 %start lp_description
@@ -28,12 +29,13 @@
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME
 %token <intVal> POSITION
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
-%token OPTION_ITEMSLIST OPTION_SKIP OPTION_NOITEMS
+%token OPTION_SKIP OPTION_GHOST OPTION_START IS_LIST_NODE
 
 %type <quantVal> quantifier
 %type <strVal> body_element_core body_element_atom group body_element
 %type <strList> identifiers
 %type <altList> body
+%type <boolVal> is_list_node
 
 %%
 
@@ -57,7 +59,7 @@ terminal
 	: ENTITY_NAME REGEX { ConstructedGrammar.DeclareTerminal($1, $2); }
 	;
 
-/******* ID ::= 'regex' ID "string" (group)[*|+]  ********/
+/******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal
 	: ENTITY_NAME EQUALS body 
 		{ ConstructedGrammar.DeclareNonterminal($1, $3); }
@@ -82,17 +84,32 @@ body
 	;
 	
 body_element
-	: body_element_core quantifier 
+	: is_list_node body_element_core quantifier 
 		{ 
-			$$ = new Entry($1, $2);
+			if($3.HasValue)
+			{
+				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value);
+				$$ = new Entry(generated);
+				
+				if($1) { ConstructedGrammar.SetListSymbol($$); }
+			}
+			else
+			{
+				$$ = new Entry($2);
+			}
 		}
+	;
+	
+is_list_node
+	: IS_LIST_NODE { $$ = true; }
+	| { $$ = false; }
 	;
 	
 quantifier
 	: OPTIONAL { $$ = $1; }
 	| ZERO_OR_MORE { $$ = $1; }
 	| ONE_OR_MORE { $$ = $1; }
-	| { $$ = Quantifier.ONE; }
+	| { $$ = null; }
 	;
 	
 body_element_core
@@ -123,14 +140,9 @@ options
 	;
 	
 option
-	: itemslist_option
+	: ghost_option
 	| skip_option
-	| noitems_option
-	;
-	
-itemslist_option
-	: OPTION_ITEMSLIST identifiers
-		{ ConstructedGrammar.SetListSymbols($2.ToArray()); }
+	| start_option
 	;
 	
 skip_option
@@ -138,8 +150,14 @@ skip_option
 		{ ConstructedGrammar.SetSkipTokens($2.ToArray()); }
 	;	
 
-noitems_option
-	: OPTION_NOITEMS identifiers
+ghost_option
+	: OPTION_GHOST identifiers
+		{ ConstructedGrammar.SetGhostSymbols($2.ToArray()); }
+	;
+	
+start_option
+	: OPTION_START ID
+		{ ConstructedGrammar.SetStartSymbol($2); }
 	;
 	
 identifiers
