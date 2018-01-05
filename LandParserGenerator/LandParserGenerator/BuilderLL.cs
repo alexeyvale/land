@@ -23,6 +23,11 @@ namespace LandParserGenerator
 			grammarOutput.WriteLine();
 			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
 
+			foreach (var token in grammar.Tokens.Values.Where(t => t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+			{
+				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
+			}
+
 			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
 			{
 				/// На уровне лексера распознаём только лексемы для обычных токенов
@@ -34,11 +39,6 @@ namespace LandParserGenerator
 						//"" : "fragment ";
 					grammarOutput.WriteLine($"{isFragment}{token}: {grammar.Tokens[token].Pattern} ;");
                 }
-			}
-
-			foreach(var token in grammar.Tokens.Values.Where(t=>t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
-			{
-				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
 			}
 
 			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");

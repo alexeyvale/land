@@ -20,7 +20,7 @@ namespace LandParserGenerator.Parsing
 
 		public override void Visit(Node node)
 		{
-			if (grammar.ListSymbols.Contains(node.Symbol))
+			if (grammar.ListSymbols.Contains(node.Symbol) || node.Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX))
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
 				{
@@ -35,9 +35,12 @@ namespace LandParserGenerator.Parsing
 
 			base.Visit(node);
 
+			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
+			// или является автоматически сгенерированным и не отмечен как list
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				if(grammar.GhostSymbols.Contains(node.Children[i].Symbol))
+				if(grammar.GhostSymbols.Contains(node.Children[i].Symbol) || 
+					node.Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) && !grammar.ListSymbols.Contains(node.Symbol))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);

@@ -60,7 +60,7 @@ namespace LandParserGenerator.Parsing.LL
 			{
 				var stackTop = Stack.Peek();
 
-				Log.Add($"Текущий токен: {token.Name}: '{token.Text}'; символ на вершине стека: {stackTop.Symbol}");
+				Log.Add($"Текущий токен: {grammar.Userify(token.Name)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}");
 
                 /// Если символ на вершине стека совпадает с текущим токеном
                 if(stackTop.Symbol == token.Name)
@@ -75,7 +75,7 @@ namespace LandParserGenerator.Parsing.LL
                         if(token.Name == Grammar.ERROR_TOKEN_NAME)
                         {
                             errorMessage =
-                                    $"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {stackTop.Symbol}";
+                                    $"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {grammar.Userify(stackTop.Symbol)}";
                             return root;
                         }
                     }
@@ -99,7 +99,7 @@ namespace LandParserGenerator.Parsing.LL
                     if (alternatives.Count > 1)
                     {
                         errorMessage =
-                                $"Неоднозначная грамматика: для нетерминала {stackTop.Symbol} и входного символа {token.Name} допустимо несколько альтернатив";
+                                $"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив";
                         return root;
                     }
                     /// Если же в ячейке ровно одна альтернатива
@@ -136,7 +136,7 @@ namespace LandParserGenerator.Parsing.LL
                     if (!ErrorRecovery())
                     {
                         errorMessage = 
-                            $"Неожиданный символ {errorToken.Name}: '{errorToken.Text}', символ на вершине стека - {errorStackTop}";
+                            $"Неожиданный символ {grammar.Userify(errorToken.Name)}: '{errorToken.Text}', символ на вершине стека - {grammar.Userify(errorStackTop)}";
                         return root;
                     }
                     else

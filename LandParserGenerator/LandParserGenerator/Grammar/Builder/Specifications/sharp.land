@@ -10,11 +10,11 @@ STRING_ESC	: '@'('"' ~["]* '"')+
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
  
-namespace_content	=	opening_directive? (attribute|namespace|class_enum)*
+namespace_content	=	opening_directive* (attribute|namespace|class_enum)*
 opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 class_enum			=	name? class_enum_tail
-class_enum_tail		=	('class'|'struct'|'interface') name Any '{' class_content_elem* '}' [';']
+class_enum_tail		=	('class'|'struct'|'interface') name Any '{' class_content_elem* '}' ';'?
 					|	'enum' name Any '{' Any '}' ';'?	
 					|	'delegate' name before_body? ';'			
 class_content_elem	=	attribute | class_enum_tail | name_w_extern? class_member_tail

@@ -146,15 +146,8 @@ namespace LandParserGenerator
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
 			AutoRulesUserWrittenForm[newName] = "(" + String.Join("|", alternatives
-				.Select(a=>a.Elements.Select(e=>Userify(e.Value)))) + ")";
+				.Select(a=> String.Join(" ", a.Elements.Select(e=>Userify(e.Value))))) + ")";
 			return newName;
-		}
-
-		private string Userify(string name)
-		{
-			return name.StartsWith(AUTO_TOKEN_PREFIX) ? Tokens[name].Pattern :
-				name.StartsWith(AUTO_RULE_PREFIX) ? AutoRulesUserWrittenForm[name] :
-				name;
 		}
 
 		//Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
@@ -378,13 +371,30 @@ namespace LandParserGenerator
             return ErrorMessages;
 		}
 
-        #endregion
+		public string Userify(string name)
+		{
+			return name.StartsWith(AUTO_TOKEN_PREFIX) ? Tokens[name].Pattern :
+				name.StartsWith(AUTO_RULE_PREFIX) ? AutoRulesUserWrittenForm[name] :
+				name;
+		}
 
-        #region Построение FIRST
+		public string Userify(ISymbol smb)
+		{
+			return Userify(smb.Name);
+		}
 
-        /// Нужно ли использовать модифицированный алгоритм First
-        /// (с учётом пустого Any)
-        private bool _useModifiedFirst = false;
+		public string Userify(Alternative alt)
+		{
+			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Value))) : "eps";
+		}
+
+		#endregion
+
+		#region Построение FIRST
+
+		/// Нужно ли использовать модифицированный алгоритм First
+		/// (с учётом пустого Any)
+		private bool _useModifiedFirst = false;
         public bool UseModifiedFirst
         {
             get { return _useModifiedFirst; }
