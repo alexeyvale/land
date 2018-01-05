@@ -8,7 +8,7 @@ namespace LandParserGenerator.Parsing.Tree
 {
 	public class Node
 	{
-		public string Symbol { get; private set; }
+		public string Symbol { get; set; }
 		public List<Node> Children { get; private set; }
 
 		private Location Anchor { get; set; }

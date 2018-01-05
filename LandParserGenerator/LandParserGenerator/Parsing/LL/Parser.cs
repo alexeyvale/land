@@ -167,8 +167,8 @@ namespace LandParserGenerator.Parsing.LL
 
 		private void TreePostProcessing(Node root)
 		{
-			ListVisitor visitor = new ListVisitor(grammar);
-			root.Accept(visitor);
+			root.Accept(new NodesEliminationVisitor(grammar));
+			root.Accept(new UserifyVisitor(grammar));
 		}
 
 		/// <summary>
