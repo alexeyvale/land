@@ -42,6 +42,9 @@ namespace LandParserGenerator
 		{
 			Name = name;
 			Alternatives = alts;
+
+			foreach (var alt in alts)
+				alt.NonterminalSymbolName = name;
 		}
 
 		public void Add(params string[] altContent)

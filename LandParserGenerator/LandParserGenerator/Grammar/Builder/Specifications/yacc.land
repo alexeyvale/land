@@ -16,7 +16,7 @@ grammar_ending	=	('%%' Any)?
 declaration		=	DECLARATION_NAME ('<' ID '>')? declaration_body
 declaration_body =	ID+ | Any
 rule			=	ID ':' alternative ('|' alternative)* ';'
-alternative		=	(ID | block | LITERAL)*
+alternative		=	(ID | block | LITERAL | '%prec')*
 block			=	'{' (Any|block)+ '}'
 
 %%

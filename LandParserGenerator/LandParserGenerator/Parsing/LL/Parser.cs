@@ -383,8 +383,23 @@ namespace LandParserGenerator.Parsing.LL
 						AttemptsCount = prevAttemptsCount + 1
 					};
 
-					Log.Add($"Восстановление: пропуск большего количества токенов в качестве Any");
-					Log.Add($"Разбор продолжен с символа {LexingStream.CurrentToken().Name}: '{LexingStream.CurrentToken().Text}'");
+					message = new ParsingMessage()
+					{
+						Message = $"Восстановление: пропуск большего количества токенов в качестве Any",
+						Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+					};
+
+					Errors.Add(message);
+					Log.Add(message);
+
+					message = new ParsingMessage()
+					{
+						Message = $"Разбор продолжен с символа {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+						Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+					};
+
+					Errors.Add(message);
+					Log.Add(message);
 
 					return true;
 				}

@@ -299,6 +299,7 @@ namespace TestGUI
 				{
 					var errorCounter = 0;
 					var errorFiles = new List<string>();
+					PackageParsingLog.Items.Clear();
 
 					foreach (var filePath in files)
 					{
