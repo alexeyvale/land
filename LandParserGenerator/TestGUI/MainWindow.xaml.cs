@@ -77,7 +77,7 @@ namespace TestGUI
 			foreach (var item in LastGrammarFiles.Items)
 				listContent.Add(item.ToString());
 
-			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent);
+			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
 		}
 
 		#region Генерация парсера

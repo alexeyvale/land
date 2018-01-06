@@ -3,6 +3,8 @@
 %}
 
 %using System.Linq;
+%using QUT.Gppg;
+
 %namespace LandParserGenerator.Builder
 
 %option stack
@@ -22,6 +24,10 @@ MULTILINE_COMMENT "/*"([^*]|\*[^/])*"*/"
 STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 %%
+
+%{
+  yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
+%}
 
 {LINE_COMMENT} |
 {MULTILINE_COMMENT} {}
