@@ -21,10 +21,11 @@ namespace LandParserGenerator.Parsing.LR
 			Table = new TableLR1(g);
 		}
 
-		public override Node Parse(string text, out string errorMessage)
+		public override Node Parse(string text)
 		{
-			Log = new List<string>();
-			errorMessage = String.Empty;
+			Log = new List<ParsingMessage>();
+			Errors = new List<ParsingMessage>();
+
 			Node root = null;	
 
 			/// Готовим лексер
@@ -117,7 +118,7 @@ namespace LandParserGenerator.Parsing.LR
 
 					if (token == null)
 					{
-						errorMessage = String.Format($"Неожиданный символ {token.Name}");
+						Errors.Add($"Неожиданный символ {token.Name}");
 						return root;
 					}
 					else

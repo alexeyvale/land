@@ -53,9 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuilderLR.cs" />
+    <Compile Include="Grammar\Builder\Mapping.cs" />
+    <Compile Include="Grammar\Structures\Common\Anchor.cs" />
+    <Compile Include="Grammar\Structures\Common\ParsingMessage.cs" />
     <Compile Include="Grammar\Builder\LandParser.cs" />
     <Compile Include="Grammar\Builder\LandScanner.cs" />
-    <Compile Include="Grammar\Structures\IncorrectGrammarException.cs" />
+    <Compile Include="Grammar\Structures\Common\IncorrectGrammarException.cs" />
     <Compile Include="Grammar\Structures\Entry.cs" />
     <Compile Include="Grammar\Structures\Grammar.cs" />
     <Compile Include="Grammar\Structures\Alternative.cs" />

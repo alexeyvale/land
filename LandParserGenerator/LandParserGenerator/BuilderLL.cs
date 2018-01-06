@@ -13,19 +13,24 @@ namespace LandParserGenerator
 {
 	public static class BuilderLL
 	{
-		private static Type BuildLexer(Grammar grammar, string lexerName, List<string> errors = null)
+		private static Type BuildLexer(Grammar grammar, string lexerName, List<ParsingMessage> errors = null)
 		{
 			/// Генерируем по грамматике файл для ANTLR
-
 			var grammarOutput = new StreamWriter($"{lexerName}.g4");
 
 			grammarOutput.WriteLine($"lexer grammar {lexerName};");
 			grammarOutput.WriteLine();
 			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
 
+			/// Запоминаем соответствия между строчкой в генерируемом файле 
+			/// и тем терминалом, который оказывается на этой строчке
+			var linesCounter = 3;
+			var tokensForLines = new Dictionary<int, string>();
+
 			foreach (var token in grammar.Tokens.Values.Where(t => t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
 			{
 				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
+				tokensForLines[++linesCounter] = token.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX) ? token.Pattern : token.Name;
 			}
 
 			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
@@ -38,7 +43,8 @@ namespace LandParserGenerator
                         //|| grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a=>a.Contains(token)) ?
 						//"" : "fragment ";
 					grammarOutput.WriteLine($"{isFragment}{token}: {grammar.Tokens[token].Pattern} ;");
-                }
+					tokensForLines[++linesCounter] = token.StartsWith(Grammar.AUTO_TOKEN_PREFIX) ? grammar.Tokens[token].Pattern : token;
+				}
 			}
 
 			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
@@ -65,8 +71,40 @@ namespace LandParserGenerator
 
 			process.WaitForExit();
 
-			if(errors!=null && !String.IsNullOrEmpty(antlrErrors.Result))
-				errors.Add(antlrErrors.Result);
+			/// Если есть ошибки, приводим их к виду, больше соответствующему .land-файлу
+			if(!String.IsNullOrEmpty(antlrErrors.Result))
+			{
+				var errorsList = antlrErrors.Result.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());
+				foreach(var error in errorsList)
+				{
+					try
+					{ 
+						/// 1 - имя .g4 файла, 2 - номер строки, 3 - номер столбца, 4 - соо об ошибке
+						var parts = error.Split(new char[] { ':' }, 5);
+
+						/// проверяем, не упоминаются ли в соо об ошибке автотерминалы
+						var autoNames = System.Text.RegularExpressions.Regex.Matches(parts[4], $"{Grammar.AUTO_TOKEN_PREFIX}[0-9]+");
+						foreach(System.Text.RegularExpressions.Match name in autoNames)
+						{
+							parts[4] = parts[4].Replace(name.Value, grammar.Userify(name.Value));
+						}
+					
+						errors.Add(new ParsingMessage()
+						{
+							Message = $"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}",
+							Source = "Antlr"
+						});
+					}
+					catch
+					{
+						errors.Add(new ParsingMessage()
+						{
+							Message = error,
+							Source = "Antlr"
+						});
+					}
+				}
+			}
 
 			/// Компилируем .cs-файл лексера
 
@@ -81,7 +119,7 @@ namespace LandParserGenerator
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
-		public static Parser BuildParser(string text, List<string> errors)
+		public static Parser BuildParser(string text, List<ParsingMessage> errors)
 		{
 			var scanner = new SpecParsing.Scanner();
 			scanner.SetSource(text, 0);
@@ -92,7 +130,11 @@ namespace LandParserGenerator
 			var success = specParser.Parse();
 			if(!success)
 			{
-				errors.Add($"При генерации парсера произошла ошибка: строка {scanner.yylloc.StartLine}, столбец {scanner.yylloc.StartColumn}, последовательность {scanner.yytext}");
+				errors.Add(new ParsingMessage()
+				{
+					Message = $"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
+					Location = new Anchor(scanner.yylloc.StartLine, scanner.yylloc.StartColumn)
+				});
 				return null;
 			}
 
@@ -600,8 +642,6 @@ namespace LandParserGenerator
 			/// Формируем грамматику
 
 			Grammar exprGrammar = new Grammar(GrammarType.LL);
-
-			exprGrammar.DeclareSpecialTokens("ERROR");
 
 			exprGrammar.DeclareTerminal(new TerminalSymbol("PLUS", "'+'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));

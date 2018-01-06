@@ -45,13 +45,13 @@ namespace PackageTestGUI
                 {
                     try
                     {
-                        var errorMessage = String.Empty;
+                        parser.Parse(File.ReadAllText(filePath));
 
-                        parser.Parse(File.ReadAllText(filePath), out errorMessage);
+                        FilesListText.Text += $"{filePath} - {parser.ErrorRecoveriesCounter} {Environment.NewLine}";
+						foreach(var error in parser.Errors)
+							FilesListText.Text += $"\t{error}{Environment.NewLine}";
 
-                        FilesListText.Text += $"{filePath} - {parser.ErrorRecoveriesCounter} - {errorMessage} {Environment.NewLine}";
-
-                        if (!String.IsNullOrEmpty(errorMessage) || parser.ErrorRecoveriesCounter > 0)
+						if (parser.Errors.Count > 0 || parser.ErrorRecoveriesCounter > 0)
                         {
                             ++errorCounter;
                             errorFiles.Add(filePath);

@@ -18,7 +18,7 @@ namespace LandParserGenerator
 
 		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
-        private LinkedList<string> ConstructionErrors { get; set; } = new LinkedList<string>();
+        private LinkedList<ParsingMessage> ConstructionErrors { get; set; } = new LinkedList<ParsingMessage>();
 
 		// Особые символы, задаваемые опциями
         public string StartSymbol { get; private set; }
@@ -107,28 +107,17 @@ namespace LandParserGenerator
 			return String.Empty;
 		}
 
-		public void DeclareSpecialTokens(params string[] tokens)
-		{
-			foreach (var token in tokens)
-			{
-				var terminal = new TerminalSymbol(token, null);
-				var checkingResult = AlreadyDeclaredCheck(token);
-
-				if (!String.IsNullOrEmpty(checkingResult))
-                    ConstructionErrors.AddLast(checkingResult);
-                else
-                    SpecialTokens.Add(token);			
-			}
-
-			OnGrammarUpdate();
-		}
-
-        public void DeclareNonterminal(NonterminalSymbol rule)
+        public void DeclareNonterminal(NonterminalSymbol rule, Anchor loc = null)
 		{
 			var checkingResult = AlreadyDeclaredCheck(rule.Name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
-                ConstructionErrors.AddLast(checkingResult);
+                ConstructionErrors.AddLast(new ParsingMessage()
+				{
+					Location = loc,
+					Source = "LanD",
+					Message = checkingResult
+				});
             else
                 Rules[rule.Name] = rule;
 
@@ -344,7 +333,7 @@ namespace LandParserGenerator
 
 		}
 
-		public IEnumerable<string> CheckValidity()
+		public IEnumerable<ParsingMessage> CheckValidity()
 		{
             var ErrorMessages = ConstructionErrors;
 
@@ -366,7 +355,7 @@ namespace LandParserGenerator
 
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = ErrorMessages.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
-            ConstructionErrors = new LinkedList<string>();
+            ConstructionErrors = new LinkedList<ParsingMessage>();
 
             return ErrorMessages;
 		}

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:TestGUI"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
         mc:Ignorable="d"
-        Title="LanD Test IDE" Height="477.801" Width="712.931">
+        Title="LanD Test IDE" Height="500" Width="800"
+        Closed="Window_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30*"></ColumnDefinition>
@@ -23,7 +24,7 @@
             <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLR" Content="LR" IsEnabled="False" />
         </ToolBar>
 
-        <TabControl Grid.Column="1" Grid.Row="1">
+        <TabControl Grid.Column="1" Grid.Row="1" Name="MainTabs">
             <TabItem>
                 <TabItem.Header>
                     <Span>
@@ -39,7 +40,7 @@
                         <RowDefinition Height="25*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ToolBar Grid.Row="0">
-                        <Button Name="LoadGrammarButton" Content="Загрузить грамматику" Click="LoadGrammarButton_Click"/>
+                        <Button Name="LoadGrammarButton" Content="Открыть" Click="LoadGrammarButton_Click"/>
                         <Separator></Separator>
                         <Button Name="SaveGrammarButton" Click="SaveGrammarButton_Click">Сохранить</Button>
                         <Separator></Separator>
@@ -48,7 +49,7 @@
                         <Button Name="BuildParserButton" Click="BuildParserButton_Click">Сгенерировать парсер</Button>
                         <Separator></Separator>
                         <Separator></Separator>
-                        <Label Name="GrammarFileName"></Label>
+                        <ComboBox MinWidth="80" Name="LastGrammarFiles" ToolTip="Последние открытые грамматики" SelectionChanged="LastGrammarFiles_SelectionChanged"></ComboBox>
                     </ToolBar>
                     <avalonedit:TextEditor
                         Name="GrammarEditor"
@@ -60,11 +61,22 @@
                     <StatusBar Name="ParserStatus" Grid.Row="2">
                         <Label Name="ParserStatusLabel"></Label>
                     </StatusBar>
-                    <ListBox
-                        Name="ParserBuidingOutput"
-                        FontSize="14pt"
-                        Grid.Row="3">
-                    </ListBox>
+                    <TabControl Grid.Row="3">
+                        <TabItem>
+                            <TabItem.Header>Лог</TabItem.Header>
+                            <ListBox
+                                Name="ParserBuidingLog"
+                                FontSize="14pt">
+                            </ListBox>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>Ошибки</TabItem.Header>
+                            <ListBox
+                                Name="ParserBuidingErrors"
+                                FontSize="14pt">
+                            </ListBox>
+                        </TabItem>
+                    </TabControl>
                 </Grid>
             </TabItem>
             <TabItem>
@@ -82,11 +94,11 @@
                         <RowDefinition Height="45*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ToolBar Grid.Row="0">
-                        <Button Name="OpenFileButton" Content="Открыть файл" Click="OpenFileButton_Click"/>
+                        <Button Name="OpenFileButton" Content="Открыть" Click="OpenFileButton_Click"/>
                         <Separator></Separator>
                         <Button Name="ClearFileButton" Content="Очистить" Click="ClearFileButton_Click"/>
                         <Separator></Separator>
-                        <Button Name="ParseButton" Click="ParseButton_Click">Разобрать файл</Button>
+                        <Button Name="ParseButton" Click="ParseButton_Click">Запустить парсер</Button>
                         <Separator></Separator>
                         <Separator></Separator>
                         <Label Name="TestFileName"></Label>
@@ -100,19 +112,44 @@
                     <StatusBar Name="ProgramStatus" Grid.Row="2">
                         <Label Name="ProgramStatusLabel"></Label>
                     </StatusBar>
-                    <ListBox
-                        Name="FileParsingOutput"
-                        FontSize="14pt"
-                        Grid.Row="3">
-                    </ListBox>
+                    <TabControl Grid.Row="3">
+                        <TabItem>
+                            <TabItem.Header>Лог</TabItem.Header>
+                            <ListBox
+                                Name="FileParsingLog"
+                                MouseDoubleClick="TestFileListBox_MouseDoubleClick"
+                                FontSize="14pt">
+                            </ListBox>
+                        </TabItem>
+                        <TabItem>
+                            <TabItem.Header>Ошибки</TabItem.Header>
+                            <ListBox
+                                Name="FileParsingErrors"
+                                MouseDoubleClick="TestFileListBox_MouseDoubleClick"
+                                FontSize="14pt">
+                            </ListBox>
+                        </TabItem>
+                    </TabControl>
                 </Grid>
             </TabItem>
-            <TabItem Header="Консоль">
-                <TextBox 
-                     FontSize="14pt"
-                     Grid.Row="1"
-                     Name="ConsoleOutputText">
-                </TextBox>
+            <TabItem Header="Массовый парсинг">
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"></RowDefinition>
+                        <RowDefinition Height="100*"></RowDefinition>
+                        <RowDefinition Height="31"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ToolBar Grid.Row="0">
+                        <Button Name="ChooseFolderButton" Content="Выбрать каталог для парсинга" Click="ChooseFolderButton_Click"/>
+                        <Separator></Separator>
+                        <Label>Целевые расширения</Label>
+                        <TextBox Width="60" BorderBrush="Black" Name="TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
+                    </ToolBar>
+                    <ListBox FontSize="14pt" Grid.Row="1" Name="PackageParsingLog" MouseDoubleClick="PackageParsingListBox_MouseDoubleClick" ></ListBox>
+                    <StatusBar Name="PackageStatus" Grid.Row="2">
+                        <Label Name="PackageStatusLabel"></Label>
+                    </StatusBar>
+                </Grid>
             </TabItem>
         </TabControl>
 

@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandParserGenerator", "Land
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestGUI", "TestGUI\TestGUI.csproj", "{8F271B4E-CC67-4661-B856-88ECA83464A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackageTestGUI", "PackageTestGUI\PackageTestGUI.csproj", "{C45263D9-D19D-4470-8617-3955AA960C98}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C45263D9-D19D-4470-8617-3955AA960C98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C45263D9-D19D-4470-8617-3955AA960C98}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C45263D9-D19D-4470-8617-3955AA960C98}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C45263D9-D19D-4470-8617-3955AA960C98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

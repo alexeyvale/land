@@ -36,10 +36,11 @@ namespace LandParserGenerator.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		public override Node Parse(string text, out string errorMessage)
+		public override Node Parse(string text)
 		{
-			Log = new List<string>();
-			errorMessage = String.Empty;
+			Log = new List<ParsingMessage>();
+			Errors = new List<ParsingMessage>();
+
             LastRecoveryAction = null;
             ErrorRecoveriesCounter = 0;
 
@@ -60,7 +61,11 @@ namespace LandParserGenerator.Parsing.LL
 			{
 				var stackTop = Stack.Peek();
 
-				Log.Add($"Текущий токен: {grammar.Userify(token.Name)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}");
+				Log.Add(new ParsingMessage()
+				{
+					Message = $"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}",
+					Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+				});
 
                 /// Если символ на вершине стека совпадает с текущим токеном
                 if(stackTop.Symbol == token.Name)
@@ -74,8 +79,7 @@ namespace LandParserGenerator.Parsing.LL
                         token = SkipText(node);
                         if(token.Name == Grammar.ERROR_TOKEN_NAME)
                         {
-                            errorMessage =
-                                    $"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {grammar.Userify(stackTop.Symbol)}";
+                            Errors.Add($"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {grammar.Userify(stackTop.Symbol)}");
 							break;
                         }
                     }
@@ -98,8 +102,11 @@ namespace LandParserGenerator.Parsing.LL
                     /// Сообщаем об ошибке в случае неоднозначной грамматики
                     if (alternatives.Count > 1)
                     {
-                        errorMessage =
-                                $"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив";
+						Errors.Add(new ParsingMessage()
+						{
+							Message = $"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
+							Location = new Anchor(token.Line, token.Column)
+						});
 						break;
                     }
                     /// Если же в ячейке ровно одна альтернатива
@@ -133,16 +140,27 @@ namespace LandParserGenerator.Parsing.LL
                     var errorToken = token;
                     var errorStackTop = stackTop.Symbol;
 
-                    if (!ErrorRecovery())
-                    {
-                        errorMessage = 
-                            $"Неожиданный символ {grammar.Userify(errorToken.Name)}: '{errorToken.Text}', символ на вершине стека - {grammar.Userify(errorStackTop)}";
+					var recovered = false;
+
+					try
+					{
+						recovered = ErrorRecovery();
+					}
+					catch { }
+
+					if(!recovered)
+					{
+						Errors.Add(new ParsingMessage()
+						{
+							Message = $"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, символ на вершине стека - {grammar.Userify(errorStackTop)}",
+							Location = new Anchor(errorToken.Line, errorToken.Column)
+						});
 						break;
-                    }
-                    else
-                    {
-                        token = LexingStream.CurrentToken();
-                    }
+					}
+					else
+					{
+						token = LexingStream.CurrentToken();
+					}         
                 }
                 /// Если непонятно, что делать с текущим токеном, и он конкретный
                 /// (не Any), заменяем его на Any
@@ -220,6 +238,15 @@ namespace LandParserGenerator.Parsing.LL
 			return token;
 		}
 
+		private string GetTokenInfoForMessage(IToken token)
+		{
+			var userified = grammar.Userify(token.Name);
+			if (userified == token.Name && token.Name != Grammar.TEXT_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
+				return $"{token.Name}: '{token.Text}'";
+			else
+				return userified;
+		}
+
 		/// <summary>
 		/// Восстановление в случае ошибки разбора - 
 		/// </summary>
@@ -227,7 +254,14 @@ namespace LandParserGenerator.Parsing.LL
 		{
             ErrorRecoveriesCounter += 1;
 
-            Log.Add($"Запущен алгоритм восстановления...");
+			var message = new ParsingMessage()
+			{
+				Message = $"Запущен алгоритм восстановления...",
+				Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+			};
+
+			Errors.Add(message);
+			Log.Add(message);
 
 			var errorTokenIndex = LexingStream.CurrentTokenIndex;
 
@@ -278,8 +312,23 @@ namespace LandParserGenerator.Parsing.LL
 							AttemptsCount = 1
 						};
 
-						Log.Add($"Восстановление: переход на неприоритетную ветку для {grammar.Userify(alternativeToApply.NonterminalSymbolName)}");
-						Log.Add($"Разбор продолжен с символа {grammar.Userify(LexingStream.CurrentToken().Name)}: '{LexingStream.CurrentToken().Text}'");
+						message = new ParsingMessage()
+						{
+							Message = $"Восстановление: переход на неприоритетную ветку для {grammar.Userify(alternativeToApply.NonterminalSymbolName)}",
+							Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+						};
+
+						Errors.Add(message);
+						Log.Add(message);
+
+						message = new ParsingMessage()
+						{
+							Message = $"Разбор продолжен с символа {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+							Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
+						};
+
+						Errors.Add(message);
+						Log.Add(message);
 
 						return true;
 					}

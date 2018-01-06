@@ -76,8 +76,6 @@ namespace LandParserGenerator
 
 			Grammar exprGrammar = new Grammar(GrammarType.LR);
 
-			exprGrammar.DeclareSpecialTokens("ERROR", "Any");
-
 			exprGrammar.DeclareTerminal(new TerminalSymbol("PLUS", "'+'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("MULT", "'*'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("LPAR", "'('"));
