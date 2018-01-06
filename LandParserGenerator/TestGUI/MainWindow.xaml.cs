@@ -375,6 +375,7 @@ namespace TestGUI
 			else
 			{
 				PackageStatusLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				PackageStatus.Background = Brushes.WhiteSmoke;
 			}
 		}
 

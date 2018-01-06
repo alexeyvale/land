@@ -20,6 +20,20 @@ namespace LandParserGenerator.Parsing
 
 		public override void Visit(Node node)
 		{
+			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
+			// или является автоматически сгенерированным и не отмечен как list
+			for (var i = 0; i < node.Children.Count; ++i)
+			{
+				if (grammar.GhostSymbols.Contains(node.Children[i].Symbol) ||
+					node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) && !grammar.ListSymbols.Contains(node.Children[i].Symbol))
+				{
+					var smbToRemove = node.Children[i];
+					node.Children.RemoveAt(i);
+					node.Children.InsertRange(i, smbToRemove.Children);
+					--i;
+				}
+			}
+
 			if (grammar.ListSymbols.Contains(node.Symbol))
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
@@ -34,20 +48,6 @@ namespace LandParserGenerator.Parsing
 			}
 
 			base.Visit(node);
-
-			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
-			// или является автоматически сгенерированным и не отмечен как list
-			for (var i = 0; i < node.Children.Count; ++i)
-			{
-				if (grammar.GhostSymbols.Contains(node.Children[i].Symbol) ||
-					node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) && !grammar.ListSymbols.Contains(node.Children[i].Symbol))
-				{
-					var smbToRemove = node.Children[i];
-					node.Children.RemoveAt(i);
-					node.Children.InsertRange(i, smbToRemove.Children);
-					--i;
-				}
-			}
 		}
 	}
 
