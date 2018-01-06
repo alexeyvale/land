@@ -39,7 +39,7 @@ namespace LandParserGenerator.Parsing
 			// или является автоматически сгенерированным и не отмечен как list
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				if(grammar.GhostSymbols.Contains(node.Children[i].Symbol) || 
+				if (grammar.GhostSymbols.Contains(node.Children[i].Symbol) ||
 					node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) && !grammar.ListSymbols.Contains(node.Children[i].Symbol))
 				{
 					var smbToRemove = node.Children[i];

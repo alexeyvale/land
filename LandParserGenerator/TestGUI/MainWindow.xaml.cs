@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,6 +26,8 @@ namespace TestGUI
 	public partial class MainWindow : Window
 	{
 		private string LAST_GRAMMARS_FILE = "./last_grammars.land.ide";
+
+		private Dispatcher FrontendUpdateDispatcher { get; set; }
 
 		private Node TreeRoot { get; set; }
 		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
@@ -58,6 +61,8 @@ namespace TestGUI
 					}
 				}
 			}
+
+			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 		}
 
 		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
@@ -297,42 +302,94 @@ namespace TestGUI
 
 				if (Parser != null)
 				{
-					var errorCounter = 0;
-					var errorFiles = new List<string>();
-					PackageParsingLog.Items.Clear();
-
-					foreach (var filePath in files)
-					{
-						try
-						{
-							Parser.Parse(File.ReadAllText(filePath));
-
-							if (Parser.Errors.Count > 0)
-							{
-								PackageParsingLog.Items.Add(filePath);
-								foreach (var error in Parser.Errors)
-									PackageParsingLog.Items.Add($"\t{error}");
-
-								++errorCounter;
-								errorFiles.Add(filePath);
-							}
-						}
-						catch (Exception ex)
-						{
-							PackageParsingLog.Items.Add(filePath);
-							foreach (var error in Parser.Errors)
-								PackageParsingLog.Items.Add($"\t{error}");
-							PackageParsingLog.Items.Add($"\t{ex.ToString()}");
-
-							++errorCounter;
-							errorFiles.Add(filePath);
-						}
-					}
-
-					PackageStatusLabel.Content = $"Разобрано: {files.Count}; С ошибками: {errorCounter} {Environment.NewLine}";
-					PackageStatus.Background = errorCounter == 0 ? Brushes.LightGreen : Brushes.Red;
+					ParsePackage(files);
 				}
 			}
+		}
+
+		private void ParsePackage(List<string> files)
+		{
+			var worker = new System.ComponentModel.BackgroundWorker();
+			worker.WorkerReportsProgress = true;
+			worker.DoWork += worker_DoWork;
+			worker.ProgressChanged += worker_ProgressChanged;
+
+			worker.RunWorkerAsync(files);
+		}
+
+		void worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+		{
+			OnPackageFileParsingError = AddRecordToPackageParsingLog;
+			OnPackageFileParsed = UpdatePackageParsingStatus;
+
+			var files = (List<string>) e.Argument;
+			var errorCounter = 0;
+			var counter = 0;
+			var errorFiles = new List<string>();
+
+			FrontendUpdateDispatcher.Invoke((Action)(()=>{ PackageParsingLog.Items.Clear(); }));		
+
+			for (; counter < files.Count; ++counter)
+			{
+				try
+				{
+					FrontendUpdateDispatcher.Invoke((Action)(() => { Parser.Parse(File.ReadAllText(files[counter])); }));
+
+					if (Parser.Errors.Count > 0)
+					{
+						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
+						foreach (var error in Parser.Errors)
+							FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
+
+						++errorCounter;
+					}
+				}
+				catch (Exception ex)
+				{
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
+					foreach (var error in Parser.Errors)
+						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{ex.ToString()}");
+
+					++errorCounter;
+				}
+
+				(sender as System.ComponentModel.BackgroundWorker).ReportProgress((counter + 1) * 100 / files.Count);
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, files.Count, counter + 1, errorCounter);
+			}
+
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter);
+		}
+
+		private delegate void UpdatePackageParsingStatusDelegate(int total, int parsed, int errorsCount);
+
+		private UpdatePackageParsingStatusDelegate OnPackageFileParsed { get; set; }
+			
+		private void UpdatePackageParsingStatus(int total, int parsed, int errorsCount)
+		{
+			if (total == parsed)
+			{
+				PackageStatusLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				PackageStatus.Background = errorsCount == 0 ? Brushes.LightGreen : Brushes.Red;
+			}
+			else
+			{
+				PackageStatusLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+			}
+		}
+
+		private delegate void AddRecordToPackageParsingLogDelegate(object record);
+
+		private AddRecordToPackageParsingLogDelegate OnPackageFileParsingError { get; set; }
+
+		private void AddRecordToPackageParsingLog(object record)
+		{
+			PackageParsingLog.Items.Add(record);
+		}
+
+		void worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+		{
+			PackageParsingProgress.Value = e.ProgressPercentage;
 		}
 
 		private void PackageParsingListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
