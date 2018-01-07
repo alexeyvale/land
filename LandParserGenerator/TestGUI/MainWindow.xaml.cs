@@ -193,7 +193,7 @@ namespace TestGUI
 					var start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					GrammarEditor.Focus();
 					GrammarEditor.Select(start, 0);
-					GrammarEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+					GrammarEditor.ScrollToLine(msg.Location.Line);
 				}
 			}
 		}

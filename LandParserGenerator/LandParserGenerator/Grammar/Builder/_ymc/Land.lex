@@ -25,10 +25,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 %%
 
-%{
-  yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
-%}
-
 {LINE_COMMENT} |
 {MULTILINE_COMMENT} {}
 
@@ -128,6 +124,11 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	{LINE_COMMENT} |
 	{MULTILINE_COMMENT} {}
 }
+
+%{
+  yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
+%}
+
 
 %%
 

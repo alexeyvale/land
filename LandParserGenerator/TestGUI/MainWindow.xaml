@@ -66,6 +66,7 @@
                             <TabItem.Header>Лог</TabItem.Header>
                             <ListBox
                                 Name="ParserBuidingLog"
+                                MouseDoubleClick="GrammarListBox_MouseDoubleClick"
                                 FontSize="14pt">
                             </ListBox>
                         </TabItem>
@@ -73,6 +74,7 @@
                             <TabItem.Header>Ошибки</TabItem.Header>
                             <ListBox
                                 Name="ParserBuidingErrors"
+                                MouseDoubleClick="GrammarListBox_MouseDoubleClick"
                                 FontSize="14pt">
                             </ListBox>
                         </TabItem>
