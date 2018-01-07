@@ -54,7 +54,7 @@ namespace TestGUI
 			if (File.Exists(LAST_GRAMMARS_FILE))
 			{
 				var files = File.ReadAllLines(LAST_GRAMMARS_FILE);
-				foreach(var filepath in files.Reverse())
+				foreach(var filepath in files)
 				{
 					if(!String.IsNullOrEmpty(filepath))
 					{
@@ -76,6 +76,11 @@ namespace TestGUI
 			ParserBuidingLog.Items.Add(e.Value);
 		}
 
+		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			e.Cancel = !MayProceedClosingGrammar();
+		}
+
 		private void Window_Closed(object sender, EventArgs e)
 		{
 			var listContent = new List<string>();
@@ -87,6 +92,33 @@ namespace TestGUI
 		}
 
 		#region Генерация парсера
+
+		private string CurrentGrammarFilename { get; set; } = null;
+
+		private bool MayProceedClosingGrammar()
+		{
+			/// Предлагаем сохранить грамматику, если она новая или если в открытой грамматике произошли изменения или исходный файл был удалён
+			if (String.IsNullOrEmpty(CurrentGrammarFilename) && !String.IsNullOrEmpty(GrammarEditor.Text) ||
+				!String.IsNullOrEmpty(CurrentGrammarFilename) && (!File.Exists(CurrentGrammarFilename) || File.ReadAllText(CurrentGrammarFilename) != GrammarEditor.Text))
+			{
+				switch (MessageBox.Show(
+					"В грамматике имеются несохранённые изменения. Сохранить текущую версию?",
+					"Предупреждение",
+					MessageBoxButton.YesNoCancel,
+					MessageBoxImage.Question))
+				{
+					case MessageBoxResult.Yes:
+						SaveGrammarButton_Click(null, null);
+						return true;
+					case MessageBoxResult.No:
+						return true;
+					case MessageBoxResult.Cancel:
+						return false;
+				}
+			}
+
+			return true;
+		}
 
 		private void BuildParserButton_Click(object sender, RoutedEventArgs e)
 		{
@@ -119,11 +151,13 @@ namespace TestGUI
 
 		private void LoadGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
-			var openFileDialog = new OpenFileDialog();
-			if (openFileDialog.ShowDialog() == true)
+			if (MayProceedClosingGrammar())
 			{
-				OpenGrammar(openFileDialog.FileName);
-				SetAsCurrentGrammar(openFileDialog.FileName);
+				var openFileDialog = new OpenFileDialog();
+				if (openFileDialog.ShowDialog() == true)
+				{
+					OpenGrammar(openFileDialog.FileName);
+				}
 			}
 		}
 
@@ -142,15 +176,31 @@ namespace TestGUI
 
 		private void OpenGrammar(string filename)
 		{
+			if(!File.Exists(filename))
+			{
+				MessageBox.Show("Указанный файл не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+				LastGrammarFiles.Items.Remove(filename);
+				LastGrammarFiles.SelectedIndex = -1;
+
+				CurrentGrammarFilename = null;
+				GrammarEditor.Text = String.Empty;
+				SaveGrammarButton.IsEnabled = true;
+
+				return;
+			}
+
+			CurrentGrammarFilename = filename;
 			GrammarEditor.Text = File.ReadAllText(filename);
 			SaveGrammarButton.IsEnabled = false;
+			SetAsCurrentGrammar(filename);
 		}
 
 		private void SaveGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (LastGrammarFiles.SelectedIndex != -1)
+			if (!String.IsNullOrEmpty(CurrentGrammarFilename))
 			{
-				File.WriteAllText(LastGrammarFiles.SelectedItem.ToString(), GrammarEditor.Text);
+				File.WriteAllText(CurrentGrammarFilename, GrammarEditor.Text);
 				SaveGrammarButton.IsEnabled = false;
 			}
 			else
@@ -160,7 +210,7 @@ namespace TestGUI
 				{
 					File.WriteAllText(saveFileDialog.FileName, GrammarEditor.Text);
 					SaveGrammarButton.IsEnabled = false;
-
+					CurrentGrammarFilename = saveFileDialog.FileName;
 					SetAsCurrentGrammar(saveFileDialog.FileName);
 				}
 			}
@@ -168,8 +218,12 @@ namespace TestGUI
 
 		private void NewGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
-			LastGrammarFiles.SelectedIndex = -1;
-			GrammarEditor.Text = String.Empty;
+			if (MayProceedClosingGrammar())
+			{
+				LastGrammarFiles.SelectedIndex = -1;
+				CurrentGrammarFilename = null;
+				GrammarEditor.Text = String.Empty;
+			}
 		}
 
 		private void GrammarEditor_TextChanged(object sender, EventArgs e)
@@ -199,8 +253,24 @@ namespace TestGUI
 
 		private void LastGrammarFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if(e.AddedItems.Count > 0)
+			/// Если что-то новое было выделено
+			if (e.AddedItems.Count > 0)
+			{
+				/// Если до этого был выбран какой-то файл
+				if (e.RemovedItems.Count > 0)
+					/// Нужно предложить сохранение, и откатить смену выбора файла, если пользователь передумал
+					if(!MayProceedClosingGrammar())
+					{
+						LastGrammarFiles.SelectionChanged -= LastGrammarFiles_SelectionChanged;
+
+						ComboBox combo = (ComboBox)sender;
+						combo.SelectedItem = e.RemovedItems[0];
+
+						LastGrammarFiles.SelectionChanged += LastGrammarFiles_SelectionChanged;
+						return;
+					}
 				OpenGrammar(e.AddedItems[0].ToString());
+			}
 		}
 
 		#endregion
@@ -443,6 +513,6 @@ namespace TestGUI
 				PackageParsingProgress.Foreground = Brushes.IndianRed;
 			}
 		}
-		#endregion
+		#endregion	
 	}
 }

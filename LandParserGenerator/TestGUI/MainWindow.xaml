@@ -7,7 +7,8 @@
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
         mc:Ignorable="d"
         Title="LanD Test IDE" Height="500" Width="800"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30*"></ColumnDefinition>
