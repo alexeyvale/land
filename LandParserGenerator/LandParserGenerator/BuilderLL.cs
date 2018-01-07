@@ -128,19 +128,20 @@ namespace LandParserGenerator
 			specParser.ConstructedGrammar = new Grammar(GrammarType.LL);
 
 			var success = specParser.Parse();
+
+			errors.AddRange(specParser.Errors);
 			if(!success)
 			{
 				errors.Add(new ParsingMessage()
 				{
 					Message = $"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
+					Source = "LanD",
 					Location = new Anchor(scanner.yylloc.StartLine, scanner.yylloc.StartColumn)
 				});
 				return null;
 			}
 
 			var builtGrammar = specParser.ConstructedGrammar;
-
-			errors.AddRange(builtGrammar.CheckValidity());
 
 			if (errors.Count() == 0)
 			{
@@ -159,9 +160,6 @@ namespace LandParserGenerator
 			}
 			else
 			{
-				foreach (var error in errors)
-					Console.WriteLine(error);
-
 				return null;
 			}
 		}

@@ -18,7 +18,6 @@ namespace LandParserGenerator
 
 		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
-        private LinkedList<ParsingMessage> ConstructionErrors { get; set; } = new LinkedList<ParsingMessage>();
 
 		// Особые символы, задаваемые опциями
         public string StartSymbol { get; private set; }
@@ -107,17 +106,12 @@ namespace LandParserGenerator
 			return String.Empty;
 		}
 
-        public void DeclareNonterminal(NonterminalSymbol rule, Anchor loc = null)
+        public void DeclareNonterminal(NonterminalSymbol rule)
 		{
 			var checkingResult = AlreadyDeclaredCheck(rule.Name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
-                ConstructionErrors.AddLast(new ParsingMessage()
-				{
-					Location = loc,
-					Source = "LanD",
-					Message = checkingResult
-				});
+				throw new IncorrectGrammarException(checkingResult);
             else
                 Rules[rule.Name] = rule;
 
@@ -225,7 +219,7 @@ namespace LandParserGenerator
 			var checkingResult = AlreadyDeclaredCheck(terminal.Name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
-				ConstructionErrors.AddLast(checkingResult);
+				throw new IncorrectGrammarException(checkingResult);
 			else
 			{
 				TokenOrder.Add(terminal.Name);
@@ -274,7 +268,9 @@ namespace LandParserGenerator
             {
                 if (!this.Rules.ContainsKey(symbol))
                 {
-                    throw new IncorrectGrammarException($"Символ {symbol} не определён как нетерминальный");
+                    throw new IncorrectGrammarException(
+						$"Символ {symbol} не определён как нетерминальный"
+					);
                 }
             }
 		}
@@ -283,7 +279,9 @@ namespace LandParserGenerator
 		{
 			if (!this.Rules.ContainsKey(smb))
 			{
-				throw new IncorrectGrammarException($"Символ {smb} не определён как нетерминальный");
+				throw new IncorrectGrammarException(
+					$"Символ {smb} не определён как нетерминальный"
+				);
 			}
 			else
 			{
@@ -300,7 +298,8 @@ namespace LandParserGenerator
 				if (!this.Rules.ContainsKey(symbol))
 				{
 					throw new IncorrectGrammarException(
-                        String.Format($"Символ {symbol} не определён как нетерминальный"));
+						$"Символ {symbol} не определён как нетерминальный"
+					);
 				}
 			}
 		}
@@ -335,7 +334,7 @@ namespace LandParserGenerator
 
 		public IEnumerable<ParsingMessage> CheckValidity()
 		{
-            var ErrorMessages = ConstructionErrors;
+			var errors = new LinkedList<ParsingMessage>();
 
             foreach (var rule in Rules.Values)
             {
@@ -346,18 +345,17 @@ namespace LandParserGenerator
                     foreach (var smb in alt)
                     {
                         if (this[smb] == null && !SpecialTokens.Contains(smb))
-                            ErrorMessages.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
+							errors.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
                     }
             }
 
 			if(String.IsNullOrEmpty(StartSymbol))
-                ErrorMessages.AddLast($"Не задан стартовый символ");
+				errors.AddLast($"Не задан стартовый символ");
 
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
-			State = ErrorMessages.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
-            ConstructionErrors = new LinkedList<ParsingMessage>();
+			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
 
-            return ErrorMessages;
+            return errors;
 		}
 
 		public string Userify(string name)

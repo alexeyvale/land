@@ -96,7 +96,7 @@ namespace TestGUI
 
 			if (ParsingLL.IsChecked == true)
 			{
-				Parser = LandParserGenerator.BuilderLL.BuildSharp();//BuildParser(GrammarEditor.Text, errors);
+				Parser = LandParserGenerator.BuilderLL.BuildParser(GrammarEditor.Text, errors);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{

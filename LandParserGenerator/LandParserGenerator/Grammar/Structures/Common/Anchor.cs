@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using QUT.Gppg;
+
 namespace LandParserGenerator
 {
 	public class Anchor
@@ -17,6 +19,11 @@ namespace LandParserGenerator
 		{
 			Line = ln;
 			Column = col + COLUMN_NUMBER_CORRECTION;
+		}
+
+		public static implicit operator Anchor(LexLocation loc)
+		{
+			return new Anchor(loc.StartLine, loc.StartColumn);
 		}
 	}
 }

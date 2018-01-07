@@ -2,6 +2,7 @@
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
+    public List<ParsingMessage> Errors = new List<ParsingMessage>();
 %}
 
 %using System.Linq;
@@ -40,7 +41,7 @@
 %%
 
 lp_description 
-	: structure PROC options
+	: structure PROC options { Errors.AddRange(ConstructedGrammar.CheckValidity()); }
 	;
 
 /***************************** STRUCTURE ******************************/
@@ -56,13 +57,13 @@ element
 	;
 	
 terminal
-	: ENTITY_NAME REGEX { ConstructedGrammar.DeclareTerminal($1, $2); }
+	: ENTITY_NAME REGEX { SafeGrammarAction(() => { ConstructedGrammar.DeclareTerminal($1, $2); }, @1); }
 	;
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal
 	: ENTITY_NAME EQUALS body 
-		{ ConstructedGrammar.DeclareNonterminal($1, $3); }
+		{ SafeGrammarAction(() => { ConstructedGrammar.DeclareNonterminal($1, $3); }, @1); }
 	;
 	
 body
@@ -91,7 +92,7 @@ body_element
 				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value);
 				$$ = new Entry(generated);
 				
-				if($1) { ConstructedGrammar.SetListSymbol($$); }
+				if($1) { SafeGrammarAction(() => { ConstructedGrammar.SetListSymbol($$); }, @2); }
 			}
 			else
 			{
@@ -147,17 +148,17 @@ option
 	
 skip_option
 	: OPTION_SKIP identifiers
-		{ ConstructedGrammar.SetSkipTokens($2.ToArray()); }
+		{ SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($2.ToArray()); }, @1); }
 	;	
 
 ghost_option
 	: OPTION_GHOST identifiers
-		{ ConstructedGrammar.SetGhostSymbols($2.ToArray()); }
+		{ SafeGrammarAction(() => { ConstructedGrammar.SetGhostSymbols($2.ToArray()); }, @1); }
 	;
 	
 start_option
 	: OPTION_START ID
-		{ ConstructedGrammar.SetStartSymbol($2); }
+		{ SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($2); }, @1); }
 	;
 	
 identifiers
@@ -166,4 +167,23 @@ identifiers
 	| ID 
 		{ $$ = new List<string>(); $$.Add($1); }
 	;
+	
+%%
+
+private void SafeGrammarAction(Action action, LexLocation loc)
+{
+	try
+	{
+		action();
+	}
+	catch(IncorrectGrammarException ex)
+	{
+		Errors.Add(new ParsingMessage()
+		{
+			Message = ex.Message,
+			Location = loc,
+			Source = "LanD"
+		});
+	}
+}
 
