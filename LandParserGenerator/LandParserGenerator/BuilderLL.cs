@@ -146,7 +146,9 @@ namespace LandParserGenerator
 			if (errors.Count() == 0)
 			{
 				TableLL1 table = new TableLL1(builtGrammar);
-				//table.ExportToCsv("sharp_table.csv");
+				errors.AddRange(table.CheckValidity());
+
+				table.ExportToCsv("current_table.csv");
 
 				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", errors);
 				/// Создаём парсер

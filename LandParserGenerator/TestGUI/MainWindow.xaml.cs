@@ -27,7 +27,6 @@ namespace TestGUI
 	{
 		private string LAST_GRAMMARS_FILE = "./last_grammars.land.ide";
 
-		private Dispatcher FrontendUpdateDispatcher { get; set; }
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
 
 		private Node TreeRoot { get; set; }
@@ -64,7 +63,7 @@ namespace TestGUI
 				}
 			}
 
-			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
+			InitPackageParsing();
 		}
 
 		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
@@ -288,36 +287,32 @@ namespace TestGUI
 
 		#region Парсинг набора файлов
 
+		private System.ComponentModel.BackgroundWorker PackageParsingWorker;
+		private Dispatcher FrontendUpdateDispatcher { get; set; }
+
+		private string PackageSource { get; set; }
+
+		private void InitPackageParsing()
+		{
+			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
+
+			PackageParsingWorker = new System.ComponentModel.BackgroundWorker();
+			PackageParsingWorker.WorkerReportsProgress = true;
+			PackageParsingWorker.WorkerSupportsCancellation = true;
+			PackageParsingWorker.DoWork += worker_DoWork;
+			PackageParsingWorker.ProgressChanged += worker_ProgressChanged;
+		}
+
 		private void ChooseFolderButton_Click(object sender, RoutedEventArgs e)
 		{
 			var folderDialog = new System.Windows.Forms.FolderBrowserDialog();
 
+			/// При выборе каталога запоминаем имя и отображаем его в строке статуса
 			if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
-				var folderPath = folderDialog.SelectedPath;
-				var patterns = TargetExtentions.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ext => $"*.{ext.Trim().Trim('.')}");
-
-				List<string> files = new List<string>();
-				foreach(var pattern in patterns)
-				{
-					files.AddRange(Directory.GetFiles(folderPath, pattern, SearchOption.AllDirectories));
-				}
-
-				if (Parser != null)
-				{
-					ParsePackage(files);
-				}
+				PackageSource = folderDialog.SelectedPath;
+				PackagePathLabel.Content = $"Выбран каталог {PackageSource}";
 			}
-		}
-
-		private void ParsePackage(List<string> files)
-		{
-			var worker = new System.ComponentModel.BackgroundWorker();
-			worker.WorkerReportsProgress = true;
-			worker.DoWork += worker_DoWork;
-			worker.ProgressChanged += worker_ProgressChanged;
-
-			worker.RunWorkerAsync(files);
 		}
 
 		void worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -359,6 +354,12 @@ namespace TestGUI
 
 				(sender as System.ComponentModel.BackgroundWorker).ReportProgress((counter + 1) * 100 / files.Count);
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, files.Count, counter + 1, errorCounter);
+
+				if(PackageParsingWorker.CancellationPending)
+				{
+					e.Cancel = true;
+					return;
+				}
 			}
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter);
@@ -408,6 +409,38 @@ namespace TestGUI
 			}
 		}
 
+		private void StartOrStopPackageParsingButton_Click(object sender, RoutedEventArgs e)
+		{
+			if(!PackageParsingWorker.IsBusy)
+			{
+				/// Если в настоящий момент парсинг не осуществляется и парсер сгенерирован
+				if (Parser != null)
+				{
+					/// Получаем имена всех файлов с нужным расширением
+					var patterns = TargetExtentions.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ext => $"*.{ext.Trim().Trim('.')}");
+					var package = new List<string>();
+					/// Возможна ошибка при доступе к определённым директориям
+					try
+					{			
+						foreach (var pattern in patterns)
+						{
+							package.AddRange(Directory.GetFiles(PackageSource, pattern, SearchOption.AllDirectories));
+						}
+					}
+					catch
+					{
+						package = new List<string>();
+						PackagePathLabel.Content = $"Ошибка при получении содержимого каталога, возможно, отсутствуют права доступа";
+					}
+					/// Запускаем в отдельном потоке массовый парсинг
+					PackageParsingWorker.RunWorkerAsync(package);
+				}
+			}
+			else
+			{
+				PackageParsingWorker.CancelAsync();
+			}
+		}
 		#endregion
 	}
 }

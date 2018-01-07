@@ -30,9 +30,9 @@ namespace LandParserGenerator
 				resString += Source + ":";
 
 			if (Location != null)
-				resString += $"({Location.Line}, {Location.Column}) ";
+				resString += $"({Location.Line},{Location.Column})";
 
-			return resString + Message;
+			return $"{resString} {Message}";
 		}
 	}
 }

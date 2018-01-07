@@ -146,9 +146,12 @@
                         <Separator></Separator>
                         <Label>Целевые расширения</Label>
                         <TextBox Width="60" BorderBrush="Black" Name="TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
+                        <Separator></Separator>
+                        <Button Name="StartOrStopPackageParsingButton" Content="Запуск/Остановка" Click="StartOrStopPackageParsingButton_Click"/>
                     </ToolBar>
                     <ListBox FontSize="14pt" Grid.Row="1" Name="PackageParsingLog" MouseDoubleClick="PackageParsingListBox_MouseDoubleClick" ></ListBox>
                     <StatusBar Name="PackageStatus" Grid.Row="2">
+                        <Label Name="PackagePathLabel"></Label>
                         <Label Name="PackageStatusLabel"></Label>
                         <ProgressBar Width="200" Height="20" Name="PackageParsingProgress" Minimum="0" Maximum="100"></ProgressBar>
                     </StatusBar>

@@ -12,12 +12,14 @@ namespace LandParserGenerator.Parsing.LL
 	/// </summary>
 	public class TableLL1
 	{
+		private Grammar Gram { get; set; }
 		private HashSet<Alternative>[,] Table { get; set; }
 		private Dictionary<string, int> Lookaheads { get; set; }
 		private Dictionary<string, int> NonterminalSymbols { get; set; }
 
 		public TableLL1(Grammar g)
 		{
+			Gram = g;
 			Table = new HashSet<Alternative>[g.Rules.Count, g.Tokens.Count];
 
 			NonterminalSymbols = g.Rules
@@ -63,6 +65,26 @@ namespace LandParserGenerator.Parsing.LL
 					}
 				}
             }
+		}
+
+		public List<ParsingMessage> CheckValidity()
+		{
+			var errors = new List<ParsingMessage>();
+
+			foreach(var nt in NonterminalSymbols.Keys)
+				foreach(var tok in Lookaheads.Keys)
+				{
+					if(this[nt, tok].Count > 1)
+					{
+						errors.Add(new ParsingMessage()
+						{
+							Source = "LanD",
+							Message = $"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив"
+						});
+					}
+				}
+
+			return errors;
 		}
 
 		public HashSet<Alternative> this[string nt, string lookahead]
