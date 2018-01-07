@@ -62,6 +62,7 @@
     </ApplicationDefinition>
     <Compile Include="ConsoleWriter.cs" />
     <Compile Include="CurrentLineHighlighter.cs" />
+    <Compile Include="SelectedTextColorizer.cs" />
     <Compile Include="TreeNodesAdapter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

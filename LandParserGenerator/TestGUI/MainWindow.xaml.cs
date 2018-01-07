@@ -28,6 +28,7 @@ namespace TestGUI
 		private string LAST_GRAMMARS_FILE = "./last_grammars.land.ide";
 
 		private Dispatcher FrontendUpdateDispatcher { get; set; }
+		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
 
 		private Node TreeRoot { get; set; }
 		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
@@ -49,8 +50,9 @@ namespace TestGUI
 
 			GrammarEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(GrammarEditor.TextArea));
 			FileEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(FileEditor.TextArea));
+			SelectedTextColorizerForGrammar = new SelectedTextColorizer(GrammarEditor.TextArea);
 
-			if(File.Exists(LAST_GRAMMARS_FILE))
+			if (File.Exists(LAST_GRAMMARS_FILE))
 			{
 				var files = File.ReadAllLines(LAST_GRAMMARS_FILE);
 				foreach(var filepath in files.Reverse())
@@ -94,7 +96,7 @@ namespace TestGUI
 
 			if (ParsingLL.IsChecked == true)
 			{
-				Parser = LandParserGenerator.BuilderLL.BuildParser(GrammarEditor.Text, errors);
+				Parser = LandParserGenerator.BuilderLL.BuildSharp();//BuildParser(GrammarEditor.Text, errors);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
@@ -176,6 +178,7 @@ namespace TestGUI
 			ParserStatus.Background = Brushes.Yellow;
 			ParserStatusLabel.Content = "Текст грамматики изменился со времени последней генерации парсера";
 			SaveGrammarButton.IsEnabled = true;
+			SelectedTextColorizerForGrammar.Reset();
 		}
 
 		private void GrammarListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
