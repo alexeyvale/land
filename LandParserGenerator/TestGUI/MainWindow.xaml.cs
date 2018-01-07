@@ -379,7 +379,6 @@ namespace TestGUI
 			else
 			{
 				PackageStatusLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
-				PackageStatus.Background = Brushes.WhiteSmoke;
 			}
 		}
 
@@ -433,12 +432,15 @@ namespace TestGUI
 						PackagePathLabel.Content = $"Ошибка при получении содержимого каталога, возможно, отсутствуют права доступа";
 					}
 					/// Запускаем в отдельном потоке массовый парсинг
+					PackageStatus.Background = Brushes.WhiteSmoke;
 					PackageParsingWorker.RunWorkerAsync(package);
+					PackageParsingProgress.Foreground = Brushes.MediumSeaGreen;
 				}
 			}
 			else
 			{
 				PackageParsingWorker.CancelAsync();
+				PackageParsingProgress.Foreground = Brushes.IndianRed;
 			}
 		}
 		#endregion
