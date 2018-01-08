@@ -345,7 +345,7 @@ namespace LandParserGenerator
                     foreach (var smb in alt)
                     {
                         if (this[smb] == null && !SpecialTokens.Contains(smb))
-							errors.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {rule.Name}");
+							errors.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}");
                     }
             }
 

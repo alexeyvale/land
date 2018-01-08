@@ -258,19 +258,19 @@ namespace TestGUI
 			/// Если что-то новое было выделено
 			if (e.AddedItems.Count > 0)
 			{
-				/// Если до этого был выбран какой-то файл
-				if (e.RemovedItems.Count > 0)
-					/// Нужно предложить сохранение, и откатить смену выбора файла, если пользователь передумал
-					if(!MayProceedClosingGrammar())
-					{
-						LastGrammarFiles.SelectionChanged -= LastGrammarFiles_SelectionChanged;
-
-						ComboBox combo = (ComboBox)sender;
+				/// Нужно предложить сохранение, и откатить смену выбора файла, если пользователь передумал
+				if (!MayProceedClosingGrammar())
+				{
+					LastGrammarFiles.SelectionChanged -= LastGrammarFiles_SelectionChanged;
+					ComboBox combo = (ComboBox)sender;
+					/// Если до этого был выбран какой-то файл
+					if (e.RemovedItems.Count > 0)
 						combo.SelectedItem = e.RemovedItems[0];
-
-						LastGrammarFiles.SelectionChanged += LastGrammarFiles_SelectionChanged;
-						return;
-					}
+					else
+						combo.SelectedIndex = -1;
+					LastGrammarFiles.SelectionChanged += LastGrammarFiles_SelectionChanged;
+					return;
+				}
 				OpenGrammar(e.AddedItems[0].ToString());
 			}
 		}
