@@ -55,6 +55,7 @@
                     <avalonedit:TextEditor
                         Name="GrammarEditor"
                         Grid.Row="1"
+                        ShowLineNumbers="True"
                         FontFamily="Consolas"
                         TextChanged="GrammarEditor_TextChanged"
                         FontSize="12pt">
@@ -109,6 +110,7 @@
                     <avalonedit:TextEditor
                         Name="FileEditor"
                         Grid.Row="1"
+                        ShowLineNumbers="True"
                         FontFamily="Consolas"
                         FontSize="12pt">
                     </avalonedit:TextEditor>
