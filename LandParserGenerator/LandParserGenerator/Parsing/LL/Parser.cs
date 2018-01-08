@@ -152,7 +152,9 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						Errors.Add(new ParsingMessage()
 						{
-							Message = $"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, символ на вершине стека - {grammar.Userify(errorStackTop)}",
+							Message = grammar.Tokens.ContainsKey(errorStackTop) ?
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался символ {grammar.Userify(errorStackTop)}" :
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался один из следующих символов: {String.Join(", ", Table[errorStackTop].Where(t=>t.Value.Count>0).Select(t => grammar.Userify(t.Key)))}",
 							Location = new Anchor(errorToken.Line, errorToken.Column)
 						});
 						break;

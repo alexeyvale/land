@@ -27,6 +27,8 @@ namespace TestGUI
 	{
 		private string LAST_GRAMMARS_FILE = "./last_grammars.land.ide";
 
+		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
+
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
 
 		private Node TreeRoot { get; set; }
@@ -140,7 +142,7 @@ namespace TestGUI
 			if (Parser == null || errors.Count > 0)
 			{
 				ParserStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
-				ParserStatus.Background = Brushes.Red;
+				ParserStatus.Background = LightRed;
 			}
 			else
 			{
@@ -284,7 +286,7 @@ namespace TestGUI
                 var root = Parser.Parse(FileEditor.Text);
 
                 ProgramStatusLabel.Content = Parser.Errors.Count == 0 ? "Разбор произведён успешно" : "Ошибки при разборе файла";
-                ProgramStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : Brushes.Red;
+                ProgramStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
 
                 if (root != null)
                 {
@@ -444,7 +446,7 @@ namespace TestGUI
 			if (total == parsed)
 			{
 				PackageStatusLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
-				PackageStatus.Background = errorsCount == 0 ? Brushes.LightGreen : Brushes.Red;
+				PackageStatus.Background = errorsCount == 0 ? Brushes.LightGreen : LightRed;
 			}
 			else
 			{
