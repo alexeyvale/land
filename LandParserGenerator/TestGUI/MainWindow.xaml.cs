@@ -242,8 +242,8 @@ namespace TestGUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = (LandParserGenerator.Message)lb.SelectedItem;
-				if (msg.Location != null)
+				var msg = lb.SelectedItem as LandParserGenerator.Message;
+				if (msg != null && msg.Location != null)
 				{
 					var start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					GrammarEditor.Focus();
@@ -476,8 +476,11 @@ namespace TestGUI
 			if (lb.SelectedIndex != -1 && lb.SelectedItem is string)
 			{
 				/// Открыть файл
-				OpenFile(lb.SelectedItem.ToString());
-				MainTabs.SelectedIndex = 1;
+				if (File.Exists(lb.SelectedItem.ToString()))
+				{
+					OpenFile(lb.SelectedItem.ToString());
+					MainTabs.SelectedIndex = 1;
+				}
 			}
 		}
 
