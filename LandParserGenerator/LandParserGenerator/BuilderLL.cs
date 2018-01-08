@@ -13,7 +13,7 @@ namespace LandParserGenerator
 {
 	public static class BuilderLL
 	{
-		private static Type BuildLexer(Grammar grammar, string lexerName, List<ParsingMessage> errors = null)
+		private static Type BuildLexer(Grammar grammar, string lexerName, List<Message> errors = null)
 		{
 			/// Генерируем по грамматике файл для ANTLR
 			var grammarOutput = new StreamWriter($"{lexerName}.g4");
@@ -88,20 +88,12 @@ namespace LandParserGenerator
 						{
 							parts[4] = parts[4].Replace(name.Value, grammar.Userify(name.Value));
 						}
-					
-						errors.Add(new ParsingMessage()
-						{
-							Message = $"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}",
-							Source = "Antlr"
-						});
+
+						errors.Add(Message.Error($"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}", "Antlr"));
 					}
 					catch
 					{
-						errors.Add(new ParsingMessage()
-						{
-							Message = error,
-							Source = "Antlr"
-						});
+						errors.Add(Message.Error(error, "Antlr"));
 					}
 				}
 			}
@@ -119,7 +111,7 @@ namespace LandParserGenerator
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
-		public static Parser BuildParser(string text, List<ParsingMessage> errors)
+		public static Parser BuildParser(string text, List<Message> errors)
 		{
 			var scanner = new SpecParsing.Scanner();
 			scanner.SetSource(text, 0);
@@ -130,14 +122,17 @@ namespace LandParserGenerator
 			var success = specParser.Parse();
 
 			errors.AddRange(specParser.Errors);
+			errors.AddRange(scanner.Log);
+
 			if(!success)
 			{
-				errors.Add(new ParsingMessage()
-				{
-					Message = $"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
-					Source = "LanD",
-					Location = new Anchor(scanner.yylloc.StartLine, scanner.yylloc.StartColumn)
-				});
+				//errors.Add(Message.Error(
+				//	$"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
+				//	scanner.yylloc.StartLine,
+				//	scanner.yylloc.StartColumn,
+				//	"LanD"
+				//));
+
 				return null;
 			}
 

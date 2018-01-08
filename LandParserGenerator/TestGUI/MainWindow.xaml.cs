@@ -125,7 +125,7 @@ namespace TestGUI
 		private void BuildParserButton_Click(object sender, RoutedEventArgs e)
 		{
 			Parser = null;
-			var errors = new List<LandParserGenerator.ParsingMessage>();
+			var errors = new List<LandParserGenerator.Message>();
 
 			if (ParsingLL.IsChecked == true)
 			{
@@ -242,7 +242,7 @@ namespace TestGUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = (LandParserGenerator.ParsingMessage)lb.SelectedItem;
+				var msg = (LandParserGenerator.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
 					var start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
@@ -345,7 +345,7 @@ namespace TestGUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = (LandParserGenerator.ParsingMessage)lb.SelectedItem;
+				var msg = (LandParserGenerator.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
 					var start = FileEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);

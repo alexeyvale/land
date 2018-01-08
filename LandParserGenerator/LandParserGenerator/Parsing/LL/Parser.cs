@@ -38,8 +38,8 @@ namespace LandParserGenerator.Parsing.LL
 		/// </returns>
 		public override Node Parse(string text)
 		{
-			Log = new List<ParsingMessage>();
-			Errors = new List<ParsingMessage>();
+			Log = new List<Message>();
+			Errors = new List<Message>();
 
             LastRecoveryAction = null;
             ErrorRecoveriesCounter = 0;
@@ -61,11 +61,11 @@ namespace LandParserGenerator.Parsing.LL
 			{
 				var stackTop = Stack.Peek();
 
-				Log.Add(new ParsingMessage()
-				{
-					Message = $"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}",
-					Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-				});
+				Log.Add(Message.Trace(
+					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}",
+					LexingStream.CurrentToken().Line, 
+					LexingStream.CurrentToken().Column
+				));
 
                 /// Если символ на вершине стека совпадает с текущим токеном
                 if(stackTop.Symbol == token.Name)
@@ -77,11 +77,9 @@ namespace LandParserGenerator.Parsing.LL
                     if (token.Name == Grammar.TEXT_TOKEN_NAME)
                     {
                         token = SkipText(node);
+						/// Если при пропуске текста произошла ошибка, прерываем разбор
                         if(token.Name == Grammar.ERROR_TOKEN_NAME)
-                        {
-                            Errors.Add($"Ошибка при пропуске токенов: неожиданный конец файла, символ на вершине стека: {grammar.Userify(stackTop.Symbol)}");
 							break;
-                        }
                     }
                     /// иначе читаем следующий токен
                     else
@@ -102,11 +100,11 @@ namespace LandParserGenerator.Parsing.LL
                     /// Сообщаем об ошибке в случае неоднозначной грамматики
                     if (alternatives.Count > 1)
                     {
-						Errors.Add(new ParsingMessage()
-						{
-							Message = $"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
-							Location = new Anchor(token.Line, token.Column)
-						});
+						Errors.Add(Message.Error(
+							$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
+							token.Line,
+							token.Column
+						));
 						break;
                     }
                     /// Если же в ячейке ровно одна альтернатива
@@ -140,23 +138,42 @@ namespace LandParserGenerator.Parsing.LL
                     var errorToken = token;
                     var errorStackTop = stackTop.Symbol;
 
+					Errors.Add(Message.Error(
+							grammar.Tokens.ContainsKey(errorStackTop) ?
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался символ {grammar.Userify(errorStackTop)}" :
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался один из следующих символов: {String.Join(", ", Table[errorStackTop].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
+							errorToken.Line,
+							errorToken.Column
+						));
+
 					var recovered = false;
 
 					try
 					{
+						var message = Message.Warning(
+							$"Запущен алгоритм восстановления...",
+							errorToken.Line,
+							errorToken.Column
+						);
+
+						Errors.Add(message);
+						Log.Add(message);
+
 						recovered = ErrorRecovery();
 					}
 					catch { }
 
 					if(!recovered)
 					{
-						Errors.Add(new ParsingMessage()
-						{
-							Message = grammar.Tokens.ContainsKey(errorStackTop) ?
-								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался символ {grammar.Userify(errorStackTop)}" :
-								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался один из следующих символов: {String.Join(", ", Table[errorStackTop].Where(t=>t.Value.Count>0).Select(t => grammar.Userify(t.Key)))}",
-							Location = new Anchor(errorToken.Line, errorToken.Column)
-						});
+						var message = Message.Warning(
+							$"Не удалось продолжить разбор",
+							errorToken.Line,
+							errorToken.Column
+						);
+
+						Errors.Add(message);
+						Log.Add(message);
+
 						break;
 					}
 					else
@@ -208,6 +225,8 @@ namespace LandParserGenerator.Parsing.LL
 
 			/// Определяем множество токенов, которые могут идти после Any
 			var tokensAfterText = grammar.First(alt);
+			/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
+			tokensAfterText.Remove(Grammar.TEXT_TOKEN_NAME);
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
@@ -233,6 +252,10 @@ namespace LandParserGenerator.Parsing.LL
                 if(token.Name == Grammar.EOF_TOKEN_NAME 
                     && !tokensAfterText.Contains(token.Name))
                 {
+					Errors.Add(Message.Error(
+						$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }"
+					));
+
                     return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
                 }
 			}		
@@ -255,15 +278,7 @@ namespace LandParserGenerator.Parsing.LL
 		private bool ErrorRecovery()
 		{
             ErrorRecoveriesCounter += 1;
-
-			var message = new ParsingMessage()
-			{
-				Message = $"Запущен алгоритм восстановления...",
-				Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-			};
-
-			Errors.Add(message);
-			Log.Add(message);
+			Message message = null;
 
 			var errorTokenIndex = LexingStream.CurrentTokenIndex;
 
@@ -314,20 +329,11 @@ namespace LandParserGenerator.Parsing.LL
 							AttemptsCount = 1
 						};
 
-						message = new ParsingMessage()
-						{
-							Message = $"Восстановление: переход на неприоритетную ветку для {grammar.Userify(alternativeToApply.NonterminalSymbolName)}",
-							Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-						};
-
-						Errors.Add(message);
-						Log.Add(message);
-
-						message = new ParsingMessage()
-						{
-							Message = $"Разбор продолжен с символа {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
-							Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-						};
+						message = Message.Warning(
+							$"Восстановление: переход на неприоритетную ветку для нетерминала {grammar.Userify(alternativeToApply.NonterminalSymbolName)}, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+							LexingStream.CurrentToken().Line, 
+							LexingStream.CurrentToken().Column
+						);
 
 						Errors.Add(message);
 						Log.Add(message);
@@ -385,20 +391,11 @@ namespace LandParserGenerator.Parsing.LL
 						AttemptsCount = prevAttemptsCount + 1
 					};
 
-					message = new ParsingMessage()
-					{
-						Message = $"Восстановление: пропуск большего количества токенов в качестве Any",
-						Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-					};
-
-					Errors.Add(message);
-					Log.Add(message);
-
-					message = new ParsingMessage()
-					{
-						Message = $"Разбор продолжен с символа {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
-						Location = new Anchor(LexingStream.CurrentToken().Line, LexingStream.CurrentToken().Column)
-					};
+					message = Message.Warning(
+						$"Восстановление: пропуск большего количества токенов в качестве Any, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+						LexingStream.CurrentToken().Line, 
+						LexingStream.CurrentToken().Column
+					);
 
 					Errors.Add(message);
 					Log.Add(message);

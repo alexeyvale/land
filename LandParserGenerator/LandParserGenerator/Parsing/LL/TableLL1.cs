@@ -67,20 +67,19 @@ namespace LandParserGenerator.Parsing.LL
             }
 		}
 
-		public List<ParsingMessage> CheckValidity()
+		public List<Message> CheckValidity()
 		{
-			var errors = new List<ParsingMessage>();
+			var errors = new List<Message>();
 
 			foreach(var nt in NonterminalSymbols.Keys)
 				foreach(var tok in Lookaheads.Keys)
 				{
 					if(this[nt, tok].Count > 1)
 					{
-						errors.Add(new ParsingMessage()
-						{
-							Source = "LanD",
-							Message = $"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив"
-						});
+						errors.Add(Message.Error(
+							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив",
+							"LanD"
+						));
 					}
 				}
 

@@ -23,8 +23,8 @@ namespace LandParserGenerator.Parsing.LR
 
 		public override Node Parse(string text)
 		{
-			Log = new List<ParsingMessage>();
-			Errors = new List<ParsingMessage>();
+			Log = new List<Message>();
+			Errors = new List<Message>();
 
 			Node root = null;	
 
@@ -41,9 +41,13 @@ namespace LandParserGenerator.Parsing.LR
 				var currentState = Stack.PeekState();
 
 				if (Stack.CountSymbols > 0)
-					Log.Add($"Текущий токен: {token.Name}; символ на вершине стека: {Stack.PeekSymbol().Symbol}");
+					Log.Add(Message.Trace(
+						$"Текущий токен: {token.Name}; символ на вершине стека: {Stack.PeekSymbol().Symbol}"
+					));
 				else
-					Log.Add($"Текущий токен: {token.Name}");
+					Log.Add(Message.Trace(
+						$"Текущий токен: {token.Name}"
+					));
 
 				if (Table[currentState, token.Name].Count == 1)
 				{
@@ -57,7 +61,9 @@ namespace LandParserGenerator.Parsing.LR
 						/// Вносим в стек новое состояние
 						Stack.Push(tokenNode, action.TargetItemIndex);
 
-						Log.Add($"Перенос токена {token.Name}");
+						Log.Add(Message.Trace(
+							$"Перенос токена {token.Name}"
+						));
 
                         token = LexingStream.NextToken();
 						continue;
@@ -87,7 +93,9 @@ namespace LandParserGenerator.Parsing.LR
 
 						Stack.FinBatch();
 
-						Log.Add($"Свёртка по правилу {action.ReductionAlternative}");
+						Log.Add(Message.Trace(
+							$"Свёртка по правилу {action.ReductionAlternative}"
+						));
 
 						continue;
 					}
@@ -118,7 +126,12 @@ namespace LandParserGenerator.Parsing.LR
 
 					if (token == null)
 					{
-						Errors.Add($"Неожиданный символ {token.Name}");
+						Errors.Add(Message.Error(
+							$"Неожиданный символ {token.Name}",
+							token.Line,
+							token.Column
+						));
+
 						return root;
 					}
 					else

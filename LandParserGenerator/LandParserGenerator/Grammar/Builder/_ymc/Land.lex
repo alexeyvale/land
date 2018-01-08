@@ -1,5 +1,5 @@
 %{
-	public List<string> Log = new List<string>();
+	public List<Message> Log = new List<Message>();
 %}
 
 %using System.Linq;
@@ -76,14 +76,13 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.STRING;
 }
 
-^{ID}[" "\t]*: {
-	yylval.strVal = yytext.Split(' ')[0].TrimEnd(':').Trim();
+":" {
 	BEGIN(in_terminal_declaration);
-	return (int)Tokens.ENTITY_NAME;
+	return (int)Tokens.COLON;
 }
 
 <in_terminal_declaration> {
-	.+[\n\r] {
+	.+ {
 		BEGIN(0);
 		
 		yylval.strVal = yytext.Trim();
@@ -134,5 +133,9 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 public override void yyerror(string format, params object[] args)
 { 
-	Log.Add(String.Format(format, args.Select(a=>a.ToString())));
+	Log.Add(Message.Error(
+		String.Format(format, args.Select(a=>a.ToString())),
+		yyline, yycol,
+		"GPPG"
+	));
 }

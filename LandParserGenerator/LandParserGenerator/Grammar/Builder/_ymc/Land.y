@@ -2,7 +2,7 @@
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
-    public List<ParsingMessage> Errors = new List<ParsingMessage>();
+    public List<Message> Errors = new List<Message>();
 %}
 
 %using System.Linq;
@@ -57,7 +57,7 @@ element
 	;
 	
 terminal
-	: ENTITY_NAME REGEX { SafeGrammarAction(() => { ConstructedGrammar.DeclareTerminal($1, $2); }, @1); }
+	: ENTITY_NAME COLON REGEX { SafeGrammarAction(() => { ConstructedGrammar.DeclareTerminal($1, $3); }, @1); }
 	;
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
@@ -178,12 +178,11 @@ private void SafeGrammarAction(Action action, LexLocation loc)
 	}
 	catch(IncorrectGrammarException ex)
 	{
-		Errors.Add(new ParsingMessage()
-		{
-			Message = ex.Message,
-			Location = loc,
-			Source = "LanD"
-		});
+		Errors.Add(Message.Error(
+			ex.Message,
+			loc.StartLine, loc.StartColumn,
+			"LanD"
+		));
 	}
 }
 

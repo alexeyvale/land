@@ -332,9 +332,9 @@ namespace LandParserGenerator
 
 		}
 
-		public IEnumerable<ParsingMessage> CheckValidity()
+		public IEnumerable<Message> CheckValidity()
 		{
-			var errors = new LinkedList<ParsingMessage>();
+			var errors = new LinkedList<Message>();
 
             foreach (var rule in Rules.Values)
             {
@@ -345,12 +345,16 @@ namespace LandParserGenerator
                     foreach (var smb in alt)
                     {
                         if (this[smb] == null && !SpecialTokens.Contains(smb))
-							errors.AddLast($"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}");
+							errors.AddLast(Message.Error(
+								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}"
+							));
                     }
             }
 
-			if(String.IsNullOrEmpty(StartSymbol))
-				errors.AddLast($"Не задан стартовый символ");
+			if (String.IsNullOrEmpty(StartSymbol))
+				errors.AddLast(Message.Error(
+					$"Не задан стартовый символ"
+				));
 
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
