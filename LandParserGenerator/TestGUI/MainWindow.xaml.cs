@@ -245,7 +245,14 @@ namespace TestGUI
 				var msg = lb.SelectedItem as LandParserGenerator.Message;
 				if (msg != null && msg.Location != null)
 				{
-					var start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					/// Если координаты не выходят за пределы файла, устанавливаем курсор в соответствии с ними, 
+					/// иначе ставим курсор в позицию после последнего элемента последней строки
+					int start = 0;
+					if(msg.Location.Line <= GrammarEditor.Document.LineCount)
+						start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					else
+						start = GrammarEditor.Document.GetOffset(GrammarEditor.Document.LineCount, GrammarEditor.Document.Lines[GrammarEditor.Document.LineCount-1].Length + 1);
+
 					GrammarEditor.Focus();
 					GrammarEditor.Select(start, 0);
 					GrammarEditor.ScrollToLine(msg.Location.Line);
