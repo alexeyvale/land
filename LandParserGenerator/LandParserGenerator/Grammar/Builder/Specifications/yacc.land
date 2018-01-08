@@ -13,8 +13,9 @@ DECLARATION_NAME : '%'ID
 
 grammar 		=	declaration* '%%' rule* grammar_ending
 grammar_ending	=	('%%' Any)?
-declaration		=	DECLARATION_NAME ('<' ID '>')? declaration_body
-declaration_body =	ID+ | Any
+declaration		=	symbol_declaration | other_declaration
+symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
+other_declaration = DECLARATION_NAME Any
 rule			=	ID ':' alternative ('|' alternative)* ';'
 alternative		=	(ID | block | LITERAL | '%prec')*
 block			=	'{' (Any|block)+ '}'
@@ -23,3 +24,4 @@ block			=	'{' (Any|block)+ '}'
 
 %start grammar
 %skip COMMENT STRING DECLARATION_CODE
+%ghost declaration

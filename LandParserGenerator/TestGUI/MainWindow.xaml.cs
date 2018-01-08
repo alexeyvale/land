@@ -310,6 +310,7 @@ namespace TestGUI
 				var end = node.EndOffset.Value;
 				FileEditor.Select(start, end - start + 1);
 				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+				MainTabs.SelectedIndex = 1;
 			}
 			else
 			{
