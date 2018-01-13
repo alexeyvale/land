@@ -97,27 +97,13 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 <in_options> {
 	^"%"{ID} {
-		var optionName = yytext.ToLower().Trim('%');
-		switch(optionName)
-		{
-			case "start":
-				return (int)Tokens.OPTION_START;
-			case "skip":
-				return (int)Tokens.OPTION_SKIP;
-			case "ghost":
-				return (int)Tokens.OPTION_GHOST;
-			default:
-				return (int)Tokens.error;
-		}
+		yylval.strVal = yytext.ToLower().Trim('%');
+		return (int)Tokens.OPTION_NAME;
 	}
 
 	{ID} {
 		yylval.strVal = yytext;
 		return (int)Tokens.ID;
-	}
-	
-	"." {
-		return (int)Tokens.DOT;
 	}
 	
 	{LINE_COMMENT} |

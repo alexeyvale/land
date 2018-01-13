@@ -42,11 +42,15 @@ namespace LandParserGenerator.Parsing.LR
 
 				if (Stack.CountSymbols > 0)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {token.Name}; символ на вершине стека: {Stack.PeekSymbol().Symbol}"
+						$"Текущий токен: {token.Name}; символ на вершине стека: {Stack.PeekSymbol().Symbol}",
+						token.Line,
+						token.Column
 					));
 				else
 					Log.Add(Message.Trace(
-						$"Текущий токен: {token.Name}"
+						$"Текущий токен: {token.Name}",
+						token.Line,
+						token.Column
 					));
 
 				if (Table[currentState, token.Name].Count == 1)
@@ -62,7 +66,9 @@ namespace LandParserGenerator.Parsing.LR
 						Stack.Push(tokenNode, action.TargetItemIndex);
 
 						Log.Add(Message.Trace(
-							$"Перенос токена {token.Name}"
+							$"Перенос токена {token.Name}",
+							token.Line,
+							token.Column
 						));
 
                         token = LexingStream.NextToken();
@@ -94,7 +100,9 @@ namespace LandParserGenerator.Parsing.LR
 						Stack.FinBatch();
 
 						Log.Add(Message.Trace(
-							$"Свёртка по правилу {action.ReductionAlternative}"
+							$"Свёртка по правилу {action.ReductionAlternative}",
+							token.Line,
+							token.Column
 						));
 
 						continue;

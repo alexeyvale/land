@@ -20,23 +20,23 @@ namespace LandParserGenerator
 		public GrammarState State { get; private set; }
 
 		// Особые символы, задаваемые опциями
-        public string StartSymbol { get; private set; }
+		public string StartSymbol { get; private set; }
 		public HashSet<string> ListSymbols { get; private set; } = new HashSet<string>();
 		public HashSet<string> GhostSymbols { get; private set; } = new HashSet<string>();
 		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
+		public bool IsCaseSensitive { get; set; } = true;
 
 		// Содержание грамматики
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
-		public Dictionary<string, string> AutoRulesUserWrittenForm = new Dictionary<string, string>();
 
-        public List<string> TokenOrder { get; private set; } = new List<string>();
+		public List<string> TokenOrder { get; private set; } = new List<string>();
 
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string TEXT_TOKEN_NAME = "Any";
-        public const string ERROR_TOKEN_NAME = "ERROR";
+		public const string ERROR_TOKEN_NAME = "ERROR";
 
 		// Префиксы и счётчики для анонимных токенов и правил
 		public const string AUTO_RULE_PREFIX = "auto__";
@@ -45,7 +45,8 @@ namespace LandParserGenerator
 		private int AutoTokenCounter { get; set; } = 0;
 
 		// Для корректных сообщений об ошибках
-		public Dictionary<string, string> AutoRuleOrigin { get; private set; } = new Dictionary<string, string>();
+		public Dictionary<string, string> AutoRulesUserWrittenForm = new Dictionary<string, string>(); // AutoRuleOrigin
+		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
 
 		public ISymbol this[string key]
 		{
@@ -90,6 +91,19 @@ namespace LandParserGenerator
 		}
 
 		#region Описание символов
+
+		public void AddAnchor(string smb, Anchor loc)
+		{
+			_symbolAnchors[smb] = loc;
+		}
+
+		public Anchor GetAnchor(string smb)
+		{
+			if (_symbolAnchors.ContainsKey(smb))
+				return _symbolAnchors[smb];
+			else
+				return null;
+		}
 
 		private string AlreadyDeclaredCheck(string name)
 		{
@@ -346,14 +360,18 @@ namespace LandParserGenerator
                     {
                         if (this[smb] == null && !SpecialTokens.Contains(smb))
 							errors.AddLast(Message.Error(
-								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}"
+								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
+								GetAnchor(rule.Name),
+								"LanD"
 							));
                     }
             }
 
 			if (String.IsNullOrEmpty(StartSymbol))
 				errors.AddLast(Message.Error(
-					$"Не задан стартовый символ"
+					$"Не задан стартовый символ",
+					null,
+					"LanD"
 				));
 
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки

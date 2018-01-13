@@ -253,7 +253,8 @@ namespace LandParserGenerator.Parsing.LL
                     && !tokensAfterText.Contains(token.Name))
                 {
 					Errors.Add(Message.Error(
-						$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }"
+						$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
+						null
 					));
 
                     return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);

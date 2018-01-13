@@ -20,36 +20,30 @@ namespace LandParserGenerator
 			var resString = String.Empty;
 
 			if (!String.IsNullOrEmpty(Source))
-				resString += Source + ":";
+				resString += Source + ":\t";
 
 			if (Location != null)
-				resString += $"({Location.Line},{Location.Column})";
+				resString += $"({Location.Line},{Location.Column})\t";
 
 			return $"{resString} {Text}";
 		}
 
 		private Message() { }
 
-		private static Message Create(MessageType type, string text, int line, int col, string src = null)
+		private static Message Create(MessageType type, string text, Anchor loc, string src = null)
 		{
 			return new Message()
 			{
-				Location = new Anchor(line, col),
+				Location = loc,
 				Text = text,
 				Source = src,
 				Type = type
 			};
 		}
 
-		private static Message Create(MessageType type, string text, string src = null)
+		private static Message Create(MessageType type, string text, int line, int col, string src = null)
 		{
-			return new Message()
-			{
-				Location = null,
-				Text = text,
-				Source = src,
-				Type = type
-			};
+			return Create(type, text, new Anchor(line, col), src);
 		}
 
 		public static Message Trace(string text, int line, int col, string src = null)
@@ -67,19 +61,19 @@ namespace LandParserGenerator
 			return Create(MessageType.Warning, text, line, col, src);
 		}
 
-		public static Message Trace(string text, string src = null)
+		public static Message Trace(string text, Anchor loc, string src = null)
 		{
-			return Create(MessageType.Trace, text, src);
+			return Create(MessageType.Trace, text, loc, src);
 		}
 
-		public static Message Error(string text, string src = null)
+		public static Message Error(string text, Anchor loc, string src = null)
 		{
-			return Create(MessageType.Error, text, src);
+			return Create(MessageType.Error, text, loc, src);
 		}
 
-		public static Message Warning(string text, string src = null)
+		public static Message Warning(string text, Anchor loc, string src = null)
 		{
-			return Create(MessageType.Warning, text, src);
+			return Create(MessageType.Warning, text, loc, src);
 		}
 	}
 }

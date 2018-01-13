@@ -89,11 +89,11 @@ namespace LandParserGenerator
 							parts[4] = parts[4].Replace(name.Value, grammar.Userify(name.Value));
 						}
 
-						errors.Add(Message.Error($"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}", "Antlr"));
+						errors.Add(Message.Error($"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}", null, "Antlr"));
 					}
 					catch
 					{
-						errors.Add(Message.Error(error, "Antlr"));
+						errors.Add(Message.Error(error, null, "Antlr"));
 					}
 				}
 			}

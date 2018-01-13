@@ -27,10 +27,10 @@
 
 %left OR
 %token COLON LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
-%token <strVal> REGEX NAMED STRING ID ENTITY_NAME
+%token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME
 %token <intVal> POSITION
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
-%token OPTION_SKIP OPTION_GHOST OPTION_START IS_LIST_NODE
+%token IS_LIST_NODE
 
 %type <quantVal> quantifier
 %type <strVal> body_element_core body_element_atom group body_element
@@ -57,13 +57,24 @@ element
 	;
 	
 terminal
-	: ENTITY_NAME COLON REGEX { SafeGrammarAction(() => { ConstructedGrammar.DeclareTerminal($1, $3); }, @1); }
+	: ENTITY_NAME COLON REGEX 
+		{ 
+			SafeGrammarAction(() => { 
+				ConstructedGrammar.DeclareTerminal($1, $3);
+				ConstructedGrammar.AddAnchor($1, @1);
+			}, @1);
+		}
 	;
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal
 	: ENTITY_NAME EQUALS body 
-		{ SafeGrammarAction(() => { ConstructedGrammar.DeclareNonterminal($1, $3); }, @1); }
+		{ 
+			SafeGrammarAction(() => { 
+				ConstructedGrammar.DeclareNonterminal($1, $3);
+				ConstructedGrammar.AddAnchor($1, @1);
+			}, @1);
+		}
 	;
 	
 body
@@ -90,6 +101,8 @@ body_element
 			if($3.HasValue)
 			{
 				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value);
+				ConstructedGrammar.AddAnchor(generated, @$);
+				
 				$$ = new Entry(generated);
 				
 				if($1) { SafeGrammarAction(() => { ConstructedGrammar.SetListSymbol($$); }, @2); }
@@ -124,13 +137,18 @@ body_element_atom
 	: STRING
 		{ 
 			$$ = ConstructedGrammar.GenerateTerminal($1);
+			ConstructedGrammar.AddAnchor($$, @$);
 		}
 	| ID 
 		{ $$ = $1; }
 	;
 	
 group
-	: LPAR body RPAR { $$ = ConstructedGrammar.GenerateNonterminal($2); }
+	: LPAR body RPAR 
+		{ 
+			$$ = ConstructedGrammar.GenerateNonterminal($2);
+			ConstructedGrammar.AddAnchor($$, @$);
+		}
 	;
 
 /***************************** OPTIONS ******************************/
@@ -141,24 +159,28 @@ options
 	;
 	
 option
-	: ghost_option
-	| skip_option
-	| start_option
-	;
-	
-skip_option
-	: OPTION_SKIP identifiers
-		{ SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($2.ToArray()); }, @1); }
-	;	
-
-ghost_option
-	: OPTION_GHOST identifiers
-		{ SafeGrammarAction(() => { ConstructedGrammar.SetGhostSymbols($2.ToArray()); }, @1); }
-	;
-	
-start_option
-	: OPTION_START ID
-		{ SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($2); }, @1); }
+	: OPTION_NAME identifiers
+		{
+			switch($1)
+			{
+				case "ghost":
+					SafeGrammarAction(() => { ConstructedGrammar.SetGhostSymbols($2.ToArray()); }, @1);
+					break;
+				case "list":
+					break;
+				case "skip":
+					SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($2.ToArray()); }, @1);
+					break;
+				case "start":
+					SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($2[0]); }, @1);
+					break;
+				case "ignorecase":
+					ConstructedGrammar.IsCaseSensitive = false;
+					break;
+				default:
+					break;
+			}
+		}
 	;
 	
 identifiers
