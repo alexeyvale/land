@@ -5,9 +5,11 @@ STRING_SKIP	: '\\\'' | '\\\\'
 STRING	: '\'' (STRING_SKIP|.)*? '\''
 ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
 
-program	=	uses declarations block '.'
+program	=	header? uses? declarations block '.'
+header	=	('program'|'unit') ID ';'
 uses 	= 	'Uses' ID (',' ID)* ';'
-declarations	=	(const|var|procedure)*
+declarations	=	(const|var|procedure|type)*
+type	=	'type' ID '=' Any ';'
 const	=	'const' (ID '=' Any ';')+
 var		=	'var' (ID (',' ID)* (':' Any)? (':=' Any)? ';')+
 procedure	=	'procedure' name ('(' (ID (',' ID)* ':' Any)? ')')? ';' block ';'
