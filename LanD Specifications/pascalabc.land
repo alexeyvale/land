@@ -9,16 +9,19 @@ program	=	uses declarations block '.'
 uses 	= 	'Uses' ID (',' ID)* ';'
 declarations	=	(const|var|procedure)*
 const	=	'const' (ID '=' Any ';')+
-var		=	'var' (ID ':' Any ';')+
-procedure	=	'procedure' ID ('(' (ID ':' Any)? ')')? ';' block ';'
+var		=	'var' (ID (',' ID)* (':' Any)? (':=' Any)? ';')+
+procedure	=	'procedure' name ('(' (ID (',' ID)* ':' Any)? ')')? ';' block ';'
 block	=	'begin' operator (';' operator)* 'end'
 operator	=	assign_or_call|for|if|case|block|
-assign_or_call	=	'var'? call ((':' Any)? (':='|'+='|'-='|'*=') Any)?
+assign_or_call	=	'var'? call (':' Any)? ((':='|'+='|'-='|'*=') Any)?
 for		=	'for' Any 'to' Any 'do' operator
 if		=	'if' Any 'then' operator ('else' operator)?!
-call	=	ID ('.' ID)* ('(' Any ')')?
+call	=	name ('(' Any ')')?
 case	=	'case' Any 'of' option+ 'end'
-option	=	Any ':' operator ';'
+option	=	(Any ':'|'else') operator ';'
+
+name				=	(ID|'('Any')') name_tail_element*
+name_tail_element	=	ID|'.'|'[' Any ']'
 
 %%
 
