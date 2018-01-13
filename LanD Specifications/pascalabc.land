@@ -1,0 +1,27 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING_SKIP	: '\\\'' | '\\\\'
+STRING	: '\'' (STRING_SKIP|.)*? '\''
+ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
+
+program	=	uses declarations block '.'
+uses 	= 	'Uses' ID (',' ID)* ';'
+declarations	=	(const|var|procedure)*
+const	=	'const' (ID '=' Any ';')+
+var		=	'var' (ID ':' Any ';')+
+procedure	=	'procedure' ID ('(' (ID ':' Any)? ')')? ';' block ';'
+block	=	'begin' operator (';' operator)* 'end'
+operator	=	assign_or_call|for|if|case|block|
+assign_or_call	=	'var'? call ((':' Any)? (':='|'+='|'-='|'*=') Any)?
+for		=	'for' Any 'to' Any 'do' operator
+if		=	'if' Any 'then' operator ('else' operator)?!
+call	=	ID ('.' ID)* ('(' Any ')')?
+case	=	'case' Any 'of' option+ 'end'
+option	=	Any ':' operator ';'
+
+%%
+
+%start program
+%skip COMMENT
+//%ignorecase
