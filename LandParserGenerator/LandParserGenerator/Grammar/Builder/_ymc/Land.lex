@@ -49,6 +49,10 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.OPTIONAL;
 }
 
+"!" {
+	return (int)Tokens.PREC_NONEMPTY;
+}
+
 // Начало правила
 
 ^{ID} {

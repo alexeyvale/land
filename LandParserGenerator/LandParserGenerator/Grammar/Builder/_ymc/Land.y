@@ -30,13 +30,13 @@
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME
 %token <intVal> POSITION
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
-%token IS_LIST_NODE
+%token IS_LIST_NODE PREC_NONEMPTY
 
 %type <quantVal> quantifier
 %type <strVal> body_element_core body_element_atom group body_element
 %type <strList> identifiers
 %type <altList> body
-%type <boolVal> is_list_node
+%type <boolVal> is_list_node prec_nonempty
 
 %%
 
@@ -96,11 +96,11 @@ body
 	;
 	
 body_element
-	: is_list_node body_element_core quantifier 
+	: is_list_node body_element_core quantifier prec_nonempty
 		{ 
 			if($3.HasValue)
 			{
-				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value);
+				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value, $4);
 				ConstructedGrammar.AddAnchor(generated, @$);
 				
 				$$ = new Entry(generated);
@@ -116,6 +116,11 @@ body_element
 	
 is_list_node
 	: IS_LIST_NODE { $$ = true; }
+	| { $$ = false; }
+	;
+	
+prec_nonempty
+	: PREC_NONEMPTY { $$ = true; }
 	| { $$ = false; }
 	;
 	

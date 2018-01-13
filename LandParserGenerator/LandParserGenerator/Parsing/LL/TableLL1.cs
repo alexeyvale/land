@@ -45,20 +45,21 @@ namespace LandParserGenerator.Parsing.LL
 
 					/// Для каждого реально возвращаемого лексером токена, 
                     /// с которого может начинаться альтернатива
-					foreach (var tk in altFirst.Where(t=>!g.SpecialTokens.Contains(t)))
+					foreach (var tk in altFirst)
 					{
 						/// добавляем эту альтернативу в соответствующую ячейку таблицы
 						this[nt, tk].Add(alt);
 					}
 
 					/// Если альтернатива может быть пустой
+					/// и у неё нет приоритета
 					if (altContainsEmpty)
 					{
 						var ntFollow = g.Follow(nt);
 
 						/// её следует выбрать, если встретили то, что может идти
 						/// после текущего нетерминала
-						foreach (var tk in ntFollow.Where(t => !g.SpecialTokens.Contains(t)))
+						foreach (var tk in ntFollow.Where(t => !g.NonEmptyPrecedence.Contains(nt) || !g.First(nt).Contains(t)))
 						{
 							this[nt, tk].Add(alt);
 						}
@@ -77,7 +78,7 @@ namespace LandParserGenerator.Parsing.LL
 					if(this[nt, tok].Count > 1)
 					{
 						errors.Add(Message.Error(
-							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив",
+							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok])}",
 							Gram.GetAnchor(nt),
 							"LanD"
 						));

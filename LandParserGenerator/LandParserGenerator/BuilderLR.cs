@@ -26,14 +26,10 @@ namespace LandParserGenerator
 
 			foreach (var token in grammar.Tokens.Values.Where(v => !String.IsNullOrEmpty(v.Pattern)))
 			{
-				/// На уровне лексера распознаём только лексемы для обычных токенов
-				if (!grammar.SpecialTokens.Contains(token.Name))
-				{
-					/// Если токен служит только для описания других токенов - это fragment
-					var isFragment = grammar.SkipTokens.Contains(token.Name) || grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a => a.Contains(token.Name)) ?
-						"" : "fragment ";
-					grammarOutput.WriteLine($"{isFragment}{token.Name}: {token.Pattern} ;");
-				}
+				/// Если токен служит только для описания других токенов - это fragment
+				var isFragment = grammar.SkipTokens.Contains(token.Name) || grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a => a.Contains(token.Name)) ?
+					"" : "fragment ";
+				grammarOutput.WriteLine($"{isFragment}{token.Name}: {token.Pattern} ;");
 			}
 
 			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");

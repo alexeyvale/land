@@ -29,8 +29,8 @@ namespace LandParserGenerator.Parsing.LR
 
 		public TableLR1(Grammar g)
 		{
-			Lookaheads = g.Tokens.Keys.Union(g.SpecialTokens)
-				.Zip(Enumerable.Range(0, g.Tokens.Count + g.SpecialTokens.Count), (a, b) => new { smb = a, idx = b })
+			Lookaheads = g.Tokens.Keys
+				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
 
 			/// Строим набор множеств пунктов
@@ -46,7 +46,7 @@ namespace LandParserGenerator.Parsing.LR
 				foreach(var marker in Items[i])
 				{
 					/// A => alpha * a beta
-					if(g[marker.Next] is TerminalSymbol || g.SpecialTokens.Contains(marker.Next))
+					if(g[marker.Next] is TerminalSymbol)
 					{
 						this[i, marker.Next].Add(new ShiftAction()
 						{
@@ -90,7 +90,7 @@ namespace LandParserGenerator.Parsing.LR
 			{
 				Transitions.Add(new Dictionary<string, int>());
 
-				foreach (var smb in g.Tokens.Keys.Union(g.Rules.Keys).Union(g.SpecialTokens))
+				foreach (var smb in g.Tokens.Keys.Union(g.Rules.Keys))
 				{
 					var gotoSet = g.Goto(Items[i], smb);
 

@@ -29,8 +29,7 @@ namespace LandParserGenerator
 		// Содержание грамматики
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
-		public HashSet<string> SpecialTokens { get; private set; } = new HashSet<string>();
-
+		public HashSet<string> NonEmptyPrecedence { get; private set; } = new HashSet<string>(); 
 		public List<string> TokenOrder { get; private set; } = new List<string>();
 
 		// Зарезервированные имена специальных токенов
@@ -148,7 +147,7 @@ namespace LandParserGenerator
 		}
 
 		//Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
-		public string GenerateNonterminal(string elemName, Quantifier quantifier)
+		public string GenerateNonterminal(string elemName, Quantifier quantifier, bool precNonEmpty = false)
 		{
 			string newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 
@@ -162,6 +161,8 @@ namespace LandParserGenerator
 								new string[]{ },
 								new string[]{ elemName, newName }
 							});
+							if (precNonEmpty)
+								NonEmptyPrecedence.Add(newName);
 							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
 
 							var oldName = newName;
@@ -201,6 +202,8 @@ namespace LandParserGenerator
 						default:
 							break;
 					}
+					if (precNonEmpty)
+						NonEmptyPrecedence.Add(newName);
 					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "*";
 					break;
 				case Quantifier.ZERO_OR_ONE:
@@ -208,6 +211,8 @@ namespace LandParserGenerator
 						new string[]{ },
 						new string[]{ elemName }
 					});
+					if (precNonEmpty)
+						NonEmptyPrecedence.Add(newName);
 					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "?";
 					break;
 			}
@@ -358,7 +363,7 @@ namespace LandParserGenerator
                 foreach (var alt in rule)
                     foreach (var smb in alt)
                     {
-                        if (this[smb] == null && !SpecialTokens.Contains(smb))
+                        if (this[smb] == null)
 							errors.AddLast(Message.Error(
 								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
 								GetAnchor(rule.Name),
@@ -527,11 +532,6 @@ namespace LandParserGenerator
 
 		public HashSet<string> First(string symbol)
 		{
-            /// Если переданный символ является специальным
-            /// и не находится в числе определённых пользователем
-            if (this.SpecialTokens.Contains(symbol))
-                return new HashSet<string>() { symbol };
-
             var gramSymbol = this[symbol];
 
             if (gramSymbol is NonterminalSymbol)
