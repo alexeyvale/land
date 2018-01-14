@@ -8,6 +8,8 @@ namespace LandParserGenerator.Parsing.Tree
 {
 	public class Node
 	{
+		public Node Parent { get; set; }
+
 		public string Symbol { get; set; }
 		public List<Node> Children { get; private set; }
 
@@ -63,11 +65,13 @@ namespace LandParserGenerator.Parsing.Tree
 		public void AddLastChild(Node child)
 		{
 			Children.Add(child);
+			child.Parent = this;
 		}
 
 		public void AddFirstChild(Node child)
 		{
 			Children.Insert(0, child);
+			child.Parent = this;
 		}
 
 		public void ResetChildren()
@@ -89,6 +93,11 @@ namespace LandParserGenerator.Parsing.Tree
 		public void Accept(BaseVisitor visitor)
 		{
 			visitor.Visit(this);
+		}
+
+		public override string ToString()
+		{
+			return this.Symbol;
 		}
 	}
 }

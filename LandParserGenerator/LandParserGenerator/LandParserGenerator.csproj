@@ -66,9 +66,10 @@
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />
     <Compile Include="Parsing\RecoveryAction.cs" />
-    <Compile Include="Parsing\BaseVisitor.cs" />
-    <Compile Include="Parsing\ListVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\BaseVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\NodesEliminationVisitor.cs" />
     <Compile Include="Parsing\LL\ParsingStackAction.cs" />
     <Compile Include="Parsing\LL\ParsingStack.cs" />
     <Compile Include="Parsing\LR\Action.cs" />

@@ -50,20 +50,4 @@ namespace LandParserGenerator.Parsing
 			base.Visit(node);
 		}
 	}
-
-	public class UserifyVisitor: BaseVisitor
-	{
-		protected Grammar grammar { get; set; }
-
-		public UserifyVisitor(Grammar g)
-		{
-			grammar = g;
-		}
-
-		public override void Visit(Node node)
-		{
-			node.Symbol = grammar.Userify(node.Symbol);
-			base.Visit(node);
-		}
-	}
 }

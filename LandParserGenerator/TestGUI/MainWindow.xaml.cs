@@ -526,6 +526,59 @@ namespace TestGUI
 				PackageParsingProgress.Foreground = Brushes.IndianRed;
 			}
 		}
-		#endregion	
+		#endregion
+
+		private void ConcernTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+
+		}
+
+		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var node = (Node)ConcernPointCandidatesList.SelectedItem;
+
+			var start = node.StartOffset.Value;
+			var end = node.EndOffset.Value;
+			FileEditor.Select(start, end - start + 1);
+			FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+			MainTabs.SelectedIndex = 1;
+		}
+
+		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
+		{
+			/// Если открыта вкладка с тестовым файлом
+			if (MainTabs.SelectedIndex == 1)
+			{
+				ConcernTreeView.Items.Remove(ConcernTreeView.SelectedItem);
+			}
+		}
+
+		private void AddConcernPoint_Click(object sender, RoutedEventArgs e)
+		{
+			/// Если открыта вкладка с тестовым файлом
+			if(MainTabs.SelectedIndex == 1)
+			{
+				var offset = FileEditor.TextArea.Caret.Offset;
+
+				var pointCandidates = new LinkedList<Node>();
+				var currentNode = TreeRoot;
+
+				/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
+				/// содержащие текущую позицию каретки
+				while (currentNode!=null)
+				{
+					pointCandidates.AddFirst(currentNode);
+					currentNode = currentNode.Children.Where(c => c.StartOffset.HasValue && c.EndOffset.HasValue
+						&& c.StartOffset <= offset && c.EndOffset >= offset).FirstOrDefault();
+				}
+
+				ConcernPointCandidatesList.ItemsSource = pointCandidates;
+			}
+		}
 	}
 }

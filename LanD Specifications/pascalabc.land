@@ -29,4 +29,5 @@ name_tail_element	=	ID|'.'|'[' Any ']'
 
 %start program
 %skip COMMENT
+%ghost operator
 //%ignorecase
