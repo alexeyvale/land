@@ -21,7 +21,7 @@ namespace LandParserGenerator
 			return this;
 		}
 
-		public string this[int i]
+		public Entry this[int i]
 		{
 			get { return Elements[i]; }
 		}
@@ -71,12 +71,12 @@ namespace LandParserGenerator
 
 		public bool Contains(string symbol)
 		{
-			return Elements.Any(e => e.Value == symbol);
+			return Elements.Any(e => e.Symbol == symbol);
 		}
 
         public bool ReplaceFirst(string smb1, string smb2)
         {
-            var idx = Elements.FindIndex(e => e.Value == smb1);
+            var idx = Elements.FindIndex(e => e.Symbol == smb1);
 
             if (idx > -1)
             {

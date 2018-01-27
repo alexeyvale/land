@@ -20,11 +20,11 @@ namespace LandParserGenerator
 		public GrammarState State { get; private set; }
 
 		// Особые символы, задаваемые опциями
-		public string StartSymbol { get; private set; }
-		public HashSet<string> ListSymbols { get; private set; } = new HashSet<string>();
-		public HashSet<string> GhostSymbols { get; private set; } = new HashSet<string>();
-		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
 		public bool IsCaseSensitive { get; set; } = true;
+		public string StartSymbol { get; private set; }
+		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
+
+		public Dictionary<NodeOption, HashSet<string>> TreeProcessingOptions { get; private set; } = new Dictionary<NodeOption, HashSet<string>>();
 
 		// Содержание грамматики
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
@@ -71,12 +71,13 @@ namespace LandParserGenerator
 		{
 			Type = type;
 
-			ListSymbols = new HashSet<string>();
-
 			DeclareTerminal(new TerminalSymbol(TEXT_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
+
+			foreach (NodeOption opt in Enum.GetValues(typeof(NodeOption)))
+				TreeProcessingOptions[opt] = new HashSet<string>();
 		}
 
 		private void OnGrammarUpdate()
@@ -142,7 +143,7 @@ namespace LandParserGenerator
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
 			AutoRulesUserWrittenForm[newName] = "(" + String.Join("|", alternatives
-				.Select(a=> String.Join(" ", a.Elements.Select(e=>Userify(e.Value))))) + ")";
+				.Select(a=> String.Join(" ", a.Elements.Select(e=>Userify(e.Symbol))))) + ")";
 			return newName;
 		}
 
@@ -279,38 +280,9 @@ namespace LandParserGenerator
             StartSymbol = symbol;
 		}
 
-		public void SetListSymbols(params string[] symbols)
+		public void SetSymbolsForOption(NodeOption opt, params string[] symbols)
 		{
-			ListSymbols = new HashSet<string>(symbols);
-
-            foreach (var symbol in symbols)
-            {
-                if (!this.Rules.ContainsKey(symbol))
-                {
-                    throw new IncorrectGrammarException(
-						$"Символ {symbol} не определён как нетерминальный"
-					);
-                }
-            }
-		}
-
-		public void SetListSymbol(string smb)
-		{
-			if (!this.Rules.ContainsKey(smb))
-			{
-				throw new IncorrectGrammarException(
-					$"Символ {smb} не определён как нетерминальный"
-				);
-			}
-			else
-			{
-				ListSymbols.Add(smb);
-			}
-		}
-
-		public void SetGhostSymbols(params string[] symbols)
-		{
-			GhostSymbols = new HashSet<string>(symbols);
+			TreeProcessingOptions[opt] = new HashSet<string>(symbols);
 
 			foreach (var symbol in symbols)
 			{
@@ -323,6 +295,7 @@ namespace LandParserGenerator
 			}
 		}
 
+
 		/// <summary>
 		/// Замена символа во всех правилах
 		/// </summary>
@@ -333,8 +306,8 @@ namespace LandParserGenerator
 			foreach (var rule in Rules.Values)
 				foreach (var alt in rule.Alternatives)
 					foreach (var elem in alt.Elements)
-						if (elem.Value == from)
-							elem.Value = to;
+						if (elem.Symbol == from)
+							elem.Symbol = to;
 
 			if (Rules.ContainsKey(from))
 			{
@@ -399,7 +372,7 @@ namespace LandParserGenerator
 
 		public string Userify(Alternative alt)
 		{
-			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Value))) : "eps";
+			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Symbol))) : "eps";
 		}
 
 		#endregion

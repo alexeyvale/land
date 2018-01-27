@@ -95,29 +95,17 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 ^"%%" {
-	BEGIN(in_options);
 	return (int)Tokens.PROC;
 }
 
-<in_options> {
-	^"%"{ID} {
+^"%"{ID} {
 		yylval.strVal = yytext.ToLower().Trim('%');
 		return (int)Tokens.OPTION_NAME;
-	}
-
-	{ID} {
-		yylval.strVal = yytext;
-		return (int)Tokens.ID;
-	}
-	
-	{LINE_COMMENT} |
-	{MULTILINE_COMMENT} {}
 }
 
 %{
   yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
 %}
-
 
 %%
 

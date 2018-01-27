@@ -126,7 +126,7 @@ namespace LandParserGenerator.Parsing.LR
 					/// Если в текущем состоянии есть переход по Any
 					if (Table[currentState, Grammar.TEXT_TOKEN_NAME].Count == 1)
 					{
-						token = SkipText();
+						token = SkipAny();
 						continue;
 					}
 
@@ -151,10 +151,10 @@ namespace LandParserGenerator.Parsing.LR
 		}
 
 
-		private IToken SkipText()
+		private IToken SkipAny()
 		{
 			var token = LexingStream.CurrentToken();
-			var textNode = new Node(Grammar.TEXT_TOKEN_NAME);
+			var anyNode = new Node(Grammar.TEXT_TOKEN_NAME);
 			var rawAction = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME].Single();
 
 			/// Пока по Any нужно производить свёртки
@@ -189,7 +189,7 @@ namespace LandParserGenerator.Parsing.LR
 			{
 				var action = (ShiftAction)rawAction;
 				/// Вносим в стек новое состояние
-				Stack.Push(textNode, action.TargetItemIndex);
+				Stack.Push(anyNode, action.TargetItemIndex);
 			}
 
 			int startOffset = token.StartOffset;
@@ -203,7 +203,7 @@ namespace LandParserGenerator.Parsing.LR
 				token = LexingStream.NextToken();
 			}
 
-			textNode.SetAnchor(startOffset, endOffset);
+			anyNode.SetAnchor(startOffset, endOffset);
 
 			return token;
 		}
@@ -222,7 +222,7 @@ namespace LandParserGenerator.Parsing.LR
 				/// 
 				if (currentTokenActions.Count == 1 && textTokenActions.Count == 1)
 				{
-					return SkipText();
+					return SkipAny();
 				}
 			}
 

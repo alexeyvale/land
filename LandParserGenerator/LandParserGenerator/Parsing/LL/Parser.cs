@@ -76,7 +76,7 @@ namespace LandParserGenerator.Parsing.LL
                     /// Если текущий токен - признак пропуска символов, запускаем алгоритм
                     if (token.Name == Grammar.TEXT_TOKEN_NAME)
                     {
-                        token = SkipText(node);
+                        token = SkipAny(node);
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
                         if(token.Name == Grammar.ERROR_TOKEN_NAME)
 							break;
@@ -85,6 +85,8 @@ namespace LandParserGenerator.Parsing.LL
                     else
                     {
                         node.SetAnchor(token.StartOffset, token.EndOffset);
+						node.SetValue(token.Text);
+
                         token = LexingStream.NextToken();
                     }
 
@@ -117,7 +119,7 @@ namespace LandParserGenerator.Parsing.LL
 
                         for (var i = alternativeToApply.Count - 1; i >= 0; --i)
                         {
-                            var newNode = new Node(alternativeToApply[i]);
+                            var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Option);
 
                             stackTop.AddFirstChild(newNode);
                             Stack.Push(newNode);
@@ -205,6 +207,7 @@ namespace LandParserGenerator.Parsing.LL
 		private void TreePostProcessing(Node root)
 		{
 			root.Accept(new NodesEliminationVisitor(grammar));
+			root.Accept(new ValueAccumulatingVisitor(grammar));
 			root.Accept(new UserifyVisitor(grammar));
 		}
 
@@ -214,7 +217,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// <returns>
 		/// Токен, найденный сразу после символа Any
 		/// </returns>
-		private IToken SkipText(Node textNode)
+		private IToken SkipAny(Node anyNode)
 		{
 			IToken token = LexingStream.CurrentToken();
 
@@ -233,8 +236,8 @@ namespace LandParserGenerator.Parsing.LL
 			if (!tokensAfterText.Contains(token.Name))
 			{
                 /// Проверка на случай, если допропускаем текст в процессе восстановления
-                if (!textNode.StartOffset.HasValue)
-                    textNode.SetAnchor(token.StartOffset, token.EndOffset);
+                if (!anyNode.StartOffset.HasValue)
+                    anyNode.SetAnchor(token.StartOffset, token.EndOffset);
 
                 /// Смещение для участка, подобранного как текст
 				int endOffset = token.EndOffset;
@@ -242,11 +245,13 @@ namespace LandParserGenerator.Parsing.LL
 				while (!tokensAfterText.Contains(token.Name) 
                     && token.Name != Grammar.EOF_TOKEN_NAME)
 				{
+					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
+
 					token = LexingStream.NextToken();
 				}
 
-				textNode.SetAnchor(textNode.StartOffset.Value, endOffset);
+				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
 
                 /// Если дошли до конца входной строки, и это было не по плану
                 if(token.Name == Grammar.EOF_TOKEN_NAME 
@@ -312,7 +317,7 @@ namespace LandParserGenerator.Parsing.LL
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
-							var newNode = new Node(alternativeToApply[i]);
+							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Option);
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
 						}
@@ -378,7 +383,7 @@ namespace LandParserGenerator.Parsing.LL
 					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.HasValue ? Stack.Peek().StartOffset.Value : textStart, textEnd);
 
 					/// Пропускаем текст дальше
-					if(SkipText(Stack.Pop()).Name == Grammar.ERROR_TOKEN_NAME)
+					if(SkipAny(Stack.Pop()).Name == Grammar.ERROR_TOKEN_NAME)
                     {
                         return false;
                     }

@@ -33,10 +33,10 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <quantVal> quantifier
-%type <strVal> body_element_core body_element_atom group body_element
+%type <strVal> body_element_core body_element_atom group body_element context_option
 %type <strList> identifiers
 %type <altList> body
-%type <boolVal> is_list_node prec_nonempty
+%type <boolVal> prec_nonempty
 
 %%
 
@@ -96,27 +96,37 @@ body
 	;
 	
 body_element
-	: is_list_node body_element_core quantifier prec_nonempty
-		{ 
+	: context_option body_element_core quantifier prec_nonempty
+		{ 		
+			NodeOption option;
+			
+			if(!Enum.TryParse<NodeOption>($1.ToUpper(), out option))
+			{
+					Errors.Add(Message.Error(
+						"Неизвестная опция '" + $1 + "'",
+						@1.StartLine, @1.StartColumn,
+						"LanD"
+					));
+					option = NodeOption.NONE;
+			}
+			
 			if($3.HasValue)
 			{
 				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value, $4);
 				ConstructedGrammar.AddAnchor(generated, @$);
 				
-				$$ = new Entry(generated);
-				
-				if($1) { SafeGrammarAction(() => { ConstructedGrammar.SetListSymbol($$); }, @2); }
+				$$ = new Entry(generated, option);
 			}
 			else
 			{
-				$$ = new Entry($2);
+				$$ = new Entry($2, option);
 			}
 		}
 	;
 	
-is_list_node
-	: IS_LIST_NODE { $$ = true; }
-	| { $$ = false; }
+context_option
+	: OPTION_NAME { $$ = $1; }
+	| { $$ = NodeOption.NONE.ToString(); }
 	;
 	
 prec_nonempty
@@ -164,25 +174,33 @@ options
 	;
 	
 option
-	: OPTION_NAME identifiers
+	: OPTION_NAME ID identifiers
 		{
-			switch($1)
+			switch($2)
 			{
-				case "ghost":
-					SafeGrammarAction(() => { ConstructedGrammar.SetGhostSymbols($2.ToArray()); }, @1);
-					break;
-				case "list":
-					break;
 				case "skip":
-					SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($2.ToArray()); }, @1);
+					SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($3.ToArray()); }, @1);
 					break;
 				case "start":
-					SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($2[0]); }, @1);
+					SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($3[0]); }, @1);
 					break;
 				case "ignorecase":
 					ConstructedGrammar.IsCaseSensitive = false;
 					break;
 				default:
+					NodeOption option;	
+					if(!Enum.TryParse<NodeOption>($2.ToUpper(), out option))
+					{
+						Errors.Add(Message.Error(
+							"Неизвестная опция '" + $2 + "'",
+							@1.StartLine, @1.StartColumn,
+							"LanD"
+						));
+					}
+					else
+					{
+						SafeGrammarAction(() => { ConstructedGrammar.SetSymbolsForOption(option, $3.ToArray()); }, @1);
+					}				
 					break;
 			}
 		}

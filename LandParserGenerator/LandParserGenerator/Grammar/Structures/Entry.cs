@@ -8,23 +8,37 @@ namespace LandParserGenerator
 {
 	public enum Quantifier { ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE }
 
+	public enum NodeOption { NONE, LAND, GHOST, LIST, LEAF }
+
+	public enum ParsingOption { START, SKIP }
+
 	public class Entry
 	{
-		public string Value { get; set; }
+		public string Symbol { get; set; }
+
+		public NodeOption Option { get; set; }
 
 		public Entry(string val)
 		{
-			Value = val;
+			Symbol = val;
+			Option = NodeOption.NONE;
 		}
+
+		public Entry(string val, NodeOption opt)
+		{
+			Symbol = val;
+			Option = opt;
+		}
+
 
 		public static implicit operator String(Entry entry)
 		{
-			return entry.Value;
+			return entry.Symbol;
 		}
 
 		public override string ToString()
 		{
-			return Value;
+			return Symbol;
 		}
 	}
 }

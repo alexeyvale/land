@@ -1,7 +1,11 @@
-<SyntaxDefinition name="LanD" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+<SyntaxDefinition name="LanD" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">	
 	<RuleSet>		
 		<Rule fontWeight="bold" foreground="DarkGreen">
-			^%\S+
+			^%\S+[\ \t\n\r\f]*\S+
+		</Rule>
+		
+		<Rule fontWeight="bold" foreground="DarkGreen">
+			%\S+
 		</Rule>
 		
 		<Rule fontWeight="bold" foreground="DarkRed">
@@ -11,5 +15,14 @@
 		<Rule fontWeight="bold" foreground="DarkBlue">
 			^[a-zA-Z_][a-zA-Z_0-9]*[\ \t\n\r\f]*:
 		</Rule>
+		
+		<Span foreground="DimGray" fontWeight="bold">
+			<Begin>'</Begin>
+			<End>'</End>
+			<RuleSet>
+				<!-- escape-sequences -->
+				<Span begin="\\" end="." />
+			</RuleSet>
+		</Span>
 	</RuleSet>
 </SyntaxDefinition>

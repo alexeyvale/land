@@ -11,7 +11,10 @@ namespace LandParserGenerator.Parsing.Tree
 		public Node Parent { get; set; }
 
 		public string Symbol { get; set; }
-		public List<Node> Children { get; private set; }
+		public List<string> Value { get; set; } = new List<string>();
+		public List<Node> Children { get; private set; } = new List<Node>();
+
+		public NodeOption ProcessingOption { get; set; } = NodeOption.NONE;
 
 		private Location Anchor { get; set; }
 		private bool AnchorReady { get; set; }
@@ -59,7 +62,12 @@ namespace LandParserGenerator.Parsing.Tree
 		public Node(string smb)
 		{
 			Symbol = smb;
-			Children = new List<Node>();
+		}
+
+		public Node(string smb, NodeOption opt)
+		{
+			Symbol = smb;
+			ProcessingOption = opt;
 		}
 
 		public void AddLastChild(Node child)
@@ -88,6 +96,11 @@ namespace LandParserGenerator.Parsing.Tree
 				StartOffset = start,
 				EndOffset = end
 			};
+		}
+
+		public void SetValue(params string[] vals)
+		{
+			Value = new List<string>(vals);
 		}
 
 		public void Accept(BaseVisitor visitor)

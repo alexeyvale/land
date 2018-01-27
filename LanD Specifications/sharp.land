@@ -35,6 +35,9 @@ arguments_content	=	(Any|arguments)*
 
 %%
 
-%start namespace_content
-%skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
-%ghost class_enum_tail class_member_tail name_w_extern_tail_element name_tail_element
+%parsing start namespace_content
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+
+%nodes ghost class_enum_tail class_member_tail name_w_extern_tail_element name_tail_element
+%nodes land namespace class_enum class_content_elem
+%nodes leaf name

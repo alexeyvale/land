@@ -85,11 +85,14 @@ namespace LandParserGenerator
 							parts[4] = parts[4].Replace(name.Value, grammar.Userify(name.Value));
 						}
 
-						errors.Add(Message.Error($"Token {tokensForLines[int.Parse(parts[2])]}: {parts[4]}", null, "Antlr"));
+						var errorToken = tokensForLines[int.Parse(parts[2])];
+						var possibleAnchor = grammar.GetAnchor(errorToken);
+
+						errors.Add(Message.Error($"Token {errorToken}: {parts[4]}", possibleAnchor, "ANTLR Scanner Generator"));
 					}
 					catch
 					{
-						errors.Add(Message.Error(error, null, "Antlr"));
+						errors.Add(Message.Error(error, null, "ANTLR Scanner Generator"));
 					}
 				}
 			}
@@ -292,9 +295,9 @@ namespace LandParserGenerator
 
 			yaccGrammar.SetStartSymbol("grammar");
 
-			yaccGrammar.SetListSymbols("alternatives_list", "alternative", "rules_list", "declarations", "identifiers_list", "code_content");
+			yaccGrammar.SetSymbolsForOption(NodeOption.LIST, "alternatives_list", "alternative", "rules_list", "declarations", "identifiers_list", "code_content");
 
-			yaccGrammar.SetGhostSymbols("alternatives_list", "rules_list", "code_content_element");
+			yaccGrammar.SetSymbolsForOption(NodeOption.GHOST, "alternatives_list", "rules_list", "code_content_element");
 
 
             var errors = yaccGrammar.CheckValidity();
@@ -579,9 +582,9 @@ namespace LandParserGenerator
             }));
 
             sharpGrammar.SetStartSymbol("namespace_content");
-            /// Символы, которые не должны рекурсивно быть детьми самих себя
-            sharpGrammar.SetListSymbols(
-                "opening_directives",
+			/// Символы, которые не должны рекурсивно быть детьми самих себя
+			sharpGrammar.SetSymbolsForOption(NodeOption.LIST,
+				"opening_directives",
                 "namespace_entities",
                 "class_entities",
                 "full_name_list",
@@ -589,9 +592,9 @@ namespace LandParserGenerator
                 "block_content",
                 "initializer_content"
             );
-            /// Символы, которые не должны порождать узел дерева
-            sharpGrammar.SetGhostSymbols(
-                "namespace_entities",
+			/// Символы, которые не должны порождать узел дерева
+			sharpGrammar.SetSymbolsForOption(NodeOption.GHOST,
+				"namespace_entities",
                 "class_entities",
                 "namespace_entity",
                 "class_entity",

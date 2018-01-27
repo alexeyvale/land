@@ -15,7 +15,7 @@ namespace TestGUI
 		{
 			var treeItem = new TreeViewAdapter();
 			treeItem.Source = node;
-			treeItem.Header = node.Symbol;
+			treeItem.Header = node.Symbol + (node.Value.Count > 0 ? ": " + String.Join(" ", node.Value) : "");
 			var items = new List<TreeViewItem>();
 			treeItem.ItemsSource = items;
 
@@ -25,40 +25,5 @@ namespace TestGUI
 			return treeItem;
 
 		}
-
-		/*
-		public static explicit operator TreeViewAdapter(Node node)
-        {
-            var treeItem = new TreeViewAdapter();
-            treeItem.Source = node;
-            treeItem.Header = node.ToString();
-            var items = new List<TreeViewItem>();
-            treeItem.ItemsSource = items;
-
-            if (node is ContainerNode)
-            {
-                foreach (var nd in (node as ContainerNode).Items)
-                    items.Add((TreeViewAdapter)nd);
-            }
-            else if (node is BinaryOpNode)
-            {
-                var bop = (BinaryOpNode)node;
-                items.Add((TreeViewAdapter)bop.Left);
-                items.Add((TreeViewAdapter)bop.Op);
-                items.Add((TreeViewAdapter)bop.Right);
-            }
-            else if (node is UnaryOpNode)
-            {
-                var uop = (UnaryOpNode)node;
-                items.Add((TreeViewAdapter)uop.Op);
-                items.Add((TreeViewAdapter)uop.Right);
-            }
-            else
-                treeItem.Background = Brushes.LightGreen;
-
-            return treeItem;
-           
-        }
-		*/
     }
 }
