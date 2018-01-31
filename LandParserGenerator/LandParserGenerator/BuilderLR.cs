@@ -27,8 +27,8 @@ namespace LandParserGenerator
 			foreach (var token in grammar.Tokens.Values.Where(v => !String.IsNullOrEmpty(v.Pattern)))
 			{
 				/// Если токен служит только для описания других токенов - это fragment
-				var isFragment = grammar.SkipTokens.Contains(token.Name) || grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a => a.Contains(token.Name)) ?
-					"" : "fragment ";
+				var isFragment = grammar.Options.IsSet(ParsingOption.SKIP, token.Name) 
+					|| grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a => a.Contains(token.Name)) ? "" : "fragment ";
 				grammarOutput.WriteLine($"{isFragment}{token.Name}: {token.Pattern} ;");
 			}
 
@@ -101,7 +101,7 @@ namespace LandParserGenerator
 				new string[]{ "ID" }
 			}));
 
-			exprGrammar.SetStartSymbol("E'");
+			exprGrammar.SetOption(ParsingOption.START, "E'");
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);
@@ -145,7 +145,7 @@ namespace LandParserGenerator
 				new string[] { "D" }
 			}));
 
-			exprGrammar.SetStartSymbol("s'");
+			exprGrammar.SetOption(ParsingOption.START, "s'");
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);
@@ -180,7 +180,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_CODE", "'%{' (STRING|COMMENT|.)*? '%}'"));
 
-			yaccGrammar.SetSkipTokens("COMMENT", "STRING", "DECLARATION_CODE");
+			yaccGrammar.SetOption(ParsingOption.SKIP, "COMMENT", "STRING", "DECLARATION_CODE");
 
 			/// Нужные штуки
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
@@ -279,7 +279,7 @@ namespace LandParserGenerator
 				new string[] {"LITERAL" }
 			}));
 
-			yaccGrammar.SetStartSymbol("grammar'");
+			yaccGrammar.SetOption(ParsingOption.START, "grammar'");
 
 			TableLR1 table = new TableLR1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");

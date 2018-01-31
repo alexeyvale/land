@@ -176,7 +176,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("DECLARATION_CODE", "'%{' (STRING|COMMENT|.)*? '%}'"));
 
-			yaccGrammar.SetSkipTokens("COMMENT", "STRING", "DECLARATION_CODE");
+			yaccGrammar.SetOption(ParsingOption.SKIP, "COMMENT", "STRING", "DECLARATION_CODE");
 
 			/// Нужные штуки
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("BORDER", "'%%'"));
@@ -293,11 +293,11 @@ namespace LandParserGenerator
 				new string[] { }
 			}));
 
-			yaccGrammar.SetStartSymbol("grammar");
+			yaccGrammar.SetOption(ParsingOption.START, "grammar");
 
-			yaccGrammar.SetSymbolsForOption(NodeOption.LIST, "alternatives_list", "alternative", "rules_list", "declarations", "identifiers_list", "code_content");
+			yaccGrammar.SetOption(NodeOption.LIST, "alternatives_list", "alternative", "rules_list", "declarations", "identifiers_list", "code_content");
 
-			yaccGrammar.SetSymbolsForOption(NodeOption.GHOST, "alternatives_list", "rules_list", "code_content_element");
+			yaccGrammar.SetOption(NodeOption.GHOST, "alternatives_list", "rules_list", "code_content_element");
 
 
             var errors = yaccGrammar.CheckValidity();
@@ -344,7 +344,7 @@ namespace LandParserGenerator
             sharpGrammar.DeclareTerminal(new TerminalSymbol("STRING_ESC", "'@'('\"' ~[\"]* '\"')+"));
             sharpGrammar.DeclareTerminal(new TerminalSymbol("CHAR", "'\\''('\\\\\\''|'\\\\\\\\'|.)*? '\\''"));
 
-            sharpGrammar.SetSkipTokens("COMMENT", "STRING", "CHAR", "DIRECTIVE", "DIRECTIVE_ELSE");
+            sharpGrammar.SetOption(ParsingOption.SKIP, "COMMENT", "STRING", "CHAR", "DIRECTIVE", "DIRECTIVE_ELSE");
 
             /// Нужные штуки
             sharpGrammar.DeclareTerminal(new TerminalSymbol("NAMESPACE", "'namespace'"));
@@ -581,9 +581,9 @@ namespace LandParserGenerator
                 new string[]{ }
             }));
 
-            sharpGrammar.SetStartSymbol("namespace_content");
+            sharpGrammar.SetOption(ParsingOption.START, "namespace_content");
 			/// Символы, которые не должны рекурсивно быть детьми самих себя
-			sharpGrammar.SetSymbolsForOption(NodeOption.LIST,
+			sharpGrammar.SetOption(NodeOption.LIST,
 				"opening_directives",
                 "namespace_entities",
                 "class_entities",
@@ -593,7 +593,7 @@ namespace LandParserGenerator
                 "initializer_content"
             );
 			/// Символы, которые не должны порождать узел дерева
-			sharpGrammar.SetSymbolsForOption(NodeOption.GHOST,
+			sharpGrammar.SetOption(NodeOption.GHOST,
 				"namespace_entities",
                 "class_entities",
                 "namespace_entity",
@@ -671,7 +671,7 @@ namespace LandParserGenerator
 				new string[]{ "ID" }
 			}));
 
-			exprGrammar.SetStartSymbol("E");
+			exprGrammar.SetOption(ParsingOption.START, "E");
 
             var errors = exprGrammar.CheckValidity();
 

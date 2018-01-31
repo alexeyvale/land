@@ -26,8 +26,8 @@ namespace LandParserGenerator.Parsing
 		private void Visit(Node node, bool computeValue)
 		{
 			/// Если текущий узел должен быть листовым
-			if (grammar.TreeProcessingOptions[NodeOption.LEAF].Contains(node.Symbol)
-					|| node.ProcessingOption == NodeOption.LEAF
+			if (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol)
+					|| node.Options.NodeOption == NodeOption.LEAF
 					|| computeValue)
 			{
 				foreach (var child in node.Children)
@@ -35,6 +35,9 @@ namespace LandParserGenerator.Parsing
 					Visit(child, true);
 					node.Value.AddRange(child.Value);
 				}
+
+				/// Перед тем, как удалить дочерние узлы, вычисляем соответствие нового листа тексту
+				var temp = node.StartOffset;
 
 				node.Children.Clear();
 			}

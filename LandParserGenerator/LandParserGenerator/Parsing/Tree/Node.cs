@@ -14,10 +14,10 @@ namespace LandParserGenerator.Parsing.Tree
 		public List<string> Value { get; set; } = new List<string>();
 		public List<Node> Children { get; private set; } = new List<Node>();
 
-		public NodeOption ProcessingOption { get; set; } = NodeOption.NONE;
+		public LocalOptions Options { get; set; }
 
-		private Location Anchor { get; set; }
-		private bool AnchorReady { get; set; }
+		protected Location Anchor { get; set; }
+		protected bool AnchorReady { get; set; }
 
 		public int? StartOffset
 		{
@@ -38,7 +38,7 @@ namespace LandParserGenerator.Parsing.Tree
 			}
 		}
 
-		private void GetAnchorFromChildren()
+		protected void GetAnchorFromChildren()
 		{
 			if (Children.Count > 0)
 			{
@@ -59,15 +59,10 @@ namespace LandParserGenerator.Parsing.Tree
 			AnchorReady = true;
 		}
 
-		public Node(string smb)
+		public Node(string smb, LocalOptions opts = null)
 		{
 			Symbol = smb;
-		}
-
-		public Node(string smb, NodeOption opt)
-		{
-			Symbol = smb;
-			ProcessingOption = opt;
+			Options = opts ?? new LocalOptions();
 		}
 
 		public void AddLastChild(Node child)

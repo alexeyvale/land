@@ -27,7 +27,8 @@ name_tail_element	=	ID|'.'|'[' Any ']'
 
 %%
 
-%start program
-%skip COMMENT
-%ghost operator
-//%ignorecase
+%parsing start program
+%parsing ignorecase
+%parsing skip COMMENT
+
+%nodes ghost operator

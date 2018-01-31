@@ -19,14 +19,11 @@ namespace LandParserGenerator
 		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
 
-		// Особые символы, задаваемые опциями
-		public bool IsCaseSensitive { get; set; } = true;
-		public string StartSymbol { get; private set; }
-		public HashSet<string> SkipTokens { get; private set; } = new HashSet<string>();
-
-		public Dictionary<NodeOption, HashSet<string>> TreeProcessingOptions { get; private set; } = new Dictionary<NodeOption, HashSet<string>>();
+		// Информация обо всех установленных опциях
+		public OptionsManager Options { get; private set; } = new OptionsManager();
 
 		// Содержание грамматики
+		public string StartSymbol { get; private set; }
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public HashSet<string> NonEmptyPrecedence { get; private set; } = new HashSet<string>(); 
@@ -75,9 +72,6 @@ namespace LandParserGenerator
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
-
-			foreach (NodeOption opt in Enum.GetValues(typeof(NodeOption)))
-				TreeProcessingOptions[opt] = new HashSet<string>();
 		}
 
 		private void OnGrammarUpdate()
@@ -257,44 +251,71 @@ namespace LandParserGenerator
 
 		#endregion
 
-		public void SetSkipTokens(params string[] tokens)
-		{
-			foreach(var token in tokens)
-				if(!Tokens.ContainsKey(token))
-				{
-                    throw new IncorrectGrammarException($"Отсутствует описание токена { token }");
-				}
+		#region Учёт опций
 
-			SkipTokens = new HashSet<string>(tokens);
+		public void SetOption(NodeOption option, params string[] symbols)
+		{
+			Options.Set(option, symbols);
+
+			var errorSymbols = CheckIfNonterminals(symbols);
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определёны как нетерминальные"
+				);
 		}
 
-		public void SetStartSymbol(string symbol)
+		public void SetOption(ParsingOption option, params string[] symbols)
 		{
-			if (!this.Rules.ContainsKey(symbol))
-            {
-                throw new IncorrectGrammarException(
-                   $"Символ {symbol} не определён как нетерминальный"
-                );
-            }
+			Options.Set(option, symbols);
 
-            StartSymbol = symbol;
-		}
-
-		public void SetSymbolsForOption(NodeOption opt, params string[] symbols)
-		{
-			TreeProcessingOptions[opt] = new HashSet<string>(symbols);
-
-			foreach (var symbol in symbols)
+			switch(option)
 			{
-				if (!this.Rules.ContainsKey(symbol))
-				{
-					throw new IncorrectGrammarException(
-						$"Символ {symbol} не определён как нетерминальный"
-					);
-				}
+				case ParsingOption.START:
+					StartSymbol = Options.GetSymbols(ParsingOption.START).FirstOrDefault();
+					if (CheckIfNonterminals(StartSymbol).Count > 0)
+						throw new IncorrectGrammarException(
+							$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
+						);
+					break;
+				case ParsingOption.SKIP:
+					var errorSymbols = CheckIfTerminals(symbols);
+					if (errorSymbols.Count > 0)
+						throw new IncorrectGrammarException(
+							$"Символы '{String.Join("', '", errorSymbols)}' не определёны как терминальные"
+						);
+					break;
+				default:
+					break;
 			}
 		}
 
+		public void SetOption(MappingOption option, params string[] symbols)
+		{
+			Options.Set(option, symbols);
+
+			var errorSymbols = CheckIfSymbols(symbols);
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
+				);
+		}
+
+		private List<string> CheckIfNonterminals(params string[] symbols)
+		{
+			return symbols.Where(s => !this.Rules.ContainsKey(s)).ToList();
+		}
+
+		private List<string> CheckIfTerminals(params string[] symbols)
+		{
+			return symbols.Where(s => !this.Tokens.ContainsKey(s)).ToList();
+		}
+
+		private List<string> CheckIfSymbols(params string[] symbols)
+		{
+			return CheckIfNonterminals(symbols).Intersect(CheckIfTerminals(symbols)).ToList();
+		}
+
+		#endregion
 
 		/// <summary>
 		/// Замена символа во всех правилах

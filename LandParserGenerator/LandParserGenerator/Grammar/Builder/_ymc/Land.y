@@ -14,6 +14,7 @@
 
 %union { 
 	public int intVal; 
+	public double doubleVal;
 	public bool boolVal;
 	public string strVal;
 	public List<string> strList;
@@ -27,14 +28,15 @@
 
 %left OR
 %token COLON LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
-%token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME
+%token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
+%token <doubleVal> RNUM
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <quantVal> quantifier
-%type <strVal> body_element_core body_element_atom group body_element context_option
-%type <strList> identifiers
+%type <strVal> body_element_core body_element_atom group body_element
+%type <strList> identifiers context_options
 %type <altList> body
 %type <boolVal> prec_nonempty
 
@@ -96,18 +98,29 @@ body
 	;
 	
 body_element
-	: context_option body_element_core quantifier prec_nonempty
+	: context_options body_element_core quantifier prec_nonempty
 		{ 		
-			NodeOption option;
+			var opts = new LocalOptions();
 			
-			if(!Enum.TryParse<NodeOption>($1.ToUpper(), out option))
+			foreach(var opt in $1)
 			{
-					Errors.Add(Message.Error(
-						"Неизвестная опция '" + $1 + "'",
-						@1.StartLine, @1.StartColumn,
-						"LanD"
-					));
-					option = NodeOption.NONE;
+				NodeOption nodeOpt;		
+				if(!Enum.TryParse<NodeOption>(opt.ToUpper(), out nodeOpt))
+				{
+					MappingOption mapOpt;
+					if(!Enum.TryParse<MappingOption>(opt.ToUpper(), out mapOpt))
+					{
+						Errors.Add(Message.Error(
+							"Неизвестная опция '" + opt + "'",
+							@1.StartLine, @1.StartColumn,
+							"LanD"
+						));
+					}
+					else
+						opts.Set(mapOpt);				
+				}
+				else
+					opts.Set(nodeOpt);	
 			}
 			
 			if($3.HasValue)
@@ -115,18 +128,18 @@ body_element
 				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value, $4);
 				ConstructedGrammar.AddAnchor(generated, @$);
 				
-				$$ = new Entry(generated, option);
+				$$ = new Entry(generated, opts);
 			}
 			else
 			{
-				$$ = new Entry($2, option);
+				$$ = new Entry($2, opts);
 			}
 		}
 	;
 	
-context_option
-	: OPTION_NAME { $$ = $1; }
-	| { $$ = NodeOption.NONE.ToString(); }
+context_options
+	: context_options OPTION_NAME opt_arg { $$ = $1; $$.Add($2); }
+	| { $$ = new List<string>(); }
 	;
 	
 prec_nonempty
@@ -174,36 +187,54 @@ options
 	;
 	
 option
-	: OPTION_NAME ID identifiers
+	: CATEGORY_NAME ID opt_arg identifiers
 		{
-			switch($2)
+			OptionCategory optCategory;
+			if(!Enum.TryParse($1.ToUpper(), out optCategory))
 			{
-				case "skip":
-					SafeGrammarAction(() => { ConstructedGrammar.SetSkipTokens($3.ToArray()); }, @1);
+				Errors.Add(Message.Error(
+					"Неизвестная категория опций '" + $1 + "'",
+					@1.StartLine, @1.StartColumn,
+					"LanD"
+				));
+			}
+
+			bool goodOption = true;
+			switch (optCategory)
+			{
+				case OptionCategory.PARSING:
+					ParsingOption parsingOpt;
+					goodOption = Enum.TryParse($2.ToUpper(), out parsingOpt);
+					if(goodOption) ConstructedGrammar.SetOption(parsingOpt, $4.ToArray());
 					break;
-				case "start":
-					SafeGrammarAction(() => { ConstructedGrammar.SetStartSymbol($3[0]); }, @1);
+				case OptionCategory.NODES:
+					NodeOption nodeOpt;
+					goodOption = Enum.TryParse($2.ToUpper(), out nodeOpt);
+					if(goodOption) ConstructedGrammar.SetOption(nodeOpt, $4.ToArray());
 					break;
-				case "ignorecase":
-					ConstructedGrammar.IsCaseSensitive = false;
+				case OptionCategory.MAPPING:
+					MappingOption mappingOpt;
+					goodOption = Enum.TryParse($2.ToUpper(), out mappingOpt);
+					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray());
 					break;
 				default:
-					NodeOption option;	
-					if(!Enum.TryParse<NodeOption>($2.ToUpper(), out option))
-					{
-						Errors.Add(Message.Error(
-							"Неизвестная опция '" + $2 + "'",
-							@1.StartLine, @1.StartColumn,
-							"LanD"
-						));
-					}
-					else
-					{
-						SafeGrammarAction(() => { ConstructedGrammar.SetSymbolsForOption(option, $3.ToArray()); }, @1);
-					}				
 					break;
 			}
+			
+			if(!goodOption)
+			{
+				Errors.Add(Message.Error(
+					"Опция '" + $2 + "' не определена для категории '" + $1 + "'",
+					@2.StartLine, @2.StartColumn,
+					"LanD"
+				));
+			}
 		}
+	;
+	
+opt_arg
+	: RNUM RPAR
+	|
 	;
 	
 identifiers

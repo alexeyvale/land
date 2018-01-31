@@ -1,0 +1,8 @@
+HEADING		: '\n' [ \t]* '#'+ .*? ([\n\r]|EOF)
+LIST_ITEM	: '\n' [ \t]* ('*'|'-'|'+'|[0-9]+'.') .*? ([\n\r]|EOF)
+
+file	= 	(HEADING|LIST_ITEM)*
+
+%%
+
+%start file

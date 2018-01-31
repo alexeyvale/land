@@ -16,7 +16,8 @@
 
 LETTER [_a-zA-Z]
 DIGIT [0-9]
-NUMBER {DIGIT}+
+INUM {DIGIT}+
+RNUM {INUM}\.{INUM}
 ID {LETTER}({LETTER}|{DIGIT})*
 
 LINE_COMMENT "//".*    
@@ -31,8 +32,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 // Группа и все возможные квантификаторы
 
 "(" return (int)Tokens.LPAR;
-
-")" return (int)Tokens.RPAR;
 
 "+" {
 	yylval.quantVal = Quantifier.ONE_OR_MORE; 
@@ -70,11 +69,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 // Элементы правила
 
-{ID} {
-	yylval.strVal = yytext;
-	return (int)Tokens.ID;
-}
-
 {STRING} {
 	yylval.strVal = yytext;
 	return (int)Tokens.STRING;
@@ -95,12 +89,39 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 ^"%%" {
+	BEGIN(in_options);
 	return (int)Tokens.PROC;
 }
 
-^"%"{ID} {
-		yylval.strVal = yytext.ToLower().Trim('%');
+"%"{ID}"("? {
+		yylval.strVal = yytext.ToLower().Trim('%').Trim('(');
 		return (int)Tokens.OPTION_NAME;
+}
+
+<0, in_options> {
+	{ID} {
+		yylval.strVal = yytext;
+		return (int)Tokens.ID;
+	}
+	
+	")" return (int)Tokens.RPAR;
+	
+	{RNUM} {
+		yylval.doubleVal = double.Parse(yytext);
+		return (int)Tokens.RNUM;
+	}
+}
+
+<in_options> {
+	"%"{ID} {
+		yylval.strVal = yytext.ToLower().Trim('%');
+		return (int)Tokens.CATEGORY_NAME;
+	}
+	
+	{ID}"("? {
+		yylval.strVal = yytext.Trim('(');
+		return (int)Tokens.ID;
+	}
 }
 
 %{

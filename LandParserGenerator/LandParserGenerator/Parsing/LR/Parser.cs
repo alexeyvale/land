@@ -117,7 +117,7 @@ namespace LandParserGenerator.Parsing.LR
 				else
 				{
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.SkipTokens.Contains(token.Name))
+					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.NextToken();
 						continue;

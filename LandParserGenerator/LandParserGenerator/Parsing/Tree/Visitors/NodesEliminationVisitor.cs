@@ -23,9 +23,9 @@ namespace LandParserGenerator.Parsing
 			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				if (grammar.TreeProcessingOptions[NodeOption.GHOST].Contains(node.Children[i].Symbol) 
+				if (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
 					|| node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) 
-					||  node.ProcessingOption == NodeOption.GHOST)
+					||  node.Options.NodeOption == NodeOption.GHOST)
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
@@ -35,8 +35,8 @@ namespace LandParserGenerator.Parsing
 			}
 
 			// Если символ помечен как List, убираем подузлы того же типа
-			if (grammar.TreeProcessingOptions[NodeOption.LIST].Contains(node.Symbol) 
-				|| node.ProcessingOption == NodeOption.LIST)
+			if (grammar.Options.IsSet(NodeOption.LIST, node.Symbol) 
+				|| node.Options.NodeOption == NodeOption.LIST)
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
 				{

@@ -119,7 +119,7 @@ namespace LandParserGenerator.Parsing.LL
 
                         for (var i = alternativeToApply.Count - 1; i >= 0; --i)
                         {
-                            var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Option);
+                            var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options);
 
                             stackTop.AddFirstChild(newNode);
                             Stack.Push(newNode);
@@ -188,8 +188,8 @@ namespace LandParserGenerator.Parsing.LL
                 else
                 {
                     /// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.SkipTokens.Contains(token.Name))
-                    {
+					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
+					{
                         token = LexingStream.NextToken();
                     }
                     else
@@ -317,7 +317,7 @@ namespace LandParserGenerator.Parsing.LL
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
-							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Option);
+							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options);
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
 						}
