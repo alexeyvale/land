@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 01.02.2018 12:18:42
+//  DateTime: 01.02.2018 12:38:10
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 01.02.2018 12:18:42>
+//  GPLEX input file <./Land.lex - 01.02.2018 12:38:09>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -706,7 +706,7 @@ yylval.strVal = yytext;
             break;
         case 7:
         case 17:
-yylval.doubleVal = double.Parse(yytext);
+yylval.doubleVal = double.Parse(yytext, CultureInfo.InvariantCulture);
 		return (int)Tokens.RNUM;
             break;
         case 8:

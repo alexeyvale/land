@@ -107,7 +107,7 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	")" return (int)Tokens.RPAR;
 	
 	{RNUM} {
-		yylval.doubleVal = double.Parse(yytext);
+		yylval.doubleVal = double.Parse(yytext, CultureInfo.InvariantCulture);
 		return (int)Tokens.RNUM;
 	}
 }

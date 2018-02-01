@@ -14,7 +14,7 @@ program				=	Any namespace
 namespace			=	'namespace' name '{' class_enum* '}'
 class_enum			=	modifiers? class_enum_tail
 modifiers			=	%ghost name
-class_enum_tail		=	('class'|'struct'|'interface') name Any block ';'?
+class_enum_tail		=	%priority(0.5) ('class'|'struct'|'interface') name Any block ';'?
 					|	'enum' name Any block ';'?
 name				=	ID name_tail_element*
 name_tail_element	=	ID|'.'|'?'|'<' name_tail_element* '>'|'[' Any ']'|','|'::'
