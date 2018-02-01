@@ -47,7 +47,11 @@
 %%
 
 lp_description 
-	: structure PROC options { Errors.AddRange(ConstructedGrammar.CheckValidity()); }
+	: structure PROC options 
+		{ 
+			ConstructedGrammar.PostProcessing();
+			Errors.AddRange(ConstructedGrammar.CheckValidity()); 
+		}
 	;
 
 /***************************** STRUCTURE ******************************/
@@ -242,10 +246,8 @@ opt_arg
 	;
 	
 identifiers
-	: identifiers ID 
-		{ $$ = $1; $$.Add($2); }
-	| ID 
-		{ $$ = new List<string>(); $$.Add($1); }
+	: identifiers ID { $$ = $1; $$.Add($2); }
+	| { $$ = new List<string>(); }
 	;
 	
 %%

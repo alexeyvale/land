@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 01.02.2018 11:15:41
+// DateTime: 01.02.2018 12:18:42
 // UserName: Алексей
-// Input file <./Land.y - 01.02.2018 11:15:40>
+// Input file <./Land.y - 01.02.2018 12:18:42>
 
 // options: no-lines gplex
 
@@ -64,18 +64,18 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 01.02.2018 11:15:40
+  // Verbatim content from ./Land.y - 01.02.2018 12:18:42
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 01.02.2018 11:15:40
+  // End verbatim content from ./Land.y - 01.02.2018 12:18:42
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
 #pragma warning restore 649
   private static Rule[] rules = new Rule[33];
-  private static State[] states = new State[43];
+  private static State[] states = new State[42];
   private static string[] nonTerms = new string[] {
       "lp_description", "quantifier", "opt_arg", "body_element_core", "body_element_atom", 
       "group", "body_element", "identifiers", "context_options", "body", "prec_nonempty", 
@@ -83,49 +83,48 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       "option", };
 
   static Parser() {
-    states[0] = new State(new int[]{20,17},new int[]{-1,1,-13,3,-15,42,-16,16,-17,41});
+    states[0] = new State(new int[]{20,16},new int[]{-1,1,-13,3,-15,41,-16,15,-17,40});
     states[1] = new State(new int[]{3,2});
     states[2] = new State(-1);
-    states[3] = new State(new int[]{9,4,20,17},new int[]{-15,15,-16,16,-17,41});
+    states[3] = new State(new int[]{9,4,20,16},new int[]{-15,14,-16,15,-17,40});
     states[4] = new State(-26,new int[]{-14,5});
     states[5] = new State(new int[]{22,7,3,-2},new int[]{-18,6});
     states[6] = new State(-27);
     states[7] = new State(new int[]{19,8});
-    states[8] = new State(new int[]{24,13,19,-30},new int[]{-3,9});
-    states[9] = new State(new int[]{19,12},new int[]{-8,10});
+    states[8] = new State(new int[]{24,12,19,-30,22,-30,3,-30},new int[]{-3,9});
+    states[9] = new State(-32,new int[]{-8,10});
     states[10] = new State(new int[]{19,11,22,-28,3,-28});
     states[11] = new State(-31);
-    states[12] = new State(-32);
-    states[13] = new State(new int[]{7,14});
-    states[14] = new State(-29);
-    states[15] = new State(-3);
-    states[16] = new State(-5);
-    states[17] = new State(new int[]{5,18,10,20});
-    states[18] = new State(new int[]{16,19});
-    states[19] = new State(-7);
-    states[20] = new State(-11,new int[]{-10,21});
-    states[21] = new State(new int[]{4,23,9,-8,20,-8,21,-14,18,-14,19,-14,6,-14},new int[]{-7,22,-9,24});
-    states[22] = new State(-9);
-    states[23] = new State(-10);
-    states[24] = new State(new int[]{21,32,18,35,19,36,6,38},new int[]{-4,25,-5,34,-6,37});
-    states[25] = new State(new int[]{25,29,26,30,27,31,29,-20,4,-20,21,-20,18,-20,19,-20,6,-20,9,-20,20,-20,7,-20},new int[]{-2,26});
-    states[26] = new State(new int[]{29,28,4,-16,21,-16,18,-16,19,-16,6,-16,9,-16,20,-16,7,-16},new int[]{-11,27});
-    states[27] = new State(-12);
-    states[28] = new State(-15);
-    states[29] = new State(-17);
-    states[30] = new State(-18);
-    states[31] = new State(-19);
-    states[32] = new State(new int[]{24,13,21,-30,18,-30,19,-30,6,-30},new int[]{-3,33});
-    states[33] = new State(-13);
-    states[34] = new State(-21);
-    states[35] = new State(-23);
-    states[36] = new State(-24);
-    states[37] = new State(-22);
-    states[38] = new State(-11,new int[]{-10,39});
-    states[39] = new State(new int[]{7,40,4,23,21,-14,18,-14,19,-14,6,-14},new int[]{-7,22,-9,24});
-    states[40] = new State(-25);
-    states[41] = new State(-6);
-    states[42] = new State(-4);
+    states[12] = new State(new int[]{7,13});
+    states[13] = new State(-29);
+    states[14] = new State(-3);
+    states[15] = new State(-5);
+    states[16] = new State(new int[]{5,17,10,19});
+    states[17] = new State(new int[]{16,18});
+    states[18] = new State(-7);
+    states[19] = new State(-11,new int[]{-10,20});
+    states[20] = new State(new int[]{4,22,9,-8,20,-8,21,-14,18,-14,19,-14,6,-14},new int[]{-7,21,-9,23});
+    states[21] = new State(-9);
+    states[22] = new State(-10);
+    states[23] = new State(new int[]{21,31,18,34,19,35,6,37},new int[]{-4,24,-5,33,-6,36});
+    states[24] = new State(new int[]{25,28,26,29,27,30,29,-20,4,-20,21,-20,18,-20,19,-20,6,-20,9,-20,20,-20,7,-20},new int[]{-2,25});
+    states[25] = new State(new int[]{29,27,4,-16,21,-16,18,-16,19,-16,6,-16,9,-16,20,-16,7,-16},new int[]{-11,26});
+    states[26] = new State(-12);
+    states[27] = new State(-15);
+    states[28] = new State(-17);
+    states[29] = new State(-18);
+    states[30] = new State(-19);
+    states[31] = new State(new int[]{24,12,21,-30,18,-30,19,-30,6,-30},new int[]{-3,32});
+    states[32] = new State(-13);
+    states[33] = new State(-21);
+    states[34] = new State(-23);
+    states[35] = new State(-24);
+    states[36] = new State(-22);
+    states[37] = new State(-11,new int[]{-10,38});
+    states[38] = new State(new int[]{7,39,4,22,21,-14,18,-14,19,-14,6,-14},new int[]{-7,21,-9,23});
+    states[39] = new State(-25);
+    states[40] = new State(-6);
+    states[41] = new State(-4);
 
     for (int sNo = 0; sNo < states.Length; sNo++) states[sNo].number = sNo;
 
@@ -160,7 +159,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
     rules[29] = new Rule(-3, new int[]{24,7});
     rules[30] = new Rule(-3, new int[]{});
     rules[31] = new Rule(-8, new int[]{-8,19});
-    rules[32] = new Rule(-8, new int[]{19});
+    rules[32] = new Rule(-8, new int[]{});
   }
 
   protected override void Initialize() {
@@ -176,7 +175,10 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
     switch (action)
     {
       case 2: // lp_description -> structure, PROC, options
-{ Errors.AddRange(ConstructedGrammar.CheckValidity()); }
+{ 
+			ConstructedGrammar.PostProcessing();
+			Errors.AddRange(ConstructedGrammar.CheckValidity()); 
+		}
         break;
       case 7: // terminal -> ENTITY_NAME, COLON, REGEX
 { 
@@ -348,8 +350,8 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 31: // identifiers -> identifiers, ID
 { CurrentSemanticValue.strList = ValueStack[ValueStack.Depth-2].strList; CurrentSemanticValue.strList.Add(ValueStack[ValueStack.Depth-1].strVal); }
         break;
-      case 32: // identifiers -> ID
-{ CurrentSemanticValue.strList = new List<string>(); CurrentSemanticValue.strList.Add(ValueStack[ValueStack.Depth-1].strVal); }
+      case 32: // identifiers -> /* empty */
+{ CurrentSemanticValue.strList = new List<string>(); }
         break;
     }
 #pragma warning restore 162, 1522

@@ -9,7 +9,7 @@ namespace LandParserGenerator
 	public class TerminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
-		public string Pattern { get; private set; }
+		public string Pattern { get; set; }
 
 		public TerminalSymbol(string name, string pattern)
 		{

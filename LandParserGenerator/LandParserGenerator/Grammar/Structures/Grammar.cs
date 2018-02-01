@@ -41,7 +41,7 @@ namespace LandParserGenerator
 		private int AutoTokenCounter { get; set; } = 0;
 
 		// Для корректных сообщений об ошибках
-		public Dictionary<string, string> AutoRulesUserWrittenForm = new Dictionary<string, string>(); // AutoRuleOrigin
+		public Dictionary<string, string> AutoSymbolsUserWrittenForm = new Dictionary<string, string>();
 		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
 
 		public ISymbol this[string key]
@@ -136,7 +136,7 @@ namespace LandParserGenerator
 		{
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
-			AutoRulesUserWrittenForm[newName] = "(" + String.Join("|", alternatives
+			AutoSymbolsUserWrittenForm[newName] = "(" + String.Join("|", alternatives
 				.Select(a=> String.Join(" ", a.Elements.Select(e=>Userify(e.Symbol))))) + ")";
 			return newName;
 		}
@@ -158,21 +158,21 @@ namespace LandParserGenerator
 							});
 							if (precNonEmpty)
 								NonEmptyPrecedence.Add(newName);
-							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+							AutoSymbolsUserWrittenForm[newName] = Userify(elemName) + "+";
 
 							var oldName = newName;
 							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName, oldName }
 							});
-							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+							AutoSymbolsUserWrittenForm[newName] = Userify(elemName) + "+";
 							break;
 						case GrammarType.LR:
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName },
 								new string[]{ newName, elemName }
 							});
-							AutoRulesUserWrittenForm[newName] = Userify(elemName) + "+";
+							AutoSymbolsUserWrittenForm[newName] = Userify(elemName) + "+";
 							break;
 						default:
 							break;
@@ -199,7 +199,7 @@ namespace LandParserGenerator
 					}
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "*";
+					AutoSymbolsUserWrittenForm[newName] = Userify(elemName) + "*";
 					break;
 				case Quantifier.ZERO_OR_ONE:
 					Rules[newName] = new NonterminalSymbol(newName, new string[][]{
@@ -208,7 +208,7 @@ namespace LandParserGenerator
 					});
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRulesUserWrittenForm[newName] = Userify(elemName) + "?";
+					AutoSymbolsUserWrittenForm[newName] = Userify(elemName) + "?";
 					break;
 			}
 
@@ -225,6 +225,8 @@ namespace LandParserGenerator
 
 			var newName = AUTO_TOKEN_PREFIX + AutoTokenCounter++;
 			Tokens.Add(newName, new TerminalSymbol(newName, regex));
+			AutoSymbolsUserWrittenForm[newName] = regex;
+
 			return newName;
 		}
 
@@ -356,6 +358,16 @@ namespace LandParserGenerator
 
 		}
 
+		public void PostProcessing()
+		{
+			if(Options.IsSet(ParsingOption.IGNORECASE))
+			{
+				foreach (var token in Tokens.Where(t => t.Key.StartsWith(AUTO_TOKEN_PREFIX)))
+					token.Value.Pattern = String.Join("",
+						token.Value.Pattern.Trim('\'').Select(c => Char.IsLetter(c) ? $"[{Char.ToLower(c)}{Char.ToUpper(c)}]" : $"'{c}'"));
+            }
+		}
+
 		public IEnumerable<Message> CheckValidity()
 		{
 			var errors = new LinkedList<Message>();
@@ -392,9 +404,7 @@ namespace LandParserGenerator
 
 		public string Userify(string name)
 		{
-			return name.StartsWith(AUTO_TOKEN_PREFIX) ? Tokens[name].Pattern :
-				name.StartsWith(AUTO_RULE_PREFIX) ? AutoRulesUserWrittenForm[name] :
-				name;
+			return AutoSymbolsUserWrittenForm.ContainsKey(name) ? AutoSymbolsUserWrittenForm[name] : name;
 		}
 
 		public string Userify(ISymbol smb)

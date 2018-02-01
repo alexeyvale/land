@@ -40,7 +40,7 @@ namespace LandParserGenerator
                     //|| grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a=>a.Contains(token)) ?
 					//"" : "fragment ";
 				grammarOutput.WriteLine($"{isFragment}{token}: {grammar.Tokens[token].Pattern} ;");
-				tokensForLines[++linesCounter] = token.StartsWith(Grammar.AUTO_TOKEN_PREFIX) ? grammar.Tokens[token].Pattern : token;
+				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 
 			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
