@@ -300,6 +300,17 @@ namespace LandParserGenerator
 				);
 		}
 
+		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
+		{
+			Options.Set(option, symbols, @params);
+
+			var errorSymbols = CheckIfSymbols(symbols);
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
+				);
+		}
+
 		private List<string> CheckIfNonterminals(params string[] symbols)
 		{
 			return symbols.Where(s => !this.Rules.ContainsKey(s)).ToList();

@@ -1,4 +1,4 @@
-%{
+﻿%{
 	public List<Message> Log = new List<Message>();
 %}
 
@@ -17,7 +17,7 @@
 LETTER [_a-zA-Z]
 DIGIT [0-9]
 INUM {DIGIT}+
-RNUM {INUM}\.{INUM}
+RNUM {INUM}(\.{INUM})?
 ID {LETTER}({LETTER}|{DIGIT})*
 
 LINE_COMMENT "//".*    

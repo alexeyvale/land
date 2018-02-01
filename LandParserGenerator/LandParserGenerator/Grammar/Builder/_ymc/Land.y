@@ -1,4 +1,4 @@
-%{
+﻿%{
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
@@ -15,13 +15,16 @@
 %union { 
 	public int intVal; 
 	public double doubleVal;
+	public Quantifier quantVal;
 	public bool boolVal;
 	public string strVal;
-	public List<string> strList;
 	
+	public List<string> strList;	
 	public List<Alternative> altList;
+	
 	// Информация о количестве повторений
-	public Nullable<Quantifier> quantVal;
+	public Nullable<Quantifier> optQuantVal;
+	public Nullable<double> optDoubleVal;
 }
 
 %start lp_description
@@ -34,7 +37,8 @@
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
 %token IS_LIST_NODE PREC_NONEMPTY
 
-%type <quantVal> quantifier
+%type <optQuantVal> quantifier
+%type <optDoubleVal> opt_arg
 %type <strVal> body_element_core body_element_atom group body_element
 %type <strList> identifiers context_options
 %type <altList> body
@@ -215,7 +219,7 @@ option
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
 					goodOption = Enum.TryParse($2.ToUpper(), out mappingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray());
+					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3);
 					break;
 				default:
 					break;
@@ -233,8 +237,8 @@ option
 	;
 	
 opt_arg
-	: RNUM RPAR
-	|
+	: RNUM RPAR { $$ = $1; }
+	| { $$ = null; }
 	;
 	
 identifiers
