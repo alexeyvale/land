@@ -9,11 +9,11 @@ using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Parsing
 {
-	public class NodesEliminationVisitor : BaseVisitor
+	public class GhostListOptionProcessingVisitor : BaseVisitor
 	{
 		protected Grammar grammar { get; set; }
 
-		public NodesEliminationVisitor(Grammar g)
+		public GhostListOptionProcessingVisitor(Grammar g)
 		{
 			grammar = g;
 		}

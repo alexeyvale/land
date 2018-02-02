@@ -19,6 +19,10 @@
 	public bool boolVal;
 	public string strVal;
 	
+	public Tuple<string, double> strDoublePair;
+	
+	public List<dynamic> dynamicList;
+	public List<Tuple<string, List<dynamic>>> optionParamsList;
 	public List<string> strList;	
 	public List<Alternative> altList;
 	
@@ -30,7 +34,7 @@
 %start lp_description
 
 %left OR
-%token COLON LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
+%token COLON OPT_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -38,11 +42,13 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
-%type <optDoubleVal> opt_arg
 %type <strVal> body_element_core body_element_atom group body_element
-%type <strList> identifiers context_options
+%type <strList> identifiers
 %type <altList> body
 %type <boolVal> prec_nonempty
+
+%type <dynamicList> opt_args args context_opt_args
+%type <optionParamsList> context_options
 
 %%
 
@@ -113,19 +119,19 @@ body_element
 			foreach(var opt in $1)
 			{
 				NodeOption nodeOpt;		
-				if(!Enum.TryParse<NodeOption>(opt.ToUpper(), out nodeOpt))
+				if(!Enum.TryParse<NodeOption>(opt.Item1.ToUpper(), out nodeOpt))
 				{
 					MappingOption mapOpt;
-					if(!Enum.TryParse<MappingOption>(opt.ToUpper(), out mapOpt))
+					if(!Enum.TryParse<MappingOption>(opt.Item1.ToUpper(), out mapOpt))
 					{
 						Errors.Add(Message.Error(
-							"Неизвестная опция '" + opt + "'",
+							"Неизвестная опция '" + opt.Item1 + "'",
 							@1.StartLine, @1.StartColumn,
 							"LanD"
 						));
 					}
 					else
-						opts.Set(mapOpt);				
+						opts.Set(mapOpt, opt.Item2.ToArray());				
 				}
 				else
 					opts.Set(nodeOpt);	
@@ -146,8 +152,17 @@ body_element
 	;
 	
 context_options
-	: context_options OPTION_NAME opt_arg { $$ = $1; $$.Add($2); }
-	| { $$ = new List<string>(); }
+	: context_options OPTION_NAME context_opt_args
+		{ 
+			$$ = $1; 
+			$$.Add(new Tuple<string, List<dynamic>>($2, $3)); 
+		}
+	| { $$ = new List<Tuple<string, List<dynamic>>>(); }
+	;
+	
+context_opt_args
+	: OPT_LPAR args RPAR { $$ = $2; }
+	| { $$ = new List<dynamic>(); }
 	;
 	
 prec_nonempty
@@ -195,7 +210,7 @@ options
 	;
 	
 option
-	: CATEGORY_NAME ID opt_arg identifiers
+	: CATEGORY_NAME ID opt_args identifiers
 		{
 			OptionCategory optCategory;
 			if(!Enum.TryParse($1.ToUpper(), out optCategory))
@@ -223,7 +238,7 @@ option
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
 					goodOption = Enum.TryParse($2.ToUpper(), out mappingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3);
+					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3.ToArray());
 					break;
 				default:
 					break;
@@ -240,9 +255,16 @@ option
 		}
 	;
 	
-opt_arg
-	: RNUM RPAR { $$ = $1; }
-	| { $$ = null; }
+opt_args
+	: LPAR args RPAR { $$ = $2; }
+	| { $$ = new List<dynamic>(); }
+	;
+	
+args
+	: args COMMA RNUM { $$ = $1; $$.Add($3); }
+	| args COMMA STRING { $$ = $1; $$.Add($3); }
+	| RNUM { $$ = new List<dynamic>(){ $1 }; }
+	| STRING { $$ = new List<dynamic>(){ $1 }; }
 	;
 	
 identifiers

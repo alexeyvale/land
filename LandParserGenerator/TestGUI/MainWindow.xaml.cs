@@ -17,6 +17,7 @@ using System.IO;
 using Microsoft.Win32;
 
 using LandParserGenerator.Parsing.Tree;
+using LandParserGenerator.Mapping;
 
 namespace TestGUI
 {
@@ -528,9 +529,25 @@ namespace TestGUI
 		}
 		#endregion
 
+		#region Работа с точками привязки
+
 		private void ConcernTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
+			var treeView = (TreeView)sender;
+			var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
 
+			if (node.StartOffset.HasValue && node.EndOffset.HasValue)
+			{
+				var start = node.StartOffset.Value;
+				var end = node.EndOffset.Value;
+				FileEditor.Select(start, end - start + 1);
+				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+				MainTabs.SelectedIndex = 1;
+			}
+			else
+			{
+				FileEditor.Select(0, 0);
+			}
 		}
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -580,5 +597,17 @@ namespace TestGUI
 				ConcernPointCandidatesList.ItemsSource = pointCandidates;
 			}
 		}
+
+		private void AddAllPossibleConcernPoints_Click(object sender, RoutedEventArgs e)
+		{
+			if (TreeRoot != null)
+			{
+				var visitor = new LandExplorerVisitor();
+				TreeRoot.Accept(visitor);
+				ConcernTreeView.ItemsSource = visitor.Land;
+			}
+		}
+
+		#endregion
 	}
 }

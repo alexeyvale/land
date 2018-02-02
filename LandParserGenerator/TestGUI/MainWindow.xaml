@@ -172,7 +172,7 @@
                         SelectedItemChanged="ParseTreeView_SelectedItemChanged">
                     </TreeView>
                 </TabItem>
-                <TabItem Header="Разметка" IsEnabled="False">
+                <TabItem Header="Разметка">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="51*"/>
@@ -185,7 +185,9 @@
                         </Grid.RowDefinitions>
                         <ToolBar Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-0.2,0.4">
                             <Button Name="AddConcernPoint"  Content="Добавить" Click="AddConcernPoint_Click"></Button>
-                            <Button Name="DeleteConcernPoint" Content="Удалить" Click="DeleteConcernPoint_Click"></Button>
+                            <Button Name="AddAllPossibleConcernPoints" Content="Добавить все" Click="AddAllPossibleConcernPoints_Click"></Button>
+                            <Separator></Separator>
+                            <Button Name="DeleteConcernPoint" Content="Удалить" Click="DeleteConcernPoint_Click" IsEnabled="False"></Button>
                         </ToolBar>
                         <TreeView
                             Name="ConcernTreeView"

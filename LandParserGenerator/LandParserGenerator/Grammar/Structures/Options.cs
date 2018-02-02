@@ -28,6 +28,8 @@ namespace LandParserGenerator
 
 	public class OptionsManager
 	{
+		public const string GLOBAL_PARAMETERS_SYMBOL = "";
+
 		private Dictionary<NodeOption, Dictionary<string, List<dynamic>>> NodeOptions { get; set; } = 
 			new Dictionary<NodeOption, Dictionary<string, List<dynamic>>>();
 		private Dictionary<MappingOption, Dictionary<string, List<dynamic>>> MappingOptions { get; set; } =
@@ -117,15 +119,28 @@ namespace LandParserGenerator
 
 	public class LocalOptions
 	{
-		public NodeOption? NodeOption;
-		public double? Priority;
+		public NodeOption? NodeOption { get; set; } = null;
+		public double? Priority { get; set; } = null;
+		public bool IsLand { get; set; } = false;
 
 		public void Set(NodeOption opt)
 		{
 			NodeOption = opt;
 		}
 
-		public void Set(MappingOption opt)
-		{ }
+		public void Set(MappingOption opt, params dynamic[] @params)
+		{
+			switch(opt)
+			{
+				case MappingOption.LAND:
+					IsLand = true;
+					break;
+				case MappingOption.PRIORITY:
+					Priority = (double)@params[0];
+					break;
+				default:
+					break;
+			}
+		}
 	}
 }

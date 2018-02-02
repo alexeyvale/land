@@ -304,13 +304,21 @@ namespace LandParserGenerator
 
 		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
 		{
-			Options.Set(option, symbols, @params);
+			if (symbols == null || symbols.Length == 0)
+			{
+				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
+				Options.Set(option, symbols, @params);
+			}
+			else
+			{
+				Options.Set(option, symbols, @params);
 
-			var errorSymbols = CheckIfSymbols(symbols);
-			if (errorSymbols.Count > 0)
-				throw new IncorrectGrammarException(
-					$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
-				);
+				var errorSymbols = CheckIfSymbols(symbols);
+				if (errorSymbols.Count > 0)
+					throw new IncorrectGrammarException(
+						$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
+					);
+			}
 		}
 
 		private List<string> CheckIfNonterminals(params string[] symbols)

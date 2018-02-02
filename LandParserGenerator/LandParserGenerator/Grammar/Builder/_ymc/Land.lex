@@ -13,6 +13,7 @@
 %x in_options
 %x in_skip
 %x in_regex
+%x before_option_args
 
 LETTER [_a-zA-Z]
 DIGIT [0-9]
@@ -31,8 +32,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 // Группа и все возможные квантификаторы
 
-"(" return (int)Tokens.LPAR;
-
 "+" {
 	yylval.quantVal = Quantifier.ONE_OR_MORE; 
 	return (int)Tokens.ONE_OR_MORE;
@@ -50,6 +49,10 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 "!" {
 	return (int)Tokens.PREC_NONEMPTY;
+}
+
+"," {
+	return (int)Tokens.COMMA;
 }
 
 // Начало правила
@@ -93,9 +96,22 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.PROC;
 }
 
-"%"{ID}"("? {
-		yylval.strVal = yytext.ToLower().Trim('%').Trim('(');
+"%"{ID}"("? {	
+		if(yytext.Contains('('))
+		{
+			yyless(yytext.Length - 1);
+			yy_push_state(before_option_args);
+		}
+			
+		yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
 		return (int)Tokens.OPTION_NAME;
+}
+
+<before_option_args> {
+	"(" {
+		yy_pop_state();
+		return (int)Tokens.OPT_LPAR;
+	}
 }
 
 <0, in_options> {
@@ -103,6 +119,8 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 		yylval.strVal = yytext;
 		return (int)Tokens.ID;
 	}
+	
+	"(" return (int)Tokens.LPAR;
 	
 	")" return (int)Tokens.RPAR;
 	
@@ -116,11 +134,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	"%"{ID} {
 		yylval.strVal = yytext.ToLower().Trim('%');
 		return (int)Tokens.CATEGORY_NAME;
-	}
-	
-	{ID}"("? {
-		yylval.strVal = yytext.Trim('(');
-		return (int)Tokens.ID;
 	}
 }
 
