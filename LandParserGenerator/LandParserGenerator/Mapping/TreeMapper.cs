@@ -16,7 +16,9 @@ namespace LandParserGenerator.Mapping
 		private const double SubstitutionCost = 1;
 
 		private Grammar Gram { get; set; }
-		private Dictionary<Node, Node> Mapping { get; set; }
+
+		public Dictionary<Node, Node> Mapping { get; set; }
+		public Dictionary<Node, Dictionary<Node, double>> Similarities { get; set; }
 
 		public ConcernMapping(Grammar g)
 		{
@@ -28,12 +30,15 @@ namespace LandParserGenerator.Mapping
 			var visitor = new LandExplorerVisitor();
 			oldTree.Accept(visitor);
 
+			/// Отображаем острова из одного дерева в острова из другого
 			var nodesToRemap = visitor.Land;
 			visitor.Land = new List<Node>();
 			newTree.Accept(visitor);
 			var candidates = visitor.Land;
 
 			Mapping = new Dictionary<Node, Node>();
+			Similarities = new Dictionary<Node, Dictionary<Node, double>>();
+
 			foreach(var oldNode in nodesToRemap)
 			{
 				if(!Mapping.ContainsKey(oldNode))
@@ -48,25 +53,42 @@ namespace LandParserGenerator.Mapping
 
 		private double Similarity(Node a, Node b)
 		{
+			/// Если узлы разных типов, они точно непохожи
 			if (a.Symbol != b.Symbol)
 				return 0;
 
+			/// Если узлы - листья, смотрим на похожесть содержимого
 			if (a.Value.Count > 0 && b.Value.Count > 0)
-				return Levenshtein(a.Value, b.Value); // В диапазон от 0 до 1!!!!!!!
+				return Levenshtein(a.Value, b.Value);
 
-			var aTypes = a.Children.GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());
-			var bTypes = b.Children.GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());
+			/// Иначе сопоставляем детей
+			var rawSimilarity = a.Children.Where(c=>Mapping.ContainsKey(c) && b.Children.Contains(Mapping[c])).Sum(c=>Similarities[c][Mapping[c]]);
+			/// Рассматриваем только тех детей, которые ещё не были ничему сопоставлены
+			var aTypes = a.Children.Where(c=>!Mapping.ContainsKey(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());
+			var bTypes = b.Children.Where(c=>!Mapping.ContainsValue(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());		
 
-			var rawSimilarity = 0.0;
-
+			/// Каждого потомка узла a пытаемся сопоставить с потомками узла b того же типа
 			foreach (var type in aTypes.Keys)
 				if (bTypes.ContainsKey(type))
 				{
 					var similarities = new double[aTypes[type].Count, bTypes[type].Count];
 
-					for (int i = 0; i < aTypes[type].Count; ++i)
-						for (int j = 0; j < aTypes[type].Count; ++j)
-							similarities[i, j] = Similarity(aTypes[type][i], bTypes[type][j]);
+					/// В рамках типа сопоставляем всех со всеми
+					foreach (var aNode in aTypes[type])
+					{
+						Similarities[aNode] = new Dictionary<Node, double>();
+						foreach (var bNode in bTypes[type])
+							Similarities[aNode][bNode] = Similarity(aNode, bNode);
+					}					
+
+					/// Выбираем наилучший вариант
+					var usedNodes = new HashSet<Node>();
+					foreach(var aNode in aTypes[type])
+					{
+						var maxSimilarity = Similarities[aNode].Max(p => p.Value);
+						Mapping[aNode] = Similarities[aNode].First(p => p.Value == maxSimilarity).Key;
+						usedNodes.Add(Mapping[aNode]);
+					}
 				}
 
 			return rawSimilarity / a.Children.Count;
@@ -75,6 +97,27 @@ namespace LandParserGenerator.Mapping
 		/// Расстояние Левенштейна
 		private static double Levenshtein<T>(IEnumerable<T> a, IEnumerable<T> b)
 		{
+			if (a.Count() == 0 ^ b.Count() == 0)
+				return 1;
+			if (a.Count() == 0 && b.Count() == 0)
+				return 0;
+
+			Type elementType = a.ElementAt(0).GetType();
+			bool containsEnumerable = typeof(System.Collections.IEnumerable).IsAssignableFrom(elementType); 
+
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
+				++commonPrefixLength;
+			a = a.Skip(commonPrefixLength);
+			b = b.Skip(commonPrefixLength);
+
+			var commonSuffixLength = 0;
+			while (a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
+				++commonSuffixLength;
+			a = a.Take(a.Count() - commonSuffixLength);
+			b = b.Take(b.Count() - commonSuffixLength);
+
 			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
 			var distances = new double[a.Count() + 1, b.Count() + 1];
 			distances[0, 0] = 0;
@@ -88,13 +131,16 @@ namespace LandParserGenerator.Mapping
 			for (int i = 1; i <= a.Count(); i++)
 				for (int j = 1; j <= b.Count(); j++)
 				{
-					double cost = b.ElementAt(j - 1).Equals(a.ElementAt(i - 1)) ? 0 : SubstitutionCost;
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = b.ElementAt(j - 1).Equals(a.ElementAt(i - 1)) ? 
+						0 : containsEnumerable ? Levenshtein((IEnumerable<dynamic>)a.ElementAt(i-1), (IEnumerable<dynamic>)b.ElementAt(j-1)) : SubstitutionCost;
 					distances[i, j] = Math.Min(Math.Min(
 						distances[i - 1, j] + DeletionCost, 
 						distances[i, j - 1] + InsertionCost),
 						distances[i - 1, j - 1] + cost);
 				}
-			return distances[a.Count(), b.Count()];
+
+			return 1 - distances[a.Count(), b.Count()] / Math.Max(a.Count(), b.Count());
 		}
 	}
 }
