@@ -312,7 +312,7 @@ namespace TestGUI
 			var treeView = (TreeView)sender;
 			var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
 
-			if (node.StartOffset.HasValue && node.EndOffset.HasValue)
+			if (node != null &&  node.StartOffset.HasValue && node.EndOffset.HasValue)
 			{
 				var start = node.StartOffset.Value;
 				var end = node.EndOffset.Value;
@@ -531,6 +531,9 @@ namespace TestGUI
 
 		#region Работа с точками привязки
 
+		private ConcernsManager Concerns { get; set; } = new ConcernsManager();
+		private ConcernMapper Mapper { get; set; } = new ConcernMapper();
+
 		private void ConcernTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			var treeView = (TreeView)sender;
@@ -552,18 +555,21 @@ namespace TestGUI
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-
+			/// Добавление ConcernPoint в список
 		}
 
 		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var node = (Node)ConcernPointCandidatesList.SelectedItem;
 
-			var start = node.StartOffset.Value;
-			var end = node.EndOffset.Value;
-			FileEditor.Select(start, end - start + 1);
-			FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
-			MainTabs.SelectedIndex = 1;
+			if (node != null)
+			{
+				var start = node.StartOffset.Value;
+				var end = node.EndOffset.Value;
+				FileEditor.Select(start, end - start + 1);
+				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+				MainTabs.SelectedIndex = 1;
+			}
 		}
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
@@ -589,7 +595,9 @@ namespace TestGUI
 				/// содержащие текущую позицию каретки
 				while (currentNode!=null)
 				{
-					pointCandidates.AddFirst(currentNode);
+					if(currentNode.Options.IsLand)
+						pointCandidates.AddFirst(currentNode);
+
 					currentNode = currentNode.Children.Where(c => c.StartOffset.HasValue && c.EndOffset.HasValue
 						&& c.StartOffset <= offset && c.EndOffset >= offset).FirstOrDefault();
 				}
@@ -604,8 +612,24 @@ namespace TestGUI
 			{
 				var visitor = new LandExplorerVisitor();
 				TreeRoot.Accept(visitor);
-				ConcernTreeView.ItemsSource = visitor.Land;
+
+				Concerns.AstRoot = TreeRoot;
+				Concerns.Concerns = visitor.Land.Select(l => new ConcernPoint(l)).ToList();
+
+				ConcernTreeView.ItemsSource = Concerns.Concerns.Select(c=>(TreeViewAdapter)c);
 			}
+		}
+
+		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
+		{
+			Concerns.Remap(TreeRoot, Mapper.Mapping);
+			ConcernTreeView.ItemsSource = Concerns.Concerns.Select(c => (TreeViewAdapter)c);
+		}
+
+		private void MapConcernPoints_Click(object sender, RoutedEventArgs e)
+		{
+			Mapper.Remap(Concerns.AstRoot, TreeRoot);
+			MappingDebugView.ItemsSource = Mapper.Similarities.Select(s => (TreeViewAdapter)s);
 		}
 
 		#endregion

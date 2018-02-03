@@ -15,5 +15,16 @@ namespace LandParserGenerator.Mapping
 		public Node TreeNode { get; set; }
 
 		// public List<ConcernPoint> Children { get; set; }
+
+		public ConcernPoint(Node node)
+		{
+			TreeNode = node;
+		}
+
+		public ConcernPoint(string name, Node node)
+		{
+			Name = name;
+			TreeNode = node;
+		}
 	}
 }

@@ -8,24 +8,19 @@ using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Mapping
 {
-	public class ConcernMapping
+	public class ConcernMapper
 	{
 		/// Веса операций для Левенштейна
 		private const double InsertionCost = 1;
 		private const double DeletionCost = 1;
 		private const double SubstitutionCost = 1;
 
-		private Grammar Gram { get; set; }
 
 		public Dictionary<Node, Node> Mapping { get; set; }
 		public Dictionary<Node, Dictionary<Node, double>> Similarities { get; set; }
 
-		public ConcernMapping(Grammar g)
-		{
-			Gram = g;
-		}
 
-		public void Remap(List<ConcernPoint> point, Node oldTree, Node newTree)
+		public void Remap(Node oldTree, Node newTree)
 		{
 			var visitor = new LandExplorerVisitor();
 			oldTree.Accept(visitor);
@@ -43,10 +38,10 @@ namespace LandParserGenerator.Mapping
 			{
 				if(!Mapping.ContainsKey(oldNode))
 				{
-					var newCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol);
-					var similarities = newCandidates.ToDictionary(c=>c, c => Similarity(oldNode, c));
-					var maxSimilarity = similarities.Max(s => s.Value);
-					Mapping[oldNode] = similarities.Where(s => s.Value == maxSimilarity).First().Key;
+					var newCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol && !Mapping.ContainsValue(c));
+					Similarities[oldNode] = newCandidates.ToDictionary(c=>c, c => Similarity(oldNode, c));
+					var maxSimilarity = Similarities[oldNode].Max(s => s.Value);
+					Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
 				}
 			}
 		}
@@ -86,6 +81,8 @@ namespace LandParserGenerator.Mapping
 					foreach(var aNode in aTypes[type])
 					{
 						var maxSimilarity = Similarities[aNode].Max(p => p.Value);
+						rawSimilarity += maxSimilarity;
+
 						Mapping[aNode] = Similarities[aNode].First(p => p.Value == maxSimilarity).Key;
 						usedNodes.Add(Mapping[aNode]);
 					}
@@ -94,29 +91,31 @@ namespace LandParserGenerator.Mapping
 			return rawSimilarity / a.Children.Count;
 		}
 
-		/// Расстояние Левенштейна
+		///  Похожесть на основе расстояния Левенштейна
 		private static double Levenshtein<T>(IEnumerable<T> a, IEnumerable<T> b)
 		{
 			if (a.Count() == 0 ^ b.Count() == 0)
-				return 1;
-			if (a.Count() == 0 && b.Count() == 0)
 				return 0;
-
-			Type elementType = a.ElementAt(0).GetType();
-			bool containsEnumerable = typeof(System.Collections.IEnumerable).IsAssignableFrom(elementType); 
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
 
 			/// Сразу отбрасываем общие префиксы и суффиксы
 			var commonPrefixLength = 0;
-			while (a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
+			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count() 
+				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
 				++commonPrefixLength;
 			a = a.Skip(commonPrefixLength);
 			b = b.Skip(commonPrefixLength);
 
 			var commonSuffixLength = 0;
-			while (a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
+			while (commonSuffixLength < a.Count() && commonSuffixLength < b.Count()
+				&& a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
 				++commonSuffixLength;
 			a = a.Take(a.Count() - commonSuffixLength);
 			b = b.Take(b.Count() - commonSuffixLength);
+
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
 
 			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
 			var distances = new double[a.Count() + 1, b.Count() + 1];
@@ -133,14 +132,24 @@ namespace LandParserGenerator.Mapping
 				{
 					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
 					double cost = b.ElementAt(j - 1).Equals(a.ElementAt(i - 1)) ? 
-						0 : containsEnumerable ? Levenshtein((IEnumerable<dynamic>)a.ElementAt(i-1), (IEnumerable<dynamic>)b.ElementAt(j-1)) : SubstitutionCost;
+						0 : (1 - Levenshtein(a.ElementAt(i-1), b.ElementAt(j-1)));
 					distances[i, j] = Math.Min(Math.Min(
 						distances[i - 1, j] + DeletionCost, 
 						distances[i, j - 1] + InsertionCost),
 						distances[i - 1, j - 1] + cost);
 				}
 
-			return 1 - distances[a.Count(), b.Count()] / Math.Max(a.Count(), b.Count());
+			return 1 - distances[a.Count(), b.Count()] / 
+				Math.Max(a.Count() + commonSuffixLength + commonPrefixLength, b.Count() + commonSuffixLength + commonPrefixLength);
+		}
+
+		private static double Levenshtein<T>(T a, T b)
+		{
+			if (a is IEnumerable<string>)
+				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
+			else if (a is string)
+				return Levenshtein((IEnumerable<char>)a, (IEnumerable<char>)b);
+			else return a.Equals(b) ? 1 : 1 - SubstitutionCost;
 		}
 	}
 }

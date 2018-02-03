@@ -26,3 +26,5 @@ block			=	'{' (Any|block)+ '}'
 %parsing skip COMMENT STRING DECLARATION_CODE
 
 %nodes ghost declaration
+
+%mapping land declaration rule alternative

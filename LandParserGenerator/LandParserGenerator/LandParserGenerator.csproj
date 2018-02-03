@@ -67,8 +67,9 @@
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Mapping\ConcernsManager.cs" />
     <Compile Include="Mapping\ConcernPoint.cs" />
-    <Compile Include="Mapping\TreeMapper.cs" />
+    <Compile Include="Mapping\ConcernMapper.cs" />
     <Compile Include="Mapping\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />

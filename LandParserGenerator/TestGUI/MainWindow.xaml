@@ -134,6 +134,14 @@
                                 FontSize="14pt">
                             </ListBox>
                         </TabItem>
+                        <TabItem>
+                            <TabItem.Header>Привязка</TabItem.Header>
+                            <DataGrid
+                                
+                                Name="LandMappingCandidatesTable"
+                                FontSize="14pt">
+                            </DataGrid>
+                        </TabItem>
                     </TabControl>
                 </Grid>
             </TabItem>
@@ -174,33 +182,49 @@
                 </TabItem>
                 <TabItem Header="Разметка">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="51*"/>
-                            <ColumnDefinition Width="181*"/>
-                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"></RowDefinition>
                             <RowDefinition Height="70*"></RowDefinition>
                             <RowDefinition Height="30*"></RowDefinition>
                         </Grid.RowDefinitions>
-                        <ToolBar Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,-0.2,0.4">
+                        <ToolBar Grid.Row="0">
                             <Button Name="AddConcernPoint"  Content="Добавить" Click="AddConcernPoint_Click"></Button>
                             <Button Name="AddAllPossibleConcernPoints" Content="Добавить все" Click="AddAllPossibleConcernPoints_Click"></Button>
                             <Separator></Separator>
                             <Button Name="DeleteConcernPoint" Content="Удалить" Click="DeleteConcernPoint_Click" IsEnabled="False"></Button>
                         </ToolBar>
                         <TreeView
+                            Grid.Row="1"
                             Name="ConcernTreeView"
                             FontFamily="Courier New"
                             FontSize="14pt"
-                            SelectedItemChanged="ConcernTreeView_SelectedItemChanged" Grid.ColumnSpan="2" Margin="0,30,-0.2,0.4" Grid.RowSpan="2"/>
+                            SelectedItemChanged="ConcernTreeView_SelectedItemChanged"/>
                         <ListBox
-                            Grid.Row="1"
+                            Grid.Row="2"
                             FontSize="12pt"
                             Name="ConcernPointCandidatesList"
                             SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
-                            MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick" Grid.ColumnSpan="2" Margin="0,267.6,-0.2,-0.4" Grid.RowSpan="2">
+                            MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
                         </ListBox>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Отладка перепривязки">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="70*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <ToolBar Grid.Row="0">
+                            <Button Name="MapConcernPoints" Content="Отобразить" Click="MapConcernPoints_Click"></Button>
+                            <Button Name="ApplyMapping" Content="Применить к разметке" Click="ApplyMapping_Click"></Button>
+                        </ToolBar>
+                        <TreeView
+                            Grid.Row="1"
+                            Name="MappingDebugView"
+                            FontFamily="Courier New"
+                            FontSize="14pt"
+                            SelectedItemChanged="ConcernTreeView_SelectedItemChanged">
+                        </TreeView>
                     </Grid>
                 </TabItem>
             </TabControl>
