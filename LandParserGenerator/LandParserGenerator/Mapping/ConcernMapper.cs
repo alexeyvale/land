@@ -39,9 +39,12 @@ namespace LandParserGenerator.Mapping
 				if(!Mapping.ContainsKey(oldNode))
 				{
 					var newCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol && !Mapping.ContainsValue(c));
-					Similarities[oldNode] = newCandidates.ToDictionary(c=>c, c => Similarity(oldNode, c));
-					var maxSimilarity = Similarities[oldNode].Max(s => s.Value);
-					Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
+					if (newCandidates.Count() > 0)
+					{
+						Similarities[oldNode] = newCandidates.ToDictionary(c => c, c => Similarity(oldNode, c));
+						var maxSimilarity = Similarities[oldNode].Max(s => s.Value);
+						Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
+					}
 				}
 			}
 		}
@@ -57,7 +60,8 @@ namespace LandParserGenerator.Mapping
 				return Levenshtein(a.Value, b.Value);
 
 			/// Иначе сопоставляем детей
-			var rawSimilarity = a.Children.Where(c=>Mapping.ContainsKey(c) && b.Children.Contains(Mapping[c])).Sum(c=>Similarities[c][Mapping[c]]);
+			var rawSimilarity = a.Children.Where(c=>Mapping.ContainsKey(c) && b.Children.Contains(Mapping[c]))
+				.Sum(c=>Similarities[c][Mapping[c]] * c.Options.Priority.Value);
 			/// Рассматриваем только тех детей, которые ещё не были ничему сопоставлены
 			var aTypes = a.Children.Where(c=>!Mapping.ContainsKey(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());
 			var bTypes = b.Children.Where(c=>!Mapping.ContainsValue(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());		
@@ -81,14 +85,15 @@ namespace LandParserGenerator.Mapping
 					foreach(var aNode in aTypes[type])
 					{
 						var maxSimilarity = Similarities[aNode].Max(p => p.Value);
-						rawSimilarity += maxSimilarity;
-
 						Mapping[aNode] = Similarities[aNode].First(p => p.Value == maxSimilarity).Key;
+
+						rawSimilarity += maxSimilarity * aNode.Options.Priority.Value;
+
 						usedNodes.Add(Mapping[aNode]);
 					}
 				}
 
-			return rawSimilarity / a.Children.Count;
+			return rawSimilarity / a.Children.Sum(c=>c.Options.Priority.Value);
 		}
 
 		///  Похожесть на основе расстояния Левенштейна
