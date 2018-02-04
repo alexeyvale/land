@@ -32,7 +32,6 @@ namespace TestGUI
 
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
 
-		private Node TreeRoot { get; set; }
 		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
 
 		public MainWindow()
@@ -92,6 +91,24 @@ namespace TestGUI
 				listContent.Add(item.ToString());
 
 			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
+		}
+
+		private void MoveCaretToSource(Node node, ICSharpCode.AvalonEdit.TextEditor editor, int? tabToSelect = null)
+		{
+			if (node != null && node.StartOffset.HasValue && node.EndOffset.HasValue)
+			{
+				var start = node.StartOffset.Value;
+				var end = node.EndOffset.Value;
+				editor.Select(start, end - start + 1);
+				editor.ScrollToLine(editor.Document.GetLocation(start).Line);
+
+				if(tabToSelect.HasValue)
+					MainTabs.SelectedIndex = tabToSelect.Value;
+			}
+			else
+			{
+				editor.Select(0, 0);
+			}
 		}
 
 		#region Генерация парсера
@@ -287,6 +304,9 @@ namespace TestGUI
 
 		#region Парсинг одиночного файла
 
+		private Node TreeRoot { get; set; }
+		private string TreeSource { get; set; }
+
 		private void ParseButton_Click(object sender, RoutedEventArgs e)
 		{
             if (Parser != null)
@@ -299,6 +319,7 @@ namespace TestGUI
                 if (root != null)
                 {
                     TreeRoot = root;
+					TreeSource = FileEditor.Text;
                     ParseTreeView.ItemsSource = new[] { (TreeViewAdapter)root };
                 }
 
@@ -312,18 +333,7 @@ namespace TestGUI
 			var treeView = (TreeView)sender;
 			var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
 
-			if (node != null &&  node.StartOffset.HasValue && node.EndOffset.HasValue)
-			{
-				var start = node.StartOffset.Value;
-				var end = node.EndOffset.Value;
-				FileEditor.Select(start, end - start + 1);
-				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
-				MainTabs.SelectedIndex = 1;
-			}
-			else
-			{
-				FileEditor.Select(0, 0);
-			}
+			MoveCaretToSource(node, FileEditor, 1);
 		}
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -537,39 +547,25 @@ namespace TestGUI
 		private void ConcernTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			var treeView = (TreeView)sender;
-			var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
 
-			if (node.StartOffset.HasValue && node.EndOffset.HasValue)
+			if (treeView.SelectedItem != null)
 			{
-				var start = node.StartOffset.Value;
-				var end = node.EndOffset.Value;
-				FileEditor.Select(start, end - start + 1);
-				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
-				MainTabs.SelectedIndex = 1;
-			}
-			else
-			{
-				FileEditor.Select(0, 0);
+				var node = ((TreeViewAdapter)treeView.SelectedItem).Source;
+				MoveCaretToSource(node, FileEditor, 1);
 			}
 		}
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			/// Добавление ConcernPoint в список
+			if (ConcernPointCandidatesList.SelectedItem != null)
+				Concerns.Concerns.Add(new ConcernPoint((Node)ConcernPointCandidatesList.SelectedItem));
 		}
 
 		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var node = (Node)ConcernPointCandidatesList.SelectedItem;
 
-			if (node != null)
-			{
-				var start = node.StartOffset.Value;
-				var end = node.EndOffset.Value;
-				FileEditor.Select(start, end - start + 1);
-				FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
-				MainTabs.SelectedIndex = 1;
-			}
+			MoveCaretToSource(node, FileEditor, 1);
 		}
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
@@ -622,14 +618,98 @@ namespace TestGUI
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
+			Mapper.Remap(Concerns.AstRoot, TreeRoot);
 			Concerns.Remap(TreeRoot, Mapper.Mapping);
 			ConcernTreeView.ItemsSource = Concerns.Concerns.Select(c => (TreeViewAdapter)c);
 		}
 
-		private void MapConcernPoints_Click(object sender, RoutedEventArgs e)
+		#endregion
+
+		#region Отладка перепривязки
+
+		private Node NewTreeRoot { get; set; }
+		private bool NewTextChanged { get; set; }
+
+		private void ReplaceNewWithOldButton_Click(object sender, RoutedEventArgs e)
 		{
-			Mapper.Remap(Concerns.AstRoot, TreeRoot);
-			MappingDebugView.ItemsSource = Mapper.Similarities.Select(s => (TreeViewAdapter)s);
+			NewTextEditor.Text = OldTextEditor.Text;
+		}
+
+		private void AddAllLandButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (TreeRoot != null)
+			{
+				var visitor = new LandExplorerVisitor();
+				TreeRoot.Accept(visitor);
+
+				Concerns.AstRoot = TreeRoot;
+				Concerns.Concerns = visitor.Land.Select(l => new ConcernPoint(l)).ToList();
+
+				ConcernTreeView.ItemsSource = DebugTreeView.ItemsSource = Concerns.Concerns.Select(c => (TreeViewAdapter)c);
+			}
+		}
+
+		private void MainPerspectiveTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if(sender == e.Source && MappingDebugTab.IsSelected)
+			{
+				NewTextEditor.Text = FileEditor.Text;
+				OldTextEditor.Text = TreeSource;
+				TreeConcerns.IsChecked = true;
+			}
+		}
+
+		private void DebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			if(DebugTreeView.SelectedItem != null)
+			{
+				var node = ((TreeViewAdapter)DebugTreeView.SelectedItem).Source;
+
+				if(NewTextChanged)
+				{
+					if (Parser != null)
+					{
+						NewTreeRoot = Parser.Parse(NewTextEditor.Text);
+						NewFileParsingStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
+
+						if (Parser.Errors.Count == 0)
+						{
+							Mapper.Remap(Concerns.AstRoot, NewTreeRoot);
+							NewTextChanged = false;
+						}
+					}
+				}
+
+				if (!NewTextChanged)
+				{
+					SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(node) ? Mapper.Similarities[node] : null;
+					MoveCaretToSource(node, OldTextEditor);
+				}
+			}
+		}
+
+		private void SimilaritiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if(SimilaritiesList.SelectedItem != null)
+			{
+				var node = ((KeyValuePair<Node,double>)SimilaritiesList.SelectedItem).Key;
+				MoveCaretToSource(node, NewTextEditor);
+			}
+		}
+
+		private void TreeConcerns_Checked(object sender, RoutedEventArgs e)
+		{
+			DebugTreeView.ItemsSource = ConcernTreeView.ItemsSource;
+		}
+
+		private void TreeAst_Checked(object sender, RoutedEventArgs e)
+		{
+			DebugTreeView.ItemsSource = ParseTreeView.ItemsSource;
+		}
+
+		private void NewTextEditor_TextChanged(object sender, EventArgs e)
+		{
+			NewTextChanged = true;
 		}
 
 		#endregion
