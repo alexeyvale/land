@@ -27,4 +27,4 @@ block			=	'{' (Any|block)+ '}'
 
 %nodes ghost declaration
 
-%mapping land declaration rule alternative
+%mapping land symbol_declaration rule alternative
