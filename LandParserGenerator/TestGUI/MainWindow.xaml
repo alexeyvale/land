@@ -155,8 +155,7 @@
                     <TabControl Grid.Column="0">
                         <TabItem Header="AST">
                             <TreeView
-                                Name="ParseTreeView"
-                                FontFamily="Courier New"
+                                Name="ParseTreeView"        
                                 FontSize="14pt"
                                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
                             </TreeView>
@@ -179,7 +178,6 @@
                                 <TreeView
                                     Grid.Row="1"
                                     Name="ConcernTreeView"
-                                    FontFamily="Courier New"
                                     FontSize="14pt"
                                     SelectedItemChanged="ConcernTreeView_SelectedItemChanged"/>
                                 <ListBox

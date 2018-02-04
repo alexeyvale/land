@@ -18,11 +18,9 @@ namespace TestGUI
 			var treeItem = new TreeViewAdapter();
 			treeItem.Source = node;
 			treeItem.Header = node.Symbol + (node.Value.Count > 0 ? ": " + String.Join(" ", node.Value) : "");
-			var items = new List<TreeViewItem>();
-			treeItem.ItemsSource = items;
 
 			foreach (var nd in node.Children)
-				items.Add((TreeViewAdapter)nd);
+				treeItem.Items.Add((TreeViewAdapter)nd);
 
 			return treeItem;
 
@@ -44,11 +42,8 @@ namespace TestGUI
 			treeItem.Source = elem.Key;
 			treeItem.Header = elem.Key.Symbol + (elem.Key.Value.Count > 0 ? ": " + String.Join(" ", elem.Key.Value) : "");
 
-			var items = new List<TreeViewItem>();
-			treeItem.ItemsSource = items;
-
 			foreach (var kvp in elem.Value)
-				items.Add((TreeViewAdapter)kvp);
+				treeItem.Items.Add((TreeViewAdapter)kvp);
 
 			return treeItem;
 		}
