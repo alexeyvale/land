@@ -713,5 +713,20 @@ namespace TestGUI
 		}
 
 		#endregion
+
+		private void AddConcernFolder_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void SaveConcernMarkup_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void LoadConcernMarkup_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
 	}
 }
