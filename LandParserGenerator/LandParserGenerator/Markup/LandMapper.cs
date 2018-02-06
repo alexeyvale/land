@@ -93,8 +93,10 @@ namespace LandParserGenerator.Markup
 					foreach(var aNode in aTypes[type])
 					{
 						var candidates = Similarities[aNode].Where(kvp => !Mapping.ContainsValue(kvp.Key));
-						var maxSimilarity = candidates.Max(p => p.Value);
-						Mapping[aNode] = candidates.First(p => p.Value == maxSimilarity).Key;
+						var maxSimilarity = candidates.Count() > 0 ? candidates.Max(p => p.Value) : 0;
+
+						if(maxSimilarity > 0)
+							Mapping[aNode] = candidates.First(p => p.Value == maxSimilarity).Key;
 
 						rawSimilarity += maxSimilarity * aNode.Options.Priority.Value;
 					}

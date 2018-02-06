@@ -315,7 +315,7 @@ namespace TestGUI
                 {
                     TreeRoot = root;
 					TreeSource = FileEditor.Text;
-                    ParseTreeView.ItemsSource = new List<Node>() { root };
+                    AstTreeView.ItemsSource = new List<Node>() { root };
                 }
 
                 FileParsingLog.ItemsSource = Parser.Log;
@@ -554,9 +554,16 @@ namespace TestGUI
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				var concern = ConcernTreeView.SelectedItem as Concern;
+				if (Markup.AstRoot == null)
+				{
+					Markup.AstRoot = TreeRoot;
+					MarkupTreeView.ItemsSource = Markup.Markup;
+				}
+
+				var concern = MarkupTreeView.SelectedItem as Concern;
+				
 				Markup.Add(new ConcernPoint((Node)ConcernPointCandidatesList.SelectedItem, concern));
-				ConcernTreeView.Items.Refresh();
+				MarkupTreeView.Items.Refresh();
 			}
 		}
 
@@ -568,10 +575,10 @@ namespace TestGUI
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
 		{
-			if (ConcernTreeView.SelectedItem != null)
+			if (MarkupTreeView.SelectedItem != null)
 			{
-				Markup.Remove((MarkupElement)ConcernTreeView.SelectedItem);
-				ConcernTreeView.Items.Refresh();
+				Markup.Remove((MarkupElement)MarkupTreeView.SelectedItem);
+				MarkupTreeView.Items.Refresh();
 			}
 		}
 
@@ -600,10 +607,16 @@ namespace TestGUI
 			}
 		}
 
-		private void AddAllPossibleConcernPoints_Click(object sender, RoutedEventArgs e)
+		private void AddAllLandButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (TreeRoot != null)
 			{
+				if (Markup.AstRoot == null)
+				{
+					Markup.AstRoot = TreeRoot;
+					MarkupTreeView.ItemsSource = Markup.Markup;
+				}
+
 				var visitor = new LandExplorerVisitor();
 				TreeRoot.Accept(visitor);
 
@@ -616,7 +629,7 @@ namespace TestGUI
 						Markup.Add(new ConcernPoint(point, concern));
 				}
 
-				ConcernTreeView.ItemsSource = Markup.Markup;
+				MarkupTreeView.Items.Refresh();
 			}
 		}
 
@@ -626,28 +639,28 @@ namespace TestGUI
 			{
 				Mapper.Remap(Markup.AstRoot, TreeRoot);
 				Markup.Remap(TreeRoot, Mapper.Mapping);
-				ConcernTreeView.ItemsSource = Markup.Markup;
+				MarkupTreeView.ItemsSource = Markup.Markup;
 			}
 		}
 
 		private void AddConcernFolder_Click(object sender, RoutedEventArgs e)
 		{
 			Markup.Add(new Concern("Новая функциональность"));
-			ConcernTreeView.Items.Refresh();
+			MarkupTreeView.Items.Refresh();
 		}
 
 		private void SaveConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
-			var saveFileDialog = new SaveFileDialog();
-			if (saveFileDialog.ShowDialog() == true)
-			{
-				XmlSerializer serializer = new XmlSerializer(typeof(MarkupManager));
+			//var saveFileDialog = new SaveFileDialog();
+			//if (saveFileDialog.ShowDialog() == true)
+			//{
+			//	XmlSerializer serializer = new XmlSerializer(typeof(MarkupManager));
 
-				using (var stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-				{
-					serializer.Serialize(stream, Markup);
-				}				
-			}
+			//	using (var stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+			//	{
+			//		serializer.Serialize(stream, Markup);
+			//	}				
+			//}
 		}
 
 		private void LoadConcernMarkup_Click(object sender, RoutedEventArgs e)
@@ -655,33 +668,10 @@ namespace TestGUI
 
 		}
 
-		private void FileEditor_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+		private void NewConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
-			if (TreeRoot != null)
-			{
-				FileEditor.ContextMenu = new ContextMenu();
-				var addMenuItem = new MenuItem() { Header = "Добавление точки привязки" };
-				FileEditor.ContextMenu.Items.Add(addMenuItem);
-
-				var offset = FileEditor.TextArea.Caret.Offset;
-
-				var pointCandidates = new LinkedList<Node>();
-				var currentNode = TreeRoot;
-
-				/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
-				/// содержащие текущую позицию каретки
-				while (currentNode != null)
-				{
-					if (currentNode.Options.IsLand)
-						pointCandidates.AddFirst(currentNode);
-
-					currentNode = currentNode.Children.Where(c => c.StartOffset.HasValue && c.EndOffset.HasValue
-						&& c.StartOffset <= offset && c.EndOffset >= offset).FirstOrDefault();
-				}
-
-				foreach(var point in pointCandidates)
-					addMenuItem.ItemsSource = pointCandidates;
-			}
+			Markup.Clear();
+			MarkupTreeView.Items.Clear();
 		}
 
 		#endregion
@@ -696,64 +686,70 @@ namespace TestGUI
 			NewTextEditor.Text = OldTextEditor.Text;
 		}
 
-		private void AddAllLandButton_Click(object sender, RoutedEventArgs e)
+		private void AddAllLandDebugButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (TreeRoot != null)
-			{
-				var visitor = new LandExplorerVisitor();
-				TreeRoot.Accept(visitor);
-
-				Markup.AstRoot = TreeRoot;
-				Markup.Markup = visitor.Land.Select(l => (MarkupElement)new ConcernPoint(l)).ToList();
-
-				ConcernTreeView.ItemsSource = DebugTreeView.ItemsSource = Markup.Markup;
-			}
+			AddAllLandButton_Click(null, null);
+			MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
 		}
 
 		private void MainPerspectiveTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if(sender == e.Source && MappingDebugTab.IsSelected)
+			if (sender == e.Source && MappingDebugTab.IsSelected)
 			{
 				NewTextEditor.Text = FileEditor.Text;
 				OldTextEditor.Text = TreeSource;
-				TreeConcerns.IsChecked = true;
+				MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
+				AstDebugTreeView.ItemsSource = AstTreeView.ItemsSource;
 			}
 		}
 
-		private void DebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void AstDebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			if(DebugTreeView.SelectedItem != null)
+			if(AstDebugTreeView.SelectedItem != null)
 			{
-				var node = (Node)DebugTreeView.SelectedItem;
+				var node = (Node)AstDebugTreeView.SelectedItem;
+				ParseNewTextAndSelectMostSimilar(node);
+			}
+		}
 
-				if(NewTextChanged)
+		private void MarkupDebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			if (MarkupDebugTreeView.SelectedItem is ConcernPoint)
+			{
+				var node = ((ConcernPoint)MarkupDebugTreeView.SelectedItem).TreeNode;
+				ParseNewTextAndSelectMostSimilar(node);
+			}
+		}
+
+		private void ParseNewTextAndSelectMostSimilar(Node node)
+		{
+			if (NewTextChanged)
+			{
+				if (Parser != null)
 				{
-					if (Parser != null)
-					{
-						NewTreeRoot = Parser.Parse(NewTextEditor.Text);
-						NewFileParsingStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
+					NewTreeRoot = Parser.Parse(NewTextEditor.Text);
+					NewFileParsingStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
 
-						if (Parser.Errors.Count == 0)
-						{
-							Mapper.Remap(Markup.AstRoot, NewTreeRoot);
-							NewTextChanged = false;
-						}
+					if (Parser.Errors.Count == 0)
+					{
+						Mapper.Remap(Markup.AstRoot, NewTreeRoot);
+						NewTextChanged = false;
 					}
 				}
+			}
 
-				if (!NewTextChanged)
+			if (!NewTextChanged)
+			{
+				SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(node) ? Mapper.Similarities[node] : null;
+				MoveCaretToSource(node, OldTextEditor);
+
+				if (Mapper.Similarities.ContainsKey(node))
 				{
-					SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(node) ? Mapper.Similarities[node] : null;
-					MoveCaretToSource(node, OldTextEditor);
-
-					if (Mapper.Similarities.ContainsKey(node))
-					{
-						SimilaritiesList.ItemsSource = Mapper.Similarities[node];
-						SimilaritiesList.SelectedItem = Mapper.Similarities[node].First(p=>p.Key == Mapper.Mapping[node]);
-					}
-					else
-						SimilaritiesList.ItemsSource = null;
+					SimilaritiesList.ItemsSource = Mapper.Similarities[node];
+					SimilaritiesList.SelectedItem = Mapper.Similarities[node].FirstOrDefault(p => p.Key == Mapper.Mapping[node]);
 				}
+				else
+					SimilaritiesList.ItemsSource = null;
 			}
 		}
 
@@ -764,16 +760,6 @@ namespace TestGUI
 				var node = ((KeyValuePair<Node,double>)SimilaritiesList.SelectedItem).Key;
 				MoveCaretToSource(node, NewTextEditor);
 			}
-		}
-
-		private void TreeConcerns_Checked(object sender, RoutedEventArgs e)
-		{
-			DebugTreeView.ItemsSource = Markup.Markup.OfType<ConcernPoint>().Select(elem=>elem.TreeNode);
-		}
-
-		private void TreeAst_Checked(object sender, RoutedEventArgs e)
-		{
-			DebugTreeView.ItemsSource = ParseTreeView.ItemsSource;
 		}
 
 		private void NewTextEditor_TextChanged(object sender, EventArgs e)

@@ -16,7 +16,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
                         <Grid Width="30" Height="30" Background="Transparent">
-                            <Label x:Name="ToggleLabel" FontFamily="{StaticResource FontAwesomeSolid}" Content="&#xf07b;" FontSize="12pt" Foreground="DimGray"/>
+                            <Label x:Name="ToggleLabel" FontFamily="{StaticResource FontAwesomeSolid}" Content="&#xf07b;" Foreground="DimGray"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
@@ -199,8 +199,7 @@
                                     Grid.Row="1"
                                     ShowLineNumbers="True"
                                     FontFamily="Consolas"
-                                    FontSize="12pt"
-                                    MouseRightButtonUp="FileEditor_MouseRightButtonUp">
+                                    FontSize="12pt">
                                 </avalonedit:TextEditor>
                                 <StatusBar Name="ProgramStatus" Grid.Row="2">
                                     <Label Name="ProgramStatusLabel"></Label>
@@ -254,7 +253,7 @@
                     <TabControl Grid.Column="0">
                         <TabItem Header="AST">
                             <TreeView
-                                Name="ParseTreeView"        
+                                Name="AstTreeView"        
                                 FontSize="14pt"
                                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
                                 <TreeView.ItemTemplate>
@@ -286,17 +285,18 @@
                                             </Style.Triggers>
                                         </Style>
                                     </ToolBar.Resources>
+                                    <Button Name="NewConcernMarkup" Content="&#xf15b;" ToolTip="Новая разметка" Click="NewConcernMarkup_Click"></Button>
                                     <Button Name="LoadConcernMarkup" Content="&#xf1c9;" ToolTip="Загрузить разметку" Click="LoadConcernMarkup_Click"></Button>
                                     <Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" Click="SaveConcernMarkup_Click"></Button>
                                     <Separator></Separator>
                                     <Button Name="AddConcernFolder" Content="&#xf07c;" ToolTip="Добавить каталог" Click="AddConcernFolder_Click"></Button>
                                     <Button Name="AddConcernPoint" Content="&#xf055;" ToolTip="Добавить точку" Click="AddConcernPoint_Click"></Button>
-                                    <Button Name="AddAllPossibleConcernPoints" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllPossibleConcernPoints_Click"></Button>
+                                    <Button Name="AddAllLand" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllLandButton_Click"></Button>
                                     <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить" Click="DeleteConcernPoint_Click"></Button>
                                     <Separator></Separator>
                                     <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
                                 </ToolBar>
-                                <TreeView Grid.Row="1" Name="ConcernTreeView" FontSize="14pt" SelectedItemChanged="ConcernTreeView_SelectedItemChanged">
+                                <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" SelectedItemChanged="ConcernTreeView_SelectedItemChanged">
                                     <TreeView.Resources>
                                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
                                     </TreeView.Resources>
@@ -325,7 +325,7 @@
                         <RowDefinition Height="70*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ToolBar Grid.Row="0">
-                        <Button Name="AddAllLandButton" Content="Пометить все Land-сущности" Click="AddAllLandButton_Click"></Button>
+                        <Button Name="AddAllLandDebugButton" Content="Пометить все Land-сущности" Click="AddAllLandDebugButton_Click"></Button>
                         <Separator></Separator>
                         <Button Name="ReplaceNewWithOldButton" Content="Очистить изменения" Click="ReplaceNewWithOldButton_Click"></Button>
                         <Separator></Separator>
@@ -341,21 +341,29 @@
                             <ColumnDefinition Width="35*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="30"></RowDefinition>
-                                <RowDefinition Height="70*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <ToolBar Grid.Row="0">
-                                <RadioButton GroupName="TreeTypeRadioButton" Name="TreeAst"  Content="AST" Checked="TreeAst_Checked"></RadioButton>
-                                <RadioButton GroupName="TreeTypeRadioButton" Name="TreeConcerns" Content="Разметка" Checked="TreeConcerns_Checked"></RadioButton>
-                            </ToolBar>
-                            <TreeView Grid.Row="1" Name="DebugTreeView" SelectedItemChanged="DebugTreeView_SelectedItemChanged">
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                        <TextBlock Text="{Binding Header}" />
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
+                            <TabControl>
+                                <TabItem Header="AST">
+                                    <TreeView Name="AstDebugTreeView" SelectedItemChanged="AstDebugTreeView_SelectedItemChanged">
+                                        <TreeView.ItemTemplate>
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                                <TextBlock Text="{Binding Header}" />
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </TabItem>
+                                <TabItem Header="Разметка">
+                                    <TreeView Name="MarkupDebugTreeView" SelectedItemChanged="MarkupDebugTreeView_SelectedItemChanged">
+                                        <TreeView.Resources>
+                                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
+                                        </TreeView.Resources>
+                                        <TreeView.ItemTemplate>
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
+                                                <TextBlock Text="{Binding Name}" />
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                    </TreeView>
+                                </TabItem>
+                            </TabControl>
                         </Grid>
                         <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray" />
                         <Grid Grid.Column="2">

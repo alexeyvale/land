@@ -14,10 +14,10 @@ namespace LandParserGenerator.Markup
 
 		public Node AstRoot { get; set; } = null;
 
-		public void Reset(Node newRoot)
+		public void Clear()
 		{
 			Markup = new List<MarkupElement>();
-			AstRoot = newRoot;
+			AstRoot = null;
 		}
 
 		public void Remove(MarkupElement elem)
