@@ -59,15 +59,21 @@ namespace LandParserGenerator.Markup
 			if (a.Value.Count > 0 ^ b.Value.Count > 0)
 				return Levenshtein(a.Value, b.Value);
 
+			/// Если у обоих узлов нет детей - совпадают полностью
 			if (a.Children.Count == 0 && a.Children.Count == 0)
 				return 1;
+
+			/// Если же у одного есть, у другого нет - не совпадают
+			if (a.Children.Count == 0 ^ a.Children.Count == 0)
+				return 0;
 
 			/// Иначе сопоставляем детей
 			var rawSimilarity = a.Children.Where(c=>Mapping.ContainsKey(c) && b.Children.Contains(Mapping[c]))
 				.Sum(c=>Similarities[c][Mapping[c]] * c.Options.Priority.Value);
-			/// Рассматриваем только тех детей, которые ещё не были ничему сопоставлены
+			/// Рассматриваем только тех детей из старого дерева, которые ещё не были ничему сопоставлены
 			var aTypes = a.Children.Where(c=>!Mapping.ContainsKey(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());
-			var bTypes = b.Children.Where(c=>!Mapping.ContainsValue(c)).GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());		
+			/// Из нового берём всех детей того же типа
+			var bTypes = b.Children.GroupBy(c => c.Symbol).ToDictionary(g => g.Key, g => g.ToList());		
 
 			/// Каждого потомка узла a пытаемся сопоставить с потомками узла b того же типа
 			foreach (var type in aTypes.Keys)
@@ -83,16 +89,14 @@ namespace LandParserGenerator.Markup
 							Similarities[aNode][bNode] = Similarity(aNode, bNode);
 					}					
 
-					/// Выбираем наилучший вариант
-					var usedNodes = new HashSet<Node>();
+					/// Выбираем наилучший вариант из ещё не сопоставленных
 					foreach(var aNode in aTypes[type])
 					{
-						var maxSimilarity = Similarities[aNode].Max(p => p.Value);
-						Mapping[aNode] = Similarities[aNode].First(p => p.Value == maxSimilarity).Key;
+						var candidates = Similarities[aNode].Where(kvp => !Mapping.ContainsValue(kvp.Key));
+						var maxSimilarity = candidates.Max(p => p.Value);
+						Mapping[aNode] = candidates.First(p => p.Value == maxSimilarity).Key;
 
 						rawSimilarity += maxSimilarity * aNode.Options.Priority.Value;
-
-						usedNodes.Add(Mapping[aNode]);
 					}
 				}
 
