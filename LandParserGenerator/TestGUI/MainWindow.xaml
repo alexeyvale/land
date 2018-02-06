@@ -9,6 +9,104 @@
         Title="LanD Test IDE" Height="500" Width="800"
         Closed="Window_Closed"
         Closing="Window_Closing">
+    <Window.Resources>
+        <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid Width="30" Height="30" Background="Transparent">
+                            <Label x:Name="ToggleLabel" FontFamily="{StaticResource FontAwesomeSolid}" Content="&#xf07b;" FontSize="12pt" Foreground="DimGray"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ToggleLabel" Property="Content" Value="&#xf07c;"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TreeViewItemFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border>
+                            <Rectangle Margin="0,0,0,0" StrokeThickness="5" Stroke="Black" StrokeDashArray="1 2" Opacity="0"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ConcernTreeItemStyle" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding Path=HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding Path=VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Padding" Value="1,0,0,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition MinWidth="19" Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <ToggleButton x:Name="Expander" Style="{StaticResource ExpandCollapseToggleStyle}" IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" ClickMode="Press"/>
+                            <Border Name="Bd" Grid.Column="1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded" Value="false">
+                                <Setter TargetName="ItemsHost" Property="Visibility" Value="Collapsed"/>
+                            </Trigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader" Value="false"/>
+                                    <Condition Property="Width" Value="Auto"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header" Property="MinWidth" Value="75"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader" Value="false"/>
+                                    <Condition Property="Height" Value="Auto"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header" Property="MinHeight" Value="19"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected" Value="true"/>
+                                    <Condition Property="IsSelectionActive" Value="false"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
     <Grid>
         <TabControl SelectionChanged="MainPerspectiveTabs_SelectionChanged" Name="MainPerspectiveTabs">
             <TabItem Header="Парсинг и разметка">
@@ -101,7 +199,8 @@
                                     Grid.Row="1"
                                     ShowLineNumbers="True"
                                     FontFamily="Consolas"
-                                    FontSize="12pt">
+                                    FontSize="12pt"
+                                    MouseRightButtonUp="FileEditor_MouseRightButtonUp">
                                 </avalonedit:TextEditor>
                                 <StatusBar Name="ProgramStatus" Grid.Row="2">
                                     <Label Name="ProgramStatusLabel"></Label>
@@ -158,6 +257,11 @@
                                 Name="ParseTreeView"        
                                 FontSize="14pt"
                                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                        <TextBlock Text="{Binding Header}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
                             </TreeView>
                         </TabItem>
                         <TabItem Header="Разметка">
@@ -188,15 +292,20 @@
                                     <Button Name="AddConcernFolder" Content="&#xf07c;" ToolTip="Добавить каталог" Click="AddConcernFolder_Click"></Button>
                                     <Button Name="AddConcernPoint" Content="&#xf055;" ToolTip="Добавить точку" Click="AddConcernPoint_Click"></Button>
                                     <Button Name="AddAllPossibleConcernPoints" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllPossibleConcernPoints_Click"></Button>
-                                    <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить точку" Click="DeleteConcernPoint_Click" IsEnabled="False"></Button>
+                                    <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить" Click="DeleteConcernPoint_Click"></Button>
                                     <Separator></Separator>
                                     <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
                                 </ToolBar>
-                                <TreeView
-                                    Grid.Row="1"
-                                    Name="ConcernTreeView"
-                                    FontSize="14pt"
-                                    SelectedItemChanged="ConcernTreeView_SelectedItemChanged"/>
+                                <TreeView Grid.Row="1" Name="ConcernTreeView" FontSize="14pt" SelectedItemChanged="ConcernTreeView_SelectedItemChanged">
+                                    <TreeView.Resources>
+                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
+                                    </TreeView.Resources>
+                                    <TreeView.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
+                                            <TextBlock Text="{Binding Name}" />
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
                                 <ListBox
                                     Grid.Row="2"
                                     FontSize="12pt"
@@ -240,7 +349,13 @@
                                 <RadioButton GroupName="TreeTypeRadioButton" Name="TreeAst"  Content="AST" Checked="TreeAst_Checked"></RadioButton>
                                 <RadioButton GroupName="TreeTypeRadioButton" Name="TreeConcerns" Content="Разметка" Checked="TreeConcerns_Checked"></RadioButton>
                             </ToolBar>
-                            <TreeView Grid.Row="1" Name="DebugTreeView" SelectedItemChanged="DebugTreeView_SelectedItemChanged"></TreeView>
+                            <TreeView Grid.Row="1" Name="DebugTreeView" SelectedItemChanged="DebugTreeView_SelectedItemChanged">
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                        <TextBlock Text="{Binding Header}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
                         </Grid>
                         <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray" />
                         <Grid Grid.Column="2">

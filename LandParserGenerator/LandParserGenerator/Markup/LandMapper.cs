@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 using LandParserGenerator.Parsing.Tree;
 
-namespace LandParserGenerator.Mapping
+namespace LandParserGenerator.Markup
 {
-	public class ConcernMapper
+	public class LandMapper
 	{
 		/// Веса операций для Левенштейна
 		private const double InsertionCost = 1;
@@ -56,8 +56,11 @@ namespace LandParserGenerator.Mapping
 				return 0;
 
 			/// Если узлы - листья, смотрим на похожесть содержимого
-			if (a.Value.Count > 0 && b.Value.Count > 0)
+			if (a.Value.Count > 0 ^ b.Value.Count > 0)
 				return Levenshtein(a.Value, b.Value);
+
+			if (a.Children.Count == 0 && a.Children.Count == 0)
+				return 1;
 
 			/// Иначе сопоставляем детей
 			var rawSimilarity = a.Children.Where(c=>Mapping.ContainsKey(c) && b.Children.Contains(Mapping[c]))

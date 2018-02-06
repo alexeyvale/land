@@ -4,20 +4,51 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace LandParserGenerator.Parsing.Tree
 {
 	public class Node
 	{
+		/// <summary>
+		/// Идентификатор узла, уникальный в пределах одного дерева
+		/// </summary>
+		public int Id { get; set; }
+
+		/// <summary>
+		/// Родительский узел
+		/// </summary>
 		public Node Parent { get; set; }
 
+		/// <summary>
+		/// Символ грамматики, которому соответствует узел
+		/// </summary>
 		public string Symbol { get; set; }
+
+		/// <summary>
+		/// Набор токенов, соответствующих листовому узлу
+		/// </summary>
 		public List<string> Value { get; set; } = new List<string>();
+
+		/// <summary>
+		/// Потомки узла
+		/// </summary>
 		public List<Node> Children { get; private set; } = new List<Node>();
 
+		/// <summary>
+		/// Опции, связанные с построением дерева и отображением деревьев
+		/// </summary>
 		public LocalOptions Options { get; set; }
 
 		protected Location Anchor { get; set; }
 		protected bool AnchorReady { get; set; }
+
+		public string Header
+		{
+			get
+			{
+				return Symbol + (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
+			}
+		}
 
 		public int? StartOffset
 		{

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using LandParserGenerator.Parsing.Tree;
 using LandParserGenerator.Parsing;
 
-namespace LandParserGenerator.Mapping
+namespace LandParserGenerator.Markup
 {
 	public class LandExplorerVisitor : BaseVisitor
 	{
