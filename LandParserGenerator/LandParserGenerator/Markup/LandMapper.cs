@@ -38,12 +38,16 @@ namespace LandParserGenerator.Markup
 			{
 				if(!Mapping.ContainsKey(oldNode))
 				{
-					var newCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol && !Mapping.ContainsValue(c));
-					if (newCandidates.Count() > 0)
+					var sameTypeCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol);
+					if (sameTypeCandidates.Count() > 0)
 					{
-						Similarities[oldNode] = newCandidates.ToDictionary(c => c, c => Similarity(oldNode, c));
-						var maxSimilarity = Similarities[oldNode].Max(s => s.Value);
-						Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
+						Similarities[oldNode] = sameTypeCandidates.ToDictionary(c => c, c => Similarity(oldNode, c));
+
+						var freeCandidates = Similarities[oldNode].Where(kvp => !Mapping.ContainsValue(kvp.Key));
+						var maxSimilarity = freeCandidates.Count() > 0 ? Similarities[oldNode].Max(s => s.Value) : 0;
+
+						if(maxSimilarity > 0)
+							Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
 					}
 				}
 			}
@@ -56,7 +60,7 @@ namespace LandParserGenerator.Markup
 				return 0;
 
 			/// Если узлы - листья, смотрим на похожесть содержимого
-			if (a.Value.Count > 0 ^ b.Value.Count > 0)
+			if (a.Value.Count > 0 || b.Value.Count > 0)
 				return Levenshtein(a.Value, b.Value);
 
 			/// Если у обоих узлов нет детей - совпадают полностью

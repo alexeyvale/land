@@ -671,7 +671,7 @@ namespace TestGUI
 		private void NewConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
 			Markup.Clear();
-			MarkupTreeView.Items.Clear();
+			MarkupTreeView.ItemsSource = null;
 		}
 
 		#endregion

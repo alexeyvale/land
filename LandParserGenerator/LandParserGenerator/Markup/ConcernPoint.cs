@@ -25,7 +25,7 @@ namespace LandParserGenerator.Markup
 			else
 				if (node.Children.Count > 0)
 					Name += ": " + String.Join(" ", 
-						node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value.Select(v=> "'" + v + "'") : new List<string>() { c.Symbol }));
+						node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value : new List<string>() { '"' + c.Symbol + '"' }));
 		}
 
 		public ConcernPoint(string name, Node node, Concern parent = null)

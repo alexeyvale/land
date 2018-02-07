@@ -258,7 +258,7 @@
                                 SelectedItemChanged="ParseTreeView_SelectedItemChanged">
                                 <TreeView.ItemTemplate>
                                     <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                        <TextBlock Text="{Binding Header}" />
+                                        <TextBlock Text="{Binding .}" />
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>
                             </TreeView>
@@ -346,7 +346,7 @@
                                     <TreeView Name="AstDebugTreeView" SelectedItemChanged="AstDebugTreeView_SelectedItemChanged">
                                         <TreeView.ItemTemplate>
                                             <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                                <TextBlock Text="{Binding Header}" />
+                                                <TextBlock Text="{Binding .}" />
                                             </HierarchicalDataTemplate>
                                         </TreeView.ItemTemplate>
                                     </TreeView>

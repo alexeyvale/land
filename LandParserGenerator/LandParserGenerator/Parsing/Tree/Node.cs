@@ -42,14 +42,6 @@ namespace LandParserGenerator.Parsing.Tree
 		protected Location Anchor { get; set; }
 		protected bool AnchorReady { get; set; }
 
-		public string Header
-		{
-			get
-			{
-				return Symbol + (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
-			}
-		}
-
 		public int? StartOffset
 		{
 			get
@@ -136,7 +128,7 @@ namespace LandParserGenerator.Parsing.Tree
 
 		public override string ToString()
 		{
-			return this.Symbol;
+			return Symbol + (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
 		}
 	}
 }

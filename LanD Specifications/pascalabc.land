@@ -32,3 +32,6 @@ name_tail_element	=	ID|'.'|'[' Any ']'
 %parsing skip COMMENT
 
 %nodes ghost operator
+%nodes leaf name
+
+%mapping land procedure for if case
