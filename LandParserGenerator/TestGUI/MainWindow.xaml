@@ -296,7 +296,12 @@
                                     <Separator></Separator>
                                     <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
                                 </ToolBar>
-                                <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" SelectedItemChanged="ConcernTreeView_SelectedItemChanged">
+                                <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
+                                          SelectedItemChanged="ConcernTreeView_SelectedItemChanged"  
+                                          MouseDown="MarkupTreeView_MouseDown"
+                                          DragOver="MarkupTreeView_DragOver"
+                                          Drop="MarkupTreeView_Drop"
+                                          MouseMove="MarkupTreeView_MouseMove">
                                     <TreeView.Resources>
                                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
                                     </TreeView.Resources>

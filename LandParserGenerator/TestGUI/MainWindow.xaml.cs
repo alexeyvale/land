@@ -674,7 +674,133 @@ namespace TestGUI
 			MarkupTreeView.ItemsSource = null;
 		}
 
+		#region drag and drop
+
+		private const int DRAG_ACTIVATION_SHIFT = 10;
+
+		private MarkupElement DraggedItem { get; set; }
+		private MarkupElement TargetItem { get; set; }
+		private Point LastMouseDown { get; set; }
+
+		private void MarkupTreeView_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left)
+			{
+				LastMouseDown = e.GetPosition(MarkupTreeView);
+			}
+		}
+
+		private void MarkupTreeView_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (e.LeftButton == MouseButtonState.Pressed)
+			{
+				Point currentPosition = e.GetPosition(MarkupTreeView);
+
+				/// Если сдвинули элемент достаточно далеко
+				if ((Math.Abs(currentPosition.X - LastMouseDown.X) > DRAG_ACTIVATION_SHIFT) ||
+					(Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_ACTIVATION_SHIFT))
+				{
+					/// Запоминаем его как перемещаемый
+					DraggedItem = (MarkupElement)MarkupTreeView.SelectedItem;
+					if (DraggedItem != null)
+					{
+						DragDropEffects finalDropEffect = DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
+
+						/// Если перетащили на какой-то существующий элемент
+						if (finalDropEffect == DragDropEffects.Move)
+						{
+							DropItem(DraggedItem, TargetItem);
+							TargetItem = null;
+							DraggedItem = null;
+						}
+					}
+				}
+			}
+		}
+
+		private void MarkupTreeView_DragOver(object sender, DragEventArgs e)
+		{
+			Point currentPosition = e.GetPosition(MarkupTreeView);
+
+			if ((Math.Abs(currentPosition.X - LastMouseDown.X) > DRAG_ACTIVATION_SHIFT) ||
+			   (Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_ACTIVATION_SHIFT))
+			{
+				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
+
+				if (treeItem != null)
+				{
+					treeItem.IsSelected = true;
+					treeItem.ExpandSubtree();
+
+					var item = (MarkupElement)treeItem.DataContext;
+
+					e.Effects = DragDropEffects.Move;
+				}
+			}
+			e.Handled = true;
+		}
+
+		private void MarkupTreeView_Drop(object sender, DragEventArgs e)
+		{
+			e.Effects = DragDropEffects.None;
+			e.Handled = true;
+
+			/// Если закончили перетаскивание над элементом treeview, нужно осуществить перемещение
+			TreeViewItem Target = GetNearestContainer(e.OriginalSource as UIElement);
+			if (DraggedItem != null)
+			{
+				TargetItem = Target != null ? (MarkupElement)Target.DataContext : null;
+				e.Effects = DragDropEffects.Move;
+			}
+		}
+
+		public void DropItem(MarkupElement source, MarkupElement target)
+		{
+			/// Если перетащили элемент на функциональность, добавляем его внутрь функциональности
+			if (target is Concern)
+			{
+				Markup.Remove(source);
+				source.Parent = (Concern)target;
+				Markup.Add(source);	
+			}
+			else
+			{
+				/// Если перетащили элемент на точку привязки с родителем
+				if (target != null && target.Parent != null && target.Parent != source.Parent)
+				{
+					Markup.Remove(source);
+					source.Parent = (Concern)target.Parent;
+					Markup.Add(source);			
+				}
+				/// Если перетащили на точку привязки без родителя
+				else
+				{
+					if (source.Parent != null)
+					{
+						Markup.Remove(source);
+						source.Parent = null;
+						Markup.Add(source);
+					}
+				}
+			}
+			MarkupTreeView.Items.Refresh();
+		}
+
+		private TreeViewItem GetNearestContainer(UIElement element)
+		{
+			// Поднимаемся по визуальному дереву до TreeViewItem-а
+			TreeViewItem container = element as TreeViewItem;
+			while ((container == null) && (element != null))
+			{
+				element = VisualTreeHelper.GetParent(element) as UIElement;
+				container = element as TreeViewItem;
+			}
+			return container;
+		}
+
 		#endregion
+
+#endregion
 
 		#region Отладка перепривязки
 
