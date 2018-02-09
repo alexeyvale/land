@@ -676,11 +676,16 @@ namespace TestGUI
 
 		#region drag and drop
 
-		private const int DRAG_ACTIVATION_SHIFT = 10;
+		/// Точка, в которой была нажата левая кнопка мыши
+		private Point LastMouseDown { get; set; }
 
+		/// Перетаскиваемый и целевой элементы
 		private MarkupElement DraggedItem { get; set; }
 		private MarkupElement TargetItem { get; set; }
-		private Point LastMouseDown { get; set; }
+
+		/// Элементы, развёрнутые вручную в ходе работы с разметкой и развёрнутые автоматически в ходе перетаскивания
+		private HashSet<MarkupElement> ExpandedItems = new HashSet<MarkupElement>();
+		private List<TreeViewItem> ExpandedWhileDragging = new List<TreeViewItem>();
 
 		private void MarkupTreeView_MouseDown(object sender, MouseButtonEventArgs e)
 		{
@@ -692,27 +697,20 @@ namespace TestGUI
 
 		private void MarkupTreeView_MouseMove(object sender, MouseEventArgs e)
 		{
-			if (e.LeftButton == MouseButtonState.Pressed)
+			if (e.LeftButton == MouseButtonState.Pressed && MarkupTreeView.SelectedItem != null)
 			{
 				Point currentPosition = e.GetPosition(MarkupTreeView);
 
 				/// Если сдвинули элемент достаточно далеко
-				if ((Math.Abs(currentPosition.X - LastMouseDown.X) > DRAG_ACTIVATION_SHIFT) ||
-					(Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_ACTIVATION_SHIFT))
+				if (Math.Abs(currentPosition.Y - LastMouseDown.Y) > 20)
 				{
 					/// Запоминаем его как перемещаемый
 					DraggedItem = (MarkupElement)MarkupTreeView.SelectedItem;
+					/// Инициируем перемещение
 					if (DraggedItem != null)
 					{
-						DragDropEffects finalDropEffect = DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
-
-						/// Если перетащили на какой-то существующий элемент
-						if (finalDropEffect == DragDropEffects.Move)
-						{
-							DropItem(DraggedItem, TargetItem);
-							TargetItem = null;
-							DraggedItem = null;
-						}
+						ExpandedWhileDragging = new List<TreeViewItem>();
+						DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
 					}
 				}
 			}
@@ -722,21 +720,54 @@ namespace TestGUI
 		{
 			Point currentPosition = e.GetPosition(MarkupTreeView);
 
-			if ((Math.Abs(currentPosition.X - LastMouseDown.X) > DRAG_ACTIVATION_SHIFT) ||
-			   (Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_ACTIVATION_SHIFT))
+			/// Прокручиваем дерево, если слишком приблизились к краю
+			ScrollViewer sv = FindVisualChild<ScrollViewer>(MarkupTreeView);
+
+			double tolerance = 20;
+			double verticalPos = currentPosition.Y;
+			double offset = 6;
+
+			if (verticalPos < tolerance)
 			{
-				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
-
-				if (treeItem != null)
-				{
-					treeItem.IsSelected = true;
-					treeItem.ExpandSubtree();
-
-					var item = (MarkupElement)treeItem.DataContext;
-
-					e.Effects = DragDropEffects.Move;
-				}
+				sv.ScrollToVerticalOffset(sv.VerticalOffset - offset);
 			}
+			else if (verticalPos > MarkupTreeView.ActualHeight - tolerance)
+			{
+				sv.ScrollToVerticalOffset(sv.VerticalOffset + offset);   
+			}
+
+			/// Ищем элемент дерева, над которым происходит перетаскивание,
+			/// чтобы выделить его и развернуть
+			TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
+
+			if (treeItem != null)
+			{
+				treeItem.IsSelected = true;
+
+				if (!treeItem.IsExpanded)
+				{
+					treeItem.IsExpanded = true;
+					/// Проходим по раскрытым в ходе перетаскивания элементам
+					for (var i = ExpandedWhileDragging.Count - 1; i >= 0; --i)
+					{
+						/// Если очередной элемент - не родитель того, который хотим раскрыть сейчас,
+						if (ExpandedWhileDragging[i].Items.Count == 0 || !ExpandedWhileDragging[i].Items.Contains(treeItem.DataContext))
+						{
+							/// то его можно схлопнуть
+							ExpandedWhileDragging[i].IsExpanded = false;
+							ExpandedWhileDragging.RemoveAt(i);
+						}
+						else
+							break;
+					}
+					ExpandedWhileDragging.Add(treeItem);
+				}
+
+				var item = (MarkupElement)treeItem.DataContext;
+
+				e.Effects = DraggedItem != item ? DragDropEffects.Move : DragDropEffects.None;
+			}
+
 			e.Handled = true;
 		}
 
@@ -750,7 +781,10 @@ namespace TestGUI
 			if (DraggedItem != null)
 			{
 				TargetItem = Target != null ? (MarkupElement)Target.DataContext : null;
-				e.Effects = DragDropEffects.Move;
+
+				DropItem(DraggedItem, TargetItem);
+				TargetItem = null;
+				DraggedItem = null;
 			}
 		}
 
@@ -766,24 +800,40 @@ namespace TestGUI
 			else
 			{
 				/// Если перетащили элемент на точку привязки с родителем
-				if (target != null && target.Parent != null && target.Parent != source.Parent)
+				if (target != null && target.Parent != source.Parent)
 				{
 					Markup.Remove(source);
-					source.Parent = (Concern)target.Parent;
+					source.Parent = target.Parent;
 					Markup.Add(source);			
 				}
 				/// Если перетащили на точку привязки без родителя
 				else
 				{
-					if (source.Parent != null)
-					{
-						Markup.Remove(source);
-						source.Parent = null;
-						Markup.Add(source);
-					}
+					Markup.Remove(source);
+					source.Parent = null;
+					Markup.Add(source);
 				}
 			}
 			MarkupTreeView.Items.Refresh();
+
+			/// Восстанавливаем раскрытые ранее элементы
+			var oldExpanded = ExpandedItems;
+			ExpandedItems = new HashSet<MarkupElement>();
+			foreach (var item in oldExpanded)
+			{
+				var test = GetTreeViewItem(MarkupTreeView, item);
+				test.IsExpanded = true;
+			}
+		}
+
+		private void MarkupTreeView_Expanded(object sender, RoutedEventArgs e)
+		{
+			ExpandedItems.Add((MarkupElement)((TreeViewItem)sender).DataContext);
+		}
+
+		private void MarkupTreeView_Collapsed(object sender, RoutedEventArgs e)
+		{
+			ExpandedItems.Remove((MarkupElement)((TreeViewItem)sender).DataContext);
 		}
 
 		private TreeViewItem GetNearestContainer(UIElement element)
@@ -798,9 +848,131 @@ namespace TestGUI
 			return container;
 		}
 
+		/// <summary>
+		/// Recursively search for an item in this subtree.
+		/// https://docs.microsoft.com/en-us/dotnet/framework/wpf/controls/how-to-find-a-treeviewitem-in-a-treeview
+		/// </summary>
+		/// <param name="container">
+		/// The parent ItemsControl. This can be a TreeView or a TreeViewItem.
+		/// </param>
+		/// <param name="item">
+		/// The item to search for.
+		/// </param>
+		/// <returns>
+		/// The TreeViewItem that contains the specified item.
+		/// </returns>
+		private TreeViewItem GetTreeViewItem(ItemsControl container, object item)
+		{
+			if (container != null)
+			{
+				if (container.DataContext == item)
+				{
+					return container as TreeViewItem;
+				}
+
+				// Expand the current container
+				if (container is TreeViewItem && !((TreeViewItem)container).IsExpanded)
+				{
+					container.SetValue(TreeViewItem.IsExpandedProperty, true);
+				}
+
+				// Try to generate the ItemsPresenter and the ItemsPanel.
+				// by calling ApplyTemplate.  Note that in the 
+				// virtualizing case even if the item is marked 
+				// expanded we still need to do this step in order to 
+				// regenerate the visuals because they may have been virtualized away.
+
+				container.ApplyTemplate();
+				ItemsPresenter itemsPresenter =
+					(ItemsPresenter)container.Template.FindName("ItemsHost", container);
+				if (itemsPresenter != null)
+				{
+					itemsPresenter.ApplyTemplate();
+				}
+				else
+				{
+					// The Tree template has not named the ItemsPresenter, 
+					// so walk the descendents and find the child.
+					itemsPresenter = FindVisualChild<ItemsPresenter>(container);
+					if (itemsPresenter == null)
+					{
+						container.UpdateLayout();
+
+						itemsPresenter = FindVisualChild<ItemsPresenter>(container);
+					}
+				}
+
+				Panel itemsHostPanel = (Panel)VisualTreeHelper.GetChild(itemsPresenter, 0);
+
+				// Ensure that the generator for this panel has been created.
+				UIElementCollection children = itemsHostPanel.Children;
+
+				for (int i = 0, count = container.Items.Count; i < count; i++)
+				{
+					var subContainer =
+						(TreeViewItem)container.ItemContainerGenerator.
+						ContainerFromIndex(i);
+
+					// Bring the item into view to maintain the 
+					// same behavior as with a virtualizing panel.
+					subContainer.BringIntoView();
+
+					if (subContainer != null)
+					{
+						// Search the next level for the object.
+						var subContainerExpanded = subContainer.IsExpanded;
+
+						TreeViewItem resultContainer = GetTreeViewItem(subContainer, item);
+						if (resultContainer != null)
+						{
+							return resultContainer;
+						}
+						else
+						{
+							// The object is not under this TreeViewItem
+							// so collapse it.
+							subContainer.IsExpanded = subContainerExpanded;
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Search for an element of a certain type in the visual tree.
+		/// </summary>
+		/// <typeparam name="T">The type of element to find.</typeparam>
+		/// <param name="visual">The parent element.</param>
+		/// <returns></returns>
+		private T FindVisualChild<T>(Visual visual) where T : Visual
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
+			{
+				Visual child = (Visual)VisualTreeHelper.GetChild(visual, i);
+				if (child != null)
+				{
+					T correctlyTyped = child as T;
+					if (correctlyTyped != null)
+					{
+						return correctlyTyped;
+					}
+
+					T descendent = FindVisualChild<T>(child);
+					if (descendent != null)
+					{
+						return descendent;
+					}
+				}
+			}
+
+			return null;
+		}
+
 		#endregion
 
-#endregion
+		#endregion
 
 		#region Отладка перепривязки
 

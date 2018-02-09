@@ -302,14 +302,17 @@
                                           DragOver="MarkupTreeView_DragOver"
                                           Drop="MarkupTreeView_Drop"
                                           MouseMove="MarkupTreeView_MouseMove">
-                                    <TreeView.Resources>
-                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
-                                    </TreeView.Resources>
                                     <TreeView.ItemTemplate>
                                         <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
                                             <TextBlock Text="{Binding Name}" />
                                         </HierarchicalDataTemplate>
                                     </TreeView.ItemTemplate>
+                                    <TreeView.ItemContainerStyle>
+                                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}">
+                                            <EventSetter Event="Expanded" Handler="MarkupTreeView_Expanded"/>
+                                            <EventSetter Event="Collapsed" Handler="MarkupTreeView_Collapsed"/>
+                                        </Style>
+                                    </TreeView.ItemContainerStyle>
                                 </TreeView>
                                 <ListBox
                                     Grid.Row="2"
