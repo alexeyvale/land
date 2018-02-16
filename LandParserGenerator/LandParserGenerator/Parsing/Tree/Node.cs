@@ -32,7 +32,7 @@ namespace LandParserGenerator.Parsing.Tree
 		/// <summary>
 		/// Потомки узла
 		/// </summary>
-		public List<Node> Children { get; private set; } = new List<Node>();
+		public List<Node> Children { get; set; } = new List<Node>();
 
 		/// <summary>
 		/// Опции, связанные с построением дерева и отображением деревьев

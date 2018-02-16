@@ -29,7 +29,13 @@ namespace LandParserGenerator.Parsing
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
-					node.Children.InsertRange(i, smbToRemove.Children);
+
+					for(var j=smbToRemove.Children.Count -1; j >=0; --j)
+					{
+						smbToRemove.Children[j].Parent = node;
+						node.Children.Insert(i, smbToRemove.Children[j]);
+					}
+
 					--i;
 				}
 			}
@@ -44,7 +50,13 @@ namespace LandParserGenerator.Parsing
 					{
 						var smbToRemove = node.Children[i];
 						node.Children.RemoveAt(i);
-						node.Children.InsertRange(i, smbToRemove.Children);
+
+						for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
+						{
+							smbToRemove.Children[j].Parent = node;
+							node.Children.Insert(i, smbToRemove.Children[j]);
+						}
+
 						--i;
 					}
 				}

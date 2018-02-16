@@ -24,36 +24,22 @@ namespace LandParserGenerator.Markup
 		{
 			var visitor = new LandExplorerVisitor();
 			oldTree.Accept(visitor);
+			var oldLand = new Node(String.Empty, null);
+			oldLand.Children = visitor.HighLevelLand;
 
-			/// Отображаем острова из одного дерева в острова из другого
-			var nodesToRemap = visitor.Land;
-			visitor.Land = new List<Node>();
+			visitor = new LandExplorerVisitor();
 			newTree.Accept(visitor);
-			var candidates = visitor.Land;
+			var newLand = new Node(String.Empty, null);
+			newLand.Children = visitor.HighLevelLand;
 
 			Mapping = new Dictionary<Node, Node>();
 			Similarities = new Dictionary<Node, Dictionary<Node, double>>();
 
-			foreach(var oldNode in nodesToRemap)
-			{
-				if(!Mapping.ContainsKey(oldNode))
-				{
-					var sameTypeCandidates = candidates.Where(c => c.Symbol == oldNode.Symbol);
-					if (sameTypeCandidates.Count() > 0)
-					{
-						Similarities[oldNode] = sameTypeCandidates.ToDictionary(c => c, c => Similarity(oldNode, c));
-
-						var freeCandidates = Similarities[oldNode].Where(kvp => !Mapping.ContainsValue(kvp.Key));
-						var maxSimilarity = freeCandidates.Count() > 0 ? Similarities[oldNode].Max(s => s.Value) : 0;
-
-						if(maxSimilarity > 0)
-							Mapping[oldNode] = Similarities[oldNode].Where(s => s.Value == maxSimilarity).First().Key;
-					}
-				}
-			}
+			Similarity(oldLand, newLand, Mapping);
 		}
 
-		private double Similarity(Node a, Node b)
+		/// Возвращаеть похожесть узлов, в mapping добавляет сопоставление их поддеревьев
+		private double Similarity(Node a, Node b, Dictionary<Node, Node> mapping)
 		{
 			/// Если узлы разных типов, они точно непохожи
 			if (a.Symbol != b.Symbol)
@@ -83,24 +69,34 @@ namespace LandParserGenerator.Markup
 			foreach (var type in aTypes.Keys)
 				if (bTypes.ContainsKey(type))
 				{
-					var similarities = new double[aTypes[type].Count, bTypes[type].Count];
+					var mappings = new Dictionary<Node, Dictionary<Node, Node>>();
 
 					/// В рамках типа сопоставляем всех со всеми
 					foreach (var aNode in aTypes[type])
 					{
-						Similarities[aNode] = new Dictionary<Node, double>();
+						if(!Similarities.ContainsKey(aNode))
+							Similarities[aNode] = new Dictionary<Node, double>();
 						foreach (var bNode in bTypes[type])
-							Similarities[aNode][bNode] = Similarity(aNode, bNode);
+						{
+							mappings[bNode] = new Dictionary<Node, Node>();
+							Similarities[aNode][bNode] = Similarity(aNode, bNode, mappings[bNode]);
+						}
 					}					
 
-					/// Выбираем наилучший вариант из ещё не сопоставленных
+					/// Выбираем наилучший вариант из ещё не сопоставленных узлов-потомков b
 					foreach(var aNode in aTypes[type])
 					{
-						var candidates = Similarities[aNode].Where(kvp => !Mapping.ContainsValue(kvp.Key));
+						var candidates = Similarities[aNode].Where(kvp => !Mapping.ContainsValue(kvp.Key) && bTypes[type].Contains(kvp.Key));
 						var maxSimilarity = candidates.Count() > 0 ? candidates.Max(p => p.Value) : 0;
 
-						if(maxSimilarity > 0)
-							Mapping[aNode] = candidates.First(p => p.Value == maxSimilarity).Key;
+						if (maxSimilarity > 0)
+						{
+							var bestCandidate = candidates.First(p => p.Value == maxSimilarity).Key;
+							mapping[aNode] = bestCandidate;
+
+							foreach (var kvp in mappings[bestCandidate])
+								mapping[kvp.Key] = kvp.Value; 
+						}
 
 						rawSimilarity += maxSimilarity * aNode.Options.Priority.Value;
 					}

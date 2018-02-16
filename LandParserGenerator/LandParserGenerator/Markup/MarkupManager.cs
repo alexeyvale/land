@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Markup
 {
+	[DataContract]
 	public class MarkupManager
 	{
+		[DataMember]
 		public List<MarkupElement> Markup { get; set; } = new List<MarkupElement>();
 
 		public Node AstRoot { get; set; } = null;

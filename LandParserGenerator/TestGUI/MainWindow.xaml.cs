@@ -8,7 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
-using System.Xml.Serialization;
+using System.Runtime.Serialization.Json;
+
 using Microsoft.Win32;
 
 using LandParserGenerator.Parsing.Tree;
@@ -651,16 +652,23 @@ namespace TestGUI
 
 		private void SaveConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
-			//var saveFileDialog = new SaveFileDialog();
-			//if (saveFileDialog.ShowDialog() == true)
-			//{
-			//	XmlSerializer serializer = new XmlSerializer(typeof(MarkupManager));
+			var saveFileDialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				DefaultExt = "json",
+				Filter = "Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*"
+			};
 
-			//	using (var stream = new FileStream(saveFileDialog.FileName, FileMode.Create))
-			//	{
-			//		serializer.Serialize(stream, Markup);
-			//	}				
-			//}
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				DataContractJsonSerializer jsonFormatter = 
+					new DataContractJsonSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint)});
+
+				using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+				{
+					jsonFormatter.WriteObject(fs, Markup);
+				}
+			}
 		}
 
 		private void LoadConcernMarkup_Click(object sender, RoutedEventArgs e)
@@ -1021,13 +1029,17 @@ namespace TestGUI
 
 		private void ParseNewTextAndSelectMostSimilar(Node node)
 		{
+			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
+				/// и при этом парсер сгенерирован
 				if (Parser != null)
 				{
+					/// пытаемся распарсить текст
 					NewTreeRoot = Parser.Parse(NewTextEditor.Text);
 					NewFileParsingStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
 
+					/// Если текст распарсился, ищем отображение из старого текста в новый
 					if (Parser.Errors.Count == 0)
 					{
 						Mapper.Remap(Markup.AstRoot, NewTreeRoot);
@@ -1036,18 +1048,19 @@ namespace TestGUI
 				}
 			}
 
+			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
+				/// Заполняем список похожестей похожестями узлов нового дерева на выбранный узел старого дерева
 				SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(node) ? Mapper.Similarities[node] : null;
 				MoveCaretToSource(node, OldTextEditor);
 
-				if (Mapper.Similarities.ContainsKey(node))
+				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
+				if (SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(node))
 				{
-					SimilaritiesList.ItemsSource = Mapper.Similarities[node];
+					/// значит, в какой-то новый узел мы отобразили старый
 					SimilaritiesList.SelectedItem = Mapper.Similarities[node].FirstOrDefault(p => p.Key == Mapper.Mapping[node]);
 				}
-				else
-					SimilaritiesList.ItemsSource = null;
 			}
 		}
 

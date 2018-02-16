@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Markup
 {
+	[DataContract]
 	public class ConcernPoint: MarkupElement
 	{
 		public Node TreeNode { get; set; }
 
+		[DataMember]
 		public int TreeNodeId { get; set; }
 
 		public ConcernPoint(Node node, Concern parent = null)
