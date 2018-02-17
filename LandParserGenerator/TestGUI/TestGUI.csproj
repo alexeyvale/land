@@ -62,6 +62,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ConsoleWriter.cs" />
+    <Compile Include="CurrentConcernHighlighter.cs" />
     <Compile Include="CurrentLineHighlighter.cs" />
     <Compile Include="SelectedTextColorizer.cs" />
     <Page Include="MainWindow.xaml">

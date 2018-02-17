@@ -27,6 +27,7 @@ namespace TestGUI
 		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
+		private CurrentConcernHighlighter CurrentConcernColorizer { get; set; }
 
 		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
 
@@ -47,6 +48,7 @@ namespace TestGUI
 
 			GrammarEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(GrammarEditor.TextArea));
 			FileEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(FileEditor.TextArea));
+			FileEditor.TextArea.TextView.BackgroundRenderers.Add(CurrentConcernColorizer = new CurrentConcernHighlighter(FileEditor.TextArea));
 			SelectedTextColorizerForGrammar = new SelectedTextColorizer(GrammarEditor.TextArea);
 
 			if (File.Exists(LAST_GRAMMARS_FILE))
@@ -539,15 +541,53 @@ namespace TestGUI
 		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
 
-		private void ConcernTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			var treeView = (TreeView)sender;
 
 			if (treeView.SelectedItem != null)
 			{
-				var point = treeView.SelectedItem as ConcernPoint;
-				if(point != null)
-					MoveCaretToSource(point.TreeNode, FileEditor, 1);
+				var point = treeView.SelectedItem as MarkupElement;
+				var elementNumStack = new Stack<int>();
+				int? currentElementNum = null;
+				var segments = new List<Tuple<int, int>>();
+
+				while(point != null)
+				{
+					if(point is ConcernPoint)
+					{
+						var cp = (ConcernPoint)point;
+						segments.Add(new Tuple<int, int>(cp.TreeNode.StartOffset.Value, cp.TreeNode.EndOffset.Value));
+					}
+					else
+					{
+						var concern = (Concern)point;
+
+						if (currentElementNum.HasValue)
+							currentElementNum += 1;
+						else
+							currentElementNum = 0;
+
+						if (currentElementNum < concern.Elements.Count)
+						{
+							point = concern.Elements[currentElementNum.Value];
+							elementNumStack.Push(currentElementNum.Value);
+							continue;
+						}
+					}
+
+					if (point == treeView.SelectedItem)
+						break;
+
+					point = point.Parent;
+					currentElementNum = elementNumStack.Count > 0 ? elementNumStack.Pop() : (int?)null;
+				}
+
+				CurrentConcernColorizer.SetSegments(segments);
+			}
+			else
+			{
+				CurrentConcernColorizer.ResetSegments();
 			}
 		}
 
@@ -696,6 +736,10 @@ namespace TestGUI
 		private MarkupElement DraggedItem { get; set; }
 		private MarkupElement TargetItem { get; set; }
 
+		private const int DRAG_START_TOLERANCE = 20;
+		private const int SCROLL_START_TOLERANCE = 20;
+		private const int SCROLL_BASE_OFFSET = 6;
+
 		/// Элементы, развёрнутые вручную в ходе работы с разметкой и развёрнутые автоматически в ходе перетаскивания
 		private HashSet<MarkupElement> ExpandedItems = new HashSet<MarkupElement>();
 		private List<TreeViewItem> ExpandedWhileDragging = new List<TreeViewItem>();
@@ -704,27 +748,25 @@ namespace TestGUI
 		{
 			if (e.ChangedButton == MouseButton.Left)
 			{
+				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
+
+				DraggedItem = treeItem != null ? (MarkupElement)treeItem.DataContext : null;
 				LastMouseDown = e.GetPosition(MarkupTreeView);
 			}
 		}
 
 		private void MarkupTreeView_MouseMove(object sender, MouseEventArgs e)
 		{
-			if (e.LeftButton == MouseButtonState.Pressed && MarkupTreeView.SelectedItem != null)
+			if (e.LeftButton == MouseButtonState.Pressed && DraggedItem != null)
 			{
 				Point currentPosition = e.GetPosition(MarkupTreeView);
 
 				/// Если сдвинули элемент достаточно далеко
-				if (Math.Abs(currentPosition.Y - LastMouseDown.Y) > 20)
+				if (Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_START_TOLERANCE)
 				{
-					/// Запоминаем его как перемещаемый
-					DraggedItem = (MarkupElement)MarkupTreeView.SelectedItem;
 					/// Инициируем перемещение
-					if (DraggedItem != null)
-					{
-						ExpandedWhileDragging = new List<TreeViewItem>();
-						DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
-					}
+					ExpandedWhileDragging = new List<TreeViewItem>();
+					DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
 				}
 			}
 		}
@@ -736,17 +778,15 @@ namespace TestGUI
 			/// Прокручиваем дерево, если слишком приблизились к краю
 			ScrollViewer sv = FindVisualChild<ScrollViewer>(MarkupTreeView);
 
-			double tolerance = 20;
 			double verticalPos = currentPosition.Y;
-			double offset = 6;
 
-			if (verticalPos < tolerance)
+			if (verticalPos < SCROLL_START_TOLERANCE)
 			{
-				sv.ScrollToVerticalOffset(sv.VerticalOffset - offset);
+				sv.ScrollToVerticalOffset(sv.VerticalOffset - SCROLL_BASE_OFFSET);
 			}
-			else if (verticalPos > MarkupTreeView.ActualHeight - tolerance)
+			else if (verticalPos > MarkupTreeView.ActualHeight - SCROLL_START_TOLERANCE)
 			{
-				sv.ScrollToVerticalOffset(sv.VerticalOffset + offset);   
+				sv.ScrollToVerticalOffset(sv.VerticalOffset + SCROLL_BASE_OFFSET);   
 			}
 
 			/// Ищем элемент дерева, над которым происходит перетаскивание,
@@ -778,7 +818,19 @@ namespace TestGUI
 
 				var item = (MarkupElement)treeItem.DataContext;
 
-				e.Effects = DraggedItem != item ? DragDropEffects.Move : DragDropEffects.None;
+				/// Запрещаем перенос элемента во вложенный элемент
+				var canMove = true;
+				while (item != null)
+				{
+					if (item == DraggedItem)
+					{
+						canMove = false;
+						break;
+					}
+					item = item.Parent;
+				}
+
+				e.Effects = canMove ? DragDropEffects.Move : DragDropEffects.None;
 			}
 
 			e.Handled = true;
