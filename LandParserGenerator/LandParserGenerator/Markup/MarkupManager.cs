@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Runtime.Serialization;
 
 using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Markup
 {
-	[DataContract]
+	[DataContract(IsReference = true)]
 	public class MarkupManager
 	{
 		[DataMember]
 		public List<MarkupElement> Markup { get; set; } = new List<MarkupElement>();
 
+		[DataMember]
 		public Node AstRoot { get; set; } = null;
 
 		public void Clear()
@@ -54,6 +56,26 @@ namespace LandParserGenerator.Markup
 						--i;
 					}
 				}
+			}
+		}
+
+		public static void Serialize(string filename, MarkupManager target)
+		{
+			DataContractSerializer serializer = new DataContractSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint) });
+
+			using (FileStream fs = new FileStream(filename, FileMode.Create))
+			{
+				serializer.WriteObject(fs, target);
+			}
+		}
+
+		public static MarkupManager Deserialize(string filename)
+		{
+			DataContractSerializer serializer = new DataContractSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint) });
+
+			using (FileStream fs = new FileStream(filename, FileMode.Open))
+			{
+				return (MarkupManager)serializer.ReadObject(fs);
 			}
 		}
 	}

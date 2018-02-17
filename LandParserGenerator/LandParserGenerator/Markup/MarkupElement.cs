@@ -8,12 +8,13 @@ using LandParserGenerator.Parsing.Tree;
 
 namespace LandParserGenerator.Markup
 {
-	[DataContract]
+	[DataContract(IsReference = true)]
 	public abstract class MarkupElement
 	{
 		[DataMember]
 		public string Name { get; set; }
 
+		[DataMember]
 		public Concern Parent { get; set; }
 	}
 }

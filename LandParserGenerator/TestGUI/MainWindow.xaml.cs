@@ -655,25 +655,30 @@ namespace TestGUI
 			var saveFileDialog = new SaveFileDialog()
 			{
 				AddExtension = true,
-				DefaultExt = "json",
-				Filter = "Файлы JSON (*.json)|*.json|Все файлы (*.*)|*.*"
+				DefaultExt = "landmark",
+				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
 			};
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				DataContractJsonSerializer jsonFormatter = 
-					new DataContractJsonSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint)});
-
-				using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
-				{
-					jsonFormatter.WriteObject(fs, Markup);
-				}
+				MarkupManager.Serialize(saveFileDialog.FileName, Markup);
 			}
 		}
 
 		private void LoadConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
+			var openFileDialog = new OpenFileDialog()
+			{
+				AddExtension = true,
+				DefaultExt = "landmark",
+				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
+			};
 
+			if (openFileDialog.ShowDialog() == true)
+			{
+				Markup = MarkupManager.Deserialize(openFileDialog.FileName);
+				MarkupTreeView.ItemsSource = Markup.Markup;
+			}
 		}
 
 		private void NewConcernMarkup_Click(object sender, RoutedEventArgs e)

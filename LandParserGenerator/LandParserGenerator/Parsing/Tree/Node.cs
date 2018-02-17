@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Runtime.Serialization;
 
 namespace LandParserGenerator.Parsing.Tree
 {
+	[DataContract(IsReference = true)]
 	public class Node
 	{
 		/// <summary>
 		/// Идентификатор узла, уникальный в пределах одного дерева
 		/// </summary>
+		[DataMember]
 		public int Id { get; set; }
 
 		/// <summary>
@@ -22,24 +24,31 @@ namespace LandParserGenerator.Parsing.Tree
 		/// <summary>
 		/// Символ грамматики, которому соответствует узел
 		/// </summary>
+		[DataMember]
 		public string Symbol { get; set; }
 
 		/// <summary>
 		/// Набор токенов, соответствующих листовому узлу
 		/// </summary>
+		[DataMember]
 		public List<string> Value { get; set; } = new List<string>();
 
 		/// <summary>
 		/// Потомки узла
 		/// </summary>
+		[DataMember]
 		public List<Node> Children { get; set; } = new List<Node>();
 
 		/// <summary>
 		/// Опции, связанные с построением дерева и отображением деревьев
 		/// </summary>
+		[DataMember]
 		public LocalOptions Options { get; set; }
 
+		[DataMember]
 		protected Location Anchor { get; set; }
+
+		[DataMember]
 		protected bool AnchorReady { get; set; }
 
 		public int? StartOffset
