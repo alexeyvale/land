@@ -21,7 +21,7 @@ namespace TestGUI
 		public void SetSegments(List<Tuple<int, int>> segments)
 		{
 			Segments = segments;
-			textEditor.InvalidateVisual();
+			textEditor.TextView.Redraw();
 		}
 
 		public void ResetSegments()
