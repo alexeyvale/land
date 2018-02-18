@@ -8,7 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
-using System.Runtime.Serialization.Json;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 using Microsoft.Win32;
 
@@ -541,13 +542,51 @@ namespace TestGUI
 		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
 
+		public class MarkupTreeViewModel: INotifyPropertyChanged
+		{
+			public MarkupElement Data { get; set; }
+
+			private bool _isExpanded = false;
+			public bool IsExpanded { get { return _isExpanded; } set { _isExpanded = value; NotifyPropertyChanged(); } }
+
+			private bool _isSelected = false;
+			public bool IsSelected { get { return _isSelected; } set { _isSelected = value; NotifyPropertyChanged(); } }
+
+			public bool _isEdited { get; set; } = false;
+			public bool IsEdited { get { return _isEdited; } set { _isEdited = value; NotifyPropertyChanged(); } }
+
+			private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+			{
+				if (PropertyChanged != null)
+				{
+					PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+				}
+			}
+
+			public static explicit operator MarkupTreeViewModel(MarkupElement elem)
+			{
+				return new MarkupTreeViewModel() { Data = elem };
+			}
+
+			public static implicit operator MarkupElement(MarkupTreeViewModel model)
+			{
+				return model.Data;
+			}
+
+			public event PropertyChangedEventHandler PropertyChanged;
+		}
+
 		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			var treeView = (TreeView)sender;
 
-			if (treeView.SelectedItem != null)
+			if (e.OldValue != null)
+				((MarkupTreeViewModel)e.OldValue).IsSelected = false;
+
+			if (e.NewValue != null)
 			{
-				var point = treeView.SelectedItem as MarkupElement;
+				((MarkupTreeViewModel)e.NewValue).IsSelected = true;
+
+				var point = e.NewValue as MarkupElement;
 				var elementNumStack = new Stack<int>();
 				int? currentElementNum = null;
 				var segments = new List<Tuple<int, int>>();
@@ -576,7 +615,7 @@ namespace TestGUI
 						}
 					}
 
-					if (point == treeView.SelectedItem)
+					if (point == e.NewValue)
 						break;
 
 					point = point.Parent;
@@ -591,6 +630,24 @@ namespace TestGUI
 			}
 		}
 
+		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			if (item != null)
+			{
+				item.IsSelected = true;
+				e.Handled = true;
+			}
+		}
+
+		private static TreeViewItem VisualUpwardSearch(DependencyObject source)
+		{
+			while (source != null && !(source is TreeViewItem))
+				source = VisualTreeHelper.GetParent(source);
+
+			return source as TreeViewItem;
+		}
+
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
@@ -598,13 +655,14 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup;
+					MarkupTreeView.ItemsSource = Markup.Markup.Select(m=>(MarkupTreeViewModel)m);
 				}
 
 				var concern = MarkupTreeView.SelectedItem as Concern;
 				
 				Markup.Add(new ConcernPoint((Node)ConcernPointCandidatesList.SelectedItem, concern));
-				MarkupTreeView.Items.Refresh();
+
+				RefreshMarkupTreeView();
 			}
 		}
 
@@ -619,7 +677,8 @@ namespace TestGUI
 			if (MarkupTreeView.SelectedItem != null)
 			{
 				Markup.Remove((MarkupElement)MarkupTreeView.SelectedItem);
-				MarkupTreeView.Items.Refresh();
+
+				RefreshMarkupTreeView();
 			}
 		}
 
@@ -655,7 +714,7 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup;
+					MarkupTreeView.ItemsSource = Markup.Markup.Select(m=>(MarkupTreeViewModel)m);
 				}
 
 				var visitor = new LandExplorerVisitor();
@@ -670,7 +729,7 @@ namespace TestGUI
 						Markup.Add(new ConcernPoint(point, concern));
 				}
 
-				MarkupTreeView.Items.Refresh();
+				RefreshMarkupTreeView();
 			}
 		}
 
@@ -680,14 +739,15 @@ namespace TestGUI
 			{
 				Mapper.Remap(Markup.AstRoot, TreeRoot);
 				Markup.Remap(TreeRoot, Mapper.Mapping);
-				MarkupTreeView.ItemsSource = Markup.Markup;
+				RefreshMarkupTreeView();
 			}
 		}
 
 		private void AddConcernFolder_Click(object sender, RoutedEventArgs e)
 		{
 			Markup.Add(new Concern("Новая функциональность"));
-			MarkupTreeView.Items.Refresh();
+
+			RefreshMarkupTreeView();
 		}
 
 		private void SaveConcernMarkup_Click(object sender, RoutedEventArgs e)
@@ -717,7 +777,7 @@ namespace TestGUI
 			if (openFileDialog.ShowDialog() == true)
 			{
 				Markup = MarkupManager.Deserialize(openFileDialog.FileName);
-				MarkupTreeView.ItemsSource = Markup.Markup;
+				RefreshMarkupTreeView();
 			}
 		}
 
@@ -725,6 +785,21 @@ namespace TestGUI
 		{
 			Markup.Clear();
 			MarkupTreeView.ItemsSource = null;
+		}
+
+		private void MarkupTreeRenameMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			((MarkupTreeViewModel)MarkupTreeView.SelectedItem).IsEdited = true;
+		}
+
+		private void MarkupTreeDeleteMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void MarkupTreeDisableMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 
 		#region drag and drop
@@ -750,7 +825,7 @@ namespace TestGUI
 			{
 				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
 
-				DraggedItem = treeItem != null ? (MarkupElement)treeItem.DataContext : null;
+				DraggedItem = treeItem != null ? (MarkupTreeViewModel)treeItem.DataContext : null;
 				LastMouseDown = e.GetPosition(MarkupTreeView);
 			}
 		}
@@ -879,26 +954,35 @@ namespace TestGUI
 					Markup.Add(source);
 				}
 			}
-			MarkupTreeView.Items.Refresh();
+			
+			RefreshMarkupTreeView();
+		}
+
+		private void RefreshMarkupTreeView()
+		{
+			MarkupTreeView.ItemsSource = Markup.Markup.Select(m => (MarkupTreeViewModel)m);
 
 			/// Восстанавливаем раскрытые ранее элементы
 			var oldExpanded = ExpandedItems;
 			ExpandedItems = new HashSet<MarkupElement>();
 			foreach (var item in oldExpanded)
 			{
-				var test = GetTreeViewItem(MarkupTreeView, item);
-				test.IsExpanded = true;
+				var curItem = GetTreeViewItem(MarkupTreeView, item);
+				if (curItem != null)
+					curItem.IsExpanded = true;
 			}
 		}
 
-		private void MarkupTreeView_Expanded(object sender, RoutedEventArgs e)
+		private void MarkupTreeViewItem_Expanded(object sender, RoutedEventArgs e)
 		{
-			ExpandedItems.Add((MarkupElement)((TreeViewItem)sender).DataContext);
+			ExpandedItems.Add((MarkupTreeViewModel)((TreeViewItem)sender).DataContext);
+			((MarkupTreeViewModel)((TreeViewItem)sender).DataContext).IsExpanded = true;
 		}
 
-		private void MarkupTreeView_Collapsed(object sender, RoutedEventArgs e)
+		private void MarkupTreeViewItem_Collapsed(object sender, RoutedEventArgs e)
 		{
-			ExpandedItems.Remove((MarkupElement)((TreeViewItem)sender).DataContext);
+			ExpandedItems.Remove((MarkupTreeViewModel)((TreeViewItem)sender).DataContext);
+			((MarkupTreeViewModel)((TreeViewItem)sender).DataContext).IsExpanded = false;
 		}
 
 		private TreeViewItem GetNearestContainer(UIElement element)
@@ -1135,6 +1219,6 @@ namespace TestGUI
 			NewTextChanged = true;
 		}
 
-		#endregion
+		#endregion		
 	}
 }
