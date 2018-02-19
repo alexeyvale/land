@@ -542,50 +542,12 @@ namespace TestGUI
 		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
 
-		public class MarkupTreeViewModel: INotifyPropertyChanged
-		{
-			public MarkupElement Data { get; set; }
-
-			private bool _isExpanded = false;
-			public bool IsExpanded { get { return _isExpanded; } set { _isExpanded = value; NotifyPropertyChanged(); } }
-
-			private bool _isSelected = false;
-			public bool IsSelected { get { return _isSelected; } set { _isSelected = value; NotifyPropertyChanged(); } }
-
-			public bool _isEdited { get; set; } = false;
-			public bool IsEdited { get { return _isEdited; } set { _isEdited = value; NotifyPropertyChanged(); } }
-
-			private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-			{
-				if (PropertyChanged != null)
-				{
-					PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-				}
-			}
-
-			public static explicit operator MarkupTreeViewModel(MarkupElement elem)
-			{
-				return new MarkupTreeViewModel() { Data = elem };
-			}
-
-			public static implicit operator MarkupElement(MarkupTreeViewModel model)
-			{
-				return model.Data;
-			}
-
-			public event PropertyChangedEventHandler PropertyChanged;
-		}
+		private HashSet<MarkupElement> ExpandedItems = new HashSet<MarkupElement>();
 
 		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-
-			if (e.OldValue != null)
-				((MarkupTreeViewModel)e.OldValue).IsSelected = false;
-
 			if (e.NewValue != null)
 			{
-				((MarkupTreeViewModel)e.NewValue).IsSelected = true;
-
 				var point = e.NewValue as MarkupElement;
 				var elementNumStack = new Stack<int>();
 				int? currentElementNum = null;
@@ -611,6 +573,7 @@ namespace TestGUI
 						{
 							point = concern.Elements[currentElementNum.Value];
 							elementNumStack.Push(currentElementNum.Value);
+							currentElementNum = null;
 							continue;
 						}
 					}
@@ -655,7 +618,7 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup.Select(m=>(MarkupTreeViewModel)m);
+					MarkupTreeView.ItemsSource = Markup.Markup;
 				}
 
 				var concern = MarkupTreeView.SelectedItem as Concern;
@@ -714,7 +677,7 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup.Select(m=>(MarkupTreeViewModel)m);
+					MarkupTreeView.ItemsSource = Markup.Markup;
 				}
 
 				var visitor = new LandExplorerVisitor();
@@ -777,7 +740,7 @@ namespace TestGUI
 			if (openFileDialog.ShowDialog() == true)
 			{
 				Markup = MarkupManager.Deserialize(openFileDialog.FileName);
-				RefreshMarkupTreeView();
+				MarkupTreeView.ItemsSource = Markup.Markup;
 			}
 		}
 
@@ -789,7 +752,10 @@ namespace TestGUI
 
 		private void MarkupTreeRenameMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			((MarkupTreeViewModel)MarkupTreeView.SelectedItem).IsEdited = true;
+			TreeViewItem item = 
+				MarkupTreeView.ItemContainerGenerator.ContainerFromItem(MarkupTreeView.SelectedItem) as TreeViewItem;
+			var textbox = GetMarkupTreeItemTextBox(item);
+			textbox.Visibility = Visibility.Visible;
 		}
 
 		private void MarkupTreeDeleteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -800,6 +766,141 @@ namespace TestGUI
 		private void MarkupTreeDisableMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 
+		}
+
+		private void MarkupTreeViewItem_Expanded(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+
+			if (item.DataContext is Concern)
+			{
+				ExpandedItems.Add((MarkupElement)item.DataContext);
+
+				var label = GetMarkupTreeItemLabel(item);
+				if (label != null)
+					label.Content = "\xf07c";
+			}
+
+			e.Handled = true;
+		}
+
+		private void MarkupTreeViewItem_Collapsed(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+
+			if (item.DataContext is Concern)
+			{
+				ExpandedItems.Remove((MarkupElement)item.DataContext);
+
+				var label = GetMarkupTreeItemLabel(item);
+				if (label != null)
+					label.Content = "\xf07b";
+			}
+
+			e.Handled = true;
+		}
+
+		private void MarkupTreeViewItem_GotFocus(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+			var label = GetMarkupTreeItemLabel(item);
+			if (label != null)
+				label.Foreground = Brushes.WhiteSmoke;
+
+			e.Handled = true;
+		}
+
+		private void MarkupTreeViewItem_LostFocus(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+			var label = GetMarkupTreeItemLabel(item);
+			if (label != null)
+				label.Foreground = Brushes.DimGray;
+
+			e.Handled = true;
+		}
+
+		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
+		{
+		
+		}
+
+		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+			var label = GetMarkupTreeItemLabel(item);
+			if (label != null)
+				label.Foreground = Brushes.DimGray;
+
+			e.Handled = true;
+		}
+
+		private void MarkupTreeViewItem_Loaded(object sender, RoutedEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+
+			if(!(item.DataContext is Concern))
+			{
+				var label = GetMarkupTreeItemLabel(item);
+				if (label != null)
+					label.Visibility = Visibility.Hidden;
+			}
+
+			e.Handled = true;
+		}
+
+		private Label GetMarkupTreeItemLabel(TreeViewItem item)
+		{
+			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
+			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
+
+			try
+			{
+				if (dataTemplate != null && templateParent != null)
+				{
+					return dataTemplate.FindName("ConcernIcon", templateParent) as Label;
+				}
+			}
+			catch
+			{ }
+
+			return null;
+		}
+
+		private TextBox GetMarkupTreeItemTextBox(TreeViewItem item)
+		{
+			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
+			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
+
+			if (dataTemplate != null && templateParent != null)
+			{
+				return dataTemplate.FindName("ConcernNameEditor", templateParent) as TextBox;
+			}
+
+			return null;
+		}
+
+		private static T GetFrameworkElementByName<T>(FrameworkElement referenceElement) where T : FrameworkElement
+		{
+			FrameworkElement child = null;
+
+			//travel the visualtree by VisualTreeHelper to get the template
+			for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(referenceElement); i++)
+			{
+				child = VisualTreeHelper.GetChild(referenceElement, i) as FrameworkElement;
+
+				if (child != null && child.GetType() == typeof(T)) { break; }
+				else if (child != null)
+				{
+					child = GetFrameworkElementByName<T>(child);
+					if (child != null && child.GetType() == typeof(T))
+					{
+						break;
+					}
+				}
+			}
+
+			return child as T;
 		}
 
 		#region drag and drop
@@ -815,8 +916,7 @@ namespace TestGUI
 		private const int SCROLL_START_TOLERANCE = 20;
 		private const int SCROLL_BASE_OFFSET = 6;
 
-		/// Элементы, развёрнутые вручную в ходе работы с разметкой и развёрнутые автоматически в ходе перетаскивания
-		private HashSet<MarkupElement> ExpandedItems = new HashSet<MarkupElement>();
+		/// Элементы, развёрнутые автоматически в ходе перетаскивания
 		private List<TreeViewItem> ExpandedWhileDragging = new List<TreeViewItem>();
 
 		private void MarkupTreeView_MouseDown(object sender, MouseButtonEventArgs e)
@@ -825,7 +925,7 @@ namespace TestGUI
 			{
 				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
 
-				DraggedItem = treeItem != null ? (MarkupTreeViewModel)treeItem.DataContext : null;
+				DraggedItem = treeItem != null ? (MarkupElement)treeItem.DataContext : null;
 				LastMouseDown = e.GetPosition(MarkupTreeView);
 			}
 		}
@@ -960,7 +1060,7 @@ namespace TestGUI
 
 		private void RefreshMarkupTreeView()
 		{
-			MarkupTreeView.ItemsSource = Markup.Markup.Select(m => (MarkupTreeViewModel)m);
+			MarkupTreeView.Items.Refresh();
 
 			/// Восстанавливаем раскрытые ранее элементы
 			var oldExpanded = ExpandedItems;
@@ -971,19 +1071,7 @@ namespace TestGUI
 				if (curItem != null)
 					curItem.IsExpanded = true;
 			}
-		}
-
-		private void MarkupTreeViewItem_Expanded(object sender, RoutedEventArgs e)
-		{
-			ExpandedItems.Add((MarkupTreeViewModel)((TreeViewItem)sender).DataContext);
-			((MarkupTreeViewModel)((TreeViewItem)sender).DataContext).IsExpanded = true;
-		}
-
-		private void MarkupTreeViewItem_Collapsed(object sender, RoutedEventArgs e)
-		{
-			ExpandedItems.Remove((MarkupTreeViewModel)((TreeViewItem)sender).DataContext);
-			((MarkupTreeViewModel)((TreeViewItem)sender).DataContext).IsExpanded = false;
-		}
+		}	
 
 		private TreeViewItem GetNearestContainer(UIElement element)
 		{

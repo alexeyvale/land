@@ -207,12 +207,12 @@
                                           Drop="MarkupTreeView_Drop"
                                           MouseMove="MarkupTreeView_MouseMove">
                                     <TreeView.ItemTemplate>
-                                        <HierarchicalDataTemplate ItemsSource="{Binding Data.Elements}">
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
                                             <StackPanel Orientation="Horizontal">
                                                 <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
                                                 <Grid>
-                                                    <TextBlock Text="{Binding Path=Data.Name, Mode=TwoWay}" />
-                                                    <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Data.Name}"/>
+                                                    <TextBlock Text="{Binding Path=Name, Mode=TwoWay}" />
+                                                    <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name}"/>
                                                 </Grid>
                                                 <StackPanel.ContextMenu>
                                                     <ContextMenu>
@@ -222,17 +222,6 @@
                                                     </ContextMenu>
                                                 </StackPanel.ContextMenu>
                                             </StackPanel>
-                                            <HierarchicalDataTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding IsExpanded}" Value="True">
-                                                    <Setter TargetName="ConcernIcon" Property="Content" Value="&#xf07c;"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter TargetName="ConcernIcon" Property="Foreground" Value="WhiteSmoke"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsEdited}" Value="True">
-                                                    <Setter TargetName="ConcernNameEditor" Property="Visibility" Value="Visible"/>
-                                                </DataTrigger>
-                                            </HierarchicalDataTemplate.Triggers>
                                         </HierarchicalDataTemplate>
                                     </TreeView.ItemTemplate>
                                     <TreeView.ItemContainerStyle>
@@ -243,6 +232,7 @@
                                             <EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
                                             <EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
                                             <EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
+                                            <EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
                                         </Style>
                                     </TreeView.ItemContainerStyle>
                                 </TreeView>
@@ -294,7 +284,7 @@
                                 <TabItem Header="Разметка">
                                     <TreeView Name="MarkupDebugTreeView" SelectedItemChanged="MarkupDebugTreeView_SelectedItemChanged">
                                         <TreeView.Resources>
-                                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ConcernTreeItemStyle}"/>
+                                            <Style TargetType="{x:Type TreeViewItem}"/>
                                         </TreeView.Resources>
                                         <TreeView.ItemTemplate>
                                             <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
