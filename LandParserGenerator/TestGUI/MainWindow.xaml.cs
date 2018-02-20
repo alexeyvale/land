@@ -539,10 +539,17 @@ namespace TestGUI
 
 		#region Работа с точками привязки
 
+		public class MarkupPanelState
+		{
+			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
+			public TreeViewItem EditedItem { get; set; }
+			public string EditedItemOldHeader { get; set; }
+			public TreeViewItem SelectedItem { get; set; }
+		}
+
 		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
-
-		private HashSet<MarkupElement> ExpandedItems = new HashSet<MarkupElement>();
+		private MarkupPanelState MarkupState { get; set; } = new MarkupPanelState();	
 
 		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
@@ -752,10 +759,14 @@ namespace TestGUI
 
 		private void MarkupTreeRenameMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			TreeViewItem item = 
-				MarkupTreeView.ItemContainerGenerator.ContainerFromItem(MarkupTreeView.SelectedItem) as TreeViewItem;
+			TreeViewItem item = MarkupState.SelectedItem;
+
 			var textbox = GetMarkupTreeItemTextBox(item);
 			textbox.Visibility = Visibility.Visible;
+			textbox.Focus();
+
+			MarkupState.EditedItemOldHeader = textbox.Text;
+			MarkupState.EditedItem = item;
 		}
 
 		private void MarkupTreeDeleteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -774,7 +785,7 @@ namespace TestGUI
 
 			if (item.DataContext is Concern)
 			{
-				ExpandedItems.Add((MarkupElement)item.DataContext);
+				MarkupState.ExpandedItems.Add((MarkupElement)item.DataContext);
 
 				var label = GetMarkupTreeItemLabel(item);
 				if (label != null)
@@ -790,7 +801,7 @@ namespace TestGUI
 
 			if (item.DataContext is Concern)
 			{
-				ExpandedItems.Remove((MarkupElement)item.DataContext);
+				MarkupState.ExpandedItems.Remove((MarkupElement)item.DataContext);
 
 				var label = GetMarkupTreeItemLabel(item);
 				if (label != null)
@@ -822,7 +833,16 @@ namespace TestGUI
 
 		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
-		
+			MarkupState.SelectedItem = (TreeViewItem)e.OriginalSource;
+
+			if (MarkupState.EditedItem != null && MarkupState.EditedItem != MarkupState.SelectedItem)
+			{
+				var textbox = GetMarkupTreeItemTextBox(MarkupState.EditedItem);
+				textbox.Visibility = Visibility.Hidden;
+				MarkupState.EditedItem = null;
+			}
+
+			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
@@ -1063,8 +1083,8 @@ namespace TestGUI
 			MarkupTreeView.Items.Refresh();
 
 			/// Восстанавливаем раскрытые ранее элементы
-			var oldExpanded = ExpandedItems;
-			ExpandedItems = new HashSet<MarkupElement>();
+			var oldExpanded = MarkupState.ExpandedItems;
+			MarkupState.ExpandedItems = new HashSet<MarkupElement>();
 			foreach (var item in oldExpanded)
 			{
 				var curItem = GetTreeViewItem(MarkupTreeView, item);

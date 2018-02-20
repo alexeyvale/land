@@ -211,8 +211,8 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
                                                 <Grid>
-                                                    <TextBlock Text="{Binding Path=Name, Mode=TwoWay}" />
-                                                    <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name}"/>
+                                                    <TextBlock Text="{Binding Path=Name}" />
+                                                    <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
                                                 </Grid>
                                                 <StackPanel.ContextMenu>
                                                     <ContextMenu>
