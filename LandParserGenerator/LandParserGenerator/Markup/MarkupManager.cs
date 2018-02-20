@@ -43,18 +43,14 @@ namespace LandParserGenerator.Markup
 		public void Remap(Node newRoot, Dictionary<Node, Node> mapping)
 		{
 			AstRoot = newRoot;
+
+			var visitor = new MarkupRemapVisitor(mapping);
 			for (int i = 0; i < Markup.Count; ++i)
 			{
-				ConcernPoint point = Markup[i] as ConcernPoint;
-				if (point != null)
+				if (!visitor.Visit(Markup[i]))
 				{
-					if (mapping.ContainsKey(point.TreeNode))
-						point.TreeNode = mapping[point.TreeNode];
-					else
-					{
-						Markup.RemoveAt(i);
-						--i;
-					}
+					Markup.RemoveAt(i);
+					--i;
 				}
 			}
 		}
@@ -77,6 +73,44 @@ namespace LandParserGenerator.Markup
 			{
 				return (MarkupManager)serializer.ReadObject(fs);
 			}
+		}
+	}
+
+	public class MarkupRemapVisitor
+	{
+		public Dictionary<Node, Node> Mapping;
+
+		public MarkupRemapVisitor(Dictionary<Node, Node> mapping)
+		{
+			Mapping = mapping;
+		}
+
+		public bool Visit(MarkupElement element)
+		{
+			var result = true;
+
+			if (element is Concern)
+			{
+				var concern = (Concern)element;
+
+				for(var i=0;i<concern.Elements.Count;++i)
+					if(!Visit(concern.Elements[i]))
+					{
+						concern.Elements.RemoveAt(i);
+						--i;
+					}
+			}
+			else
+			{
+				var concernPoint = (ConcernPoint)element;
+
+				if (Mapping.ContainsKey(concernPoint.TreeNode))
+					concernPoint.TreeNode = Mapping[concernPoint.TreeNode];
+				else
+					result = false;
+			}
+
+			return result;
 		}
 	}
 }

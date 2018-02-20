@@ -8,19 +8,24 @@ ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
 program	=	header? uses? declarations block '.'
 header	=	('program'|'unit') ID ';'
 uses 	= 	'Uses' ID (',' ID)* ';'
+
 declarations	=	(const|var|procedure|type)*
-type	=	'type' ID '=' Any ';'
-const	=	'const' (ID '=' Any ';')+
-var		=	'var' (ID (',' ID)* (':' Any)? (':=' Any)? ';')+
-procedure	=	'procedure' name ('(' (ID (',' ID)* ':' Any)? ')')? ';' block ';'
-block	=	'begin' operator (';' operator)* 'end'
+type			=	'type' ID '=' Any ';'
+const			=	'const' const_atom+
+const_atom		=	ID '=' Any ';'
+var				=	'var' var_atom+
+var_atom		=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
+procedure		=	'procedure' %priority(2) name %priority(2) ('(' (ID (',' ID)* ':' Any)? ')')? ';' block ';'
+
+block		=	'begin' operator (';' operator)* 'end'
 operator	=	assign_or_call|for|if|case|block|
 assign_or_call	=	'var'? call (':' Any)? ((':='|'+='|'-='|'*=') Any)?
 for		=	'for' Any 'to' Any 'do' operator
 if		=	'if' Any 'then' operator ('else' operator)?!
 call	=	name ('(' Any ')')?
-case	=	'case' Any 'of' option+ 'end'
-option	=	(Any ':'|'else') operator ';'
+case	=	'case' Any 'of' case_option+ 'end'
+case_option	=	(case_label (',' case_label)* ':'|'else') operator ';'
+case_label	=	Any
 
 name				=	(ID|'('Any')') name_tail_element*
 name_tail_element	=	ID|'.'|'[' Any ']'
@@ -34,4 +39,4 @@ name_tail_element	=	ID|'.'|'[' Any ']'
 %nodes ghost operator
 %nodes leaf name
 
-%mapping land procedure for if case
+%mapping land assign_or_call for if case case_option case_label var var_atom const const_atom procedure
