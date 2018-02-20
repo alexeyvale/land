@@ -209,7 +209,10 @@
                                     <TreeView.ItemTemplate>
                                         <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
                                             <StackPanel Orientation="Horizontal">
-                                                <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
+                                                <Grid>
+                                                    <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
+                                                    <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
+                                                </Grid>
                                                 <Grid>
                                                     <TextBlock Text="{Binding Path=Name}" />
                                                     <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>

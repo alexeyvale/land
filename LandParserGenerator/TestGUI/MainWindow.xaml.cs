@@ -92,14 +92,16 @@ namespace TestGUI
 			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
 		}
 
-		private void MoveCaretToSource(Node node, ICSharpCode.AvalonEdit.TextEditor editor, int? tabToSelect = null)
+		private void MoveCaretToSource(Node node, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
 		{
 			if (node != null && node.StartOffset.HasValue && node.EndOffset.HasValue)
 			{
 				var start = node.StartOffset.Value;
 				var end = node.EndOffset.Value;
-				editor.Select(start, end - start + 1);
 				editor.ScrollToLine(editor.Document.GetLocation(start).Line);
+
+				if (selectText)
+					editor.Select(start, end - start + 1);
 
 				if(tabToSelect.HasValue)
 					MainTabs.SelectedIndex = tabToSelect.Value;
@@ -331,7 +333,7 @@ namespace TestGUI
 		{
 			var treeView = (TreeView)sender;
 
-			MoveCaretToSource((Node)treeView.SelectedItem, FileEditor, 1);
+			MoveCaretToSource((Node)treeView.SelectedItem, FileEditor, true, 1);
 		}
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -347,6 +349,8 @@ namespace TestGUI
 		{
 			FileEditor.Text = File.ReadAllText(filename);
 			TestFileName.Content = filename;
+
+			ParseButton_Click(null, null);
 		}
 
 		private void ClearFileButton_Click(object sender, RoutedEventArgs e)
@@ -556,6 +560,10 @@ namespace TestGUI
 			if (e.NewValue != null)
 			{
 				var point = e.NewValue as MarkupElement;
+
+				if (point is ConcernPoint)
+					MoveCaretToSource(((ConcernPoint)point).TreeNode, FileEditor, false, 1);
+
 				var elementNumStack = new Stack<int>();
 				int? currentElementNum = null;
 				var segments = new List<Tuple<int, int>>();
@@ -639,7 +647,7 @@ namespace TestGUI
 		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var node = (Node)ConcernPointCandidatesList.SelectedItem;
-			MoveCaretToSource(node, FileEditor, 1);
+			MoveCaretToSource(node, FileEditor, true, 1);
 		}
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
@@ -748,6 +756,7 @@ namespace TestGUI
 			{
 				Markup = MarkupManager.Deserialize(openFileDialog.FileName);
 				MarkupTreeView.ItemsSource = Markup.Markup;
+				RefreshMarkupTreeView();
 			}
 		}
 
@@ -787,7 +796,7 @@ namespace TestGUI
 			{
 				MarkupState.ExpandedItems.Add((MarkupElement)item.DataContext);
 
-				var label = GetMarkupTreeItemLabel(item);
+				var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
 				if (label != null)
 					label.Content = "\xf07c";
 			}
@@ -803,7 +812,7 @@ namespace TestGUI
 			{
 				MarkupState.ExpandedItems.Remove((MarkupElement)item.DataContext);
 
-				var label = GetMarkupTreeItemLabel(item);
+				var label = GetMarkupTreeItemLabel(item,"ConcernIcon");
 				if (label != null)
 					label.Content = "\xf07b";
 			}
@@ -814,7 +823,11 @@ namespace TestGUI
 		private void MarkupTreeViewItem_GotFocus(object sender, RoutedEventArgs e)
 		{
 			var item = (TreeViewItem)sender;
-			var label = GetMarkupTreeItemLabel(item);
+
+			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
+			if (label != null)
+				label.Foreground = Brushes.WhiteSmoke;
+			label = GetMarkupTreeItemLabel(item, "PointIcon");
 			if (label != null)
 				label.Foreground = Brushes.WhiteSmoke;
 
@@ -824,7 +837,11 @@ namespace TestGUI
 		private void MarkupTreeViewItem_LostFocus(object sender, RoutedEventArgs e)
 		{
 			var item = (TreeViewItem)sender;
-			var label = GetMarkupTreeItemLabel(item);
+
+			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
+			if (label != null)
+				label.Foreground = Brushes.DimGray;
+			label = GetMarkupTreeItemLabel(item, "PointIcon");
 			if (label != null)
 				label.Foreground = Brushes.DimGray;
 
@@ -848,7 +865,7 @@ namespace TestGUI
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
 		{
 			var item = (TreeViewItem)sender;
-			var label = GetMarkupTreeItemLabel(item);
+			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
 			if (label != null)
 				label.Foreground = Brushes.DimGray;
 
@@ -859,17 +876,14 @@ namespace TestGUI
 		{
 			var item = (TreeViewItem)sender;
 
-			if(!(item.DataContext is Concern))
-			{
-				var label = GetMarkupTreeItemLabel(item);
-				if (label != null)
-					label.Visibility = Visibility.Hidden;
-			}
+			var label = GetMarkupTreeItemLabel(item, item.DataContext is Concern ? "PointIcon" : "ConcernIcon");
+			if (label != null)
+				label.Visibility = Visibility.Hidden;
 
 			e.Handled = true;
 		}
 
-		private Label GetMarkupTreeItemLabel(TreeViewItem item)
+		private Label GetMarkupTreeItemLabel(TreeViewItem item, string labelName)
 		{
 			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
 			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
@@ -878,7 +892,7 @@ namespace TestGUI
 			{
 				if (dataTemplate != null && templateParent != null)
 				{
-					return dataTemplate.FindName("ConcernIcon", templateParent) as Label;
+					return dataTemplate.FindName(labelName, templateParent) as Label;
 				}
 			}
 			catch
@@ -961,7 +975,7 @@ namespace TestGUI
 				{
 					/// Инициируем перемещение
 					ExpandedWhileDragging = new List<TreeViewItem>();
-					DragDrop.DoDragDrop(MarkupTreeView, MarkupTreeView.SelectedValue, DragDropEffects.Move);
+					DragDrop.DoDragDrop(MarkupTreeView, DraggedItem, DragDropEffects.Move);
 				}
 			}
 		}

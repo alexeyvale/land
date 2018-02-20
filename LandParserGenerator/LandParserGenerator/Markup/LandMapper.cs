@@ -69,17 +69,19 @@ namespace LandParserGenerator.Markup
 			foreach (var type in aTypes.Keys)
 				if (bTypes.ContainsKey(type))
 				{
-					var mappings = new Dictionary<Node, Dictionary<Node, Node>>();
+					var mappings = new Dictionary<Node, Dictionary<Node, Dictionary<Node, Node>>>();
 
 					/// В рамках типа сопоставляем всех со всеми
 					foreach (var aNode in aTypes[type])
 					{
-						if(!Similarities.ContainsKey(aNode))
+						mappings[aNode] = new Dictionary<Node, Dictionary<Node, Node>>();
+
+						if (!Similarities.ContainsKey(aNode))
 							Similarities[aNode] = new Dictionary<Node, double>();
 						foreach (var bNode in bTypes[type])
 						{
-							mappings[bNode] = new Dictionary<Node, Node>();
-							Similarities[aNode][bNode] = Similarity(aNode, bNode, mappings[bNode]);
+							mappings[aNode][bNode] = new Dictionary<Node, Node>();
+							Similarities[aNode][bNode] = Similarity(aNode, bNode, mappings[aNode][bNode]);
 						}
 					}					
 
@@ -94,7 +96,7 @@ namespace LandParserGenerator.Markup
 							var bestCandidate = candidates.First(p => p.Value == maxSimilarity).Key;
 							mapping[aNode] = bestCandidate;
 
-							foreach (var kvp in mappings[bestCandidate])
+							foreach (var kvp in mappings[aNode][bestCandidate])
 								mapping[kvp.Key] = kvp.Value; 
 						}
 
