@@ -18,7 +18,8 @@ namespace LandParserGenerator.Parsing.Tree
 
 		/// <summary>
 		/// Родительский узел
-		/// </summary>
+		/// </summary
+		[DataMember]
 		public Node Parent { get; set; }
 
 		/// <summary>
