@@ -731,8 +731,8 @@ namespace LandParserGenerator
 		{
 			var result = String.Empty;
 
-			foreach (var token in TokenOrder)
-				result += $"{token}:\t{Tokens[token]}{Environment.NewLine}";
+			foreach (var token in TokenOrder.Where(t => !String.IsNullOrEmpty(Tokens[t].Pattern)))
+				result += $"{token}:\t{Tokens[token].Pattern}{Environment.NewLine}";
 
 			foreach (var rule in Rules.Where(r=>!r.Key.StartsWith(AUTO_RULE_PREFIX)))
 				result += $"{rule.Key}\t=\t{String.Join(Environment.NewLine, rule.Value.Alternatives.Select(a=>String.Join(" ", a.Elements.Select(elem=>Userify(elem.Symbol)))))}{Environment.NewLine}";
