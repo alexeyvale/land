@@ -56,11 +56,13 @@
                                 <TabControl Grid.Row="3">
                                     <TabItem>
                                         <TabItem.Header>Лог</TabItem.Header>
-                                        <ListBox
+                                        <TextBox
                                             Name="ParserBuidingLog"
-                                            MouseDoubleClick="GrammarListBox_MouseDoubleClick"
+                                            IsReadOnly="True"
+                                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                             FontSize="14pt">
-                                        </ListBox>
+                                        </TextBox>
                                     </TabItem>
                                     <TabItem>
                                         <TabItem.Header>Ошибки</TabItem.Header>

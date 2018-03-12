@@ -69,12 +69,12 @@ namespace TestGUI
 
 		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
 		{
-			ParserBuidingLog.Items.Add(e.Value);
+			ParserBuidingLog.Text += e.Value + Environment.NewLine;
 		}
 
 		private void consoleWriter_WriteEvent(object sender, ConsoleWriterEventArgs e)
 		{
-			ParserBuidingLog.Items.Add(e.Value);
+			ParserBuidingLog.Text += e.Value + Environment.NewLine;
 		}
 
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -865,6 +865,7 @@ namespace TestGUI
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
 		{
 			var item = (TreeViewItem)sender;
+
 			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
 			if (label != null)
 				label.Foreground = Brushes.DimGray;
@@ -895,8 +896,9 @@ namespace TestGUI
 					return dataTemplate.FindName(labelName, templateParent) as Label;
 				}
 			}
-			catch
-			{ }
+			catch(Exception e)
+			{
+			}
 
 			return null;
 		}

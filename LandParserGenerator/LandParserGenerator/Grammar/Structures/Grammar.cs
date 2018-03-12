@@ -407,7 +407,11 @@ namespace LandParserGenerator
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
 
-            return errors;
+#if DEBUG
+			Console.WriteLine(FormatTokensAndRules());
+#endif
+
+			return errors;
 		}
 
 		public string Userify(string name)
@@ -718,5 +722,22 @@ namespace LandParserGenerator
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Возвращает строку с описаниями токенов и правил грамматики
+		/// </summary>
+		/// <returns></returns>
+		public string FormatTokensAndRules()
+		{
+			var result = String.Empty;
+
+			foreach (var token in TokenOrder)
+				result += $"{token}:\t{Tokens[token]}{Environment.NewLine}";
+
+			foreach (var rule in Rules.Where(r=>!r.Key.StartsWith(AUTO_RULE_PREFIX)))
+				result += $"{rule.Key}\t=\t{String.Join(Environment.NewLine, rule.Value.Alternatives.Select(a=>String.Join(" ", a.Elements.Select(elem=>Userify(elem.Symbol)))))}{Environment.NewLine}";
+
+			return result;
+		}
 	}
 }
