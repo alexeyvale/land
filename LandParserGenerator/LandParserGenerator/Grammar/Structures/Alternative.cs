@@ -10,7 +10,7 @@ namespace LandParserGenerator
 	{
 		public string NonterminalSymbolName { get; set; } = null;
 
-		public List<Entry> Elements { get; private set; } = new List<Entry>();
+		public List<Entry> Elements { get; set; } = new List<Entry>();
 
 		public int Count { get { return Elements.Count; } }
 
@@ -34,15 +34,16 @@ namespace LandParserGenerator
 		/// <summary>
 		/// Получение подпоследовательности элементов альтернативы
 		/// </summary>
-		/// <param name="pos">Позиция, с которой начинается подпоследовательность</param>
+		/// <param name="start">Позиция, с которой начинается подпоследовательность</param>
 		/// <returns></returns>
-		public Alternative Subsequence(int pos)
+		public Alternative Subsequence(int start, int? end = null)
 		{
+			var length = end.HasValue ? Math.Min(this.Elements.Count - start, end.Value - start + 1) : this.Elements.Count - start;
+
 			return new Alternative()
 			{
-				Elements = pos < Elements.Count ?
-					this.Elements.GetRange(pos, this.Elements.Count - pos) :
-					new List<Entry>()
+				Elements = start < Elements.Count ?
+					this.Elements.GetRange(start, length) : new List<Entry>()
 			};
 		}
 

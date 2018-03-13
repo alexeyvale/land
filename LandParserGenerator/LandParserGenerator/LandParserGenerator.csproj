@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuilderLR.cs" />
+    <Compile Include="Grammar\Transformer.cs" />
     <Compile Include="Grammar\Structures\Common\Anchor.cs" />
     <Compile Include="Grammar\Structures\Common\Message.cs" />
     <Compile Include="Grammar\Builder\LandParser.cs" />

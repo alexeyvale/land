@@ -14,7 +14,7 @@ namespace LandParserGenerator
 
 	public class Grammar
 	{
-		private GrammarType Type { get; set; }
+		public GrammarType Type { get; private set; }
 
 		// Информация об успешности конструирования грамматики
 		public GrammarState State { get; private set; }
@@ -82,6 +82,7 @@ namespace LandParserGenerator
 			State = GrammarState.Unknown;
 			FirstCacheConsistent = false;
 			FollowCacheConsistent = false;
+			SentenceTokensCacheConsistent = false;
 		}
 
 		#region Описание символов
@@ -364,6 +365,30 @@ namespace LandParserGenerator
 				Tokens.Add(to, body);
 			}
 
+			OnGrammarUpdate();
+		}
+
+		/// <summary>
+		/// Заменяет участок альтернативы на заданный символ 
+		/// </summary>
+		/// <param name="alt">Альтернатива</param>
+		/// <param name="startIdx">Стартовый индекс заменяемого участка</param>
+		/// <param name="length">Длина заменяемого участка</param>
+		/// <param name="symbol">Подставляемый символ</param>
+		public void Replace(Alternative alt, int startIdx, int length, params string[] symbols)
+		{
+			alt.Elements.RemoveRange(startIdx, length);
+			alt.Elements.InsertRange(startIdx, symbols.Select(s=>new Entry(s)));
+
+			OnGrammarUpdate();
+		}
+
+		public void Replace(Alternative alt, int startIdx, int length, params Entry[] symbols)
+		{
+			alt.Elements.RemoveRange(startIdx, length);
+			alt.Elements.InsertRange(startIdx, symbols);
+
+			OnGrammarUpdate();
 		}
 
 		public void PostProcessing()
@@ -662,6 +687,105 @@ namespace LandParserGenerator
 		public HashSet<string> Follow(string nonterminal)
 		{
 			return FollowCache[nonterminal];
+		}
+
+		#endregion
+
+		#region Построение SentenceTokens
+
+		private bool SentenceTokensCacheConsistent { get; set; } = false;
+		private Dictionary<string, HashSet<string>> _sentenceTokens;
+		private Dictionary<string, HashSet<string>> SentenceTokensCache
+		{
+			get
+			{
+				if (_sentenceTokens == null || !SentenceTokensCacheConsistent)
+				{
+					SentenceTokensCacheConsistent = true;
+					try
+					{
+						BuildSentenceTokens();
+					}
+					catch
+					{
+						SentenceTokensCacheConsistent = false;
+						throw;
+					}
+				}
+
+				return _sentenceTokens;
+			}
+
+			set { _sentenceTokens = value; }
+		}
+
+		/// <summary>
+		/// Построение множеств SYMBOLS для нетерминалов
+		/// </summary>
+		private void BuildSentenceTokens()
+		{
+			_sentenceTokens = new Dictionary<string, HashSet<string>>();
+
+			/// Изначально множества пустые
+			foreach (var nt in Rules)
+			{
+				_sentenceTokens[nt.Key] = new HashSet<string>();
+			}
+
+			var changed = true;
+
+			/// Пока итеративно вносятся изменения
+			while (changed)
+			{
+				changed = false;
+
+				/// Проходим по всем альтернативам и пересчитываем FIRST 
+				foreach (var nt in Rules)
+				{
+					var oldCount = _sentenceTokens[nt.Key].Count;
+
+					foreach (var alt in nt.Value)
+					{
+						_sentenceTokens[nt.Key].UnionWith(SentenceTokens(alt));
+					}
+
+					if (!changed)
+					{
+						changed = oldCount != _sentenceTokens[nt.Key].Count;
+					}
+				}
+			}
+		}
+
+		public HashSet<string> SentenceTokens(Alternative alt)
+		{
+			if (alt.Count > 0)
+			{
+				var symbols = new HashSet<string>();
+				var elementsCounter = 0;
+
+				for (; elementsCounter < alt.Count; ++elementsCounter)
+				{
+					var elemFirst = SentenceTokens(alt[elementsCounter]);
+					symbols.UnionWith(elemFirst);
+				}
+
+				return symbols;
+			}
+			else
+			{
+				return new HashSet<string>() { };
+			}
+		}
+
+		public HashSet<string> SentenceTokens(string symbol)
+		{
+			var gramSymbol = this[symbol];
+
+			if (gramSymbol is NonterminalSymbol)
+				return new HashSet<string>(SentenceTokensCache[gramSymbol.Name]);
+			else
+				return new HashSet<string>() { gramSymbol.Name };
 		}
 
 		#endregion

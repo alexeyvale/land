@@ -122,6 +122,7 @@ namespace LandParserGenerator
 		public NodeOption? NodeOption { get; set; } = null;
 		public double? Priority { get; set; } = null;
 		public bool IsLand { get; set; } = false;
+		public HashSet<string> AnySyncTokens { get; set; } = new HashSet<string>();
 
 		public void Set(NodeOption opt)
 		{
