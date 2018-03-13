@@ -68,6 +68,7 @@ namespace LandParserGenerator
 
 		public void Transform()
 		{
+			/// Проходим по всем альтернативам и пытаемся заменить их части на Any
 			foreach (var nt in GrammarTransformed.Rules.Values)
 				foreach (var alt in nt.Alternatives)
 				{
@@ -79,17 +80,50 @@ namespace LandParserGenerator
 					}
 				}
 
-			///// Убираем недостижимые терминалы и нетерминалы
-			////var reachableSymbols = new HashSet<string>();
-			////reachableSymbols.Add(GrammarOriginal.StartSymbol);
+			/// Формируем множество достижимых символов грамматики
+			var reachableSymbols = new HashSet<string>();
+			var currentIterationSymbols = new HashSet<string>();
 
-			////int oldCount;
-			////do
-			////{
-			////	oldCount = reachableSymbols.Count;
-			////	foreach (var nt in reachableSymbols.Where(Gramm))
-			////}
-			////while (oldCount != reachableSymbols.Count);
+			currentIterationSymbols.Add(GrammarTransformed.StartSymbol);
+			reachableSymbols.Add(GrammarTransformed.StartSymbol);
+
+			int oldCount;
+			do
+			{
+				oldCount = reachableSymbols.Count;
+				var newSet = new HashSet<string>();
+
+				foreach (var nt in currentIterationSymbols.Where(s => GrammarTransformed.Rules.ContainsKey(s)))
+					foreach (var alt in GrammarTransformed.Rules[nt].Alternatives)
+						newSet.UnionWith(alt.Elements.Select(e=>e.Symbol));
+
+				currentIterationSymbols = newSet;
+				reachableSymbols.UnionWith(newSet);
+			}
+			while (oldCount != reachableSymbols.Count);
+
+			/// Формируем множества недостижимых токенов и нетерминалов
+			var unreachableTokens = new HashSet<string>(GrammarTransformed.Tokens.Keys).Except(reachableSymbols);
+			var unreachableRules = new HashSet<string>(GrammarTransformed.Rules.Keys).Except(reachableSymbols);
+
+			/// Все недостижимые токены, не указанные в skip и не являющиеся специальными, убираем
+			foreach(var token in unreachableTokens.Where(t=>
+				t!=Grammar.TEXT_TOKEN_NAME 
+				&& t != Grammar.EOF_TOKEN_NAME 
+				&& !GrammarTransformed.Options.GetSymbols(ParsingOption.SKIP).Contains(t))
+			)
+			{
+				GrammarTransformed.TokenOrder.Remove(token);
+				GrammarTransformed.Tokens.Remove(token);
+			}
+
+			/// Также удаляем недостижимые правила
+			foreach (var nonterm in unreachableRules)
+			{
+				GrammarTransformed.Rules.Remove(nonterm);
+			}
+
+			GrammarTransformed.OnGrammarUpdate();
 
 			var test = GrammarTransformed.FormatTokensAndRules();
 		}

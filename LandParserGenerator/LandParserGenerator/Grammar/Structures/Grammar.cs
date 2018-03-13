@@ -74,7 +74,7 @@ namespace LandParserGenerator
 			State = GrammarState.Valid;
 		}
 
-		private void OnGrammarUpdate()
+		public void OnGrammarUpdate()
 		{
 			/// Если грамматика была изменена,
 			/// её корректность нужно перепроверить,
@@ -859,7 +859,7 @@ namespace LandParserGenerator
 				result += $"{token}:\t{Tokens[token].Pattern}{Environment.NewLine}";
 
 			foreach (var rule in Rules.Where(r=>!r.Key.StartsWith(AUTO_RULE_PREFIX)))
-				result += $"{rule.Key}\t=\t{String.Join(Environment.NewLine, rule.Value.Alternatives.Select(a=>String.Join(" ", a.Elements.Select(elem=>Userify(elem.Symbol)))))}{Environment.NewLine}";
+				result += $"{rule.Key}\t=\t{String.Join(" | ", rule.Value.Alternatives.Select(a=>String.Join(" ", a.Elements.Select(elem=>Userify(elem.Symbol)))))}{Environment.NewLine}";
 
 			return result;
 		}
