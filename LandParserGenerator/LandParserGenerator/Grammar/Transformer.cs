@@ -108,7 +108,7 @@ namespace LandParserGenerator
 				foreach (var alt in GrammarTransformed.Rules[currentNonterminal])
 				{
 					var shift = 0;
-					foreach (var range in Replace(GrammarTransformed, alt))
+					foreach (var range in Replace(GrammarTransformed, alt).OrderBy(e=>e.Item1.StartIndex))
 					{
 						var entry = new Entry(Grammar.TEXT_TOKEN_NAME);
 						entry.Options.AnySyncTokens = range.Item2;
@@ -247,12 +247,8 @@ namespace LandParserGenerator
 					if (curRight == curLeft && GrammarOriginal[alt[curLeft]] is TerminalSymbol)
 						continue;
 
-					var curElements = alt.Subsequence(curLeft, curRight).Elements;
 					HashSet<string> syncSet;
-
-					g.Replace(alt, curLeft, range.Length - skipLength, Grammar.TEXT_TOKEN_NAME);
-					var brokeDefinition = !CheckDefinition(g, alt, curLeft, curRight, out syncSet);
-					g.Replace(alt, curLeft, 1, curElements.ToArray());
+					var brokeDefinition = !CheckDefinition(GrammarOriginal, alt, curLeft, curRight, out syncSet);
 
 					/// Если выполняется определение
 					if (!brokeDefinition)
