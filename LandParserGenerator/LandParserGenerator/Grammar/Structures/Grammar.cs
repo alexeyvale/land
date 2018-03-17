@@ -392,6 +392,22 @@ namespace LandParserGenerator
 
 		public void PostProcessing()
 		{
+			/// Для LR грамматики добавляем фиктивный стартовый символ, чтобы произошла
+			/// финальная свёртка
+			if(Type == GrammarType.LR)
+			{
+				if (!String.IsNullOrEmpty(StartSymbol))
+				{
+					this.DeclareNonterminal(new NonterminalSymbol(StartSymbol + "'", new string[][]
+					{
+					new string[]{ StartSymbol }
+					}));
+				}
+
+				this.Options.Clear(ParsingOption.START);
+				this.SetOption(ParsingOption.START, StartSymbol + "'");
+			}
+
 			if(Options.IsSet(ParsingOption.IGNORECASE))
 			{
 				foreach (var token in Tokens.Where(t => t.Key.StartsWith(AUTO_TOKEN_PREFIX)))

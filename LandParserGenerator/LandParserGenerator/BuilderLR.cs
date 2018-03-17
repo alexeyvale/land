@@ -31,11 +31,6 @@ namespace LandParserGenerator
 			exprGrammar.DeclareTerminal(new TerminalSymbol("RPAR", "')'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("ID", "[_a-zA-Z][_0-9a-zA-Z]*"));
 
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E'", new string[][]
-			{
-				new string[]{ "E" }
-			}));
-
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("E", new string[][]
 			{
 				new string[]{ "E", "PLUS", "T" },
@@ -55,6 +50,8 @@ namespace LandParserGenerator
 			}));
 
 			exprGrammar.SetOption(ParsingOption.START, "E'");
+
+			exprGrammar.PostProcessing();
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);
@@ -82,11 +79,6 @@ namespace LandParserGenerator
 			exprGrammar.DeclareTerminal(new TerminalSymbol("C", "'c'"));
 			exprGrammar.DeclareTerminal(new TerminalSymbol("D", "'d'"));
 
-			exprGrammar.DeclareNonterminal(new NonterminalSymbol("s'", new string[][]
-			{
-				new string[]{ "s" }
-			}));
-
 			exprGrammar.DeclareNonterminal(new NonterminalSymbol("s", new string[][]
 			{
 				new string[]{ "c", "c" }
@@ -99,6 +91,8 @@ namespace LandParserGenerator
 			}));
 
 			exprGrammar.SetOption(ParsingOption.START, "s'");
+
+			exprGrammar.PostProcessing();
 
 			/// Строим таблицу парсинга
 			TableLR1 table = new TableLR1(exprGrammar);
@@ -147,11 +141,6 @@ namespace LandParserGenerator
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("LBRACE", "'{'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("RBRACE", "'}'"));
 			yaccGrammar.DeclareTerminal(new TerminalSymbol("PIPE", "'|'"));
-
-			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar'", new string[][]
-			{
-				new string[]{ "grammar" }
-			}));
 
 			yaccGrammar.DeclareNonterminal(new NonterminalSymbol("grammar", new string[][]
 			{
@@ -233,6 +222,8 @@ namespace LandParserGenerator
 			}));
 
 			yaccGrammar.SetOption(ParsingOption.START, "grammar'");
+
+			exprGrammar.PostProcessing();
 
 			TableLR1 table = new TableLR1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");

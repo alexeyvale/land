@@ -115,6 +115,21 @@ namespace LandParserGenerator
 		{
 			return IsSet(opt, symbol) ? MappingOptions[opt][symbol] : new List<dynamic>();
 		}
+
+		public void Clear(NodeOption opt)
+		{
+			NodeOptions.Remove(opt);
+		}
+
+		public void Clear(ParsingOption opt)
+		{
+			ParsingOptions.Remove(opt);
+		}
+
+		public void Clear(MappingOption opt)
+		{
+			MappingOptions.Remove(opt);
+		}
 	}
 
 	public class LocalOptions
