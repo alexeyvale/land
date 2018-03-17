@@ -10,7 +10,7 @@ namespace LandParserGenerator.Parsing.LR
 	/// <summary>
 	/// Таблица LR(1) парсинга
 	/// </summary>
-	public class TableLR1
+	public class TableLR1: BaseTable
 	{
 		private Dictionary<string, int> Lookaheads { get; set; }
 
@@ -27,7 +27,7 @@ namespace LandParserGenerator.Parsing.LR
 		/// </summary>
 		public List<Dictionary<string, int>> Transitions { get; private set; }
 
-		public TableLR1(Grammar g)
+		public TableLR1(Grammar g): base(g)
 		{
 			Lookaheads = g.Tokens.Keys
 				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a, idx = b })
@@ -138,7 +138,23 @@ namespace LandParserGenerator.Parsing.LR
 			private set { Actions[i, Lookaheads[lookahead]] = value; }
 		}
 
-		public void ExportToCsv(string filename)
+		public override List<Message> CheckValidity()
+		{
+			var errors = new List<Message>();
+
+			for(var itemIdx = 0; itemIdx < Actions.GetLength(0); ++itemIdx)
+				for(var lookaheadIdx = 0; lookaheadIdx < Actions.GetLength(1); ++lookaheadIdx)
+					if(Actions[itemIdx, lookaheadIdx].Count > 1)
+						errors.Add(Message.Error(
+								$"Грамматика не является LR(1): для токена {Lookaheads.FirstOrDefault(l=>l.Value == lookaheadIdx)} допустимы действия {String.Join(", ", Actions[itemIdx, lookaheadIdx].Select(a=>a.ActionName))}",
+								null,
+								"LanD"
+							));
+
+			return errors;
+		}
+
+		public override void ExportToCsv(string filename)
 		{
 			var output = new StreamWriter(filename);
 

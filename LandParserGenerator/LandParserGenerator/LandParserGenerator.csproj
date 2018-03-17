@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuilderBase.cs" />
     <Compile Include="BuilderLR.cs" />
     <Compile Include="Grammar\Transformer.cs" />
     <Compile Include="Grammar\Structures\Common\Anchor.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Markup\ConcernPoint.cs" />
     <Compile Include="Markup\LandMapper.cs" />
     <Compile Include="Markup\LandExplorerVisitor.cs" />
+    <Compile Include="Parsing\BaseTable.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />

@@ -46,6 +46,8 @@ namespace LandParserGenerator
 		{
 			GrammarTransformed = grammar;
 
+			/// Частично копируем грамматику, чтобы на основе исходной версии грамматики
+			/// проверять замены на соответствие определению
 			GrammarOriginal = new Grammar(grammar.Type);
 			foreach (var tk in grammar.Tokens.Where(t=>t.Key!=Grammar.EOF_TOKEN_NAME && t.Key!=Grammar.TEXT_TOKEN_NAME))
 				GrammarOriginal.DeclareTerminal(tk.Key, tk.Value.Pattern);
@@ -57,50 +59,69 @@ namespace LandParserGenerator
 				}).ToList());
 			GrammarOriginal.SetOption(ParsingOption.START, grammar.StartSymbol);
 
+			/// Запрещаем заменять символы, отмеченные как land
 			Forbidden = new Dictionary<Alternative, HashSet<int>>();
 
 			foreach (var smb in grammar.Rules)
 				foreach (var alt in smb.Value.Alternatives)
+				{
 					Forbidden[alt] = new HashSet<int>();
+					for (var i = 0; i < alt.Count; ++i)
+						if (alt[i].Options.IsLand || grammar.Options.GetSymbols(MappingOption.LAND).Contains(alt[i].Symbol))
+							Forbidden[alt].Add(i);
+				}
 
-			/// Надо как-то задать интересные области и провести дополнение корнем
+			/// и те символы, которые нужны для их достижения из стартового символа
+			
 		}
 
 		public void Transform()
 		{
-			/// Проходим по всем альтернативам и пытаемся заменить их части на Any
-			foreach (var nt in GrammarTransformed.Rules.Values)
-				foreach (var alt in nt.Alternatives)
+			/// Проходим по всем нетерминалам, наиная со стартового символа,
+			/// и пытаемся заменить на Any части их продукций
+			var reachableSymbols = new HashSet<string>();
+			var queue = new Queue<string>();
+
+			reachableSymbols.Add(GrammarTransformed.StartSymbol);
+			queue.Enqueue(GrammarTransformed.StartSymbol);
+
+			while (queue.Count > 0)
+			{
+				var currentNonterminal = queue.Dequeue();
+
+				foreach (var alt in GrammarTransformed.Rules[currentNonterminal])
 				{
 					var shift = 0;
 					foreach (var range in Replace(GrammarTransformed, alt))
 					{
-						GrammarTransformed.Replace(alt, range.StartIndex - shift, range.Length, Grammar.TEXT_TOKEN_NAME);
-						shift += range.Length - 1;
+						var entry = new Entry(Grammar.TEXT_TOKEN_NAME);
+						entry.Options.AnySyncTokens = range.Item2;
+
+						GrammarTransformed.Replace(alt, range.Item1.StartIndex - shift, range.Item1.Length, entry);
+						shift += range.Item1.Length - 1;
+					}
+
+					/// Проходим по преобразованной альтернативе и добавляем в очередь
+					/// оставшиеся в ней ранее не исследованные нетерминалы
+					foreach(var smb in alt)
+					{
+						/// Заодно формируем множество достижимых символов грамматики
+						if (GrammarTransformed[smb] is NonterminalSymbol)
+						{
+							if (!reachableSymbols.Contains(smb))
+							{
+								queue.Enqueue(smb);
+								reachableSymbols.Add(smb);
+							}
+						}
+						else
+							reachableSymbols.Add(smb);
 					}
 				}
 
-			/// Формируем множество достижимых символов грамматики
-			var reachableSymbols = new HashSet<string>();
-			var currentIterationSymbols = new HashSet<string>();
-
-			currentIterationSymbols.Add(GrammarTransformed.StartSymbol);
-			reachableSymbols.Add(GrammarTransformed.StartSymbol);
-
-			int oldCount;
-			do
-			{
-				oldCount = reachableSymbols.Count;
-				var newSet = new HashSet<string>();
-
-				foreach (var nt in currentIterationSymbols.Where(s => GrammarTransformed.Rules.ContainsKey(s)))
-					foreach (var alt in GrammarTransformed.Rules[nt].Alternatives)
-						newSet.UnionWith(alt.Elements.Select(e=>e.Symbol));
-
-				currentIterationSymbols = newSet;
-				reachableSymbols.UnionWith(newSet);
+				/// Эвристика: если у текущего символа есть пустая альтернатива и альтернатива, 
+				/// порождающая только Any, можно выкинуть пустую ветку
 			}
-			while (oldCount != reachableSymbols.Count);
 
 			/// Формируем множества недостижимых токенов и нетерминалов
 			var unreachableTokens = new HashSet<string>(GrammarTransformed.Tokens.Keys).Except(reachableSymbols);
@@ -128,9 +149,9 @@ namespace LandParserGenerator
 			var test = GrammarTransformed.FormatTokensAndRules();
 		}
 
-		private List<Range> Replace(Grammar g, Alternative alt)
+		private List<Tuple<Range, HashSet<string>>> Replace(Grammar g, Alternative alt)
 		{
-			var replacements = new List<Range>();
+			var replacements = new List<Tuple<Range, HashSet<string>>>();
 
 			if (alt.Elements.Count > 0)
 			{
@@ -171,14 +192,14 @@ namespace LandParserGenerator
 						var leftSearchRange = new Range()
 						{
 							StartIndex = curRange.StartIndex,
-							EndIndex = anyRange.StartIndex
+							EndIndex = anyRange.Item1.StartIndex
 						};
 						foreach (var range in GetRanges(alt, leftSearchRange))
 							ranges.Enqueue(range);
 
 						var rightSearchRange = new Range()
 						{
-							StartIndex = anyRange.EndIndex,
+							StartIndex = anyRange.Item1.EndIndex,
 							EndIndex = curRange.EndIndex
 						};
 						foreach (var range in GetRanges(alt, rightSearchRange))
@@ -190,7 +211,7 @@ namespace LandParserGenerator
 			return replacements;
 		}
 
-		private Range ReplaceInRange(Grammar g, Alternative alt, Range range)
+		private Tuple<Range, HashSet<string>> ReplaceInRange(Grammar g, Alternative alt, Range range)
 		{
 			/// Суммарная длина отступов от границ участка
 			for(var skipLength = 0; skipLength < range.Length; ++ skipLength)
@@ -198,9 +219,16 @@ namespace LandParserGenerator
 				for(var curLeft = range.StartIndex; curLeft <= range.StartIndex + skipLength; ++curLeft)
 				{
 					var curRight = curLeft + range.Length - skipLength - 1;
+
+					/// Не заменяем на ANY одиночный терминальный символ
+					if (curRight == curLeft && GrammarOriginal[alt[curLeft]] is TerminalSymbol)
+						continue;
+
 					var curElements = alt.Subsequence(curLeft, curRight).Elements;
+					HashSet<string> syncSet;
+
 					g.Replace(alt, curLeft, range.Length - skipLength, Grammar.TEXT_TOKEN_NAME);
-					var brokeDefinition = !CheckDefinition(g, alt, curLeft, curRight);
+					var brokeDefinition = !CheckDefinition(g, alt, curLeft, curRight, out syncSet);
 					g.Replace(alt, curLeft, 1, curElements.ToArray());
 
 					/// Если выполняется определение
@@ -213,11 +241,12 @@ namespace LandParserGenerator
 						if (curRight < range.StartIndex + range.Length - 1 && !Forbidden[alt].Contains(curRight + 1))
 							Forbidden[alt].Add(curRight + 1);
 
-						return new Range()
-						{
-							StartIndex = curLeft,
-							Length = range.Length - skipLength
-						};
+						return new Tuple<Range, HashSet<string>>(
+							new Range()
+							{
+								StartIndex = curLeft,
+								Length = range.Length - skipLength
+							}, syncSet);
 					}
 				}
 			return null;
@@ -284,24 +313,28 @@ namespace LandParserGenerator
 			return true;
 		}
 
-		private bool CheckDefinition(Grammar g, Alternative alt, int left, int right)
+		private bool CheckDefinition(Grammar g, Alternative alt, int left, int right, out HashSet<string> syncSet)
 		{
 			var sequenceToReplace = alt.Subsequence(left, right);
 			var sequenceFollowing = alt.Subsequence(right + 1);
 
+			var tmpSyncSet = new HashSet<string>(GrammarOriginal.First(sequenceFollowing));
+			if (tmpSyncSet.Contains(null))
+				tmpSyncSet.UnionWith(GrammarOriginal.Follow(alt.NonterminalSymbolName));
+
 			/// Если множество символов, составляющих предложения, порождаемые указанным участком, 
 			/// не пересекается со множеством символов, которые могут следовать сразу за этим участком
-			/// в последовательностях, порождаемых остальной частью правила
-			if(GrammarOriginal.SentenceTokens(sequenceToReplace).Intersect(GrammarOriginal.First(sequenceFollowing)).Count() == 0)
+			/// в последовательностях, порождаемых остальной частью правила;
+			/// а также если последовательность, порождаемая остатком правила может быть пустой
+			/// или SentenceTokens не пересекается также со множеством токенов, следующих за нетерминалом,
+			/// определяемым альтернативой alt
+			if (GrammarOriginal.SentenceTokens(sequenceToReplace).Intersect(tmpSyncSet).Count() == 0)
 			{
-				/// Если последовательность, порождаемая остатком правила не может быть пустой
-				/// или SentenceTokens не пересекается также со множеством токенов, следующих за нетерминалом,
-				/// определяемым альтернативой alt
-				if (!GrammarOriginal.First(sequenceFollowing).Contains(null)
-					|| GrammarOriginal.SentenceTokens(sequenceToReplace).Intersect(GrammarOriginal.Follow(alt.NonterminalSymbolName)).Count() == 0)
-					return true;
+				syncSet = tmpSyncSet;
+				return true;
 			}
 
+			syncSet = null;
 			return false;
 		}
 	}

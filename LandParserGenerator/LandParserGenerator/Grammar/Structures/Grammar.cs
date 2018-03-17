@@ -189,7 +189,6 @@ namespace LandParserGenerator
 							});
 							break;
 						case GrammarType.LR:
-							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ },
 								new string[]{ newName, elemName }

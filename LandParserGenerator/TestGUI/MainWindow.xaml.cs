@@ -152,10 +152,9 @@ namespace TestGUI
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
-
+				Parser = LandParserGenerator.BuilderLR.BuildParser(GrammarEditor.Text, errors);
 			}
 
-			//ParserBuidingLog
 			ParserBuidingErrors.ItemsSource = errors;
 
 			if (Parser == null || errors.Count > 0)
@@ -896,7 +895,7 @@ namespace TestGUI
 					return dataTemplate.FindName(labelName, templateParent) as Label;
 				}
 			}
-			catch(Exception e)
+			catch
 			{
 			}
 

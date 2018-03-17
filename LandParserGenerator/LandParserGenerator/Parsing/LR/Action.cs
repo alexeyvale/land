@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 namespace LandParserGenerator.Parsing.LR
 {
 	public abstract class Action
-	{ }
+	{
+		public abstract string ActionName { get; }
+	}
 
 	public class ShiftAction: Action
 	{
+		public override string ActionName { get { return "Shift"; } }
+
 		public int TargetItemIndex { get; set; }
 
 		public override string ToString()
@@ -36,6 +40,8 @@ namespace LandParserGenerator.Parsing.LR
 
 	public class ReduceAction: Action
 	{
+		public override string ActionName { get { return "Reduce"; } }
+
 		public Alternative ReductionAlternative { get; set; }
 
 		public override string ToString()
@@ -62,6 +68,8 @@ namespace LandParserGenerator.Parsing.LR
 
 	public class AcceptAction: Action
 	{
+		public override string ActionName { get { return "Accept"; } }
+
 		public override string ToString()
 		{
 			return "accept";

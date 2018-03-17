@@ -10,14 +10,14 @@ namespace LandParserGenerator.Parsing.LL
 	/// <summary>
 	/// Таблица LL(1) парсинга
 	/// </summary>
-	public class TableLL1
+	public class TableLL1: BaseTable
 	{
 		private Grammar Gram { get; set; }
 		private HashSet<Alternative>[,] Table { get; set; }
 		private Dictionary<string, int> Lookaheads { get; set; }
 		private Dictionary<string, int> NonterminalSymbols { get; set; }
 
-		public TableLL1(Grammar g)
+		public TableLL1(Grammar g): base(g)
 		{
 			Gram = g;
 			Table = new HashSet<Alternative>[g.Rules.Count, g.Tokens.Count];
@@ -68,7 +68,7 @@ namespace LandParserGenerator.Parsing.LL
             }
 		}
 
-		public List<Message> CheckValidity()
+		public override List<Message> CheckValidity()
 		{
 			var errors = new List<Message>();
 
@@ -108,7 +108,7 @@ namespace LandParserGenerator.Parsing.LL
 			}
 		}
 
-		public void ExportToCsv(string filename)
+		public override void ExportToCsv(string filename)
 		{
 			var output = new StreamWriter(filename);
 

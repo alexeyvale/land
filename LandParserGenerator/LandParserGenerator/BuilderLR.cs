@@ -14,56 +14,9 @@ namespace LandParserGenerator
 {
 	public static class BuilderLR
 	{
-		private static Type BuildLexer(Grammar grammar, string lexerName)
+		public static Parser BuildParser(string text, List<Message> errors)
 		{
-			/// Генерируем по грамматике файл для ANTLR
-
-			var grammarOutput = new StreamWriter($"{lexerName}.g4");
-
-			grammarOutput.WriteLine($"lexer grammar {lexerName};");
-			grammarOutput.WriteLine();
-			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
-
-			foreach (var token in grammar.Tokens.Values.Where(v => !String.IsNullOrEmpty(v.Pattern)))
-			{
-				/// Если токен служит только для описания других токенов - это fragment
-				var isFragment = grammar.Options.IsSet(ParsingOption.SKIP, token.Name) 
-					|| grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a => a.Contains(token.Name)) ? "" : "fragment ";
-				grammarOutput.WriteLine($"{isFragment}{token.Name}: {token.Pattern} ;");
-			}
-
-			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
-
-			grammarOutput.Close();
-
-			/// Запускаем ANTLR и получаем файл лексера
-
-			Process process = new Process();
-			ProcessStartInfo startInfo = new ProcessStartInfo()
-			{
-				FileName = "cmd.exe",
-				Arguments = $"/C java -jar \"../../../components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
-				WindowStyle = ProcessWindowStyle.Hidden
-			};
-			process.StartInfo = startInfo;
-			process.Start();
-
-			while (!process.HasExited)
-			{
-				System.Threading.Thread.Sleep(0);
-			}
-
-			/// Компилируем .cs-файл лексера
-
-			var codeProvider = new CSharpCodeProvider();
-
-			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
-			compilerParams.GenerateInMemory = true;
-			compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
-			compilerParams.ReferencedAssemblies.Add("System.dll");
-
-			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{lexerName}.cs");
-			return compilationResult.CompiledAssembly.GetType(lexerName);
+			return BuilderBase.BuildParser(GrammarType.LR, text, errors) as Parser;
 		}
 
 		public static Parser BuildExpressionGrammar()
@@ -108,7 +61,7 @@ namespace LandParserGenerator
 			table.ExportToCsv("expr_table.csv");
 
 			/// Получаем тип лексера
-			var lexerType = BuildLexer(exprGrammar, "ExpressionGrammarLexer");
+			var lexerType = BuilderBase.BuildLexer(exprGrammar, "ExpressionGrammarLexer");
 
 			/// Создаём парсер
 			var parser = new Parser(exprGrammar,
@@ -152,7 +105,7 @@ namespace LandParserGenerator
 			table.ExportToCsv("test_table.csv");
 
 			/// Получаем тип лексера
-			var lexerType = BuildLexer(exprGrammar, "TestGrammarLexer");
+			var lexerType = BuilderBase.BuildLexer(exprGrammar, "TestGrammarLexer");
 
 			/// Создаём парсер
 			var parser = new Parser(exprGrammar,
@@ -284,7 +237,7 @@ namespace LandParserGenerator
 			TableLR1 table = new TableLR1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");
 
-			var lexerType = BuildLexer(yaccGrammar, "YaccGrammarLexer");
+			var lexerType = BuilderBase.BuildLexer(yaccGrammar, "YaccGrammarLexer");
 
 			/// Создаём парсер
 

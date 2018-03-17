@@ -75,7 +75,7 @@ namespace LandParserGenerator.Parsing.LR
 						continue;
 					}
 
-					/// Если нужно произвести перенос
+					/// Если нужно произвести свёртку
 					if (Table[currentState, token.Name].Single() is ReduceAction)
 					{
 						Stack.InitBatch();

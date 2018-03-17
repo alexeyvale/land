@@ -20,6 +20,7 @@ namespace LandParserGenerator
 		public Entry(string val)
 		{
 			Symbol = val;
+			Options = new LocalOptions();
 		}
 
 		public Entry(string val, LocalOptions opts)
