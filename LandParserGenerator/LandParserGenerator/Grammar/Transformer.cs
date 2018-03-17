@@ -252,10 +252,6 @@ namespace LandParserGenerator
 					{
 						for (var i = curLeft; i <= curRight; ++i)
 							Forbidden[alt].Add(i);
-						if (curLeft > range.StartIndex && !Forbidden[alt].Contains(curLeft - 1))
-							Forbidden[alt].Add(curLeft - 1);
-						if (curRight < range.StartIndex + range.Length - 1 && !Forbidden[alt].Contains(curRight + 1))
-							Forbidden[alt].Add(curRight + 1);
 
 						return new Tuple<Range, HashSet<string>>(
 							new Range()
