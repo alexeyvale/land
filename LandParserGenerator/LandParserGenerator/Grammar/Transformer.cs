@@ -136,7 +136,35 @@ namespace LandParserGenerator
 				}
 
 				/// Эвристика: если у текущего символа есть пустая альтернатива и альтернатива, 
-				/// порождающая только Any, можно выкинуть пустую ветку
+				/// порождающая только Any, можно выкинуть пустую ветку;
+				/// если получилось несколько альтернатив, состоящих только из Any, можно схлопнуть их в одну
+				var grammarNonterminal = GrammarTransformed.Rules[currentNonterminal];
+				var hasPureAny = false;
+				var emptyAlternativeIdx = (int?)null;
+
+				for(var i=0; i<grammarNonterminal.Alternatives.Count; ++i)
+				{
+					/// Если альтернатива состоит из одного Any
+					if (grammarNonterminal[i].Count == 1 && grammarNonterminal[i][0].Symbol == Grammar.TEXT_TOKEN_NAME)
+					{
+						/// и это не первая такая альтернатива
+						if (hasPureAny)
+						{
+							grammarNonterminal.Alternatives.RemoveAt(i);
+							--i;
+						}
+						else
+							hasPureAny = true;
+					}
+					else
+					{
+						if (grammarNonterminal[i].Count == 0)
+							emptyAlternativeIdx = i;
+					}
+				}
+
+				if (hasPureAny && emptyAlternativeIdx.HasValue)
+					grammarNonterminal.Alternatives.RemoveAt(emptyAlternativeIdx.Value);
 			}
 
 			/// Формируем множества недостижимых токенов и нетерминалов
@@ -171,27 +199,6 @@ namespace LandParserGenerator
 
 			if (alt.Elements.Count > 0)
 			{
-				/// Проверяем, нужно ли отступить от начала ветки на некоторое расстояние,
-				/// чтобы из части ветки перед добавляемыми Any не выводилась пустая строка
-				//var currentElements = alt.Subsequence(0).Elements;
-				//g.Replace(alt, 0, alt.Elements.Count, Grammar.TEXT_TOKEN_NAME);
-				//var brokeLL1 = !CheckLL1(g);
-				//g.Replace(alt, 0, 1, currentElements.ToArray());
-
-				//if (brokeLL1)
-				//{
-				//	if (!Forbidden[alt].Contains(0))
-				//		Forbidden[alt].Add(0);
-
-				//	for (var i = 1; i < alt.Elements.Count; ++i)
-				//	{
-				//		if (g.First(alt.Subsequence(0, i)).Contains(null))
-				//			Forbidden[alt].Add(i);
-				//		else
-				//			break;
-				//	}
-				//}
-
 				/// Формируем набор диапазонов, которые можно попробовать заменить на Any
 				var ranges = new Queue<Range>(GetRanges(alt));
 
