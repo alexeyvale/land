@@ -223,7 +223,7 @@ namespace LandParserGenerator
 
 			yaccGrammar.SetOption(ParsingOption.START, "grammar'");
 
-			exprGrammar.PostProcessing();
+			yaccGrammar.PostProcessing();
 
 			TableLR1 table = new TableLR1(yaccGrammar);
 			table.ExportToCsv("yacc_table.csv");

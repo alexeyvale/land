@@ -24,5 +24,13 @@ namespace LandParserGenerator.Parsing
 		}
 
 		public abstract Node Parse(string text);
+
+		protected void TreePostProcessing(Node root)
+		{
+			root.Accept(new GhostListOptionProcessingVisitor(grammar));
+			root.Accept(new LeafOptionProcessingVisitor(grammar));
+			root.Accept(new MappingOptionsProcessingVisitor(grammar));
+			root.Accept(new UserifyVisitor(grammar));
+		}
 	}
 }

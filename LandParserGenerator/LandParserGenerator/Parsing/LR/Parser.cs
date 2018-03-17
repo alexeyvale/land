@@ -147,6 +147,8 @@ namespace LandParserGenerator.Parsing.LR
 				}
 			}
 
+			TreePostProcessing(root);
+
 			return root;
 		}
 

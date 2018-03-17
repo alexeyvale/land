@@ -204,14 +204,6 @@ namespace LandParserGenerator.Parsing.LL
 			return root;
 		}
 
-		private void TreePostProcessing(Node root)
-		{
-			root.Accept(new GhostListOptionProcessingVisitor(grammar));
-			root.Accept(new LeafOptionProcessingVisitor(grammar));
-			root.Accept(new MappingOptionsProcessingVisitor(grammar));
-			root.Accept(new UserifyVisitor(grammar));
-		}
-
 		/// <summary>
 		/// Пропуск токенов в позиции, задаваемой символом Any
 		/// </summary>
