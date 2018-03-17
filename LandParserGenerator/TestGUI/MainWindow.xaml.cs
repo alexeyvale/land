@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 
 using Microsoft.Win32;
 
+using LandParserGenerator;
 using LandParserGenerator.Parsing.Tree;
 using LandParserGenerator.Markup;
 
@@ -148,11 +149,11 @@ namespace TestGUI
 
 			if (ParsingLL.IsChecked == true)
 			{
-				Parser = LandParserGenerator.BuilderLL.BuildParser(GrammarEditor.Text, errors);
+				Parser = BuilderLL.BuildParser(GrammarEditor.Text, errors);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
-				Parser = LandParserGenerator.BuilderLR.BuildParser(GrammarEditor.Text, errors);
+				Parser = BuilderLR.BuildParser(GrammarEditor.Text, errors);
 			}
 
 			ParserBuidingErrors.ItemsSource = errors;
@@ -298,6 +299,14 @@ namespace TestGUI
 				}
 				OpenGrammar(e.AddedItems[0].ToString());
 			}
+		}
+
+		private void TransformGrammarButton_Click(object sender, RoutedEventArgs e)
+		{
+			var grammar = BuilderBase.BuildGrammar(ParsingLL.IsChecked == true ? GrammarType.LL : GrammarType.LR, GrammarEditor.Text, new List<Message>());
+			var transformer = new Transformer(grammar);
+			var transformed = transformer.Transform();
+			GrammarEditor.Text = transformed.FormatTokensAndRules();
 		}
 
 		#endregion
@@ -1342,6 +1351,7 @@ namespace TestGUI
 			NewTextChanged = true;
 		}
 
-		#endregion		
+		#endregion
+
 	}
 }

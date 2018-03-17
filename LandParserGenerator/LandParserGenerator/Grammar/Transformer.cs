@@ -59,23 +59,39 @@ namespace LandParserGenerator
 				}).ToList());
 			GrammarOriginal.SetOption(ParsingOption.START, grammar.StartSymbol);
 
-			/// Запрещаем заменять символы, отмеченные как land
+			/// Запрещаем заменять символы, отмеченные как land, а также символы,
+			/// необходимые для их достижения
+			var forbiddenSymbols = grammar.Options.GetSymbols(MappingOption.LAND);
+			var oldCount = 0;
+
+			while (oldCount != forbiddenSymbols.Count)
+			{
+				oldCount = forbiddenSymbols.Count;
+				foreach (var smb in grammar.Rules)
+				{
+					foreach (var alt in smb.Value.Alternatives)
+						if (alt.Elements.Any(e=>forbiddenSymbols.Contains(e) || e.Options.IsLand))
+						{
+							forbiddenSymbols.Add(alt.NonterminalSymbolName);
+							break;
+						}
+				}
+			}
+
 			Forbidden = new Dictionary<Alternative, HashSet<int>>();
 
+			/// Отмечаем все вхождения запрещённых символов
 			foreach (var smb in grammar.Rules)
 				foreach (var alt in smb.Value.Alternatives)
 				{
 					Forbidden[alt] = new HashSet<int>();
 					for (var i = 0; i < alt.Count; ++i)
-						if (alt[i].Options.IsLand || grammar.Options.GetSymbols(MappingOption.LAND).Contains(alt[i].Symbol))
+						if (forbiddenSymbols.Contains(alt[i]) || alt[i].Options.IsLand)
 							Forbidden[alt].Add(i);
 				}
-
-			/// и те символы, которые нужны для их достижения из стартового символа
-			
 		}
 
-		public void Transform()
+		public Grammar Transform()
 		{
 			/// Проходим по всем нетерминалам, наиная со стартового символа,
 			/// и пытаемся заменить на Any части их продукций
@@ -146,7 +162,7 @@ namespace LandParserGenerator
 
 			GrammarTransformed.OnGrammarUpdate();
 
-			var test = GrammarTransformed.FormatTokensAndRules();
+			return GrammarTransformed;
 		}
 
 		private List<Tuple<Range, HashSet<string>>> Replace(Grammar g, Alternative alt)
@@ -157,24 +173,24 @@ namespace LandParserGenerator
 			{
 				/// Проверяем, нужно ли отступить от начала ветки на некоторое расстояние,
 				/// чтобы из части ветки перед добавляемыми Any не выводилась пустая строка
-				var currentElements = alt.Subsequence(0).Elements;
-				g.Replace(alt, 0, alt.Elements.Count, Grammar.TEXT_TOKEN_NAME);
-				var brokeLL1 = !CheckLL1(g);
-				g.Replace(alt, 0, 1, currentElements.ToArray());
+				//var currentElements = alt.Subsequence(0).Elements;
+				//g.Replace(alt, 0, alt.Elements.Count, Grammar.TEXT_TOKEN_NAME);
+				//var brokeLL1 = !CheckLL1(g);
+				//g.Replace(alt, 0, 1, currentElements.ToArray());
 
-				if (brokeLL1)
-				{
-					if (!Forbidden[alt].Contains(0))
-						Forbidden[alt].Add(0);
+				//if (brokeLL1)
+				//{
+				//	if (!Forbidden[alt].Contains(0))
+				//		Forbidden[alt].Add(0);
 
-					for (var i = 1; i < alt.Elements.Count; ++i)
-					{
-						if (g.First(alt.Subsequence(0, i)).Contains(null))
-							Forbidden[alt].Add(i);
-						else
-							break;
-					}
-				}
+				//	for (var i = 1; i < alt.Elements.Count; ++i)
+				//	{
+				//		if (g.First(alt.Subsequence(0, i)).Contains(null))
+				//			Forbidden[alt].Add(i);
+				//		else
+				//			break;
+				//	}
+				//}
 
 				/// Формируем набор диапазонов, которые можно попробовать заменить на Any
 				var ranges = new Queue<Range>(GetRanges(alt));

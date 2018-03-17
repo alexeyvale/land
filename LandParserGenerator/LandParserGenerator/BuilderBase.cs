@@ -113,7 +113,7 @@ namespace LandParserGenerator
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
-		public static BaseParser BuildParser(GrammarType type, string text, List<Message> errors)
+		public static Grammar BuildGrammar(GrammarType type, string text, List<Message> errors)
 		{
 			var scanner = new SpecParsing.Scanner();
 			scanner.SetSource(text, 0);
@@ -126,7 +126,7 @@ namespace LandParserGenerator
 			errors.AddRange(specParser.Errors);
 			errors.AddRange(scanner.Log);
 
-			if(!success)
+			if (!success)
 			{
 				//errors.Add(Message.Error(
 				//	$"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
@@ -138,7 +138,12 @@ namespace LandParserGenerator
 				return null;
 			}
 
-			var builtGrammar = specParser.ConstructedGrammar;
+			return specParser.ConstructedGrammar;
+		}
+
+		public static BaseParser BuildParser(GrammarType type, string text, List<Message> errors)
+		{
+			var builtGrammar = BuildGrammar(type, text, errors);
 
 			if (errors.Count() == 0)
 			{
