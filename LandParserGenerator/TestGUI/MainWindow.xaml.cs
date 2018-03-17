@@ -306,7 +306,7 @@ namespace TestGUI
 			var grammar = BuilderBase.BuildGrammar(ParsingLL.IsChecked == true ? GrammarType.LL : GrammarType.LR, GrammarEditor.Text, new List<Message>());
 			var transformer = new Transformer(grammar);
 			var transformed = transformer.Transform();
-			GrammarEditor.Text = transformed.FormatTokensAndRules();
+			GrammarEditor.Text = transformed.GetGrammarText();
 		}
 
 		#endregion

@@ -448,7 +448,7 @@ namespace LandParserGenerator
 			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
 
 #if DEBUG
-			Console.WriteLine(FormatTokensAndRules());
+			Console.WriteLine(GetGrammarText());
 #endif
 
 			return errors;
@@ -862,19 +862,62 @@ namespace LandParserGenerator
 
 		#endregion
 
-		/// <summary>
-		/// Возвращает строку с описаниями токенов и правил грамматики
-		/// </summary>
-		/// <returns></returns>
-		public string FormatTokensAndRules()
+		public string GetGrammarText()
 		{
 			var result = String.Empty;
 
+			/// Выводим терминалы в порядке их описания
 			foreach (var token in TokenOrder.Where(t => !String.IsNullOrEmpty(Tokens[t].Pattern)))
 				result += $"{token}:\t{Tokens[token].Pattern}{Environment.NewLine}";
 
-			foreach (var rule in Rules.Where(r=>!r.Key.StartsWith(AUTO_RULE_PREFIX)))
-				result += $"{rule.Key}\t=\t{String.Join(" | ", rule.Value.Alternatives.Select(a=>String.Join(" ", a.Elements.Select(elem=>Userify(elem.Symbol)))))}{Environment.NewLine}";
+			result += Environment.NewLine;
+
+			/// Выводим правила
+			foreach (var rule in Rules.Where(r => !r.Key.StartsWith(AUTO_RULE_PREFIX)))
+			{
+				result += $"{rule.Key}\t=\t";
+				for(var altIdx = 0; altIdx < rule.Value.Alternatives.Count; ++altIdx)
+				{
+					if (altIdx > 0)
+						result += "\t| ";
+					foreach(var entry in rule.Value.Alternatives[altIdx])
+					{				
+						if (entry.Options.NodeOption.HasValue)
+							result += $"%{entry.Options.NodeOption.Value.ToString().ToLower()} ";
+						if (entry.Options.IsLand)
+							result += "%land ";
+						if(entry.Options.Priority.HasValue)
+							result += $"%priority({entry.Options.Priority.Value}) ";
+						result += $"{Userify(entry.Symbol)} ";
+					}
+					result += Environment.NewLine;
+				}
+			}
+
+			result += Environment.NewLine + "%%" + Environment.NewLine;
+
+			/// Выводим опции
+			foreach(ParsingOption option in Enum.GetValues(typeof(ParsingOption)))
+				if(Options.IsSet(option))
+					result += $"%parsing {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
+			foreach (NodeOption option in Enum.GetValues(typeof(NodeOption)))
+				if (Options.IsSet(option))
+					result += $"%node {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
+			foreach (MappingOption option in Enum.GetValues(typeof(MappingOption)))
+				if (Options.IsSet(option))
+					switch (option)
+					{
+						case MappingOption.LAND:
+							result += $"%mapping {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
+							break;
+						case MappingOption.BASEPRIORITY:
+							result += $"%mapping {option.ToString().ToLower()}({(double)Options.GetParams(option, OptionsManager.GLOBAL_PARAMETERS_SYMBOL).Single()}){Environment.NewLine}";
+							break;
+						case MappingOption.PRIORITY:
+							foreach(var smb in Options.GetSymbols(option))
+								result += $"%mapping {option.ToString().ToLower()}({(double)Options.GetParams(option, smb).Single()}) {smb}{Environment.NewLine}";
+							break;
+					}	
 
 			return result;
 		}
