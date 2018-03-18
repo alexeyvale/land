@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 18.03.2018 14:54:35
+// DateTime: 18.03.2018 20:11:18
 // UserName: Алексей
-// Input file <./Land.y - 18.03.2018 14:54:34>
+// Input file <./Land.y - 18.03.2018 20:11:18>
 
 // options: no-lines gplex
 
@@ -70,12 +70,12 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 18.03.2018 14:54:34
+  // Verbatim content from ./Land.y - 18.03.2018 20:11:18
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 18.03.2018 14:54:34
+  // End verbatim content from ./Land.y - 18.03.2018 20:11:18
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -281,6 +281,11 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			}
 			else
 			{
+				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.TEXT_TOKEN_NAME && ValueStack[ValueStack.Depth-3].dynamicList.Count > 0)
+				{
+					opts.AnySyncTokens = new HashSet<string>(ValueStack[ValueStack.Depth-3].dynamicList.Select(e=>(string)e));
+				}
+				
 				CurrentSemanticValue.entryVal = new Entry(ValueStack[ValueStack.Depth-4].strVal, opts);
 			}
 		}

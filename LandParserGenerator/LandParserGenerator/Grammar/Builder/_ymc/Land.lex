@@ -14,6 +14,7 @@
 %x in_skip
 %x in_regex
 %x before_option_args
+%x before_body_element_args
 
 LETTER [_a-zA-Z]
 DIGIT [0-9]
@@ -114,8 +115,21 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	}
 }
 
+<before_body_element_args> {
+	"(" {
+		yy_pop_state();
+		return (int)Tokens.ELEM_LPAR;
+	}
+}
+
 <0, in_options> {
-	{ID} {
+	{ID}"("? {
+		if(yytext.Contains('('))
+		{
+			yyless(yytext.Length - 1);
+			yy_push_state(before_body_element_args);
+		}
+		
 		yylval.strVal = yytext;
 		return (int)Tokens.ID;
 	}

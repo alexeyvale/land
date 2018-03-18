@@ -148,6 +148,11 @@ body_element
 			}
 			else
 			{
+				if($2 == Grammar.TEXT_TOKEN_NAME && $3.Count > 0)
+				{
+					opts.AnySyncTokens = new HashSet<string>($3.Select(e=>(string)e));
+				}
+				
 				$$ = new Entry($2, opts);
 			}
 		}

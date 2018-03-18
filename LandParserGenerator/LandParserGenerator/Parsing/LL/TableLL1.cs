@@ -78,7 +78,7 @@ namespace LandParserGenerator.Parsing.LL
 					if(this[nt, tok].Count > 1)
 					{
 						errors.Add(Message.Error(
-							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok])}",
+							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok].Select(e=>String.Join(" ", e.Elements.Select(el=> Gram.Userify(el)))))}",
 							Gram.GetAnchor(nt),
 							"LanD"
 						));
