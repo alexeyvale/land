@@ -178,7 +178,7 @@ ARule
     = RuleProlog RightHandSide AlternativesOpt ';'
     
 RuleProlog
-    = anchoredSymbol ':'
+    = %land anchoredSymbol ':'
     
 AlternativesOpt
     = /* skip */
@@ -218,5 +218,5 @@ Action
 %%
 
 %parsing start Program
-%mapping land ARule
+%mapping land ARule RightHandSide
 

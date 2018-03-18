@@ -213,16 +213,25 @@ namespace LandParserGenerator.Parsing.LL
 		private IToken SkipAny(Node anyNode)
 		{
 			IToken token = LexingStream.CurrentToken();
+			HashSet<string> tokensAfterText;
 
-			/// Создаём последовательность символов, идущих в стеке после Any
-			var alt = new Alternative();
-			foreach (var elem in Stack)
-				alt.Add(elem.Symbol);
+			/// Если с Any не связана последовательность стоп-символов
+			if (anyNode.Options.AnySyncTokens.Count == 0)
+			{
+				/// Создаём последовательность символов, идущих в стеке после Any
+				var alt = new Alternative();
+				foreach (var elem in Stack)
+					alt.Add(elem.Symbol);
 
-			/// Определяем множество токенов, которые могут идти после Any
-			var tokensAfterText = grammar.First(alt);
-			/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
-			tokensAfterText.Remove(Grammar.TEXT_TOKEN_NAME);
+				/// Определяем множество токенов, которые могут идти после Any
+				tokensAfterText = grammar.First(alt);
+				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
+				tokensAfterText.Remove(Grammar.TEXT_TOKEN_NAME);
+			}
+			else
+			{
+				tokensAfterText = anyNode.Options.AnySyncTokens;
+			}
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)

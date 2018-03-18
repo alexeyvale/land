@@ -21,6 +21,13 @@ namespace LandParserGenerator
 			return this;
 		}
 
+		public Alternative Add(Entry elem)
+		{
+			Elements.Add(elem);
+
+			return this;
+		}
+
 		public Entry this[int i]
 		{
 			get { return Elements[i]; }

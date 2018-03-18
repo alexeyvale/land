@@ -18,6 +18,7 @@
 	public Quantifier quantVal;
 	public bool boolVal;
 	public string strVal;
+	public Entry entryVal;
 	
 	public Tuple<string, double> strDoublePair;
 	
@@ -34,7 +35,7 @@
 %start lp_description
 
 %left OR
-%token COLON OPT_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
+%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -42,12 +43,13 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
-%type <strVal> body_element_core body_element_atom group body_element
+%type <strVal> body_element_core body_element_atom group
+%type <entryVal> body_element
 %type <strList> identifiers
 %type <altList> body
 %type <boolVal> prec_nonempty
 
-%type <dynamicList> opt_args args context_opt_args
+%type <dynamicList> opt_args args context_opt_args body_element_args
 %type <optionParamsList> context_options
 
 %%
@@ -112,7 +114,7 @@ body
 	;
 	
 body_element
-	: context_options body_element_core quantifier prec_nonempty
+	: context_options body_element_core body_element_args quantifier prec_nonempty
 		{ 		
 			var opts = new LocalOptions();
 			
@@ -137,9 +139,9 @@ body_element
 					opts.Set(nodeOpt);	
 			}
 			
-			if($3.HasValue)
+			if($4.HasValue)
 			{
-				var generated = ConstructedGrammar.GenerateNonterminal($2, $3.Value, $4);
+				var generated = ConstructedGrammar.GenerateNonterminal($2, $4.Value, $5);
 				ConstructedGrammar.AddAnchor(generated, @$);
 				
 				$$ = new Entry(generated, opts);
@@ -149,6 +151,11 @@ body_element
 				$$ = new Entry($2, opts);
 			}
 		}
+	;
+	
+body_element_args
+	: ELEM_LPAR args RPAR { $$ = $2; }
+	| { $$ = new List<dynamic>(); }
 	;
 	
 context_options
@@ -263,8 +270,10 @@ opt_args
 args
 	: args COMMA RNUM { $$ = $1; $$.Add($3); }
 	| args COMMA STRING { $$ = $1; $$.Add($3); }
+	| args COMMA ID { $$ = $1; $$.Add($3); }
 	| RNUM { $$ = new List<dynamic>(){ $1 }; }
 	| STRING { $$ = new List<dynamic>(){ $1 }; }
+	| ID { $$ = new List<dynamic>(){ $1 }; }
 	;
 	
 identifiers

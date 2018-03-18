@@ -131,7 +131,11 @@ namespace LandParserGenerator
 							}
 						}
 						else
+						{
 							reachableSymbols.Add(smb);
+							if (smb.Options.AnySyncTokens.Count > 0)
+								reachableSymbols.UnionWith(smb.Options.AnySyncTokens);
+						}
 					}
 				}
 
