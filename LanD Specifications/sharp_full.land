@@ -1315,4 +1315,4 @@ identifier
 
 %parsing start compilation_unit
 %parsing skip SINGLE_LINE_DOC_COMMENT DELIMITED_DOC_COMMENT SINGLE_LINE_COMMENT DELIMITED_COMMENT
-%mapping land class_definition struct_definition
+%mapping land class_definition struct_definition using_directive
