@@ -913,8 +913,12 @@ namespace LandParserGenerator
 							result += "%land ";
 						if(entry.Options.Priority.HasValue)
 							result += $"%priority({entry.Options.Priority.Value}) ";
-						result += $"{Userify(entry.Symbol)} ";
-					}
+						if(entry.Options.AnySyncTokens != null 
+							&& entry.Options.AnySyncTokens.Count > 0)
+							result += $"{Userify(entry.Symbol)}({String.Join(", ", entry.Options.AnySyncTokens.Select(e=>Userify(e)))}) ";
+						else
+							result += $"{Userify(entry.Symbol)} ";
+                    }
 					result += Environment.NewLine;
 				}
 			}

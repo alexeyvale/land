@@ -131,14 +131,11 @@ namespace LandParserGenerator
 							}
 						}
 						else
-						{
 							reachableSymbols.Add(smb);
-							if (smb.Options.AnySyncTokens.Count > 0)
-								reachableSymbols.UnionWith(smb.Options.AnySyncTokens);
-						}
 					}
 				}
 
+				#region Удаление дублирующихся веток из одного Any и пустой ветки, если есть ветка из Any
 				/// Эвристика: если у текущего символа есть пустая альтернатива и альтернатива, 
 				/// порождающая только Any, можно выкинуть пустую ветку;
 				/// если получилось несколько альтернатив, состоящих только из Any, можно схлопнуть их в одну
@@ -169,8 +166,32 @@ namespace LandParserGenerator
 
 				if (hasPureAny && emptyAlternativeIdx.HasValue)
 					grammarNonterminal.Alternatives.RemoveAt(emptyAlternativeIdx.Value);
+				#endregion
 			}
 
+			#region Нормализация AnyExcept
+			foreach (var nt in GrammarTransformed.Rules)
+				foreach (var alt in nt.Value.Alternatives)
+					for (var i = 0; i < alt.Elements.Count; ++i)
+					{
+						if (alt[i].Symbol == Grammar.TEXT_TOKEN_NAME)
+						{
+							var sequenceFollowing = alt.Subsequence(i + 1);
+
+							var afterAnySet = new HashSet<string>(GrammarTransformed.First(sequenceFollowing));
+							if (afterAnySet.Contains(null))
+								afterAnySet.UnionWith(GrammarTransformed.Follow(alt.NonterminalSymbolName));
+
+							/// Удаляем синхронизирующие множества у тех Any, после которых не могут идти Any
+							if (!afterAnySet.Contains(Grammar.TEXT_TOKEN_NAME))
+								alt[i].Options.AnySyncTokens.Clear();
+							else
+								reachableSymbols.UnionWith(alt[i].Options.AnySyncTokens);
+						}
+					}
+			#endregion
+
+			#region Формирование множеств Tc и Nc
 			/// Формируем множества недостижимых токенов и нетерминалов
 			var unreachableTokens = new HashSet<string>(GrammarTransformed.Tokens.Keys).Except(reachableSymbols);
 			var unreachableRules = new HashSet<string>(GrammarTransformed.Rules.Keys).Except(reachableSymbols);
@@ -191,6 +212,7 @@ namespace LandParserGenerator
 			{
 				GrammarTransformed.Rules.Remove(nonterm);
 			}
+			#endregion
 
 			GrammarTransformed.OnGrammarUpdate();
 
@@ -340,6 +362,9 @@ namespace LandParserGenerator
 			var tmpSyncSet = new HashSet<string>(GrammarOriginal.First(sequenceFollowing));
 			if (tmpSyncSet.Contains(null))
 				tmpSyncSet.UnionWith(GrammarOriginal.Follow(alt.NonterminalSymbolName));
+
+			tmpSyncSet.Remove(null);
+			tmpSyncSet.Remove(Grammar.EOF_TOKEN_NAME);
 
 			/// Если множество символов, составляющих предложения, порождаемые указанным участком, 
 			/// не пересекается со множеством символов, которые могут следовать сразу за этим участком
