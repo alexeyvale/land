@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 18.03.2018 13:55:48
+//  DateTime: 18.03.2018 14:54:35
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 18.03.2018 13:55:47>
+//  GPLEX input file <./Land.lex - 18.03.2018 14:54:34>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize

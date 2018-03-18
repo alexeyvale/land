@@ -235,17 +235,26 @@ option
 				case OptionCategory.PARSING:
 					ParsingOption parsingOpt;
 					goodOption = Enum.TryParse($2.ToUpper(), out parsingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(parsingOpt, $4.ToArray());
+					if(goodOption) 
+						SafeGrammarAction(() => { 
+					 		ConstructedGrammar.SetOption(parsingOpt, $4.ToArray());
+					 	}, @1);
 					break;
 				case OptionCategory.NODES:
 					NodeOption nodeOpt;
 					goodOption = Enum.TryParse($2.ToUpper(), out nodeOpt);
-					if(goodOption) ConstructedGrammar.SetOption(nodeOpt, $4.ToArray());
+					if(goodOption)
+						SafeGrammarAction(() => { 					
+							ConstructedGrammar.SetOption(nodeOpt, $4.ToArray());
+						}, @1);
 					break;
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
 					goodOption = Enum.TryParse($2.ToUpper(), out mappingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3.ToArray());
+					if(goodOption)
+						SafeGrammarAction(() => { 			
+							ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3.ToArray());
+						}, @1);
 					break;
 				default:
 					break;

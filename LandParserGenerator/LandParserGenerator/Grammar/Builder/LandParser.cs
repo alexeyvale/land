@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 18.03.2018 13:55:48
+// DateTime: 18.03.2018 14:54:35
 // UserName: Алексей
-// Input file <./Land.y - 18.03.2018 13:55:47>
+// Input file <./Land.y - 18.03.2018 14:54:34>
 
 // options: no-lines gplex
 
@@ -70,12 +70,12 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 18.03.2018 13:55:47
+  // Verbatim content from ./Land.y - 18.03.2018 14:54:34
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 18.03.2018 13:55:47
+  // End verbatim content from ./Land.y - 18.03.2018 14:54:34
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -363,17 +363,26 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 				case OptionCategory.PARSING:
 					ParsingOption parsingOpt;
 					goodOption = Enum.TryParse(ValueStack[ValueStack.Depth-3].strVal.ToUpper(), out parsingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(parsingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
+					if(goodOption) 
+						SafeGrammarAction(() => { 
+					 		ConstructedGrammar.SetOption(parsingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
+					 	}, LocationStack[LocationStack.Depth-4]);
 					break;
 				case OptionCategory.NODES:
 					NodeOption nodeOpt;
 					goodOption = Enum.TryParse(ValueStack[ValueStack.Depth-3].strVal.ToUpper(), out nodeOpt);
-					if(goodOption) ConstructedGrammar.SetOption(nodeOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
+					if(goodOption)
+						SafeGrammarAction(() => { 					
+							ConstructedGrammar.SetOption(nodeOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
+						}, LocationStack[LocationStack.Depth-4]);
 					break;
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
 					goodOption = Enum.TryParse(ValueStack[ValueStack.Depth-3].strVal.ToUpper(), out mappingOpt);
-					if(goodOption) ConstructedGrammar.SetOption(mappingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray(), ValueStack[ValueStack.Depth-2].dynamicList.ToArray());
+					if(goodOption)
+						SafeGrammarAction(() => { 			
+							ConstructedGrammar.SetOption(mappingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray(), ValueStack[ValueStack.Depth-2].dynamicList.ToArray());
+						}, LocationStack[LocationStack.Depth-4]);
 					break;
 				default:
 					break;
