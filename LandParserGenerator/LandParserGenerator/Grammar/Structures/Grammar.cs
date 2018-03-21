@@ -449,10 +449,6 @@ namespace LandParserGenerator
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
 
-#if DEBUG
-			Console.WriteLine(GetGrammarText());
-#endif
-
 			return errors;
 		}
 
@@ -929,8 +925,8 @@ namespace LandParserGenerator
 			foreach (ParsingOption option in Enum.GetValues(typeof(ParsingOption)))
 				if (Options.IsSet(option))
 				{
-					if (option == ParsingOption.START)
-						result += $"%parsing {option.ToString().ToLower()} {Rules[StartSymbol].Alternatives[0][0]}";
+					if (option == ParsingOption.START && this.Type == GrammarType.LR)
+						result += $"%parsing {option.ToString().ToLower()} {Rules[StartSymbol].Alternatives[0][0]}{Environment.NewLine}";
 					else
 						result += $"%parsing {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
 				}
