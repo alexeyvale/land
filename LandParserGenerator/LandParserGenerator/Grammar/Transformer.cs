@@ -263,33 +263,48 @@ namespace LandParserGenerator
 		private Tuple<Range, HashSet<string>> ReplaceInRange(Grammar g, Alternative alt, Range range)
 		{
 			/// Суммарная длина отступов от границ участка
-			for(var skipLength = 0; skipLength < range.Length; ++ skipLength)
+			for (var skipLength = 0; skipLength < range.Length; ++skipLength)
+			{
+				var ranges = new List<Range>();
+
 				/// Цикл по возможным вариантам для левой границы с учётом отступа
-				for(var curLeft = range.StartIndex; curLeft <= range.StartIndex + skipLength; ++curLeft)
+				for (var curLeft = range.StartIndex; curLeft <= range.StartIndex + skipLength; ++curLeft)
 				{
 					var curRight = curLeft + range.Length - skipLength - 1;
 
+					ranges.Add(new Range()
+					{
+						StartIndex = curLeft,
+						EndIndex = curRight
+					});
+				}
+
+				/// Перебираем диапазоны в порядке убывания количества нетерминалов в них
+				ranges = ranges.OrderByDescending(r => alt.Elements
+					.Skip(r.StartIndex)
+					.Take(r.Length)
+					.Count(e => GrammarOriginal[e.Symbol] is NonterminalSymbol)).ToList();
+
+				foreach(var r in ranges)
+				{
 					/// Не заменяем на ANY одиночный терминальный символ
-					if (curRight == curLeft && GrammarOriginal[alt[curLeft]] is TerminalSymbol)
+					if (r.EndIndex == r.StartIndex && GrammarOriginal[alt[r.StartIndex]] is TerminalSymbol)
 						continue;
 
 					HashSet<string> syncSet;
-					var brokeDefinition = !CheckDefinition(GrammarOriginal, alt, curLeft, curRight, out syncSet);
+					var brokeDefinition = 
+						!CheckDefinition(GrammarOriginal, alt, r.StartIndex, r.EndIndex, out syncSet);
 
 					/// Если выполняется определение
 					if (!brokeDefinition)
 					{
-						for (var i = curLeft; i <= curRight; ++i)
+						for (var i = r.StartIndex; i <= r.EndIndex; ++i)
 							Forbidden[alt].Add(i);
 
-						return new Tuple<Range, HashSet<string>>(
-							new Range()
-							{
-								StartIndex = curLeft,
-								Length = range.Length - skipLength
-							}, syncSet);
+						return new Tuple<Range, HashSet<string>>(r, syncSet);
 					}
 				}
+			}
 			return null;
 		}
 
