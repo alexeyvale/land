@@ -826,6 +826,143 @@ namespace LandParserGenerator
 
 		#endregion
 
+		#region Построение N-GRAMS
+
+		public class TokenSequence
+		{
+			public List<string> Sequence { get; set; }
+			
+			public TokenSequence(params string[] elements)
+			{
+				Sequence = new List<string>(elements);
+			}
+
+			public override int GetHashCode()
+			{
+				if (Sequence.Count > 0)
+					return 3 * Sequence.Count
+						+ 9 * Sequence[0].Length
+						+ 81 * Sequence[Sequence.Count - 1].Length;
+				else
+					return 0;
+			}
+
+			public override bool Equals(object obj)
+			{
+				if (!(obj is TokenSequence))
+					return false;
+
+				return Sequence.SequenceEqual(((TokenSequence)obj).Sequence);
+			}
+
+			public TokenSequence Clone()
+			{
+				return new TokenSequence()
+				{
+					Sequence = new List<string>(this.Sequence)
+				};
+			}
+		}
+
+		private int K { get; set; }
+
+		private bool PrefixesCacheConsistent { get; set; } = false;
+		private Dictionary<string, HashSet<TokenSequence>> _prefixes;
+		private Dictionary<string, HashSet<TokenSequence>> PrefixesCache
+		{
+			get
+			{
+				if (_prefixes == null || !PrefixesCacheConsistent)
+				{
+					PrefixesCacheConsistent = true;
+					try
+					{
+						BuildPrefixes();
+					}
+					catch
+					{
+						PrefixesCacheConsistent = false;
+						throw;
+					}
+				}
+
+				return _prefixes;
+			}
+
+			set { _prefixes = value; }
+		}
+
+		private void BuildPrefixes()
+		{
+			_prefixes = new Dictionary<string, HashSet<TokenSequence>>();
+
+			foreach (var nt in this.Rules.Keys)
+				Prefixes(nt);
+		}
+
+		public HashSet<TokenSequence> Prefixes(List<string> alt)
+		{
+			var prefixes = new HashSet<TokenSequence>();
+			var stack = new Stack<TokenSequence>();
+
+			stack.Push(new TokenSequence(alt.ToArray()));
+
+			while (stack.Count > 0)
+			{
+				var current = stack.Pop();
+				var canGetPrefix = true;
+
+				for (var i = 0; i < Math.Min(current.Sequence.Count, K); ++i)
+				{
+					if (this[current.Sequence[i]] is NonterminalSymbol)
+					{
+						canGetPrefix = false;
+
+						var sequencesToInsert = PrefixesCache.ContainsKey(current.Sequence[i])
+							? PrefixesCache[current.Sequence[i]].Select(p => p.Sequence)
+							: Rules[current.Sequence[i]].Alternatives.Select(a => a.Elements.Select(e => e.Symbol));
+
+						foreach (var seq in sequencesToInsert)
+						{
+							var modified = current.Clone();
+							modified.Sequence.RemoveAt(i);
+							modified.Sequence.InsertRange(i, seq);
+
+							stack.Push(modified);
+						}
+
+						break;
+					}
+				}
+
+				if (canGetPrefix)
+				{
+					if (current.Sequence.Count > K)
+						current.Sequence = current.Sequence.Take(K).ToList();
+					prefixes.Add(current);
+				}
+			}
+
+			return prefixes;
+		}
+
+		public HashSet<TokenSequence> Prefixes(string symbol)
+		{
+			var gramSymbol = this[symbol];
+
+			if (gramSymbol is NonterminalSymbol)
+			{
+				if (!PrefixesCache.ContainsKey(symbol))
+					PrefixesCache[gramSymbol.Name] = Prefixes(new List<string>() { symbol });
+
+				return new HashSet<TokenSequence>(PrefixesCache[gramSymbol.Name]);
+			}
+			else
+				return new HashSet<TokenSequence>() { new TokenSequence(gramSymbol.Name) };
+		}
+
+		#endregion
+
 		#region For LR Parsing
 
 		/// <summary>
