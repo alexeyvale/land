@@ -468,7 +468,7 @@ namespace LandParserGenerator
 						case Quantifier.ZERO_OR_MORE:
 							return Userify(elementName) + "*";
 						case Quantifier.ZERO_OR_ONE:					
-							return Userify(elementName) + "*";
+							return Userify(elementName) + "?";
 					}
 				}
 				else

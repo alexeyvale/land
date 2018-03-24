@@ -1,0 +1,50 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING		: STRING_STD|STRING_ESC
+STRING_SKIP	: '\\"' | '\\\\'
+STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+STRING_ESC	: '@'('"' ~["]* '"')+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+ 
+namespace_content	=	opening_directive*! (attribute|namespace|namespace_member)*
+opening_directive	=	('using'|'extern') Any ';'
+namespace			=	'namespace' name '{' namespace_content '}'
+
+namespace_member		=	name? (enum|delegate|class_struct_interface)
+enum					=	'enum' name Any '{' Any '}' ';'?
+delegate				=	'delegate' name before_body? ';'
+class_struct_interface	=	('class'|'interface'|'struct') name Any '{' class_content_element* '}' ';'?
+
+class_content_element	=	attribute | keyword_marked_entities | name (keyword_marked_entities | class_member_tail)
+keyword_marked_entities	=	enum | delegate | class_struct_interface | operator
+operator			=	'operator' Any arguments class_member_tail
+class_member_tail	=	before_body? (block init_value? | initializer | ';')
+
+before_body			=	Any ':' (arguments|Any)*
+initializer			= 	init_expression | init_value
+init_expression		=	'=>' (Any|block)* ';'
+init_value			=	'=' (Any|block)* ';'
+
+name				=	(ID|arguments|'extern') name_tail_element*
+name_tail_element	=	ID|arguments|'extern'|'.'|'?'|'<' name_tail_element* '>'|'[' Any ']'|','|'::'
+
+attribute			=	'[' attribute_content ']'
+attribute_content	=	(Any|attribute)*
+block				=	'{' block_content '}'
+block_content		=	(Any|block)*
+arguments			=	'(' arguments_content ')'
+arguments_content	=	(Any|arguments)*
+
+%%
+
+%parsing start namespace_content
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+
+%nodes ghost  name_tail_element keyword_marked_entities initializer
+%nodes leaf name
+
+%mapping land namespace enum delegate class_struct_interface
