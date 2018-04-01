@@ -38,11 +38,8 @@ namespace LandParserGenerator
 
 			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
 			{
-                /// Если токен служит только для описания других токенов - это fragment
-                var isFragment = "";// grammar.SkipTokens.Contains(token) 
-                    //|| grammar.Rules.SelectMany(r => r.Value.Alternatives).Any(a=>a.Contains(token)) ?
-					//"" : "fragment ";
-				grammarOutput.WriteLine($"{isFragment}{token}: {grammar.Tokens[token].Pattern} ;");
+				var fragment = grammar.Options.GetSymbols(ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
+				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern} ;");
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 

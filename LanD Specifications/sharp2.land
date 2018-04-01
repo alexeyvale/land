@@ -1,12 +1,16 @@
 DIRECTIVE	: '#' ~[\n\r]*
 DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+
 COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
-STRING		: STRING_STD|STRING_VERB
-STRING_SKIP	: '\\"' | '\\\\'
-STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
 STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
  
@@ -33,17 +37,15 @@ init_value			=	'=' (Any|block)* ';'
 name				=	(ID|arguments|'extern') name_tail_element*
 name_tail_element	=	ID|arguments|'extern'|'.'|'?'|'<' name_tail_element* '>'|'[' Any ']'|','|'::'
 
-attribute			=	'[' attribute_content ']'
-attribute_content	=	(Any|attribute)*
-block				=	'{' block_content '}'
-block_content		=	(Any|block)*
-arguments			=	'(' arguments_content ')'
-arguments_content	=	(Any|arguments)*
+attribute			=	'[' (Any|attribute)* ']'
+block				=	'{' (Any|block)* '}'
+arguments			=	'(' (Any|arguments)* ')'
 
 %%
 
-%parsing start namespace_content
+%parsing fragment STRING_INT_CODE
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+%parsing start namespace_content
 
 %nodes ghost  name_tail_element keyword_marked_entities initializer
 %nodes leaf name
