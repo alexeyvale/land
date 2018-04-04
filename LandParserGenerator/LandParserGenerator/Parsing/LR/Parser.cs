@@ -42,13 +42,13 @@ namespace LandParserGenerator.Parsing.LR
 
 				if (Stack.CountSymbols > 0)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {token.Name}; символ на вершине стека: {Stack.PeekSymbol().Symbol}",
+						$"Текущий токен: {grammar.Userify(token.Name)}; символ на вершине стека: {grammar.Userify(Stack.PeekSymbol().Symbol)}",
 						token.Line,
 						token.Column
 					));
 				else
 					Log.Add(Message.Trace(
-						$"Текущий токен: {token.Name}",
+						$"Текущий токен: {grammar.Userify(token.Name)}",
 						token.Line,
 						token.Column
 					));
@@ -66,7 +66,7 @@ namespace LandParserGenerator.Parsing.LR
 						Stack.Push(tokenNode, action.TargetItemIndex);
 
 						Log.Add(Message.Trace(
-							$"Перенос токена {token.Name}",
+							$"Перенос токена {grammar.Userify(token.Name)}",
 							token.Line,
 							token.Column
 						));
@@ -127,7 +127,12 @@ namespace LandParserGenerator.Parsing.LR
 					if (Table[currentState, Grammar.TEXT_TOKEN_NAME].Count == 1)
 					{
 						token = SkipAny();
-						continue;
+
+						/// Если при пропуске текста произошла ошибка, прерываем разбор
+						if (token.Name == Grammar.ERROR_TOKEN_NAME)
+							break;
+						else
+							continue;
 					}
 
 					token = ErrorRecovery();
@@ -135,7 +140,7 @@ namespace LandParserGenerator.Parsing.LR
 					if (token == null)
 					{
 						Errors.Add(Message.Error(
-							$"Неожиданный символ {token.Name}",
+							$"Неожиданный символ {grammar.Userify(token.Name)}",
 							token.Line,
 							token.Column
 						));
@@ -147,7 +152,8 @@ namespace LandParserGenerator.Parsing.LR
 				}
 			}
 
-			TreePostProcessing(root);
+			if(root != null)
+				TreePostProcessing(root);
 
 			return root;
 		}
@@ -199,13 +205,26 @@ namespace LandParserGenerator.Parsing.LR
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
-			while (Table[Stack.PeekState(), token.Name].Count == 0)
+			while (Table[Stack.PeekState(), token.Name].Count == 0 
+				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				endOffset = token.EndOffset;
 				token = LexingStream.NextToken();
 			}
 
 			anyNode.SetAnchor(startOffset, endOffset);
+
+			/// Если дошли до конца входной строки, и это было не по плану
+			if (token.Name == Grammar.EOF_TOKEN_NAME
+				&& Table[Stack.PeekState(), token.Name].Count == 0)
+			{
+				Errors.Add(Message.Error(
+					$"Ошибка при пропуске токенов: неожиданный конец файла",
+					null
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
 
 			return token;
 		}

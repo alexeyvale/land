@@ -12,7 +12,12 @@ namespace LandParserGenerator.Parsing
 	/// </summary>
 	public abstract class BaseTable
 	{
-		public BaseTable(Grammar g) { }
+		protected Grammar Gram { get; set; }
+
+		public BaseTable(Grammar g)
+		{
+			Gram = g;
+		}
 
 		public abstract List<Message> CheckValidity();
 

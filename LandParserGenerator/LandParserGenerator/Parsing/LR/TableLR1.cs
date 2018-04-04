@@ -146,7 +146,7 @@ namespace LandParserGenerator.Parsing.LR
 				for(var lookaheadIdx = 0; lookaheadIdx < Actions.GetLength(1); ++lookaheadIdx)
 					if(Actions[itemIdx, lookaheadIdx].Count > 1)
 						errors.Add(Message.Error(
-								$"Грамматика не является LR(1): для токена {Lookaheads.FirstOrDefault(l=>l.Value == lookaheadIdx)} допустимы действия {String.Join(", ", Actions[itemIdx, lookaheadIdx].Select(a=>a.ActionName))}",
+								$"Грамматика не является LR(1): для токена {Gram.Userify(Lookaheads.FirstOrDefault(l=>l.Value == lookaheadIdx).Key)} допустимы действия {String.Join(", ", Actions[itemIdx, lookaheadIdx].Select(a=>a.ActionName))}",
 								null,
 								"LanD"
 							));

@@ -12,14 +12,12 @@ namespace LandParserGenerator.Parsing.LL
 	/// </summary>
 	public class TableLL1: BaseTable
 	{
-		private Grammar Gram { get; set; }
 		private HashSet<Alternative>[,] Table { get; set; }
 		private Dictionary<string, int> Lookaheads { get; set; }
 		private Dictionary<string, int> NonterminalSymbols { get; set; }
 
 		public TableLL1(Grammar g): base(g)
 		{
-			Gram = g;
 			Table = new HashSet<Alternative>[g.Rules.Count, g.Tokens.Count];
 
 			NonterminalSymbols = g.Rules

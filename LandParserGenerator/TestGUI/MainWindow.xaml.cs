@@ -8,8 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 using Microsoft.Win32;
 
