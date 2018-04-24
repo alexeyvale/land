@@ -98,14 +98,14 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 "%"{ID}"("? {	
-		if(yytext.Contains('('))
-		{
-			yyless(yytext.Length - 1);
-			yy_push_state(before_option_args);
-		}
-			
-		yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
-		return (int)Tokens.OPTION_NAME;
+	if(yytext.Contains('('))
+	{
+		yyless(yytext.Length - 1);
+		yy_push_state(before_option_args);
+	}
+		
+	yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
+	return (int)Tokens.OPTION_NAME;
 }
 
 <before_option_args> {
@@ -122,18 +122,18 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	}
 }
 
-<0, in_options> {
-	{ID}"("? {
-		if(yytext.Contains('('))
-		{
-			yyless(yytext.Length - 1);
-			yy_push_state(before_body_element_args);
-		}
-		
-		yylval.strVal = yytext;
-		return (int)Tokens.ID;
+{ID}"("? {
+	if(yytext.Contains('('))
+	{
+		yyless(yytext.Length - 1);
+		yy_push_state(before_body_element_args);
 	}
 	
+	yylval.strVal = yytext;
+	return (int)Tokens.ID;
+}
+	
+<0, in_options> {
 	"(" return (int)Tokens.LPAR;
 	
 	")" return (int)Tokens.RPAR;
@@ -148,6 +148,11 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	"%"{ID} {
 		yylval.strVal = yytext.ToLower().Trim('%');
 		return (int)Tokens.CATEGORY_NAME;
+	}
+	
+	{ID} {
+		yylval.strVal = yytext;
+		return (int)Tokens.ID;
 	}
 }
 

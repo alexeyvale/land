@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 18.03.2018 20:11:18
+//  DateTime: 24.04.2018 23:53:18
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 18.03.2018 20:11:18>
+//  GPLEX input file <./Land.lex - 24.04.2018 23:53:18>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -128,8 +128,8 @@ namespace LandParserGenerator.Builder
         
         enum Result {accept, noMatch, contextFound};
 
-        const int maxAccept = 26;
-        const int initial = 27;
+        const int maxAccept = 27;
+        const int initial = 28;
         const int eofNum = 0;
         const int goStart = -1;
         const int INITIAL = 0;
@@ -173,11 +173,11 @@ public List<Message> Log = new List<Message>();
         }
     };
 
-    static int[] startState = new int[] {27, 37, 38, 40, 40, 41, 
-        42, 0};
+    static int[] startState = new int[] {28, 38, 39, 41, 41, 42, 
+        43, 0};
 
-   static int[] anchorState = new int[] {28, 37, 38, 40, 40, 41, 
-        42, 0};
+   static int[] anchorState = new int[] {29, 38, 39, 41, 41, 42, 
+        43, 0};
 
 #region CompressedCharacterMap
     //
@@ -206,7 +206,7 @@ public List<Message> Log = new List<Message>();
     }
 #endregion
 
-    static Table[] NxS = new Table[43] {
+    static Table[] NxS = new Table[44] {
 /* NxS[   0] */ new Table(0, 0, 0, null),
 /* NxS[   1] */ new Table(0, 0, -1, null),
 /* NxS[   2] */ new Table(0, 0, -1, null),
@@ -216,7 +216,7 @@ public List<Message> Log = new List<Message>();
 /* NxS[   6] */ new Table(8, 10, -1, new sbyte[] {6, 6, -1, -1, -1, -1, 
           -1, -1, -1, 19}),
 /* NxS[   7] */ new Table(9, 11, -1, new sbyte[] {7, -1, -1, -1, -1, -1, 
-          -1, -1, -1, -1, 33}),
+          -1, -1, -1, -1, 34}),
 /* NxS[   8] */ new Table(0, 0, -1, null),
 /* NxS[   9] */ new Table(0, 0, -1, null),
 /* NxS[  10] */ new Table(0, 0, -1, null),
@@ -236,30 +236,31 @@ public List<Message> Log = new List<Message>();
           -1, -1, -1, 19}),
 /* NxS[  23] */ new Table(0, 1, 23, new sbyte[] {-1}),
 /* NxS[  24] */ new Table(8, 2, -1, new sbyte[] {24, 24}),
-/* NxS[  25] */ new Table(0, 0, -1, null),
+/* NxS[  25] */ new Table(8, 2, -1, new sbyte[] {25, 25}),
 /* NxS[  26] */ new Table(0, 0, -1, null),
-/* NxS[  27] */ new Table(1, 18, -1, new sbyte[] {29, -1, 1, 2, 3, 4, 
-          5, 22, 7, 8, 9, 10, 30, -1, 11, 36, 12, 13}),
-/* NxS[  28] */ new Table(1, 18, -1, new sbyte[] {29, -1, 1, 2, 3, 4, 
-          5, 6, 7, 8, 9, 10, 30, -1, 11, 31, 12, 13}),
-/* NxS[  29] */ new Table(1, 3, -1, new sbyte[] {20, -1, 34}),
-/* NxS[  30] */ new Table(13, 10, 30, new sbyte[] {17, 30, 30, 30, 30, 30, 
-          30, 30, 30, 32}),
-/* NxS[  31] */ new Table(8, 9, -1, new sbyte[] {14, -1, -1, -1, -1, -1, 
+/* NxS[  27] */ new Table(0, 0, -1, null),
+/* NxS[  28] */ new Table(1, 18, -1, new sbyte[] {30, -1, 1, 2, 3, 4, 
+          5, 22, 7, 8, 9, 10, 31, -1, 11, 37, 12, 13}),
+/* NxS[  29] */ new Table(1, 18, -1, new sbyte[] {30, -1, 1, 2, 3, 4, 
+          5, 6, 7, 8, 9, 10, 31, -1, 11, 32, 12, 13}),
+/* NxS[  30] */ new Table(1, 3, -1, new sbyte[] {20, -1, 35}),
+/* NxS[  31] */ new Table(13, 10, 31, new sbyte[] {17, 31, 31, 31, 31, 31, 
+          31, 31, 31, 33}),
+/* NxS[  32] */ new Table(8, 9, -1, new sbyte[] {14, -1, -1, -1, -1, -1, 
           -1, -1, 15}),
-/* NxS[  32] */ new Table(0, 20, 30, new sbyte[] {30, 30, 30, 30, 30, 30, 
-          30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30}),
-/* NxS[  33] */ new Table(9, 1, -1, new sbyte[] {18}),
-/* NxS[  34] */ new Table(3, 1, 34, new sbyte[] {35}),
-/* NxS[  35] */ new Table(1, 1, 34, new sbyte[] {21}),
-/* NxS[  36] */ new Table(8, 1, -1, new sbyte[] {14}),
-/* NxS[  37] */ new Table(0, 1, 23, new sbyte[] {-1}),
-/* NxS[  38] */ new Table(8, 11, -1, new sbyte[] {22, 7, -1, -1, -1, -1, 
-          -1, -1, 39, 12, 13}),
-/* NxS[  39] */ new Table(8, 1, -1, new sbyte[] {24}),
-/* NxS[  40] */ new Table(0, 0, -1, null),
-/* NxS[  41] */ new Table(17, 1, -1, new sbyte[] {25}),
+/* NxS[  33] */ new Table(0, 20, 31, new sbyte[] {31, 31, 31, 31, 31, 31, 
+          31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31}),
+/* NxS[  34] */ new Table(9, 1, -1, new sbyte[] {18}),
+/* NxS[  35] */ new Table(3, 1, 35, new sbyte[] {36}),
+/* NxS[  36] */ new Table(1, 1, 35, new sbyte[] {21}),
+/* NxS[  37] */ new Table(8, 1, -1, new sbyte[] {14}),
+/* NxS[  38] */ new Table(0, 1, 23, new sbyte[] {-1}),
+/* NxS[  39] */ new Table(8, 11, -1, new sbyte[] {24, 7, -1, -1, -1, -1, 
+          -1, -1, 40, 12, 13}),
+/* NxS[  40] */ new Table(8, 1, -1, new sbyte[] {25}),
+/* NxS[  41] */ new Table(0, 0, -1, null),
 /* NxS[  42] */ new Table(17, 1, -1, new sbyte[] {26}),
+/* NxS[  43] */ new Table(17, 1, -1, new sbyte[] {27}),
     };
 
 int NextState() {
@@ -742,13 +743,13 @@ return (int)Tokens.RPAR;
         case 14:
         case 16:
 if(yytext.Contains('('))
-		{
-			yyless(yytext.Length - 1);
-			yy_push_state(before_option_args);
-		}
-			
-		yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
-		return (int)Tokens.OPTION_NAME;
+	{
+		yyless(yytext.Length - 1);
+		yy_push_state(before_option_args);
+	}
+		
+	yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
+	return (int)Tokens.OPTION_NAME;
             break;
         case 15:
 BEGIN(in_options);
@@ -761,13 +762,13 @@ yylval.strVal = yytext;
         case 19:
         case 22:
 if(yytext.Contains('('))
-		{
-			yyless(yytext.Length - 1);
-			yy_push_state(before_body_element_args);
-		}
-		
-		yylval.strVal = yytext;
-		return (int)Tokens.ID;
+	{
+		yyless(yytext.Length - 1);
+		yy_push_state(before_body_element_args);
+	}
+	
+	yylval.strVal = yytext;
+	return (int)Tokens.ID;
             break;
         case 20:
         case 21:
@@ -780,14 +781,18 @@ BEGIN(0);
 		return (int)Tokens.REGEX;
             break;
         case 24:
+yylval.strVal = yytext;
+		return (int)Tokens.ID;
+            break;
+        case 25:
 yylval.strVal = yytext.ToLower().Trim('%');
 		return (int)Tokens.CATEGORY_NAME;
             break;
-        case 25:
+        case 26:
 yy_pop_state();
 		return (int)Tokens.OPT_LPAR;
             break;
-        case 26:
+        case 27:
 yy_pop_state();
 		return (int)Tokens.ELEM_LPAR;
             break;
