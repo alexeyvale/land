@@ -1,0 +1,58 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING		: STRING_STD|STRING_VERB
+STRING_SKIP	: '\\"' | '\\\\'
+STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+STRING_VERB	: '@'('"' ~["]* '"')+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+ 
+namespace_content	=	opening_directive*! (namespace|entity)*
+opening_directive	=	('using'|'extern') Any ';'
+namespace			=	'namespace' name '{' namespace_content '}'
+entity				=	attribute | modifiers (class_struct_interface | enum | class_member)
+
+modifiers				=	(MODIFIER|'extern'|'const')*
+enum					=	'enum' name Any '{' Any '}' ';'?
+class_struct_interface	=	('class'|'interface'|'struct') name Any '{' entity* '}' ';'?
+class_member			=	class_member_header class_member_tail
+class_member_header		=	('delegate'|'event')? type ('operator' Any arguments | names_list? arguments?)
+class_member_tail		=	before_body? (block init_value? | initializer | ';')
+
+before_body			=	Any ':' (round_bracketed_water | Any)*
+initializer			= 	init_expression | init_value
+init_expression		=	'=>' (Any|bracketed_water)+ ';'
+init_value			=	'=' (Any|bracketed_water)+ ';'
+
+name_atom	=	ID | 'this' | MODIFIER
+name		=	name_atom ((('.'|'::') name_atom) | ('<' types_list '>' | '[' Any ']'))*
+names_list	=	name (',' name)*
+
+type_atom	=	'unsigned'? ID | arguments
+type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' Any ']'))*
+types_list	=	type (',' type)*
+
+argument	=	attribute* ('out'|'ref'|'params'|'const'|'this')? type name? ('=' (Any|bracketed_water)+)?
+arguments	=	'(' (argument (',' argument)*)? ')'
+
+bracketed_water			=	round_bracketed_water | curly_bracketed_water | square_bracketed_water
+round_bracketed_water	=	'(' (Any| round_bracketed_water)* ')'
+curly_bracketed_water	=	'{' (Any| curly_bracketed_water)* '}'
+square_bracketed_water	=	'[' (Any| square_bracketed_water)* ']'
+
+attribute	=	square_bracketed_water
+block		=	curly_bracketed_water
+
+%%
+
+%parsing start namespace_content
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+
+%nodes ghost  names_list initializer
+%nodes leaf name
+
+%mapping land namespace enum class_struct_interface class_member
