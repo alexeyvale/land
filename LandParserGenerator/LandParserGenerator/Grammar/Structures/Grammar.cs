@@ -31,7 +31,7 @@ namespace LandParserGenerator
 
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
-		public const string TEXT_TOKEN_NAME = "Any";
+		public const string ANY_TOKEN_NAME = "Any";
 		public const string ERROR_TOKEN_NAME = "ERROR";
 
 		// Префиксы и счётчики для анонимных токенов и правил
@@ -69,7 +69,7 @@ namespace LandParserGenerator
 		{
 			Type = type;
 
-			DeclareTerminal(new TerminalSymbol(TEXT_TOKEN_NAME, null));
+			DeclareTerminal(new TerminalSymbol(ANY_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
@@ -603,7 +603,7 @@ namespace LandParserGenerator
                     /// Если из текущего элемента нельзя вывести пустую строку
                     /// и (для модифицированной версии First) он не равен ANY
                     if (!containsEmpty 
-                        && (!UseModifiedFirst || alt[elementsCounter] != TEXT_TOKEN_NAME))
+                        && (!UseModifiedFirst || alt[elementsCounter] != ANY_TOKEN_NAME))
                         break;
                 }
 

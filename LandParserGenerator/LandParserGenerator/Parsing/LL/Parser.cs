@@ -74,7 +74,7 @@ namespace LandParserGenerator.Parsing.LL
                     var node = Stack.Pop();
 
                     /// Если текущий токен - признак пропуска символов, запускаем алгоритм
-                    if (token.Name == Grammar.TEXT_TOKEN_NAME)
+                    if (token.Name == Grammar.ANY_TOKEN_NAME)
                     {
                         token = SkipAny(node);
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
@@ -133,7 +133,7 @@ namespace LandParserGenerator.Parsing.LL
 
                 /// Если не смогли ни сопоставить текущий токен с терминалом на вершине стека,
                 /// ни найти ветку правила для нетерминала на вершине стека
-                if(token.Name == Grammar.TEXT_TOKEN_NAME)
+                if(token.Name == Grammar.ANY_TOKEN_NAME)
                 {
                     token = LexingStream.CurrentToken();
                                 
@@ -194,7 +194,7 @@ namespace LandParserGenerator.Parsing.LL
                     }
                     else
                     {
-                        token = Lexer.CreateToken(Grammar.TEXT_TOKEN_NAME);
+                        token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
                     }
                 }
 			}
@@ -226,7 +226,7 @@ namespace LandParserGenerator.Parsing.LL
 				/// Определяем множество токенов, которые могут идти после Any
 				tokensAfterText = grammar.First(alt);
 				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
-				tokensAfterText.Remove(Grammar.TEXT_TOKEN_NAME);
+				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
 			}
 			else
 			{
@@ -274,7 +274,7 @@ namespace LandParserGenerator.Parsing.LL
 		private string GetTokenInfoForMessage(IToken token)
 		{
 			var userified = grammar.Userify(token.Name);
-			if (userified == token.Name && token.Name != Grammar.TEXT_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
+			if (userified == token.Name && token.Name != Grammar.ANY_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
 				return $"{token.Name}: '{token.Text}'";
 			else
 				return userified;
@@ -301,7 +301,7 @@ namespace LandParserGenerator.Parsing.LL
 					/// Проверяем, есть ли у него ветка для Any
 					/// и является ли она приоритетной для текущего lookahead-а
 					if (Table[Stack.Peek().Symbol, LexingStream.CurrentToken().Name].Count == 1 
-						&& Table[Stack.Peek().Symbol, Grammar.TEXT_TOKEN_NAME].Count == 1)
+						&& Table[Stack.Peek().Symbol, Grammar.ANY_TOKEN_NAME].Count == 1)
 					{
 						/// Если уже восстанавливались в том же месте тем же образом
 						if (LastRecoveryAction != null
@@ -309,7 +309,7 @@ namespace LandParserGenerator.Parsing.LL
 							&& LexingStream.CurrentTokenIndex == LastRecoveryAction.RecoveryStartTokenIndex)
 							return false;
 
-						var alternativeToApply = Table[Stack.Peek().Symbol, Grammar.TEXT_TOKEN_NAME].Single();
+						var alternativeToApply = Table[Stack.Peek().Symbol, Grammar.ANY_TOKEN_NAME].Single();
 						var stackTop = Stack.Peek();
 
 						/// Определившись с альтернативой, снимаем со стека нетерминал и кладём её на стек
@@ -351,7 +351,7 @@ namespace LandParserGenerator.Parsing.LL
 				}
 
 				/// Если на вершине стека оказался символ Any
-				if (Stack.Peek().Symbol == Grammar.TEXT_TOKEN_NAME)
+				if (Stack.Peek().Symbol == Grammar.ANY_TOKEN_NAME)
 				{
 					var prevAttemptsCount = LastRecoveryAction != null 
 						&& LastRecoveryAction.ActionType == RecoveryActionType.SkipMoreText

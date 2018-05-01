@@ -49,7 +49,7 @@ namespace LandParserGenerator
 			/// Частично копируем грамматику, чтобы на основе исходной версии грамматики
 			/// проверять замены на соответствие определению
 			GrammarOriginal = new Grammar(grammar.Type);
-			foreach (var tk in grammar.Tokens.Where(t=>t.Key!=Grammar.EOF_TOKEN_NAME && t.Key!=Grammar.TEXT_TOKEN_NAME))
+			foreach (var tk in grammar.Tokens.Where(t=>t.Key!=Grammar.EOF_TOKEN_NAME && t.Key!=Grammar.ANY_TOKEN_NAME))
 				GrammarOriginal.DeclareTerminal(tk.Key, tk.Value.Pattern);
 			foreach (var nt in grammar.Rules)
 				GrammarOriginal.DeclareNonterminal(nt.Key, nt.Value.Alternatives.Select(a => new Alternative()
@@ -110,7 +110,7 @@ namespace LandParserGenerator
 					var shift = 0;
 					foreach (var range in Replace(GrammarTransformed, alt).OrderBy(e=>e.Item1.StartIndex))
 					{
-						var entry = new Entry(Grammar.TEXT_TOKEN_NAME);
+						var entry = new Entry(Grammar.ANY_TOKEN_NAME);
 						entry.Options.AnySyncTokens = range.Item2;
 
 						GrammarTransformed.Replace(alt, range.Item1.StartIndex - shift, range.Item1.Length, entry);
@@ -146,7 +146,7 @@ namespace LandParserGenerator
 				for(var i=0; i<grammarNonterminal.Alternatives.Count; ++i)
 				{
 					/// Если альтернатива состоит из одного Any
-					if (grammarNonterminal[i].Count == 1 && grammarNonterminal[i][0].Symbol == Grammar.TEXT_TOKEN_NAME)
+					if (grammarNonterminal[i].Count == 1 && grammarNonterminal[i][0].Symbol == Grammar.ANY_TOKEN_NAME)
 					{
 						/// и это не первая такая альтернатива
 						if (hasPureAny)
@@ -174,7 +174,7 @@ namespace LandParserGenerator
 				foreach (var alt in nt.Value.Alternatives)
 					for (var i = 0; i < alt.Elements.Count; ++i)
 					{
-						if (alt[i].Symbol == Grammar.TEXT_TOKEN_NAME)
+						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME)
 						{
 							var sequenceFollowing = alt.Subsequence(i + 1);
 
@@ -183,7 +183,7 @@ namespace LandParserGenerator
 								afterAnySet.UnionWith(GrammarTransformed.Follow(alt.NonterminalSymbolName));
 
 							/// Удаляем синхронизирующие множества у тех Any, после которых не могут идти Any
-							if (!afterAnySet.Contains(Grammar.TEXT_TOKEN_NAME))
+							if (!afterAnySet.Contains(Grammar.ANY_TOKEN_NAME))
 								alt[i].Options.AnySyncTokens.Clear();
 							else
 								reachableSymbols.UnionWith(alt[i].Options.AnySyncTokens);
@@ -198,7 +198,7 @@ namespace LandParserGenerator
 
 			/// Все недостижимые токены, не указанные в skip и не являющиеся специальными, убираем
 			foreach(var token in unreachableTokens.Where(t=>
-				t!=Grammar.TEXT_TOKEN_NAME 
+				t!=Grammar.ANY_TOKEN_NAME 
 				&& t != Grammar.EOF_TOKEN_NAME 
 				&& !GrammarTransformed.Options.GetSymbols(ParsingOption.SKIP).Contains(t))
 			)
@@ -359,10 +359,10 @@ namespace LandParserGenerator
 				var firsts = nt.Alternatives.Select(a => g.First(a)).ToList();
 
 				/// Нет ли у одного нетерминала двух веток, которые могут начинаться с Any
-				if (firsts.Where(f => f.Contains(Grammar.TEXT_TOKEN_NAME)).Count() > 1)
+				if (firsts.Where(f => f.Contains(Grammar.ANY_TOKEN_NAME)).Count() > 1)
 					return false;
 				/// Нет ли ветки, из которой выводится пустая строка, ветки, начинающейся с Any и Any в Follow
-				if (firsts.Any(f => f.Contains(null)) && firsts.Any(f => f.Contains(Grammar.TEXT_TOKEN_NAME)) && g.Follow(nt.Name).Contains(Grammar.TEXT_TOKEN_NAME))
+				if (firsts.Any(f => f.Contains(null)) && firsts.Any(f => f.Contains(Grammar.ANY_TOKEN_NAME)) && g.Follow(nt.Name).Contains(Grammar.ANY_TOKEN_NAME))
 					return false;
 			}
 

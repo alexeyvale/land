@@ -124,7 +124,7 @@ namespace LandParserGenerator.Parsing.LR
 					}
 
 					/// Если в текущем состоянии есть переход по Any
-					if (Table[currentState, Grammar.TEXT_TOKEN_NAME].Count == 1)
+					if (Table[currentState, Grammar.ANY_TOKEN_NAME].Count == 1)
 					{
 						token = SkipAny();
 
@@ -162,8 +162,8 @@ namespace LandParserGenerator.Parsing.LR
 		private IToken SkipAny()
 		{
 			var token = LexingStream.CurrentToken();
-			var anyNode = new Node(Grammar.TEXT_TOKEN_NAME);
-			var rawAction = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME].Single();
+			var anyNode = new Node(Grammar.ANY_TOKEN_NAME);
+			var rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].Single();
 
 			/// Пока по Any нужно производить свёртки
 			while(rawAction is ReduceAction)
@@ -189,7 +189,7 @@ namespace LandParserGenerator.Parsing.LR
 
 				Stack.FinBatch();
 
-				rawAction = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME].FirstOrDefault();
+				rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].FirstOrDefault();
 			}
 
 			/// Если нужно произвести перенос
@@ -236,7 +236,7 @@ namespace LandParserGenerator.Parsing.LR
 				Stack.Undo();
 
 				var currentTokenActions = Table[Stack.PeekState(), LexingStream.CurrentToken().Name];
-				var textTokenActions = Table[Stack.PeekState(), Grammar.TEXT_TOKEN_NAME];
+				var textTokenActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
 
 				/// Если в текущем состоянии есть приоритетные действия 
 				/// и действия для Any,

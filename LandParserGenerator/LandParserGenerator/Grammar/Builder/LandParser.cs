@@ -281,7 +281,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			}
 			else
 			{
-				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.TEXT_TOKEN_NAME && ValueStack[ValueStack.Depth-3].dynamicList.Count > 0)
+				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_TOKEN_NAME && ValueStack[ValueStack.Depth-3].dynamicList.Count > 0)
 				{
 					opts.AnySyncTokens = new HashSet<string>(ValueStack[ValueStack.Depth-3].dynamicList.Select(e=>(string)e));
 				}
