@@ -29,6 +29,7 @@ namespace LandParserGenerator.Parsing
 		{
 			root.Accept(new GhostListOptionProcessingVisitor(grammar));
 			root.Accept(new LeafOptionProcessingVisitor(grammar));
+			root.Accept(new MergeAnyVisitor(grammar));
 			root.Accept(new MappingOptionsProcessingVisitor(grammar));
 			root.Accept(new UserifyVisitor(grammar));
 		}

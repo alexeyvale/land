@@ -31,9 +31,11 @@ namespace LandParserGenerator
 
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
-		public const string ANY_TOKEN_NAME = "Any";
 		public const string UNDEFINED_TOKEN_NAME = "UNDEFINED";
 		public const string ERROR_TOKEN_NAME = "ERROR";
+		public const string ANY_TOKEN_NAME = "Any";
+		public const string ANY_WITH_SYNC_TOKEN_NAME = "AnyExcept";
+		public const string ANY_WITH_ERROR_TOKEN_NAME = "AnyAvoid";
 
 		// Префиксы и счётчики для анонимных токенов и правил
 		public const string AUTO_RULE_PREFIX = "auto__";
@@ -911,9 +913,10 @@ namespace LandParserGenerator
 							result += "%land ";
 						if(entry.Options.Priority.HasValue)
 							result += $"%priority({entry.Options.Priority.Value}) ";
-						if(entry.Options.AnySyncTokens != null 
-							&& entry.Options.AnySyncTokens.Count > 0)
-							result += $"{Userify(entry.Symbol)}({String.Join(", ", entry.Options.AnySyncTokens.Select(e=>Userify(e)))}) ";
+						if(entry.Options.AnySyncTokens.Count > 0)
+							result += $"{Grammar.ANY_WITH_SYNC_TOKEN_NAME}({String.Join(", ", entry.Options.AnySyncTokens.Select(e=>Userify(e)))}) ";
+						else if(entry.Options.AnyErrorTokens.Count > 0)
+							result += $"{Grammar.ANY_WITH_ERROR_TOKEN_NAME}({String.Join(", ", entry.Options.AnySyncTokens.Select(e => Userify(e)))}) ";
 						else
 							result += $"{Userify(entry.Symbol)} ";
                     }

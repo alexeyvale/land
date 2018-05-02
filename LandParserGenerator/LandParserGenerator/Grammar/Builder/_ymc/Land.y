@@ -148,12 +148,18 @@ body_element
 			}
 			else
 			{
-				if($2 == Grammar.TEXT_TOKEN_NAME && $3.Count > 0)
+				if($2 == Grammar.ANY_WITH_SYNC_TOKEN_NAME)
 				{
 					opts.AnySyncTokens = new HashSet<string>($3.Select(e=>(string)e));
+					$$ = new Entry(Grammar.ANY_TOKEN_NAME, opts);
 				}
-				
-				$$ = new Entry($2, opts);
+				else if($2 == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
+				{
+					opts.AnyErrorTokens = new HashSet<string>($3.Select(e=>(string)e));
+					$$ = new Entry(Grammar.ANY_TOKEN_NAME, opts);
+				}
+				else
+					$$ = new Entry($2, opts);
 			}
 		}
 	;
@@ -283,10 +289,24 @@ opt_args
 	
 args
 	: args COMMA RNUM { $$ = $1; $$.Add($3); }
-	| args COMMA STRING { $$ = $1; $$.Add($3); }
+	| args COMMA STRING 
+		{ 
+			$$ = $1;
+			
+			var generated = ConstructedGrammar.GenerateTerminal($3);
+			ConstructedGrammar.AddAnchor(generated, @3);
+			
+			$$.Add(generated); 
+		}
 	| args COMMA ID { $$ = $1; $$.Add($3); }
 	| RNUM { $$ = new List<dynamic>(){ $1 }; }
-	| STRING { $$ = new List<dynamic>(){ $1 }; }
+	| STRING 
+		{ 
+			var generated = ConstructedGrammar.GenerateTerminal($1);
+			ConstructedGrammar.AddAnchor(generated, @1);
+			
+			$$ = new List<dynamic>(){ generated }; 
+		}
 	| ID { $$ = new List<dynamic>(){ $1 }; }
 	;
 	

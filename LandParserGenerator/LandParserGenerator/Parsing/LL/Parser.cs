@@ -59,6 +59,11 @@ namespace LandParserGenerator.Parsing.LL
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
 			{
+				var test = false;
+
+				if (test)
+					break;
+
 				var stackTop = Stack.Peek();
 
 				Log.Add(Message.Trace(
@@ -84,9 +89,7 @@ namespace LandParserGenerator.Parsing.LL
 						var node = Stack.Pop();
 						token = SkipAny(node);
 
-						if (token.Name == Grammar.ERROR_TOKEN_NAME)
-							Decisions.Pop();
-						else
+						if (token.Name != Grammar.ERROR_TOKEN_NAME)
 							continue;
 					}
                     /// иначе читаем следующий токен
@@ -230,14 +233,11 @@ namespace LandParserGenerator.Parsing.LL
 				}
 				else if (token.Name == Grammar.ERROR_TOKEN_NAME)
 				{
-					Errors.Add(Message.Error(
-							$"Неожиданный конец файла при пропуске символа {Grammar.ANY_TOKEN_NAME}",
-							null
-						));
-
 					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
 					{
 						Stack.FlushBatch();
+						Stack.Undo();
+						Decisions.Pop();
 
 						var recovered = Backtrack();
 
@@ -315,15 +315,16 @@ namespace LandParserGenerator.Parsing.LL
 			/// который может идти после Any)
 			if (!tokensAfterText.Contains(token.Name))
 			{
-                /// Проверка на случай, если допропускаем текст в процессе восстановления
-                if (!anyNode.StartOffset.HasValue)
-                    anyNode.SetAnchor(token.StartOffset, token.EndOffset);
+				/// Проверка на случай, если допропускаем текст в процессе восстановления
+				if (!anyNode.StartOffset.HasValue)
+					anyNode.SetAnchor(token.StartOffset, token.EndOffset);
 
-                /// Смещение для участка, подобранного как текст
+				/// Смещение для участка, подобранного как текст
 				int endOffset = token.EndOffset;
 
-				while (!tokensAfterText.Contains(token.Name) 
-                    && token.Name != Grammar.EOF_TOKEN_NAME)
+				while (!tokensAfterText.Contains(token.Name)
+					&& !anyNode.Options.AnyErrorTokens.Contains(token.Name)
+					&& token.Name != Grammar.EOF_TOKEN_NAME)
 				{
 					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
@@ -333,21 +334,21 @@ namespace LandParserGenerator.Parsing.LL
 
 				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
 
-                /// Если дошли до конца входной строки, и это было не по плану
-                if(token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name))
-                {
-					Errors.Add(Message.Error(
-						$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
+				/// Если дошли до конца входной строки, и это было не по плану
+				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
+					|| anyNode.Options.AnyErrorTokens.Contains(token.Name))
+				{
+					LogError(Message.Error(
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
 						null
 					));
-					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-                }
-				else
-				{
-					Decisions.Peek().DecisionTokenIndex = LexingStream.CurrentTokenIndex;
-				}
-			}		
 
+					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+				}
+			}
+
+
+			Decisions.Peek().DecisionTokenIndex = LexingStream.CurrentTokenIndex;
 			return token;
 		}
 
@@ -366,7 +367,6 @@ namespace LandParserGenerator.Parsing.LL
 		private bool Backtrack()
 		{
             BacktrackingCounter += 1;
-			Message message = null;
 
 			var errorTokenIndex = LexingStream.CurrentTokenIndex;
 
@@ -395,14 +395,11 @@ namespace LandParserGenerator.Parsing.LL
 							Stack.Push(newNode);
 						}
 
-						message = Message.Warning(
-							$"Восстановление: переход на неприоритетную ветку для нетерминала {grammar.Userify(alternativeToApply.NonterminalSymbolName)}, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
-							LexingStream.CurrentToken().Line, 
+						LogError(Message.Warning(
+							$"BACKTRACKING: успех, смена ветки для {grammar.Userify(alternativeToApply.NonterminalSymbolName)} на {String.Join(" ", alternativeToApply.Elements.Select(e => grammar.Userify(e)))}, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+							LexingStream.CurrentToken().Line,
 							LexingStream.CurrentToken().Column
-						);
-
-						Errors.Add(message);
-						Log.Add(message);
+						));
 
 						return true;
 					}
@@ -420,6 +417,12 @@ namespace LandParserGenerator.Parsing.LL
 						/// на котором восстанавливались в прошлый раз
 						LexingStream.BackToToken(finish.DecisionTokenIndex);
 
+						LogError(Message.Warning(
+								$"BACKTRACKING: попытка продлить Any с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+								LexingStream.CurrentToken().Line,
+								LexingStream.CurrentToken().Column
+							));
+
 						/// Включаем в текст цепочку однотипных токенов,
 						/// на которых ранее прекратили подбор текста
 						var tokenToSkip = LexingStream.CurrentToken();
@@ -430,9 +433,10 @@ namespace LandParserGenerator.Parsing.LL
 
 						while (currentToken.Name == tokenToSkip.Name)
 						{
+							Stack.Peek().Value.Add(currentToken.Text);
 							textEnd = currentToken.EndOffset;
 							currentToken = LexingStream.NextToken();
-							//break; /// Пока попробуем пропускать не цепочку токенов, а один токен
+							break; /// Пока попробуем пропускать не цепочку токенов, а один токен
 						}
 
 						Stack.Peek().SetAnchor(Stack.Peek().StartOffset.HasValue ? Stack.Peek().StartOffset.Value : textStart, textEnd);
@@ -440,19 +444,21 @@ namespace LandParserGenerator.Parsing.LL
 						/// Пропускаем текст дальше
 						if (SkipAny(Stack.Pop()).Name != Grammar.ERROR_TOKEN_NAME)
 						{
-							message = Message.Warning(
-								$"Восстановление: пропуск большего количества токенов в качестве Any, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+							LogError(Message.Warning(
+								$"BACKTRACKING: успех, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
 								LexingStream.CurrentToken().Line,
 								LexingStream.CurrentToken().Column
-							);
-
-							Errors.Add(message);
-							Log.Add(message);
+							));
 
 							finish.DecisionTokenIndex = LexingStream.CurrentTokenIndex;
 							finish.AttemptsCount += 1;
 
 							return true;
+						}
+						else
+						{
+							Stack.FlushBatch();
+							Stack.Undo();
 						}
 					}
 				}
@@ -461,6 +467,12 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			return false;
+		}
+
+		private void LogError(Message message)
+		{
+			Errors.Add(message);
+			Log.Add(message);
 		}
 	}
 }

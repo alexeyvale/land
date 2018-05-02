@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 24.04.2018 23:53:19
+// DateTime: 02.05.2018 16:14:57
 // UserName: Алексей
-// Input file <./Land.y - 24.04.2018 23:53:18>
+// Input file <./Land.y - 02.05.2018 16:14:57>
 
 // options: no-lines gplex
 
@@ -70,12 +70,12 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 24.04.2018 23:53:18
+  // Verbatim content from ./Land.y - 02.05.2018 16:14:57
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 24.04.2018 23:53:18
+  // End verbatim content from ./Land.y - 02.05.2018 16:14:57
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -281,12 +281,18 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			}
 			else
 			{
-				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_TOKEN_NAME && ValueStack[ValueStack.Depth-3].dynamicList.Count > 0)
+				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_WITH_SYNC_TOKEN_NAME)
 				{
 					opts.AnySyncTokens = new HashSet<string>(ValueStack[ValueStack.Depth-3].dynamicList.Select(e=>(string)e));
+					CurrentSemanticValue.entryVal = new Entry(Grammar.ANY_TOKEN_NAME, opts);
 				}
-				
-				CurrentSemanticValue.entryVal = new Entry(ValueStack[ValueStack.Depth-4].strVal, opts);
+				else if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
+				{
+					opts.AnyErrorTokens = new HashSet<string>(ValueStack[ValueStack.Depth-3].dynamicList.Select(e=>(string)e));
+					CurrentSemanticValue.entryVal = new Entry(Grammar.ANY_TOKEN_NAME, opts);
+				}
+				else
+					CurrentSemanticValue.entryVal = new Entry(ValueStack[ValueStack.Depth-4].strVal, opts);
 			}
 		}
         break;
@@ -413,7 +419,14 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 { CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-3].dynamicList; CurrentSemanticValue.dynamicList.Add(ValueStack[ValueStack.Depth-1].doubleVal); }
         break;
       case 36: // args -> args, COMMA, STRING
-{ CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-3].dynamicList; CurrentSemanticValue.dynamicList.Add(ValueStack[ValueStack.Depth-1].strVal); }
+{ 
+			CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-3].dynamicList;
+			
+			var generated = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
+			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);
+			
+			CurrentSemanticValue.dynamicList.Add(generated); 
+		}
         break;
       case 37: // args -> args, COMMA, ID
 { CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-3].dynamicList; CurrentSemanticValue.dynamicList.Add(ValueStack[ValueStack.Depth-1].strVal); }
@@ -422,7 +435,12 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 { CurrentSemanticValue.dynamicList = new List<dynamic>(){ ValueStack[ValueStack.Depth-1].doubleVal }; }
         break;
       case 39: // args -> STRING
-{ CurrentSemanticValue.dynamicList = new List<dynamic>(){ ValueStack[ValueStack.Depth-1].strVal }; }
+{ 
+			var generated = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
+			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);
+			
+			CurrentSemanticValue.dynamicList = new List<dynamic>(){ generated }; 
+		}
         break;
       case 40: // args -> ID
 { CurrentSemanticValue.dynamicList = new List<dynamic>(){ ValueStack[ValueStack.Depth-1].strVal }; }

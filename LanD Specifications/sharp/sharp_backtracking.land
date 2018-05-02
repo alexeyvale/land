@@ -15,8 +15,8 @@ CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
 
 program		=	Any 'namespace' name '{' (Any|class)* '}'
-class		=	name* 'class' name Any '{' (Any|method|block|attribute)* '}'
-method		=	name+ '(' Any ')' Any block
+class		=	ID* 'class' name Any '{' (Any|method|block|attribute)* '}'
+method		=	ID* type name arguments AnyAvoid(';') block
 block		=	'{' (Any|block)* '}'
 attribute	=	'[' (Any|attribute)* ']'
 
