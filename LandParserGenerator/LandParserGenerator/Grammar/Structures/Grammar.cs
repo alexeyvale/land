@@ -450,10 +450,122 @@ namespace LandParserGenerator
 					"LanD"
 				));
 
+			if(Type == GrammarType.LL)
+			{
+				foreach(var nt in FindLeftRecursion())
+				{
+					errors.AddLast(Message.Error(
+						$"Определение нетерминала {nt} содержит левую рекурсию",
+						GetAnchor(nt),
+						"LanD"
+					));
+				}
+			}
+
 			/// Грамматика валидна или невалидна в зависимости от результатов проверки
 			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
 
 			return errors;
+		}
+
+		/// Возвращает леворекурсивно определённые нетерминалы
+		private List<string> FindLeftRecursion()
+		{
+			List<string> recursive = new List<string>();
+
+			/// Составили списки смежностей для нетерминалов,
+			/// учитываем только нетерминалы, которым не предшествуют 
+			Dictionary<string, HashSet<string>> graph = new Dictionary<string, HashSet<string>>();
+			foreach (string nt in Rules.Keys)
+			{
+				graph.Add(nt, new HashSet<string>());
+				foreach (var alt in Rules[nt])
+				{
+					var altStartingNonterminals = alt.Elements.Select(e => e.Symbol).TakeWhile(s => Rules.ContainsKey(s)).ToList();
+
+					for(var i = 0; i< altStartingNonterminals.Count; ++i)
+					{
+						graph[nt].Add(altStartingNonterminals[i]);
+
+						if (!First(altStartingNonterminals[i]).Contains(null))
+							break;
+					}
+				}
+			}
+
+			/// Готовимся к первому DFS
+			/// Завели структуры для хранения номеров и метки открытия
+			Dictionary<string, bool> opened = new Dictionary<string, bool>(graph.Count);
+			Stack<string> finished = new Stack<string>(graph.Count);
+			int maxInd = graph.Count;
+			foreach (string res in graph.Keys)
+				opened.Add(res, false);
+			Stack<string> way = new Stack<string>();
+			/// Обходим в глубину
+			foreach (string key in graph.Keys)
+				if (!opened[key])
+				{
+					way.Push(key);
+					opened[key] = true;
+					while (way.Count > 0)
+					{
+						string curSymb = graph[way.Peek()].FirstOrDefault(e => !opened[e]);
+						if (curSymb != null)
+						{
+							opened[curSymb] = true;
+							way.Push(curSymb);
+						}
+						else
+							finished.Push(way.Pop());
+					}
+				}
+
+
+			/// Инвертируем граф
+			Dictionary<string, HashSet<string>> invertedGraph = new Dictionary<string, HashSet<string>>(graph.Count);
+			foreach (string key in graph.Keys)
+				invertedGraph.Add(key, new HashSet<string>());
+			foreach (KeyValuePair<string, HashSet<string>> p in graph)
+				foreach (string str in p.Value)
+					invertedGraph[str].Add(p.Key);
+
+			/// Готовимся ко второму DFS
+			foreach (string res in graph.Keys)
+				opened[res] = false;
+			way = new Stack<string>();
+			bool bigComponent = false;
+
+			foreach (string key in finished)
+				if (!opened[key])
+				{
+					way.Push(key);
+					opened[key] = true;
+					while (way.Count > 0)
+					{
+						string curSymb = invertedGraph[way.Peek()].FirstOrDefault(e => !opened[e]);
+						if (curSymb != null)
+						{
+							opened[curSymb] = true;
+							way.Push(curSymb);
+						}
+						else
+							if (way.Count == 1)
+						{
+							if (bigComponent || graph[way.Peek()].Contains(way.Peek()))
+								recursive.Add(way.Peek());
+							way.Pop();
+							bigComponent = false;
+						}
+						else
+						{
+							bigComponent = true;
+							recursive.Add(way.Peek());
+							way.Pop();
+						}
+					}
+				}
+
+			return recursive;
 		}
 
 		public string Userify(string name)
