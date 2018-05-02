@@ -49,6 +49,15 @@ namespace LandParserGenerator.Parsing.LL
 		}
 
 		/// <summary>
+		/// Сброс в стек одного пакета и начало другого
+		/// </summary>
+		public void FlushBatch()
+		{
+			Actions.Push(Batch);
+			Batch = new List<ParsingStackAction>();
+		}
+
+		/// <summary>
 		/// Завершение пакета
 		/// </summary>
 		public void FinBatch()

@@ -17,9 +17,8 @@ namespace LandParserGenerator.Parsing.LL
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
-		private RecoveryAction LastRecoveryAction { get; set; }
-
-        public int ErrorRecoveriesCounter { get; private set; }
+		private Stack<DecisionPoint> Decisions { get; set; }
+		private int BacktrackingCounter { get; set; }
 
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
@@ -41,14 +40,15 @@ namespace LandParserGenerator.Parsing.LL
 			Log = new List<Message>();
 			Errors = new List<Message>();
 
-            LastRecoveryAction = null;
-            ErrorRecoveriesCounter = 0;
+			Decisions = new Stack<DecisionPoint>();
+			BacktrackingCounter = 0;
 
             /// Готовим лексер
             LexingStream = new TokenStream(Lexer, text);
 
 			/// Кладём на стек стартовый символ
 			Stack = new ParsingStack(LexingStream);
+			Stack.InitBatch();
 			var root = new Node(grammar.StartSymbol);
 			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
@@ -70,51 +70,106 @@ namespace LandParserGenerator.Parsing.LL
                 /// Если символ на вершине стека совпадает с текущим токеном
                 if(stackTop.Symbol == token.Name)
                 {
-                    /// Снимаем узел со стека и устанавливаем координаты в координаты токена
-                    var node = Stack.Pop();
-
                     /// Если текущий токен - признак пропуска символов, запускаем алгоритм
                     if (token.Name == Grammar.ANY_TOKEN_NAME)
                     {
-                        token = SkipAny(node);
-						/// Если при пропуске текста произошла ошибка, прерываем разбор
-                        if(token.Name == Grammar.ERROR_TOKEN_NAME)
-							break;
-                    }
+						Decisions.Push(new FinishAnyDecision()
+						{
+							AttemptsCount = 0,
+							DecisionTokenIndex = LexingStream.CurrentTokenIndex
+						});
+
+						Stack.FlushBatch();
+
+						var node = Stack.Pop();
+						token = SkipAny(node);
+
+						if (token.Name == Grammar.ERROR_TOKEN_NAME)
+							Decisions.Pop();
+						else
+							continue;
+					}
                     /// иначе читаем следующий токен
                     else
                     {
-                        node.SetAnchor(token.StartOffset, token.EndOffset);
+						var node = Stack.Pop();
+
+						node.SetAnchor(token.StartOffset, token.EndOffset);
 						node.SetValue(token.Text);
 
                         token = LexingStream.NextToken();
-                    }
 
-                    continue;
+						continue;
+                    }
                 }
 
                 /// Если на вершине стека нетерминал, выбираем альтернативу по таблице
                 if (grammar[stackTop.Symbol] is NonterminalSymbol)
                 {
                     var alternatives = Table[stackTop.Symbol, token.Name];
-                    Alternative alternativeToApply = null;
+					var anyAlternatives = Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME]
+						.Where(alt=>!alternatives.Contains(alt)).ToList();
 
-                    /// Сообщаем об ошибке в случае неоднозначной грамматики
-                    if (alternatives.Count > 1)
-                    {
-						Errors.Add(Message.Error(
-							$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
-							token.Line,
-							token.Column
-						));
-						break;
-                    }
-                    /// Если же в ячейке ровно одна альтернатива
-                    else if (alternatives.Count == 1)
-                    {
-                        alternativeToApply = alternatives.Single();
+					Alternative alternativeToApply = null;
+
+					/// Сообщаем об ошибке в случае неоднозначной грамматики,
+					/// либо запоминаем точку для возможного бэктрекинга
+					if (alternatives.Count > 1)
+					{
+						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING) 
+							&& !Decisions.Any(d => d is ChooseAlternativeDecision
+								 && d.DecisionTokenIndex == LexingStream.CurrentTokenIndex
+								 && ((ChooseAlternativeDecision)d).Alternatives[0].NonterminalSymbolName == stackTop.Symbol))
+						{
+							Decisions.Push(new ChooseAlternativeDecision()
+							{
+								DecisionTokenIndex = LexingStream.CurrentTokenIndex,
+								Alternatives = token.Name != Grammar.ANY_TOKEN_NAME 
+									? alternatives.Concat(anyAlternatives).ToList() 
+									: alternatives,
+								ChosenIndex = 0
+							});
+
+							alternativeToApply = alternatives[0];
+							Stack.FlushBatch();
+						}
+						else
+						{
+							Errors.Add(Message.Error(
+								$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
+								token.Line,
+								token.Column
+							));
+
+							break;
+						}
+					}
+					/// Если же в ячейке ровно одна альтернатива
+					else if (alternatives.Count == 1)
+					{
+						alternativeToApply = alternatives.Single();
+
+						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING) 
+							&& anyAlternatives.Count > 0 
+							&& token.Name != Grammar.ANY_TOKEN_NAME
+							&& !Decisions.Any(d=>d is ChooseAlternativeDecision 
+								&& d.DecisionTokenIndex == LexingStream.CurrentTokenIndex 
+								&& ((ChooseAlternativeDecision)d).Alternatives[0].NonterminalSymbolName == stackTop.Symbol))
+						{
+							Decisions.Push(new ChooseAlternativeDecision()
+							{
+								DecisionTokenIndex = LexingStream.CurrentTokenIndex,
+								Alternatives = alternatives.Concat(anyAlternatives).ToList(),
+								ChosenIndex = 0
+							});
+
+							Stack.FlushBatch();
+						}
+					}
+
+					if(alternativeToApply != null)
+					{
                         /// снимаем со стека нетерминал и кладём её на стек
-                        Stack.InitBatch();
                         Stack.Pop();
 
                         for (var i = alternativeToApply.Count - 1; i >= 0; --i)
@@ -125,20 +180,18 @@ namespace LandParserGenerator.Parsing.LL
                             Stack.Push(newNode);
                         }
 
-                        Stack.FinBatch();
-
                         continue;
                     }
                 }
 
-                /// Если не смогли ни сопоставить текущий токен с терминалом на вершине стека,
-                /// ни найти ветку правила для нетерминала на вершине стека
-                if(token.Name == Grammar.ANY_TOKEN_NAME)
-                {
-                    token = LexingStream.CurrentToken();
-                                
-                    var errorToken = token;
-                    var errorStackTop = stackTop.Symbol;
+				/// Если не смогли ни сопоставить текущий токен с терминалом на вершине стека,
+				/// ни найти ветку правила для нетерминала на вершине стека
+				if (token.Name == Grammar.ANY_TOKEN_NAME)
+				{
+					token = LexingStream.CurrentToken();
+
+					var errorToken = token;
+					var errorStackTop = stackTop.Symbol;
 
 					Errors.Add(Message.Error(
 							grammar.Tokens.ContainsKey(errorStackTop) ?
@@ -148,55 +201,80 @@ namespace LandParserGenerator.Parsing.LL
 							errorToken.Column
 						));
 
-					var recovered = false;
-
-					try
+					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
 					{
-						var message = Message.Warning(
-							$"Запущен алгоритм восстановления...",
-							errorToken.Line,
-							errorToken.Column
-						);
+						Stack.FlushBatch();
 
-						Errors.Add(message);
-						Log.Add(message);
+						var recovered = Backtrack();
 
-						recovered = ErrorRecovery();
+						if (!recovered)
+						{
+							var message = Message.Error(
+								$"Не удалось возобновить разбор",
+								errorToken.Line,
+								errorToken.Column
+							);
+
+							Errors.Add(message);
+							Log.Add(message);
+
+							break;
+						}
+						else
+						{
+							token = LexingStream.CurrentToken();
+						}
 					}
-					catch { }
-
-					if(!recovered)
-					{
-						var message = Message.Warning(
-							$"Не удалось продолжить разбор",
-							errorToken.Line,
-							errorToken.Column
-						);
-
-						Errors.Add(message);
-						Log.Add(message);
-
+					else
 						break;
+				}
+				else if (token.Name == Grammar.ERROR_TOKEN_NAME)
+				{
+					Errors.Add(Message.Error(
+							$"Неожиданный конец файла при пропуске символа {Grammar.ANY_TOKEN_NAME}",
+							null
+						));
+
+					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
+					{
+						Stack.FlushBatch();
+
+						var recovered = Backtrack();
+
+						if (!recovered)
+						{
+							var message = Message.Error(
+								$"Не удалось возобновить разбор",
+								null
+							);
+
+							Errors.Add(message);
+							Log.Add(message);
+
+							break;
+						}
+						else
+						{
+							token = LexingStream.CurrentToken();
+						}
+					}
+					else
+						break;
+				}
+				/// Если непонятно, что делать с текущим токеном, и он конкретный
+				/// (не Any), заменяем его на Any
+				else
+				{
+					/// Если встретился неожиданный токен, но он в списке пропускаемых
+					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
+					{
+						token = LexingStream.NextToken();
 					}
 					else
 					{
-						token = LexingStream.CurrentToken();
-					}         
-                }
-                /// Если непонятно, что делать с текущим токеном, и он конкретный
-                /// (не Any), заменяем его на Any
-                else
-                {
-                    /// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
-					{
-                        token = LexingStream.NextToken();
-                    }
-                    else
-                    {
-                        token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
-                    }
-                }
+						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
+					}
+				}
 			}
 
 			TreePostProcessing(root);
@@ -256,16 +334,18 @@ namespace LandParserGenerator.Parsing.LL
 				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
 
                 /// Если дошли до конца входной строки, и это было не по плану
-                if(token.Name == Grammar.EOF_TOKEN_NAME 
-                    && !tokensAfterText.Contains(token.Name))
+                if(token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name))
                 {
 					Errors.Add(Message.Error(
 						$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
 						null
 					));
-
-                    return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
                 }
+				else
+				{
+					Decisions.Peek().DecisionTokenIndex = LexingStream.CurrentTokenIndex;
+				}
 			}		
 
 			return token;
@@ -283,38 +363,29 @@ namespace LandParserGenerator.Parsing.LL
 		/// <summary>
 		/// Восстановление в случае ошибки разбора - 
 		/// </summary>
-		private bool ErrorRecovery()
+		private bool Backtrack()
 		{
-            ErrorRecoveriesCounter += 1;
+            BacktrackingCounter += 1;
 			Message message = null;
 
 			var errorTokenIndex = LexingStream.CurrentTokenIndex;
 
-			while (Stack.Count > 0)
+			while (Decisions.Count > 0)
 			{
 				var prevActionTokenIndex = LexingStream.CurrentTokenIndex;
-				Stack.Undo();
+				var decision = Decisions.Peek();
+				Stack.Undo();			
 
-				/// Если на вершине стека оказался нетерминал
-				if (grammar[Stack.Peek().Symbol] is NonterminalSymbol)
+				/// Если текущее решение касается выбора альтернативы
+				if (decision is ChooseAlternativeDecision)
 				{
-					/// Проверяем, есть ли у него ветка для Any
-					/// и является ли она приоритетной для текущего lookahead-а
-					if (Table[Stack.Peek().Symbol, LexingStream.CurrentToken().Name].Count == 1 
-						&& Table[Stack.Peek().Symbol, Grammar.ANY_TOKEN_NAME].Count == 1)
-					{
-						/// Если уже восстанавливались в том же месте тем же образом
-						if (LastRecoveryAction != null
-							&& LastRecoveryAction.ActionType == RecoveryActionType.UseSecondaryTextAlt
-							&& LexingStream.CurrentTokenIndex == LastRecoveryAction.RecoveryStartTokenIndex)
-							return false;
+					var choice = (ChooseAlternativeDecision)decision;
 
-						var alternativeToApply = Table[Stack.Peek().Symbol, Grammar.ANY_TOKEN_NAME].Single();
+					if (choice.ChosenIndex < choice.Alternatives.Count - 1)
+					{
+						var alternativeToApply = choice.Alternatives[++choice.ChosenIndex];
 						var stackTop = Stack.Peek();
 
-						/// Определившись с альтернативой, снимаем со стека нетерминал и кладём её на стек
-						Stack.InitBatch();
-						/// снимаем со стека нетерминал и кладём содержимое его альтернативы
 						Stack.Pop();
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
@@ -323,19 +394,6 @@ namespace LandParserGenerator.Parsing.LL
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
 						}
-
-						Stack.FinBatch();
-
-						/// Выполнили восстановление "переход на неприоритетную альтернативу,
-						/// начинающуюся с символа Any"
-						LastRecoveryAction = new RecoveryAction()
-						{
-							ActionType = RecoveryActionType.UseSecondaryTextAlt,
-							RecoveryEndTokenIndex = LexingStream.CurrentTokenIndex,
-							RecoveryStartTokenIndex = LexingStream.CurrentTokenIndex,
-							ErrorTokenIndex = errorTokenIndex,
-							AttemptsCount = 1
-						};
 
 						message = Message.Warning(
 							$"Восстановление: переход на неприоритетную ветку для нетерминала {grammar.Userify(alternativeToApply.NonterminalSymbolName)}, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
@@ -350,66 +408,56 @@ namespace LandParserGenerator.Parsing.LL
 					}
 				}
 
-				/// Если на вершине стека оказался символ Any
-				if (Stack.Peek().Symbol == Grammar.ANY_TOKEN_NAME)
+				if (decision is FinishAnyDecision)
 				{
-					var prevAttemptsCount = LastRecoveryAction != null 
-						&& LastRecoveryAction.ActionType == RecoveryActionType.SkipMoreText
-						&& LastRecoveryAction.RecoveryStartTokenIndex == prevActionTokenIndex  ?
-						LastRecoveryAction.AttemptsCount : 0;
+					var finish = (FinishAnyDecision)decision;
 
-					if (prevAttemptsCount == MAX_RECOVERY_ATTEMPTS)
-						return false;
-
-					/// Пытаемся продлить область, которая ему соответствует
-					/// Если уже пытались восстановиться в этом же месте,
-					/// продлеваем текст до и дальше того символа,
-					/// на котором восстанавливались в прошлый раз
-					LexingStream.BackToToken(prevAttemptsCount == 0 ? prevActionTokenIndex : LastRecoveryAction.RecoveryEndTokenIndex);
-
-					/// Включаем в текст цепочку однотипных токенов,
-					/// на которых ранее прекратили подбор текста
-					var tokenToSkip = LexingStream.CurrentToken();
-					var currentToken = tokenToSkip;
-
-                    var textStart = currentToken.StartOffset;
-					var textEnd = currentToken.EndOffset;
-
-					while (currentToken.Name == tokenToSkip.Name)
+					if (finish.AttemptsCount < MAX_RECOVERY_ATTEMPTS)
 					{
-						textEnd = currentToken.EndOffset;
-						currentToken = LexingStream.NextToken();
-						break; /// Пока попробуем пропускать не цепочку токенов, а один токен
+						/// Пытаемся продлить область, которая ему соответствует
+						/// Если уже пытались восстановиться в этом же месте,
+						/// продлеваем текст до и дальше того символа,
+						/// на котором восстанавливались в прошлый раз
+						LexingStream.BackToToken(finish.DecisionTokenIndex);
+
+						/// Включаем в текст цепочку однотипных токенов,
+						/// на которых ранее прекратили подбор текста
+						var tokenToSkip = LexingStream.CurrentToken();
+						var currentToken = tokenToSkip;
+
+						var textStart = currentToken.StartOffset;
+						var textEnd = currentToken.EndOffset;
+
+						while (currentToken.Name == tokenToSkip.Name)
+						{
+							textEnd = currentToken.EndOffset;
+							currentToken = LexingStream.NextToken();
+							//break; /// Пока попробуем пропускать не цепочку токенов, а один токен
+						}
+
+						Stack.Peek().SetAnchor(Stack.Peek().StartOffset.HasValue ? Stack.Peek().StartOffset.Value : textStart, textEnd);
+
+						/// Пропускаем текст дальше
+						if (SkipAny(Stack.Pop()).Name != Grammar.ERROR_TOKEN_NAME)
+						{
+							message = Message.Warning(
+								$"Восстановление: пропуск большего количества токенов в качестве Any, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+								LexingStream.CurrentToken().Line,
+								LexingStream.CurrentToken().Column
+							);
+
+							Errors.Add(message);
+							Log.Add(message);
+
+							finish.DecisionTokenIndex = LexingStream.CurrentTokenIndex;
+							finish.AttemptsCount += 1;
+
+							return true;
+						}
 					}
-
-					Stack.Peek().SetAnchor(Stack.Peek().StartOffset.HasValue ? Stack.Peek().StartOffset.Value : textStart, textEnd);
-
-					/// Пропускаем текст дальше
-					if(SkipAny(Stack.Pop()).Name == Grammar.ERROR_TOKEN_NAME)
-                    {
-                        return false;
-                    }
-
-					LastRecoveryAction = new RecoveryAction()
-					{
-						ActionType = RecoveryActionType.SkipMoreText,
-						RecoveryEndTokenIndex = LexingStream.CurrentTokenIndex,
-						RecoveryStartTokenIndex = prevActionTokenIndex,
-						ErrorTokenIndex = errorTokenIndex,
-						AttemptsCount = prevAttemptsCount + 1
-					};
-
-					message = Message.Warning(
-						$"Восстановление: пропуск большего количества токенов в качестве Any, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
-						LexingStream.CurrentToken().Line, 
-						LexingStream.CurrentToken().Column
-					);
-
-					Errors.Add(message);
-					Log.Add(message);
-
-					return true;
 				}
+
+				Decisions.Pop();
 			}
 
 			return false;

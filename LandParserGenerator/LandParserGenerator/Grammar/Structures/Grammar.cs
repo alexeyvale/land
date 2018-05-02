@@ -32,6 +32,7 @@ namespace LandParserGenerator
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string ANY_TOKEN_NAME = "Any";
+		public const string UNDEFINED_TOKEN_NAME = "UNDEFINED";
 		public const string ERROR_TOKEN_NAME = "ERROR";
 
 		// Префиксы и счётчики для анонимных токенов и правил
@@ -71,6 +72,7 @@ namespace LandParserGenerator
 
 			DeclareTerminal(new TerminalSymbol(ANY_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
+			DeclareTerminal(new TerminalSymbol(UNDEFINED_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
 		}

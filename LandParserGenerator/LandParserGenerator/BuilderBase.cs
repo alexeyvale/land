@@ -43,7 +43,10 @@ namespace LandParserGenerator
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 
-			grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
+			if(grammar.Options.IsSet(ParsingOption.IGNOREUNDEFINED))
+				grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
+			else
+				grammarOutput.WriteLine(@"UNDEFINED: . ;");
 
 			grammarOutput.Close();
 
@@ -156,7 +159,10 @@ namespace LandParserGenerator
 						break;
 				}
 
-				errors.AddRange(table.CheckValidity());
+				/// Для LR бэктрекинга пока нет
+				if(table is TableLR1 || !builtGrammar.Options.IsSet(ParsingOption.BACKTRACKING))
+					errors.AddRange(table.CheckValidity());
+
 				table.ExportToCsv("current_table.csv");
 
 				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", errors);
