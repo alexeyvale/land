@@ -24,7 +24,6 @@ namespace LandParserGenerator.Parsing.LR
 		public override Node Parse(string text)
 		{
 			Log = new List<Message>();
-			Errors = new List<Message>();
 
 			Node root = null;	
 
@@ -139,7 +138,7 @@ namespace LandParserGenerator.Parsing.LR
 
 					if (token == null)
 					{
-						Errors.Add(Message.Error(
+						Log.Add(Message.Error(
 							$"Неожиданный символ {grammar.Userify(token.Name)}",
 							token.Line,
 							token.Column
@@ -218,7 +217,7 @@ namespace LandParserGenerator.Parsing.LR
 			if (token.Name == Grammar.EOF_TOKEN_NAME
 				&& Table[Stack.PeekState(), token.Name].Count == 0)
 			{
-				Errors.Add(Message.Error(
+				Log.Add(Message.Error(
 					$"Ошибка при пропуске токенов: неожиданный конец файла",
 					null
 				));

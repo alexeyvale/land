@@ -319,9 +319,10 @@ namespace TestGUI
             if (Parser != null)
             {
                 var root = Parser.Parse(FileEditor.Text);
+				var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
 
-                ProgramStatusLabel.Content = Parser.Errors.Count == 0 ? "Разбор произведён успешно" : "Ошибки при разборе файла";
-                ProgramStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
+				ProgramStatusLabel.Content = noErrors ? "Разбор произведён успешно" : "Ошибки при разборе файла";
+                ProgramStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
 
                 if (root != null)
                 {
@@ -331,7 +332,7 @@ namespace TestGUI
                 }
 
                 FileParsingLog.ItemsSource = Parser.Log;
-				FileParsingErrors.ItemsSource = Parser.Errors;
+				FileParsingErrors.ItemsSource = Parser.Log.Where(l=>l.Type != MessageType.Trace).ToList();
             }
 		}
 
@@ -432,10 +433,10 @@ namespace TestGUI
 				{
 					FrontendUpdateDispatcher.Invoke((Action)(() => { Parser.Parse(File.ReadAllText(files[counter])); }));
 
-					if (Parser.Errors.Count > 0)
+					if (Parser.Log.Any(l=>l.Type == MessageType.Error))
 					{
 						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
-						foreach (var error in Parser.Errors)
+						foreach (var error in Parser.Log.Where(l=>l.Type != MessageType.Trace))
 							FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
 
 						++errorCounter;
@@ -444,7 +445,7 @@ namespace TestGUI
 				catch (Exception ex)
 				{
 					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
-					foreach (var error in Parser.Errors)
+					foreach (var error in Parser.Log.Where(l => l.Type != MessageType.Trace))
 						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
 					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{ex.ToString()}");
 
@@ -1308,10 +1309,12 @@ namespace TestGUI
 				{
 					/// пытаемся распарсить текст
 					NewTreeRoot = Parser.Parse(NewTextEditor.Text);
-					NewFileParsingStatus.Background = Parser.Errors.Count == 0 ? Brushes.LightGreen : LightRed;
+					var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
+
+					NewFileParsingStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
 
 					/// Если текст распарсился, ищем отображение из старого текста в новый
-					if (Parser.Errors.Count == 0)
+					if (noErrors)
 					{
 						Mapper.Remap(Markup.AstRoot, NewTreeRoot);
 						NewTextChanged = false;

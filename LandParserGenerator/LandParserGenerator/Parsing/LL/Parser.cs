@@ -38,7 +38,6 @@ namespace LandParserGenerator.Parsing.LL
 		public override Node Parse(string text)
 		{
 			Log = new List<Message>();
-			Errors = new List<Message>();
 
 			Decisions = new Stack<DecisionPoint>();
 			BacktrackingCounter = 0;
@@ -60,7 +59,6 @@ namespace LandParserGenerator.Parsing.LL
 			while (Stack.Count > 0)
 			{
 				var test = false;
-
 				if (test)
 					break;
 
@@ -119,26 +117,29 @@ namespace LandParserGenerator.Parsing.LL
 					/// либо запоминаем точку для возможного бэктрекинга
 					if (alternatives.Count > 1)
 					{
-						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING) 
-							&& !Decisions.Any(d => d is ChooseAlternativeDecision
-								 && d.DecisionTokenIndex == LexingStream.CurrentTokenIndex
-								 && ((ChooseAlternativeDecision)d).Alternatives[0].NonterminalSymbolName == stackTop.Symbol))
+						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
 						{
-							Decisions.Push(new ChooseAlternativeDecision()
+							if (!Decisions.Any(d => d is ChooseAlternativeDecision
+								  && d.DecisionTokenIndex == LexingStream.CurrentTokenIndex
+								  && ((ChooseAlternativeDecision)d).Alternatives[0].NonterminalSymbolName == stackTop.Symbol))
 							{
-								DecisionTokenIndex = LexingStream.CurrentTokenIndex,
-								Alternatives = token.Name != Grammar.ANY_TOKEN_NAME 
-									? alternatives.Concat(anyAlternatives).ToList() 
-									: alternatives,
-								ChosenIndex = 0
-							});
+								Decisions.Push(new ChooseAlternativeDecision()
+								{
+									DecisionTokenIndex = LexingStream.CurrentTokenIndex,
+									Alternatives = token.Name != Grammar.ANY_TOKEN_NAME
+										? alternatives.Concat(anyAlternatives).ToList()
+										: alternatives,
+									ChosenIndex = 0
+								});
 
-							alternativeToApply = alternatives[0];
-							Stack.FlushBatch();
+								Stack.FlushBatch();
+							}
+
+							alternativeToApply = alternatives[0];						
 						}
 						else
 						{
-							Errors.Add(Message.Error(
+							Log.Add(Message.Error(
 								$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
 								token.Line,
 								token.Column
@@ -196,7 +197,9 @@ namespace LandParserGenerator.Parsing.LL
 					var errorToken = token;
 					var errorStackTop = stackTop.Symbol;
 
-					Errors.Add(Message.Error(
+					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
+					{
+						Log.Add(Message.Warning(
 							grammar.Tokens.ContainsKey(errorStackTop) ?
 								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался символ {grammar.Userify(errorStackTop)}" :
 								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался один из следующих символов: {String.Join(", ", Table[errorStackTop].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
@@ -204,22 +207,17 @@ namespace LandParserGenerator.Parsing.LL
 							errorToken.Column
 						));
 
-					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
-					{
 						Stack.FlushBatch();
 
 						var recovered = Backtrack();
 
 						if (!recovered)
 						{
-							var message = Message.Error(
+							Log.Add(Message.Error(
 								$"Не удалось возобновить разбор",
 								errorToken.Line,
 								errorToken.Column
-							);
-
-							Errors.Add(message);
-							Log.Add(message);
+							));
 
 							break;
 						}
@@ -229,7 +227,17 @@ namespace LandParserGenerator.Parsing.LL
 						}
 					}
 					else
+					{
+						Log.Add(Message.Error(
+							grammar.Tokens.ContainsKey(errorStackTop) ?
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался символ {grammar.Userify(errorStackTop)}" :
+								$"Неожиданный символ {GetTokenInfoForMessage(errorToken)}, ожидался один из следующих символов: {String.Join(", ", Table[errorStackTop].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
+							errorToken.Line,
+							errorToken.Column
+						));
+
 						break;
+					}
 				}
 				else if (token.Name == Grammar.ERROR_TOKEN_NAME)
 				{
@@ -243,13 +251,10 @@ namespace LandParserGenerator.Parsing.LL
 
 						if (!recovered)
 						{
-							var message = Message.Error(
+							Log.Add(Message.Error(
 								$"Не удалось возобновить разбор",
 								null
-							);
-
-							Errors.Add(message);
-							Log.Add(message);
+							));
 
 							break;
 						}
@@ -338,11 +343,20 @@ namespace LandParserGenerator.Parsing.LL
 				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
 					|| anyNode.Options.AnyErrorTokens.Contains(token.Name))
 				{
-					LogError(Message.Error(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
-						null
-					));
-
+					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
+					{
+						Log.Add(Message.Warning(
+							$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
+							null
+						));
+					}
+					else
+					{
+						Log.Add(Message.Error(
+							$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
+							null
+						));
+					}
 					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 				}
 			}
@@ -395,7 +409,7 @@ namespace LandParserGenerator.Parsing.LL
 							Stack.Push(newNode);
 						}
 
-						LogError(Message.Warning(
+						Log.Add(Message.Warning(
 							$"BACKTRACKING: успех, смена ветки для {grammar.Userify(alternativeToApply.NonterminalSymbolName)} на {String.Join(" ", alternativeToApply.Elements.Select(e => grammar.Userify(e)))}, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
 							LexingStream.CurrentToken().Line,
 							LexingStream.CurrentToken().Column
@@ -417,7 +431,7 @@ namespace LandParserGenerator.Parsing.LL
 						/// на котором восстанавливались в прошлый раз
 						LexingStream.BackToToken(finish.DecisionTokenIndex);
 
-						LogError(Message.Warning(
+						Log.Add(Message.Warning(
 								$"BACKTRACKING: попытка продлить Any с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
 								LexingStream.CurrentToken().Line,
 								LexingStream.CurrentToken().Column
@@ -444,7 +458,7 @@ namespace LandParserGenerator.Parsing.LL
 						/// Пропускаем текст дальше
 						if (SkipAny(Stack.Pop()).Name != Grammar.ERROR_TOKEN_NAME)
 						{
-							LogError(Message.Warning(
+							Log.Add(Message.Warning(
 								$"BACKTRACKING: успех, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
 								LexingStream.CurrentToken().Line,
 								LexingStream.CurrentToken().Column
@@ -467,12 +481,6 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			return false;
-		}
-
-		private void LogError(Message message)
-		{
-			Errors.Add(message);
-			Log.Add(message);
 		}
 	}
 }

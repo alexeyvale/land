@@ -15,7 +15,6 @@ namespace LandParserGenerator.Parsing
 		protected ILexer Lexer { get; set; }
 
 		public List<Message> Log { get; protected set; }
-		public List<Message> Errors { get; protected set; }
 
 		public BaseParser(Grammar g, ILexer lexer)
 		{
