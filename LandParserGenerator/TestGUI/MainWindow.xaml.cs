@@ -354,8 +354,13 @@ namespace TestGUI
 
 		private void OpenFile(string filename)
 		{
-			FileEditor.Text = File.ReadAllText(filename);
+			var stream = new StreamReader(filename, Encoding.Default, true);
+
 			TestFileName.Content = filename;
+			FileEditor.Text = stream.ReadToEnd();
+			FileEditor.Encoding = stream.CurrentEncoding;
+
+			stream.Close();
 
 			ParseButton_Click(null, null);
 		}
@@ -363,7 +368,9 @@ namespace TestGUI
 		private void ClearFileButton_Click(object sender, RoutedEventArgs e)
 		{
 			TestFileName.Content = null;
+
 			FileEditor.Text = String.Empty;
+			FileEditor.Encoding = Encoding.UTF8;
 		}
 
 		private void TestFileListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

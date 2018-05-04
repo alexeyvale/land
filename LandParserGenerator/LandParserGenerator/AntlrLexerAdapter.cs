@@ -51,13 +51,13 @@ namespace LandParserGenerator
 
 		public void SetSourceFile(string filename)
 		{
-			var stream = new UnbufferedCharStream(new StreamReader(filename));
+			var stream = new UnbufferedCharStream(new StreamReader(filename, Encoding.Default, true));
 			Lexer = LexerConstructor(stream);
 		}
 
 		public void SetSourceText(string text)
 		{
-			byte[] textBuffer = Encoding.Default.GetBytes(text);
+			byte[] textBuffer = Encoding.UTF8.GetBytes(text);
 			MemoryStream memStream = new MemoryStream(textBuffer);
 
 			var stream = CharStreams.fromStream(memStream);
