@@ -22,6 +22,7 @@ block			=	'{' (Any|block)+ '}'
 
 %%
 
+%parsing ignoreundefined
 %parsing start grammar
 %parsing skip COMMENT STRING DECLARATION_CODE
 

@@ -35,6 +35,7 @@ arguments_content	=	(Any|arguments)*
 
 %%
 
+%parsing ignoreundefined
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 

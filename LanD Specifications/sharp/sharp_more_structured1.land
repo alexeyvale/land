@@ -49,6 +49,7 @@ block		=	curly_bracketed_water
 
 %%
 
+%parsing ignoreundefined
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 

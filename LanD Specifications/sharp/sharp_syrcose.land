@@ -43,6 +43,7 @@ arguments			=	'(' (Any|arguments)* ')'
 
 %%
 
+%parsing ignoreundefined
 %parsing fragment STRING_INT_CODE
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 %parsing start namespace_content

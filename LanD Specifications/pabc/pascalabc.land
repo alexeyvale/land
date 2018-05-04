@@ -32,6 +32,7 @@ name_tail_element	=	ID|'.'|'[' Any ']'
 
 %%
 
+%parsing ignoreundefined
 %parsing start program
 %parsing ignorecase
 %parsing skip COMMENT
