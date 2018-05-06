@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.IO;
@@ -13,14 +14,14 @@ namespace LandParserGenerator.Markup
 	public class MarkupManager
 	{
 		[DataMember]
-		public List<MarkupElement> Markup { get; set; } = new List<MarkupElement>();
+		public ObservableCollection<MarkupElement> Markup { get; set; } = new ObservableCollection<MarkupElement>();
 
 		[DataMember]
 		public Node AstRoot { get; set; } = null;
 
 		public void Clear()
 		{
-			Markup = new List<MarkupElement>();
+			Markup = new ObservableCollection<MarkupElement>();
 			AstRoot = null;
 		}
 

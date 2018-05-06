@@ -455,7 +455,7 @@ namespace LandParserGenerator
 				foreach(var nt in FindLeftRecursion())
 				{
 					errors.AddLast(Message.Error(
-						$"Определение нетерминала {nt} содержит левую рекурсию",
+						$"Определение нетерминала {Userify(nt)} содержит левую рекурсию",
 						GetAnchor(nt),
 						"LanD"
 					));

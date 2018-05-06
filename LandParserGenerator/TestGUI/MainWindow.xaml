@@ -204,7 +204,8 @@
                                 </ToolBar>
                                 <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
                                           SelectedItemChanged="MarkupTreeView_SelectedItemChanged"  
-                                          PreviewMouseLeftButtonDown="MarkupTreeView_MouseDown"
+                                          PreviewMouseLeftButtonDown="MarkupTreeView_MouseLeftButtonDown"
+                                          MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
                                           PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
                                           DragOver="MarkupTreeView_DragOver"
                                           Drop="MarkupTreeView_Drop"
