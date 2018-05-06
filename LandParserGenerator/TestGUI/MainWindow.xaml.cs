@@ -967,7 +967,7 @@ namespace TestGUI
 		private const int SCROLL_BASE_OFFSET = 6;
 
 		/// Элементы, развёрнутые автоматически в ходе перетаскивания
-		private List<TreeViewItem> ExpandedWhileDragging = new List<TreeViewItem>();
+		private List<TreeViewItem> ExpandedWhileDrag = new List<TreeViewItem>();
 
 		private void MarkupTreeView_MouseDown(object sender, MouseButtonEventArgs e)
 		{
@@ -990,7 +990,8 @@ namespace TestGUI
 				if (Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_START_TOLERANCE)
 				{
 					/// Инициируем перемещение
-					ExpandedWhileDragging = new List<TreeViewItem>();
+					ExpandedWhileDrag.Clear();
+
 					DragDrop.DoDragDrop(MarkupTreeView, DraggedItem, DragDropEffects.Move);
 				}
 			}
@@ -1022,23 +1023,10 @@ namespace TestGUI
 			{
 				treeItem.IsSelected = true;
 
-				if (!treeItem.IsExpanded)
+				if (!treeItem.IsExpanded && treeItem.DataContext is Concern)
 				{
 					treeItem.IsExpanded = true;
-					/// Проходим по раскрытым в ходе перетаскивания элементам
-					for (var i = ExpandedWhileDragging.Count - 1; i >= 0; --i)
-					{
-						/// Если очередной элемент - не родитель того, который хотим раскрыть сейчас,
-						if (ExpandedWhileDragging[i].Items.Count == 0 || !ExpandedWhileDragging[i].Items.Contains(treeItem.DataContext))
-						{
-							/// то его можно схлопнуть
-							ExpandedWhileDragging[i].IsExpanded = false;
-							ExpandedWhileDragging.RemoveAt(i);
-						}
-						else
-							break;
-					}
-					ExpandedWhileDragging.Add(treeItem);
+					ExpandedWhileDrag.Add(treeItem);
 				}
 
 				var item = (MarkupElement)treeItem.DataContext;
@@ -1067,15 +1055,27 @@ namespace TestGUI
 			e.Handled = true;
 
 			/// Если закончили перетаскивание над элементом treeview, нужно осуществить перемещение
-			TreeViewItem Target = GetNearestContainer(e.OriginalSource as UIElement);
+			TreeViewItem target = GetNearestContainer(e.OriginalSource as UIElement);
+
 			if (DraggedItem != null)
 			{
-				TargetItem = Target != null ? (MarkupElement)Target.DataContext : null;
+				TargetItem = target != null ? (MarkupElement)target.DataContext : null;
 
 				DropItem(DraggedItem, TargetItem);
 				TargetItem = null;
 				DraggedItem = null;
 			}
+
+			var dataElement = (MarkupElement)target.DataContext;
+
+			while(dataElement != null)
+			{
+				ExpandedWhileDrag.RemoveAll(elem=>elem.DataContext == dataElement);
+				dataElement = dataElement.Parent;
+			}
+
+			foreach (var item in ExpandedWhileDrag)
+				item.IsExpanded = false;
 		}
 
 		public void DropItem(MarkupElement source, MarkupElement target)
@@ -1089,14 +1089,15 @@ namespace TestGUI
 			}
 			else
 			{
-				/// Если перетащили элемент на точку привязки с родителем
-				if (target != null && target.Parent != source.Parent)
+				if (target != null)
 				{
-					Markup.Remove(source);
-					source.Parent = target.Parent;
-					Markup.Add(source);			
+					if (target.Parent != source.Parent)
+					{
+						Markup.Remove(source);
+						source.Parent = target.Parent;
+						Markup.Add(source);
+					}
 				}
-				/// Если перетащили на точку привязки без родителя
 				else
 				{
 					Markup.Remove(source);
