@@ -120,7 +120,7 @@
                                         </ListBox>
                                     </TabItem>
                                     <TabItem>
-                                        <TabItem.Header>Ошибки</TabItem.Header>
+                                        <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
                                         <ListBox
                                             Name="FileParsingErrors"
                                             MouseDoubleClick="TestFileListBox_MouseDoubleClick"

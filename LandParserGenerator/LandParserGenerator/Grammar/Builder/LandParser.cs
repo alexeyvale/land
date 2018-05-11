@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 02.05.2018 16:14:57
+// DateTime: 11.05.2018 12:54:25
 // UserName: Алексей
-// Input file <./Land.y - 02.05.2018 16:14:57>
+// Input file <./Land.y - 11.05.2018 12:54:25>
 
 // options: no-lines gplex
 
@@ -70,12 +70,12 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 02.05.2018 16:14:57
+  // Verbatim content from ./Land.y - 11.05.2018 12:54:25
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 02.05.2018 16:14:57
+  // End verbatim content from ./Land.y - 11.05.2018 12:54:25
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -274,12 +274,26 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			
 			if(ValueStack[ValueStack.Depth-2].optQuantVal.HasValue)
 			{
-				var generated = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].optQuantVal.Value, ValueStack[ValueStack.Depth-1].boolVal);
-				ConstructedGrammar.AddAnchor(generated, CurrentLocationSpan);
-				
-				CurrentSemanticValue.entryVal = new Entry(generated, opts);
+				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_TOKEN_NAME
+					|| ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_WITH_SYNC_TOKEN_NAME
+					|| ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
+				{
+					Errors.Add(Message.Warning(
+							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
+							LocationStack[LocationStack.Depth-5].StartLine, LocationStack[LocationStack.Depth-5].StartColumn,
+							"LanD"
+						));
+				}
+				else
+				{			
+					var generated = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].optQuantVal.Value, ValueStack[ValueStack.Depth-1].boolVal);
+					ConstructedGrammar.AddAnchor(generated, CurrentLocationSpan);
+					
+					CurrentSemanticValue.entryVal = new Entry(generated, opts);
+				}
 			}
-			else
+			
+			if(CurrentSemanticValue.entryVal == null)
 			{
 				if(ValueStack[ValueStack.Depth-4].strVal == Grammar.ANY_WITH_SYNC_TOKEN_NAME)
 				{
@@ -292,7 +306,9 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					CurrentSemanticValue.entryVal = new Entry(Grammar.ANY_TOKEN_NAME, opts);
 				}
 				else
+				{
 					CurrentSemanticValue.entryVal = new Entry(ValueStack[ValueStack.Depth-4].strVal, opts);
+				}
 			}
 		}
         break;

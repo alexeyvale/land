@@ -170,6 +170,7 @@ namespace LandParserGenerator
 			}
 
 			#region Нормализация AnyExcept
+
 			foreach (var nt in GrammarTransformed.Rules)
 				foreach (var alt in nt.Value.Alternatives)
 					for (var i = 0; i < alt.Elements.Count; ++i)

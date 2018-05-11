@@ -13,9 +13,9 @@ namespace LandParserGenerator
 {
 	public static class BuilderLL
 	{
-		public static Parser BuildParser(string text, List<Message> errors)
+		public static Parser BuildParser(string text, List<Message> messages)
 		{
-			return BuilderBase.BuildParser(GrammarType.LL, text, errors) as Parser;
+			return BuilderBase.BuildParser(GrammarType.LL, text, messages) as Parser;
 		}
 
 		public static Parser BuildYacc()

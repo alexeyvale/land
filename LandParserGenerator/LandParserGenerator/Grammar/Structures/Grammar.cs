@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using LandParserGenerator.Parsing.LR;
@@ -424,7 +424,7 @@ namespace LandParserGenerator
 
 		public IEnumerable<Message> CheckValidity()
 		{
-			var errors = new LinkedList<Message>();
+			var messages = new List<Message>();
 
             foreach (var rule in Rules.Values)
             {
@@ -435,7 +435,7 @@ namespace LandParserGenerator
                     foreach (var smb in alt)
                     {
                         if (this[smb] == null)
-							errors.AddLast(Message.Error(
+							messages.Add(Message.Error(
 								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
 								GetAnchor(rule.Name),
 								"LanD"
@@ -444,7 +444,7 @@ namespace LandParserGenerator
             }
 
 			if (String.IsNullOrEmpty(StartSymbol))
-				errors.AddLast(Message.Error(
+				messages.Add(Message.Error(
 					$"Не задан стартовый символ",
 					null,
 					"LanD"
@@ -454,7 +454,7 @@ namespace LandParserGenerator
 			{
 				foreach(var nt in FindLeftRecursion())
 				{
-					errors.AddLast(Message.Error(
+					messages.Add(Message.Error(
 						$"Определение нетерминала {Userify(nt)} содержит левую рекурсию",
 						GetAnchor(nt),
 						"LanD"
@@ -462,10 +462,12 @@ namespace LandParserGenerator
 				}
 			}
 
-			/// Грамматика валидна или невалидна в зависимости от результатов проверки
-			State = errors.Count > 0 ? GrammarState.Invalid : GrammarState.Valid;
+			messages.AddRange(CheckConsecutiveAny());
 
-			return errors;
+			/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
+			State = messages.Where(m=>m.Type == MessageType.Error).Count() > 0 ? GrammarState.Invalid : GrammarState.Valid;
+
+			return messages;
 		}
 
 		/// Возвращает леворекурсивно определённые нетерминалы
@@ -568,6 +570,75 @@ namespace LandParserGenerator
 			return recursive;
 		}
 
+		private List<Message> CheckConsecutiveAny()
+		{
+			var messages = new List<Message>();
+			var anys = new Dictionary<string, Tuple<Alternative, int>>();
+
+			/// Временно подменяем все вхождения Any на AnyНомер,
+			/// чтобы сделать каждое вхождение уникальным
+			foreach (var rule in Rules.Values)
+				foreach (var alt in rule)
+					for (var i = 0; i < alt.Count; ++i)
+					{
+						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME
+							&& alt[i].Options.AnySyncTokens.Count == 0)
+						{
+							var newName = Grammar.ANY_TOKEN_NAME + anys.Count;
+							anys[newName] = new Tuple<Alternative, int>(alt, i);
+							alt[i].Symbol = newName;
+							Tokens.Add(newName, new TerminalSymbol(newName, String.Empty));
+						}
+					}
+			BuildFirst();
+			BuildFollow();
+
+			/// Для каждого Any находим Any, которые могут идти после него
+			/// и не являются этим же самым Any
+			foreach(var pair in anys.Values)
+			{
+				var nextTokens = First(pair.Item1.Subsequence(pair.Item2 + 1));
+				if (nextTokens.Contains(null))
+				{
+					nextTokens.Remove(null);
+					nextTokens.UnionWith(Follow(pair.Item1.NonterminalSymbolName));
+				}
+
+				/// Множество токенов Any, о которых надо предупредить разработчика грамматики
+				var warningTokens = nextTokens.Where(t => t.StartsWith(Grammar.ANY_TOKEN_NAME) && t != pair.Item1[pair.Item2]);
+
+				if (warningTokens.Count() > 0)
+				{
+					var anyUserifyRegex = $"{Grammar.ANY_TOKEN_NAME}\\d+";
+					var fromAltUserified = Regex.Replace(Userify(pair.Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+					var fromNontermUserified = Regex.Replace(Userify(pair.Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+
+					foreach (var token in warningTokens)
+					{
+						var nextAltUserified = Regex.Replace(Userify(anys[token].Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+						var nextNontermUserified = Regex.Replace(Userify(anys[token].Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+
+						messages.Add(Message.Warning(
+							$"После символа {Grammar.ANY_TOKEN_NAME} из альтернативы {fromAltUserified} нетерминала {fromNontermUserified} может следовать символ {Grammar.ANY_TOKEN_NAME} из альтернативы {nextAltUserified} нетерминала {nextNontermUserified}",
+							GetAnchor(pair.Item1.NonterminalSymbolName),
+							"LanD"
+						));
+					}
+				}
+			}
+
+			/// Возвращаем всё как было
+			foreach (var val in anys.Values)
+			{
+				Tokens.Remove(val.Item1[val.Item2].Symbol);
+				val.Item1[val.Item2].Symbol = Grammar.ANY_TOKEN_NAME;
+			}
+
+			OnGrammarUpdate();
+
+			return messages;
+		}
+
 		public string Userify(string name)
 		{
 			if(name.StartsWith(AUTO_RULE_PREFIX))
@@ -589,7 +660,7 @@ namespace LandParserGenerator
 				}
 				else
 				{
-					return $"({String.Join(" | ", Rules[name].Alternatives.Select(a=>String.Join(" ", a.Elements.Select(e=>Userify(e)))))})";
+					return $"({String.Join(" | ", Rules[name].Alternatives.Select(a=>Userify(a)))})";
                 }
 			}
 
@@ -603,7 +674,8 @@ namespace LandParserGenerator
 
 		public string Userify(Alternative alt)
 		{
-			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Symbol))) : "eps";
+			/// Если альтернатива пустая, показываем пользователю эпсилон
+			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Symbol))) : "\u03B5";
 		}
 
 		#endregion

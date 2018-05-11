@@ -141,12 +141,26 @@ body_element
 			
 			if($4.HasValue)
 			{
-				var generated = ConstructedGrammar.GenerateNonterminal($2, $4.Value, $5);
-				ConstructedGrammar.AddAnchor(generated, @$);
-				
-				$$ = new Entry(generated, opts);
+				if($2 == Grammar.ANY_TOKEN_NAME
+					|| $2 == Grammar.ANY_WITH_SYNC_TOKEN_NAME
+					|| $2 == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
+				{
+					Errors.Add(Message.Warning(
+							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
+							@1.StartLine, @1.StartColumn,
+							"LanD"
+						));
+				}
+				else
+				{			
+					var generated = ConstructedGrammar.GenerateNonterminal($2, $4.Value, $5);
+					ConstructedGrammar.AddAnchor(generated, @$);
+					
+					$$ = new Entry(generated, opts);
+				}
 			}
-			else
+			
+			if($$ == null)
 			{
 				if($2 == Grammar.ANY_WITH_SYNC_TOKEN_NAME)
 				{
@@ -159,7 +173,9 @@ body_element
 					$$ = new Entry(Grammar.ANY_TOKEN_NAME, opts);
 				}
 				else
+				{
 					$$ = new Entry($2, opts);
+				}
 			}
 		}
 	;

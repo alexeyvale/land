@@ -143,20 +143,20 @@ namespace TestGUI
 		private void BuildParserButton_Click(object sender, RoutedEventArgs e)
 		{
 			Parser = null;
-			var errors = new List<LandParserGenerator.Message>();
+			var messages = new List<Message>();
 
 			if (ParsingLL.IsChecked == true)
 			{
-				Parser = BuilderLL.BuildParser(GrammarEditor.Text, errors);
+				Parser = BuilderLL.BuildParser(GrammarEditor.Text, messages);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
-				Parser = BuilderLR.BuildParser(GrammarEditor.Text, errors);
+				Parser = BuilderLR.BuildParser(GrammarEditor.Text, messages);
 			}
 
-			ParserBuidingErrors.ItemsSource = errors;
+			ParserBuidingErrors.ItemsSource = messages;
 
-			if (Parser == null || errors.Count > 0)
+			if (Parser == null || messages.Count(m=>m.Type == MessageType.Error) > 0)
 			{
 				ParserStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
 				ParserStatus.Background = LightRed;

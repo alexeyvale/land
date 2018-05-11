@@ -141,11 +141,11 @@ namespace LandParserGenerator
 			return specParser.ConstructedGrammar;
 		}
 
-		public static BaseParser BuildParser(GrammarType type, string text, List<Message> errors)
+		public static BaseParser BuildParser(GrammarType type, string text, List<Message> messages)
 		{
-			var builtGrammar = BuildGrammar(type, text, errors);
+			var builtGrammar = BuildGrammar(type, text, messages);
 
-			if (errors.Count() == 0)
+			if (messages.Count(m=>m.Type == MessageType.Error) == 0)
 			{
 				BaseTable table = null;
 
@@ -161,11 +161,11 @@ namespace LandParserGenerator
 
 				/// Для LR бэктрекинга пока нет
 				if(table is TableLR1 || !builtGrammar.Options.IsSet(ParsingOption.BACKTRACKING))
-					errors.AddRange(table.CheckValidity());
+					messages.AddRange(table.CheckValidity());
 
 				table.ExportToCsv("current_table.csv");
 
-				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", errors);
+				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", messages);
 
 				/// Создаём парсер
 				BaseParser parser = null;
