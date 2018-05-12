@@ -18,7 +18,6 @@ namespace LandParserGenerator.Parsing.LL
 		private TokenStream LexingStream { get; set; }
 
 		private DecisionStack Decisions { get; set; }
-		private int BacktrackingCounter { get; set; }
 
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
@@ -38,8 +37,8 @@ namespace LandParserGenerator.Parsing.LL
 		public override Node Parse(string text)
 		{
 			Log = new List<Message>();
-		
-			BacktrackingCounter = 0;
+
+			Statistics = new Statistics();
 
             /// Готовим лексер
             LexingStream = new TokenStream(Lexer, text);
@@ -348,7 +347,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// </summary>
 		private bool Backtrack()
 		{
-            BacktrackingCounter += 1;
+            Statistics.BacktracingCalled += 1;
 
 			var decision = Decisions.BacktrackToClosestDecision();
 

@@ -127,6 +127,14 @@
                                             FontSize="14pt">
                                         </ListBox>
                                     </TabItem>
+                                    <TabItem>
+                                        <TabItem.Header>Статистика</TabItem.Header>
+                                        <TextBox
+                                            Name="FileStatistics"
+                                            IsReadOnly="True"
+                                            FontSize="14pt">
+                                        </TextBox>
+                                    </TabItem>
                                 </TabControl>
                             </Grid>
                         </TabItem>

@@ -76,7 +76,9 @@
     <Compile Include="Markup\ConcernPoint.cs" />
     <Compile Include="Markup\LandMapper.cs" />
     <Compile Include="Markup\LandExplorerVisitor.cs" />
+    <Compile Include="Parsing\BaseStatistics.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
+    <Compile Include="Parsing\LL\Statistics.cs" />
     <Compile Include="Parsing\LL\DecisionStack.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />

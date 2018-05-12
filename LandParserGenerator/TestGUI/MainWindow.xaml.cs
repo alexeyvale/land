@@ -319,8 +319,9 @@ namespace TestGUI
             if (Parser != null)
             {
                 var root = Parser.Parse(FileEditor.Text);
-				var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
+				FileStatistics.Text = Parser.Statistics.ToString();
 
+				var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
 				ProgramStatusLabel.Content = noErrors ? "Разбор произведён успешно" : "Ошибки при разборе файла";
                 ProgramStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
 
