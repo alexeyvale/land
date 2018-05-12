@@ -15,17 +15,17 @@ CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
 
 program		=	Any 'namespace' name '{' (Any|class)* '}'
-class		=	ID* 'class' name Any '{' (Any|method|block|attribute)* '}'
+class		=	ID* 'class' name Any '{' (Any|method|block|attribute|class)* '}'
 method		=	ID* type name arguments AnyAvoid(';') block
 block		=	'{' (Any|block)* '}'
 attribute	=	'[' (Any|attribute)* ']'
 
 name_atom	=	ID
-name		=	name_atom ((('.'|'::') name_atom) | ('<' types_list '>' | '[' Any ']'))*
+name		=	name_atom ((('.'|'::') name_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
 names_list	=	name (',' name)*
 
 type_atom	=	'unsigned'? ID | arguments
-type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' Any ']'))*
+type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
 types_list	=	type (',' type)*
 
 argument	=	('out'|'ref'|'params'|'const'|'this')? type name? Any

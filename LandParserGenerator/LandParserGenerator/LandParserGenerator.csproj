@@ -77,11 +77,12 @@
     <Compile Include="Markup\LandMapper.cs" />
     <Compile Include="Markup\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
+    <Compile Include="Parsing\LL\DecisionStack.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />
-    <Compile Include="Parsing\DecisionPoint.cs" />
+    <Compile Include="Parsing\LL\DecisionPoint.cs" />
     <Compile Include="Parsing\Tree\Visitors\BaseVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\GhostListOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\LL\ParsingStackAction.cs" />
