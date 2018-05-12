@@ -105,22 +105,26 @@ namespace LandParserGenerator.Parsing.LL
 			/// Пока на стеке есть решения
 			while(Decisions.Count > 0)
 			{
-				if (Decisions.Peek().ParsingStackTop == ParsingStack.Peek()
-					&& Decisions.Peek().DecisionTokenIndex >= TokensStream.CurrentTokenIndex)
-					if (CanBeChanged(Decisions.Peek()))
-						return Decisions.Peek();
-					else
-						Decisions.Pop();
-
-				if (FailureCandidates.Contains(ParsingStack.Peek()))
+				/// По идее, стек разбора не может закончиться раньше стека решений
+				while (Decisions.Peek().ParsingStackTop != ParsingStack.Peek())
 				{
-					if (!RuleFailures.ContainsKey(ParsingStack.Peek().Symbol))
-						RuleFailures[ParsingStack.Peek().Symbol] = new List<int>();
+					ParsingStack.Undo();
 
-					RuleFailures[ParsingStack.Peek().Symbol].Add(TokensStream.CurrentTokenIndex);
+					if (FailureCandidates.Contains(ParsingStack.Peek()))
+					{
+						if (!RuleFailures.ContainsKey(ParsingStack.Peek().Symbol))
+							RuleFailures[ParsingStack.Peek().Symbol] = new List<int>();
+
+						RuleFailures[ParsingStack.Peek().Symbol].Add(TokensStream.CurrentTokenIndex);
+					}
 				}
 
-				ParsingStack.Undo();
+				/// Возвращаем решение, если его ещё можно изменить
+				if (CanBeChanged(Decisions.Peek()))
+					return Decisions.Peek();
+				/// или отбрасываем
+				else
+					Decisions.Pop();
 			}
 
 			return null;
