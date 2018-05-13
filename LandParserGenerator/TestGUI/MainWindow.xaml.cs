@@ -27,7 +27,7 @@ namespace TestGUI
 		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
-		private CurrentConcernHighlighter CurrentConcernColorizer { get; set; }
+		private SegmentsHighlighter CurrentConcernColorizer { get; set; }
 
 		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
 
@@ -48,7 +48,7 @@ namespace TestGUI
 
 			GrammarEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(GrammarEditor.TextArea));
 			FileEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(FileEditor.TextArea));
-			FileEditor.TextArea.TextView.BackgroundRenderers.Add(CurrentConcernColorizer = new CurrentConcernHighlighter(FileEditor.TextArea));
+			FileEditor.TextArea.TextView.BackgroundRenderers.Add(CurrentConcernColorizer = new SegmentsHighlighter(FileEditor.TextArea));
 			SelectedTextColorizerForGrammar = new SelectedTextColorizer(GrammarEditor.TextArea);
 
 			if (File.Exists(LAST_GRAMMARS_FILE))
@@ -572,55 +572,75 @@ namespace TestGUI
 
 		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
+			/// Если не включено постоянное выделение чего-либо,
+			/// сбрасываем текущее выделение
+			if (HighlightNone.IsChecked == true)
+				CurrentConcernColorizer.ResetSegments();
+
 			if (e.NewValue != null)
 			{
-				var point = e.NewValue as MarkupElement;
-
-				if (point is ConcernPoint)
-					MoveCaretToSource(((ConcernPoint)point).TreeNode, FileEditor, false, 1);
-
-				var elementNumStack = new Stack<int>();
-				int? currentElementNum = null;
-				var segments = new List<Tuple<int, int>>();
-
-				while(point != null)
+				/// При клике по точке переходим к ней и подсвечиваем участок
+				if (e.NewValue is ConcernPoint)
 				{
-					if(point is ConcernPoint)
+					var concernPoint = (ConcernPoint)e.NewValue;
+					MoveCaretToSource(concernPoint.TreeNode, FileEditor, false, 1);
+
+					if (HighlightNone.IsChecked == true)
 					{
-						var cp = (ConcernPoint)point;
+						CurrentConcernColorizer.SetSegments(new List<SegmentToHighlight>(){
+							new SegmentToHighlight()
+							{
+								StartOffset = concernPoint.TreeNode.StartOffset.Value,
+								EndOffset = concernPoint.TreeNode.EndOffset.Value,
+								HighlightWholeLine = false
+							}
+						});
+					}
+
+					return;
+				}
+
+				/// Если отключен режим постоянной подсветки функциональностей,
+				/// подсвечиваем то, что выбрано в данный конкретный момент
+				if (e.NewValue is Concern)
+					if (HighlightNone.IsChecked == true)
+					{
+						CurrentConcernColorizer.SetSegments(GetConcernSegments((Concern)e.NewValue).Select(s=> new SegmentToHighlight()
+							{
+								StartOffset = s.Item1,
+								EndOffset = s.Item2,
+								HighlightWholeLine = true
+							}
+						).ToList());
+					}
+			}
+		}
+
+		private List<Tuple<int, int>> GetConcernSegments(Concern concern)
+		{
+			var concernsQueue = new Queue<Concern>();
+			concernsQueue.Enqueue(concern);
+
+			var segments = new List<Tuple<int, int>>();
+
+			/// Для выделения функциональности целиком придётся обходить её и подфункциональности
+			while (concernsQueue.Count > 0)
+			{
+				var currentConcern = concernsQueue.Dequeue();
+
+				foreach (var element in currentConcern.Elements)
+				{
+					if (element is ConcernPoint)
+					{
+						var cp = (ConcernPoint)element;
 						segments.Add(new Tuple<int, int>(cp.TreeNode.StartOffset.Value, cp.TreeNode.EndOffset.Value));
 					}
 					else
-					{
-						var concern = (Concern)point;
-
-						if (currentElementNum.HasValue)
-							currentElementNum += 1;
-						else
-							currentElementNum = 0;
-
-						if (currentElementNum < concern.Elements.Count)
-						{
-							point = concern.Elements[currentElementNum.Value];
-							elementNumStack.Push(currentElementNum.Value);
-							currentElementNum = null;
-							continue;
-						}
-					}
-
-					if (point == e.NewValue)
-						break;
-
-					point = point.Parent;
-					currentElementNum = elementNumStack.Count > 0 ? elementNumStack.Pop() : (int?)null;
+						concernsQueue.Enqueue((Concern)element);
 				}
+			}
 
-				CurrentConcernColorizer.SetSegments(segments);
-			}
-			else
-			{
-				CurrentConcernColorizer.ResetSegments();
-			}
+			return segments;
 		}
 
 		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -942,6 +962,83 @@ namespace TestGUI
 			}
 
 			return child as T;
+		}
+
+		private void HighlightingRadioButton_Checked(object sender, RoutedEventArgs e)
+		{
+			if (CurrentConcernColorizer != null)
+			{
+				CurrentConcernColorizer.ResetSegments();
+
+				if (HighlightNone.IsChecked == true)
+				{
+					return;
+				}
+
+				if (HighlightWater.IsChecked == true)
+				{
+					if (TreeRoot != null)
+					{
+						var waterVisitor = new GetWaterSegmentsVisitor();
+						waterVisitor.Visit(TreeRoot);
+						CurrentConcernColorizer.SetSegments(waterVisitor.AnySegments.Select(s => new SegmentToHighlight()
+							{
+								StartOffset = s.Item1,
+								EndOffset = s.Item2,
+								HighlightWholeLine = false
+							}).ToList(), Color.FromArgb(45, 150, 150, 200));
+					}
+					return;
+				}
+
+				if (HighlightConcerns.IsChecked == true)
+				{
+
+					var concernsAndColors = new Dictionary<Concern, Color>();
+
+					foreach (var concern in Markup.Markup.OfType<Concern>().Where(c=>c.Parent == null))
+					{
+						concernsAndColors[concern] = 
+							CurrentConcernColorizer.SetSegments(GetConcernSegments(concern).Select(s => new SegmentToHighlight()
+							{
+								StartOffset = s.Item1,
+								EndOffset = s.Item2,
+								HighlightWholeLine = true
+							}).ToList());
+
+						var label = GetMarkupTreeItemLabel(MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, "ConcernIcon");
+						if (label != null)
+							label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
+					}
+
+					return;
+				}
+			}
+		}
+
+		public class GetWaterSegmentsVisitor
+		{
+			public List<Tuple<int, int>> AnySegments { get; set; } = new List<Tuple<int, int>>();
+			public List<Tuple<int, int>> TypedWaterSegments { get; set; } = new List<Tuple<int, int>>();
+
+			public void Visit(Node node)
+			{
+				foreach (var child in node.Children)
+				{
+					if (child.Symbol == Grammar.ANY_TOKEN_NAME)
+					{
+						if (child.StartOffset.HasValue)
+							AnySegments.Add(new Tuple<int, int>(child.StartOffset.Value, child.EndOffset.Value));
+					}
+					else
+					{
+						if (!child.Options.IsLand)
+							TypedWaterSegments.Add(new Tuple<int, int>(child.StartOffset.Value, child.EndOffset.Value));
+					}
+
+					Visit(child);
+				}
+			}
 		}
 
 		#region drag and drop
