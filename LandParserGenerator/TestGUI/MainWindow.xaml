@@ -183,6 +183,7 @@
                                     <RowDefinition Height="35"></RowDefinition>
                                     <RowDefinition Height="70*"></RowDefinition>
                                     <RowDefinition Height="30*"></RowDefinition>
+                                    <RowDefinition Height="50"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <ToolBar Grid.Row="0">
                                     <ToolBar.Resources>
@@ -258,6 +259,11 @@
                                     SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
                                     MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
                                 </ListBox>
+                                <StackPanel Orientation="Vertical" Grid.Row="3">
+                                    <RadioButton GroupName="HighlightingMode" FontSize="8pt" Margin="10,5,0,0" Content="Отключить постоянную подсветку" IsChecked="True"></RadioButton>
+                                    <RadioButton GroupName="HighlightingMode" FontSize="8pt" Margin="10,0,0,0" Content="Подсвечивать функциональности"></RadioButton>
+                                    <RadioButton GroupName="HighlightingMode" FontSize="8pt" Margin="10,0,5,0" Content="Подсвечивать воду"></RadioButton>
+                                </StackPanel>
                             </Grid>
                         </TabItem>
                     </TabControl>
