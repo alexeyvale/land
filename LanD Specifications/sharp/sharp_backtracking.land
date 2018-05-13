@@ -28,7 +28,7 @@ type_atom	=	'unsigned'? ID | arguments
 type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
 types_list	=	type (',' type)*
 
-argument	=	('out'|'ref'|'params'|'const'|'this')? type name? Any
+argument	=	('out'|'ref'|'params'|'const'|'this')? type name? ('=' Any)?
 arguments	=	'(' (argument (',' argument)*)? ')'
 
 %%

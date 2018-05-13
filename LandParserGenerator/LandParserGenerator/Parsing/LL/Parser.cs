@@ -17,6 +17,10 @@ namespace LandParserGenerator.Parsing.LL
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
+		/// Вспомогательные переменные для сбора статистики:
+		private int LastBacktrackingDecisionsStackHeight { get; set; }
+		private int LastBacktrackingLength { get; set; }
+
 		private DecisionStack Decisions { get; set; }
 
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
@@ -37,20 +41,20 @@ namespace LandParserGenerator.Parsing.LL
 		public override Node Parse(string text)
 		{
 			Log = new List<Message>();
-
 			Statistics = new Statistics();
+			LastBacktrackingDecisionsStackHeight = 0;
+			LastBacktrackingLength = 0;
 
-            /// Готовим лексер
-            LexingStream = new TokenStream(Lexer, text);
-
-			/// Кладём на стек стартовый символ
+            /// Готовим лексер и стеки
+            LexingStream = new TokenStream(Lexer, text);		
 			Stack = new ParsingStack(LexingStream);
 			Decisions = new DecisionStack(Stack, LexingStream);
-			var root = new Node(grammar.StartSymbol);
-
+			
 			/// Читаем первую лексему из входного потока
 			var token = LexingStream.NextToken();
 
+			/// Кладём на стек стартовый символ
+			var root = new Node(grammar.StartSymbol);
 			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
 
@@ -97,71 +101,73 @@ namespace LandParserGenerator.Parsing.LL
                     }
                 }
 
-                /// Если на вершине стека нетерминал, выбираем альтернативу по таблице
-                if (grammar[stackTop.Symbol] is NonterminalSymbol 
-					&& !Decisions.RuleFailed(stackTop.Symbol, LexingStream.CurrentTokenIndex))
-                {
-                    var alternatives = Table[stackTop.Symbol, token.Name];
-					var anyAlternatives = Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME]
-						.Where(alt=>!alternatives.Contains(alt)).ToList();
-
-					Alternative alternativeToApply = null;
-
-					/// Сообщаем об ошибке в случае неоднозначной грамматики,
-					/// либо запоминаем точку для возможного бэктрекинга
-					if (alternatives.Count > 1)
+				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
+				if (grammar[stackTop.Symbol] is NonterminalSymbol)
+					if (!Decisions.RuleFailed(stackTop.Symbol, LexingStream.CurrentTokenIndex))
 					{
-						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
-						{
-							Decisions.ChooseAlternative(token.Name != Grammar.ANY_TOKEN_NAME
-								? alternatives.Concat(anyAlternatives).ToList()
-								: alternatives);
+						var alternatives = Table[stackTop.Symbol, token.Name];
+						var anyAlternatives = Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME]
+							.Where(alt => !alternatives.Contains(alt)).ToList();
 
-							alternativeToApply = alternatives[0];						
+						Alternative alternativeToApply = null;
+
+						/// Сообщаем об ошибке в случае неоднозначной грамматики,
+						/// либо запоминаем точку для возможного бэктрекинга
+						if (alternatives.Count > 1)
+						{
+							if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
+							{
+								Decisions.ChooseAlternative(token.Name != Grammar.ANY_TOKEN_NAME
+									? alternatives.Concat(anyAlternatives).ToList()
+									: alternatives);
+
+								alternativeToApply = alternatives[0];
+							}
+							else
+							{
+								Log.Add(Message.Error(
+									$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
+									token.Line,
+									token.Column
+								));
+
+								break;
+							}
 						}
-						else
+						/// Если же в ячейке ровно одна альтернатива
+						else if (alternatives.Count == 1)
 						{
-							Log.Add(Message.Error(
-								$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
-								token.Line,
-								token.Column
-							));
+							alternativeToApply = alternatives.Single();
 
-							break;
+							if (grammar.Options.IsSet(ParsingOption.BACKTRACKING)
+								&& anyAlternatives.Count > 0
+								&& token.Name != Grammar.ANY_TOKEN_NAME)
+							{
+								Decisions.ChooseAlternative(alternatives.Concat(anyAlternatives).ToList());
+							}
+						}
+
+						if (alternativeToApply != null)
+						{
+							/// снимаем со стека нетерминал и кладём её на стек
+							Stack.InitBatch();
+							Stack.Pop();
+
+							for (var i = alternativeToApply.Count - 1; i >= 0; --i)
+							{
+								var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options);
+
+								stackTop.AddFirstChild(newNode);
+								Stack.Push(newNode);
+							}
+
+							Stack.FinBatch();
+
+							continue;
 						}
 					}
-					/// Если же в ячейке ровно одна альтернатива
-					else if (alternatives.Count == 1)
-					{
-						alternativeToApply = alternatives.Single();
-
-						if (grammar.Options.IsSet(ParsingOption.BACKTRACKING) 
-							&& anyAlternatives.Count > 0 
-							&& token.Name != Grammar.ANY_TOKEN_NAME)
-						{
-							Decisions.ChooseAlternative(alternatives.Concat(anyAlternatives).ToList());
-						}
-					}
-
-					if(alternativeToApply != null)
-					{
-						/// снимаем со стека нетерминал и кладём её на стек
-						Stack.InitBatch();
-                        Stack.Pop();
-
-                        for (var i = alternativeToApply.Count - 1; i >= 0; --i)
-                        {
-                            var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options);
-
-                            stackTop.AddFirstChild(newNode);
-                            Stack.Push(newNode);
-                        }
-
-						Stack.FinBatch();
-
-                        continue;
-                    }
-                }
+					else
+						((Statistics)Statistics).FailedRuleReenterRejections += 1;
 
 				/// Если не смогли ни сопоставить текущий токен с терминалом на вершине стека,
 				/// ни найти ветку правила для нетерминала на вершине стека
@@ -348,6 +354,7 @@ namespace LandParserGenerator.Parsing.LL
 		private bool Backtrack()
 		{
             Statistics.BacktracingCalled += 1;
+			var initialDecisionsStackHeight = Decisions.Count;
 
 			var decision = Decisions.BacktrackToClosestDecision();
 
@@ -379,6 +386,9 @@ namespace LandParserGenerator.Parsing.LL
 						LexingStream.CurrentToken().Line,
 						LexingStream.CurrentToken().Column
 					));
+
+					ChangeBacktrackingStatistics(initialDecisionsStackHeight);
+					((Statistics)Statistics).ChangeAlternativeDecisionChanges += 1;
 
 					return true;
 				}
@@ -429,6 +439,9 @@ namespace LandParserGenerator.Parsing.LL
 						finish.DecisionTokenIndex = LexingStream.CurrentTokenIndex;
 						finish.AttemptsCount += 1;
 
+						ChangeBacktrackingStatistics(initialDecisionsStackHeight);
+						((Statistics)Statistics).FinishAnyDecisionChanges += 1;
+
 						return true;
 					}
 					else
@@ -439,6 +452,19 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			return false;
+		}
+
+		private void ChangeBacktrackingStatistics(int initialDecisionsStackHeight)
+		{
+			var backtrackingLength = initialDecisionsStackHeight == LastBacktrackingDecisionsStackHeight
+						? LastBacktrackingLength + initialDecisionsStackHeight - Decisions.Count + 1
+						: initialDecisionsStackHeight - Decisions.Count + 1;
+
+			LastBacktrackingLength = backtrackingLength;
+			LastBacktrackingDecisionsStackHeight = Decisions.Count;
+
+			if (backtrackingLength > Statistics.LongestBacktracking)
+				Statistics.LongestBacktracking = backtrackingLength;
 		}
 	}
 }

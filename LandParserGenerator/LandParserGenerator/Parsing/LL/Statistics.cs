@@ -12,11 +12,19 @@ namespace LandParserGenerator.Parsing.LL
 {
 	public class Statistics: BaseStatistics
 	{
-		public Dictionary<string, int> ChangeAlternativeBacktrackings { get; set; } = new Dictionary<string, int>();
+		public int ChangeAlternativeDecisionChanges { get; set; }
+		public int FinishAnyDecisionChanges { get; set; }
+		public int FailedRuleReenterRejections { get; set; }
 
 		public override string ToString()
 		{
-			return $"Всего вызовов бэктрекинга:\t{BacktracingCalled}{System.Environment.NewLine}";
+			var result = $"Всего вызовов бэктрекинга:\t{BacktracingCalled}{System.Environment.NewLine}"
+				+ $"Наибольшее число последовательно отменённых решений:\t{LongestBacktracking}{System.Environment.NewLine}"
+				+ $"Смен альтернативы:\t{ChangeAlternativeDecisionChanges}{System.Environment.NewLine}"
+				+ $"Продлений Any:\t{FinishAnyDecisionChanges}{System.Environment.NewLine}"
+				+ $"Предотвращено заходов в заведомо неуспешные правила:\t{FailedRuleReenterRejections}{System.Environment.NewLine}";
+
+			return result;
 		}
 	}
 }

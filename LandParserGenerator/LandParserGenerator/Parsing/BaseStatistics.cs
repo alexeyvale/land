@@ -12,6 +12,7 @@ namespace LandParserGenerator.Parsing
 {
 	public abstract class BaseStatistics
 	{
+		public TimeSpan TimeSpent { get; set; }
 		public int BacktracingCalled { get; set; }
 		public int MaxNumberOfDecisions { get; set; }
 		public int LongestBacktracking { get; set; }
