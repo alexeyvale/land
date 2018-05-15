@@ -113,11 +113,11 @@
                                         <Label Name="TestFileName"></Label>
                                     </ToolBar>
                                     <avalonedit:TextEditor
-                                    Name="FileEditor"
-                                    Grid.Row="1"
-                                    ShowLineNumbers="True"
-                                    FontFamily="Consolas"
-                                    FontSize="12pt">
+                                        Name="FileEditor"
+                                        Grid.Row="1"
+                                        ShowLineNumbers="True"
+                                        FontFamily="Consolas"
+                                        FontSize="12pt">
                                     </avalonedit:TextEditor>
                                     <StatusBar Name="ProgramStatus" Grid.Row="2">
                                         <Label Name="ProgramStatusLabel"></Label>
@@ -194,38 +194,43 @@
                         <TabItem Header="Разметка">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="35"></RowDefinition>
-                                    <RowDefinition Height="70*"></RowDefinition>
-                                    <RowDefinition Height="30*"></RowDefinition>
+                                    <RowDefinition Height="75*"></RowDefinition>
+                                    <RowDefinition Height="5"></RowDefinition>
+                                    <RowDefinition Height="25*"></RowDefinition>
                                     <RowDefinition Height="50"></RowDefinition>
                                 </Grid.RowDefinitions>
-                                <ToolBar Grid.Row="0">
-                                    <ToolBar.Resources>
-                                        <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="{x:Type Button}">
-                                            <Setter Property="FontSize" Value="12pt"/>
-                                            <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
-                                            <Setter Property="Foreground" Value="DarkBlue"/>
-                                            <Setter Property="IsEnabled" Value="True"/>
-                                            <Setter Property="Margin" Value="2,0,2,0"/>
-                                            <Style.Triggers>
-                                                <Trigger Property="IsEnabled" Value="false">
-                                                    <Setter Property="Foreground" Value="DarkGray"/>
-                                                </Trigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ToolBar.Resources>
-                                    <Button Name="NewConcernMarkup" Content="&#xf15b;" ToolTip="Новая разметка" Click="NewConcernMarkup_Click"></Button>
-                                    <Button Name="LoadConcernMarkup" Content="&#xf07c;" ToolTip="Загрузить разметку" Click="LoadConcernMarkup_Click"></Button>
-                                    <Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" Click="SaveConcernMarkup_Click"></Button>
-                                    <Separator></Separator>
-                                    <Button Name="AddConcernPoint" Content="&#xf067;" ToolTip="Добавить точку" Click="AddConcernPoint_Click"></Button>
-                                    <Button Name="AddConcernFolder" Content="&#xf0fe;" ToolTip="Добавить каталог" Click="AddConcernFolder_Click"></Button>
-                                    <Button Name="AddAllLand" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllLandButton_Click"></Button>
-                                    <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить" Click="DeleteConcernPoint_Click"></Button>
-                                    <Separator></Separator>
-                                    <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
-                                </ToolBar>
-                                <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
+                                <Grid Grid.Row="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="35"></RowDefinition>
+                                        <RowDefinition Height="100*"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <ToolBar Grid.Row="0">
+                                        <ToolBar.Resources>
+                                            <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="{x:Type Button}">
+                                                <Setter Property="FontSize" Value="12pt"/>
+                                                <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+                                                <Setter Property="Foreground" Value="DarkBlue"/>
+                                                <Setter Property="IsEnabled" Value="True"/>
+                                                <Setter Property="Margin" Value="2,0,2,0"/>
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="false">
+                                                        <Setter Property="Foreground" Value="DarkGray"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToolBar.Resources>
+                                        <Button Name="NewConcernMarkup" Content="&#xf15b;" ToolTip="Новая разметка" Click="NewConcernMarkup_Click"></Button>
+                                        <Button Name="LoadConcernMarkup" Content="&#xf07c;" ToolTip="Загрузить разметку" Click="LoadConcernMarkup_Click"></Button>
+                                        <Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" Click="SaveConcernMarkup_Click"></Button>
+                                        <Separator></Separator>
+                                        <Button Name="AddConcernPoint" Content="&#xf067;" ToolTip="Добавить точку" Click="AddConcernPoint_Click"></Button>
+                                        <Button Name="AddConcernFolder" Content="&#xf0fe;" ToolTip="Добавить каталог" Click="AddConcernFolder_Click"></Button>
+                                        <Button Name="AddAllLand" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllLandButton_Click"></Button>
+                                        <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить" Click="DeleteConcernPoint_Click"></Button>
+                                        <Separator></Separator>
+                                        <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
+                                    </ToolBar>
+                                    <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
                                           SelectedItemChanged="MarkupTreeView_SelectedItemChanged"  
                                           PreviewMouseLeftButtonDown="MarkupTreeView_MouseLeftButtonDown"
                                           MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
@@ -233,39 +238,41 @@
                                           DragOver="MarkupTreeView_DragOver"
                                           Drop="MarkupTreeView_Drop"
                                           MouseMove="MarkupTreeView_MouseMove">
-                                    <TreeView.ItemTemplate>
-                                        <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Grid>
-                                                    <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
-                                                    <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
-                                                </Grid>
-                                                <Grid>
-                                                    <TextBlock Text="{Binding Path=Name}" />
-                                                    <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
-                                                </Grid>
-                                                <StackPanel.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Name="MarkupTreeRenameMenuItem" Header="Переименовать" Click="MarkupTreeRenameMenuItem_Click"/>
-                                                        <MenuItem Name="MarkupTreeDeleteMenuItem" Header="Удалить" Click="MarkupTreeDeleteMenuItem_Click"/>
-                                                        <MenuItem Name="MarkupTreeDisableMenuItem" Header="Отключить" Click="MarkupTreeDisableMenuItem_Click"/>
-                                                    </ContextMenu>
-                                                </StackPanel.ContextMenu>
-                                            </StackPanel>
-                                        </HierarchicalDataTemplate>
-                                    </TreeView.ItemTemplate>
-                                    <TreeView.ItemContainerStyle>
-                                        <Style TargetType="{x:Type TreeViewItem}">
-                                            <EventSetter Event="Expanded" Handler="MarkupTreeViewItem_Expanded"/>
-                                            <EventSetter Event="Collapsed" Handler="MarkupTreeViewItem_Collapsed"/>
-                                            <EventSetter Event="GotFocus" Handler="MarkupTreeViewItem_GotFocus" />
-                                            <EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
-                                            <EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
-                                            <EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
-                                            <EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
-                                        </Style>
-                                    </TreeView.ItemContainerStyle>
-                                </TreeView>
+                                        <TreeView.ItemTemplate>
+                                            <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Grid>
+                                                        <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
+                                                        <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
+                                                    </Grid>
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Path=Name}" />
+                                                        <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
+                                                    </Grid>
+                                                    <StackPanel.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Name="MarkupTreeRenameMenuItem" Header="Переименовать" Click="MarkupTreeRenameMenuItem_Click"/>
+                                                            <MenuItem Name="MarkupTreeDeleteMenuItem" Header="Удалить" Click="MarkupTreeDeleteMenuItem_Click"/>
+                                                            <MenuItem Name="MarkupTreeDisableMenuItem" Header="Отключить" Click="MarkupTreeDisableMenuItem_Click"/>
+                                                        </ContextMenu>
+                                                    </StackPanel.ContextMenu>
+                                                </StackPanel>
+                                            </HierarchicalDataTemplate>
+                                        </TreeView.ItemTemplate>
+                                        <TreeView.ItemContainerStyle>
+                                            <Style TargetType="{x:Type TreeViewItem}">
+                                                <EventSetter Event="Expanded" Handler="MarkupTreeViewItem_Expanded"/>
+                                                <EventSetter Event="Collapsed" Handler="MarkupTreeViewItem_Collapsed"/>
+                                                <EventSetter Event="GotFocus" Handler="MarkupTreeViewItem_GotFocus" />
+                                                <EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
+                                                <EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
+                                                <EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
+                                                <EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
+                                            </Style>
+                                        </TreeView.ItemContainerStyle>
+                                    </TreeView>
+                                </Grid>
+                                <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
                                 <ListBox
                                     Grid.Row="2"
                                     FontSize="12pt"

@@ -47,14 +47,16 @@ namespace TestGUI
 					: Color.FromArgb(45, (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206));
 
 			SegmentGroups.Add(new Tuple<List<SegmentToHighlight>, Color>(segments, currentColor));
-
 			textEditor.TextView.Redraw();
+
+			currentColor.A = (byte)255;
 			return currentColor;
 		}
 
 		public void ResetSegments()
 		{
 			SegmentGroups = new List<Tuple<List<SegmentToHighlight>, Color>>();
+			textEditor.TextView.Redraw();
 		}
 
 		public KnownLayer Layer
