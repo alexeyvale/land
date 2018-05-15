@@ -583,7 +583,7 @@ namespace TestGUI
 				if (e.NewValue is ConcernPoint)
 				{
 					var concernPoint = (ConcernPoint)e.NewValue;
-					MoveCaretToSource(concernPoint.TreeNode, FileEditor, false, 1);
+					MoveCaretToSource(concernPoint.TreeNode, FileEditor, HighlightNone.IsChecked == false, 1);
 
 					if (HighlightNone.IsChecked == true)
 					{
@@ -968,7 +968,20 @@ namespace TestGUI
 		{
 			if (CurrentConcernColorizer != null)
 			{
+				/// Сбрасываем текущее выделение участков текста
 				CurrentConcernColorizer.ResetSegments();
+
+				/// Обеспечиваем стандартное отображение Concern-ов в панели
+				foreach (var concern in Markup.Markup.OfType<Concern>().Where(c => c.Parent == null))
+				{
+					var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
+					if (!markupTreeItem.IsSelected)
+					{
+						var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
+						if (label != null)
+							label.Foreground = Brushes.DimGray;
+					}
+				}
 
 				if (HighlightNone.IsChecked == true)
 				{
@@ -986,14 +999,13 @@ namespace TestGUI
 								StartOffset = s.Item1,
 								EndOffset = s.Item2,
 								HighlightWholeLine = false
-							}).ToList(), Color.FromArgb(45, 150, 150, 200));
+							}).ToList(), Color.FromArgb(60, 150, 150, 200));
 					}
 					return;
 				}
 
 				if (HighlightConcerns.IsChecked == true)
 				{
-
 					var concernsAndColors = new Dictionary<Concern, Color>();
 
 					foreach (var concern in Markup.Markup.OfType<Concern>().Where(c=>c.Parent == null))
