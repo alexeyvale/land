@@ -24,13 +24,13 @@ namespace TestGUI
 
 		private Random Generator { get; set; } = new Random();
 		private Color[] ColorsList { get; set; } = new Color[] {
-			Color.FromArgb(45, 100, 200, 100),
-			Colors.Cyan,
-			Colors.HotPink,
-			Colors.Coral,
-			Colors.Gold,
-			Colors.LightSkyBlue,
-			Colors.Thistle
+			Color.FromArgb(60, 100, 200, 100),
+			Color.FromArgb(60, Colors.Cyan.R, Colors.Cyan.G, Colors.Cyan.B),
+			Color.FromArgb(60, Colors.HotPink.R, Colors.HotPink.G, Colors.HotPink.B),
+			Color.FromArgb(60, Colors.Coral.R, Colors.Coral.G, Colors.Coral.B),
+			Color.FromArgb(60, Colors.Gold.R, Colors.Gold.G, Colors.Gold.B),
+			Color.FromArgb(60, Colors.LightSkyBlue.R, Colors.LightSkyBlue.G, Colors.LightSkyBlue.B),
+			Color.FromArgb(60, Colors.Thistle.R, Colors.Thistle.G, Colors.Thistle.B)
 		};
 
 		public SegmentsHighlighter(TextArea editor)
