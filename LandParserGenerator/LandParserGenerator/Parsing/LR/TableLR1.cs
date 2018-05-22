@@ -142,14 +142,27 @@ namespace LandParserGenerator.Parsing.LR
 		{
 			var errors = new List<Message>();
 
-			for(var itemIdx = 0; itemIdx < Actions.GetLength(0); ++itemIdx)
-				for(var lookaheadIdx = 0; lookaheadIdx < Actions.GetLength(1); ++lookaheadIdx)
-					if(Actions[itemIdx, lookaheadIdx].Count > 1)
+			for (var itemIdx = 0; itemIdx < Actions.GetLength(0); ++itemIdx)
+				for (var lookaheadIdx = 0; lookaheadIdx < Actions.GetLength(1); ++lookaheadIdx)
+					if (Actions[itemIdx, lookaheadIdx].Count > 1)
+					{
+						/// Сразу вытаскиваем токен, по которому возникает неоднозначность
+						var lookahead = Lookaheads.FirstOrDefault(l => l.Value == lookaheadIdx).Key;
+						/// Формируем строковые представления действий, которые по этому токену можно сделать
+						var actions = Actions[itemIdx, lookaheadIdx].Select(a => a is ReduceAction
+								? $"{a.ActionName} по ветке {Gram.Userify(((ReduceAction)a).ReductionAlternative)} нетерминала {Gram.Userify(((ReduceAction)a).ReductionAlternative.NonterminalSymbolName)}"
+								: $"{a.ActionName}").ToList();
+
+						var messageText = $"Грамматика не является LR(1): для токена {Gram.Userify(lookahead)} и состояния{Environment.NewLine}"
+							+ $"\t\t{String.Join(Environment.NewLine + "\t\t", Items[itemIdx].Where(i => i.Lookahead == lookahead).Select(i => "(" + Gram.Userify(i.Alternative) + ", " + i.Position + ")"))}{Environment.NewLine}"
+							+ $"\tвозможны действия:{Environment.NewLine}" + "\t\t" + String.Join(Environment.NewLine + "\t\t", actions);
+
 						errors.Add(Message.Error(
-								$"Грамматика не является LR(1): для токена {Gram.Userify(Lookaheads.FirstOrDefault(l=>l.Value == lookaheadIdx).Key)} допустимы действия {String.Join(", ", Actions[itemIdx, lookaheadIdx].Select(a=>a.ActionName))}",
+								messageText,
 								null,
 								"LanD"
 							));
+					}
 
 			return errors;
 		}
