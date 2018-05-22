@@ -29,11 +29,11 @@ namespace LandParserGenerator.Parsing.LR
 
 			/// Готовим лексер
 			LexingStream = new TokenStream(Lexer, text);
+			/// Читаем первую лексему из входного потока
+			var token = LexingStream.NextToken();
 			/// Создаём стек
 			Stack = new ParsingStack(LexingStream);
 			Stack.Push(0);
-			/// Читаем первую лексему из входного потока
-			var token = LexingStream.NextToken();
 
 			while (true)
 			{

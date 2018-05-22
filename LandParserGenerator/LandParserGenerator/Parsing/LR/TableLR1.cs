@@ -124,7 +124,9 @@ namespace LandParserGenerator.Parsing.LR
 
 			foreach(var elem in a)
 			{
-				if (!b.Contains(elem))
+				if (!b.Any(e=> e.Position == elem.Position
+					&& e.Lookahead == elem.Lookahead
+					&& e.Alternative.Equals(elem.Alternative)))
 					return false;
 			}
 
@@ -157,11 +159,25 @@ namespace LandParserGenerator.Parsing.LR
 							+ $"\t\t{String.Join(Environment.NewLine + "\t\t", Items[itemIdx].Where(i => i.Lookahead == lookahead).Select(i => "(" + Gram.Userify(i.Alternative) + ", " + i.Position + ")"))}{Environment.NewLine}"
 							+ $"\tвозможны действия:{Environment.NewLine}" + "\t\t" + String.Join(Environment.NewLine + "\t\t", actions);
 
-						errors.Add(Message.Error(
-								messageText,
-								null,
-								"LanD"
-							));
+						/// Для Shift/Reduce конфликта кидаем предупреждение, а не соо об ошибке
+						if (Actions[itemIdx, lookaheadIdx].Count == 2
+							&& Actions[itemIdx, lookaheadIdx].Any(a => a is ReduceAction)
+							&& Actions[itemIdx, lookaheadIdx].Any(a => a is ShiftAction))
+						{
+							errors.Add(Message.Warning(
+									messageText,
+									null,
+									"LanD"
+								));
+						}
+						else
+						{
+							errors.Add(Message.Error(
+									messageText,
+									null,
+									"LanD"
+								));
+						}
 					}
 
 			return errors;
