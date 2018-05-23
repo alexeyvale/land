@@ -21,7 +21,7 @@ namespace LandParserGenerator.Markup
 
 		public void Clear()
 		{
-			Markup = new ObservableCollection<MarkupElement>();
+			Markup.Clear();
 			AstRoot = null;
 		}
 

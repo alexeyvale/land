@@ -41,7 +41,7 @@ namespace LandParserGenerator.Parsing.LR
 
 				if (Stack.CountSymbols > 0)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {grammar.Userify(token.Name)}; символ на вершине стека: {grammar.Userify(Stack.PeekSymbol().Symbol)}",
+						$"Текущий токен: {grammar.Userify(token.Name)} | Стек: {Stack.ToString(grammar)}",
 						token.Line,
 						token.Column
 					));
@@ -65,7 +65,7 @@ namespace LandParserGenerator.Parsing.LR
 						Stack.Push(tokenNode, action.TargetItemIndex);
 
 						Log.Add(Message.Trace(
-							$"Перенос токена {grammar.Userify(token.Name)}",
+							$"Перенос",
 							token.Line,
 							token.Column
 						));
@@ -99,7 +99,7 @@ namespace LandParserGenerator.Parsing.LR
 						Stack.FinBatch();
 
 						Log.Add(Message.Trace(
-							$"Свёртка по правилу {action.ReductionAlternative}",
+							$"Свёртка по правилу {grammar.Userify(action.ReductionAlternative)} -> {grammar.Userify(action.ReductionAlternative.NonterminalSymbolName)}",
 							token.Line,
 							token.Column
 						));
@@ -125,6 +125,12 @@ namespace LandParserGenerator.Parsing.LR
 					/// Если в текущем состоянии есть переход по Any
 					if (Table[currentState, Grammar.ANY_TOKEN_NAME].Count == 1)
 					{
+						Log.Add(Message.Trace(
+							$"Попытка интерпретировать токен как Any",
+							token.Line,
+							token.Column
+						));
+
 						token = SkipAny();
 
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
@@ -134,14 +140,16 @@ namespace LandParserGenerator.Parsing.LR
 							continue;
 					}
 
-					token = ErrorRecovery();
+					var errorToken = token;
+					token = null;// ErrorRecovery();
 
 					if (token == null)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданный символ {grammar.Userify(token.Name)}",
-							token.Line,
-							token.Column
+							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" +
+							$"{String.Join(Environment.NewLine + "\t\t", Table.Items[Stack.PeekState()].Where(i => i.Lookahead == errorToken.Name).Select(i => "(" + grammar.Userify(i.Alternative) + ", " + i.Position + ")"))}",
+                            errorToken.Line,
+							errorToken.Column
 						));
 
 						return root;

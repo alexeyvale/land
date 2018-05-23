@@ -17,7 +17,7 @@ namespace LandParserGenerator.Parsing.LR
 		/// <summary>
 		/// Множества состояний (множество множеств пунктов)
 		/// </summary>
-		private List<HashSet<Marker>> Items { get; set; }
+		public List<HashSet<Marker>> Items { get; set; }
 		/// <summary>
 		/// Действия, которые надо совершать при встрече различных терминалов
 		/// </summary>

@@ -154,5 +154,10 @@ namespace LandParserGenerator.Parsing.LR
 
 		public int CountSymbols { get { return SymbolsStack.Count; } }
 		public int CountStates { get { return StatesStack.Count; } }
+
+		public string ToString(Grammar grammar)
+		{
+			return String.Join(" ", SymbolsStack.Reverse().Select(s=>grammar.Userify(s.Symbol)));
+		}
 	}
 }

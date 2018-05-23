@@ -63,6 +63,8 @@ namespace TestGUI
 				}
 			}
 
+			MarkupTreeView.ItemsSource = Markup.Markup;
+
 			InitPackageParsing();
 		}
 
@@ -352,6 +354,19 @@ namespace TestGUI
 				OpenFile(openFileDialog.FileName);
 			}
 		}
+
+		private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+		{
+			/// По нажатию на "Сохранить" всегда предлагаем выбрать, куда,
+			/// чтобы не перезатереть файлы разбираемых проектов 
+			var saveFileDialog = new SaveFileDialog();
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				File.WriteAllText(saveFileDialog.FileName, FileEditor.Text);
+				TestFileName.Content = saveFileDialog.FileName;
+			}
+		}
+
 
 		private void OpenFile(string filename)
 		{
@@ -668,7 +683,6 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup;
 				}
 
 				var concern = MarkupTreeView.SelectedItem as Concern;
@@ -723,7 +737,6 @@ namespace TestGUI
 				if (Markup.AstRoot == null)
 				{
 					Markup.AstRoot = TreeRoot;
-					MarkupTreeView.ItemsSource = Markup.Markup;
 				}
 
 				var visitor = new LandExplorerVisitor();
@@ -788,7 +801,6 @@ namespace TestGUI
 		private void NewConcernMarkup_Click(object sender, RoutedEventArgs e)
 		{
 			Markup.Clear();
-			MarkupTreeView.ItemsSource = null;
 		}
 
 		private void MarkupTreeRenameMenuItem_Click(object sender, RoutedEventArgs e)

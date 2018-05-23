@@ -105,6 +105,8 @@
                                     <ToolBar Grid.Row="0">
                                         <Button Name="OpenFileButton" Content="Открыть" Click="OpenFileButton_Click"/>
                                         <Separator></Separator>
+                                        <Button Name="SaveFileButton" Content="Сохранить" Click="SaveFileButton_Click"/>
+                                        <Separator></Separator>
                                         <Button Name="ClearFileButton" Content="Очистить" Click="ClearFileButton_Click"/>
                                         <Separator></Separator>
                                         <Button Name="ParseButton" Click="ParseButton_Click">Запустить парсер</Button>
