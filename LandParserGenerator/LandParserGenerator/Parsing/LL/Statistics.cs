@@ -22,7 +22,8 @@ namespace LandParserGenerator.Parsing.LL
 				+ $"Наибольшее число последовательно отменённых решений:\t{LongestBacktracking}{System.Environment.NewLine}"
 				+ $"Смен альтернативы:\t{ChangeAlternativeDecisionChanges}{System.Environment.NewLine}"
 				+ $"Продлений Any:\t{FinishAnyDecisionChanges}{System.Environment.NewLine}"
-				+ $"Предотвращено заходов в заведомо неуспешные правила:\t{FailedRuleReenterRejections}{System.Environment.NewLine}";
+				+ $"Предотвращено заходов в заведомо неуспешные правила:\t{FailedRuleReenterRejections}{System.Environment.NewLine}"
+				+ $"Потрачено времени:\t{TimeSpent}{System.Environment.NewLine}";
 
 			return result;
 		}

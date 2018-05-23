@@ -45,6 +45,8 @@ namespace LandParserGenerator.Parsing.LL
 			LastBacktrackingDecisionsStackHeight = 0;
 			LastBacktrackingLength = 0;
 
+			var parsingStarted = DateTime.Now; 
+
             /// Готовим лексер и стеки
             LexingStream = new TokenStream(Lexer, text);		
 			Stack = new ParsingStack(LexingStream);
@@ -258,6 +260,8 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			TreePostProcessing(root);
+
+			Statistics.TimeSpent = DateTime.Now - parsingStarted;
 
 			return root;
 		}
