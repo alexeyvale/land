@@ -14,6 +14,13 @@ namespace LandParserGenerator
 
 	public class Grammar
 	{
+		public class ElementQuantifierPair
+		{
+			public string Element { get; set; }
+			public Quantifier Quantifier { get; set; }
+		}
+
+
 		public GrammarType Type { get; private set; }
 
 		// Информация об успешности конструирования грамматики
@@ -45,7 +52,7 @@ namespace LandParserGenerator
 
 		// Для корректных сообщений об ошибках
 		public Dictionary<string, string> AutoTokenUserWrittenForm = new Dictionary<string, string>();
-		public Dictionary<string, Tuple<string, Quantifier?>> AutoRuleQuantifier = new Dictionary<string, Tuple<string, Quantifier?>>();
+		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
 		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
 
 		public ISymbol this[string key]
@@ -152,7 +159,6 @@ namespace LandParserGenerator
 
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
-			AutoRuleQuantifier[newName] = null;
 			return newName;
 		}
 
@@ -162,9 +168,9 @@ namespace LandParserGenerator
 			if (Type == GrammarType.LR)
 			{
 				var generated = Rules.Where(r => r.Key.StartsWith(AUTO_RULE_PREFIX))
-				.Select(r => r.Value).FirstOrDefault(r => AutoRuleQuantifier[r.Name] != null
-				  && AutoRuleQuantifier[r.Name].Item1 == elemName
-				  && AutoRuleQuantifier[r.Name].Item2 == quantifier);
+				.Select(r => r.Value).FirstOrDefault(r => AutoRuleQuantifier.ContainsKey(r.Name)
+				  && AutoRuleQuantifier[r.Name].Element == elemName
+				  && AutoRuleQuantifier[r.Name].Quantifier == quantifier);
 
 				if (generated != null)
 					return generated.Name;
@@ -184,21 +190,33 @@ namespace LandParserGenerator
 							});
 							if (precNonEmpty)
 								NonEmptyPrecedence.Add(newName);
-							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
+							AutoRuleQuantifier[newName] = new ElementQuantifierPair()
+							{
+								Element = elemName,
+								Quantifier = quantifier
+							};
 
 							var oldName = newName;
 							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName, oldName }
 							});
-							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
+							AutoRuleQuantifier[newName] = new ElementQuantifierPair()
+							{
+								Element = elemName,
+								Quantifier = quantifier
+							};
 							break;
 						case GrammarType.LR:
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName },
 								new string[]{ newName, elemName }
 							});
-							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
+							AutoRuleQuantifier[newName] = new ElementQuantifierPair()
+							{
+								Element = elemName,
+								Quantifier = quantifier
+							};
 							break;
 						default:
 							break;
@@ -224,7 +242,11 @@ namespace LandParserGenerator
 					}
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
+					AutoRuleQuantifier[newName] = new ElementQuantifierPair()
+					{
+						Element = elemName,
+						Quantifier = quantifier
+					};
 					break;
 				case Quantifier.ZERO_OR_ONE:
 					Rules[newName] = new NonterminalSymbol(newName, new string[][]{
@@ -233,7 +255,11 @@ namespace LandParserGenerator
 					});
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
+					AutoRuleQuantifier[newName] = new ElementQuantifierPair()
+					{
+						Element = elemName,
+						Quantifier = quantifier
+					};
 					break;
 			}
 
@@ -664,12 +690,12 @@ namespace LandParserGenerator
 		{
 			if(name.StartsWith(AUTO_RULE_PREFIX))
 			{
-				if(AutoRuleQuantifier[name] != null)
+				if(AutoRuleQuantifier.ContainsKey(name))
 				{
 					var elementName = Rules[name].Alternatives
 						.SelectMany(a => a.Elements).FirstOrDefault(e => e.Symbol != name);
 
-					switch (AutoRuleQuantifier[name].Item2)
+					switch (AutoRuleQuantifier[name].Quantifier)
 					{
 						case Quantifier.ONE_OR_MORE:
 							return Userify(elementName) + "+";

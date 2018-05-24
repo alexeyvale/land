@@ -146,7 +146,7 @@ namespace LandParserGenerator.Parsing.LR
 					if (token == null)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), "\t\t"),
+							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
                             errorToken.Line,
 							errorToken.Column
 						));
