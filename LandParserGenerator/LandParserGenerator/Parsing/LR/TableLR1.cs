@@ -156,7 +156,7 @@ namespace LandParserGenerator.Parsing.LR
 								: $"{a.ActionName}").ToList();
 
 						var messageText = $"Грамматика не является LR(1): для токена {Gram.Userify(lookahead)} и состояния{Environment.NewLine}"
-							+ $"\t\t{String.Join(Environment.NewLine + "\t\t", Items[itemIdx].Where(i => i.Lookahead == lookahead).Select(i => "(" + Gram.Userify(i.Alternative) + ", " + i.Position + ")"))}{Environment.NewLine}"
+							+ $"\t\t{ToString(itemIdx, lookahead, "\t\t")}{Environment.NewLine}"
 							+ $"\tвозможны действия:{Environment.NewLine}" + "\t\t" + String.Join(Environment.NewLine + "\t\t", actions);
 
 						/// Для Shift/Reduce конфликта кидаем предупреждение, а не соо об ошибке
@@ -202,6 +202,33 @@ namespace LandParserGenerator.Parsing.LR
 			}
 
 			output.Close();
+		}
+
+		public string ToString(int state, string lookahead = null, string padding = "")
+		{
+			var altPosGroups = Items[state]
+				.Where(i=>String.IsNullOrEmpty(lookahead) || i.Lookahead == lookahead)
+				.GroupBy(i => new { i.Alternative, i.Position });
+			var strings = new List<string>();
+
+			foreach (var group in altPosGroups)
+			{
+				var userified = Gram.UserifyElementwise(group.Key.Alternative);
+				userified.Insert(group.Key.Position, "\u2022");
+
+				var groupString = $"{String.Join("   ", userified)}";
+				if (String.IsNullOrEmpty(lookahead))
+					groupString += $"    |    {String.Join(", ", group.Select(l => Gram.Userify(l.Lookahead)))}";
+
+				strings.Add(groupString);
+            }
+
+			return String.Join($"{Environment.NewLine}{padding}", strings);
+		}
+
+		public HashSet<string> GetLookaheads(int state)
+		{
+			return new HashSet<string>(Items[state].Select(i => i.Lookahead));
 		}
 	}
 }

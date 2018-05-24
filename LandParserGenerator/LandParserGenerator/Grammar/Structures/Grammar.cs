@@ -45,7 +45,7 @@ namespace LandParserGenerator
 
 		// Для корректных сообщений об ошибках
 		public Dictionary<string, string> AutoTokenUserWrittenForm = new Dictionary<string, string>();
-		public Dictionary<string, Quantifier?> AutoRuleQuantifier = new Dictionary<string, Quantifier?>();
+		public Dictionary<string, Tuple<string, Quantifier?>> AutoRuleQuantifier = new Dictionary<string, Tuple<string, Quantifier?>>();
 		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
 
 		public ISymbol this[string key]
@@ -140,15 +140,36 @@ namespace LandParserGenerator
 
 		public string GenerateNonterminal(List<Alternative> alternatives)
 		{
+			if (Type == GrammarType.LR)
+			{
+				/// Проверяем, нет ли уже правила с такими альтернативами
+				var generated = Rules.Where(r => r.Key.StartsWith(AUTO_RULE_PREFIX))
+					.Select(r => r.Value).FirstOrDefault(r => r.Alternatives.Intersect(alternatives).Count() == alternatives.Count);
+
+				if (generated != null)
+					return generated.Name;
+			}
+
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
 			AutoRuleQuantifier[newName] = null;
 			return newName;
 		}
 
-		//Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
+		/// Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
 		public string GenerateNonterminal(string elemName, Quantifier quantifier, bool precNonEmpty = false)
 		{
+			if (Type == GrammarType.LR)
+			{
+				var generated = Rules.Where(r => r.Key.StartsWith(AUTO_RULE_PREFIX))
+				.Select(r => r.Value).FirstOrDefault(r => AutoRuleQuantifier[r.Name] != null
+				  && AutoRuleQuantifier[r.Name].Item1 == elemName
+				  && AutoRuleQuantifier[r.Name].Item2 == quantifier);
+
+				if (generated != null)
+					return generated.Name;
+			}
+
 			string newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 
 			switch (quantifier)
@@ -163,21 +184,21 @@ namespace LandParserGenerator
 							});
 							if (precNonEmpty)
 								NonEmptyPrecedence.Add(newName);
-							AutoRuleQuantifier[newName] = quantifier;
+							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
 
 							var oldName = newName;
 							newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName, oldName }
 							});
-							AutoRuleQuantifier[newName] = quantifier;
+							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
 							break;
 						case GrammarType.LR:
 							Rules[newName] = new NonterminalSymbol(newName, new string[][]{
 								new string[]{ elemName },
 								new string[]{ newName, elemName }
 							});
-							AutoRuleQuantifier[newName] = quantifier;
+							AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
 							break;
 						default:
 							break;
@@ -203,7 +224,7 @@ namespace LandParserGenerator
 					}
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRuleQuantifier[newName] = quantifier;
+					AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
 					break;
 				case Quantifier.ZERO_OR_ONE:
 					Rules[newName] = new NonterminalSymbol(newName, new string[][]{
@@ -212,7 +233,7 @@ namespace LandParserGenerator
 					});
 					if (precNonEmpty)
 						NonEmptyPrecedence.Add(newName);
-					AutoRuleQuantifier[newName] = quantifier;
+					AutoRuleQuantifier[newName] = new Tuple<string, Quantifier?>(elemName, quantifier);
 					break;
 			}
 
@@ -643,12 +664,12 @@ namespace LandParserGenerator
 		{
 			if(name.StartsWith(AUTO_RULE_PREFIX))
 			{
-				if(AutoRuleQuantifier[name].HasValue)
+				if(AutoRuleQuantifier[name] != null)
 				{
 					var elementName = Rules[name].Alternatives
 						.SelectMany(a => a.Elements).FirstOrDefault(e => e.Symbol != name);
 
-					switch (AutoRuleQuantifier[name].Value)
+					switch (AutoRuleQuantifier[name].Item2)
 					{
 						case Quantifier.ONE_OR_MORE:
 							return Userify(elementName) + "+";
@@ -675,7 +696,12 @@ namespace LandParserGenerator
 		public string Userify(Alternative alt)
 		{
 			/// Если альтернатива пустая, показываем пользователю эпсилон
-			return alt.Elements.Count > 0 ? String.Join(" ", alt.Elements.Select(e => Userify(e.Symbol))) : "\u03B5";
+			return alt.Elements.Count > 0 ? String.Join(" ", UserifyElementwise(alt)) : "\u03B5";
+		}
+
+		public List<string> UserifyElementwise(Alternative alt)
+		{
+			return alt.Elements.Select(e => Userify(e.Symbol)).ToList();
 		}
 
 		#endregion

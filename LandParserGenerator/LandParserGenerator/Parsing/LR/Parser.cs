@@ -39,30 +39,30 @@ namespace LandParserGenerator.Parsing.LR
 			{
 				var currentState = Stack.PeekState();
 
-				if (Stack.CountSymbols > 0)
-					Log.Add(Message.Trace(
-						$"Текущий токен: {grammar.Userify(token.Name)} | Стек: {Stack.ToString(grammar)}",
-						token.Line,
-						token.Column
-					));
-				else
-					Log.Add(Message.Trace(
-						$"Текущий токен: {grammar.Userify(token.Name)}",
-						token.Line,
-						token.Column
-					));
+				Log.Add(Message.Trace(
+					$"Текущий токен: {grammar.Userify(token.Name)} | Стек: {Stack.ToString(grammar)}",
+					token.Line,
+					token.Column
+				));
 
-				if (Table[currentState, token.Name].Count == 1)
+				/// Знаем, что предпринять, если действие однозначно
+				/// или существует выбор между shift и reduce (тогда выбираем shift)
+				if (Table[currentState, token.Name].Count == 1
+					|| Table[currentState, token.Name].Count == 2 && Table[currentState, token.Name].Any(a=>a is ShiftAction))
 				{
+					var action = Table[currentState, token.Name].Count == 1
+						? Table[currentState, token.Name].Single()
+						: Table[currentState, token.Name].Single(a => a is ShiftAction);
+
 					/// Если нужно произвести перенос
-					if (Table[currentState, token.Name].Single() is ShiftAction)
+					if (action is ShiftAction)
 					{
 						var tokenNode = new Node(token.Name);
 						tokenNode.SetAnchor(token.StartOffset, token.EndOffset);
 
-						var action = (ShiftAction)Table[currentState, token.Name].Single();
+						var shift = (ShiftAction)action;
 						/// Вносим в стек новое состояние
-						Stack.Push(tokenNode, action.TargetItemIndex);
+						Stack.Push(tokenNode, shift.TargetItemIndex);
 
 						Log.Add(Message.Trace(
 							$"Перенос",
@@ -79,11 +79,11 @@ namespace LandParserGenerator.Parsing.LR
 					{
 						Stack.InitBatch();
 
-						var action = (ReduceAction)Table[currentState, token.Name].Single();
-						var parentNode = new Node(action.ReductionAlternative.NonterminalSymbolName);
+						var reduce = (ReduceAction)action;
+						var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
 
 						/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
-						for (var i = 0; i < action.ReductionAlternative.Count; ++i)
+						for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
 						{
 							parentNode.AddFirstChild(Stack.PeekSymbol());
 							Stack.Pop();
@@ -93,13 +93,13 @@ namespace LandParserGenerator.Parsing.LR
 						/// Кладём на стек состояние, в которое нужно произвести переход
 						Stack.Push(
 							parentNode,
-							Table.Transitions[currentState][action.ReductionAlternative.NonterminalSymbolName]
+							Table.Transitions[currentState][reduce.ReductionAlternative.NonterminalSymbolName]
 						);
 
 						Stack.FinBatch();
 
 						Log.Add(Message.Trace(
-							$"Свёртка по правилу {grammar.Userify(action.ReductionAlternative)} -> {grammar.Userify(action.ReductionAlternative.NonterminalSymbolName)}",
+							$"Свёртка по правилу {grammar.Userify(reduce.ReductionAlternative)} -> {grammar.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
 							token.Line,
 							token.Column
 						));
@@ -146,8 +146,7 @@ namespace LandParserGenerator.Parsing.LR
 					if (token == null)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" +
-							$"{String.Join(Environment.NewLine + "\t\t", Table.Items[Stack.PeekState()].Where(i => i.Lookahead == errorToken.Name).Select(i => "(" + grammar.Userify(i.Alternative) + ", " + i.Position + ")"))}",
+							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), "\t\t"),
                             errorToken.Line,
 							errorToken.Column
 						));

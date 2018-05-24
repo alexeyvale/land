@@ -44,6 +44,9 @@ namespace LandParserGenerator
 
 		public Transformer(Grammar grammar)
 		{
+			if (grammar == null)
+				return;
+
 			GrammarTransformed = grammar;
 
 			/// Частично копируем грамматику, чтобы на основе исходной версии грамматики
