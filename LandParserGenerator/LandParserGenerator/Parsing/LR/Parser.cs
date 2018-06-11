@@ -15,6 +15,7 @@ namespace LandParserGenerator.Parsing.LR
 
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
+		private DecisionStack Decisions { get; set; }
 
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
@@ -23,8 +24,8 @@ namespace LandParserGenerator.Parsing.LR
 
 		public override Node Parse(string text)
 		{
+			Statistics = new Statistics();
 			Log = new List<Message>();
-
 			Node root = null;	
 
 			/// Готовим лексер
@@ -35,82 +36,131 @@ namespace LandParserGenerator.Parsing.LR
 			Stack = new ParsingStack(LexingStream);
 			Stack.Push(0);
 
+			Decisions = new DecisionStack(Stack, LexingStream);
+
 			while (true)
 			{
 				var currentState = Stack.PeekState();
 
-				Log.Add(Message.Trace(
-					$"Текущий токен: {grammar.Userify(token.Name)} | Стек: {Stack.ToString(grammar)}",
-					token.Line,
-					token.Column
-				));
+				if(token.Name != Grammar.ERROR_TOKEN_NAME)
+					Log.Add(Message.Trace(
+						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(grammar)}",
+						token.Line,
+						token.Column
+					));
 
+				if (token.Name == Grammar.ERROR_TOKEN_NAME)
+				{
+					var errorToken = LexingStream.CurrentToken();
+
+					if (grammar.Options.IsSet(ParsingOption.BACKTRACKING))
+					{
+						Log.Add(Message.Warning(
+							$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+							errorToken.Line,
+							errorToken.Column
+						));
+
+						token = Backtrack();
+
+						if (token == null)
+						{
+							Log.Add(Message.Error(
+								$"Не удалось возобновить разбор",
+								errorToken.Line,
+								errorToken.Column
+							));
+
+							break;
+						}
+					}
+					else
+					{
+						Log.Add(Message.Error(
+							$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+							errorToken.Line,
+							errorToken.Column
+						));
+
+						break;
+					}
+				}
 				/// Знаем, что предпринять, если действие однозначно
 				/// или существует выбор между shift и reduce (тогда выбираем shift)
-				if (Table[currentState, token.Name].Count == 1
-					|| Table[currentState, token.Name].Count == 2 && Table[currentState, token.Name].Any(a=>a is ShiftAction))
+				else if (Table[currentState, token.Name].Count == 1
+					|| Table[currentState, token.Name].Count == 2 && Table[currentState, token.Name].Any(a => a is ShiftAction))
 				{
-					var action = Table[currentState, token.Name].Count == 1
-						? Table[currentState, token.Name].Single()
-						: Table[currentState, token.Name].Single(a => a is ShiftAction);
+					var action = GetAction(currentState, token.Name);
 
-					/// Если нужно произвести перенос
-					if (action is ShiftAction)
+					/// Не совершаем переход, который уже делали для того же самого токена
+					var isError = token.Name != Grammar.ANY_TOKEN_NAME 
+						&& Table[currentState, Grammar.ANY_TOKEN_NAME].Count > 0 
+						&& !Decisions.ChooseTransition();
+
+					if (!isError)
 					{
-						var tokenNode = new Node(token.Name);
-						tokenNode.SetAnchor(token.StartOffset, token.EndOffset);
-
-						var shift = (ShiftAction)action;
-						/// Вносим в стек новое состояние
-						Stack.Push(tokenNode, shift.TargetItemIndex);
-
-						Log.Add(Message.Trace(
-							$"Перенос",
-							token.Line,
-							token.Column
-						));
-
-                        token = LexingStream.NextToken();
-						continue;
-					}
-
-					/// Если нужно произвести свёртку
-					if (Table[currentState, token.Name].Single() is ReduceAction)
-					{
-						Stack.InitBatch();
-
-						var reduce = (ReduceAction)action;
-						var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
-
-						/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
-						for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
+						/// Если нужно произвести перенос
+						if (action is ShiftAction)
 						{
-							parentNode.AddFirstChild(Stack.PeekSymbol());
-							Stack.Pop();
+							var tokenNode = new Node(token.Name);
+							tokenNode.SetAnchor(token.StartOffset, token.EndOffset);
+
+							var shift = (ShiftAction)action;
+							/// Вносим в стек новое состояние
+							Stack.Push(tokenNode, shift.TargetItemIndex);
+
+							Log.Add(Message.Trace(
+								$"Перенос",
+								token.Line,
+								token.Column
+							));
+
+							if(token.Name == Grammar.ANY_TOKEN_NAME)
+								token = SkipAny(Stack.PeekSymbol());
+							else
+								token = LexingStream.NextToken();
 						}
-						currentState = Stack.PeekState();
+						/// Если нужно произвести свёртку
+						else if (action is ReduceAction)
+						{
+							Stack.InitBatch();
 
-						/// Кладём на стек состояние, в которое нужно произвести переход
-						Stack.Push(
-							parentNode,
-							Table.Transitions[currentState][reduce.ReductionAlternative.NonterminalSymbolName]
-						);
+							var reduce = (ReduceAction)action;
+							var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
 
-						Stack.FinBatch();
+							/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
+							for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
+							{
+								parentNode.AddFirstChild(Stack.PeekSymbol());
+								Stack.Pop();
+							}
+							currentState = Stack.PeekState();
 
-						Log.Add(Message.Trace(
-							$"Свёртка по правилу {grammar.Userify(reduce.ReductionAlternative)} -> {grammar.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
-							token.Line,
-							token.Column
-						));
+							/// Кладём на стек состояние, в которое нужно произвести переход
+							Stack.Push(
+								parentNode,
+								Table.Transitions[currentState][reduce.ReductionAlternative.NonterminalSymbolName]
+							);
 
-						continue;
+							Stack.FinBatch();
+
+							Log.Add(Message.Trace(
+								$"Свёртка по правилу {grammar.Userify(reduce.ReductionAlternative)} -> {grammar.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
+								token.Line,
+								token.Column
+							));
+
+							continue;
+						}
+						else if (action is AcceptAction)
+						{
+							root = Stack.PeekSymbol();
+							break;
+						}
 					}
-
-					if (Table[currentState, token.Name].Single() is AcceptAction)
+					else
 					{
-						root = Stack.PeekSymbol();
-						break;
+						token = Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 					}
 				}
 				else
@@ -119,42 +169,17 @@ namespace LandParserGenerator.Parsing.LR
 					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.NextToken();
-						continue;
 					}
-
-					/// Если в текущем состоянии есть переход по Any
-					if (Table[currentState, Grammar.ANY_TOKEN_NAME].Count == 1)
+					else
 					{
 						Log.Add(Message.Trace(
-							$"Попытка интерпретировать токен как Any",
+							$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 							token.Line,
 							token.Column
 						));
 
-						token = SkipAny();
-
-						/// Если при пропуске текста произошла ошибка, прерываем разбор
-						if (token.Name == Grammar.ERROR_TOKEN_NAME)
-							break;
-						else
-							continue;
+						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
 					}
-
-					var errorToken = token;
-					token = null;// ErrorRecovery();
-
-					if (token == null)
-					{
-						Log.Add(Message.Error(
-							$"Неожиданный символ {grammar.Userify(errorToken.Name)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-                            errorToken.Line,
-							errorToken.Column
-						));
-
-						return root;
-					}
-					else
-						continue;
 				}
 			}
 
@@ -164,47 +189,19 @@ namespace LandParserGenerator.Parsing.LR
 			return root;
 		}
 
+		private Action GetAction(int currentState, string token)
+		{
+			if (Table[currentState, token].Count == 0)
+				return null;
 
-		private IToken SkipAny()
+			return Table[currentState, token].Count == 1
+				? Table[currentState, token].Single()
+				: Table[currentState, token].Single(a => a is ShiftAction);
+		}
+
+		private IToken SkipAny(Node anyNode)
 		{
 			var token = LexingStream.CurrentToken();
-			var anyNode = new Node(Grammar.ANY_TOKEN_NAME);
-			var rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].Single();
-
-			/// Пока по Any нужно производить свёртки
-			while(rawAction is ReduceAction)
-			{
-				Stack.InitBatch();
-
-				var action = (ReduceAction)rawAction;
-				var parentNode = new Node(action.ReductionAlternative.NonterminalSymbolName);
-
-				/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
-				for (var i = 0; i < action.ReductionAlternative.Count; ++i)
-				{
-					parentNode.AddFirstChild(Stack.PeekSymbol());
-					Stack.Pop();
-				}
-				var currentState = Stack.PeekState();
-
-				/// Кладём на стек состояние, в которое нужно произвести переход
-				Stack.Push(
-					parentNode,
-					Table.Transitions[currentState][action.ReductionAlternative.NonterminalSymbolName]
-				);
-
-				Stack.FinBatch();
-
-				rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].FirstOrDefault();
-			}
-
-			/// Если нужно произвести перенос
-			if (rawAction is ShiftAction)
-			{
-				var action = (ShiftAction)rawAction;
-				/// Вносим в стек новое состояние
-				Stack.Push(anyNode, action.TargetItemIndex);
-			}
 
 			int startOffset = token.StartOffset;
 			int endOffset = token.EndOffset;
@@ -235,22 +232,78 @@ namespace LandParserGenerator.Parsing.LR
 			return token;
 		}
 
-		private IToken ErrorRecovery()
+		/// <summary>
+		/// Бэктрекинг в случае ошибки разбора
+		/// </summary>
+		private IToken Backtrack()
 		{
-			while (Stack.CountStates > 0)
+			Statistics.BacktracingCalled += 1;
+
+			var decision = Decisions.BacktrackToClosestDecision();
+
+			while (decision != null)
 			{
-				Stack.Undo();
-
-				var currentTokenActions = Table[Stack.PeekState(), LexingStream.CurrentToken().Name];
-				var textTokenActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
-
-				/// Если в текущем состоянии есть приоритетные действия 
-				/// и действия для Any,
-				/// 
-				if (currentTokenActions.Count == 1 && textTokenActions.Count == 1)
+				/// Если текущее решение касается выбора альтернативы
+				if (decision is ChooseTransitionDecision)
 				{
-					return SkipAny();
+					/// Больше это решение не поменять
+					Decisions.Pop();
+
+					Log.Add(Message.Warning(
+						$"BACKTRACKING: успех, трактовка токена {GetTokenInfoForMessage(LexingStream.CurrentToken())} как Any",
+						LexingStream.CurrentToken().Line,
+						LexingStream.CurrentToken().Column
+					));
+
+					return Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
 				}
+
+				if (decision is FinishAnyDecision)
+				{
+					var finish = (FinishAnyDecision)decision;
+
+					Log.Add(Message.Warning(
+							$"BACKTRACKING: попытка продлить Any",
+							LexingStream.CurrentToken().Line,
+							LexingStream.CurrentToken().Column
+						));
+
+					/// Включаем в текст цепочку однотипных токенов,
+					/// на которых ранее прекратили подбор текста
+					var tokenToSkip = LexingStream.CurrentToken();
+					var currentToken = tokenToSkip;
+
+					var textStart = currentToken.StartOffset;
+					var textEnd = currentToken.EndOffset;
+
+					while (currentToken.Name == tokenToSkip.Name)
+					{
+						finish.AnyNode.Value.Add(currentToken.Text);
+						textEnd = currentToken.EndOffset;
+						currentToken = LexingStream.NextToken();
+					}
+
+					finish.AnyNode.SetAnchor(finish.AnyNode.StartOffset.HasValue ? finish.AnyNode.StartOffset.Value : textStart, textEnd);
+
+					/// Пропускаем текст дальше
+					if (SkipAny(finish.AnyNode).Name != Grammar.ERROR_TOKEN_NAME)
+					{
+						Log.Add(Message.Warning(
+							$"BACKTRACKING: успех, разбор продолжен с токена {GetTokenInfoForMessage(LexingStream.CurrentToken())}",
+							LexingStream.CurrentToken().Line,
+							LexingStream.CurrentToken().Column
+						));
+
+						finish.DecisionTokenIndex = LexingStream.CurrentTokenIndex;
+						finish.AttemptsCount += 1;
+
+						return LexingStream.CurrentToken();
+					}
+					else
+						Decisions.Pop();
+				}
+
+				decision = Decisions.BacktrackToClosestDecision();
 			}
 
 			return null;

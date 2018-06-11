@@ -33,5 +33,14 @@ namespace LandParserGenerator.Parsing
 			root.Accept(new MappingOptionsProcessingVisitor(grammar));
 			root.Accept(new UserifyVisitor(grammar));
 		}
+
+		protected string GetTokenInfoForMessage(IToken token)
+		{
+			var userified = grammar.Userify(token.Name);
+			if (userified == token.Name && token.Name != Grammar.ANY_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
+				return $"{token.Name}: '{token.Text}'";
+			else
+				return userified;
+		}
 	}
 }

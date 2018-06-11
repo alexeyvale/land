@@ -488,7 +488,27 @@ namespace LandParserGenerator
 								"LanD"
 							));
                     }
-            }
+            }	
+
+			/// Если в грамматике не фигурируют неопределённые символы
+			if (messages.Count == 0)
+			{
+				/// Проверяем наличие левой рекурсии для случая LL
+				if (Type == GrammarType.LL)
+				{
+					foreach (var nt in FindLeftRecursion())
+					{
+						messages.Add(Message.Error(
+							$"Определение нетерминала {Userify(nt)} содержит левую рекурсию",
+							GetAnchor(nt),
+							"LanD"
+						));
+					}
+				}
+
+				/// Также добавляем предупреждения о последовательно идущих Any
+				messages.AddRange(CheckConsecutiveAny());
+			}
 
 			if (String.IsNullOrEmpty(StartSymbol))
 				messages.Add(Message.Error(
@@ -496,20 +516,6 @@ namespace LandParserGenerator
 					null,
 					"LanD"
 				));
-
-			if(Type == GrammarType.LL)
-			{
-				foreach(var nt in FindLeftRecursion())
-				{
-					messages.Add(Message.Error(
-						$"Определение нетерминала {Userify(nt)} содержит левую рекурсию",
-						GetAnchor(nt),
-						"LanD"
-					));
-				}
-			}
-
-			messages.AddRange(CheckConsecutiveAny());
 
 			/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
 			State = messages.Where(m=>m.Type == MessageType.Error).Count() > 0 ? GrammarState.Invalid : GrammarState.Valid;

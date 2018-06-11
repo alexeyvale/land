@@ -1,0 +1,40 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+
+program		=	Any 'namespace' name '{' (Any|class)* '}'
+class		=	MODIFIER* 'class' name Any '{' (Any|method|block|attribute|class)* '}'
+method		=	MODIFIER* type name arguments AnyAvoid(';') block
+block		=	'{' (Any|block)* '}'
+attribute	=	'[' (Any|attribute)* ']'
+
+name_atom	=	ID
+name		=	name_atom ((('.'|'::') name_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
+names_list	=	name (',' name)*
+
+type_atom	=	'unsigned'? ID | arguments
+type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
+types_list	=	type (',' type)*
+
+argument	=	('out'|'ref'|'params'|'const'|'this')? type name? ('=' Any)?
+arguments	=	'(' (argument (',' argument)*)? ')'
+
+%%
+
+%parsing backtracking
+%parsing fragment STRING_INT_CODE
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+%parsing start program

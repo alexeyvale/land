@@ -80,6 +80,9 @@
     <Compile Include="Parsing\BaseTable.cs" />
     <Compile Include="Parsing\LL\Statistics.cs" />
     <Compile Include="Parsing\LL\DecisionStack.cs" />
+    <Compile Include="Parsing\LR\DecisionPoint.cs" />
+    <Compile Include="Parsing\LR\DecisionStack.cs" />
+    <Compile Include="Parsing\LR\Statistics.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
