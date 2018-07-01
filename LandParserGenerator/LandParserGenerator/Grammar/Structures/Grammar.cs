@@ -52,6 +52,7 @@ namespace LandParserGenerator
 
 		// Для корректных сообщений об ошибках
 		public Dictionary<string, string> AutoTokenUserWrittenForm = new Dictionary<string, string>();
+		public Dictionary<string, string> AutoRuleUserWrittenForm = new Dictionary<string, string>();
 		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
 		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
 
@@ -692,10 +693,21 @@ namespace LandParserGenerator
 			return messages;
 		}
 
+		public void RebuildUserificationCache()
+		{
+			AutoRuleUserWrittenForm = new Dictionary<string, string>();
+
+			foreach(var smb in Rules.Keys.Where(k=>k.StartsWith(AUTO_RULE_PREFIX)))
+				AutoRuleUserWrittenForm[smb] = Userify(smb);
+		}
+
 		public string Userify(string name)
 		{
 			if(name.StartsWith(AUTO_RULE_PREFIX))
 			{
+				if (AutoRuleUserWrittenForm.ContainsKey(name))
+					return AutoRuleUserWrittenForm[name];
+
 				if(AutoRuleQuantifier.ContainsKey(name))
 				{
 					var elementName = Rules[name].Alternatives

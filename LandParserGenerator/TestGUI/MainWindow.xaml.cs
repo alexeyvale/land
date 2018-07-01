@@ -320,8 +320,18 @@ namespace TestGUI
 		{
             if (Parser != null)
             {
-                var root = Parser.Parse(FileEditor.Text);
-				FileStatistics.Text = Parser.Statistics.ToString();
+				Node root = null;
+
+				try
+				{
+					root = Parser.Parse(FileEditor.Text);
+				}
+				catch(Exception ex)
+				{
+					Parser.Log.Add(Message.Error(ex.ToString(), null));
+				}
+
+				FileStatistics.Text = Parser.Statistics?.ToString();
 
 				var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
 				ProgramStatusLabel.Content = noErrors ? "Разбор произведён успешно" : "Ошибки при разборе файла";

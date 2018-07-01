@@ -14,7 +14,7 @@ namespace LandParserGenerator.Parsing
 		protected Grammar grammar { get; set; }
 		protected ILexer Lexer { get; set; }
 
-		public BaseStatistics Statistics { get; set; }
+		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }
 
 		public BaseParser(Grammar g, ILexer lexer)

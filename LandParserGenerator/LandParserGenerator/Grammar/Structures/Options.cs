@@ -19,7 +19,7 @@ namespace LandParserGenerator
 	/// <summary>
 	/// Опции, касающиеся процесса разбора
 	/// </summary>
-	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, BACKTRACKING, IGNOREUNDEFINED }
+	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, IGNOREUNDEFINED }
 
 	/// <summary>
 	/// Опции, касающиеся отображения старого дерева в новое (изменённое) дерево

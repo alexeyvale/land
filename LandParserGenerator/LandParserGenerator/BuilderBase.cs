@@ -147,6 +147,8 @@ namespace LandParserGenerator
 
 			if (messages.Count(m=>m.Type == MessageType.Error) == 0)
 			{
+				builtGrammar.RebuildUserificationCache();
+
 				BaseTable table = null;
 
 				switch(type)
@@ -159,9 +161,7 @@ namespace LandParserGenerator
 						break;
 				}
 
-				/// Для LR бэктрекинга пока нет
-				if(table is TableLR1 || !builtGrammar.Options.IsSet(ParsingOption.BACKTRACKING))
-					messages.AddRange(table.CheckValidity());
+				messages.AddRange(table.CheckValidity());
 
 				table.ExportToCsv("current_table.csv");
 
