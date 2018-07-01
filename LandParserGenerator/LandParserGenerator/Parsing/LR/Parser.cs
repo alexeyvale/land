@@ -47,21 +47,9 @@ namespace LandParserGenerator.Parsing.LR
 						token.Column
 					));
 
-				if (token.Name == Grammar.ERROR_TOKEN_NAME)
-				{
-					var errorToken = LexingStream.CurrentToken();
-
-					Log.Add(Message.Error(
-						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						errorToken.Line,
-						errorToken.Column
-					));
-
-					break;
-				}
 				/// Знаем, что предпринять, если действие однозначно
 				/// или существует выбор между shift и reduce (тогда выбираем shift)
-				else if (Table[currentState, token.Name].Count == 1
+				if (Table[currentState, token.Name].Count == 1
 					|| Table[currentState, token.Name].Count == 2 && Table[currentState, token.Name].Any(a => a is ShiftAction))
 				{
 					if (token.Name == Grammar.ANY_TOKEN_NAME)

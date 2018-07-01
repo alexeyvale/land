@@ -459,6 +459,7 @@ namespace TestGUI
 			var errorFiles = new List<string>();
 
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ PackageParsingLog.Items.Clear(); }));		
+			var timePerFile = new Dictionary<string, TimeSpan>();
 
 			for (; counter < files.Count; ++counter)
 			{
@@ -473,6 +474,10 @@ namespace TestGUI
 							FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
 
 						++errorCounter;
+					}
+					else
+					{
+						timePerFile[files[counter]] = Parser.Statistics.TimeSpent;
 					}
 				}
 				catch (Exception ex)
@@ -494,6 +499,15 @@ namespace TestGUI
 					return;
 				}
 			}
+
+			/// Выводим предупреждения о наиболее долго разбираемых файлах
+			foreach(var file in timePerFile.OrderByDescending(f=>f.Value).Take(10))
+			{
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{Message.Warning(file.Value.ToString(@"hh\:mm\:ss\:ff"), null)}");
+			}
+
+			//visitor.Finish();
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter);
 		}
