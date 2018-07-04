@@ -34,7 +34,6 @@ names_list	=	name (',' name)*
 
 %%
 
-%parsing backtracking
 %parsing start program
 %parsing ignorecase
 %parsing skip COMMENT

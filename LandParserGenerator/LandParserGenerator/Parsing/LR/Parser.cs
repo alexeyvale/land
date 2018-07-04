@@ -19,6 +19,8 @@ namespace LandParserGenerator.Parsing.LR
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
 			Table = new TableLR1(g);
+
+
 		}
 
 		public override Node Parse(string text)
@@ -54,7 +56,7 @@ namespace LandParserGenerator.Parsing.LR
 				{
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
-						token = SkipAny(Stack.PeekSymbol());
+						token = SkipAny(new Node(Grammar.ANY_TOKEN_NAME));
 
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
 						if (token.Name == Grammar.ERROR_TOKEN_NAME)
@@ -120,14 +122,24 @@ namespace LandParserGenerator.Parsing.LR
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
 					var errorToken = LexingStream.CurrentToken();
-
-					Log.Add(Message.Error(
+					var message = Message.Error(
 						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						errorToken.Line,
 						errorToken.Column
-					));
+					);
 
-					break;
+					token = ErrorRecovery();
+
+					if (token == null)
+					{
+						Log.Add(message);
+						break;
+					}
+					else
+					{
+						message.Type = MessageType.Warning;
+						Log.Add(message);
+					}
 				}
 				else
 				{
@@ -201,8 +213,12 @@ namespace LandParserGenerator.Parsing.LR
 				Stack.Push(anyNode, action.TargetItemIndex);
 			}
 
-			int startOffset = token.StartOffset;
-			int endOffset = token.EndOffset;
+			int startOffset = anyNode.StartOffset.HasValue 
+				? anyNode.StartOffset.Value 
+				: token.StartOffset;
+			int? endOffset = anyNode.EndOffset.HasValue
+				? anyNode.EndOffset.Value
+				: (int?)null;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
@@ -213,7 +229,8 @@ namespace LandParserGenerator.Parsing.LR
 				token = LexingStream.NextToken();
 			}
 
-			anyNode.SetAnchor(startOffset, endOffset);
+			if(endOffset.HasValue)
+				anyNode.SetAnchor(startOffset, endOffset.Value);
 
 			/// Если дошли до конца входной строки, и это было не по плану
 			if (token.Name == Grammar.EOF_TOKEN_NAME
@@ -228,6 +245,49 @@ namespace LandParserGenerator.Parsing.LR
 			}
 
 			return token;
+		}
+
+		private IToken ErrorRecovery()
+		{
+			int? startOffset = null;
+			int? endOffset = null;
+
+			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
+			/// в котором есть пункт A -> * Any
+			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count == 1
+				&& m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null)
+			{
+				if (Stack.PeekSymbol().StartOffset.HasValue)
+				{
+					startOffset = Stack.PeekSymbol().StartOffset;
+					if(!endOffset.HasValue)
+					{
+						endOffset = Stack.PeekSymbol().EndOffset;
+					}
+				}
+
+				Stack.Pop();
+			}
+
+			if (Stack.CountStates > 0)
+			{
+				/// Пытаемся пропустить Any в этом месте,
+				/// Any захватывает участок с начала последнего 
+				/// снятого со стека символа до места восстановления
+				var anyNode = new Node(Grammar.ANY_TOKEN_NAME);
+				if(startOffset.HasValue)
+					anyNode.SetAnchor(startOffset.Value, startOffset.Value);
+
+				var token = SkipAny(anyNode);
+
+				/// Если Any успешно пропустили и возобновили разбор,
+				/// возвращаем токен, с которого разбор продолжается
+				return token.Name != Grammar.ERROR_TOKEN_NAME ? token : null;
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }

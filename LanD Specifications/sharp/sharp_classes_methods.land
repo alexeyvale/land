@@ -17,7 +17,8 @@ ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
 
 program		=	Any 'namespace' name '{' (Any|class)* '}'
 class		=	MODIFIER* 'class' name Any '{' (Any|method|block|attribute|class)* '}'
-method		=	MODIFIER* type name arguments AnyAvoid(';') block
+method		=	MODIFIER* type name arguments Any block
+
 block		=	'{' (Any|block)* '}'
 attribute	=	'[' (Any|attribute)* ']'
 
@@ -26,7 +27,7 @@ name		=	name_atom ((('.'|'::') name_atom) | ('<' types_list '>' | '[' AnyAvoid('
 names_list	=	name (',' name)*
 
 type_atom	=	'unsigned'? ID | arguments
-type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))*
+type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' AnyAvoid(']') ']'))* '?'?
 types_list	=	type (',' type)*
 
 argument	=	('out'|'ref'|'params'|'const'|'this')? type name? ('=' Any)?
@@ -34,7 +35,6 @@ arguments	=	'(' (argument (',' argument)*)? ')'
 
 %%
 
-%parsing backtracking
 %parsing fragment STRING_INT_CODE
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 %parsing start program

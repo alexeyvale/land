@@ -46,8 +46,10 @@ namespace LandParserGenerator.Parsing.LR
 
 		public void Pop()
 		{
-			SymbolsStack.Pop();
-			StatesStack.Pop();
+			if(SymbolsStack.Count > 0)
+				SymbolsStack.Pop();
+			if (StatesStack.Count > 0)
+				StatesStack.Pop();
 		}
 
 		public Node PeekSymbol()
