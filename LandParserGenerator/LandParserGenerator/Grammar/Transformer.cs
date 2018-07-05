@@ -114,7 +114,7 @@ namespace LandParserGenerator
 					foreach (var range in Replace(GrammarTransformed, alt).OrderBy(e=>e.Item1.StartIndex))
 					{
 						var entry = new Entry(Grammar.ANY_TOKEN_NAME);
-						entry.Options.AnySyncTokens = range.Item2;
+						entry.Options.AnyOptions[AnyOption.Except] = range.Item2;
 
 						GrammarTransformed.Replace(alt, range.Item1.StartIndex - shift, range.Item1.Length, entry);
 						shift += range.Item1.Length - 1;
@@ -188,9 +188,9 @@ namespace LandParserGenerator
 
 							/// Удаляем синхронизирующие множества у тех Any, после которых не могут идти Any
 							if (!afterAnySet.Contains(Grammar.ANY_TOKEN_NAME))
-								alt[i].Options.AnySyncTokens.Clear();
+								alt[i].Options.AnyOptions[AnyOption.Except].Clear();
 							else
-								reachableSymbols.UnionWith(alt[i].Options.AnySyncTokens);
+								reachableSymbols.UnionWith(alt[i].Options.AnyOptions[AnyOption.Except]);
 						}
 					}
 			#endregion

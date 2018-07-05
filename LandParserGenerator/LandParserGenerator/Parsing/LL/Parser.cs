@@ -176,7 +176,7 @@ namespace LandParserGenerator.Parsing.LL
 			HashSet<string> tokensAfterText;
 
 			/// Если с Any не связана последовательность стоп-символов
-			if (anyNode.Options.AnySyncTokens.Count == 0)
+			if (!anyNode.Options.AnyOptions.ContainsKey(AnyOption.Except))
 			{
 				/// Создаём последовательность символов, идущих в стеке после Any
 				var alt = new Alternative();
@@ -190,7 +190,7 @@ namespace LandParserGenerator.Parsing.LL
 			}
 			else
 			{
-				tokensAfterText = anyNode.Options.AnySyncTokens;
+				tokensAfterText = anyNode.Options.AnyOptions[AnyOption.Except];
 			}
 
 			/// Если Any непустой (текущий токен - это не токен,
@@ -205,7 +205,7 @@ namespace LandParserGenerator.Parsing.LL
 				int endOffset = token.EndOffset;
 
 				while (!tokensAfterText.Contains(token.Name)
-					&& !anyNode.Options.AnyErrorTokens.Contains(token.Name)
+					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 					&& token.Name != Grammar.EOF_TOKEN_NAME)
 				{
 					anyNode.Value.Add(token.Text);
@@ -218,7 +218,7 @@ namespace LandParserGenerator.Parsing.LL
 
 				/// Если дошли до конца входной строки, и это было не по плану
 				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
-					|| anyNode.Options.AnyErrorTokens.Contains(token.Name))
+					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
 				{
 					Log.Add(Message.Error(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",

@@ -138,8 +138,8 @@ namespace LandParserGenerator
 		public double? Priority { get; set; } = null;
 		public bool IsLand { get; set; } = false;
 
-		public HashSet<string> AnySyncTokens { get; set; } = new HashSet<string>();
-		public HashSet<string> AnyErrorTokens { get; set; } = new HashSet<string>();
+		public Dictionary<AnyOption, HashSet<string>> AnyOptions { get; set; } 
+			= new Dictionary<AnyOption, HashSet<string>>();
 
 		public void Set(NodeOption opt)
 		{
@@ -160,5 +160,16 @@ namespace LandParserGenerator
 					break;
 			}
 		}
+
+		public bool Contains(AnyOption anyOption, string smb)
+		{
+			return AnyOptions.ContainsKey(anyOption) && AnyOptions[anyOption].Contains(smb);
+		}
+	}
+
+	public class ArgumentGroup
+	{
+		public string Name { get; set; }
+		public List<dynamic> Arguments { get; set; }
 	}
 }

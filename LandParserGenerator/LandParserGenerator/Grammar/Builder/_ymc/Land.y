@@ -19,6 +19,7 @@
 	public bool boolVal;
 	public string strVal;
 	public Entry entryVal;
+	public ArgumentGroup argGroupVal;
 	
 	public Tuple<string, double> strDoublePair;
 	
@@ -48,6 +49,7 @@
 %type <strList> identifiers
 %type <altList> body
 %type <boolVal> prec_nonempty
+%type <argGroupVal> argument_group
 
 %type <dynamicList> opt_args args context_opt_args body_element_args
 %type <optionParamsList> context_options
@@ -141,9 +143,7 @@ body_element
 			
 			if($4.HasValue)
 			{
-				if($2 == Grammar.ANY_TOKEN_NAME
-					|| $2 == Grammar.ANY_WITH_SYNC_TOKEN_NAME
-					|| $2 == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
+				if($2.StartsWith(Grammar.ANY_TOKEN_NAME))
 				{
 					Errors.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
@@ -162,14 +162,30 @@ body_element
 			
 			if($$ == null)
 			{
-				if($2 == Grammar.ANY_WITH_SYNC_TOKEN_NAME)
+				if($2.StartsWith(Grammar.ANY_TOKEN_NAME))
 				{
-					opts.AnySyncTokens = new HashSet<string>($3.Select(e=>(string)e));
-					$$ = new Entry(Grammar.ANY_TOKEN_NAME, opts);
-				}
-				else if($2 == Grammar.ANY_WITH_ERROR_TOKEN_NAME)
-				{
-					opts.AnyErrorTokens = new HashSet<string>($3.Select(e=>(string)e));
+					AnyOption sugarOption;
+
+					if(Enum.TryParse($2.Substring(Grammar.ANY_TOKEN_NAME.Length), out sugarOption))
+						opts.AnyOptions[sugarOption] = new HashSet<string>($3.Select(e=>(string)e)); 
+					else
+					{
+						foreach(var opt in $3)
+						{
+							var group = (ArgumentGroup)opt;
+
+							if(Enum.TryParse(group.Name, out sugarOption))
+								opts.AnyOptions[sugarOption] = new HashSet<string>(group.Arguments.Select(e=>(string)e)); 
+							else
+								Errors.Add(Message.Error(
+									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
+										+ group.Name + "', группа проигнорирована",
+									@1.StartLine, @1.StartColumn,
+									"LanD"
+								));
+						}
+					}				
+					
 					$$ = new Entry(Grammar.ANY_TOKEN_NAME, opts);
 				}
 				else
@@ -315,6 +331,7 @@ args
 			$$.Add(generated); 
 		}
 	| args COMMA ID { $$ = $1; $$.Add($3); }
+	| args COMMA argument_group { $$ = $1; $$.Add($3); }
 	| RNUM { $$ = new List<dynamic>(){ $1 }; }
 	| STRING 
 		{ 
@@ -324,8 +341,20 @@ args
 			$$ = new List<dynamic>(){ generated }; 
 		}
 	| ID { $$ = new List<dynamic>(){ $1 }; }
+	| argument_group { $$ = new List<dynamic>(){ $1 }; }
 	;
-	
+
+argument_group
+	: ID ELEM_LPAR args RPAR 
+		{ 
+			$$ = new ArgumentGroup()
+			{
+				Name = $1,
+				Arguments = $3
+			};
+		}
+	;
+
 identifiers
 	: identifiers ID { $$ = $1; $$.Add($2); }
 	| { $$ = new List<string>(); }

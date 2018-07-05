@@ -12,6 +12,8 @@ namespace LandParserGenerator
 
 	public enum GrammarType { LL, LR }
 
+	public enum AnyOption { Include, Except, Pair, Avoid, NonEmpty }
+
 	public class Grammar
 	{
 		public class ElementQuantifierPair
@@ -41,8 +43,6 @@ namespace LandParserGenerator
 		public const string UNDEFINED_TOKEN_NAME = "UNDEFINED";
 		public const string ERROR_TOKEN_NAME = "ERROR";
 		public const string ANY_TOKEN_NAME = "Any";
-		public const string ANY_WITH_SYNC_TOKEN_NAME = "AnyExcept";
-		public const string ANY_WITH_ERROR_TOKEN_NAME = "AnyAvoid";
 
 		// Префиксы и счётчики для анонимных токенов и правил
 		public const string AUTO_RULE_PREFIX = "auto__";
@@ -636,7 +636,7 @@ namespace LandParserGenerator
 					for (var i = 0; i < alt.Count; ++i)
 					{
 						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME
-							&& alt[i].Options.AnySyncTokens.Count == 0)
+							&& alt[i].Options.AnyOptions.ContainsKey(AnyOption.Except))
 						{
 							var newName = Grammar.ANY_TOKEN_NAME + anys.Count;
 							anys[newName] = new Tuple<Alternative, int>(alt, i);
@@ -1167,10 +1167,10 @@ namespace LandParserGenerator
 							result += "%land ";
 						if(entry.Options.Priority.HasValue)
 							result += $"%priority({entry.Options.Priority.Value}) ";
-						if(entry.Options.AnySyncTokens.Count > 0)
-							result += $"{Grammar.ANY_WITH_SYNC_TOKEN_NAME}({String.Join(", ", entry.Options.AnySyncTokens.Select(e=>Userify(e)))}) ";
-						else if(entry.Options.AnyErrorTokens.Count > 0)
-							result += $"{Grammar.ANY_WITH_ERROR_TOKEN_NAME}({String.Join(", ", entry.Options.AnySyncTokens.Select(e => Userify(e)))}) ";
+						if(entry.Options.AnyOptions.Count > 0)
+						{
+							result += $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Options.AnyOptions.Select(kvp=>$"{kvp.Key}({kvp.Value.Select(e => Userify(e))})"))})";
+                        }
 						else
 							result += $"{Userify(entry.Symbol)} ";
                     }
