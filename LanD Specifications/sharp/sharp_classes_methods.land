@@ -15,9 +15,9 @@ MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
 
-program		=	Any 'namespace' name '{' (Any|class)* '}'
+program		=	Any ('namespace' name '{' (Any|class)* '}')?
 class		=	MODIFIER* 'class' name Any '{' (Any|method|block|attribute|class)* '}'
-method		=	MODIFIER* type name arguments Any block
+method		=	MODIFIER* type name arguments Any (block | ';')
 
 block		=	'{' (Any|block)* '}'
 attribute	=	'[' (Any|attribute)* ']'

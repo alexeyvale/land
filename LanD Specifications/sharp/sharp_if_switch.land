@@ -1,0 +1,36 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+
+program		=	(island|Any)*
+island		=	if|switch
+if			=	'if' round_bracketed (block | island | (Any|round_bracketed)+ (block|';')) (else)?!
+else		=	'else' (block | island | (Any|round_bracketed)+ (block|';'))
+switch		=	'switch' round_bracketed '{' case+ '}'
+case		=	('case' Any |'default') ':' (Any ';' |block|island)+
+
+round_bracketed		=	'(' (Any|round_bracketed)* ')'
+curve_bracketed		=	'{'	(Any|curve_bracketed)* '}'
+
+block				=	'{'	(Any|block|island)* '}'
+
+%%
+
+%parsing fragment STRING_INT_CODE
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+%parsing start program
+
+%nodes ghost island
+%nodes leaf round_bracketed
