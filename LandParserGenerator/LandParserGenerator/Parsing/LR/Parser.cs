@@ -26,7 +26,9 @@ namespace LandParserGenerator.Parsing.LR
 		public override Node Parse(string text)
 		{
 			Log = new List<Message>();
+
 			Statistics = new Statistics();
+			var parsingStarted = DateTime.Now;
 
 			Node root = null;	
 
@@ -164,6 +166,8 @@ namespace LandParserGenerator.Parsing.LR
 			if(root != null)
 				TreePostProcessing(root);
 
+			Statistics.TimeSpent = DateTime.Now - parsingStarted;
+
 			return root;
 		}
 
@@ -180,16 +184,16 @@ namespace LandParserGenerator.Parsing.LR
 		private IToken SkipAny(Node anyNode)
 		{
 			var token = LexingStream.CurrentToken();
-			var rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].Single();
+			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
 
-			/// Пока по Any нужно производить свёртки
-			while (rawAction is ReduceAction)
+			/// Пока по Any нужно производить свёртки (ячейка таблицы непуста и нет конфликтов)
+			while (rawActions.Count == 1 && rawActions[0] is ReduceAction)
 			{
-				var action = (ReduceAction)rawAction;
-				var parentNode = new Node(action.ReductionAlternative.NonterminalSymbolName);
+				var reduce = (ReduceAction)rawActions[0];
+				var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
 
 				/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
-				for (var i = 0; i < action.ReductionAlternative.Count; ++i)
+				for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
 				{
 					parentNode.AddFirstChild(Stack.PeekSymbol());
 					Stack.Pop();
@@ -199,19 +203,16 @@ namespace LandParserGenerator.Parsing.LR
 				/// Кладём на стек состояние, в которое нужно произвести переход
 				Stack.Push(
 					parentNode,
-					Table.Transitions[currentState][action.ReductionAlternative.NonterminalSymbolName]
+					Table.Transitions[currentState][reduce.ReductionAlternative.NonterminalSymbolName]
 				);
 
-				rawAction = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].FirstOrDefault();
+				rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
 			}
 
-			/// Если нужно произвести перенос
-			if (rawAction is ShiftAction)
-			{
-				var action = (ShiftAction)rawAction;
-				/// Вносим в стек новое состояние
-				Stack.Push(anyNode, action.TargetItemIndex);
-			}
+			/// Производим перенос
+			var shift = (ShiftAction)rawActions.Where(a => a is ShiftAction).Single();
+			/// Вносим в стек новое состояние
+			Stack.Push(anyNode, shift.TargetItemIndex);
 
 			int startOffset = anyNode.StartOffset.HasValue 
 				? anyNode.StartOffset.Value 
@@ -257,7 +258,7 @@ namespace LandParserGenerator.Parsing.LR
 			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count == 1
 				&& m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null)
 			{
-				if (Stack.PeekSymbol().StartOffset.HasValue)
+				if (Stack.CountSymbols > 0 && Stack.PeekSymbol().StartOffset.HasValue)
 				{
 					startOffset = Stack.PeekSymbol().StartOffset;
 					if(!endOffset.HasValue)
