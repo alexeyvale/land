@@ -732,6 +732,14 @@ namespace LandParserGenerator
 			return AutoTokenUserWrittenForm.ContainsKey(name) ? AutoTokenUserWrittenForm[name] : name;
 		}
 
+		public string Userify(Entry entry)
+		{
+			if (entry.Options.AnyOptions.Count > 0)
+				return $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Options.AnyOptions.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Userify(e)))})"))})";
+			else
+				return Userify(entry.Symbol);
+		}
+
 		public string Userify(ISymbol smb)
 		{
 			return Userify(smb.Name);
@@ -745,7 +753,7 @@ namespace LandParserGenerator
 
 		public List<string> UserifyElementwise(Alternative alt)
 		{
-			return alt.Elements.Select(e => Userify(e.Symbol)).ToList();
+			return alt.Elements.Select(e => Userify(e)).ToList();
 		}
 
 		#endregion
@@ -1169,8 +1177,8 @@ namespace LandParserGenerator
 							result += $"%priority({entry.Options.Priority.Value}) ";
 						if(entry.Options.AnyOptions.Count > 0)
 						{
-							result += $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Options.AnyOptions.Select(kvp=>$"{kvp.Key}({kvp.Value.Select(e => Userify(e))})"))})";
-                        }
+							result += $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Options.AnyOptions.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Userify(e)))})"))})";
+						}
 						else
 							result += $"{Userify(entry.Symbol)} ";
                     }
