@@ -1,0 +1,11 @@
+A : 'a'
+B : 'b'
+C : 'c'
+
+a = Any b c
+b = A |
+c = Any C
+
+%%
+
+%parsing start a
