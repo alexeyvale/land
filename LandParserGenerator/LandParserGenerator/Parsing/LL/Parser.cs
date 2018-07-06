@@ -130,16 +130,26 @@ namespace LandParserGenerator.Parsing.LL
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
 					token = LexingStream.CurrentToken();
-
-					Log.Add(Message.Error(
+					var message = Message.Error(
 						grammar.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный символ {GetTokenInfoForMessage(token)}, ожидался символ {grammar.Userify(stackTop.Symbol)}" :
 							$"Неожиданный символ {GetTokenInfoForMessage(token)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
 						token.Line,
 						token.Column
-					));
+					);
 
-					break;
+					token = ErrorRecovery();
+
+					if (token == null)
+					{
+						Log.Add(message);
+						break;
+					}
+					else
+					{
+						message.Type = MessageType.Warning;
+						Log.Add(message);
+					}
 				}
 				/// Если непонятно, что делать с текущим токеном, и он конкретный
 				/// (не Any), заменяем его на Any
@@ -230,6 +240,57 @@ namespace LandParserGenerator.Parsing.LL
 			}
 
 			return token;
+		}
+
+		private IToken ErrorRecovery()
+		{
+			/// То, что мы хотели разобрать, и не смогли
+			var currentNode = Stack.Peek();
+			Stack.Pop();
+
+			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
+			/// для которого допустима альтернатива из одного Any
+			while (currentNode != null
+				&& (!grammar.Rules.ContainsKey(currentNode.Symbol)
+				|| !grammar.Rules[currentNode.Symbol].Alternatives.Any(a => a.Count == 1 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)))
+			{
+				if (currentNode.Parent != null)
+				{
+					var childIndex = currentNode.Parent.Children.IndexOf(currentNode);
+
+					/// Снимаем со стека всех неразобранных потомков родителя текущего узла,
+					/// для текущего узла они являются правыми братьями
+					for (var i = 0; i < currentNode.Parent.Children.Count - childIndex - 1; ++i)
+						Stack.Pop();
+				}
+
+				/// Переходим к родителю
+				currentNode = currentNode.Parent;
+			}
+
+			if(currentNode != null)
+			{
+				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
+				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options);
+				anyNode.Value = currentNode.GetValue();
+
+				if (currentNode.StartOffset.HasValue)
+					anyNode.SetAnchor(currentNode.StartOffset.Value, currentNode.EndOffset.Value);
+
+				/// Пытаемся пропустить Any в этом месте
+				var token = SkipAny(anyNode);
+
+				/// Если Any успешно пропустили и возобновили разбор,
+				/// возвращаем токен, с которого разбор продолжается
+				if (token.Name != Grammar.ERROR_TOKEN_NAME)
+				{
+					currentNode.ResetChildren();
+					currentNode.AddFirstChild(anyNode);
+					return token;
+				}
+			}
+
+			return null;
 		}
 	}
 }

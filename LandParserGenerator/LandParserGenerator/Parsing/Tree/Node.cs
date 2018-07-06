@@ -92,6 +92,18 @@ namespace LandParserGenerator.Parsing.Tree
 			AnchorReady = true;
 		}
 
+		/// <summary>
+		/// Возвращает текст токенов из области, 
+		/// соответствующей данному узлу
+		/// </summary>
+		public List<string> GetValue()
+		{
+			if (Value.Count > 0)
+				return new List<string>(Value);
+
+			return Children.SelectMany(c => c.GetValue()).ToList();
+		}
+
 		public Node(string smb, LocalOptions opts = null)
 		{
 			Symbol = smb;

@@ -16,10 +16,11 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="30*"></ColumnDefinition>
+						<ColumnDefinition Width="5"></ColumnDefinition>
                         <ColumnDefinition Width="70*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <TabControl Grid.Column="1" Name="MainTabs">
+                    <TabControl Grid.Column="2" Name="MainTabs">
                         <TabItem Header="Грамматика .land">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -179,6 +180,7 @@
                         </TabItem>
                     </TabControl>
 
+					<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
                     <TabControl Grid.Column="0">
                         <TabItem Header="AST">
@@ -346,11 +348,11 @@
                                 </TabItem>
                             </TabControl>
                         </Grid>
-                        <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray" />
+                        <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
                         <Grid Grid.Column="2">
                             <ListBox Name="SimilaritiesList" SelectionChanged="SimilaritiesList_SelectionChanged"></ListBox>
                         </Grid>
-                        <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray" />
+                        <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
                         <avalonedit:TextEditor 
                             Grid.Column="4" 
                             IsReadOnly="True"
@@ -359,7 +361,7 @@
                             FontFamily="Consolas"
                             FontSize="12pt">
                         </avalonedit:TextEditor>
-                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="DarkGray" />
+                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
                         <Grid Grid.Column="6">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="70*"></RowDefinition>
