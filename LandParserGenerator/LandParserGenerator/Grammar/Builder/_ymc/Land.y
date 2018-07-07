@@ -20,6 +20,7 @@
 	public string strVal;
 	public Entry entryVal;
 	public ArgumentGroup argGroupVal;
+	public dynamic dynamicVal;
 	
 	public Tuple<string, double> strDoublePair;
 	
@@ -50,6 +51,7 @@
 %type <altList> body
 %type <boolVal> prec_nonempty
 %type <argGroupVal> argument_group
+%type <dynamicVal> argument
 
 %type <dynamicList> opt_args args context_opt_args body_element_args
 %type <optionParamsList> context_options
@@ -172,17 +174,34 @@ body_element
 					{
 						foreach(var opt in $3)
 						{
-							var group = (ArgumentGroup)opt;
+							var errorGroupName = String.Empty;
+							
+							if(opt is ArgumentGroup)
+							{
+								var group = (ArgumentGroup)opt;
 
-							if(Enum.TryParse(group.Name, out sugarOption))
-								opts.AnyOptions[sugarOption] = new HashSet<string>(group.Arguments.Select(e=>(string)e)); 
-							else
+								if(Enum.TryParse(group.Name, out sugarOption))
+									opts.AnyOptions[sugarOption] = new HashSet<string>(group.Arguments.Select(e=>(string)e)); 
+								else
+									errorGroupName = group.Name;
+							}
+							else if(opt is String)
+							{
+								if(Enum.TryParse((string)opt, out sugarOption))
+									opts.AnyOptions[sugarOption] = new HashSet<string>(); 
+								else
+									errorGroupName = (string)opt;
+							}
+							
+							if(!String.IsNullOrEmpty(errorGroupName))
+							{
 								Errors.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
-										+ group.Name + "', группа проигнорирована",
+										+ errorGroupName + "', группа проигнорирована",
 									@1.StartLine, @1.StartColumn,
 									"LanD"
 								));
+							}
 						}
 					}				
 					
@@ -320,28 +339,28 @@ opt_args
 	;
 	
 args
-	: args COMMA RNUM { $$ = $1; $$.Add($3); }
-	| args COMMA STRING 
+	: args COMMA argument 
 		{ 
-			$$ = $1;
+			$$ = $1; 
 			
-			var generated = ConstructedGrammar.GenerateTerminal($3);
-			ConstructedGrammar.AddAnchor(generated, @3);
-			
-			$$.Add(generated); 
+			if($3 is String)
+			{
+				var generated = ConstructedGrammar.GenerateTerminal((string)$3);
+				ConstructedGrammar.AddAnchor(generated, @3);		
+				$$.Add(generated); 
+			}
+			else
+				$$.Add($3); 
 		}
-	| args COMMA ID { $$ = $1; $$.Add($3); }
-	| args COMMA argument_group { $$ = $1; $$.Add($3); }
-	| RNUM { $$ = new List<dynamic>(){ $1 }; }
-	| STRING 
-		{ 
-			var generated = ConstructedGrammar.GenerateTerminal($1);
-			ConstructedGrammar.AddAnchor(generated, @1);
-			
-			$$ = new List<dynamic>(){ generated }; 
-		}
-	| ID { $$ = new List<dynamic>(){ $1 }; }
-	| argument_group { $$ = new List<dynamic>(){ $1 }; }
+	| argument { $$ = new List<dynamic>(){ $1 }; }
+	;
+	
+	
+argument
+	: RNUM { $$ = $1; }
+	| STRING { $$ = $1; }
+	| ID { $$ = $1; }
+	| argument_group { $$ = $1; }
 	;
 
 argument_group
