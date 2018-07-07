@@ -22,7 +22,7 @@ arguments_element	=	('var'|'const')? ID (',' ID)* ':' Any
 
 pseudo_block	=	OPENING_PSEUDOCOMMENT operator (';' operator)*	CLOSING_PSEUDOCOMMENT
 block			=	'begin' operator (';' operator)* 'end'
-operator		=	assign_or_call|if|case|block|pseudo_block|Any
+operator		=	assign_or_call|if|case|Any block?|pseudo_block
 assign_or_call	=	name ('(' Any ')')? ((':='|'+='|'-='|'*=') Any)?
 if				=	'if' Any 'then' operator ('else' operator)?!
 case			=	'case' Any 'of' case_option+ 'end'
