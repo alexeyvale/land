@@ -65,6 +65,12 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 "=" return (int)Tokens.EQUALS;
 
+// Для пар
+
+"%left" return (int)Tokens.LEFT;
+
+"%right" return (int)Tokens.RIGHT;
+
 // Символы, означающие нечто внутри правила
 
 "|" return (int)Tokens.OR;
