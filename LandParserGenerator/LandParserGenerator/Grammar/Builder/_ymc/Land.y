@@ -342,15 +342,7 @@ args
 	: args COMMA argument 
 		{ 
 			$$ = $1; 
-			
-			if($3 is String)
-			{
-				var generated = ConstructedGrammar.GenerateTerminal((string)$3);
-				ConstructedGrammar.AddAnchor(generated, @3);		
-				$$.Add(generated); 
-			}
-			else
-				$$.Add($3); 
+			$$.Add($3); 
 		}
 	| argument { $$ = new List<dynamic>(){ $1 }; }
 	;
@@ -358,7 +350,12 @@ args
 	
 argument
 	: RNUM { $$ = $1; }
-	| STRING { $$ = $1; }
+	| STRING 
+		{
+			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
+			ConstructedGrammar.AddAnchor(generated, @1);		
+			$$ = generated;
+		}
 	| ID { $$ = $1; }
 	| argument_group { $$ = $1; }
 	;
