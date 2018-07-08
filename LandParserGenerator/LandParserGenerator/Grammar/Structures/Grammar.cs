@@ -12,7 +12,7 @@ namespace LandParserGenerator
 
 	public enum GrammarType { LL, LR }
 
-	public enum AnyOption { Include, Except, Pair, Avoid, NonEmpty }
+	public enum AnyOption { Include, Except, Pair, Avoid }
 
 	public class Grammar
 	{
