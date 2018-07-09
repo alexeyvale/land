@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         Title="LanD Test IDE" Height="500" Width="800"
         Closed="Window_Closed"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        Icon="AppIcon.png">
 
     <Grid>
         <TabControl SelectionChanged="MainPerspectiveTabs_SelectionChanged" Name="MainPerspectiveTabs">

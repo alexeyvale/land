@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 07.07.2018 19:41:20
+// DateTime: 09.07.2018 1:49:14
 // UserName: Алексей
-// Input file <./Land.y - 07.07.2018 19:41:20>
+// Input file <./Land.y - 09.07.2018 1:49:13>
 
 // options: no-lines gplex
 
@@ -72,12 +72,12 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 07.07.2018 19:41:20
+  // Verbatim content from ./Land.y - 09.07.2018 1:49:13
     public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
-  // End verbatim content from ./Land.y - 07.07.2018 19:41:20
+  // End verbatim content from ./Land.y - 09.07.2018 1:49:13
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -471,15 +471,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 35: // args -> args, COMMA, argument
 { 
 			CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-3].dynamicList; 
-			
-			if(ValueStack[ValueStack.Depth-1].dynamicVal is String)
-			{
-				var generated = ConstructedGrammar.GenerateTerminal((string)ValueStack[ValueStack.Depth-1].dynamicVal);
-				ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);		
-				CurrentSemanticValue.dynamicList.Add(generated); 
-			}
-			else
-				CurrentSemanticValue.dynamicList.Add(ValueStack[ValueStack.Depth-1].dynamicVal); 
+			CurrentSemanticValue.dynamicList.Add(ValueStack[ValueStack.Depth-1].dynamicVal); 
 		}
         break;
       case 36: // args -> argument
@@ -489,7 +481,11 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 { CurrentSemanticValue.dynamicVal = ValueStack[ValueStack.Depth-1].doubleVal; }
         break;
       case 38: // argument -> STRING
-{ CurrentSemanticValue.dynamicVal = ValueStack[ValueStack.Depth-1].strVal; }
+{
+			var generated = ConstructedGrammar.GenerateTerminal((string)ValueStack[ValueStack.Depth-1].strVal);
+			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);		
+			CurrentSemanticValue.dynamicVal = generated;
+		}
         break;
       case 39: // argument -> ID
 { CurrentSemanticValue.dynamicVal = ValueStack[ValueStack.Depth-1].strVal; }

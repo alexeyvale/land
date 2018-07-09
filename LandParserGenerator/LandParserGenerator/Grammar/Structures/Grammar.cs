@@ -488,6 +488,20 @@ namespace LandParserGenerator
 								GetAnchor(rule.Name),
 								"LanD"
 							));
+
+						if(smb == Grammar.ANY_TOKEN_NAME)
+						{
+							foreach(var kvp in smb.Options.AnyOptions)
+							{
+								foreach (var arg in kvp.Value)
+									if (this[arg] == null)
+										messages.Add(Message.Error(
+											$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
+											GetAnchor(rule.Name),
+											"LanD"
+										));
+							}
+						}
                     }
             }	
 
@@ -636,7 +650,7 @@ namespace LandParserGenerator
 					for (var i = 0; i < alt.Count; ++i)
 					{
 						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME
-							&& alt[i].Options.AnyOptions.ContainsKey(AnyOption.Except))
+							&& !alt[i].Options.AnyOptions.ContainsKey(AnyOption.Except))
 						{
 							var newName = Grammar.ANY_TOKEN_NAME + anys.Count;
 							anys[newName] = new Tuple<Alternative, int>(alt, i);

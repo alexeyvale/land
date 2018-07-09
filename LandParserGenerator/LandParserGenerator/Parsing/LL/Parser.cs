@@ -149,6 +149,12 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						message.Type = MessageType.Warning;
 						Log.Add(message);
+
+						Log.Add(Message.Warning(
+							$"Разбор продолжен с токена {GetTokenInfoForMessage(token)}",
+							token.Line,
+							token.Column
+						));
 					}
 				}
 				/// Если непонятно, что делать с текущим токеном, и он конкретный
@@ -197,11 +203,17 @@ namespace LandParserGenerator.Parsing.LL
 				tokensAfterText = grammar.First(alt);
 				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
 				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
+
+				/// Если указаны токены, которые нужно однозначно включать в Any
+				if (anyNode.Options.AnyOptions.ContainsKey(AnyOption.Include))
+				{
+					tokensAfterText.ExceptWith(anyNode.Options.AnyOptions[AnyOption.Include]);
+				}
 			}
 			else
 			{
 				tokensAfterText = anyNode.Options.AnyOptions[AnyOption.Except];
-			}
+			}		
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
