@@ -35,6 +35,7 @@ namespace LandParserGenerator
 		public string StartSymbol { get; private set; }
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
+		public Dictionary<string, PairSymbol> Pairs { get; private set; } = new Dictionary<string, PairSymbol>();
 		public HashSet<string> NonEmptyPrecedence { get; private set; } = new HashSet<string>(); 
 		public List<string> TokenOrder { get; private set; } = new List<string>();
 
@@ -71,6 +72,11 @@ namespace LandParserGenerator
 				if (Tokens.ContainsKey(key))
 				{
 					return Tokens[key];
+				}
+
+				if (Pairs.ContainsKey(key))
+				{
+					return Pairs[key];
 				}
 
 				return null;
@@ -141,6 +147,11 @@ namespace LandParserGenerator
 			if (Tokens.ContainsKey(name))
 			{
 				return $"Повторное определение: символ {name} определён как терминальный";
+			}
+
+			if (Pairs.ContainsKey(name))
+			{
+				return $"Повторное определение: символ {name} определён как пара";
 			}
 
 			return String.Empty;
@@ -319,6 +330,25 @@ namespace LandParserGenerator
 		{
 			var terminal = new TerminalSymbol(name, pattern);
 			DeclareTerminal(terminal);
+		}
+
+		public void DeclarePair(string name, HashSet<string> left, HashSet<string> right)
+		{
+			var checkingResult = AlreadyDeclaredCheck(name);
+
+			if (!String.IsNullOrEmpty(checkingResult))
+				throw new IncorrectGrammarException(checkingResult);
+			else
+			{
+				Pairs[name] = new PairSymbol()
+				{
+					Left = left,
+					Right = right,
+					Name = name
+				};
+			}
+
+			OnGrammarUpdate();
 		}
 
 		#endregion

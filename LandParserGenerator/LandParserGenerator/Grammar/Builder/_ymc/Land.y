@@ -31,6 +31,8 @@
 	public List<string> strList;	
 	public List<Alternative> altList;
 	
+	public HashSet<string> strSet;
+	
 	// Информация о количестве повторений
 	public Nullable<Quantifier> optQuantVal;
 	public Nullable<double> optDoubleVal;
@@ -39,7 +41,8 @@
 %start lp_description
 
 %left OR
-%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT ARROW
+
+%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT ARROW LEFT RIGHT CONTENT
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -57,6 +60,8 @@
 
 %type <dynamicList> opt_args args context_opt_args body_element_args
 %type <optionParamsList> context_options
+
+%type <strSet> pair_border_group_content pair_border
 
 %%
 
@@ -78,6 +83,7 @@ structure
 element
 	: terminal
 	| nonterminal
+	| pair
 	;
 	
 terminal
@@ -89,6 +95,34 @@ terminal
 			}, @1);
 		}
 	;
+	
+/******** ID = %left ID1 %right (ID2 | ID3) ***************/
+
+pair
+	: ENTITY_NAME EQUALS LEFT pair_border RIGHT pair_border 
+		{
+			SafeGrammarAction(() => { 
+				ConstructedGrammar.DeclarePair($1, $4, $6);
+				ConstructedGrammar.AddAnchor($1, @1);
+			}, @1);
+		}
+	;
+	
+pair_border
+	: ID { $$ = new HashSet<string>() { $1 }; }
+	| STRING 
+		{ 	
+			var generated = ConstructedGrammar.GenerateTerminal($1);
+			ConstructedGrammar.AddAnchor(generated, @1);
+			$$ = new HashSet<string>() { generated };
+		}
+	| LPAR pair_border_group_content RPAR { $$ = $2; }
+	;
+	
+pair_border_group_content
+	: pair_border { $$ = $1; }
+	| pair_border_group_content OR pair_border { $1.UnionWith($3); $$ = $1; }
+	;	
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal

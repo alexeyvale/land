@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="BuilderBase.cs" />
     <Compile Include="BuilderLR.cs" />
+    <Compile Include="Grammar\Structures\PairSymbol.cs" />
     <Compile Include="Grammar\Transformer.cs" />
     <Compile Include="Grammar\Structures\Common\Anchor.cs" />
     <Compile Include="Grammar\Structures\Common\Message.cs" />
