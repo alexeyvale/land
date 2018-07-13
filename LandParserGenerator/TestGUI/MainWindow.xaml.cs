@@ -766,12 +766,31 @@ namespace TestGUI
 				var visitor = new LandExplorerVisitor();
 				TreeRoot.Accept(visitor);
 
+				/// Группируем land-сущности по типу (символу)
 				foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
 				{
 					var concern = new Concern(group.Key);
 					Markup.Add(concern);
 
-					foreach (var point in group)
+					/// В пределах символа группируем по псевдониму
+					var subgroups = group.GroupBy(g => g.Alias);
+
+					/// Для всех точек, для которых указан псевдоним
+					foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
+					{
+						/// создаём подфункциональность
+						var subconcern = new Concern(subgroup.Key, concern);
+						Markup.Add(subconcern);
+
+						foreach (var point in subgroup)
+							Markup.Add(new ConcernPoint(point, subconcern));
+					}
+
+					/// Остальные добавляются напрямую к функциональности, соответствующей символу
+					var points = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
+						.SelectMany(s => s).ToList();
+
+					foreach (var point in points)
 						Markup.Add(new ConcernPoint(point, concern));
 				}
 			}

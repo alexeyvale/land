@@ -8,7 +8,8 @@ namespace LandParserGenerator
 {
 	public class Alternative
 	{
-		public string NonterminalSymbolName { get; set; } = null;
+		public string NonterminalSymbolName { get; set; }
+		public string Alias { get; set; }
 
 		public List<Entry> Elements { get; set; } = new List<Entry>();
 

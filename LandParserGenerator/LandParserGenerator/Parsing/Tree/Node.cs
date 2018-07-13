@@ -11,12 +11,6 @@ namespace LandParserGenerator.Parsing.Tree
 	public class Node
 	{
 		/// <summary>
-		/// Идентификатор узла, уникальный в пределах одного дерева
-		/// </summary>
-		[DataMember]
-		public int Id { get; set; }
-
-		/// <summary>
 		/// Родительский узел
 		/// </summary
 		[DataMember]
@@ -27,6 +21,13 @@ namespace LandParserGenerator.Parsing.Tree
 		/// </summary>
 		[DataMember]
 		public string Symbol { get; set; }
+
+		/// <summary>
+		/// Псевдоним символа, которому соответствует узел
+		/// в соответствии с подструктурой
+		/// </summary>
+		[DataMember]
+		public string Alias { get; set; }
 
 		/// <summary>
 		/// Набор токенов, соответствующих листовому узлу
@@ -150,7 +151,8 @@ namespace LandParserGenerator.Parsing.Tree
 
 		public override string ToString()
 		{
-			return Symbol + (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
+			return (String.IsNullOrEmpty(Alias) ? Symbol : Alias) 
+				+ (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
 		}
 	}
 }

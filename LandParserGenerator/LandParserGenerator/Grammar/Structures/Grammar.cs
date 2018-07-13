@@ -38,6 +38,9 @@ namespace LandParserGenerator
 		public HashSet<string> NonEmptyPrecedence { get; private set; } = new HashSet<string>(); 
 		public List<string> TokenOrder { get; private set; } = new List<string>();
 
+		// Псевдонимы именованных нетерминалов
+		public Dictionary<string, HashSet<string>> Aliases = new Dictionary<string, HashSet<string>>();
+
 		// Зарезервированные имена специальных токенов
 		public const string EOF_TOKEN_NAME = "EOF";
 		public const string UNDEFINED_TOKEN_NAME = "UNDEFINED";
@@ -99,6 +102,21 @@ namespace LandParserGenerator
 		}
 
 		#region Описание символов
+
+		public void AddAliases(string smb, HashSet<string> aliases)
+		{
+			foreach(var kvp in Aliases)
+			{
+				var intersection = kvp.Value.Intersect(aliases).ToList();
+
+				if(intersection.Count > 0)
+					throw new IncorrectGrammarException(
+						$"Нетерминалы {smb} и {kvp.Key} имеют общие псевдонимы: {String.Join(", ", intersection)}"
+					);
+			}
+
+			Aliases[smb] = aliases;
+		}
 
 		public void AddAnchor(string smb, Anchor loc)
 		{
@@ -491,12 +509,30 @@ namespace LandParserGenerator
 
 						if(smb == Grammar.ANY_TOKEN_NAME)
 						{
-							foreach(var kvp in smb.Options.AnyOptions)
+							var union = new HashSet<string>();
+
+							/// Проверяем, что в качестве аргументов для Any не указаны
+							/// имена неизвестных символов
+							foreach (var kvp in smb.Options.AnyOptions)
 							{
+								union.UnionWith(kvp.Value);
 								foreach (var arg in kvp.Value)
+								{
 									if (this[arg] == null)
 										messages.Add(Message.Error(
 											$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
+											GetAnchor(rule.Name),
+											"LanD"
+										));
+								}
+							}
+
+							/// Проверяем, что не существует символов, указанных
+							/// сразу в нескольких опциях
+							if (union.Count < smb.Options.AnyOptions.Sum(o => o.Value.Count))
+							{
+								messages.Add(Message.Error(
+											$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)} пересекаются",
 											GetAnchor(rule.Name),
 											"LanD"
 										));

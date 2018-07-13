@@ -110,8 +110,10 @@ namespace LandParserGenerator.Parsing.LL
 					else if (alternatives.Count == 1)
 					{
 						alternativeToApply = alternatives.Single();
-
 						Stack.Pop();
+
+						if (!String.IsNullOrEmpty(alternativeToApply.Alias))
+							stackTop.Alias = alternativeToApply.Alias;
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
@@ -298,6 +300,10 @@ namespace LandParserGenerator.Parsing.LL
 				{
 					currentNode.ResetChildren();
 					currentNode.AddFirstChild(anyNode);
+
+					if (!String.IsNullOrEmpty(alternativeToApply.Alias))
+						currentNode.Alias = alternativeToApply.Alias;
+
 					return token;
 				}
 			}

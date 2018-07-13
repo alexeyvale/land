@@ -81,6 +81,7 @@
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\PullAliasVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\BaseVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\GhostListOptionProcessingVisitor.cs" />

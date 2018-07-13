@@ -27,8 +27,9 @@ namespace LandParserGenerator.Parsing
 		{
 			/// Если текущий узел должен быть листовым
 			if (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol)
-					|| node.Options.NodeOption == NodeOption.LEAF
-					|| computeValue)
+				|| !String.IsNullOrEmpty(node.Alias) &&  grammar.Options.IsSet(NodeOption.LEAF, node.Alias)
+				|| node.Options.NodeOption == NodeOption.LEAF
+				|| computeValue)
 			{
 				foreach (var child in node.Children)
 				{

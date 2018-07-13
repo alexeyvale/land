@@ -56,6 +56,10 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.COMMA;
 }
 
+"=>" {
+	return (int)Tokens.ARROW;
+}
+
 // Начало правила
 
 ^{ID} {

@@ -3,6 +3,8 @@
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
+    
+    private HashSet<string> Aliases = new HashSet<string>();
 %}
 
 %using System.Linq;
@@ -37,7 +39,7 @@
 %start lp_description
 
 %left OR
-%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT
+%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION ADD_CHILD DOT ARROW
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -45,7 +47,7 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
-%type <strVal> body_element_core body_element_atom group
+%type <strVal> body_element_core body_element_atom group optional_alias
 %type <entryVal> body_element
 %type <strList> identifiers
 %type <altList> body
@@ -90,11 +92,18 @@ terminal
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal
-	: ENTITY_NAME EQUALS body 
+	: ENTITY_NAME EQUALS body optional_alias
 		{ 
+			$3[$3.Count-1].Alias = $4;
+			var aliases = this.Aliases;
+			this.Aliases = new HashSet<string>(); 
+			
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareNonterminal($1, $3);
 				ConstructedGrammar.AddAnchor($1, @1);
+				
+				if(aliases.Count > 0)
+					ConstructedGrammar.AddAliases($1, aliases);
 			}, @1);
 		}
 	;
@@ -105,8 +114,10 @@ body
 			$$ = $1; 
 			$$[$$.Count-1].Add($2); 	
 		}
-	| body OR 
+	| body optional_alias OR 
 		{ 
+			$1[$1.Count-1].Alias = $2;
+			
 			$$ = $1;
 			$$.Add(new Alternative());		
 		}
@@ -115,6 +126,11 @@ body
 			$$ = new List<Alternative>(); 
 			$$.Add(new Alternative()); 
 		}
+	;
+	
+optional_alias
+	: ARROW ID { $$ = $2; this.Aliases.Add($2); }
+	| { $$ = null; }
 	;
 	
 body_element
@@ -264,8 +280,10 @@ body_element_atom
 	;
 	
 group
-	: LPAR body RPAR 
+	: LPAR body optional_alias RPAR 
 		{ 
+			$2[$2.Count-1].Alias = $3;
+			
 			$$ = ConstructedGrammar.GenerateNonterminal($2);
 			ConstructedGrammar.AddAnchor($$, @$);
 		}

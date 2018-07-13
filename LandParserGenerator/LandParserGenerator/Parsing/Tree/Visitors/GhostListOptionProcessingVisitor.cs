@@ -23,7 +23,8 @@ namespace LandParserGenerator.Parsing
 			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				if (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
+				if (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol)
+					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)
 					|| node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) 
 					||  node.Options.NodeOption == NodeOption.GHOST)
 				{
@@ -40,13 +41,16 @@ namespace LandParserGenerator.Parsing
 				}
 			}
 
+			var listForAlias = !String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LIST, node.Alias);
+			var listForSymbol = grammar.Options.IsSet(NodeOption.LIST, node.Symbol);
+
 			// Если символ помечен как List, убираем подузлы того же типа
-			if (grammar.Options.IsSet(NodeOption.LIST, node.Symbol) 
-				|| node.Options.NodeOption == NodeOption.LIST)
+			if (listForAlias || listForSymbol || node.Options.NodeOption == NodeOption.LIST)
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
 				{
-					if (node.Children[i].Symbol == node.Symbol)
+					if (listForSymbol && node.Children[i].Symbol == node.Symbol 
+						|| listForAlias && node.Children[i].Alias == node.Alias)
 					{
 						var smbToRemove = node.Children[i];
 						node.Children.RemoveAt(i);

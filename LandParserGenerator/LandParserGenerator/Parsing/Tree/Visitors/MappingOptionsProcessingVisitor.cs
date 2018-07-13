@@ -26,7 +26,7 @@ namespace LandParserGenerator.Parsing
 
 		public override void Visit(Node node)
 		{
-			if (Land.Contains(node.Symbol))
+			if (Land.Contains(node.Symbol) || Land.Contains(node.Alias))
 				node.Options.Set(MappingOption.LAND);
 
 			if (!node.Options.Priority.HasValue)
