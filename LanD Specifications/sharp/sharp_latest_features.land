@@ -1,0 +1,62 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING		: STRING_STD|STRING_VERB
+STRING_SKIP	: '\\"' | '\\\\'
+STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+STRING_VERB	: '@'('"' ~["]* '"')+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+ 
+ 
+curve_bracketed	= %left '{' %right '}'
+round_bracketed	= %left '(' %right ')'
+square_bracketed = %left '[' %right ']'
+
+ 
+namespace_content	=	opening_directive*! (namespace|entity)*
+opening_directive	=	('using'|'extern') Any ';'
+namespace			=	'namespace' name '{' namespace_content '}'
+
+
+entity =
+		(MODIFIER|'extern')*
+		(
+		 	'enum' name Any '{' Any '}' ';'? 								=> enum |
+			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface |
+			type name?
+			(
+		  		arguments Any (init_expression? ';' | block)	=> method |
+		  		(';'| init_value)		=> field  |
+		  		block init_value?		=> property
+		  	)
+		) | Any
+
+init_expression		=	'=>' Any ';'
+init_value			=	'=' Any ';'
+
+name_atom	=	ID | MODIFIER
+name		=	name_atom ((('.'|'::') name_atom) | '<' types_list '>')*
+names_list	=	name (',' name)*
+
+tuple		=	'(' type name? (',' type name?)* ')'
+type_atom	=	'unsigned'? ID | tuple
+type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' ','* ']'))*!
+types_list	=	type (',' type)*
+
+arguments	=	'(' Any ')'
+block		=	'{' Any '}'
+
+%%
+
+%parsing ignoreundefined
+%parsing start namespace_content
+%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+
+%nodes ghost  names_list
+%nodes leaf name
+
+%mapping land namespace entity

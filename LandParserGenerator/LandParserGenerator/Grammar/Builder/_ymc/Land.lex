@@ -75,8 +75,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 "%right" return (int)Tokens.RIGHT;
 
-"%content" return (int)Tokens.CONTENT;
-
 // Символы, означающие нечто внутри правила
 
 "|" return (int)Tokens.OR;

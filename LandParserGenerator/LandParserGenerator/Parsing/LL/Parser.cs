@@ -17,6 +17,9 @@ namespace LandParserGenerator.Parsing.LL
 		private Stack<Node> Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
+		private Stack<PairSymbol> Nesting { get; set; }
+		private Dictionary<Node, int> NestingLevel { get; set; }
+
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
 			Table = new TableLL1(g);
@@ -37,6 +40,9 @@ namespace LandParserGenerator.Parsing.LL
 			Log = new List<Message>();
 			Statistics = new Statistics();
 
+			Nesting = new Stack<PairSymbol>();
+			NestingLevel = new Dictionary<Node, int>();
+
 			var parsingStarted = DateTime.Now; 
 
             /// Готовим лексер и стеки
@@ -49,7 +55,7 @@ namespace LandParserGenerator.Parsing.LL
 			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
-			var token = LexingStream.NextToken();
+			var token = GetNextToken();
 
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
@@ -84,7 +90,7 @@ namespace LandParserGenerator.Parsing.LL
 						node.SetAnchor(token.StartOffset, token.EndOffset);
 						node.SetValue(token.Text);
 
-						token = LexingStream.NextToken();
+						token = GetNextToken();
 					}
 
 					continue;
@@ -114,6 +120,8 @@ namespace LandParserGenerator.Parsing.LL
 
 						if (!String.IsNullOrEmpty(alternativeToApply.Alias))
 							stackTop.Alias = alternativeToApply.Alias;
+
+						NestingLevel[stackTop] = Nesting.Count;
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
@@ -166,7 +174,7 @@ namespace LandParserGenerator.Parsing.LL
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
 					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
-						token = LexingStream.NextToken();
+						token = GetNextToken();
 					}
 					else
 					{
@@ -180,6 +188,30 @@ namespace LandParserGenerator.Parsing.LL
 			Statistics.TimeSpent = DateTime.Now - parsingStarted;
 
 			return root;
+		}
+
+		private IToken GetNextToken(int? level = null)
+		{
+			while(true)
+			{
+				if (LexingStream.CurrentToken() != null)
+				{
+					var token = LexingStream.CurrentToken();
+					var closed = grammar.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
+
+					if (closed.Value != null && Nesting.Peek() == closed.Value)
+						Nesting.Pop();
+
+					var opened = grammar.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
+
+					if (opened.Value != null)
+						Nesting.Push(opened.Value);
+				}
+
+				var next = LexingStream.NextToken();
+				if (!level.HasValue || Nesting.Count == level || next.Name == Grammar.EOF_TOKEN_NAME)
+					return next;
+			}
 		}
 
 		/// <summary>
@@ -227,6 +259,7 @@ namespace LandParserGenerator.Parsing.LL
 
 				/// Смещение для участка, подобранного как текст
 				int endOffset = token.EndOffset;
+				var anyLevel = Nesting.Count;
 
 				while (!tokensAfterText.Contains(token.Name)
 					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
@@ -235,7 +268,7 @@ namespace LandParserGenerator.Parsing.LL
 					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
 
-					token = LexingStream.NextToken();
+					token = GetNextToken(anyLevel);
 				}
 
 				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
@@ -284,6 +317,10 @@ namespace LandParserGenerator.Parsing.LL
 
 			if(currentNode != null)
 			{
+				/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
+				/// на котором раскрывали нетерминал
+				GetNextToken(NestingLevel[currentNode]);
+
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
 				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options);
 				anyNode.Value = currentNode.GetValue();

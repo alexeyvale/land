@@ -10,9 +10,7 @@ namespace LandParserGenerator.Lexing
 	{
 		private ILexer Lexer { get; set; }
 
-		private List<IToken> Tokens { get; set; } = new List<IToken>();
-
-		public int CurrentTokenIndex { get; private set; } = -1;
+		public List<IToken> Tokens { get; set; } = new List<IToken>();
 
 		public TokenStream(ILexer lexer, string text)
 		{
@@ -21,28 +19,15 @@ namespace LandParserGenerator.Lexing
 		}
 
 		/// <summary>
-		/// Переход к предыдущему токену
-		/// </summary>
-		/// <returns></returns>
-		public IToken PrevToken()
-		{
-			return Tokens[--CurrentTokenIndex];
-		}
-
-		/// <summary>
 		/// Переход к следующему токену потока
 		/// </summary>
 		/// <returns></returns>
 		public IToken NextToken()
 		{
-			++CurrentTokenIndex;
-
-			if(CurrentTokenIndex == Tokens.Count)
-			{
+			if(Tokens.Count == 0 || Tokens.Last().Name != Grammar.EOF_TOKEN_NAME)
 				Tokens.Add(Lexer.NextToken());
-			}
 
-			return Tokens[CurrentTokenIndex];
+			return Tokens[Tokens.Count - 1];
 		}
 
 		/// <summary>
@@ -51,26 +36,7 @@ namespace LandParserGenerator.Lexing
 		/// <returns></returns>
 		public IToken CurrentToken()
 		{
-			if (CurrentTokenIndex == Tokens.Count)
-			{
-				Tokens.Add(Lexer.NextToken());
-			}
-
-			return Tokens[CurrentTokenIndex];
-		}
-
-		/// <summary>
-		/// Переход к ранее прочитанному токену с заданным индексом
-		/// </summary>
-		public IToken BackToToken(int pos)
-		{
-			if (pos < Tokens.Count)
-			{
-				CurrentTokenIndex = pos;
-				return Tokens[pos];
-			}
-			else
-				return null;
+			return Tokens.LastOrDefault();
 		}
 	}
 }
