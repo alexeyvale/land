@@ -44,7 +44,7 @@ namespace LandParserGenerator.Lexing
 		/// Текущий токен потока
 		/// </summary>
 		/// <returns></returns>
-		public IToken CurrentToken { get { return Tokens.LastOrDefault(); } }
+		public IToken CurrentToken { get { return CurrentIndex >= 0 ? Tokens[CurrentIndex] : null; } }
 
 		public int CurrentIndex { get; private set; } = -1;
 

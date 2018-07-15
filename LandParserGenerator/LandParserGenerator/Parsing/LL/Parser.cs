@@ -77,13 +77,11 @@ namespace LandParserGenerator.Parsing.LL
 					/// Если текущий токен - признак пропуска символов, запускаем алгоритм
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
-						token = SkipAny(node);
+						token = SkipAny(node, true);
+
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
-						if (token.Name == Grammar.ERROR_TOKEN_NAME 
-							&& ErrorRecovery().Name == Grammar.ERROR_TOKEN_NAME)
-						{
+						if (token.Name == Grammar.ERROR_TOKEN_NAME)
 							break;
-						}
 					}
 					/// иначе читаем следующий токен
 					else
@@ -140,33 +138,18 @@ namespace LandParserGenerator.Parsing.LL
 				/// ни найти ветку правила для нетерминала на вершине стека
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					token = LexingStream.CurrentToken;
-					var message = Message.Error(
+					Log.Add(Message.Warning(
 						grammar.Tokens.ContainsKey(stackTop.Symbol) ?
-							$"Неожиданный символ {GetTokenInfoForMessage(token)}, ожидался символ {grammar.Userify(stackTop.Symbol)}" :
-							$"Неожиданный символ {GetTokenInfoForMessage(token)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
-						token.Line,
-						token.Column
-					);
+							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {grammar.Userify(stackTop.Symbol)}" :
+							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
+						LexingStream.CurrentToken.Line,
+						LexingStream.CurrentToken.Column
+					));
 
 					token = ErrorRecovery();
 
 					if (token.Name == Grammar.ERROR_TOKEN_NAME)
-					{
-						Log.Add(message);
 						break;
-					}
-					else
-					{
-						message.Type = MessageType.Warning;
-						Log.Add(message);
-
-						Log.Add(Message.Warning(
-							$"Разбор продолжен с токена {GetTokenInfoForMessage(token)}",
-							token.Line,
-							token.Column
-						));
-					}
 				}
 				/// Если непонятно, что делать с текущим токеном, и он конкретный
 				/// (не Any), заменяем его на Any
@@ -221,7 +204,7 @@ namespace LandParserGenerator.Parsing.LL
 		/// <returns>
 		/// Токен, найденный сразу после символа Any
 		/// </returns>
-		private IToken SkipAny(Node anyNode)
+		private IToken SkipAny(Node anyNode, bool enableRecovery)
 		{
 			var nestingCopy = new Stack<PairSymbol>(Nesting);
 			var tokenIndex = LexingStream.CurrentIndex;
@@ -281,15 +264,29 @@ namespace LandParserGenerator.Parsing.LL
 				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
 					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
 				{
-					Nesting = nestingCopy;
-					LexingStream.MoveTo(tokenIndex);
-
-					Log.Add(Message.Error(
+					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
-						null
-					));
+						token.Line,
+						token.Column
+					);
 
-					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					if (enableRecovery)
+					{
+						message.Type = MessageType.Warning;
+						Log.Add(message);
+
+						Nesting = nestingCopy;
+						LexingStream.MoveTo(tokenIndex);
+						anyNode.Parent.Children.Remove(anyNode);
+
+						return ErrorRecovery();
+					}
+					else
+					{
+						message.Type = MessageType.Error;
+						Log.Add(message);
+						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					}
 				}
 			}
 
@@ -298,6 +295,12 @@ namespace LandParserGenerator.Parsing.LL
 
 		private IToken ErrorRecovery()
 		{
+			Log.Add(Message.Warning(
+				$"Процесс восстановления запущен в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				LexingStream.CurrentToken.Line,
+				LexingStream.CurrentToken.Column
+			));
+
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Peek();
 			Stack.Pop();
@@ -336,7 +339,7 @@ namespace LandParserGenerator.Parsing.LL
 					anyNode.SetAnchor(currentNode.StartOffset.Value, currentNode.EndOffset.Value);
 
 				/// Пытаемся пропустить Any в этом месте
-				var token = SkipAny(anyNode);
+				var token = SkipAny(anyNode, false);
 
 				/// Если Any успешно пропустили и возобновили разбор,
 				/// возвращаем токен, с которого разбор продолжается
@@ -348,9 +351,20 @@ namespace LandParserGenerator.Parsing.LL
 					if (!String.IsNullOrEmpty(alternativeToApply.Alias))
 						currentNode.Alias = alternativeToApply.Alias;
 
+					Log.Add(Message.Warning(
+						$"Произведено восстановление на уровне {currentNode.Symbol}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
+						token.Line,
+						token.Column
+					));
+
 					return token;
 				}
 			}
+
+			Log.Add(Message.Error(
+				$"Не удалось продолжить разбор",
+				null
+			));
 
 			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 		}

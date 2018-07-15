@@ -25,13 +25,13 @@ namespace			=	'namespace' name '{' namespace_content '}'
 entity =
 		(MODIFIER|'extern')*
 		(
-		 	'enum' name Any '{' Any '}' ';'? 								=> enum |
-			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface |
-			type name?
+		 	'enum' name Any '{' Any '}' ';'? 								=> enum	|
+			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
+			type name
 			(
-		  		arguments Any (init_expression | ';' | block)	=> method |
-		  		(';'| init_value)		=> field  |
-		  		(block init_value? | init_expression)		=> property
+		  		arguments Any (init_expression | ';' | block)	=> method	|
+		  		(';'| init_value)								=> field	|
+		  		(block init_value? | init_expression)			=> property
 		  	)
 		) | Any
 
