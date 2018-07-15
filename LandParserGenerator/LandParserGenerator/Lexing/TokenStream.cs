@@ -10,7 +10,7 @@ namespace LandParserGenerator.Lexing
 	{
 		private ILexer Lexer { get; set; }
 
-		public List<IToken> Tokens { get; set; } = new List<IToken>();
+		private List<IToken> Tokens { get; set; } = new List<IToken>();
 
 		public TokenStream(ILexer lexer, string text)
 		{
@@ -24,19 +24,41 @@ namespace LandParserGenerator.Lexing
 		/// <returns></returns>
 		public IToken NextToken()
 		{
-			if(Tokens.Count == 0 || Tokens.Last().Name != Grammar.EOF_TOKEN_NAME)
-				Tokens.Add(Lexer.NextToken());
+			/// Если токен с нужным индексом ещё не считан
+			/// и последний считанный токен - не признак конца файла
+			if (CurrentIndex + 1 == Tokens.Count)
+			{
+				if (Tokens.Count == 0 || Tokens.Last().Name != Grammar.EOF_TOKEN_NAME)
+				{
+					++CurrentIndex;
+					Tokens.Add(Lexer.NextToken());
+				}
+			}
+			else
+				++CurrentIndex;
 
-			return Tokens[Tokens.Count - 1];
+			return Tokens[CurrentIndex];
 		}
 
 		/// <summary>
 		/// Текущий токен потока
 		/// </summary>
 		/// <returns></returns>
-		public IToken CurrentToken()
+		public IToken CurrentToken { get { return Tokens.LastOrDefault(); } }
+
+		public int CurrentIndex { get; private set; } = -1;
+
+		public IToken MoveTo(int idx)
 		{
-			return Tokens.LastOrDefault();
+			if (idx >= 0 && idx < Tokens.Count)
+			{
+				CurrentIndex = idx;
+				return Tokens[CurrentIndex];
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }

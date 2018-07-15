@@ -64,8 +64,8 @@ namespace LandParserGenerator.Parsing.LL
 
 				Log.Add(Message.Trace(
 					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}",
-					LexingStream.CurrentToken().Line, 
-					LexingStream.CurrentToken().Column
+					LexingStream.CurrentToken.Line, 
+					LexingStream.CurrentToken.Column
 				));
 
                 /// Если символ на вершине стека совпадает с текущим токеном
@@ -79,7 +79,8 @@ namespace LandParserGenerator.Parsing.LL
 					{
 						token = SkipAny(node);
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
-						if (token.Name == Grammar.ERROR_TOKEN_NAME)
+						if (token.Name == Grammar.ERROR_TOKEN_NAME 
+							&& ErrorRecovery().Name == Grammar.ERROR_TOKEN_NAME)
 						{
 							break;
 						}
@@ -139,7 +140,7 @@ namespace LandParserGenerator.Parsing.LL
 				/// ни найти ветку правила для нетерминала на вершине стека
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					token = LexingStream.CurrentToken();
+					token = LexingStream.CurrentToken;
 					var message = Message.Error(
 						grammar.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный символ {GetTokenInfoForMessage(token)}, ожидался символ {grammar.Userify(stackTop.Symbol)}" :
@@ -150,7 +151,7 @@ namespace LandParserGenerator.Parsing.LL
 
 					token = ErrorRecovery();
 
-					if (token == null)
+					if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					{
 						Log.Add(message);
 						break;
@@ -194,9 +195,9 @@ namespace LandParserGenerator.Parsing.LL
 		{
 			while(true)
 			{
-				if (LexingStream.CurrentToken() != null)
+				if (LexingStream.CurrentToken != null)
 				{
-					var token = LexingStream.CurrentToken();
+					var token = LexingStream.CurrentToken;
 					var closed = grammar.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
 
 					if (closed.Value != null && Nesting.Peek() == closed.Value)
@@ -222,7 +223,10 @@ namespace LandParserGenerator.Parsing.LL
 		/// </returns>
 		private IToken SkipAny(Node anyNode)
 		{
-			IToken token = LexingStream.CurrentToken();
+			var nestingCopy = new Stack<PairSymbol>(Nesting);
+			var tokenIndex = LexingStream.CurrentIndex;
+
+			IToken token = LexingStream.CurrentToken;
 			HashSet<string> tokensAfterText;
 
 			/// Если с Any не связана последовательность стоп-символов
@@ -277,6 +281,9 @@ namespace LandParserGenerator.Parsing.LL
 				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
 					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
 				{
+					Nesting = nestingCopy;
+					LexingStream.MoveTo(tokenIndex);
+
 					Log.Add(Message.Error(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
 						null
@@ -345,7 +352,7 @@ namespace LandParserGenerator.Parsing.LL
 				}
 			}
 
-			return null;
+			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 		}
 	}
 }

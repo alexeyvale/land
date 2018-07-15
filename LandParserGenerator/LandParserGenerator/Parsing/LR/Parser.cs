@@ -123,7 +123,7 @@ namespace LandParserGenerator.Parsing.LR
 				}
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					var errorToken = LexingStream.CurrentToken();
+					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
 						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						errorToken.Line,
@@ -183,7 +183,7 @@ namespace LandParserGenerator.Parsing.LR
 
 		private IToken SkipAny(Node anyNode)
 		{
-			var token = LexingStream.CurrentToken();
+			var token = LexingStream.CurrentToken;
 			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
 
 			/// Пока по Any нужно производить свёртки (ячейка таблицы непуста и нет конфликтов)
