@@ -1,12 +1,16 @@
 DIRECTIVE	: '#' ~[\n\r]*
 DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+
 COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
-STRING		: STRING_STD|STRING_VERB
-STRING_SKIP	: '\\"' | '\\\\'
-STRING_STD	: '"' (STRING_SKIP|.)*? '"'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
 STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
@@ -52,6 +56,7 @@ block		=	'{' Any '}'
 
 %%
 
+%parsing fragment STRING_INT_CODE
 %parsing ignoreundefined
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE

@@ -50,14 +50,11 @@ namespace LandParserGenerator.Parsing.Tree
 		[DataMember]
 		protected Location Anchor { get; set; }
 
-		[DataMember]
-		protected bool AnchorReady { get; set; }
-
 		public int? StartOffset
 		{
 			get
 			{
-				if (Anchor == null && !AnchorReady)
+				if (Anchor == null)
 					GetAnchorFromChildren();
 				return Anchor?.StartOffset;
 			}
@@ -66,7 +63,7 @@ namespace LandParserGenerator.Parsing.Tree
 		{
 			get
 			{
-				if (Anchor == null && !AnchorReady)
+				if (Anchor == null)
 					GetAnchorFromChildren();
 				return Anchor?.EndOffset;
 			}
@@ -89,8 +86,6 @@ namespace LandParserGenerator.Parsing.Tree
 						Anchor = Anchor.Merge(child.Anchor);
 				}
 			}
-
-			AnchorReady = true;
 		}
 
 		/// <summary>
@@ -115,23 +110,30 @@ namespace LandParserGenerator.Parsing.Tree
 		{
 			Children.Add(child);
 			child.Parent = this;
+			Anchor = null;
 		}
 
 		public void AddFirstChild(Node child)
 		{
 			Children.Insert(0, child);
 			child.Parent = this;
+			Anchor = null;
 		}
 
 		public void ResetChildren()
 		{
 			Children = new List<Node>();
+			Anchor = null;
+		}
+
+		public void Reset()
+		{
+			ResetChildren();
+			Value.Clear();
 		}
 
 		public void SetAnchor(int start, int end)
 		{
-			AnchorReady = true;
-
 			Anchor = new Location()
 			{
 				StartOffset = start,

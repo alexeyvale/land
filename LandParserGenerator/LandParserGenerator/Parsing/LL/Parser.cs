@@ -17,7 +17,14 @@ namespace LandParserGenerator.Parsing.LL
 		private Stack<Node> Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
+		/// <summary>
+		/// Стек открытых на момент прочтения последнего токена пар
+		/// </summary>
 		private Stack<PairSymbol> Nesting { get; set; }
+		/// <summary>
+		/// Уровень вложенности относительно описанных в грамматике пар,
+		/// на котором начался разбор нетерминала
+		/// </summary>
 		private Dictionary<Node, int> NestingLevel { get; set; }
 
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
@@ -37,13 +44,14 @@ namespace LandParserGenerator.Parsing.LL
 		/// </returns>
 		public override Node Parse(string text)
 		{
+			/// Логирование, статистика
 			Log = new List<Message>();
 			Statistics = new Statistics();
+			var parsingStarted = DateTime.Now;
 
+			/// Контроль вложенностей пар
 			Nesting = new Stack<PairSymbol>();
 			NestingLevel = new Dictionary<Node, int>();
-
-			var parsingStarted = DateTime.Now; 
 
             /// Готовим лексер и стеки
             LexingStream = new TokenStream(Lexer, text);
@@ -174,27 +182,37 @@ namespace LandParserGenerator.Parsing.LL
 			return root;
 		}
 
-		private IToken GetNextToken(int? level = null)
+		private IToken GetNextToken()
 		{
+			if (LexingStream.CurrentToken != null)
+			{
+				var token = LexingStream.CurrentToken;
+				var closed = grammar.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
+
+				if (closed.Value != null && Nesting.Peek() == closed.Value)
+					Nesting.Pop();
+
+				var opened = grammar.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
+
+				if (opened.Value != null)
+					Nesting.Push(opened.Value);
+			}
+
+			return LexingStream.NextToken();
+		}
+
+		private IToken GetNextToken(int level, out List<IToken> skipped)
+		{
+			skipped = new List<IToken>();
+
 			while(true)
 			{
-				if (LexingStream.CurrentToken != null)
-				{
-					var token = LexingStream.CurrentToken;
-					var closed = grammar.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
+				var next = GetNextToken();
 
-					if (closed.Value != null && Nesting.Peek() == closed.Value)
-						Nesting.Pop();
-
-					var opened = grammar.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
-
-					if (opened.Value != null)
-						Nesting.Push(opened.Value);
-				}
-
-				var next = LexingStream.NextToken();
-				if (!level.HasValue || Nesting.Count == level || next.Name == Grammar.EOF_TOKEN_NAME)
+				if (Nesting.Count == level || next.Name == Grammar.EOF_TOKEN_NAME)
 					return next;
+				else
+					skipped.Add(next);
 			}
 		}
 
@@ -255,7 +273,15 @@ namespace LandParserGenerator.Parsing.LL
 					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
 
-					token = GetNextToken(anyLevel);
+					token = GetNextToken(anyLevel, out List<IToken> skippedBuffer);
+
+					/// Если при пропуске до токена на том же уровне
+					/// пропустили токены с более глубокой вложенностью
+					if(skippedBuffer.Count > 0)
+					{
+						anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
+						endOffset = skippedBuffer.Last().EndOffset;
+					}
 				}
 
 				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
@@ -277,7 +303,9 @@ namespace LandParserGenerator.Parsing.LL
 
 						Nesting = nestingCopy;
 						LexingStream.MoveTo(tokenIndex);
-						anyNode.Parent.Children.Remove(anyNode);
+						anyNode.Reset();
+						///	Возвращаем узел обратно на стек
+						Stack.Push(anyNode);
 
 						return ErrorRecovery();
 					}
@@ -327,16 +355,31 @@ namespace LandParserGenerator.Parsing.LL
 
 			if(currentNode != null)
 			{
+				/// Запоминаем токен, на котором произошла ошибка
+				var errorToken = LexingStream.CurrentToken;
 				/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
 				/// на котором раскрывали нетерминал
-				GetNextToken(NestingLevel[currentNode]);
+				GetNextToken(NestingLevel[currentNode], out List<IToken> skippedBuffer);
+				/// Токен, на котором произошла ошибка, тоже считаем пропускаемым,
+				/// за счёт этого Any, на котором восстанавливаемся, всегда непусто
+				/// и алгоритм не зацикливается
+				skippedBuffer.Insert(0, errorToken);
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
 				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options);
+
 				anyNode.Value = currentNode.GetValue();
+				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
 				if (currentNode.StartOffset.HasValue)
 					anyNode.SetAnchor(currentNode.StartOffset.Value, currentNode.EndOffset.Value);
+				if (skippedBuffer.Count > 0)
+				{
+					anyNode.SetAnchor(
+						anyNode.StartOffset.HasValue ? anyNode.StartOffset.Value : skippedBuffer.First().StartOffset,
+						skippedBuffer.Last().EndOffset
+					);
+				}
 
 				/// Пытаемся пропустить Any в этом месте
 				var token = SkipAny(anyNode, false);
