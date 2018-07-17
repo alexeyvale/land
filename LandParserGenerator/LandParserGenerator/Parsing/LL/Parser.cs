@@ -273,14 +273,22 @@ namespace LandParserGenerator.Parsing.LL
 					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
 
-					token = GetNextToken(anyLevel, out List<IToken> skippedBuffer);
-
-					/// Если при пропуске до токена на том же уровне
-					/// пропустили токены с более глубокой вложенностью
-					if(skippedBuffer.Count > 0)
+					if (anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs))
 					{
-						anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
-						endOffset = skippedBuffer.Last().EndOffset;
+						token = GetNextToken();
+					}
+					else
+					{
+						List<IToken> skippedBuffer;
+						token = GetNextToken(anyLevel, out skippedBuffer);
+
+						/// Если при пропуске до токена на том же уровне
+						/// пропустили токены с более глубокой вложенностью
+						if (skippedBuffer.Count > 0)
+						{
+							anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
+							endOffset = skippedBuffer.Last().EndOffset;
+						}
 					}
 				}
 
@@ -333,6 +341,15 @@ namespace LandParserGenerator.Parsing.LL
 			var currentNode = Stack.Peek();
 			Stack.Pop();
 
+			/// Если произошла ошибка при пропуске Any и конфигурация ветки
+			/// может заставить нас повторно перейти на неё же при восстановлении,
+			/// переходим сразу к родителю родителя этого Any
+			if(currentNode.Symbol == Grammar.ANY_TOKEN_NAME 
+				&& currentNode.Parent.Children.Count == 1)
+			{
+				currentNode = currentNode.Parent.Parent;
+			}
+
 			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
 			/// для которого допустима альтернатива из одного Any
 			while (currentNode != null
@@ -359,7 +376,8 @@ namespace LandParserGenerator.Parsing.LL
 				var errorToken = LexingStream.CurrentToken;
 				/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
 				/// на котором раскрывали нетерминал
-				GetNextToken(NestingLevel[currentNode], out List<IToken> skippedBuffer);
+				List<IToken> skippedBuffer;
+				GetNextToken(NestingLevel[currentNode], out skippedBuffer);
 				/// Токен, на котором произошла ошибка, тоже считаем пропускаемым,
 				/// за счёт этого Any, на котором восстанавливаемся, всегда непусто
 				/// и алгоритм не зацикливается
