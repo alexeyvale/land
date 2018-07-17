@@ -58,7 +58,7 @@ namespace LandParserGenerator.Parsing.LL
 			Stack = new Stack<Node>();
 
 			/// Кладём на стек стартовый символ
-			var root = new Node(grammar.StartSymbol);
+			var root = new Node(GrammarObject.StartSymbol);
 			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
 
@@ -71,7 +71,7 @@ namespace LandParserGenerator.Parsing.LL
 				var stackTop = Stack.Peek();
 
 				Log.Add(Message.Trace(
-					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {grammar.Userify(stackTop.Symbol)}",
+					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
 					LexingStream.CurrentToken.Line, 
 					LexingStream.CurrentToken.Column
 				));
@@ -104,7 +104,7 @@ namespace LandParserGenerator.Parsing.LL
 				}
 
 				/// Если на вершине стека нетерминал, выбираем альтернативу по таблице
-				if (grammar[stackTop.Symbol] is NonterminalSymbol)
+				if (GrammarObject[stackTop.Symbol] is NonterminalSymbol)
 				{
 					var alternatives = Table[stackTop.Symbol, token.Name];
 					Alternative alternativeToApply = null;
@@ -113,7 +113,7 @@ namespace LandParserGenerator.Parsing.LL
 					if (alternatives.Count > 1)
 					{
 						Log.Add(Message.Error(
-							$"Неоднозначная грамматика: для нетерминала {grammar.Userify(stackTop.Symbol)} и входного символа {grammar.Userify(token.Name)} допустимо несколько альтернатив",
+							$"Неоднозначная грамматика: для нетерминала {GrammarObject.Userify(stackTop.Symbol)} и входного символа {GrammarObject.Userify(token.Name)} допустимо несколько альтернатив",
 							token.Line,
 							token.Column
 						));
@@ -147,9 +147,9 @@ namespace LandParserGenerator.Parsing.LL
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
 					Log.Add(Message.Warning(
-						grammar.Tokens.ContainsKey(stackTop.Symbol) ?
-							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {grammar.Userify(stackTop.Symbol)}" :
-							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => grammar.Userify(t.Key)))}",
+						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
+							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
+							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
 						LexingStream.CurrentToken.Line,
 						LexingStream.CurrentToken.Column
 					));
@@ -164,7 +164,7 @@ namespace LandParserGenerator.Parsing.LL
 				else
 				{
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
+					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
 						token = GetNextToken();
 					}
@@ -187,12 +187,12 @@ namespace LandParserGenerator.Parsing.LL
 			if (LexingStream.CurrentToken != null)
 			{
 				var token = LexingStream.CurrentToken;
-				var closed = grammar.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
+				var closed = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
 
 				if (closed.Value != null && Nesting.Peek() == closed.Value)
 					Nesting.Pop();
 
-				var opened = grammar.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
+				var opened = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
 
 				if (opened.Value != null)
 					Nesting.Push(opened.Value);
@@ -239,7 +239,7 @@ namespace LandParserGenerator.Parsing.LL
 					alt.Add(elem.Symbol);
 
 				/// Определяем множество токенов, которые могут идти после Any
-				tokensAfterText = grammar.First(alt);
+				tokensAfterText = GrammarObject.First(alt);
 				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
 				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
 
@@ -299,7 +299,7 @@ namespace LandParserGenerator.Parsing.LL
 					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
 				{
 					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {grammar.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => grammar.Userify(t))) }",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => GrammarObject.Userify(t))) }",
 						token.Line,
 						token.Column
 					);
@@ -353,8 +353,8 @@ namespace LandParserGenerator.Parsing.LL
 			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
 			/// для которого допустима альтернатива из одного Any
 			while (currentNode != null
-				&& (!grammar.Rules.ContainsKey(currentNode.Symbol)
-				|| !grammar.Rules[currentNode.Symbol].Alternatives.Any(a => a.Count == 1 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)))
+				&& (!GrammarObject.Rules.ContainsKey(currentNode.Symbol)
+				|| !GrammarObject.Rules[currentNode.Symbol].Alternatives.Any(a => a.Count == 1 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)))
 			{
 				if (currentNode.Parent != null)
 				{

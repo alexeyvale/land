@@ -11,7 +11,7 @@ namespace LandParserGenerator.Parsing
 {
 	public abstract class BaseParser
 	{
-		protected Grammar grammar { get; set; }
+		protected Grammar GrammarObject { get; set; }
 		protected ILexer Lexer { get; set; }
 
 		public Statistics Statistics { get; set; }
@@ -19,7 +19,7 @@ namespace LandParserGenerator.Parsing
 
 		public BaseParser(Grammar g, ILexer lexer)
 		{
-			grammar = g;
+			GrammarObject = g;
 			Lexer = lexer;
 		}
 
@@ -27,17 +27,17 @@ namespace LandParserGenerator.Parsing
 
 		protected void TreePostProcessing(Node root)
 		{
-			root.Accept(new PullAliasVisitor(grammar));
-			root.Accept(new GhostListOptionProcessingVisitor(grammar));
-			root.Accept(new LeafOptionProcessingVisitor(grammar));
-			root.Accept(new MergeAnyVisitor(grammar));
-			root.Accept(new MappingOptionsProcessingVisitor(grammar));
-			root.Accept(new UserifyVisitor(grammar));
+			root.Accept(new PullAliasVisitor(GrammarObject));
+			root.Accept(new GhostListOptionProcessingVisitor(GrammarObject));
+			root.Accept(new LeafOptionProcessingVisitor(GrammarObject));
+			root.Accept(new MergeAnyVisitor(GrammarObject));
+			root.Accept(new MappingOptionsProcessingVisitor(GrammarObject));
+			root.Accept(new UserifyVisitor(GrammarObject));
 		}
 
 		protected string GetTokenInfoForMessage(IToken token)
 		{
-			var userified = grammar.Userify(token.Name);
+			var userified = GrammarObject.Userify(token.Name);
 			if (userified == token.Name && token.Name != Grammar.ANY_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
 				return $"{token.Name}: '{token.Text}'";
 			else

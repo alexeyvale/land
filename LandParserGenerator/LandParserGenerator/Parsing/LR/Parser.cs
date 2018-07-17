@@ -46,7 +46,7 @@ namespace LandParserGenerator.Parsing.LR
 
 				if(token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(grammar)}",
+						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Line,
 						token.Column
 					));
@@ -108,7 +108,7 @@ namespace LandParserGenerator.Parsing.LR
 						);
 
 						Log.Add(Message.Trace(
-							$"Свёртка по правилу {grammar.Userify(reduce.ReductionAlternative)} -> {grammar.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
+							$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
 							token.Line,
 							token.Column
 						));
@@ -146,7 +146,7 @@ namespace LandParserGenerator.Parsing.LR
 				else
 				{
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (grammar.Options.IsSet(ParsingOption.SKIP, token.Name))
+					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.NextToken();
 					}
