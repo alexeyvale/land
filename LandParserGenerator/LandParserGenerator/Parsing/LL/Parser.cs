@@ -372,16 +372,21 @@ namespace LandParserGenerator.Parsing.LL
 
 			if(currentNode != null)
 			{
-				/// Запоминаем токен, на котором произошла ошибка
-				var errorToken = LexingStream.CurrentToken;
-				/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
-				/// на котором раскрывали нетерминал
 				List<IToken> skippedBuffer;
-				GetNextToken(NestingLevel[currentNode], out skippedBuffer);
-				/// Токен, на котором произошла ошибка, тоже считаем пропускаемым,
-				/// за счёт этого Any, на котором восстанавливаемся, всегда непусто
-				/// и алгоритм не зацикливается
-				skippedBuffer.Insert(0, errorToken);
+
+				if (Nesting.Count != NestingLevel[currentNode])
+				{
+					/// Запоминаем токен, на котором произошла ошибка
+					var errorToken = LexingStream.CurrentToken;
+					/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
+					/// на котором раскрывали нетерминал
+					GetNextToken(NestingLevel[currentNode], out skippedBuffer);
+					skippedBuffer.Insert(0, errorToken);
+				}
+				else
+				{
+					skippedBuffer = new List<IToken>();
+				}
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
 				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options);
