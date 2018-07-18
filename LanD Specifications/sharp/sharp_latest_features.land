@@ -64,4 +64,5 @@ block		=	'{' Any '}'
 %nodes ghost  names_list
 %nodes leaf name
 
-%mapping land namespace entity
+%mapping land namespace enum class_struct_interface method field property
+ 

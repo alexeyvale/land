@@ -359,10 +359,10 @@ namespace LandParserGenerator
 		{
 			Options.Set(option, symbols);
 
-			var errorSymbols = CheckIfNonterminals(symbols);
+			var errorSymbols = CheckIfNonterminals(symbols).Intersect(СheckIfAliases(symbols)).ToList();
 			if (errorSymbols.Count > 0)
 				throw new IncorrectGrammarException(
-					$"Символы '{String.Join("', '", errorSymbols)}' не определёны как нетерминальные"
+					$"Символы '{String.Join("', '", errorSymbols)}' не определены как нетерминальные или псевдонимы"
 				);
 		}
 
@@ -383,7 +383,7 @@ namespace LandParserGenerator
 					var errorSymbols = CheckIfTerminals(symbols);
 					if (errorSymbols.Count > 0)
 						throw new IncorrectGrammarException(
-							$"Символы '{String.Join("', '", errorSymbols)}' не определёны как терминальные"
+							$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
 						);
 					break;
 				default:
@@ -398,7 +398,7 @@ namespace LandParserGenerator
 			var errorSymbols = CheckIfSymbols(symbols);
 			if (errorSymbols.Count > 0)
 				throw new IncorrectGrammarException(
-					$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
+					$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
 				);
 		}
 
@@ -416,7 +416,7 @@ namespace LandParserGenerator
 				var errorSymbols = CheckIfSymbols(symbols);
 				if (errorSymbols.Count > 0)
 					throw new IncorrectGrammarException(
-						$"Символы '{String.Join("', '", errorSymbols)}' не определёны в грамматике"
+						$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
 					);
 			}
 		}
@@ -431,9 +431,16 @@ namespace LandParserGenerator
 			return symbols.Where(s => !this.Tokens.ContainsKey(s)).ToList();
 		}
 
+		private List<string> СheckIfAliases(params string[] symbols)
+		{
+			return symbols.Where(s => !this.Aliases.Any(a => a.Value.Contains(s))).ToList();
+		}
+
 		private List<string> CheckIfSymbols(params string[] symbols)
 		{
-			return CheckIfNonterminals(symbols).Intersect(CheckIfTerminals(symbols)).ToList();
+			return CheckIfNonterminals(symbols)
+				.Intersect(CheckIfTerminals(symbols))
+				.Intersect(СheckIfAliases(symbols)).ToList();
 		}
 
 		#endregion
