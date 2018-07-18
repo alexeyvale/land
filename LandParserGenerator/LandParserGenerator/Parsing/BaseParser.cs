@@ -27,7 +27,9 @@ namespace LandParserGenerator.Parsing
 
 		protected void TreePostProcessing(Node root)
 		{
-			root.Accept(new PullAliasVisitor(GrammarObject));
+			if (GrammarObject.Aliases.Count > 0)
+				root.Accept(new PullAliasVisitor(GrammarObject));
+
 			root.Accept(new GhostListOptionProcessingVisitor(GrammarObject));
 			root.Accept(new LeafOptionProcessingVisitor(GrammarObject));
 			root.Accept(new MergeAnyVisitor(GrammarObject));

@@ -19,8 +19,6 @@ namespace LandParserGenerator.Parsing.LR
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
 			Table = new TableLR1(g);
-
-
 		}
 
 		public override Node Parse(string text)

@@ -27,6 +27,8 @@ namespace LandParserGenerator.Parsing.LL
 		/// </summary>
 		private Dictionary<Node, int> NestingLevel { get; set; }
 
+		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
+
 		public Parser(Grammar g, ILexer lexer): base(g, lexer)
 		{
 			Table = new TableLL1(g);
@@ -52,9 +54,10 @@ namespace LandParserGenerator.Parsing.LL
 			/// Контроль вложенностей пар
 			Nesting = new Stack<PairSymbol>();
 			NestingLevel = new Dictionary<Node, int>();
+			PositionsWhereRecoveryStarted = new HashSet<int>();
 
-            /// Готовим лексер и стеки
-            LexingStream = new TokenStream(Lexer, text);
+			/// Готовим лексер и стеки
+			LexingStream = new TokenStream(Lexer, text);
 			Stack = new Stack<Node>();
 
 			/// Кладём на стек стартовый символ
@@ -331,6 +334,17 @@ namespace LandParserGenerator.Parsing.LL
 
 		private IToken ErrorRecovery()
 		{
+			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
+			{
+				Log.Add(Message.Error(
+					$"Возобновление разбора невозможно: восстановление в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
+					LexingStream.CurrentToken.Line,
+					LexingStream.CurrentToken.Column
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
+
 			Log.Add(Message.Warning(
 				$"Процесс восстановления запущен в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Line,
