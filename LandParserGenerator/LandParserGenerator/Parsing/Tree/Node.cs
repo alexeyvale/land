@@ -47,7 +47,6 @@ namespace LandParserGenerator.Parsing.Tree
 		[DataMember]
 		public LocalOptions Options { get; set; }
 
-		[DataMember]
 		protected Location Anchor { get; set; }
 
 		public int? StartOffset
