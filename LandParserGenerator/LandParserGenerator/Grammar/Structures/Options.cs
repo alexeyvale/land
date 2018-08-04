@@ -165,6 +165,17 @@ namespace LandParserGenerator
 		{
 			return AnyOptions.ContainsKey(anyOption) && AnyOptions[anyOption].Contains(smb);
 		}
+
+		public LocalOptions Clone()
+		{
+			return new LocalOptions()
+			{
+				IsLand = IsLand,
+				NodeOption = NodeOption,
+				Priority = Priority,
+				AnyOptions = new Dictionary<AnyOption, HashSet<string>>(AnyOptions)
+			};
+		}
 	}
 
 	public class ArgumentGroup

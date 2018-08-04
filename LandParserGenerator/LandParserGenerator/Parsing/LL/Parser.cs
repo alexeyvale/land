@@ -135,7 +135,7 @@ namespace LandParserGenerator.Parsing.LL
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
-							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options);
+							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
 
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
@@ -403,7 +403,7 @@ namespace LandParserGenerator.Parsing.LL
 				}
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
-				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options);
+				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
 
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
