@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 using Antlr4.Runtime;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
-	public class AntlrTokenAdapter: LandParserGenerator.Lexing.IToken
+	public class AntlrTokenAdapter: Lexing.IToken
 	{
 		private IToken Token { get; set; }
 		private Lexer Lexer { get; set; }
@@ -38,7 +38,7 @@ namespace LandParserGenerator
 		}
 	}
 
-	public class AntlrLexerAdapter: LandParserGenerator.Lexing.ILexer
+	public class AntlrLexerAdapter: Lexing.ILexer
 	{
 		private Lexer Lexer { get; set; }
 
@@ -65,14 +65,14 @@ namespace LandParserGenerator
 			Lexer = LexerConstructor(stream);
 		}
 
-		public LandParserGenerator.Lexing.IToken NextToken()
+		public Lexing.IToken NextToken()
 		{
 			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer);
 		}
 
-        public LandParserGenerator.Lexing.IToken CreateToken(string name)
+        public Land.Core.Lexing.IToken CreateToken(string name)
         {
-            return new LandParserGenerator.Lexing.StubToken(name);
+            return new Lexing.StubToken(name);
         }
     }
 }

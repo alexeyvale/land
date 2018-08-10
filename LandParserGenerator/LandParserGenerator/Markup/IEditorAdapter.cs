@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace LandParserGenerator.Markup
+namespace Land.Core.Markup
 {
     public interface IEditorAdapter
     {

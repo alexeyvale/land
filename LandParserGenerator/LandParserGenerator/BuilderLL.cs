@@ -6,10 +6,10 @@ using System.Diagnostics;
 
 using Microsoft.CSharp;
 
-using SpecParsing = LandParserGenerator.Builder;
-using LandParserGenerator.Parsing.LL;
+using SpecParsing = Land.Core.Builder;
+using Land.Core.Parsing.LL;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
 	public static class BuilderLL
 	{

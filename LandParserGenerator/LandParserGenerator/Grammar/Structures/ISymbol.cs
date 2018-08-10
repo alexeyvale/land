@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
 	public interface ISymbol
 	{

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator.Parsing.Tree
+namespace Land.Core.Parsing.Tree
 {
 	public class Location
 	{

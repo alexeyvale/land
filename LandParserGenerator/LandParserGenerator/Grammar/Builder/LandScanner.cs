@@ -37,7 +37,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using QUT.Gppg;
 
-namespace LandParserGenerator.Builder
+namespace Land.Core.Builder
 {   
     /// <summary>
     /// Summary Canonical example of GPLEX automaton

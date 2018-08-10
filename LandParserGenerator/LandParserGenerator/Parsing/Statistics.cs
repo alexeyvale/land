@@ -5,10 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Parsing.Tree;
-using LandParserGenerator.Lexing;
-
-namespace LandParserGenerator.Parsing
+namespace Land.Core.Parsing
 {
 	public class Statistics
 	{

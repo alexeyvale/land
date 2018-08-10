@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator.Lexing
+namespace Land.Core.Lexing
 {
 	public interface IToken
 	{

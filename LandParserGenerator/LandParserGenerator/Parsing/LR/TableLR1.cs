@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator.Parsing.LR
+namespace Land.Core.Parsing.LR
 {
 	/// <summary>
 	/// Таблица LR(1) парсинга

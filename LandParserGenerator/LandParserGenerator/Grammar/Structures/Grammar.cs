@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Parsing.LR;
+using Land.Core.Parsing.LR;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
 	public enum GrammarState { Unknown, Valid, Invalid }
 

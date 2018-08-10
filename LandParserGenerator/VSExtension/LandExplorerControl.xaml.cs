@@ -17,9 +17,9 @@ namespace Land.VSExtension
 
 	using Microsoft.Win32;
 
-	using LandParserGenerator;
-	using LandParserGenerator.Parsing.Tree;
-	using LandParserGenerator.Markup;
+	using Land.Core;
+	using Land.Core.Parsing.Tree;
+	using Land.Core.Markup;
 
 	/// <summary>
 	/// Interaction logic for LandExplorerControl.

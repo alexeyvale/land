@@ -17,9 +17,9 @@ using System.Globalization;
 using System.Text;
 using QUT.Gppg;
 using System.Linq;
-using LandParserGenerator;
+using Land.Core;
 
-namespace LandParserGenerator.Builder
+namespace Land.Core.Builder
 {
 public enum Tokens {error=2,EOF=3,OR=4,COLON=5,OPT_LPAR=6,
     ELEM_LPAR=7,LPAR=8,RPAR=9,COMMA=10,PROC=11,EQUALS=12,
@@ -75,7 +75,7 @@ public class ScanObj {
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
   // Verbatim content from ./Land.y - 14.07.2018 0:08:54
-    public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
+    public Parser(AbstractScanner<Land.Core.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();

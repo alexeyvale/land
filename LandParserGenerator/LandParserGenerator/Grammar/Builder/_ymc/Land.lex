@@ -5,7 +5,7 @@
 %using System.Linq;
 %using QUT.Gppg;
 
-%namespace LandParserGenerator.Builder
+%namespace Land.Core.Builder
 
 %option stack
 

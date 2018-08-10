@@ -5,10 +5,10 @@ using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Parsing.Tree;
-using LandParserGenerator.Lexing;
+using Land.Core.Parsing.Tree;
+using Land.Core.Lexing;
 
-namespace LandParserGenerator.Parsing.LR
+namespace Land.Core.Parsing.LR
 {
 	public class ParsingStack
 	{

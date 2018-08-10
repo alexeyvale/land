@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 using Microsoft.CSharp;
 
-using LandParserGenerator.Parsing.LR;
+using Land.Core.Parsing.LR;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
 	public static class BuilderLR
 	{

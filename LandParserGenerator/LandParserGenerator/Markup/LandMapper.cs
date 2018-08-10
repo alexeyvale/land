@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Parsing.Tree;
+using Land.Core.Parsing.Tree;
 
-namespace LandParserGenerator.Markup
+namespace Land.Core.Markup
 {
 	public class LandMapper
 	{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using QUT.Gppg;
 
-namespace LandParserGenerator
+namespace Land.Core
 {
 	public class Anchor
 	{

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using LandParserGenerator.Lexing;
-using LandParserGenerator.Parsing.Tree;
+using Land.Core.Lexing;
+using Land.Core.Parsing.Tree;
 
-namespace LandParserGenerator.Parsing
+namespace Land.Core.Parsing
 {
 	public class MappingOptionsProcessingVisitor : BaseVisitor
 	{

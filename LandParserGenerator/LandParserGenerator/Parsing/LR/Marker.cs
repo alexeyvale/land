@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LandParserGenerator.Parsing.LR
+namespace Land.Core.Parsing.LR
 {
 	public class Marker
 	{

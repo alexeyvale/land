@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 
-namespace LandParserGenerator.Parsing.Tree
+namespace Land.Core.Parsing.Tree
 {
 	[DataContract(IsReference = true)]
 	public class Node

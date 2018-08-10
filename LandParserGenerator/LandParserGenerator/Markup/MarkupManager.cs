@@ -6,9 +6,9 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization;
 
-using LandParserGenerator.Parsing.Tree;
+using Land.Core.Parsing.Tree;
 
-namespace LandParserGenerator.Markup
+namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
 	public class MarkupManager

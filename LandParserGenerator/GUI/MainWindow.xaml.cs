@@ -11,9 +11,9 @@ using System.IO;
 
 using Microsoft.Win32;
 
-using LandParserGenerator;
-using LandParserGenerator.Parsing.Tree;
-using LandParserGenerator.Markup;
+using Land.Core;
+using Land.Core.Parsing.Tree;
+using Land.Core.Markup;
 
 namespace Land.GUI
 {
@@ -29,7 +29,7 @@ namespace Land.GUI
 		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
 		private SegmentsHighlighter CurrentConcernColorizer { get; set; }
 
-		private LandParserGenerator.Parsing.BaseParser Parser { get; set; }
+		private Land.Core.Parsing.BaseParser Parser { get; set; }
 
 		public MainWindow()
 		{
@@ -261,7 +261,7 @@ namespace Land.GUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = lb.SelectedItem as LandParserGenerator.Message;
+				var msg = lb.SelectedItem as Land.Core.Message;
 				if (msg != null && msg.Location != null)
 				{
 					/// Если координаты не выходят за пределы файла, устанавливаем курсор в соответствии с ними, 
@@ -397,7 +397,7 @@ namespace Land.GUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = (LandParserGenerator.Message)lb.SelectedItem;
+				var msg = (Land.Core.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
 					var start = FileEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);

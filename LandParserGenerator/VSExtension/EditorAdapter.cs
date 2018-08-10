@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 
-using LandParserGenerator.Markup;
+using Land.Core.Markup;
 
 namespace Land.VSExtension
 {

@@ -8,11 +8,11 @@
 %}
 
 %using System.Linq;
-%using LandParserGenerator;
+%using Land.Core;
 
 %output = LandParser.cs
 
-%namespace LandParserGenerator.Builder
+%namespace Land.Core.Builder
 
 %union { 
 	public int intVal; 
