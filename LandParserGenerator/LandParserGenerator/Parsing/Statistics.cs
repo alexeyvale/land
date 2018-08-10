@@ -13,5 +13,10 @@ namespace LandParserGenerator.Parsing
 	public class Statistics
 	{
 		public TimeSpan TimeSpent { get; set; }
+
+		public override string ToString()
+		{
+			return $"Время парсинга: {TimeSpent.ToString(@"hh\:mm\:ss\:ff")}";
+		}
 	}
 }
