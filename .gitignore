@@ -10,3 +10,10 @@ LandParserGenerator/PackageTestGUI/bin/
 *.suo
 *.user
 LandParserGenerator/.vs/
+LandParserGenerator/GUI/bin/
+LandParserGenerator/GUI/obj/
+LandParserGenerator/VSExtension/bin/
+LandParserGenerator/VSExtension/obj/
+LandParserGenerator/CLI/obj/Debug/CLI.csproj.FileListAbsolute.txt
+LandParserGenerator/CLI/obj/
+LandParserGenerator/CLI/bin/

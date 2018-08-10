@@ -14,14 +14,15 @@ namespace LandParserGenerator
 
 	public enum AnyOption { Include, Except, Avoid, IgnorePairs }
 
+	[Serializable]
 	public class Grammar
 	{
+		[Serializable]
 		public class ElementQuantifierPair
 		{
 			public string Element { get; set; }
 			public Quantifier Quantifier { get; set; }
 		}
-
 
 		public GrammarType Type { get; private set; }
 

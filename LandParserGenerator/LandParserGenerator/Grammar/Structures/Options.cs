@@ -26,6 +26,7 @@ namespace LandParserGenerator
 	/// </summary>
 	public enum MappingOption { PRIORITY, LAND, BASEPRIORITY }
 
+	[Serializable]
 	public class OptionsManager
 	{
 		public const string GLOBAL_PARAMETERS_SYMBOL = "";
@@ -132,6 +133,7 @@ namespace LandParserGenerator
 		}
 	}
 
+	[Serializable]
 	public class LocalOptions
 	{
 		public NodeOption? NodeOption { get; set; } = null;

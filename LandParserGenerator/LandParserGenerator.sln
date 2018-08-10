@@ -5,7 +5,11 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandParserGenerator", "LandParserGenerator\LandParserGenerator.csproj", "{F1276A3B-A504-47A3-B858-8224EF265795}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestGUI", "TestGUI\TestGUI.csproj", "{8F271B4E-CC67-4661-B856-88ECA83464A4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{8F271B4E-CC67-4661-B856-88ECA83464A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSExtension", "VSExtension\VSExtension.csproj", "{5A8AA51F-418F-4ADD-B3B8-837FEC4A3CB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "CLI\CLI.csproj", "{454E1E2A-AA5A-40E7-8E9F-1F354B915A62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F271B4E-CC67-4661-B856-88ECA83464A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A8AA51F-418F-4ADD-B3B8-837FEC4A3CB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A8AA51F-418F-4ADD-B3B8-837FEC4A3CB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A8AA51F-418F-4ADD-B3B8-837FEC4A3CB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A8AA51F-418F-4ADD-B3B8-837FEC4A3CB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{454E1E2A-AA5A-40E7-8E9F-1F354B915A62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{454E1E2A-AA5A-40E7-8E9F-1F354B915A62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{454E1E2A-AA5A-40E7-8E9F-1F354B915A62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{454E1E2A-AA5A-40E7-8E9F-1F354B915A62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

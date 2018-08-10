@@ -11,6 +11,7 @@ namespace LandParserGenerator
 	/// </summary>
 	public enum Quantifier { ONE_OR_MORE, ZERO_OR_MORE, ZERO_OR_ONE }
 
+	[Serializable]
 	public class Entry
 	{
 		public string Symbol { get; set; }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
+	[Serializable]
 	public class NonterminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }

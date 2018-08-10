@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace LandParserGenerator
 {
+	[Serializable]
 	public class TerminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
