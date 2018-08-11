@@ -44,8 +44,6 @@
                                         <Separator></Separator>
                                         <Button Name="BuildParserButton" Click="BuildParserButton_Click">Сгенерировать парсер</Button>
                                         <Separator></Separator>
-                                        <!--<Button Name="TransformGrammarButton" Content="Преобразовать"  Click="TransformGrammarButton_Click"/>
-                                        <Separator></Separator>-->
                                         <ComboBox MinWidth="80" Name="LastGrammarFiles" ToolTip="Последние открытые грамматики" SelectionChanged="LastGrammarFiles_SelectionChanged"></ComboBox>
                                         <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLL" Content="LL" IsChecked="True" Margin="20,0,0,0"/>
                                         <RadioButton GroupName="ParsingTypeRadioButton" Name="ParsingLR" Content="LR" IsEnabled="False" />
