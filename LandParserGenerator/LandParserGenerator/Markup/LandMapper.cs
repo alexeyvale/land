@@ -22,20 +22,10 @@ namespace Land.Core.Markup
 
 		public void Remap(Node oldTree, Node newTree)
 		{
-			var visitor = new LandExplorerVisitor();
-			oldTree.Accept(visitor);
-			var oldLand = new Node(String.Empty, null);
-			oldLand.Children = visitor.HighLevelLand;
-
-			visitor = new LandExplorerVisitor();
-			newTree.Accept(visitor);
-			var newLand = new Node(String.Empty, null);
-			newLand.Children = visitor.HighLevelLand;
-
 			Mapping = new Dictionary<Node, Node>();
 			Similarities = new Dictionary<Node, Dictionary<Node, double>>();
 
-			Similarity(oldLand, newLand, Mapping);
+			Similarity(oldTree, newTree, Mapping);
 		}
 
 		/// Возвращаеть похожесть узлов, в mapping добавляет сопоставление их поддеревьев
