@@ -11,9 +11,12 @@ namespace Land.CLI
 {
 	class Program
 	{
+		private const string GenerateSyntax = "--generate <имя_файла_грамматики> [<имя_результирующего_файла>]";
+		private const string ParseSyntax = "--parse <имя_текстового_или_бинарного_файла_грамматики> <имя_разбираемого_файла> [<имя_файла_для_сохранения_дерева>]";
+
 		static void Main(string[] args)
 		{
-			if (args != null)
+			if (args != null && args.Length > 0)
 			{
 				switch (args[0])
 				{
@@ -29,9 +32,14 @@ namespace Land.CLI
 						Parse(grammarOrParserFileName, targetFileName, treeFileName);
 						break;
 					default:
-						Console.WriteLine($"Неизвестная команда {args[i]}");
+						Console.WriteLine($"Неизвестная команда {args[0]}");
 						return;
 				}
+			}
+			else
+			{
+				Console.WriteLine(GenerateSyntax);
+				Console.WriteLine(ParseSyntax);
 			}
 		}
 
@@ -42,7 +50,7 @@ namespace Land.CLI
 			/// Проверяем, есть ли файл грамматики
 			if (String.IsNullOrEmpty(grammarFileName))
 			{
-				Console.WriteLine($"Отсутствует обязательный аргумент команды. Корректный синтаксис: --generate <имя_файла_грамматики> [<имя_результирующего_файла>]");
+				Console.WriteLine($"Отсутствует обязательный аргумент команды. Корректный синтаксис: {GenerateSyntax}");
 				return null;
 			}
 			if (!File.Exists(grammarFileName))
@@ -52,7 +60,7 @@ namespace Land.CLI
 			}
 
 			/// Генерируем парсер
-			var log = new ();
+			var log = new List<Message>();
 			var parser = BuilderLL.BuildParser(File.ReadAllText(grammarFileName), log);
 
 			/// Проверяем, были ли ошибки при генерации
@@ -75,8 +83,7 @@ namespace Land.CLI
 		{
 			if(String.IsNullOrEmpty(grammarOrParserFileName) || String.IsNullOrEmpty(targetFileName))
 			{
-				Console.WriteLine($"Отсутствует обязательный аргумент команды. Корректный синтаксис:");
-				Console.WriteLine($"--parse <имя_текстового_или_бинарного_файла_грамматики> <имя_разбираемого_файла> [<имя_файла_для_сохранения_дерева>]");
+				Console.WriteLine($"Отсутствует обязательный аргумент команды. Корректный синтаксис:{Environment.NewLine}{ParseSyntax}");
 				return;
 			}
 
