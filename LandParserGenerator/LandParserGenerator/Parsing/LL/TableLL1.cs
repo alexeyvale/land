@@ -10,6 +10,7 @@ namespace Land.Core.Parsing.LL
 	/// <summary>
 	/// Таблица LL(1) парсинга
 	/// </summary>
+	[Serializable]
 	public class TableLL1: BaseTable
 	{
 		/// В ячейку таблицы альтернативы попадают в том порядке, в котором записаны в правиле

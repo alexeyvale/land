@@ -112,13 +112,22 @@ namespace Land.Core
 
 		public void AddAliases(string smb, HashSet<string> aliases)
 		{
+			var intersectionWithSymbols = aliases.Intersect(Rules.Keys.Union(Tokens.Keys)).ToList();
+
+			if(intersectionWithSymbols.Count > 0)
+			{
+				throw new IncorrectGrammarException(
+						$"Среди псевдонимов нетерминала {smb} присутствуют символы, определённые как терминалы или нетерминалы: {String.Join(", ", intersectionWithSymbols)}"
+					);
+			}
+
 			foreach(var kvp in Aliases)
 			{
-				var intersection = kvp.Value.Intersect(aliases).ToList();
+				var intersectionWithAliases = kvp.Value.Intersect(aliases).ToList();
 
-				if(intersection.Count > 0)
+				if(intersectionWithAliases.Count > 0)
 					throw new IncorrectGrammarException(
-						$"Нетерминалы {smb} и {kvp.Key} имеют общие псевдонимы: {String.Join(", ", intersection)}"
+						$"Нетерминалы {smb} и {kvp.Key} имеют общие псевдонимы: {String.Join(", ", intersectionWithAliases)}"
 					);
 			}
 
@@ -153,6 +162,11 @@ namespace Land.Core
 			if (Pairs.ContainsKey(name))
 			{
 				return $"Повторное определение: символ {name} определён как пара";
+			}
+
+			if (Aliases.Any(p=>p.Value.Contains(name)))
+			{
+				return $"Повторное определение: символ {name} определён как псевдоним";
 			}
 
 			return String.Empty;

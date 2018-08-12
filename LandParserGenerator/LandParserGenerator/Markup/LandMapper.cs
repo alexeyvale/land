@@ -35,13 +35,15 @@ namespace Land.Core.Markup
 			if (a.Symbol != b.Symbol)
 				return 0;
 
+			var coefficient = a.Alias == b.Alias ? 1 : 0.8;
+
 			/// Если узлы - листья, смотрим на похожесть содержимого
 			if (a.Value.Count > 0 || b.Value.Count > 0)
-				return Levenshtein(a.Value, b.Value);
+				return coefficient * Levenshtein(a.Value, b.Value);
 
 			/// Если у обоих узлов нет детей - совпадают полностью
 			if (a.Children.Count == 0 && a.Children.Count == 0)
-				return 1;
+				return coefficient;
 
 			/// Если же у одного есть, у другого нет - не совпадают
 			if (a.Children.Count == 0 ^ a.Children.Count == 0)
@@ -94,7 +96,7 @@ namespace Land.Core.Markup
 					}
 				}
 
-			return rawSimilarity / a.Children.Sum(c=>c.Options.Priority.Value);
+			return coefficient * rawSimilarity / a.Children.Sum(c=>c.Options.Priority.Value);
 		}
 
 		///  Похожесть на основе расстояния Левенштейна
