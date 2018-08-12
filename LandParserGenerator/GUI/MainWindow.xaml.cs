@@ -1458,7 +1458,63 @@ namespace Land.GUI
 
 		private void SaveDocumentButton_Click(object sender, RoutedEventArgs e)
 		{
+			var activeTab = (TabItem)DocumentTabs.SelectedItem;
 
+			if (activeTab != null)
+			{
+				if (!File.Exists(Documents[activeTab].DocumentName))
+				{
+					var saveFileDialog = new SaveFileDialog();
+					if (saveFileDialog.ShowDialog() == true)
+					{
+						File.WriteAllText(saveFileDialog.FileName, Documents[activeTab].Editor.Text);
+						Documents[activeTab].DocumentName = saveFileDialog.FileName;
+						activeTab.Header = Path.GetFileName(saveFileDialog.FileName);
+					}
+				}
+				else
+				{
+					File.WriteAllText(
+						Documents[activeTab].DocumentName, 
+						Documents[activeTab].Editor.Text
+					);
+				}
+			}
+		}
+
+		private void CloseDocumentButton_Click(object sender, RoutedEventArgs e)
+		{
+			var activeTab = (TabItem)DocumentTabs.SelectedItem;
+
+			if (activeTab != null)
+			{
+				/// Если файла для закрываемого таба не существует, и закрываемый текст непуст
+				if ((String.IsNullOrEmpty(Documents[activeTab].DocumentName) 
+					|| !File.Exists(Documents[activeTab].DocumentName)) 
+					&& !String.IsNullOrEmpty(Documents[activeTab].Editor.Text)
+					/// или если файл существует и его текст не совпадает с текстом в табе
+					|| !String.IsNullOrEmpty(Documents[activeTab].DocumentName) 
+					&& File.Exists(Documents[activeTab].DocumentName) 
+					&& File.ReadAllText(Documents[activeTab].DocumentName) != Documents[activeTab].Editor.Text)
+				{
+					switch (MessageBox.Show(
+						"В файле имеются несохранённые изменения. Сохранить текущую версию?",
+						"Предупреждение",
+						MessageBoxButton.YesNoCancel,
+						MessageBoxImage.Question))
+					{
+						case MessageBoxResult.Yes:
+							SaveDocumentButton_Click(null, null);
+							break;
+						case MessageBoxResult.No:
+							break;
+						case MessageBoxResult.Cancel:
+							return;
+					}
+				}
+
+				DocumentTabs.Items.Remove(activeTab);
+			}
 		}
 
 		private void OpenDocumentButton_Click(object sender, RoutedEventArgs e)

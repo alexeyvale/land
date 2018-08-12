@@ -39,15 +39,16 @@
                 <Button Name="NewConcernMarkup" Content="&#xf15b;" ToolTip="Новая разметка" Click="NewConcernMarkup_Click"></Button>
                 <Button Name="LoadConcernMarkup" Content="&#xf07c;" ToolTip="Загрузить разметку" Click="LoadConcernMarkup_Click"></Button>
                 <Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" Click="SaveConcernMarkup_Click"></Button>
-                <Separator></Separator>
+                <Separator Margin="10"></Separator>
                 <Button Name="AddConcernPoint" Content="&#xf067;" ToolTip="Добавить точку" Click="AddConcernPoint_Click"></Button>
                 <Button Name="AddConcernFolder" Content="&#xf0fe;" ToolTip="Добавить каталог" Click="AddConcernFolder_Click"></Button>
                 <Button Name="AddAllLand" Content="&#xf0e8;" ToolTip="Добавить все" Click="AddAllLandButton_Click"></Button>
                 <Button Name="DeleteConcernPoint" Content="&#xf2ed;" ToolTip="Удалить" Click="DeleteConcernPoint_Click"></Button>
-                <Separator></Separator>
+                <Separator Margin="10"></Separator>
                 <Button Name="HighlightConcernsButton" Content="&#xf1fc;" ToolTip="Выделить все функциональности" Click="HighlightConcerns_Click"></Button>
-                <Separator></Separator>
+                <Separator Margin="10"></Separator>
                 <Button Name="ApplyMapping" Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
+                <Button Name="Settings" Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
             </ToolBar>
             <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
                 SelectedItemChanged="MarkupTreeView_SelectedItemChanged"  

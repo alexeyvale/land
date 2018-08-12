@@ -141,8 +141,11 @@ namespace MarkupControl
 
 		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			var node = (Node)ConcernPointCandidatesList.SelectedItem;
-			Editor.SetActiveDocumentAndOffset(State.DocumentForCurrentCandidates, node.StartOffset.Value);
+			if (ConcernPointCandidatesList.SelectedItem != null)
+			{
+				var node = (Node)ConcernPointCandidatesList.SelectedItem;
+				Editor.SetActiveDocumentAndOffset(State.DocumentForCurrentCandidates, node.StartOffset.Value);
+			}
 		}
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
@@ -245,6 +248,8 @@ namespace MarkupControl
 			if (saveFileDialog.ShowDialog() == true)
 			{
 				MarkupManager.Serialize(saveFileDialog.FileName, MarkupManager);
+
+
 			}
 		}
 
@@ -475,6 +480,11 @@ namespace MarkupControl
 			//	if (label != null)
 			//		label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
 			//}
+		}
+
+		private void Settings_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 
 		#region methods
