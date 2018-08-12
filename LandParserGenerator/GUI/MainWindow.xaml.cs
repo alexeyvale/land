@@ -11,6 +11,8 @@ using System.IO;
 
 using Microsoft.Win32;
 
+using ICSharpCode.AvalonEdit;
+
 using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
@@ -64,6 +66,12 @@ namespace Land.GUI
 			}
 
 			MarkupTreeView.ItemsSource = Markup.Markup;
+
+			LandExplorer.Initialize(new EditorAdapter(this), new Dictionary<string, string>()
+			{
+				{ ".cs", "../../../../Land Specifications/sharp/sharp_latest_features.land" },
+				{ ".y", "../../../../Land Specifications/yacc/yacc.land" }
+			});
 
 			InitPackageParsing();
 		}
@@ -696,14 +704,16 @@ namespace Land.GUI
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				if (Markup.AstRoot == null)
+				var documentName = (string)TestFileName.Content;
+
+				if (!Markup.AstRoots.ContainsKey(documentName))
 				{
-					Markup.AstRoot = TreeRoot;
+					Markup.AstRoots[documentName] = TreeRoot;
 				}
 
 				var concern = MarkupTreeView.SelectedItem as Concern;
 				
-				Markup.Add(new ConcernPoint((Node)ConcernPointCandidatesList.SelectedItem, concern));
+				Markup.Add(new ConcernPoint(documentName, (Node)ConcernPointCandidatesList.SelectedItem, concern));
 			}
 		}
 
@@ -750,9 +760,11 @@ namespace Land.GUI
 		{
 			if (TreeRoot != null)
 			{
-				if (Markup.AstRoot == null)
+				var documentName = (string)TestFileName.Content;
+
+				if (!Markup.AstRoots.ContainsKey(documentName))
 				{
-					Markup.AstRoot = TreeRoot;
+					Markup.AstRoots[documentName] = TreeRoot;
 				}
 
 				var visitor = new LandExplorerVisitor();
@@ -775,7 +787,7 @@ namespace Land.GUI
 						Markup.Add(subconcern);
 
 						foreach (var point in subgroup)
-							Markup.Add(new ConcernPoint(point, subconcern));
+							Markup.Add(new ConcernPoint(documentName, point, subconcern));
 					}
 
 					/// Остальные добавляются напрямую к функциональности, соответствующей символу
@@ -783,17 +795,19 @@ namespace Land.GUI
 						.SelectMany(s => s).ToList();
 
 					foreach (var point in points)
-						Markup.Add(new ConcernPoint(point, concern));
+						Markup.Add(new ConcernPoint(documentName, point, concern));
 				}
 			}
 		}
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
-			if (Markup.AstRoot != null && TreeRoot != null)
+			var documentName = (string)TestFileName.Content;
+
+			if (Markup.AstRoots.ContainsKey(documentName) && TreeRoot != null)
 			{
-				Mapper.Remap(Markup.AstRoot, TreeRoot);
-				Markup.Remap(TreeRoot, Mapper.Mapping);
+				Mapper.Remap(Markup.AstRoots[documentName], TreeRoot);
+				Markup.Remap(documentName, TreeRoot, Mapper.Mapping);
 			}
 		}
 
@@ -1371,7 +1385,7 @@ namespace Land.GUI
 					/// Если текст распарсился, ищем отображение из старого текста в новый
 					if (noErrors)
 					{
-						Mapper.Remap(Markup.AstRoot, NewTreeRoot);
+						Mapper.Remap(Markup.AstRoots.Single().Value, NewTreeRoot);
 						NewTextChanged = false;
 					}
 				}
@@ -1409,5 +1423,76 @@ namespace Land.GUI
 
 		#endregion
 
+		#region Тестирование панели разметки
+
+		public class DocumentTab
+		{
+			public TextEditor Editor { get; set; }
+
+			public string DocumentName { get; set; }
+		}
+
+		public Dictionary<TabItem, DocumentTab> Documents { get; set; } = new Dictionary<TabItem, DocumentTab>();
+
+		private void NewDocumentButton_Click(object sender, RoutedEventArgs e)
+		{
+			var tab = new TabItem();
+
+			Documents[tab] = new DocumentTab()
+			{
+				DocumentName = "Тест",
+				Editor = new TextEditor()
+				{
+					ShowLineNumbers = true,
+					FontSize = 16,
+					FontFamily = new FontFamily("Consolas")
+				}
+			};
+
+			DocumentTabs.Items.Add(tab);
+			tab.Content = Documents[tab].Editor;
+			tab.Header = Documents[tab].DocumentName;
+
+			DocumentTabs.SelectedItem = tab;
+		}
+
+		private void SaveDocumentButton_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void OpenDocumentButton_Click(object sender, RoutedEventArgs e)
+		{
+			var openFileDialog = new OpenFileDialog();
+			if (openFileDialog.ShowDialog() == true)
+			{
+				var stream = new StreamReader(openFileDialog.FileName, Encoding.Default, true);
+
+				var tab = new TabItem();
+
+				Documents[tab] = new DocumentTab()
+				{
+					DocumentName = openFileDialog.FileName,
+					Editor = new TextEditor()
+					{
+						ShowLineNumbers = true,
+						FontSize = 16,
+						FontFamily = new FontFamily("Consolas"),
+						Text = stream.ReadToEnd(),
+						Encoding = stream.CurrentEncoding
+					}
+				};
+
+				stream.Close();
+
+				DocumentTabs.Items.Add(tab);
+				tab.Content = Documents[tab].Editor;
+				tab.Header = Path.GetFileName(Documents[tab].DocumentName);
+
+				DocumentTabs.SelectedItem = tab;
+			}
+		}
+
+		#endregion
 	}
 }

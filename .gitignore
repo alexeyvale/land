@@ -17,3 +17,5 @@ LandParserGenerator/VSExtension/obj/
 LandParserGenerator/CLI/obj/Debug/CLI.csproj.FileListAbsolute.txt
 LandParserGenerator/CLI/obj/
 LandParserGenerator/CLI/bin/
+LandParserGenerator/MarkupControl/bin/
+LandParserGenerator/MarkupControl/obj/

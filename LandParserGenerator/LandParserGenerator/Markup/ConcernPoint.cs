@@ -11,14 +11,23 @@ namespace Land.Core.Markup
 	[DataContract(IsReference=true)]
 	public class ConcernPoint: MarkupElement
 	{
-		[DataMember]
-		public Node TreeNode { get; set; }
+		private Node _treeNode = null;
 
-		[DataMember]
-		public int TreeNodeId { get; set; }
-
-		public ConcernPoint(Node node, Concern parent = null)
+		public Node TreeNode
 		{
+			get { return _treeNode; }
+			set { _treeNode = value; TreeNodeId = value?.Id; }
+		}
+
+		[DataMember]
+		public int? TreeNodeId { get; set; }
+
+		[DataMember]
+		public string FileName { get; set; }
+
+		public ConcernPoint(string fileName, Node node, Concern parent = null)
+		{
+			FileName = fileName;
 			TreeNode = node;
 			Parent = parent;
 			Name = String.IsNullOrEmpty(node.Alias) ? node.Symbol : node.Alias;
@@ -35,9 +44,10 @@ namespace Land.Core.Markup
 			}
 		}
 
-		public ConcernPoint(string name, Node node, Concern parent = null)
+		public ConcernPoint(string name, string fileName, Node node, Concern parent = null)
 		{
 			Name = name;
+			FileName = fileName;
 			TreeNode = node;
 			Parent = parent;
 		}

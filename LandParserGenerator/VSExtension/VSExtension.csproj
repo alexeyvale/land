@@ -53,9 +53,6 @@
   <ItemGroup>
     <Compile Include="LandExplorer.cs" />
     <Compile Include="LandExplorerCommand.cs" />
-    <Compile Include="LandExplorerControl.xaml.cs">
-      <DependentUpon>LandExplorerControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LandExplorerPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EditorAdapter.cs" />
@@ -63,8 +60,6 @@
   <ItemGroup>
     <None Include="Key.snk" />
     <None Include="packages.config" />
-    <None Include="Resources\Font-Awesome-5-Regular-400.otf" />
-    <None Include="Resources\Font-Awesome-5-Solid-900.otf" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -77,12 +72,6 @@
     <Content Include="Resources\LandExplorerCommand.png" />
     <Content Include="Resources\LandExplorerPackage.ico" />
     <Content Include="stylesheet.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="LandExplorerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -202,6 +191,10 @@
     <ProjectReference Include="..\LandParserGenerator\LandParserGenerator.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MarkupControl\MarkupControl.csproj">
+      <Project>{2bfdcbe8-7eb3-4b9f-afeb-5ef2b2495aa7}</Project>
+      <Name>MarkupControl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

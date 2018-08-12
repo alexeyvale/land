@@ -7,6 +7,21 @@ using System.Runtime.Serialization;
 
 namespace Land.Core.Parsing.Tree
 {
+	public class NodeGenerator
+	{
+		public int NodesCreated { get; private set; } = 0;
+
+		public Node CreateNode(string symbol, LocalOptions opts = null)
+		{
+			return new Node()
+			{
+				Symbol = symbol,
+				Options = opts ?? new LocalOptions(),
+				Id = NodesCreated++
+			};
+		}
+	}
+
 	[DataContract(IsReference = true)]
 	public class Node
 	{
@@ -46,6 +61,8 @@ namespace Land.Core.Parsing.Tree
 		/// </summary>
 		[DataMember]
 		public LocalOptions Options { get; set; }
+
+		public int Id { get; set; }
 
 		protected Location Anchor { get; set; }
 
@@ -97,12 +114,6 @@ namespace Land.Core.Parsing.Tree
 				return new List<string>(Value);
 
 			return Children.SelectMany(c => c.GetValue()).ToList();
-		}
-
-		public Node(string smb, LocalOptions opts = null)
-		{
-			Symbol = smb;
-			Options = opts ?? new LocalOptions();
 		}
 
 		public void AddLastChild(Node child)

@@ -16,13 +16,12 @@ namespace Land.Core.Markup
 		[DataMember]
 		public ObservableCollection<MarkupElement> Markup { get; set; } = new ObservableCollection<MarkupElement>();
 
-		[DataMember]
-		public Node AstRoot { get; set; } = null;
+		public Dictionary<string, Node> AstRoots { get; set; } = new Dictionary<string, Node>();
 
 		public void Clear()
 		{
 			Markup.Clear();
-			AstRoot = null;
+			AstRoots.Clear();
 		}
 
 		public void Remove(MarkupElement elem)
@@ -41,9 +40,9 @@ namespace Land.Core.Markup
 				elem.Parent.Elements.Add(elem);
 		}
 
-		public void Remap(Node newRoot, Dictionary<Node, Node> mapping)
+		public void Remap(string fileName, Node newRoot, Dictionary<Node, Node> mapping)
 		{
-			AstRoot = newRoot;
+			AstRoots[fileName] = newRoot;
 
 			var visitor = new MarkupRemapVisitor(mapping);
 			for (int i = 0; i < Markup.Count; ++i)

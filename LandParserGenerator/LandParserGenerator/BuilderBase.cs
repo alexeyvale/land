@@ -57,7 +57,7 @@ namespace Land.Core
 			{
 				FileName = "cmd.exe",
 				Arguments = $"/C java -jar \"../../../components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
-				WindowStyle = ProcessWindowStyle.Hidden,
+				CreateNoWindow = true,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false

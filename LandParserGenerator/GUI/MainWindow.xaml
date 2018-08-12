@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TestGUI"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+        xmlns:landcontrol="clr-namespace:MarkupControl;assembly=MarkupControl"
         mc:Ignorable="d"
         Title="LanD Test IDE" Height="500" Width="800"
         Closed="Window_Closed"
@@ -13,11 +14,11 @@
 
     <Grid>
         <TabControl SelectionChanged="MainPerspectiveTabs_SelectionChanged" Name="MainPerspectiveTabs">
-            <TabItem Header="Парсинг и разметка">
+            <TabItem Header="Парсинг">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="30*"></ColumnDefinition>
-						<ColumnDefinition Width="5"></ColumnDefinition>
+                        <ColumnDefinition Width="5"></ColumnDefinition>
                         <ColumnDefinition Width="70*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
@@ -179,7 +180,7 @@
                         </TabItem>
                     </TabControl>
 
-					<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
                     <TabControl Grid.Column="0">
                         <TabItem Header="AST">
@@ -298,6 +299,60 @@
                             </Grid>
                         </TabItem>
                     </TabControl>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Разметка">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30*"></ColumnDefinition>
+                        <ColumnDefinition Width="5"></ColumnDefinition>
+                        <ColumnDefinition Width="70*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"></RowDefinition>
+                            <RowDefinition Height="65*"></RowDefinition>
+                            <RowDefinition Height="5"></RowDefinition>
+                            <RowDefinition Height="35*"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <ToolBar Grid.Row="0">
+                            <Button Name="NewDocumentButton" Content="Новый" Click="NewDocumentButton_Click"/>
+                            <Separator></Separator>
+                            <Button Name="OpenDocumentButton" Content="Открыть" Click="OpenDocumentButton_Click"/>
+                            <Separator></Separator>
+                            <Button Name="SaveDocumentButton" Content="Сохранить" Click="SaveDocumentButton_Click"/>
+                        </ToolBar>
+
+                        <TabControl Grid.Row="1" Name="DocumentTabs" Background="WhiteSmoke">
+                        </TabControl>
+
+                        <GridSplitter Grid.Row="2" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
+                        <TabControl Grid.Row="3" Name="MarkupTestOutputTabs">
+                            <TabItem Name="MarkupTestLogTab">
+                                <TabItem.Header>Лог</TabItem.Header>
+                                <ListBox
+                                    Name="MarkupTestLog"
+                                    MouseDoubleClick="TestFileListBox_MouseDoubleClick"
+                                    FontSize="14pt">
+                                </ListBox>
+                            </TabItem>
+                            <TabItem Name="MarkupTestErrorsTab">
+                                <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
+                                <ListBox
+                                    Name="MarkupTestErrors"
+                                    MouseDoubleClick="TestFileListBox_MouseDoubleClick"
+                                    FontSize="14pt">
+                                </ListBox>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+
+                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+
+                    <landcontrol:MarkupControl Name="LandExplorer"  Grid.Column="0"></landcontrol:MarkupControl>
                 </Grid>
             </TabItem>
             <TabItem Header="Тестирование перепривязки" Name="MappingDebugTab">
