@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using MarkupControl;
+using Land.Control;
 
 namespace Land.VSExtension
 {
@@ -35,7 +35,7 @@ namespace Land.VSExtension
 		{
 			this.Caption = "LandExplorer";
 
-			var control = new MarkupControl.MarkupControl();
+			var control = new LandExplorerControl();
 			control.Initialize(new EditorAdapter(), new Dictionary<string, string>());
 
 			this.Content = control;

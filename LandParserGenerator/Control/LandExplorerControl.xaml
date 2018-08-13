@@ -1,0 +1,129 @@
+﻿<UserControl x:Class="Land.Control.LandExplorerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Land.Control"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="300"
+			 x:Name="LandExplorer">
+    <UserControl.Resources>
+        <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
+        <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
+    </UserControl.Resources>
+	<UserControl.CommandBindings>
+		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
+		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+
+		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Rename" Executed="Command_Rename_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+	</UserControl.CommandBindings>
+	<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75*"></RowDefinition>
+            <RowDefinition Height="5"></RowDefinition>
+            <RowDefinition Height="25*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"></RowDefinition>
+                <RowDefinition Height="100*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <ToolBar Grid.Row="0">
+                <ToolBar.Resources>
+                    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="{x:Type Button}">
+                        <Setter Property="FontSize" Value="12pt"/>
+                        <Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+                        <Setter Property="Foreground" Value="DarkBlue"/>
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Setter Property="Margin" Value="2,0,2,0"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="DarkGray"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToolBar.Resources>
+				
+				<Button Name="NewConcernMarkup" Content="&#xf15b;" ToolTip="Новая разметка" 
+						Command="ApplicationCommands.New" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Name="LoadConcernMarkup" Content="&#xf07c;" ToolTip="Загрузить разметку" 
+						Command="ApplicationCommands.Open" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" 
+						Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				
+                <Separator Margin="5"></Separator>
+				
+				<Button Content="&#xf067;" ToolTip="Добавить точку привязки" 
+						Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf0fe;" ToolTip="Добавить функциональность" 
+						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
+						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf2ed;" ToolTip="Удалить" 
+						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				
+                <Separator Margin="5"></Separator>
+				
+                <Button Content="&#xf1fc;" ToolTip="Выделить все функциональности" Click="HighlightConcerns_Click"></Button>
+                <Separator Margin="5"></Separator>
+                <Button Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
+                <Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
+            </ToolBar>
+            <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
+                SelectedItemChanged="MarkupTreeView_SelectedItemChanged"  
+                PreviewMouseLeftButtonDown="MarkupTreeView_MouseLeftButtonDown"
+                MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
+                PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
+                DragOver="MarkupTreeView_DragOver"
+                Drop="MarkupTreeView_Drop"
+                MouseMove="MarkupTreeView_MouseMove">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
+                        <StackPanel Orientation="Horizontal">
+                            <Grid>
+                                <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
+                                <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
+                            </Grid>
+                            <Grid>
+                                <TextBlock Text="{Binding Path=Name}" />
+                                <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
+                            </Grid>
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+									<MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Rename" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
+								</ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+				<TreeView.ItemContainerStyle>
+					<Style TargetType="{x:Type TreeViewItem}">
+						<EventSetter Event="Expanded" Handler="MarkupTreeViewItem_Expanded"/>
+						<EventSetter Event="Collapsed" Handler="MarkupTreeViewItem_Collapsed"/>
+						<EventSetter Event="GotFocus" Handler="MarkupTreeViewItem_GotFocus" />
+						<EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
+						<EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
+						<EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
+						<EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
+					</Style>
+				</TreeView.ItemContainerStyle>
+			</TreeView>
+        </Grid>
+        <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
+        <ListBox
+            Grid.Row="2"
+            FontSize="12pt"
+            Name="ConcernPointCandidatesList"
+            SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
+            MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
+        </ListBox>
+    </Grid>
+</UserControl>

@@ -188,13 +188,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Control\Control.csproj">
+      <Project>{2bfdcbe8-7eb3-4b9f-afeb-5ef2b2495aa7}</Project>
+      <Name>Control</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LandParserGenerator\LandParserGenerator.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MarkupControl\MarkupControl.csproj">
-      <Project>{2bfdcbe8-7eb3-4b9f-afeb-5ef2b2495aa7}</Project>
-      <Name>MarkupControl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

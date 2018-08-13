@@ -546,10 +546,13 @@ namespace Land.Core
 
             foreach (var rule in Rules.Values)
             {
-#if DEBUG
-                Console.WriteLine(rule);
-#endif
-                foreach (var alt in rule)
+				messages.Add(Message.Trace(
+					rule.ToString(),
+					GetAnchor(rule.Name),
+					"LanD"
+				));
+
+				foreach (var alt in rule)
                     foreach (var smb in alt)
                     {
                         if (this[smb] == null)
@@ -939,14 +942,7 @@ namespace Land.Core
 						changed = oldCount != _first[nt.Key].Count;
 					}
 				}
-			}
-
-#if DEBUG
-			foreach(var set in _first)
-			{
-				Console.WriteLine($"FIRST({set.Key}) = {String.Join(" ", set.Value.Select(v=> v?.ToString() ?? "eps"))}");
-            }
-#endif
+			}			
 		}
 
 		public HashSet<string> First(Alternative alt)
@@ -1079,13 +1075,6 @@ namespace Land.Core
 						}
 					}
 			}
-
-#if DEBUG
-			foreach (var set in _follow)
-			{
-				Console.WriteLine($"FOLLOW({set.Key}) = {String.Join(" ", set.Value.Select(v => v ?? "eps"))}");
-			}
-#endif
 		}
 
 		public HashSet<string> Follow(string nonterminal)

@@ -19,3 +19,5 @@ LandParserGenerator/CLI/obj/
 LandParserGenerator/CLI/bin/
 LandParserGenerator/MarkupControl/bin/
 LandParserGenerator/MarkupControl/obj/
+LandParserGenerator/Control/obj/
+LandParserGenerator/Control/bin/

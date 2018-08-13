@@ -37,21 +37,14 @@ namespace Land.GUI
 		{
 			InitializeComponent();
 
-			using (var consoleWriter = new ConsoleWriter())
-			{
-				consoleWriter.WriteEvent += consoleWriter_WriteEvent;
-				consoleWriter.WriteLineEvent += consoleWriter_WriteLineEvent;
-				Console.SetOut(consoleWriter);
-			}
-
-			GrammarEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
+			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
 				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
 				ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
 
-			GrammarEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(GrammarEditor.TextArea));
-			FileEditor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(FileEditor.TextArea));
-			FileEditor.TextArea.TextView.BackgroundRenderers.Add(CurrentConcernColorizer = new SegmentsHighlighter(FileEditor.TextArea));
-			SelectedTextColorizerForGrammar = new SelectedTextColorizer(GrammarEditor.TextArea);
+			Grammar_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(Grammar_Editor.TextArea));
+			File_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(File_Editor.TextArea));
+			File_Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentConcernColorizer = new SegmentsHighlighter(File_Editor.TextArea));
+			SelectedTextColorizerForGrammar = new SelectedTextColorizer(Grammar_Editor.TextArea);
 
 			if (File.Exists(LAST_GRAMMARS_FILE))
 			{
@@ -60,7 +53,7 @@ namespace Land.GUI
 				{
 					if(!String.IsNullOrEmpty(filepath))
 					{
-						LastGrammarFiles.Items.Add(filepath);
+						Grammar_RecentFiles.Items.Add(filepath);
 					}
 				}
 			}
@@ -76,16 +69,6 @@ namespace Land.GUI
 			InitPackageParsing();
 		}
 
-		private void consoleWriter_WriteLineEvent(object sender, ConsoleWriterEventArgs e)
-		{
-			ParserBuidingLog.Text += e.Value + Environment.NewLine;
-		}
-
-		private void consoleWriter_WriteEvent(object sender, ConsoleWriterEventArgs e)
-		{
-			ParserBuidingLog.Text += e.Value + Environment.NewLine;
-		}
-
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			e.Cancel = !MayProceedClosingGrammar();
@@ -95,7 +78,7 @@ namespace Land.GUI
 		{
 			var listContent = new List<string>();
 
-			foreach (var item in LastGrammarFiles.Items)
+			foreach (var item in Grammar_RecentFiles.Items)
 				listContent.Add(item.ToString());
 
 			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
@@ -128,8 +111,8 @@ namespace Land.GUI
 		private bool MayProceedClosingGrammar()
 		{
 			/// Предлагаем сохранить грамматику, если она новая или если в открытой грамматике произошли изменения или исходный файл был удалён
-			if (String.IsNullOrEmpty(CurrentGrammarFilename) && !String.IsNullOrEmpty(GrammarEditor.Text) ||
-				!String.IsNullOrEmpty(CurrentGrammarFilename) && (!File.Exists(CurrentGrammarFilename) || File.ReadAllText(CurrentGrammarFilename) != GrammarEditor.Text))
+			if (String.IsNullOrEmpty(CurrentGrammarFilename) && !String.IsNullOrEmpty(Grammar_Editor.Text) ||
+				!String.IsNullOrEmpty(CurrentGrammarFilename) && (!File.Exists(CurrentGrammarFilename) || File.ReadAllText(CurrentGrammarFilename) != Grammar_Editor.Text))
 			{
 				switch (MessageBox.Show(
 					"В грамматике имеются несохранённые изменения. Сохранить текущую версию?",
@@ -138,7 +121,7 @@ namespace Land.GUI
 					MessageBoxImage.Question))
 				{
 					case MessageBoxResult.Yes:
-						SaveGrammarButton_Click(null, null);
+						Grammar_SaveButton_Click(null, null);
 						return true;
 					case MessageBoxResult.No:
 						return true;
@@ -150,35 +133,36 @@ namespace Land.GUI
 			return true;
 		}
 
-		private void BuildParserButton_Click(object sender, RoutedEventArgs e)
+		private void Grammar_BuildButton_Click(object sender, RoutedEventArgs e)
 		{
 			Parser = null;
 			var messages = new List<Message>();
 
 			if (ParsingLL.IsChecked == true)
 			{
-				Parser = BuilderLL.BuildParser(GrammarEditor.Text, messages);
+				Parser = BuilderLL.BuildParser(Grammar_Editor.Text, messages);
 			}
 			else if (ParsingLR.IsChecked == true)
 			{
-				Parser = BuilderLR.BuildParser(GrammarEditor.Text, messages);
+				Parser = BuilderLR.BuildParser(Grammar_Editor.Text, messages);
 			}
 
-			ParserBuidingErrors.ItemsSource = messages;
+			Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m=>m.Type == MessageType.Trace).Select(m=>m.Text));
+			Grammar_ErrorsList.ItemsSource = messages.Where(m=>m.Type == MessageType.Error || m.Type == MessageType.Warning);
 
 			if (Parser == null || messages.Count(m=>m.Type == MessageType.Error) > 0)
 			{
-				ParserStatusLabel.Content = "Обнаружены ошибки в грамматике языка";
-				ParserStatus.Background = LightRed;
+				Grammar_StatusBarLabel.Content = "Обнаружены ошибки в грамматике языка";
+				Grammar_StatusBar.Background = LightRed;
 			}
 			else
 			{
-				ParserStatusLabel.Content = "Парсер успешно сгенерирован";
-				ParserStatus.Background = Brushes.LightGreen;
+				Grammar_StatusBarLabel.Content = "Парсер успешно сгенерирован";
+				Grammar_StatusBar.Background = Brushes.LightGreen;
 			}
 		}
 
-		private void LoadGrammarButton_Click(object sender, RoutedEventArgs e)
+		private void Grammar_LoadGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (MayProceedClosingGrammar())
 			{
@@ -192,15 +176,15 @@ namespace Land.GUI
 
 		private void SetAsCurrentGrammar(string filename)
 		{
-			LastGrammarFiles.SelectionChanged -= LastGrammarFiles_SelectionChanged;
+			Grammar_RecentFiles.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
 
-			if (LastGrammarFiles.Items.Contains(filename))
-				LastGrammarFiles.Items.Remove(filename);
+			if (Grammar_RecentFiles.Items.Contains(filename))
+				Grammar_RecentFiles.Items.Remove(filename);
 
-			LastGrammarFiles.Items.Insert(0, filename);
-			LastGrammarFiles.SelectedIndex = 0;
+			Grammar_RecentFiles.Items.Insert(0, filename);
+			Grammar_RecentFiles.SelectedIndex = 0;
 
-			LastGrammarFiles.SelectionChanged += LastGrammarFiles_SelectionChanged;
+			Grammar_RecentFiles.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
 		}
 
 		private void OpenGrammar(string filename)
@@ -209,61 +193,61 @@ namespace Land.GUI
 			{
 				MessageBox.Show("Указанный файл не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
-				LastGrammarFiles.Items.Remove(filename);
-				LastGrammarFiles.SelectedIndex = -1;
+				Grammar_RecentFiles.Items.Remove(filename);
+				Grammar_RecentFiles.SelectedIndex = -1;
 
 				CurrentGrammarFilename = null;
-				GrammarEditor.Text = String.Empty;
-				SaveGrammarButton.IsEnabled = true;
+				Grammar_Editor.Text = String.Empty;
+				Grammar_SaveButton.IsEnabled = true;
 
 				return;
 			}
 
 			CurrentGrammarFilename = filename;
-			GrammarEditor.Text = File.ReadAllText(filename);
-			SaveGrammarButton.IsEnabled = false;
+			Grammar_Editor.Text = File.ReadAllText(filename);
+			Grammar_SaveButton.IsEnabled = false;
 			SetAsCurrentGrammar(filename);
 		}
 
-		private void SaveGrammarButton_Click(object sender, RoutedEventArgs e)
+		private void Grammar_SaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (!String.IsNullOrEmpty(CurrentGrammarFilename))
 			{
-				File.WriteAllText(CurrentGrammarFilename, GrammarEditor.Text);
-				SaveGrammarButton.IsEnabled = false;
+				File.WriteAllText(CurrentGrammarFilename, Grammar_Editor.Text);
+				Grammar_SaveButton.IsEnabled = false;
 			}
 			else
 			{
 				var saveFileDialog = new SaveFileDialog();
 				if (saveFileDialog.ShowDialog() == true)
 				{
-					File.WriteAllText(saveFileDialog.FileName, GrammarEditor.Text);
-					SaveGrammarButton.IsEnabled = false;
+					File.WriteAllText(saveFileDialog.FileName, Grammar_Editor.Text);
+					Grammar_SaveButton.IsEnabled = false;
 					CurrentGrammarFilename = saveFileDialog.FileName;
 					SetAsCurrentGrammar(saveFileDialog.FileName);
 				}
 			}
 		}
 
-		private void NewGrammarButton_Click(object sender, RoutedEventArgs e)
+		private void Grammar_NewGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (MayProceedClosingGrammar())
 			{
-				LastGrammarFiles.SelectedIndex = -1;
+				Grammar_RecentFiles.SelectedIndex = -1;
 				CurrentGrammarFilename = null;
-				GrammarEditor.Text = String.Empty;
+				Grammar_Editor.Text = String.Empty;
 			}
 		}
 
-		private void GrammarEditor_TextChanged(object sender, EventArgs e)
+		private void Grammar_Editor_TextChanged(object sender, EventArgs e)
 		{
-			ParserStatus.Background = Brushes.Yellow;
-			ParserStatusLabel.Content = "Текст грамматики изменился со времени последней генерации парсера";
-			SaveGrammarButton.IsEnabled = true;
+			Grammar_StatusBar.Background = Brushes.Yellow;
+			Grammar_StatusBarLabel.Content = "Текст грамматики изменился со времени последней генерации парсера";
+			Grammar_SaveButton.IsEnabled = true;
 			SelectedTextColorizerForGrammar.Reset();
 		}
 
-		private void GrammarListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void Grammar_ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var lb = sender as ListBox;
 
@@ -275,19 +259,19 @@ namespace Land.GUI
 					/// Если координаты не выходят за пределы файла, устанавливаем курсор в соответствии с ними, 
 					/// иначе ставим курсор в позицию после последнего элемента последней строки
 					int start = 0;
-					if(msg.Location.Line <= GrammarEditor.Document.LineCount)
-						start = GrammarEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					if(msg.Location.Line <= Grammar_Editor.Document.LineCount)
+						start = Grammar_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					else
-						start = GrammarEditor.Document.GetOffset(GrammarEditor.Document.LineCount, GrammarEditor.Document.Lines[GrammarEditor.Document.LineCount-1].Length + 1);
+						start = Grammar_Editor.Document.GetOffset(Grammar_Editor.Document.LineCount, Grammar_Editor.Document.Lines[Grammar_Editor.Document.LineCount-1].Length + 1);
 
-					GrammarEditor.Focus();
-					GrammarEditor.Select(start, 0);
-					GrammarEditor.ScrollToLine(msg.Location.Line);
+					Grammar_Editor.Focus();
+					Grammar_Editor.Select(start, 0);
+					Grammar_Editor.ScrollToLine(msg.Location.Line);
 				}
 			}
 		}
 
-		private void LastGrammarFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void Grammar_RecentFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			/// Если что-то новое было выделено
 			if (e.AddedItems.Count > 0)
@@ -295,14 +279,14 @@ namespace Land.GUI
 				/// Нужно предложить сохранение, и откатить смену выбора файла, если пользователь передумал
 				if (!MayProceedClosingGrammar())
 				{
-					LastGrammarFiles.SelectionChanged -= LastGrammarFiles_SelectionChanged;
+					Grammar_RecentFiles.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
 					ComboBox combo = (ComboBox)sender;
 					/// Если до этого был выбран какой-то файл
 					if (e.RemovedItems.Count > 0)
 						combo.SelectedItem = e.RemovedItems[0];
 					else
 						combo.SelectedIndex = -1;
-					LastGrammarFiles.SelectionChanged += LastGrammarFiles_SelectionChanged;
+					Grammar_RecentFiles.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
 					return;
 				}
 				OpenGrammar(e.AddedItems[0].ToString());
@@ -316,7 +300,7 @@ namespace Land.GUI
 		private Node TreeRoot { get; set; }
 		private string TreeSource { get; set; }
 
-		private void ParseButton_Click(object sender, RoutedEventArgs e)
+		private void File_ParseButton_Click(object sender, RoutedEventArgs e)
 		{
             if (Parser != null)
             {
@@ -324,28 +308,28 @@ namespace Land.GUI
 
 				try
 				{
-					root = Parser.Parse(FileEditor.Text);
+					root = Parser.Parse(File_Editor.Text);
 				}
 				catch(Exception ex)
 				{
 					Parser.Log.Add(Message.Error(ex.ToString(), null));
 				}
 
-				FileStatistics.Text = Parser.Statistics?.ToString();
+				File_Statistics.Text = Parser.Statistics?.ToString();
 
 				var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
-				ProgramStatusLabel.Content = noErrors ? "Разбор произведён успешно" : "Ошибки при разборе файла";
-                ProgramStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
+				File_StatusBarLabel.Content = noErrors ? "Разбор произведён успешно" : "Ошибки при разборе файла";
+                File_StatusBar.Background = noErrors ? Brushes.LightGreen : LightRed;
 
                 if (root != null)
                 {
                     TreeRoot = root;
-					TreeSource = FileEditor.Text;
+					TreeSource = File_Editor.Text;
                     AstTreeView.ItemsSource = new List<Node>() { root };
                 }
 
-                FileParsingLog.ItemsSource = Parser.Log;
-				FileParsingErrors.ItemsSource = Parser.Log.Where(l=>l.Type != MessageType.Trace).ToList();
+                File_LogList.ItemsSource = Parser.Log;
+				File_ErrorsList.ItemsSource = Parser.Log.Where(l=>l.Type != MessageType.Trace).ToList();
             }
 		}
 
@@ -353,10 +337,10 @@ namespace Land.GUI
 		{
 			var treeView = (TreeView)sender;
 
-			MoveCaretToSource((Node)treeView.SelectedItem, FileEditor, true, 1);
+			MoveCaretToSource((Node)treeView.SelectedItem, File_Editor, true, 1);
 		}
 
-		private void OpenFileButton_Click(object sender, RoutedEventArgs e)
+		private void File_OpenButton_Click(object sender, RoutedEventArgs e)
 		{
 			var openFileDialog = new OpenFileDialog();
 			if (openFileDialog.ShowDialog() == true)
@@ -365,15 +349,15 @@ namespace Land.GUI
 			}
 		}
 
-		private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+		private void File_SaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			/// По нажатию на "Сохранить" всегда предлагаем выбрать, куда,
 			/// чтобы не перезатереть файлы разбираемых проектов 
 			var saveFileDialog = new SaveFileDialog();
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				File.WriteAllText(saveFileDialog.FileName, FileEditor.Text);
-				TestFileName.Content = saveFileDialog.FileName;
+				File.WriteAllText(saveFileDialog.FileName, File_Editor.Text);
+				File_NameLabel.Content = saveFileDialog.FileName;
 			}
 		}
 
@@ -382,24 +366,24 @@ namespace Land.GUI
 		{
 			var stream = new StreamReader(filename, Encoding.Default, true);
 
-			TestFileName.Content = filename;
-			FileEditor.Text = stream.ReadToEnd();
-			FileEditor.Encoding = stream.CurrentEncoding;
+			File_NameLabel.Content = filename;
+			File_Editor.Text = stream.ReadToEnd();
+			File_Editor.Encoding = stream.CurrentEncoding;
 
 			stream.Close();
 
-			ParseButton_Click(null, null);
+			File_ParseButton_Click(null, null);
 		}
 
-		private void ClearFileButton_Click(object sender, RoutedEventArgs e)
+		private void File_ClearButton_Click(object sender, RoutedEventArgs e)
 		{
-			TestFileName.Content = null;
+			File_NameLabel.Content = null;
 
-			FileEditor.Text = String.Empty;
-			FileEditor.Encoding = Encoding.UTF8;
+			File_Editor.Text = String.Empty;
+			File_Editor.Encoding = Encoding.UTF8;
 		}
 
-		private void TestFileListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void File_ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var lb = sender as ListBox;
 
@@ -408,10 +392,10 @@ namespace Land.GUI
 				var msg = (Land.Core.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
-					var start = FileEditor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
-					FileEditor.Focus();
-					FileEditor.Select(start, 0);
-					FileEditor.ScrollToLine(FileEditor.Document.GetLocation(start).Line);
+					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					File_Editor.Focus();
+					File_Editor.Select(start, 0);
+					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
 				}
 			}
 		}
@@ -436,7 +420,7 @@ namespace Land.GUI
 			PackageParsingWorker.ProgressChanged += worker_ProgressChanged;
 		}
 
-		private void ChooseFolderButton_Click(object sender, RoutedEventArgs e)
+		private void Batch_ChooseFolderButton_Click(object sender, RoutedEventArgs e)
 		{
 			var folderDialog = new System.Windows.Forms.FolderBrowserDialog();
 
@@ -444,7 +428,7 @@ namespace Land.GUI
 			if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 			{
 				PackageSource = folderDialog.SelectedPath;
-				PackagePathLabel.Content = $"Выбран каталог {PackageSource}";
+				Batch_PathLabel.Content = $"Выбран каталог {PackageSource}";
 			}
 		}
 
@@ -458,7 +442,7 @@ namespace Land.GUI
 			var counter = 0;
 			var errorFiles = new List<string>();
 
-			FrontendUpdateDispatcher.Invoke((Action)(()=>{ PackageParsingLog.Items.Clear(); }));		
+			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
 			var timePerFile = new Dictionary<string, TimeSpan>();
 
 			for (; counter < files.Count; ++counter)
@@ -520,12 +504,12 @@ namespace Land.GUI
 		{
 			if (total == parsed)
 			{
-				PackageStatusLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
-				PackageStatus.Background = errorsCount == 0 ? Brushes.LightGreen : LightRed;
+				Batch_StatusBarLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				Batch_StatusBar.Background = errorsCount == 0 ? Brushes.LightGreen : LightRed;
 			}
 			else
 			{
-				PackageStatusLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				Batch_StatusBarLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
 			}
 		}
 
@@ -535,15 +519,15 @@ namespace Land.GUI
 
 		private void AddRecordToPackageParsingLog(object record)
 		{
-			PackageParsingLog.Items.Add(record);
+			Batch_Log.Items.Add(record);
 		}
 
 		void worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
 		{
-			PackageParsingProgress.Value = e.ProgressPercentage;
+			Batch_ParsingProgress.Value = e.ProgressPercentage;
 		}
 
-		private void PackageParsingListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void Batch_ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var lb = sender as ListBox;
 
@@ -558,7 +542,7 @@ namespace Land.GUI
 			}
 		}
 
-		private void StartOrStopPackageParsingButton_Click(object sender, RoutedEventArgs e)
+		private void Batch_StartOrStopPackageParsingButton_Click(object sender, RoutedEventArgs e)
 		{
 			if(!PackageParsingWorker.IsBusy)
 			{
@@ -566,7 +550,7 @@ namespace Land.GUI
 				if (Parser != null)
 				{
 					/// Получаем имена всех файлов с нужным расширением
-					var patterns = TargetExtentions.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ext => $"*.{ext.Trim().Trim('.')}");
+					var patterns = Batch_TargetExtentions.Text.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ext => $"*.{ext.Trim().Trim('.')}");
 					var package = new List<string>();
 					/// Возможна ошибка при доступе к определённым директориям
 					try
@@ -579,18 +563,18 @@ namespace Land.GUI
 					catch
 					{
 						package = new List<string>();
-						PackagePathLabel.Content = $"Ошибка при получении содержимого каталога, возможно, отсутствуют права доступа";
+						Batch_PathLabel.Content = $"Ошибка при получении содержимого каталога, возможно, отсутствуют права доступа";
 					}
 					/// Запускаем в отдельном потоке массовый парсинг
-					PackageStatus.Background = Brushes.WhiteSmoke;
+					Batch_StatusBar.Background = Brushes.WhiteSmoke;
 					PackageParsingWorker.RunWorkerAsync(package);
-					PackageParsingProgress.Foreground = Brushes.MediumSeaGreen;
+					Batch_ParsingProgress.Foreground = Brushes.MediumSeaGreen;
 				}
 			}
 			else
 			{
 				PackageParsingWorker.CancelAsync();
-				PackageParsingProgress.Foreground = Brushes.IndianRed;
+				Batch_ParsingProgress.Foreground = Brushes.IndianRed;
 			}
 		}
 		#endregion
@@ -622,7 +606,7 @@ namespace Land.GUI
 				if (e.NewValue is ConcernPoint)
 				{
 					var concernPoint = (ConcernPoint)e.NewValue;
-					MoveCaretToSource(concernPoint.TreeNode, FileEditor, HighlightNone.IsChecked == false, 1);
+					MoveCaretToSource(concernPoint.TreeNode, File_Editor, HighlightNone.IsChecked == false, 1);
 
 					if (HighlightNone.IsChecked == true)
 					{
@@ -704,7 +688,7 @@ namespace Land.GUI
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				var documentName = (string)TestFileName.Content;
+				var documentName = (string)File_NameLabel.Content;
 
 				if (!Markup.AstRoots.ContainsKey(documentName))
 				{
@@ -720,7 +704,7 @@ namespace Land.GUI
 		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var node = (Node)ConcernPointCandidatesList.SelectedItem;
-			MoveCaretToSource(node, FileEditor, true, 1);
+			MoveCaretToSource(node, File_Editor, true, 1);
 		}
 
 		private void DeleteConcernPoint_Click(object sender, RoutedEventArgs e)
@@ -736,7 +720,7 @@ namespace Land.GUI
 			/// Если открыта вкладка с тестовым файлом
 			if(MainTabs.SelectedIndex == 1)
 			{
-				var offset = FileEditor.TextArea.Caret.Offset;
+				var offset = File_Editor.TextArea.Caret.Offset;
 
 				var pointCandidates = new LinkedList<Node>();
 				var currentNode = TreeRoot;
@@ -760,7 +744,7 @@ namespace Land.GUI
 		{
 			if (TreeRoot != null)
 			{
-				var documentName = (string)TestFileName.Content;
+				var documentName = (string)File_NameLabel.Content;
 
 				if (!Markup.AstRoots.ContainsKey(documentName))
 				{
@@ -802,7 +786,7 @@ namespace Land.GUI
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
-			var documentName = (string)TestFileName.Content;
+			var documentName = (string)File_NameLabel.Content;
 
 			if (Markup.AstRoots.ContainsKey(documentName) && TreeRoot != null)
 			{
@@ -1343,7 +1327,7 @@ namespace Land.GUI
 		{
 			if (sender == e.Source && MappingDebugTab.IsSelected)
 			{
-				NewTextEditor.Text = FileEditor.Text;
+				NewTextEditor.Text = File_Editor.Text;
 				OldTextEditor.Text = TreeSource;
 				MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
 				AstDebugTreeView.ItemsSource = AstTreeView.ItemsSource;
@@ -1546,6 +1530,23 @@ namespace Land.GUI
 				tab.Header = Path.GetFileName(Documents[tab].DocumentName);
 
 				DocumentTabs.SelectedItem = tab;
+			}
+		}
+
+		private void DocumentsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var lb = sender as ListBox;
+
+			if (lb.SelectedIndex != -1)
+			{
+				var msg = (Land.Core.Message)lb.SelectedItem;
+				if (msg.Location != null)
+				{
+					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					File_Editor.Focus();
+					File_Editor.Select(start, 0);
+					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
+				}
 			}
 		}
 

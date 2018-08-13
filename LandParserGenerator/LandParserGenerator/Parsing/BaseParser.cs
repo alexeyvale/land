@@ -11,8 +11,8 @@ namespace Land.Core.Parsing
 {
 	public abstract class BaseParser
 	{
-		protected Grammar GrammarObject { get; set; }
 		protected ILexer Lexer { get; set; }
+		public Grammar GrammarObject { get; protected set; }
 
 		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }

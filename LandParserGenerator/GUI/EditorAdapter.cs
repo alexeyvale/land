@@ -88,6 +88,10 @@ namespace Land.GUI
 			{
 				EditorWindow.DocumentTabs.SelectedItem = newActive;
 				EditorWindow.Documents[newActive].Editor.CaretOffset = offset;
+				EditorWindow.Documents[newActive].Editor.Focus();
+
+				var location = EditorWindow.Documents[newActive].Editor.Document.GetLocation(offset);
+				EditorWindow.Documents[newActive].Editor.ScrollTo(location.Line, location.Column);
 			}
 		}
 
