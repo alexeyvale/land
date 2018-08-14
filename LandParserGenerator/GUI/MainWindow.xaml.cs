@@ -16,6 +16,7 @@ using ICSharpCode.AvalonEdit;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
+using Land.Control;
 
 namespace Land.GUI
 {
@@ -60,11 +61,8 @@ namespace Land.GUI
 
 			MarkupTreeView.ItemsSource = Markup.Markup;
 
-			LandExplorer.Initialize(new EditorAdapter(this), new Dictionary<string, string>()
-			{
-				{ ".cs", "../../../../Land Specifications/sharp/sharp_latest_features.land" },
-				{ ".y", "../../../../Land Specifications/yacc/yacc.land" }
-			});
+			var editorAdapter = new EditorAdapter(this, "./land_explorer_settings.xml");
+			LandExplorer.Initialize(editorAdapter);
 
 			InitPackageParsing();
 		}

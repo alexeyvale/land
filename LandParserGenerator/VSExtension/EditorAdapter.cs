@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Land.Core.Markup;
 using Land.Core;
+using Land.Control;
 
 namespace Land.VSExtension
 {
@@ -54,6 +55,16 @@ namespace Land.VSExtension
 		}
 
 		public void SetSegments(List<DocumentSegment> segments)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void SaveSettings(LandExplorerSettings settings)
+		{
+			throw new NotImplementedException();
+		}
+
+		public LandExplorerSettings LoadSettings()
 		{
 			throw new NotImplementedException();
 		}

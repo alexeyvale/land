@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:Land.Control"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="300"
-			 x:Name="LandExplorer">
+			 x:Name="LandExplorer"
+             Loaded="LandExplorer_Loaded">
     <UserControl.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
         <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>

@@ -32,6 +32,16 @@ namespace Land.Control
 		}
 
 		/// <summary>
+		/// Настройки панели
+		/// </summary>
+		private LandExplorerSettings SettingsObject { get; set; }
+
+		/// <summary>
+		/// Окно настроек
+		/// </summary>
+		private SettingsWindow SettingsWindow { get; set; }
+
+		/// <summary>
 		/// Адаптер редактора, с которым взаимодействует панель
 		/// </summary>
 		private IEditorAdapter Editor { get; set; }
@@ -61,17 +71,22 @@ namespace Land.Control
 			InitializeComponent();
         }
 
-		public void Initialize(IEditorAdapter adapter, Dictionary<string, string> parserSources)
+		private void LandExplorer_Loaded(object sender, RoutedEventArgs e)
 		{
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
+		}
+
+		public void Initialize(IEditorAdapter adapter)
+		{	
 			Editor = adapter;
+			SettingsObject = Editor.LoadSettings() ?? new LandExplorerSettings();
 
 			var messages = new List<Message>();
 
-			foreach (var extPathPair in parserSources)
+			foreach (var pair in SettingsObject.Grammars)
 			{
-				Parsers[extPathPair.Key] = BuilderLL.BuildParser(
-					File.ReadAllText(extPathPair.Value),
+				Parsers[pair.Extension] = BuilderLL.BuildParser(
+					File.ReadAllText(pair.GrammarPath),
 					messages
 				);
 			}
@@ -252,7 +267,14 @@ namespace Land.Control
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
+			SettingsWindow = new SettingsWindow(SettingsObject.Clone());
+			SettingsWindow.Owner = Window.GetWindow(this);
 
+			if (SettingsWindow.ShowDialog() ?? false)
+			{
+				SettingsObject = SettingsWindow.SettingsObject;
+				Editor.SaveSettings(SettingsObject);
+			}
 		}
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)

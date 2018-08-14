@@ -2,19 +2,24 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.IO;
+using System.Runtime.Serialization;
 
 using Land.Core;
 using Land.Core.Markup;
+using Land.Control;
 
 namespace Land.GUI
 {
 	public class EditorAdapter : IEditorAdapter
 	{
 		private MainWindow EditorWindow { get; set; }
+		private string SettingsPath { get; set; }
 
-		public EditorAdapter(MainWindow window)
+		public EditorAdapter(MainWindow window, string settingsPath)
 		{
 			EditorWindow = window;
+			SettingsPath = settingsPath;
 		}
 
 		private TabItem GetActiveTab()
@@ -98,6 +103,33 @@ namespace Land.GUI
 		public void SetSegments(List<DocumentSegment> segments)
 		{
 
+		}
+
+		public void SaveSettings(LandExplorerSettings settings)
+		{
+			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ExtensionGrammarPair) });
+
+			using (FileStream fs = new FileStream(SettingsPath, FileMode.Create))
+			{
+				serializer.WriteObject(fs, settings);
+			}
+		}
+
+		public LandExplorerSettings LoadSettings()
+		{
+			if (File.Exists(SettingsPath))
+			{
+				DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ExtensionGrammarPair) });
+
+				using (FileStream fs = new FileStream(SettingsPath, FileMode.Open))
+				{
+					return (LandExplorerSettings)serializer.ReadObject(fs);
+				}
+			}
+			else
+			{
+				return null;
+			}
 		}
 	}
 }

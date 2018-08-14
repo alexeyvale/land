@@ -36,7 +36,7 @@ namespace Land.VSExtension
 			this.Caption = "LandExplorer";
 
 			var control = new LandExplorerControl();
-			control.Initialize(new EditorAdapter(), new Dictionary<string, string>());
+			control.Initialize(new EditorAdapter());
 
 			this.Content = control;
 		}
