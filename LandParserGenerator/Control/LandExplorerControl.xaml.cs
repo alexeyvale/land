@@ -29,6 +29,7 @@ namespace Land.Control
 			public string EditedItemOldHeader { get; set; }
 			public TreeViewItem SelectedItem { get; set; }
 			public string DocumentForCurrentCandidates { get; set; }
+			public bool HighlightConcerns { get; set; }
 		}
 
 		/// <summary>
@@ -64,7 +65,7 @@ namespace Land.Control
 		/// <summary>
 		/// Состояние контрола
 		/// </summary>
-		private ControlState State { get; set; } = new ControlState();
+		public ControlState State { get; set; } = new ControlState();
 
 		public LandExplorerControl()
         {
@@ -77,21 +78,11 @@ namespace Land.Control
 		}
 
 		public void Initialize(IEditorAdapter adapter)
-		{	
+		{
+			SettingsObject = adapter.LoadSettings() ?? new LandExplorerSettings();
+
 			Editor = adapter;
-			SettingsObject = Editor.LoadSettings() ?? new LandExplorerSettings();
-
-			var messages = new List<Message>();
-
-			foreach (var pair in SettingsObject.Grammars)
-			{
-				Parsers[pair.Extension] = BuilderLL.BuildParser(
-					File.ReadAllText(pair.GrammarPath),
-					messages
-				);
-			}
-
-			Editor.ProcessMessages(messages);
+			Editor.ProcessMessages(BuildParsers());
 		}
 
 
@@ -225,44 +216,44 @@ namespace Land.Control
 			State.EditedItem = item;
 		}
 
+		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
+		{
+			State.HighlightConcerns = !State.HighlightConcerns;
+
+			Editor.ResetSegments();
+
+			if (!State.HighlightConcerns)
+			{
+				/// Обеспечиваем стандартное отображение Concern-ов в панели
+				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
+				{
+					var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
+					if (!markupTreeItem.IsSelected)
+					{
+						var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
+						if (label != null)
+							label.Foreground = Brushes.DimGray;
+					}
+				}
+			}
+			else
+			{
+				var concernsAndColors = new Dictionary<Concern, Color>();
+
+				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
+				{
+					concernsAndColors[concern] = Editor.SetSegments(GetSegments(concern, true));
+
+					var label = GetMarkupTreeItemLabel(MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, "ConcernIcon");
+					if (label != null)
+						label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
+				}
+			}
+		}
+
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
-		}
-
-		private void HighlightConcerns_Click(object sender, RoutedEventArgs e)
-		{
-			/// Сбрасываем текущее выделение участков текста
-			//Editor.ResetSegments();
-
-			///// Обеспечиваем стандартное отображение Concern-ов в панели
-			//foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-			//{
-			//	var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
-			//	if (!markupTreeItem.IsSelected)
-			//	{
-			//		var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
-			//		if (label != null)
-			//			label.Foreground = Brushes.DimGray;
-			//	}
-			//}
-
-			//var concernsAndColors = new Dictionary<Concern, Color>();
-
-			//foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-			//{
-			//	concernsAndColors[concern] =
-			//		CurrentConcernColorizer.SetSegments(GetConcernSegments(concern).Select(s => new DocumentSegment()
-			//		{
-			//			StartOffset = s.Item1,
-			//			EndOffset = s.Item2,
-			//			CaptureWholeLine = true
-			//		}).ToList());
-
-			//	var label = GetMarkupTreeItemLabel(MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, "ConcernIcon");
-			//	if (label != null)
-			//		label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
-			//}
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
@@ -272,8 +263,12 @@ namespace Land.Control
 
 			if (SettingsWindow.ShowDialog() ?? false)
 			{
+				var grammarsChanged = 
+
 				SettingsObject = SettingsWindow.SettingsObject;
 				Editor.SaveSettings(SettingsObject);
+
+				Editor.ProcessMessages(BuildParsers());
 			}
 		}
 
@@ -284,59 +279,6 @@ namespace Land.Control
 				var newTreeRoot = ParseDocument(nameRootPair.Key);
 				Mapper.Remap(nameRootPair.Value, newTreeRoot);
 				MarkupManager.Remap(nameRootPair.Key, newTreeRoot, Mapper.Mapping);
-			}
-		}
-
-		#endregion
-
-
-		#region MarkupTreeView manipulations
-
-		private void MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			Editor.ResetSegments();
-
-			if (e.NewValue != null)
-			{
-				/// При клике по точке переходим к ней и подсвечиваем участок
-				if (e.NewValue is ConcernPoint)
-				{
-					var concernPoint = (ConcernPoint)e.NewValue;
-					Editor.SetActiveDocumentAndOffset(concernPoint.FileName, concernPoint.TreeNode.StartOffset.Value);
-
-					Editor.SetSegments(new List<DocumentSegment>(){
-						new DocumentSegment()
-						{
-							StartOffset = concernPoint.TreeNode.StartOffset.Value,
-							EndOffset = concernPoint.TreeNode.EndOffset.Value,
-							CaptureWholeLine = false
-						}
-					});
-
-					return;
-				}
-
-				/// Если отключен режим постоянной подсветки функциональностей,
-				/// подсвечиваем то, что выбрано в данный конкретный момент
-				if (e.NewValue is Concern)
-				{
-					Editor.SetSegments(GetConcernSegments((Concern)e.NewValue).Select(s => new DocumentSegment()
-					{
-						StartOffset = s.Item1,
-						EndOffset = s.Item2,
-						CaptureWholeLine = true
-					}).ToList());
-				}
-			}
-		}
-
-		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-			if (item != null)
-			{
-				item.IsSelected = true;
-				e.Handled = true;
 			}
 		}
 
@@ -360,6 +302,91 @@ namespace Land.Control
 			{
 				var node = (Node)ConcernPointCandidatesList.SelectedItem;
 				Editor.SetActiveDocumentAndOffset(State.DocumentForCurrentCandidates, node.StartOffset.Value);
+			}
+		}
+
+		#endregion
+
+
+		#region MarkupTreeView manipulations
+
+		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+			if (item != null && State.EditedItem != item && e.ChangedButton == MouseButton.Left)
+			{
+				/// При клике по точке переходим к ней
+				if (item.DataContext is ConcernPoint)
+				{
+					var concernPoint = (ConcernPoint)item.DataContext;
+					Editor.SetActiveDocumentAndOffset(concernPoint.FileName, concernPoint.TreeNode.StartOffset.Value);
+
+					e.Handled = true;
+				}
+			}
+		}
+
+		private void MarkupTreeViewItem_KeyDown(object sender, KeyEventArgs e)
+		{
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+			if (item != null)
+			{
+				switch (e.Key)
+				{
+					case Key.Enter:
+						if (State.EditedItem == item)
+						{
+							var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
+							textbox.Visibility = Visibility.Hidden;
+							State.EditedItem = null;
+						}
+						else
+						{
+							if (item.DataContext is ConcernPoint)
+							{
+								var concernPoint = (ConcernPoint)item.DataContext;
+								Editor.SetActiveDocumentAndOffset(concernPoint.FileName, concernPoint.TreeNode.StartOffset.Value);
+							}
+						}
+						break;
+					case Key.Escape:
+						if (State.EditedItem == item)
+						{
+							var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
+							textbox.Text = State.EditedItemOldHeader;
+							textbox.Visibility = Visibility.Hidden;						
+
+							State.EditedItem = null;				
+						}
+						break;
+				}
+			}
+		}
+
+		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			if (item != null)
+			{
+				item.IsSelected = true;
+				e.Handled = true;
+			}
+		}
+
+		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight(object sender, MouseButtonEventArgs e)
+		{
+			var item = (TreeViewItem)sender;
+
+			if (SettingsObject.HighlightSelectedElement && !State.HighlightConcerns)
+			{
+				Editor.ResetSegments();
+
+				Editor.SetSegments(GetSegments(
+					(MarkupElement)item.DataContext,
+					item.DataContext is Concern
+				));
 			}
 		}
 
@@ -402,7 +429,7 @@ namespace Land.Control
 			var item = (TreeViewItem)sender;
 
 			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null)
+			if (label != null && !State.HighlightConcerns)
 				label.Foreground = Brushes.WhiteSmoke;
 			label = GetMarkupTreeItemLabel(item, "PointIcon");
 			if (label != null)
@@ -416,7 +443,7 @@ namespace Land.Control
 			var item = (TreeViewItem)sender;
 
 			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null)
+			if (label != null && !State.HighlightConcerns)
 				label.Foreground = Brushes.DimGray;
 			label = GetMarkupTreeItemLabel(item, "PointIcon");
 			if (label != null)
@@ -444,7 +471,7 @@ namespace Land.Control
 			var item = (TreeViewItem)sender;
 
 			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null)
+			if (label != null && !State.HighlightConcerns)
 				label.Foreground = Brushes.DimGray;
 
 			e.Handled = true;
@@ -478,7 +505,7 @@ namespace Land.Control
 		/// Элементы, развёрнутые автоматически в ходе перетаскивания
 		private List<TreeViewItem> ExpandedWhileDrag = new List<TreeViewItem>();
 
-		private void MarkupTreeView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton == MouseButton.Left)
 			{
@@ -690,6 +717,30 @@ namespace Land.Control
 			return null;
 		}
 
+		private List<Message> BuildParsers()
+		{
+			Parsers = new Dictionary<string, Parser>();
+
+			var messages = new List<Message>();
+
+			/// Генерируем парсер и связываем его с каждым из расширений, 
+			/// указанных для грамматики
+			foreach (var pair in SettingsObject.Grammars)
+			{
+				var parser = BuilderLL.BuildParser(
+					File.ReadAllText(pair.GrammarPath),
+					messages
+				);
+
+				foreach(var key in pair.Extensions)
+				{
+					Parsers[key] = parser;
+				}
+			}
+
+			return messages;
+		}
+
 		private bool EnsureTreeExistence(string documentName)
 		{
 			if (MarkupManager.AstRoots.ContainsKey(documentName))
@@ -714,28 +765,50 @@ namespace Land.Control
 			return false;
 		}
 
-		private List<Tuple<int, int>> GetConcernSegments(Concern concern)
+		private List<DocumentSegment> GetSegments(MarkupElement elem, bool captureWholeLine)
 		{
-			var concernsQueue = new Queue<Concern>();
-			concernsQueue.Enqueue(concern);
+			var segments = new List<DocumentSegment>();
 
-			var segments = new List<Tuple<int, int>>();
-
-			/// Для выделения функциональности целиком придётся обходить её и подфункциональности
-			while (concernsQueue.Count > 0)
+			if (elem is Concern)
 			{
-				var currentConcern = concernsQueue.Dequeue();
+				var concern = (Concern)elem;
+				var concernsQueue = new Queue<Concern>();
+				concernsQueue.Enqueue(concern);
 
-				foreach (var element in currentConcern.Elements)
+				/// Для выделения функциональности целиком придётся обходить её и подфункциональности
+				while (concernsQueue.Count > 0)
 				{
-					if (element is ConcernPoint)
+					var currentConcern = concernsQueue.Dequeue();
+
+					foreach (var element in currentConcern.Elements)
 					{
-						var cp = (ConcernPoint)element;
-						segments.Add(new Tuple<int, int>(cp.TreeNode.StartOffset.Value, cp.TreeNode.EndOffset.Value));
+						if (element is ConcernPoint)
+						{
+							var cp = (ConcernPoint)element;
+							segments.Add(new DocumentSegment()
+							{
+								FileName = cp.FileName,
+								StartOffset = cp.TreeNode.StartOffset.Value,
+								EndOffset = cp.TreeNode.EndOffset.Value,
+								CaptureWholeLine = captureWholeLine
+							});
+						}
+						else
+							concernsQueue.Enqueue((Concern)element);
 					}
-					else
-						concernsQueue.Enqueue((Concern)element);
 				}
+			}
+			else
+			{
+				var concernPoint = (ConcernPoint)elem;
+
+				segments.Add(new DocumentSegment()
+				{
+					FileName = concernPoint.FileName,
+					StartOffset = concernPoint.TreeNode.StartOffset.Value,
+					EndOffset = concernPoint.TreeNode.EndOffset.Value,
+					CaptureWholeLine = captureWholeLine
+				});
 			}
 
 			return segments;

@@ -50,7 +50,7 @@ namespace Land.Control
 
 		public static RoutedUICommand Highlight { get; } = new RoutedUICommand
 			(
-				"Выделить функциональность",
+				"Выделить функциональности",
 				"Highlight",
 				typeof(LandExplorerCommands)
 			);

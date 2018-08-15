@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Land.Control"
         mc:Ignorable="d"
         Title="Настройки" Height="400" Width="500" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Icon="Resources/AppIcon.ico"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+		Name="SettingsWindowObject">
     <Window.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
         <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
@@ -25,15 +26,18 @@
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
 
-        <CheckBox Name="HighlightCheckBox" Grid.Row="0">Подсвечивать выбранную функциональность</CheckBox>
+		<CheckBox Name="HighlightCheckBox" 
+				  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.HighlightSelectedElement, Mode=TwoWay}" 
+				  Grid.Row="0">Подсвечивать выбранную функциональность
+		</CheckBox>
 
         <DockPanel Grid.Row="1">
-            <Label DockPanel.Dock="Top">Синтаксический анализ</Label>
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Width="20" Height="20" Margin="0, 5, 10, 0" Content="&#xf067;" Style="{StaticResource IconButton}" Click="GrammarsGrid_Add_Click"></Button>
-                <Button Width="20" Height="20" Margin="0, 5, 0, 0" Content="&#xf068;" Style="{StaticResource IconButton}" Click="GrammarsGrid_Delete_Click"></Button>
-            </StackPanel>
-            <DataGrid Name="GrammarsGrid" IsReadOnly="False"
+			<Label DockPanel.Dock="Top">Синтаксический анализ</Label>
+			<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+				<Button Width="25" Height="25" Margin="0, 5, 10, 0" Content="&#xf067;" Style="{StaticResource IconButton}" Click="GrammarsGrid_Add_Click"></Button>
+				<Button Width="25" Height="25" Margin="0, 5, 0, 0" Content="&#xf068;" Style="{StaticResource IconButton}" Click="GrammarsGrid_Delete_Click"></Button>
+			</StackPanel>
+			<DataGrid Name="GrammarsGrid" IsReadOnly="False"
                     ScrollViewer.CanContentScroll="True" 
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -42,7 +46,7 @@
                     CanUserReorderColumns="False"
                     AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Расширение" Binding="{Binding Path=Extension}" Width="30*" />
+					<DataGridTextColumn Header="Расширение" Binding="{Binding Path=ExtensionsString}" Width="30*" />
                     <DataGridTextColumn Header="Файл грамматики" Binding="{Binding Path=GrammarPath}" Width="70*" />
                     <DataGridTemplateColumn CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>

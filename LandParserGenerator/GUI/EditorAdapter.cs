@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.IO;
+using System.Windows.Media;
 using System.Runtime.Serialization;
 
 using Land.Core;
@@ -11,10 +12,40 @@ using Land.Control;
 
 namespace Land.GUI
 {
+	public class ColorsManager
+	{
+		private Color[] ColorsList { get; set; } = new Color[] {
+			Color.FromArgb(60, 100, 200, 100),
+			Color.FromArgb(60, Colors.Cyan.R, Colors.Cyan.G, Colors.Cyan.B),
+			Color.FromArgb(60, Colors.HotPink.R, Colors.HotPink.G, Colors.HotPink.B),
+			Color.FromArgb(60, Colors.Coral.R, Colors.Coral.G, Colors.Coral.B),
+			Color.FromArgb(60, Colors.Gold.R, Colors.Gold.G, Colors.Gold.B),
+			Color.FromArgb(60, Colors.LightSkyBlue.R, Colors.LightSkyBlue.G, Colors.LightSkyBlue.B),
+			Color.FromArgb(60, Colors.Thistle.R, Colors.Thistle.G, Colors.Thistle.B)
+		};
+
+		private Random Generator { get; set; } = new Random();
+
+		private int ColorsUsed { get; set; } = 0;
+
+		public Color GetColor()
+		{
+			return ColorsUsed < ColorsList.Length 
+				? ColorsList[ColorsUsed++]
+				: Color.FromArgb(45, (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206));
+		}
+
+		public void Reset()
+		{
+			ColorsUsed = 0;
+		}
+	}
+
 	public class EditorAdapter : IEditorAdapter
 	{
 		private MainWindow EditorWindow { get; set; }
 		private string SettingsPath { get; set; }
+		private ColorsManager ColorsManager { get; set; } = new ColorsManager(); 
 
 		public EditorAdapter(MainWindow window, string settingsPath)
 		{
@@ -22,28 +53,25 @@ namespace Land.GUI
 			SettingsPath = settingsPath;
 		}
 
-		private TabItem GetActiveTab()
-		{
-			return (TabItem)EditorWindow.DocumentTabs.SelectedItem;
-		}
+		#region IEditorAdapter
 
 		public string GetActiveDocumentName()
 		{
-			var activeTab = GetActiveTab();
+			var activeTab = GetActiveDocumentTab();
 
 			return activeTab != null ? EditorWindow.Documents[activeTab].DocumentName : null;
 		}
 
 		public int? GetActiveDocumentOffset()
 		{
-			var activeTab = GetActiveTab();
+			var activeTab = GetActiveDocumentTab();
 
 			return activeTab != null ? EditorWindow.Documents[activeTab].Editor.CaretOffset : (int?)null;
 		}
 
 		public string GetActiveDocumentText()
 		{
-			var activeTab = GetActiveTab();
+			var activeTab = GetActiveDocumentTab();
 
 			return activeTab != null ? EditorWindow.Documents[activeTab].Editor.Text : null;
 		}
@@ -78,11 +106,6 @@ namespace Land.GUI
 			}
 		}
 
-		public void ResetSegments()
-		{
-
-		}
-
 		public void SetActiveDocumentAndOffset(string documentName, int offset)
 		{
 			var newActive = EditorWindow.Documents
@@ -100,9 +123,34 @@ namespace Land.GUI
 			}
 		}
 
-		public void SetSegments(List<DocumentSegment> segments)
+		public Color SetSegments(List<DocumentSegment> segments)
 		{
+			var color = ColorsManager.GetColor();
 
+			foreach(var group in segments.GroupBy(s=>s.FileName))
+			{
+				var documentTab = EditorWindow.Documents
+					.Where(d => d.Value.DocumentName == group.Key)
+					.Select(d => d.Value).FirstOrDefault();
+
+				if(documentTab != null)
+				{
+					documentTab.SegmentsColorizer.SetSegments(group.ToList(), color);
+				}
+			}
+
+			color.A = (byte)255;
+			return color;
+		}
+
+		public void ResetSegments()
+		{
+			foreach(var document in EditorWindow.Documents)
+			{
+				document.Value.SegmentsColorizer.ResetSegments();
+			}
+
+			ColorsManager.Reset();
 		}
 
 		public void SaveSettings(LandExplorerSettings settings)
@@ -131,5 +179,17 @@ namespace Land.GUI
 				return null;
 			}
 		}
+
+		#endregion
+
+
+		#region methods
+
+		private TabItem GetActiveDocumentTab()
+		{
+			return (TabItem)EditorWindow.DocumentTabs.SelectedItem;
+		}
+
+		#endregion
 	}
 }

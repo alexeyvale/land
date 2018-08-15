@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.IO;
+using System.Windows.Media;
 using System.Runtime.Serialization;
 
 using Land.Core;
@@ -12,6 +11,7 @@ namespace Land.Control
 {
 	public class DocumentSegment
 	{
+		public string FileName { get; set; }
 		public int StartOffset { get; set; }
 		public int EndOffset { get; set; }
 		public bool CaptureWholeLine { get; set; }
@@ -21,16 +21,28 @@ namespace Land.Control
 	public class ExtensionGrammarPair
 	{
 		[DataMember]
-		public string Extension { get; set; }
+		public List<string> Extensions { get; set; } = new List<string>();
 
 		[DataMember]
 		public string GrammarPath { get; set; }
+
+		public string ExtensionsString
+		{
+			get { return String.Join("; ", Extensions); }
+
+			set
+			{
+				/// Разбиваем строку на отдельные расширения, добавляем точку, если она отсутствует
+				Extensions = value.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+					.Select(ext => ext.StartsWith(".") ? ext : '.' + ext).ToList();
+			}
+		}
 
 		public ExtensionGrammarPair Clone()
 		{
 			return new ExtensionGrammarPair()
 			{
-				Extension = Extension,
+				Extensions = Extensions,
 				GrammarPath = GrammarPath
 			};
 		}
@@ -102,7 +114,7 @@ namespace Land.Control
 		/// <summary>
 		/// Выделить участки текста в файле
 		/// </summary>
-		void SetSegments(List<DocumentSegment> segments);
+		Color SetSegments(List<DocumentSegment> segments);
 
 		/// <summary>
 		/// Сбросить выделение
