@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[DataContract(IsReference=true)]
+	[Serializable]
 	public class ConcernPoint: MarkupElement
 	{
+		[NonSerialized]
 		private Node _treeNode = null;
 
 		public Node TreeNode
@@ -19,10 +19,8 @@ namespace Land.Core.Markup
 			set { _treeNode = value; TreeNodeId = value?.Id; }
 		}
 
-		[DataMember]
 		public int? TreeNodeId { get; set; }
 
-		[DataMember]
 		public string FileName { get; set; }
 
 		public ConcernPoint(string fileName, Node node, Concern parent = null)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Land.Core.Parsing.Tree
 {
+	[Serializable]
 	public class Location
 	{
 		public int StartOffset { get; set; }

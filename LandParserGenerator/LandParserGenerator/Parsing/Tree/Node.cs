@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Serialization;
 
 namespace Land.Core.Parsing.Tree
 {
@@ -22,44 +21,37 @@ namespace Land.Core.Parsing.Tree
 		}
 	}
 
-	[DataContract(IsReference = true)]
 	public class Node
 	{
 		/// <summary>
 		/// Родительский узел
 		/// </summary
-		[DataMember]
 		public Node Parent { get; set; }
 
 		/// <summary>
 		/// Символ грамматики, которому соответствует узел
 		/// </summary>
-		[DataMember]
 		public string Symbol { get; set; }
 
 		/// <summary>
 		/// Псевдоним символа, которому соответствует узел
 		/// в соответствии с подструктурой
 		/// </summary>
-		[DataMember]
 		public string Alias { get; set; }
 
 		/// <summary>
 		/// Набор токенов, соответствующих листовому узлу
 		/// </summary>
-		[DataMember]
 		public List<string> Value { get; set; } = new List<string>();
 
 		/// <summary>
 		/// Потомки узла
 		/// </summary>
-		[DataMember]
 		public List<Node> Children { get; set; } = new List<Node>();
 
 		/// <summary>
 		/// Опции, связанные с построением дерева и отображением деревьев
 		/// </summary>
-		[DataMember]
 		public LocalOptions Options { get; set; }
 
 		public int Id { get; set; }

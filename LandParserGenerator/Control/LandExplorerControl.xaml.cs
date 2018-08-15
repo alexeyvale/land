@@ -755,7 +755,10 @@ namespace Land.Control
 
 					if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
 					{
-						MarkupManager.AstRoots[documentName] = Parsers[extension].Parse(Editor.GetDocumentText(documentName));
+						var text = Editor.GetDocumentText(documentName);
+
+						MarkupManager.AstRoots[documentName] = Parsers[extension].Parse(text);
+						MarkupManager.AstSources[documentName] = text;
 
 						return Parsers[extension].Log.All(l => l.Type != MessageType.Error) && MarkupManager.AstRoots[documentName] != null;
 					}

@@ -4,19 +4,23 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.IO.Compression;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[DataContract(IsReference = true)]
+	[Serializable]
 	public class MarkupManager
 	{
-		[DataMember]
-		public ObservableCollection<MarkupElement> Markup { get; set; } = new ObservableCollection<MarkupElement>();
+		public ObservableCollection<MarkupElement> Markup = new ObservableCollection<MarkupElement>();
 
-		public Dictionary<string, Node> AstRoots { get; set; } = new Dictionary<string, Node>();
+		[NonSerialized]
+		public Dictionary<string, Node> AstRoots = new Dictionary<string, Node>();
+
+		public Dictionary<string, string> AstSources = new Dictionary<string, string>();
 
 		public void Clear()
 		{
@@ -57,21 +61,27 @@ namespace Land.Core.Markup
 
 		public static void Serialize(string filename, MarkupManager target)
 		{
-			DataContractSerializer serializer = new DataContractSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint) });
-
 			using (FileStream fs = new FileStream(filename, FileMode.Create))
 			{
-				serializer.WriteObject(fs, target);
+				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
+				{
+					BinaryFormatter serializer = new BinaryFormatter();
+					serializer.Serialize(gZipStream, target);
+				}
 			}
 		}
 
 		public static MarkupManager Deserialize(string filename)
 		{
-			DataContractSerializer serializer = new DataContractSerializer(typeof(MarkupManager), new Type[] { typeof(Concern), typeof(ConcernPoint) });
+			/// Здесь нужно построить деревья и связать дерево с разметкой
 
 			using (FileStream fs = new FileStream(filename, FileMode.Open))
 			{
-				return (MarkupManager)serializer.ReadObject(fs);
+				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
+				{
+					BinaryFormatter serializer = new BinaryFormatter();
+					return (MarkupManager)serializer.Deserialize(gZipStream);
+				}
 			}
 		}
 	}

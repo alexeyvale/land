@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 using Land.Core.Markup;
 using Land.Core;
@@ -54,7 +55,7 @@ namespace Land.VSExtension
 			throw new NotImplementedException();
 		}
 
-		public void SetSegments(List<DocumentSegment> segments)
+		public Color SetSegments(List<DocumentSegment> segments)
 		{
 			throw new NotImplementedException();
 		}
