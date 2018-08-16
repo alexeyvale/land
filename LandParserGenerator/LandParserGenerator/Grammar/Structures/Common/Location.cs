@@ -14,7 +14,7 @@ namespace Land.Core
 
 		public int? Line { get; set; }
 		public int? Column { get; set; }
-		public int? Offset { get; set; }
+		public int Offset { get; set; }
 
 		public PointLocation(int offset)
 		{
@@ -44,8 +44,8 @@ namespace Land.Core
 
 			return new SegmentLocation()
 			{
-				Start = this.Start,
-				End = last.End
+				Start = Start.Offset <= last.Start.Offset ? Start : last.Start,
+				End = End.Offset <= last.End.Offset ? last.End : End,
 			};
 		}
 	}
