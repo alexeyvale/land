@@ -35,7 +35,7 @@ namespace Land.VSExtension
 			throw new NotImplementedException();
 		}
 
-		public void ProcessMessages(List<Message> messages, bool skipTrace)
+		public void ProcessMessages(List<Message> messages, bool skipTrace, bool resetPrevious)
 		{
 			throw new NotImplementedException();
 		}
@@ -50,7 +50,7 @@ namespace Land.VSExtension
 			throw new NotImplementedException();
 		}
 
-		public void SetActiveDocumentAndOffset(string documentName, int offset)
+		public void SetActiveDocumentAndOffset(string documentName, Anchor location)
 		{
 			throw new NotImplementedException();
 		}

@@ -1,5 +1,5 @@
 ﻿%{
-    public Parser(AbstractScanner<LandParserGenerator.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
+    public Parser(AbstractScanner<Land.Core.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
@@ -182,7 +182,7 @@ body_element
 					{
 						Errors.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
-							@1.StartLine, @1.StartColumn,
+							@1,
 							"LanD"
 						));
 					}
@@ -199,7 +199,7 @@ body_element
 				{
 					Errors.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
-							@1.StartLine, @1.StartColumn,
+							@1,
 							"LanD"
 						));
 				}
@@ -248,7 +248,7 @@ body_element
 								Errors.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
-									@1.StartLine, @1.StartColumn,
+									@1,
 									"LanD"
 								));
 							}
@@ -338,7 +338,7 @@ option
 			{
 				Errors.Add(Message.Error(
 					"Неизвестная категория опций '" + $1 + "'",
-					@1.StartLine, @1.StartColumn,
+					@1,
 					"LanD"
 				));
 			}
@@ -378,7 +378,7 @@ option
 			{
 				Errors.Add(Message.Error(
 					"Опция '" + $2 + "' не определена для категории '" + $1 + "'",
-					@2.StartLine, @2.StartColumn,
+					@2,
 					"LanD"
 				));
 			}
@@ -440,7 +440,7 @@ private void SafeGrammarAction(Action action, LexLocation loc)
 	{
 		Errors.Add(Message.Error(
 			ex.Message,
-			loc.StartLine, loc.StartColumn,
+			loc,
 			"LanD"
 		));
 	}

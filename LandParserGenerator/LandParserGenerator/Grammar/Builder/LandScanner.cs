@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 14.07.2018 0:08:54
+//  DateTime: 16.08.2018 20:40:23
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 14.07.2018 0:08:54>
+//  GPLEX input file <./Land.lex - 16.08.2018 20:40:23>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -905,7 +905,7 @@ public override void yyerror(string format, params object[] args)
 { 
 	Log.Add(Message.Error(
 		String.Format(format, args.Select(a=>a.ToString())),
-		yyline, yycol,
+		new Anchor(yyline, yycol),
 		"GPPG"
 	));
 }

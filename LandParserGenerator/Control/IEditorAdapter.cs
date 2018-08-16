@@ -104,7 +104,7 @@ namespace Land.Control
 		/// <summary>
 		/// Задание активного документа и установка курсора
 		/// </summary>
-		void SetActiveDocumentAndOffset(string documentName, int offset);
+		void SetActiveDocumentAndOffset(string documentName, Anchor location);
 
 		#endregion
 
@@ -126,7 +126,7 @@ namespace Land.Control
 
 		#region Messages
 
-		void ProcessMessages(List<Message> messages, bool skipTrace);
+		void ProcessMessages(List<Message> messages, bool skipTrace, bool resetPrevious);
 
 		void ProcessMessage(Message message);
 

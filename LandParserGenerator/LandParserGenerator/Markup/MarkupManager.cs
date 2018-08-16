@@ -62,6 +62,8 @@ namespace Land.Core.Markup
 
 		public void RemoveElement(MarkupElement elem)
 		{
+			Log.Clear();
+
 			if (elem.Parent != null)
 				elem.Parent.Elements.Remove(elem);
 			else
@@ -84,6 +86,8 @@ namespace Land.Core.Markup
 
 		public Concern AddConcern(string name, Concern parent = null)
 		{
+			Log.Clear();
+
 			var concern = new Concern(name, parent);
 			AddElement(concern);
 			return concern;
@@ -91,6 +95,8 @@ namespace Land.Core.Markup
 
 		public ConcernPoint AddConcernPoint(string fileName, Node node, string name = null, Concern parent = null)
 		{
+			Log.Clear();
+
 			var point = new ConcernPoint(fileName, node, parent);
 			AddElement(point);
 			return point;
@@ -98,6 +104,8 @@ namespace Land.Core.Markup
 
 		public void AddLand(string fileName)
 		{
+			Log.Clear();
+
 			if (!AstRoots.ContainsKey(fileName) && Parse(fileName, GetText(fileName)))
 			{
 				var visitor = new LandExplorerVisitor();
@@ -133,6 +141,8 @@ namespace Land.Core.Markup
 
 		public LinkedList<Node> GetConcernPointCandidates(string fileName, int offset)
 		{
+			Log.Clear();
+
 			if (AstRoots.ContainsKey(fileName) || Parse(fileName, GetText(fileName)))
 			{
 				var pointCandidates = new LinkedList<Node>();
@@ -157,6 +167,8 @@ namespace Land.Core.Markup
 
 		public void MoveTo(Concern newParent, MarkupElement elem)
 		{
+			Log.Clear();
+
 			if (elem.Parent != null)
 				elem.Parent.Elements.Remove(elem);
 			else
@@ -172,6 +184,8 @@ namespace Land.Core.Markup
 
 		public void Remap(string fileName, Node newRoot, Dictionary<Node, Node> mapping)
 		{
+			Log.Clear();
+
 			AstRoots[fileName] = newRoot;
 
 			var visitor = new RemapVisitor(mapping);
@@ -183,6 +197,8 @@ namespace Land.Core.Markup
 
 		public void Serialize(string fileName)
 		{
+			Log.Clear();
+
 			using (FileStream fs = new FileStream(fileName, FileMode.Create))
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
@@ -252,12 +268,20 @@ namespace Land.Core.Markup
 
 				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
 				{
-					AstRoots[fileName] = Parsers[extension].Parse(text);
-					Sources[fileName] = text;
+					var root = Parsers[extension].Parse(text);
+					var success = Parsers[extension].Log
+						.All(l => l.Type != MessageType.Error && l.Type != MessageType.Warning);
 
+					if (success)
+					{
+						AstRoots[fileName] = root;
+						Sources[fileName] = text;
+					}
+
+					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
 					Log.AddRange(Parsers[extension].Log);
 
-					return Parsers[extension].Log.All(l=>l.Type != MessageType.Error && l.Type != MessageType.Warning);
+					return success;
 				}
 				else
 				{

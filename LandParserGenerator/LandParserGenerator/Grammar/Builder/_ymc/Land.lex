@@ -176,7 +176,7 @@ public override void yyerror(string format, params object[] args)
 { 
 	Log.Add(Message.Error(
 		String.Format(format, args.Select(a=>a.ToString())),
-		yyline, yycol,
+		new Anchor(yyline, yycol),
 		"GPPG"
 	));
 }

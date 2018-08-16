@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 14.07.2018 0:08:55
+// DateTime: 16.08.2018 20:40:23
 // UserName: Алексей
-// Input file <./Land.y - 14.07.2018 0:08:54>
+// Input file <./Land.y - 16.08.2018 20:40:23>
 
 // options: no-lines gplex
 
@@ -74,14 +74,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, LexLocation>
 {
-  // Verbatim content from ./Land.y - 14.07.2018 0:08:54
+  // Verbatim content from ./Land.y - 16.08.2018 20:40:23
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 14.07.2018 0:08:54
+  // End verbatim content from ./Land.y - 16.08.2018 20:40:23
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -340,7 +340,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					{
 						Errors.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
-							LocationStack[LocationStack.Depth-5].StartLine, LocationStack[LocationStack.Depth-5].StartColumn,
+							LocationStack[LocationStack.Depth-5],
 							"LanD"
 						));
 					}
@@ -357,7 +357,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 				{
 					Errors.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
-							LocationStack[LocationStack.Depth-5].StartLine, LocationStack[LocationStack.Depth-5].StartColumn,
+							LocationStack[LocationStack.Depth-5],
 							"LanD"
 						));
 				}
@@ -406,7 +406,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 								Errors.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
-									LocationStack[LocationStack.Depth-5].StartLine, LocationStack[LocationStack.Depth-5].StartColumn,
+									LocationStack[LocationStack.Depth-5],
 									"LanD"
 								));
 							}
@@ -491,7 +491,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			{
 				Errors.Add(Message.Error(
 					"Неизвестная категория опций '" + ValueStack[ValueStack.Depth-4].strVal + "'",
-					LocationStack[LocationStack.Depth-4].StartLine, LocationStack[LocationStack.Depth-4].StartColumn,
+					LocationStack[LocationStack.Depth-4],
 					"LanD"
 				));
 			}
@@ -531,7 +531,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			{
 				Errors.Add(Message.Error(
 					"Опция '" + ValueStack[ValueStack.Depth-3].strVal + "' не определена для категории '" + ValueStack[ValueStack.Depth-4].strVal + "'",
-					LocationStack[LocationStack.Depth-3].StartLine, LocationStack[LocationStack.Depth-3].StartColumn,
+					LocationStack[LocationStack.Depth-3],
 					"LanD"
 				));
 			}
@@ -608,7 +608,7 @@ private void SafeGrammarAction(Action action, LexLocation loc)
 	{
 		Errors.Add(Message.Error(
 			ex.Message,
-			loc.StartLine, loc.StartColumn,
+			loc,
 			"LanD"
 		));
 	}

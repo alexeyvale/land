@@ -40,6 +40,13 @@ namespace Land.Control
 				typeof(LandExplorerCommands)
 			);
 
+		public static RoutedUICommand Relink { get; } = new RoutedUICommand
+			(
+				"Перепривязать",
+				"Relink",
+				typeof(LandExplorerCommands)
+			);
+
 		public static RoutedUICommand Delete { get; } = new RoutedUICommand
 			(
 				"Удалить элемент разметки",

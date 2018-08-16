@@ -57,8 +57,8 @@ namespace Land.GUI
 				}
 			}
 
-			var editorAdapter = new EditorAdapter(this, "./land_explorer_settings.xml");
-			LandExplorer.Initialize(editorAdapter);
+			EditorAdapter = new EditorAdapter(this, "./land_explorer_settings.xml");
+			LandExplorer.Initialize(EditorAdapter);
 
 			InitPackageParsing();
 		}
@@ -254,13 +254,13 @@ namespace Land.GUI
 					/// иначе ставим курсор в позицию после последнего элемента последней строки
 					int start = 0;
 					if(msg.Location.Line <= Grammar_Editor.Document.LineCount)
-						start = Grammar_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+						start = Grammar_Editor.Document.GetOffset(msg.Location.Line.Value, msg.Location.Column.Value);
 					else
 						start = Grammar_Editor.Document.GetOffset(Grammar_Editor.Document.LineCount, Grammar_Editor.Document.Lines[Grammar_Editor.Document.LineCount-1].Length + 1);
 
 					Grammar_Editor.Focus();
 					Grammar_Editor.Select(start, 0);
-					Grammar_Editor.ScrollToLine(msg.Location.Line);
+					Grammar_Editor.ScrollToLine(msg.Location.Line.Value);
 				}
 			}
 		}
@@ -386,7 +386,7 @@ namespace Land.GUI
 				var msg = (Land.Core.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
-					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
+					var start = File_Editor.Document.GetOffset(msg.Location.Line.Value, msg.Location.Column.Value);
 					File_Editor.Focus();
 					File_Editor.Select(start, 0);
 					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
@@ -743,6 +743,8 @@ namespace Land.GUI
 			public SegmentsHighlighter SegmentsColorizer { get; set; }
 		}
 
+		public EditorAdapter EditorAdapter { get; set; }
+
 		public Dictionary<TabItem, DocumentTab> Documents { get; set; } = new Dictionary<TabItem, DocumentTab>();
 
 		private int NewDocumentCounter { get; set; } = 1;
@@ -872,13 +874,11 @@ namespace Land.GUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = (Land.Core.Message)lb.SelectedItem;
-				if (msg.Location != null)
+				var msg = (Message)lb.SelectedItem;
+
+				if (!String.IsNullOrEmpty(msg.FileName))
 				{
-					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
-					File_Editor.Focus();
-					File_Editor.Select(start, 0);
-					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
+					EditorAdapter.SetActiveDocumentAndOffset(msg.FileName, msg.Location);
 				}
 			}
 		}

@@ -86,7 +86,7 @@ namespace Land.Control
 			MarkupManager.GetText = Editor.GetDocumentText;
 			MarkupManager.Parsers = BuildParsers();
 
-			Editor.ProcessMessages(Log, true);
+			Editor.ProcessMessages(Log, true, true);
 		}
 
 		#region Commands
@@ -95,7 +95,10 @@ namespace Land.Control
 		{
 			if (MarkupTreeView.SelectedItem != null)
 			{
-				MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
+				MarkupManagerAction(() =>
+				{
+					MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
+				});
 			}
 		}
 
@@ -106,12 +109,18 @@ namespace Land.Control
 
 			State.DocumentForCurrentCandidates = documentName;
 
-			ConcernPointCandidatesList.ItemsSource = MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+			{
+				return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+			});
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.AddLand(Editor.GetActiveDocumentName());
+			MarkupManagerAction(() =>
+			{
+				MarkupManager.AddLand(Editor.GetActiveDocumentName());
+			});
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -130,7 +139,10 @@ namespace Land.Control
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Serialize(saveFileDialog.FileName);
+				MarkupManagerAction(() =>
+				{
+					MarkupManager.Serialize(saveFileDialog.FileName);
+				});
 			}
 		}
 
@@ -145,14 +157,22 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Deserialize(openFileDialog.FileName);
-				MarkupTreeView.ItemsSource = MarkupManager.Markup;
+				MarkupManagerAction(() =>
+				{
+					MarkupManager.Deserialize(openFileDialog.FileName);
+					MarkupTreeView.ItemsSource = MarkupManager.Markup;
+				});
 			}
 		}
 
 		private void Command_New_Executed(object sender, RoutedEventArgs e)
 		{
 			MarkupManager.Clear();
+		}
+
+		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
+		{
+			
 		}
 
 		private void Command_Rename_Executed(object sender, RoutedEventArgs e)
@@ -218,7 +238,7 @@ namespace Land.Control
 				Editor.SaveSettings(SettingsObject);
 
 				MarkupManager.Parsers = BuildParsers();
-				Editor.ProcessMessages(Log, true);
+				Editor.ProcessMessages(Log, true, true);
 			}
 		}
 
@@ -251,7 +271,11 @@ namespace Land.Control
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
 				var node = (Node)ConcernPointCandidatesList.SelectedItem;
-				Editor.SetActiveDocumentAndOffset(State.DocumentForCurrentCandidates, node.StartOffset.Value);
+
+				Editor.SetActiveDocumentAndOffset(
+					State.DocumentForCurrentCandidates, 
+					new Anchor(node.StartOffset.Value)
+				);
 			}
 		}
 
@@ -270,7 +294,11 @@ namespace Land.Control
 				if (item.DataContext is ConcernPoint)
 				{
 					var concernPoint = (ConcernPoint)item.DataContext;
-					Editor.SetActiveDocumentAndOffset(concernPoint.FileName, concernPoint.TreeNode.StartOffset.Value);
+
+					Editor.SetActiveDocumentAndOffset(
+						concernPoint.FileName, 
+						new Anchor(concernPoint.TreeNode.StartOffset.Value)
+					);
 
 					e.Handled = true;
 				}
@@ -297,7 +325,11 @@ namespace Land.Control
 							if (item.DataContext is ConcernPoint)
 							{
 								var concernPoint = (ConcernPoint)item.DataContext;
-								Editor.SetActiveDocumentAndOffset(concernPoint.FileName, concernPoint.TreeNode.StartOffset.Value);
+
+								Editor.SetActiveDocumentAndOffset(
+									concernPoint.FileName, 
+									new Anchor(concernPoint.TreeNode.StartOffset.Value)
+								);
 							}
 						}
 						break;
@@ -645,6 +677,19 @@ namespace Land.Control
 
 
 		#region Helpers
+
+		private T MarkupManagerFunction<T>(Func<T> func, bool skipTrace = true)
+		{
+			var result = func();
+			Editor.ProcessMessages(MarkupManager.Log, skipTrace, true);
+			return result;
+		}
+
+		private void MarkupManagerAction(Action action, bool skipTrace = true)
+		{
+			action();
+			Editor.ProcessMessages(MarkupManager.Log, skipTrace, true);
+		}
 
 		private Dictionary<string, BaseParser> BuildParsers()
 		{

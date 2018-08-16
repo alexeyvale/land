@@ -87,10 +87,16 @@ namespace Land.GUI
 			return EditorWindow.Documents.Count > 0;
 		}
 
-		public void ProcessMessages(List<Message> messages, bool skipTrace)
+		public void ProcessMessages(List<Message> messages, bool skipTrace, bool resetPrevious)
 		{
 			IEnumerable<Message> toProcess = skipTrace 
 				? messages.Where(m => m.Type != MessageType.Trace) : messages;
+
+			if (resetPrevious)
+			{
+				EditorWindow.MarkupTestErrors.Items.Clear();
+				EditorWindow.MarkupTestLog.Items.Clear();
+			}
 
 			foreach (var msg in toProcess)
 			{
@@ -109,7 +115,7 @@ namespace Land.GUI
 			}
 		}
 
-		public void SetActiveDocumentAndOffset(string documentName, int offset)
+		public void SetActiveDocumentAndOffset(string documentName, Anchor location)
 		{
 			/// Получаем вкладку для заданного имени файла
 			var newActive = EditorWindow.Documents
@@ -123,12 +129,26 @@ namespace Land.GUI
 			/// Получаем документ, если вкладки нет - открываем документ в новой вкладке
 			var documentTab = newActive != null 
 				? EditorWindow.Documents[newActive] : EditorWindow.OpenDocument(documentName);
-
-			documentTab.Editor.CaretOffset = offset;
 			documentTab.Editor.Focus();
 
-			var location = documentTab.Editor.Document.GetLocation(offset);
-			documentTab.Editor.ScrollTo(location.Line, location.Column);
+			if (location != null)
+			{
+				if (!location.Offset.HasValue)
+				{
+					location.Offset =
+						documentTab.Editor.Document.GetOffset(location.Line.Value, location.Column.Value);
+				}
+
+				if (!location.Line.HasValue)
+				{
+					var locationFromEditor = documentTab.Editor.Document.GetLocation(location.Offset.Value);
+					location.Line = locationFromEditor.Line;
+					location.Column = locationFromEditor.Column;
+				}
+
+				documentTab.Editor.CaretOffset = location.Offset.Value;
+				documentTab.Editor.ScrollTo(location.Line.Value, location.Column.Value);
+			}
 		}
 
 		public Color SetSegments(List<DocumentSegment> segments)

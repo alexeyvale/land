@@ -21,6 +21,7 @@
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+        <CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Rename" Executed="Command_Rename_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
@@ -69,6 +70,8 @@
 						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+                <Button Content="&#xf0c1;" ToolTip="Перепривязать" 
+						Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf2ed;" ToolTip="Удалить" 
 						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
@@ -103,6 +106,7 @@
                                 <ContextMenu>
 									<MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
+                                    <MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.Rename" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
 								</ContextMenu>
