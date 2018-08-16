@@ -62,7 +62,7 @@
     <Compile Include="BuilderBase.cs" />
     <Compile Include="BuilderLR.cs" />
     <Compile Include="Grammar\Structures\PairSymbol.cs" />
-    <Compile Include="Grammar\Structures\Common\Anchor.cs" />
+    <Compile Include="Grammar\Structures\Common\Location.cs" />
     <Compile Include="Grammar\Structures\Common\Message.cs" />
     <Compile Include="Grammar\Builder\LandParser.cs" />
     <Compile Include="Grammar\Builder\LandScanner.cs" />

@@ -104,7 +104,7 @@ namespace Land.Control
 		/// <summary>
 		/// Задание активного документа и установка курсора
 		/// </summary>
-		void SetActiveDocumentAndOffset(string documentName, Anchor location);
+		void SetActiveDocumentAndOffset(string documentName, PointLocation location);
 
 		#endregion
 

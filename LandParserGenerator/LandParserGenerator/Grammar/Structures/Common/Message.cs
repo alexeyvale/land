@@ -9,7 +9,7 @@ namespace Land.Core
 
 	public class Message
 	{
-		public Anchor Location { get; set; }
+		public PointLocation Location { get; set; }
 		public string FileName { get; set; }
 		public string Source { get; set; }
 		public string Text { get; set; }
@@ -33,7 +33,7 @@ namespace Land.Core
 
 		private Message() { }
 
-		private static Message Create(MessageType type, string text, Anchor loc, string src = null, string fileName = null)
+		private static Message Create(MessageType type, string text, PointLocation loc, string src = null, string fileName = null)
 		{
 			return new Message()
 			{
@@ -45,22 +45,17 @@ namespace Land.Core
 			};
 		}
 
-		private static Message Create(MessageType type, string text, int line, int col, string src = null)
-		{
-			return Create(type, text, new Anchor(line, col), src);
-		}
-
-		public static Message Trace(string text, Anchor loc, string src = null)
+		public static Message Trace(string text, PointLocation loc, string src = null)
 		{
 			return Create(MessageType.Trace, text, loc, src);
 		}
 
-		public static Message Error(string text, Anchor loc, string src = null)
+		public static Message Error(string text, PointLocation loc, string src = null)
 		{
 			return Create(MessageType.Error, text, loc, src);
 		}
 
-		public static Message Warning(string text, Anchor loc, string src = null)
+		public static Message Warning(string text, PointLocation loc, string src = null)
 		{
 			return Create(MessageType.Warning, text, loc, src);
 		}

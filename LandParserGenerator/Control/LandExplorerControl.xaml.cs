@@ -274,7 +274,7 @@ namespace Land.Control
 
 				Editor.SetActiveDocumentAndOffset(
 					State.DocumentForCurrentCandidates, 
-					new Anchor(node.StartOffset.Value)
+					new PointLocation(node.StartOffset.Value)
 				);
 			}
 		}
@@ -297,7 +297,7 @@ namespace Land.Control
 
 					Editor.SetActiveDocumentAndOffset(
 						concernPoint.FileName, 
-						new Anchor(concernPoint.TreeNode.StartOffset.Value)
+						new PointLocation(concernPoint.TreeNode.StartOffset.Value)
 					);
 
 					e.Handled = true;
@@ -328,7 +328,7 @@ namespace Land.Control
 
 								Editor.SetActiveDocumentAndOffset(
 									concernPoint.FileName, 
-									new Anchor(concernPoint.TreeNode.StartOffset.Value)
+									new PointLocation(concernPoint.TreeNode.StartOffset.Value)
 								);
 							}
 						}

@@ -4,6 +4,7 @@
 
 %using System.Linq;
 %using QUT.Gppg;
+%using Land.Core;
 
 %namespace Land.Core.Builder
 
@@ -167,7 +168,11 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 %{
-  yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
+  yylloc = new SegmentLocation()
+  	{
+		Start = new PointLocation(tokLin, tokCol, tokPos),
+		End = new PointLocation(tokELin, tokECol, tokEPos)
+	};
 %}
 
 %%
@@ -176,7 +181,7 @@ public override void yyerror(string format, params object[] args)
 { 
 	Log.Add(Message.Error(
 		String.Format(format, args.Select(a=>a.ToString())),
-		new Anchor(yyline, yycol),
+		new PointLocation(yyline, yycol, yypos),
 		"GPPG"
 	));
 }

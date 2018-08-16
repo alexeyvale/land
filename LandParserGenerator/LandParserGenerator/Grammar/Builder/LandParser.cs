@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 16.08.2018 20:40:23
+// DateTime: 16.08.2018 21:48:09
 // UserName: Алексей
-// Input file <./Land.y - 16.08.2018 20:40:23>
+// Input file <./Land.y - 16.08.2018 21:48:08>
 
 // options: no-lines gplex
 
@@ -54,9 +54,9 @@ public struct ValueType
 }
 // Abstract base class for GPLEX scanners
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
-public abstract class ScanBase : AbstractScanner<ValueType,LexLocation> {
-  private LexLocation __yylloc = new LexLocation();
-  public override LexLocation yylloc { get { return __yylloc; } set { __yylloc = value; } }
+public abstract class ScanBase : AbstractScanner<ValueType,Land.Core.SegmentLocation> {
+  private Land.Core.SegmentLocation __yylloc = new Land.Core.SegmentLocation();
+  public override Land.Core.SegmentLocation yylloc { get { return __yylloc; } set { __yylloc = value; } }
   protected virtual bool yywrap() { return true; }
 }
 
@@ -65,23 +65,23 @@ public abstract class ScanBase : AbstractScanner<ValueType,LexLocation> {
 public class ScanObj {
   public int token;
   public ValueType yylval;
-  public LexLocation yylloc;
-  public ScanObj( int t, ValueType val, LexLocation loc ) {
+  public Land.Core.SegmentLocation yylloc;
+  public ScanObj( int t, ValueType val, Land.Core.SegmentLocation loc ) {
     this.token = t; this.yylval = val; this.yylloc = loc;
   }
 }
 
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
-public class Parser: ShiftReduceParser<ValueType, LexLocation>
+public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 16.08.2018 20:40:23
-    public Parser(AbstractScanner<Land.Core.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
+  // Verbatim content from ./Land.y - 16.08.2018 21:48:08
+    public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 16.08.2018 20:40:23
+  // End verbatim content from ./Land.y - 16.08.2018 21:48:08
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -253,16 +253,16 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 { 
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareTerminal(ValueStack[ValueStack.Depth-3].strVal, ValueStack[ValueStack.Depth-1].strVal);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-3].strVal, LocationStack[LocationStack.Depth-3]);
-			}, LocationStack[LocationStack.Depth-3]);
+				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-3].strVal, LocationStack[LocationStack.Depth-3].Start);
+			}, LocationStack[LocationStack.Depth-3].Start);
 		}
         break;
       case 9: // pair -> ENTITY_NAME, EQUALS, LEFT, pair_border, RIGHT, pair_border
 {
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclarePair(ValueStack[ValueStack.Depth-6].strVal, ValueStack[ValueStack.Depth-3].strSet, ValueStack[ValueStack.Depth-1].strSet);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-6].strVal, LocationStack[LocationStack.Depth-6]);
-			}, LocationStack[LocationStack.Depth-6]);
+				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-6].strVal, LocationStack[LocationStack.Depth-6].Start);
+			}, LocationStack[LocationStack.Depth-6].Start);
 		}
         break;
       case 10: // pair_border -> ID
@@ -271,7 +271,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 11: // pair_border -> STRING
 { 	
 			var generated = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);
+			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1].Start);
 			CurrentSemanticValue.strSet = new HashSet<string>() { generated };
 		}
         break;
@@ -292,11 +292,11 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].altList);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-4].strVal, LocationStack[LocationStack.Depth-4]);
+				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-4].strVal, LocationStack[LocationStack.Depth-4].Start);
 				
 				if(aliases.Count > 0)
 					ConstructedGrammar.AddAliases(ValueStack[ValueStack.Depth-4].strVal, aliases);
-			}, LocationStack[LocationStack.Depth-4]);
+			}, LocationStack[LocationStack.Depth-4].Start);
 		}
         break;
       case 16: // body -> body, body_element
@@ -340,7 +340,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					{
 						Errors.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
-							LocationStack[LocationStack.Depth-5],
+							LocationStack[LocationStack.Depth-5].Start,
 							"LanD"
 						));
 					}
@@ -357,14 +357,14 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 				{
 					Errors.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
-							LocationStack[LocationStack.Depth-5],
+							LocationStack[LocationStack.Depth-5].Start,
 							"LanD"
 						));
 				}
 				else
 				{			
 					var generated = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].optQuantVal.Value, ValueStack[ValueStack.Depth-1].boolVal);
-					ConstructedGrammar.AddAnchor(generated, CurrentLocationSpan);
+					ConstructedGrammar.AddAnchor(generated, CurrentLocationSpan.Start);
 					
 					CurrentSemanticValue.entryVal = new Entry(generated, opts);
 				}
@@ -406,7 +406,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 								Errors.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
-									LocationStack[LocationStack.Depth-5],
+									LocationStack[LocationStack.Depth-5].Start,
 									"LanD"
 								));
 							}
@@ -470,7 +470,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 36: // body_element_atom -> STRING
 { 
 			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan);
+			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;
       case 37: // body_element_atom -> ID
@@ -481,7 +481,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			ValueStack[ValueStack.Depth-3].altList[ValueStack[ValueStack.Depth-3].altList.Count-1].Alias = ValueStack[ValueStack.Depth-2].strVal;
 			
 			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-3].altList);
-			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan);
+			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;
       case 41: // option -> CATEGORY_NAME, ID, opt_args, identifiers
@@ -491,7 +491,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			{
 				Errors.Add(Message.Error(
 					"Неизвестная категория опций '" + ValueStack[ValueStack.Depth-4].strVal + "'",
-					LocationStack[LocationStack.Depth-4],
+					LocationStack[LocationStack.Depth-4].Start,
 					"LanD"
 				));
 			}
@@ -505,7 +505,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					if(goodOption) 
 						SafeGrammarAction(() => { 
 					 		ConstructedGrammar.SetOption(parsingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
-					 	}, LocationStack[LocationStack.Depth-4]);
+					 	}, LocationStack[LocationStack.Depth-4].Start);
 					break;
 				case OptionCategory.NODES:
 					NodeOption nodeOpt;
@@ -513,7 +513,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					if(goodOption)
 						SafeGrammarAction(() => { 					
 							ConstructedGrammar.SetOption(nodeOpt, ValueStack[ValueStack.Depth-1].strList.ToArray());
-						}, LocationStack[LocationStack.Depth-4]);
+						}, LocationStack[LocationStack.Depth-4].Start);
 					break;
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
@@ -521,7 +521,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 					if(goodOption)
 						SafeGrammarAction(() => { 			
 							ConstructedGrammar.SetOption(mappingOpt, ValueStack[ValueStack.Depth-1].strList.ToArray(), ValueStack[ValueStack.Depth-2].dynamicList.ToArray());
-						}, LocationStack[LocationStack.Depth-4]);
+						}, LocationStack[LocationStack.Depth-4].Start);
 					break;
 				default:
 					break;
@@ -531,7 +531,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
 			{
 				Errors.Add(Message.Error(
 					"Опция '" + ValueStack[ValueStack.Depth-3].strVal + "' не определена для категории '" + ValueStack[ValueStack.Depth-4].strVal + "'",
-					LocationStack[LocationStack.Depth-3],
+					LocationStack[LocationStack.Depth-3].Start,
 					"LanD"
 				));
 			}
@@ -558,7 +558,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
       case 47: // argument -> STRING
 {
 			var generated = ConstructedGrammar.GenerateTerminal((string)ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1]);		
+			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1].Start);		
 			CurrentSemanticValue.dynamicVal = generated;
 		}
         break;
@@ -598,7 +598,7 @@ public class Parser: ShiftReduceParser<ValueType, LexLocation>
   }
 
 
-private void SafeGrammarAction(Action action, LexLocation loc)
+private void SafeGrammarAction(Action action, PointLocation loc)
 {
 	try
 	{

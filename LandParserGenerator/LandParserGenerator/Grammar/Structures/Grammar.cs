@@ -59,7 +59,7 @@ namespace Land.Core
 		public Dictionary<string, string> AutoTokenUserWrittenForm = new Dictionary<string, string>();
 		public Dictionary<string, string> AutoRuleUserWrittenForm = new Dictionary<string, string>();
 		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
-		private Dictionary<string, Anchor> _symbolAnchors = new Dictionary<string, Anchor>();
+		private Dictionary<string, PointLocation> _symbolAnchors = new Dictionary<string, PointLocation>();
 
 		public ISymbol this[string key]
 		{
@@ -134,12 +134,12 @@ namespace Land.Core
 			Aliases[smb] = aliases;
 		}
 
-		public void AddAnchor(string smb, Anchor loc)
+		public void AddAnchor(string smb, PointLocation loc)
 		{
 			_symbolAnchors[smb] = loc;
 		}
 
-		public Anchor GetAnchor(string smb)
+		public PointLocation GetAnchor(string smb)
 		{
 			if (_symbolAnchors.ContainsKey(smb))
 				return _symbolAnchors[smb];

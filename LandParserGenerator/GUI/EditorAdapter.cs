@@ -115,7 +115,7 @@ namespace Land.GUI
 			}
 		}
 
-		public void SetActiveDocumentAndOffset(string documentName, Anchor location)
+		public void SetActiveDocumentAndOffset(string documentName, PointLocation location)
 		{
 			/// Получаем вкладку для заданного имени файла
 			var newActive = EditorWindow.Documents
@@ -133,12 +133,6 @@ namespace Land.GUI
 
 			if (location != null)
 			{
-				if (!location.Offset.HasValue)
-				{
-					location.Offset =
-						documentTab.Editor.Document.GetOffset(location.Line.Value, location.Column.Value);
-				}
-
 				if (!location.Line.HasValue)
 				{
 					var locationFromEditor = documentTab.Editor.Document.GetLocation(location.Offset.Value);

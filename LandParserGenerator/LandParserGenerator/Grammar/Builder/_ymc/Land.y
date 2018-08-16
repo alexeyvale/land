@@ -1,5 +1,5 @@
 ﻿%{
-    public Parser(AbstractScanner<Land.Core.Builder.ValueType, LexLocation> scanner) : base(scanner) { }
+    public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Errors = new List<Message>();
@@ -11,6 +11,8 @@
 %using Land.Core;
 
 %output = LandParser.cs
+
+%YYLTYPE Land.Core.SegmentLocation
 
 %namespace Land.Core.Builder
 
@@ -91,8 +93,8 @@ terminal
 		{ 
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareTerminal($1, $3);
-				ConstructedGrammar.AddAnchor($1, @1);
-			}, @1);
+				ConstructedGrammar.AddAnchor($1, @1.Start);
+			}, @1.Start);
 		}
 	;
 	
@@ -103,8 +105,8 @@ pair
 		{
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclarePair($1, $4, $6);
-				ConstructedGrammar.AddAnchor($1, @1);
-			}, @1);
+				ConstructedGrammar.AddAnchor($1, @1.Start);
+			}, @1.Start);
 		}
 	;
 	
@@ -113,7 +115,7 @@ pair_border
 	| STRING 
 		{ 	
 			var generated = ConstructedGrammar.GenerateTerminal($1);
-			ConstructedGrammar.AddAnchor(generated, @1);
+			ConstructedGrammar.AddAnchor(generated, @1.Start);
 			$$ = new HashSet<string>() { generated };
 		}
 	| LPAR pair_border_group_content RPAR { $$ = $2; }
@@ -134,11 +136,11 @@ nonterminal
 			
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareNonterminal($1, $3);
-				ConstructedGrammar.AddAnchor($1, @1);
+				ConstructedGrammar.AddAnchor($1, @1.Start);
 				
 				if(aliases.Count > 0)
 					ConstructedGrammar.AddAliases($1, aliases);
-			}, @1);
+			}, @1.Start);
 		}
 	;
 	
@@ -182,7 +184,7 @@ body_element
 					{
 						Errors.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
-							@1,
+							@1.Start,
 							"LanD"
 						));
 					}
@@ -199,14 +201,14 @@ body_element
 				{
 					Errors.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
-							@1,
+							@1.Start,
 							"LanD"
 						));
 				}
 				else
 				{			
 					var generated = ConstructedGrammar.GenerateNonterminal($2, $4.Value, $5);
-					ConstructedGrammar.AddAnchor(generated, @$);
+					ConstructedGrammar.AddAnchor(generated, @$.Start);
 					
 					$$ = new Entry(generated, opts);
 				}
@@ -248,7 +250,7 @@ body_element
 								Errors.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
-									@1,
+									@1.Start,
 									"LanD"
 								));
 							}
@@ -307,7 +309,7 @@ body_element_atom
 	: STRING
 		{ 
 			$$ = ConstructedGrammar.GenerateTerminal($1);
-			ConstructedGrammar.AddAnchor($$, @$);
+			ConstructedGrammar.AddAnchor($$, @$.Start);
 		}
 	| ID 
 		{ $$ = $1; }
@@ -319,7 +321,7 @@ group
 			$2[$2.Count-1].Alias = $3;
 			
 			$$ = ConstructedGrammar.GenerateNonterminal($2);
-			ConstructedGrammar.AddAnchor($$, @$);
+			ConstructedGrammar.AddAnchor($$, @$.Start);
 		}
 	;
 
@@ -338,7 +340,7 @@ option
 			{
 				Errors.Add(Message.Error(
 					"Неизвестная категория опций '" + $1 + "'",
-					@1,
+					@1.Start,
 					"LanD"
 				));
 			}
@@ -352,7 +354,7 @@ option
 					if(goodOption) 
 						SafeGrammarAction(() => { 
 					 		ConstructedGrammar.SetOption(parsingOpt, $4.ToArray());
-					 	}, @1);
+					 	}, @1.Start);
 					break;
 				case OptionCategory.NODES:
 					NodeOption nodeOpt;
@@ -360,7 +362,7 @@ option
 					if(goodOption)
 						SafeGrammarAction(() => { 					
 							ConstructedGrammar.SetOption(nodeOpt, $4.ToArray());
-						}, @1);
+						}, @1.Start);
 					break;
 				case OptionCategory.MAPPING:
 					MappingOption mappingOpt;
@@ -368,7 +370,7 @@ option
 					if(goodOption)
 						SafeGrammarAction(() => { 			
 							ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3.ToArray());
-						}, @1);
+						}, @1.Start);
 					break;
 				default:
 					break;
@@ -378,7 +380,7 @@ option
 			{
 				Errors.Add(Message.Error(
 					"Опция '" + $2 + "' не определена для категории '" + $1 + "'",
-					@2,
+					@2.Start,
 					"LanD"
 				));
 			}
@@ -405,7 +407,7 @@ argument
 	| STRING 
 		{
 			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
-			ConstructedGrammar.AddAnchor(generated, @1);		
+			ConstructedGrammar.AddAnchor(generated, @1.Start);		
 			$$ = generated;
 		}
 	| ID { $$ = $1; }
@@ -430,7 +432,7 @@ identifiers
 	
 %%
 
-private void SafeGrammarAction(Action action, LexLocation loc)
+private void SafeGrammarAction(Action action, PointLocation loc)
 {
 	try
 	{

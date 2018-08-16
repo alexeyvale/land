@@ -48,7 +48,7 @@ namespace Land.Core.Parsing.LR
 				if(token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
 						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
-						new Anchor(token.Line, token.Column, token.StartOffset)
+						new PointLocation(token.Line, token.Column, token.StartOffset)
 					));
 
 				/// Знаем, что предпринять, если действие однозначно
@@ -81,7 +81,7 @@ namespace Land.Core.Parsing.LR
 
 						Log.Add(Message.Trace(
 							$"Перенос",
-							new Anchor(token.Line, token.Column, token.StartOffset)
+							new PointLocation(token.Line, token.Column, token.StartOffset)
 						));
 
 						token = LexingStream.NextToken();
@@ -108,7 +108,7 @@ namespace Land.Core.Parsing.LR
 
 						Log.Add(Message.Trace(
 							$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
-							new Anchor(token.Line, token.Column, token.StartOffset)
+							new PointLocation(token.Line, token.Column, token.StartOffset)
 						));
 
 						continue;
@@ -124,7 +124,7 @@ namespace Land.Core.Parsing.LR
 					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
 						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						new Anchor(errorToken.Line, errorToken.Column, errorToken.StartOffset)
+						new PointLocation(errorToken.Line, errorToken.Column, errorToken.StartOffset)
 					);
 
 					token = ErrorRecovery();
@@ -151,7 +151,7 @@ namespace Land.Core.Parsing.LR
 					{
 						Log.Add(Message.Trace(
 							$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-							new Anchor(token.Line, token.Column, token.StartOffset)
+							new PointLocation(token.Line, token.Column, token.StartOffset)
 						));
 
 						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);

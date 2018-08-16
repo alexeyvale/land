@@ -77,7 +77,7 @@ namespace Land.Core.Parsing.LL
 
 				Log.Add(Message.Trace(
 					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
-					new Anchor(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+					new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
 				));
 
                 /// Если символ на вершине стека совпадает с текущим токеном
@@ -118,7 +118,7 @@ namespace Land.Core.Parsing.LL
 					{
 						Log.Add(Message.Error(
 							$"Неоднозначная грамматика: для нетерминала {GrammarObject.Userify(stackTop.Symbol)} и входного символа {GrammarObject.Userify(token.Name)} допустимо несколько альтернатив",
-							new Anchor(token.Line, token.Column, token.StartOffset)
+							new PointLocation(token.Line, token.Column, token.StartOffset)
 						));
 						break;
 					}
@@ -153,7 +153,7 @@ namespace Land.Core.Parsing.LL
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
 							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
-						new Anchor(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+						new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
 					));
 
 					token = ErrorRecovery();
@@ -302,7 +302,7 @@ namespace Land.Core.Parsing.LL
 				{
 					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => GrammarObject.Userify(t))) }",
-						new Anchor(token.Line, token.Column, token.StartOffset)
+						new PointLocation(token.Line, token.Column, token.StartOffset)
 					);
 
 					if (enableRecovery)
@@ -336,7 +336,7 @@ namespace Land.Core.Parsing.LL
 			{
 				Log.Add(Message.Error(
 					$"Возобновление разбора невозможно: восстановление в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
-					new Anchor(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+					new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
 				));
 
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
@@ -344,7 +344,7 @@ namespace Land.Core.Parsing.LL
 
 			Log.Add(Message.Warning(
 				$"Процесс восстановления запущен в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)}",
-				new Anchor(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+				new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
 			));
 
 			/// То, что мы хотели разобрать, и не смогли
@@ -429,7 +429,7 @@ namespace Land.Core.Parsing.LL
 
 					Log.Add(Message.Warning(
 						$"Произведено восстановление на уровне {currentNode.Symbol}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
-						new Anchor(token.Line, token.Column, token.StartOffset)
+						new PointLocation(token.Line, token.Column, token.StartOffset)
 					));
 
 					return token;

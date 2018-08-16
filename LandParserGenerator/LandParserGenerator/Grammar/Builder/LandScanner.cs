@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 16.08.2018 20:40:23
+//  DateTime: 16.08.2018 21:48:08
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 16.08.2018 20:40:23>
+//  GPLEX input file <./Land.lex - 16.08.2018 21:48:08>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -36,6 +36,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using System.Linq;
 using QUT.Gppg;
+using Land.Core;
 
 namespace Land.Core.Builder
 {   
@@ -846,7 +847,11 @@ yy_pop_state();
             } // end try
             finally {
 // User-specified epilog to scan()
-yylloc = new LexLocation(tokLin, tokCol, tokELin, tokECol);
+yylloc = new SegmentLocation()
+  	{
+		Start = new PointLocation(tokLin, tokCol, tokPos),
+		End = new PointLocation(tokELin, tokECol, tokEPos)
+	};
 // End, user-specified epilog
             } // end finally
         }
@@ -905,7 +910,7 @@ public override void yyerror(string format, params object[] args)
 { 
 	Log.Add(Message.Error(
 		String.Format(format, args.Select(a=>a.ToString())),
-		new Anchor(yyline, yycol),
+		new PointLocation(yyline, yycol, yypos),
 		"GPPG"
 	));
 }

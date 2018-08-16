@@ -50,7 +50,7 @@ namespace Land.VSExtension
 			throw new NotImplementedException();
 		}
 
-		public void SetActiveDocumentAndOffset(string documentName, Anchor location)
+		public void SetActiveDocumentAndOffset(string documentName, PointLocation location)
 		{
 			throw new NotImplementedException();
 		}
