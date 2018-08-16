@@ -81,7 +81,11 @@
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\ConcernPoint.cs" />
     <Compile Include="Markup\LandMapper.cs" />
-    <Compile Include="Markup\LandExplorerVisitor.cs" />
+    <Compile Include="Markup\MarkupVisitors\GroupPointsVisitor.cs" />
+    <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
+    <Compile Include="Markup\MarkupVisitors\RemapVisitor.cs" />
+    <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
+    <Compile Include="Markup\TreeVisitors\LinkRecoveryVisitor.cs" />
     <Compile Include="Parsing\Statistics.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
@@ -89,7 +93,7 @@
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\PullAliasVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />
-    <Compile Include="Parsing\Tree\Visitors\BaseVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\BaseTreeVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\GhostListOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\LR\Action.cs" />
     <Compile Include="Parsing\LR\Parser.cs" />

@@ -747,7 +747,7 @@ namespace Land.GUI
 
 		private int NewDocumentCounter { get; set; } = 1;
 
-		private DocumentTab CreateDocument(string documentName)
+		public DocumentTab CreateDocument(string documentName)
 		{
 			var tab = new TabItem();
 			DocumentTabs.Items.Add(tab);
@@ -772,6 +772,22 @@ namespace Land.GUI
 			DocumentTabs.SelectedItem = tab;
 
 			return Documents[tab];
+		}
+
+		public DocumentTab OpenDocument(string documentName)
+		{
+			if (File.Exists(documentName))
+			{
+				var stream = new StreamReader(documentName, Encoding.Default, true);
+				var document = CreateDocument(documentName);
+
+				document.Editor.Text = stream.ReadToEnd();
+				stream.Close();
+
+				return document;
+			}
+
+			return null;
 		}
 
 		private void NewDocumentButton_Click(object sender, RoutedEventArgs e)
@@ -837,6 +853,7 @@ namespace Land.GUI
 				}
 
 				DocumentTabs.Items.Remove(activeTab);
+				Documents.Remove(activeTab);
 			}
 		}
 
@@ -845,12 +862,7 @@ namespace Land.GUI
 			var openFileDialog = new OpenFileDialog();
 			if (openFileDialog.ShowDialog() == true)
 			{
-				var stream = new StreamReader(openFileDialog.FileName, Encoding.Default, true);
-				var document = CreateDocument(openFileDialog.FileName);
-
-				document.Editor.Text = stream.ReadToEnd();
-			
-				stream.Close();
+				OpenDocument(openFileDialog.FileName);
 			}
 		}
 

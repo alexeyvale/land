@@ -13,5 +13,7 @@ namespace Land.Core.Markup
 		public string Name { get; set; }
 
 		public Concern Parent { get; set; }
+
+		public abstract void Accept(BaseMarkupVisitor visitor);
 	}
 }

@@ -9,7 +9,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Parsing
 {
-	public class MappingOptionsProcessingVisitor : BaseVisitor
+	public class MappingOptionsProcessingVisitor : BaseTreeVisitor
 	{
 		public const double DEFAULT_BASE_PRIORITY = 1;
 

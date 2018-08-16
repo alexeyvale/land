@@ -35,7 +35,7 @@ namespace Land.VSExtension
 			throw new NotImplementedException();
 		}
 
-		public void ProcessMessages(List<Message> messages)
+		public void ProcessMessages(List<Message> messages, bool skipTrace)
 		{
 			throw new NotImplementedException();
 		}

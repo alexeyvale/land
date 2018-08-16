@@ -126,7 +126,7 @@ namespace Land.Control
 
 		#region Messages
 
-		void ProcessMessages(List<Message> messages);
+		void ProcessMessages(List<Message> messages, bool skipTrace);
 
 		void ProcessMessage(Message message);
 

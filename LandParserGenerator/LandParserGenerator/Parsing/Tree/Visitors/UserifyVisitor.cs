@@ -9,7 +9,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Parsing
 {
-	public class UserifyVisitor: BaseVisitor
+	public class UserifyVisitor: BaseTreeVisitor
 	{
 		protected Grammar grammar { get; set; }
 

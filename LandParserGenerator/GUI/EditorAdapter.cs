@@ -87,9 +87,12 @@ namespace Land.GUI
 			return EditorWindow.Documents.Count > 0;
 		}
 
-		public void ProcessMessages(List<Message> messages)
+		public void ProcessMessages(List<Message> messages, bool skipTrace)
 		{
-			foreach (var msg in messages)
+			IEnumerable<Message> toProcess = skipTrace 
+				? messages.Where(m => m.Type != MessageType.Trace) : messages;
+
+			foreach (var msg in toProcess)
 			{
 				ProcessMessage(msg);
 			}
@@ -108,19 +111,24 @@ namespace Land.GUI
 
 		public void SetActiveDocumentAndOffset(string documentName, int offset)
 		{
+			/// Получаем вкладку для заданного имени файла
 			var newActive = EditorWindow.Documents
 				.Where(d => d.Value.DocumentName == documentName)
 				.Select(d => d.Key).FirstOrDefault();
 
-			if(newActive!=null)
-			{
+			/// Фокусируемся на ней, если получили
+			if (newActive != null)
 				EditorWindow.DocumentTabs.SelectedItem = newActive;
-				EditorWindow.Documents[newActive].Editor.CaretOffset = offset;
-				EditorWindow.Documents[newActive].Editor.Focus();
 
-				var location = EditorWindow.Documents[newActive].Editor.Document.GetLocation(offset);
-				EditorWindow.Documents[newActive].Editor.ScrollTo(location.Line, location.Column);
-			}
+			/// Получаем документ, если вкладки нет - открываем документ в новой вкладке
+			var documentTab = newActive != null 
+				? EditorWindow.Documents[newActive] : EditorWindow.OpenDocument(documentName);
+
+			documentTab.Editor.CaretOffset = offset;
+			documentTab.Editor.Focus();
+
+			var location = documentTab.Editor.Document.GetLocation(offset);
+			documentTab.Editor.ScrollTo(location.Line, location.Column);
 		}
 
 		public Color SetSegments(List<DocumentSegment> segments)

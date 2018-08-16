@@ -11,7 +11,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 
 using Land.Core;
-using Land.Core.Parsing.LL;
+using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
 
@@ -48,11 +48,6 @@ namespace Land.Control
 		private IEditorAdapter Editor { get; set; }
 
 		/// <summary>
-		/// Парсеры, которые необходимо запускать для каждого из расширений файлов
-		/// </summary>
-		private Dictionary<string, Parser> Parsers { get; set; } = new Dictionary<string, Parser>();
-
-		/// <summary>
 		/// Менеджер разметки
 		/// </summary>
 		private MarkupManager MarkupManager { get; set; } = new MarkupManager();
@@ -67,24 +62,32 @@ namespace Land.Control
 		/// </summary>
 		public ControlState State { get; set; } = new ControlState();
 
+		/// <summary>
+		/// Лог панели разметки
+		/// </summary>
+		public List<Message> Log { get; set; } = new List<Message>();
+
+
 		public LandExplorerControl()
         {
 			InitializeComponent();
         }
 
 		private void LandExplorer_Loaded(object sender, RoutedEventArgs e)
-		{
-			MarkupTreeView.ItemsSource = MarkupManager.Markup;
-		}
+		{ }
 
 		public void Initialize(IEditorAdapter adapter)
 		{
 			SettingsObject = adapter.LoadSettings() ?? new LandExplorerSettings();
 
 			Editor = adapter;
-			Editor.ProcessMessages(BuildParsers());
-		}
 
+			MarkupTreeView.ItemsSource = MarkupManager.Markup;		
+			MarkupManager.GetText = Editor.GetDocumentText;
+			MarkupManager.Parsers = BuildParsers();
+
+			Editor.ProcessMessages(Log, true);
+		}
 
 		#region Commands
 
@@ -92,7 +95,7 @@ namespace Land.Control
 		{
 			if (MarkupTreeView.SelectedItem != null)
 			{
-				MarkupManager.Remove((MarkupElement)MarkupTreeView.SelectedItem);
+				MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
 			}
 		}
 
@@ -101,69 +104,19 @@ namespace Land.Control
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
-			if (!offset.HasValue || !EnsureTreeExistence(documentName))
-				return;
-
 			State.DocumentForCurrentCandidates = documentName;
-			var pointCandidates = new LinkedList<Node>();
-			var currentNode = MarkupManager.AstRoots[documentName];
 
-			/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
-			/// содержащие текущую позицию каретки
-			while (currentNode != null)
-			{
-				if (currentNode.Options.IsLand)
-					pointCandidates.AddFirst(currentNode);
-
-				currentNode = currentNode.Children.Where(c => c.StartOffset.HasValue && c.EndOffset.HasValue
-					&& c.StartOffset <= offset && c.EndOffset >= offset).FirstOrDefault();
-			}
-
-			ConcernPointCandidatesList.ItemsSource = pointCandidates;
+			ConcernPointCandidatesList.ItemsSource = MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
-			var documentName = Editor.GetActiveDocumentName();
-
-			if (EnsureTreeExistence(documentName))
-			{
-				var visitor = new LandExplorerVisitor();
-				MarkupManager.AstRoots[documentName].Accept(visitor);
-
-				/// Группируем land-сущности по типу (символу)
-				foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
-				{
-					var concern = new Concern(group.Key);
-					MarkupManager.Add(concern);
-
-					/// В пределах символа группируем по псевдониму
-					var subgroups = group.GroupBy(g => g.Alias);
-
-					/// Для всех точек, для которых указан псевдоним
-					foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
-					{
-						/// создаём подфункциональность
-						var subconcern = new Concern(subgroup.Key, concern);
-						MarkupManager.Add(subconcern);
-
-						foreach (var point in subgroup)
-							MarkupManager.Add(new ConcernPoint(documentName, point, subconcern));
-					}
-
-					/// Остальные добавляются напрямую к функциональности, соответствующей символу
-					var points = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
-						.SelectMany(s => s).ToList();
-
-					foreach (var point in points)
-						MarkupManager.Add(new ConcernPoint(documentName, point, concern));
-				}
-			}
+			MarkupManager.AddLand(Editor.GetActiveDocumentName());
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.Add(new Concern("Новая функциональность"));
+			MarkupManager.AddConcern("Новая функциональность");
 		}
 
 		private void Command_Save_Executed(object sender, RoutedEventArgs e)
@@ -177,9 +130,7 @@ namespace Land.Control
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Serialize(saveFileDialog.FileName, MarkupManager);
-
-
+				MarkupManager.Serialize(saveFileDialog.FileName);
 			}
 		}
 
@@ -194,7 +145,7 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				MarkupManager = MarkupManager.Deserialize(openFileDialog.FileName);
+				MarkupManager.Deserialize(openFileDialog.FileName);
 				MarkupTreeView.ItemsSource = MarkupManager.Markup;
 			}
 		}
@@ -263,23 +214,22 @@ namespace Land.Control
 
 			if (SettingsWindow.ShowDialog() ?? false)
 			{
-				var grammarsChanged = 
-
 				SettingsObject = SettingsWindow.SettingsObject;
 				Editor.SaveSettings(SettingsObject);
 
-				Editor.ProcessMessages(BuildParsers());
+				MarkupManager.Parsers = BuildParsers();
+				Editor.ProcessMessages(Log, true);
 			}
 		}
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var nameRootPair in MarkupManager.AstRoots)
-			{
-				var newTreeRoot = ParseDocument(nameRootPair.Key);
-				Mapper.Remap(nameRootPair.Value, newTreeRoot);
-				MarkupManager.Remap(nameRootPair.Key, newTreeRoot, Mapper.Mapping);
-			}
+			//foreach (var nameRootPair in MarkupManager.AstRoots)
+			//{
+			//	var newTreeRoot = ParseDocument(nameRootPair.Key);
+			//	Mapper.Remap(nameRootPair.Value, newTreeRoot);
+			//	MarkupManager.Remap(nameRootPair.Key, newTreeRoot, Mapper.Mapping);
+			//}
 		}
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -288,11 +238,11 @@ namespace Land.Control
 			{
 				var concern = MarkupTreeView.SelectedItem as Concern;
 
-				MarkupManager.Add(new ConcernPoint(
-					State.DocumentForCurrentCandidates,
-					(Node)ConcernPointCandidatesList.SelectedItem,
-					concern
-				));
+				MarkupManager.AddConcernPoint(
+					State.DocumentForCurrentCandidates, 
+					(Node)ConcernPointCandidatesList.SelectedItem, 
+					null, concern
+				);
 			}
 		}
 
@@ -629,9 +579,7 @@ namespace Land.Control
 			/// Если перетащили элемент на функциональность, добавляем его внутрь функциональности
 			if (target is Concern)
 			{
-				MarkupManager.Remove(source);
-				source.Parent = (Concern)target;
-				MarkupManager.Add(source);
+				MarkupManager.MoveTo((Concern)target, source);
 			}
 			else
 			{
@@ -639,16 +587,12 @@ namespace Land.Control
 				{
 					if (target.Parent != source.Parent)
 					{
-						MarkupManager.Remove(source);
-						source.Parent = target.Parent;
-						MarkupManager.Add(source);
+						MarkupManager.MoveTo(target.Parent, source);
 					}
 				}
 				else
 				{
-					MarkupManager.Remove(source);
-					source.Parent = null;
-					MarkupManager.Add(source);
+					MarkupManager.MoveTo(null, source);
 				}
 			}
 		}
@@ -702,26 +646,9 @@ namespace Land.Control
 
 		#region Helpers
 
-		private Node ParseDocument(string documentName)
+		private Dictionary<string, BaseParser> BuildParsers()
 		{
-			if (!String.IsNullOrEmpty(documentName))
-			{
-				var extension = Path.GetExtension(documentName);
-
-				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
-				{
-					return Parsers[extension].Parse(Editor.GetDocumentText(documentName));
-				}
-			}
-
-			return null;
-		}
-
-		private List<Message> BuildParsers()
-		{
-			Parsers = new Dictionary<string, Parser>();
-
-			var messages = new List<Message>();
+			var parsers = new Dictionary<string, BaseParser>();
 
 			/// Генерируем парсер и связываем его с каждым из расширений, 
 			/// указанных для грамматики
@@ -729,43 +656,16 @@ namespace Land.Control
 			{
 				var parser = BuilderLL.BuildParser(
 					File.ReadAllText(pair.GrammarPath),
-					messages
+					Log
 				);
 
 				foreach(var key in pair.Extensions)
 				{
-					Parsers[key] = parser;
+					parsers[key] = parser;
 				}
 			}
 
-			return messages;
-		}
-
-		private bool EnsureTreeExistence(string documentName)
-		{
-			if (MarkupManager.AstRoots.ContainsKey(documentName))
-			{
-				return true;
-			}
-			else
-			{
-				if (!String.IsNullOrEmpty(documentName))
-				{
-					var extension = Path.GetExtension(documentName);
-
-					if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
-					{
-						var text = Editor.GetDocumentText(documentName);
-
-						MarkupManager.AstRoots[documentName] = Parsers[extension].Parse(text);
-						MarkupManager.AstSources[documentName] = text;
-
-						return Parsers[extension].Log.All(l => l.Type != MessageType.Error) && MarkupManager.AstRoots[documentName] != null;
-					}
-				}
-			}
-
-			return false;
+			return parsers;
 		}
 
 		private List<DocumentSegment> GetSegments(MarkupElement elem, bool captureWholeLine)

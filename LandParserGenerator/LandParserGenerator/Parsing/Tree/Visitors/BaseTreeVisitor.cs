@@ -9,7 +9,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Parsing
 {
-	public abstract class BaseVisitor
+	public abstract class BaseTreeVisitor
 	{
 		public virtual void Visit(Node node)
 		{

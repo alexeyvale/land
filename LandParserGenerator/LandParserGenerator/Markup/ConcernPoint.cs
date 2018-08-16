@@ -49,5 +49,10 @@ namespace Land.Core.Markup
 			TreeNode = node;
 			Parent = parent;
 		}
+
+		public override void Accept(BaseMarkupVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}
 }

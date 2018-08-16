@@ -19,5 +19,10 @@ namespace Land.Core.Markup
 			Parent = parent;
 			Elements = new ObservableCollection<MarkupElement>();
 		}
+
+		public override void Accept(BaseMarkupVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}
 }

@@ -9,7 +9,7 @@ using Land.Core.Parsing;
 
 namespace Land.Core.Markup
 {
-	public class LandExplorerVisitor : BaseVisitor
+	public class LandExplorerVisitor : BaseTreeVisitor
 	{
 		public List<Node> Land { get; set; } = new List<Node>();
 		public List<Node> HighLevelLand { get; set; } = new List<Node>();
