@@ -17,12 +17,12 @@
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
-		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
+        <CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Rename" Executed="Command_Rename_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+        <CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
+        <CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
+        <CommandBinding Command="local:LandExplorerCommands.Rename" Executed="Command_Rename_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
 	<Grid>
@@ -37,13 +37,17 @@
                 <RowDefinition Height="100*"></RowDefinition>
             </Grid.RowDefinitions>
             <ToolBar Grid.Row="0">
+                <ToolBar.CommandBindings>
+                    
+                </ToolBar.CommandBindings>
+                
                 <ToolBar.Resources>
 					<Style x:Key="ToolBarButtonStyle" TargetType="{x:Type Control}">
 						<Setter Property="FontSize" Value="12pt"/>
 						<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
 						<Setter Property="Foreground" Value="DarkBlue"/>
 						<Setter Property="IsEnabled" Value="True"/>
-						<Setter Property="Margin" Value="2,0,2,0"/>
+						<Setter Property="Margin" Value="1,0,1,0"/>
 						<Style.Triggers>
 							<Trigger Property="IsEnabled" Value="false">
 								<Setter Property="Foreground" Value="DarkGray"/>
@@ -62,7 +66,7 @@
 				<Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" 
 						Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
-                <Separator Margin="5"></Separator>
+                <Separator Margin="7"></Separator>
 				
 				<Button Content="&#xf067;" ToolTip="Добавить точку привязки" 
 						Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
@@ -75,12 +79,12 @@
 				<Button Content="&#xf2ed;" ToolTip="Удалить" 
 						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
-                <Separator Margin="5"></Separator>
+                <Separator Margin="7"></Separator>
 
 				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить все функциональности" 
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
 				
-                <Separator Margin="5"></Separator>
+                <Separator Margin="7"></Separator>
 				
                 <Button Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
                 <Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
@@ -93,7 +97,7 @@
                 MouseMove="MarkupTreeView_MouseMove">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Name="MarkupElementView">
                             <Grid>
                                 <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
                                 <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
@@ -104,7 +108,7 @@
                             </Grid>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
-									<MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
+                                    <MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
                                     <MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.Rename" CommandTarget="{Binding ElementName=LandExplorer}"/>

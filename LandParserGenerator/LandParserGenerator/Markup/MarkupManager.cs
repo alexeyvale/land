@@ -165,6 +165,26 @@ namespace Land.Core.Markup
 			return new LinkedList<Node>();
 		}
 
+		public void RelinkConcernPoint(ConcernPoint point, string fileName, Node node)
+		{
+			Log.Clear();
+
+			if (point.FileName != fileName)
+			{
+				Links[point.FileName] -= 1;
+
+				if (Links[point.FileName] == 0)
+				{
+					Links.Remove(point.FileName);
+					AstRoots.Remove(point.FileName);
+					Sources.Remove(point.FileName);
+				}
+			}
+
+			point.TreeNode = node;
+			point.FileName = fileName;		
+		}
+
 		public void MoveTo(Concern newParent, MarkupElement elem)
 		{
 			Log.Clear();

@@ -22,13 +22,20 @@ namespace Land.Control
 	/// </summary>
 	public partial class LandExplorerControl : UserControl
     {
+		public enum LandExplorerCommand { AddPoint, Relink }
+
 		public class ControlState
 		{
 			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
+			public TreeViewItem SelectedItem { get; set; }
+
 			public TreeViewItem EditedItem { get; set; }
 			public string EditedItemOldHeader { get; set; }
-			public TreeViewItem SelectedItem { get; set; }
+
+			public TreeViewItem PendingCommandTarget { get; set; }
+			public LandExplorerCommand? PendingCommand { get; set; }
 			public string DocumentForCurrentCandidates { get; set; }
+
 			public bool HighlightConcerns { get; set; }
 		}
 
@@ -93,21 +100,24 @@ namespace Land.Control
 
 		private void Command_Delete_Executed(object sender, RoutedEventArgs e)
 		{
-			if (MarkupTreeView.SelectedItem != null)
+			MarkupManagerAction(() =>
 			{
-				MarkupManagerAction(() =>
-				{
-					MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
-				});
-			}
+				MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
+			});
 		}
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
+			if (e.OriginalSource is MenuItem)
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
 			State.DocumentForCurrentCandidates = documentName;
+			State.PendingCommand = LandExplorerCommand.AddPoint;
 
 			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
 			{
@@ -125,7 +135,17 @@ namespace Land.Control
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.AddConcern("Новая функциональность");
+			var parent = e.OriginalSource is MenuItem 
+				&& MarkupTreeView.SelectedItem != null 
+				&& MarkupTreeView.SelectedItem is Concern
+					? (Concern)MarkupTreeView.SelectedItem : null;
+
+			MarkupManager.AddConcern("Новая функциональность", parent);
+
+			if (parent != null)
+			{
+				State.SelectedItem.IsExpanded = true;
+			}
 		}
 
 		private void Command_Save_Executed(object sender, RoutedEventArgs e)
@@ -172,12 +192,30 @@ namespace Land.Control
 
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
-			
+			if (e.OriginalSource is MenuItem)
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+			else
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+
+			var offset = Editor.GetActiveDocumentOffset();
+			var documentName = Editor.GetActiveDocumentName();
+
+			State.DocumentForCurrentCandidates = documentName;
+			State.PendingCommand = LandExplorerCommand.Relink;
+
+			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+			{
+				return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+			});
 		}
 
 		private void Command_Rename_Executed(object sender, RoutedEventArgs e)
 		{
-			TreeViewItem item = State.SelectedItem;
+			TreeViewItem item = e.OriginalSource as TreeViewItem;
 
 			var textbox = GetMarkupTreeItemTextBox(item);
 			textbox.Visibility = Visibility.Visible;
@@ -227,6 +265,26 @@ namespace Land.Control
 			e.CanExecute = true;
 		}
 
+		private void Command_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = MarkupTreeView != null 
+				&& MarkupTreeView.SelectedItem != null;
+		}
+
+		private void Command_HasSelectedConcernPoint_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = MarkupTreeView != null  
+				&& MarkupTreeView.SelectedItem != null 
+				&& MarkupTreeView.SelectedItem is ConcernPoint;
+		}
+
+		private void Command_ConcernPointIsNotSelected_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = e.CanExecute = MarkupTreeView != null
+				&& (MarkupTreeView.SelectedItem == null
+				|| MarkupTreeView.SelectedItem is Concern);
+		}
+
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsWindow = new SettingsWindow(SettingsObject.Clone());
@@ -256,13 +314,32 @@ namespace Land.Control
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				var concern = MarkupTreeView.SelectedItem as Concern;
+				if (State.PendingCommand == LandExplorerCommand.Relink)
+				{
+					MarkupManager.RelinkConcernPoint(
+						(ConcernPoint)State.SelectedItem.DataContext,
+						State.DocumentForCurrentCandidates,
+						(Node)ConcernPointCandidatesList.SelectedItem
+					);
+				}
+				else
+				{
+					MarkupManager.AddConcernPoint(
+						State.DocumentForCurrentCandidates,
+						(Node)ConcernPointCandidatesList.SelectedItem,
+						null,
+						State.PendingCommandTarget != null 
+							? (Concern)State.PendingCommandTarget.DataContext : null
+					);
 
-				MarkupManager.AddConcernPoint(
-					State.DocumentForCurrentCandidates, 
-					(Node)ConcernPointCandidatesList.SelectedItem, 
-					null, concern
-				);
+					if (State.PendingCommandTarget != null)
+					{
+						State.PendingCommandTarget.IsExpanded = true;
+						State.PendingCommandTarget = null;
+					}
+				}
+
+				ConcernPointCandidatesList.ItemsSource = null;
 			}
 		}
 
@@ -436,9 +513,10 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
-			State.SelectedItem = (TreeViewItem)e.OriginalSource;
+			State.SelectedItem = (TreeViewItem)sender;
 
-			if (State.EditedItem != null && State.EditedItem != State.SelectedItem)
+			if (State.EditedItem != null 
+				&& State.EditedItem != (TreeViewItem)sender)
 			{
 				var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
 				textbox.Visibility = Visibility.Hidden;
@@ -450,6 +528,8 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
 		{
+			State.SelectedItem = null;
+
 			var item = (TreeViewItem)sender;
 
 			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
