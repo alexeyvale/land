@@ -24,22 +24,6 @@ namespace Land.Control
     {
 		public enum LandExplorerCommand { AddPoint, Relink }
 
-		public class PendingCommandState
-		{
-			public MarkupElement LogicalTarget { get; set; }
-
-			public TreeViewItem VisualTarget { get; set; }
-
-			public LandExplorerCommand? Command { get; set; }
-
-			public string DocumentName { get; set; }
-
-			public bool IsSingleTarget()
-			{
-				return VisualTarget != null && VisualTarget.DataContext == LogicalTarget;
-			}
-		}
-
 		public class ControlState
 		{
 			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
@@ -48,7 +32,9 @@ namespace Land.Control
 			public TreeViewItem EditedItem { get; set; }
 			public string EditedItemOldHeader { get; set; }
 
-			public PendingCommandState PendingCommand { get; set; }
+			public TreeViewItem PendingCommandTarget { get; set; }
+			public LandExplorerCommand? PendingCommand { get; set; }
+			public string DocumentForCurrentCandidates { get; set; }
 
 			public bool HighlightConcerns { get; set; }
 		}
@@ -122,32 +108,21 @@ namespace Land.Control
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
+			if (e.OriginalSource is MenuItem)
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
-			if (!String.IsNullOrEmpty(documentName))
+			State.DocumentForCurrentCandidates = documentName;
+			State.PendingCommand = LandExplorerCommand.AddPoint;
+
+			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
 			{
-				State.PendingCommand = new PendingCommandState()
-				{
-					Command = LandExplorerCommand.AddPoint,
-					DocumentName = documentName,
-					VisualTarget = State.SelectedItem,
-
-					/// Если команду вызвали для точки, а не для функциональности, 
-					/// она действует на родителя точки
-					LogicalTarget = State.SelectedItem != null
-						? State.SelectedItem.DataContext is Concern
-							? (MarkupElement)State.SelectedItem.DataContext
-							: ((MarkupElement)State.SelectedItem.DataContext).Parent
-						: null
-				};
-
-
-				ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
-				{
-					return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
-				});
-			}
+				return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+			});
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
@@ -160,15 +135,14 @@ namespace Land.Control
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			var parent = MarkupTreeView.SelectedItem != null
-				? MarkupTreeView.SelectedItem is Concern
-					? (Concern)MarkupTreeView.SelectedItem
-					: ((MarkupElement)MarkupTreeView.SelectedItem).Parent
-				: null;
+			var parent = e.OriginalSource is MenuItem 
+				&& MarkupTreeView.SelectedItem != null 
+				&& MarkupTreeView.SelectedItem is Concern
+					? (Concern)MarkupTreeView.SelectedItem : null;
 
 			MarkupManager.AddConcern("Новая функциональность", parent);
 
-			if (parent != null && parent == MarkupTreeView.SelectedItem)
+			if (parent != null)
 			{
 				State.SelectedItem.IsExpanded = true;
 			}
@@ -218,16 +192,20 @@ namespace Land.Control
 
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
+			if (e.OriginalSource is MenuItem)
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+			else
+			{
+				State.PendingCommandTarget = State.SelectedItem;
+			}
+
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
-			State.PendingCommand = new PendingCommandState()
-			{
-				Command = LandExplorerCommand.Relink,
-				DocumentName = documentName,
-				VisualTarget = State.SelectedItem,
-				LogicalTarget = (MarkupElement)State.SelectedItem?.DataContext
-			};
+			State.DocumentForCurrentCandidates = documentName;
+			State.PendingCommand = LandExplorerCommand.Relink;
 
 			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
 			{
@@ -300,6 +278,13 @@ namespace Land.Control
 				&& MarkupTreeView.SelectedItem is ConcernPoint;
 		}
 
+		private void Command_ConcernPointIsNotSelected_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = e.CanExecute = MarkupTreeView != null
+				&& (MarkupTreeView.SelectedItem == null
+				|| MarkupTreeView.SelectedItem is Concern);
+		}
+
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
 			SettingsWindow = new SettingsWindow(SettingsObject.Clone());
@@ -329,30 +314,31 @@ namespace Land.Control
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
+				if (State.PendingCommand == LandExplorerCommand.Relink)
 				{
 					MarkupManager.RelinkConcernPoint(
 						(ConcernPoint)State.SelectedItem.DataContext,
-						State.PendingCommand.DocumentName,
+						State.DocumentForCurrentCandidates,
 						(Node)ConcernPointCandidatesList.SelectedItem
 					);
 				}
 				else
 				{
 					MarkupManager.AddConcernPoint(
-						State.PendingCommand.DocumentName,
+						State.DocumentForCurrentCandidates,
 						(Node)ConcernPointCandidatesList.SelectedItem,
 						null,
-						(Concern)State.PendingCommand.LogicalTarget
+						State.PendingCommandTarget != null 
+							? (Concern)State.PendingCommandTarget.DataContext : null
 					);
 
-					if (State.PendingCommand.IsSingleTarget())
+					if (State.PendingCommandTarget != null)
 					{
-						State.PendingCommand.VisualTarget.IsExpanded = true;
+						State.PendingCommandTarget.IsExpanded = true;
+						State.PendingCommandTarget = null;
 					}
 				}
 
-				State.PendingCommand = null;
 				ConcernPointCandidatesList.ItemsSource = null;
 			}
 		}
@@ -364,7 +350,7 @@ namespace Land.Control
 				var node = (Node)ConcernPointCandidatesList.SelectedItem;
 
 				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommand.DocumentName, 
+					State.DocumentForCurrentCandidates, 
 					new PointLocation(node.StartOffset.Value)
 				);
 			}
