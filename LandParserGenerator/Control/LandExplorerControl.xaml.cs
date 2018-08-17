@@ -34,7 +34,7 @@ namespace Land.Control
 
 			public TreeViewItem PendingCommandTarget { get; set; }
 			public LandExplorerCommand? PendingCommand { get; set; }
-			public string DocumentForCurrentCandidates { get; set; }
+			public string PendingCommandDocument { get; set; }
 
 			public bool HighlightConcerns { get; set; }
 		}
@@ -108,21 +108,20 @@ namespace Land.Control
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
-			if (e.OriginalSource is MenuItem)
-			{
-				State.PendingCommandTarget = State.SelectedItem;
-			}
-
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
-			State.DocumentForCurrentCandidates = documentName;
-			State.PendingCommand = LandExplorerCommand.AddPoint;
-
-			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+			if (!String.IsNullOrEmpty(documentName))
 			{
-				return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
-			});
+				State.PendingCommandTarget = State.SelectedItem;
+				State.PendingCommandDocument = documentName;
+				State.PendingCommand = LandExplorerCommand.AddPoint;
+
+				ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+				{
+					return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+				});
+			}
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
@@ -135,8 +134,7 @@ namespace Land.Control
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			var parent = e.OriginalSource is MenuItem 
-				&& MarkupTreeView.SelectedItem != null 
+			var parent = MarkupTreeView.SelectedItem != null 
 				&& MarkupTreeView.SelectedItem is Concern
 					? (Concern)MarkupTreeView.SelectedItem : null;
 
@@ -192,25 +190,20 @@ namespace Land.Control
 
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
-			if (e.OriginalSource is MenuItem)
-			{
-				State.PendingCommandTarget = State.SelectedItem;
-			}
-			else
-			{
-				State.PendingCommandTarget = State.SelectedItem;
-			}
-
 			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
 
-			State.DocumentForCurrentCandidates = documentName;
-			State.PendingCommand = LandExplorerCommand.Relink;
-
-			ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+			if (!String.IsNullOrEmpty(documentName))
 			{
-				return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
-			});
+				State.PendingCommandTarget = State.SelectedItem;
+				State.PendingCommandDocument = documentName;
+				State.PendingCommand = LandExplorerCommand.Relink;
+
+				ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+				{
+					return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
+				});
+			}
 		}
 
 		private void Command_Rename_Executed(object sender, RoutedEventArgs e)
@@ -318,14 +311,14 @@ namespace Land.Control
 				{
 					MarkupManager.RelinkConcernPoint(
 						(ConcernPoint)State.SelectedItem.DataContext,
-						State.DocumentForCurrentCandidates,
+						State.PendingCommandDocument,
 						(Node)ConcernPointCandidatesList.SelectedItem
 					);
 				}
 				else
 				{
 					MarkupManager.AddConcernPoint(
-						State.DocumentForCurrentCandidates,
+						State.PendingCommandDocument,
 						(Node)ConcernPointCandidatesList.SelectedItem,
 						null,
 						State.PendingCommandTarget != null 
@@ -350,7 +343,7 @@ namespace Land.Control
 				var node = (Node)ConcernPointCandidatesList.SelectedItem;
 
 				Editor.SetActiveDocumentAndOffset(
-					State.DocumentForCurrentCandidates, 
+					State.PendingCommandDocument, 
 					new PointLocation(node.StartOffset.Value)
 				);
 			}
@@ -424,13 +417,34 @@ namespace Land.Control
 			}
 		}
 
+		private void MarkupTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+			if (item == null)
+			{
+				if (State.SelectedItem != null)
+				{
+					State.SelectedItem.IsSelected = false;
+				}
+			}
+		}
+
 		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
 			if (item != null)
 			{
 				item.IsSelected = true;
 				e.Handled = true;
+			}
+			else
+			{
+				if (State.SelectedItem != null)
+				{
+					State.SelectedItem.IsSelected = false;
+				}
 			}
 		}
 

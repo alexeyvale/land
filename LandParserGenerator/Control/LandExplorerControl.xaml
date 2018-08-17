@@ -37,10 +37,6 @@
                 <RowDefinition Height="100*"></RowDefinition>
             </Grid.RowDefinitions>
             <ToolBar Grid.Row="0">
-                <ToolBar.CommandBindings>
-                    
-                </ToolBar.CommandBindings>
-                
                 <ToolBar.Resources>
 					<Style x:Key="ToolBarButtonStyle" TargetType="{x:Type Control}">
 						<Setter Property="FontSize" Value="12pt"/>
@@ -91,13 +87,14 @@
             </ToolBar>
             <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
                 MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
+                PreviewMouseLeftButtonDown="MarkupTreeView_PreviewMouseLeftButtonDown"
                 PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
                 DragOver="MarkupTreeView_DragOver"
                 Drop="MarkupTreeView_Drop"
                 MouseMove="MarkupTreeView_MouseMove">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                        <StackPanel Orientation="Horizontal" Name="MarkupElementView">
+                        <StackPanel Orientation="Horizontal">
                             <Grid>
                                 <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
                                 <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
