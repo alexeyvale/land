@@ -45,7 +45,8 @@ namespace Land.GUI
 	{
 		private MainWindow EditorWindow { get; set; }
 		private string SettingsPath { get; set; }
-		private ColorsManager ColorsManager { get; set; } = new ColorsManager(); 
+		private ColorsManager ColorsManager { get; set; } = new ColorsManager();
+		private Action<string> DocumentSavingCallback { get; set; }
 
 		public EditorAdapter(MainWindow window, string settingsPath)
 		{
@@ -200,6 +201,11 @@ namespace Land.GUI
 			{
 				return null;
 			}
+		}
+
+		public void RegisterOnDocumentSaved(Action<string> callback)
+		{
+			EditorWindow.OnDocumenSaved += new MainWindow.DocumentSavedHandler(callback);
 		}
 
 		#endregion

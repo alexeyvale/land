@@ -76,6 +76,7 @@
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Markup\BaseTreeMapper.cs" />
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\Concern.cs" />
     <Compile Include="Markup\MarkupManager.cs" />

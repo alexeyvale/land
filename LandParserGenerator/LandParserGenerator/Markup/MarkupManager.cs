@@ -51,6 +51,9 @@ namespace Land.Core.Markup
 		public GetTextDelegate GetText;
 		public delegate string GetTextDelegate(string fileName);
 
+		[NonSerialized]
+		private BaseTreeMapper Mapper = new LandMapper();
+
 		public void Clear()
 		{
 			Markup.Clear();
@@ -202,17 +205,40 @@ namespace Land.Core.Markup
 				Markup.Add(elem);
 		}
 
-		public void Remap(string fileName, Node newRoot, Dictionary<Node, Node> mapping)
+		public bool Remap(string fileName)
 		{
 			Log.Clear();
 
-			AstRoots[fileName] = newRoot;
-
-			var visitor = new RemapVisitor(mapping);
-			for (int i = 0; i < Markup.Count; ++i)
+			/// Если на файл с указанным именем ссылаются точки привязки
+			if (Links.ContainsKey(fileName))
 			{
-				Markup[i].Accept(visitor);
+				/// Запоминаем старую версию дерева и текста
+				var oldRoot = AstRoots[fileName];
+				var oldText = Sources[fileName];
+
+				/// Если удалось перепарсить файл
+				if (Parse(fileName, File.ReadAllText(fileName)))
+				{
+					Mapper.Remap(oldRoot, AstRoots[fileName]);
+
+					/// Обходим результат сопоставления и перепривязываем
+					/// элементы разметки к узлам нового дерева
+					var visitor = new RemapVisitor(Mapper.Mapping);
+					for (int i = 0; i < Markup.Count; ++i)
+					{
+						Markup[i].Accept(visitor);
+					}
+				}
+				else
+				{
+					AstRoots[fileName] = oldRoot;
+					Sources[fileName] = oldText;
+
+					return false;
+				}
 			}
+
+			return true;
 		}
 
 		public void Serialize(string fileName)

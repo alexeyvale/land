@@ -132,8 +132,20 @@ namespace Land.Control
 
 		#endregion
 
+
+		#region Settings
+
 		void SaveSettings(LandExplorerSettings settings);
 
 		LandExplorerSettings LoadSettings();
+
+		#endregion
+
+
+		#region Callbacks
+
+		void RegisterOnDocumentSaved(Action<string> callback);
+
+		#endregion
 	}
 }

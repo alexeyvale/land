@@ -28,6 +28,7 @@ namespace Land.Control
 		{
 			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
 			public TreeViewItem SelectedItem { get; set; }
+			public HashSet<TreeViewItem> InactiveItems { get; set; }
 
 			public TreeViewItem EditedItem { get; set; }
 			public string EditedItemOldHeader { get; set; }
@@ -60,11 +61,6 @@ namespace Land.Control
 		private MarkupManager MarkupManager { get; set; } = new MarkupManager();
 
 		/// <summary>
-		/// Алгоритм отображения старого дерева в новое
-		/// </summary>
-		private LandMapper Mapper { get; set; } = new LandMapper();
-
-		/// <summary>
 		/// Состояние контрола
 		/// </summary>
 		public ControlState State { get; set; } = new ControlState();
@@ -88,12 +84,14 @@ namespace Land.Control
 			SettingsObject = adapter.LoadSettings() ?? new LandExplorerSettings();
 
 			Editor = adapter;
+			Editor.RegisterOnDocumentSaved(DocumentSavedHandler);
 
-			MarkupTreeView.ItemsSource = MarkupManager.Markup;		
+			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 			MarkupManager.GetText = Editor.GetDocumentText;
-			MarkupManager.Parsers = BuildParsers();
-
-			Editor.ProcessMessages(Log, true, true);
+			MarkupManagerAction(() =>
+			{
+				MarkupManager.Parsers = BuildParsers();
+			});
 		}
 
 		#region Commands
@@ -771,6 +769,14 @@ namespace Land.Control
 
 
 		#region Helpers
+
+		private void DocumentSavedHandler(string fileName)
+		{
+			MarkupManagerAction(() =>
+			{
+				MarkupManager.Remap(fileName);
+			});
+		}
 
 		private T MarkupManagerFunction<T>(Func<T> func, bool skipTrace = true)
 		{

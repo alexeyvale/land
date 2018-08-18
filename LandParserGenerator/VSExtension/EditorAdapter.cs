@@ -69,5 +69,10 @@ namespace Land.VSExtension
 		{
 			throw new NotImplementedException();
 		}
+
+		public void RegisterOnDocumentSaved(Action<string> callback)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

@@ -8,19 +8,14 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	public class LandMapper
+	public class LandMapper: BaseTreeMapper
 	{
 		/// Веса операций для Левенштейна
 		private const double InsertionCost = 1;
 		private const double DeletionCost = 1;
 		private const double SubstitutionCost = 1;
 
-
-		public Dictionary<Node, Node> Mapping { get; set; }
-		public Dictionary<Node, Dictionary<Node, double>> Similarities { get; set; }
-
-
-		public void Remap(Node oldTree, Node newTree)
+		public override void Remap(Node oldTree, Node newTree)
 		{
 			Mapping = new Dictionary<Node, Node>();
 			Similarities = new Dictionary<Node, Dictionary<Node, double>>();

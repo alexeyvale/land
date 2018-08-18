@@ -626,25 +626,10 @@ namespace Land.GUI
 		}
 		#endregion
 
-		#region Работа с точками привязки
+		#region Отладка перепривязки
 
 		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
-
-		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
-		{
-			var documentName = (string)File_NameLabel.Content;
-
-			if (Markup.AstRoots.ContainsKey(documentName) && TreeRoot != null)
-			{
-				Mapper.Remap(Markup.AstRoots[documentName], TreeRoot);
-				Markup.Remap(documentName, TreeRoot, Mapper.Mapping);
-			}
-		}
-
-		#endregion
-
-		#region Отладка перепривязки
 
 		private Node NewTreeRoot { get; set; }
 		private bool NewTextChanged { get; set; }
@@ -746,6 +731,9 @@ namespace Land.GUI
 
 		#region Тестирование панели разметки
 
+		public event DocumentSavedHandler OnDocumenSaved;
+		public delegate void DocumentSavedHandler(string documentName);
+
 		public class DocumentTab
 		{
 			public TextEditor Editor { get; set; }
@@ -823,6 +811,9 @@ namespace Land.GUI
 						File.WriteAllText(saveFileDialog.FileName, Documents[activeTab].Editor.Text);
 						Documents[activeTab].DocumentName = saveFileDialog.FileName;
 						activeTab.Header = Path.GetFileName(saveFileDialog.FileName);
+
+						if(OnDocumenSaved != null)
+							OnDocumenSaved(Documents[activeTab].DocumentName);
 					}
 				}
 				else
@@ -831,6 +822,9 @@ namespace Land.GUI
 						Documents[activeTab].DocumentName, 
 						Documents[activeTab].Editor.Text
 					);
+
+					if (OnDocumenSaved != null)
+						OnDocumenSaved(Documents[activeTab].DocumentName);
 				}
 			}
 		}
