@@ -64,8 +64,8 @@
     </ApplicationDefinition>
     <Compile Include="ConsoleWriter.cs" />
     <Compile Include="EditorAdapter.cs" />
-    <Compile Include="SegmentsHighlighter.cs" />
-    <Compile Include="CurrentLineHighlighter.cs" />
+    <Compile Include="SegmentsBackgroundRenderer.cs" />
+    <Compile Include="CurrentLineBackgroundRenderer.cs" />
     <Compile Include="SelectedTextColorizer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -12,12 +12,12 @@ using Land.Control;
 
 namespace Land.GUI
 {
-	public class SegmentsHighlighter : IBackgroundRenderer
+	public class SegmentsBackgroundRenderer : IBackgroundRenderer
 	{
 		private TextArea textEditor { get; set; }
 		private List<Tuple<List<DocumentSegment>, Color>> SegmentGroups { get; set; } = new List<Tuple<List<DocumentSegment>, Color>>();
 		
-		public SegmentsHighlighter(TextArea editor)
+		public SegmentsBackgroundRenderer(TextArea editor)
 		{
 			textEditor = editor;
 		}

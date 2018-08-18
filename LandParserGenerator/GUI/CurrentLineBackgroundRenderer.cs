@@ -7,11 +7,11 @@ using ICSharpCode.AvalonEdit.Rendering;
 
 namespace Land.GUI
 {
-	public class CurrentLineHighlighter : IBackgroundRenderer
+	public class CurrentLineBackgroundRenderer : IBackgroundRenderer
 	{
 		private TextArea textEditor { get; set; }
 
-		public CurrentLineHighlighter(TextArea editor)
+		public CurrentLineBackgroundRenderer(TextArea editor)
 		{
 			textEditor = editor;
 		}

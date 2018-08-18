@@ -184,17 +184,31 @@
 
                     <TabControl Grid.Column="0">
 						<TabItem Header="AST">
-							<TreeView
-                                Name="AstTreeView"        
-                                FontSize="14pt"
-                                SelectedItemChanged="ParseTreeView_SelectedItemChanged">
-								<TreeView.ItemTemplate>
-									<HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-										<TextBlock Text="{Binding .}" />
-									</HierarchicalDataTemplate>
-								</TreeView.ItemTemplate>
-							</TreeView>
-						</TabItem>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="100*"></RowDefinition>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                </Grid.RowDefinitions>
+							    <TreeView
+                                    Grid.Row="0"
+                                    Name="AstView"        
+                                    FontSize="14pt"
+                                    SelectedItemChanged="AstView_SelectedItemChanged">
+								    <TreeView.ItemTemplate>
+									    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+										    <TextBlock Text="{Binding .}" />
+									    </HierarchicalDataTemplate>
+								    </TreeView.ItemTemplate>
+							    </TreeView>
+                                <CheckBox 
+                                    Grid.Row="1" 
+                                    Content="Выделить Any-области" 
+                                    Margin="10, 8, 10, 0"
+                                    Checked="AstView_SelectAny_StateChanged"
+                                    Unchecked="AstView_SelectAny_StateChanged">
+                                </CheckBox>
+                            </Grid>
+                        </TabItem>
 					</TabControl>
                 </Grid>
             </TabItem>

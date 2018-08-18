@@ -29,7 +29,8 @@ namespace Land.GUI
 
 		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 
-		private SelectedTextColorizer SelectedTextColorizerForGrammar { get; set; }
+		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
+		private SegmentsBackgroundRenderer File_SegmentColorizer { get; set; }
 
 		private Land.Core.Parsing.BaseParser Parser { get; set; }
 
@@ -41,9 +42,12 @@ namespace Land.GUI
 				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
 				ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
 
-			Grammar_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(Grammar_Editor.TextArea));
-			File_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineHighlighter(File_Editor.TextArea));
-			SelectedTextColorizerForGrammar = new SelectedTextColorizer(Grammar_Editor.TextArea);
+			Grammar_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineBackgroundRenderer(Grammar_Editor.TextArea));
+			Grammar_SelectedTextColorizer = new SelectedTextColorizer(Grammar_Editor.TextArea);
+
+			File_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineBackgroundRenderer(File_Editor.TextArea));
+			File_Editor.TextArea.TextView.BackgroundRenderers.Add(File_SegmentColorizer = new SegmentsBackgroundRenderer(File_Editor.TextArea));
+
 
 			if (File.Exists(LAST_GRAMMARS_FILE))
 			{
@@ -238,7 +242,7 @@ namespace Land.GUI
 			Grammar_StatusBar.Background = Brushes.Yellow;
 			Grammar_StatusBarLabel.Content = "Текст грамматики изменился со времени последней генерации парсера";
 			Grammar_SaveButton.IsEnabled = true;
-			SelectedTextColorizerForGrammar.Reset();
+			Grammar_SelectedTextColorizer.Reset();
 		}
 
 		private void Grammar_ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -319,7 +323,7 @@ namespace Land.GUI
                 {
                     TreeRoot = root;
 					TreeSource = File_Editor.Text;
-                    AstTreeView.ItemsSource = new List<Node>() { root };
+                    AstView.ItemsSource = new List<Node>() { root };
                 }
 
                 File_LogList.ItemsSource = Parser.Log;
@@ -327,7 +331,7 @@ namespace Land.GUI
             }
 		}
 
-		private void ParseTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void AstView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			var treeView = (TreeView)sender;
 
@@ -410,7 +414,7 @@ namespace Land.GUI
 					}
 					else
 					{
-						if (!child.Options.IsLand)
+						if (!child.Options.IsLand && child.StartOffset.HasValue)
 							TypedWaterSegments.Add(new Tuple<int, int>(child.StartOffset.Value, child.EndOffset.Value));
 					}
 
@@ -419,23 +423,31 @@ namespace Land.GUI
 			}
 		}
 
-		#endregion
+		private void AstView_SelectAny_StateChanged(object sender, RoutedEventArgs e)
+		{
+			var source = (CheckBox)sender;
 
-		//if (HighlightWater.IsChecked == true)
-		//{
-		//	if (TreeRoot != null)
-		//	{
-		//		var waterVisitor = new GetWaterSegmentsVisitor();
-		//		waterVisitor.Visit(TreeRoot);
-		//		CurrentConcernColorizer.SetSegments(waterVisitor.AnySegments.Select(s => new SegmentToHighlight()
-		//		{
-		//			StartOffset = s.Item1,
-		//			EndOffset = s.Item2,
-		//			HighlightWholeLine = false
-		//		}).ToList(), Color.FromArgb(60, 150, 150, 200));
-		//	}
-		//	return;
-		//}
+			if (source.IsChecked == true)
+			{
+				if (TreeRoot != null)
+				{
+					var waterVisitor = new GetWaterSegmentsVisitor();
+					waterVisitor.Visit(TreeRoot);
+					File_SegmentColorizer.SetSegments(waterVisitor.AnySegments.Select(s => new DocumentSegment()
+					{
+						StartOffset = s.Item1,
+						EndOffset = s.Item2,
+						CaptureWholeLine = false
+					}).ToList(), Color.FromArgb(60, 150, 150, 200));
+				}
+			}
+			else
+			{
+				File_SegmentColorizer.ResetSegments();
+			}
+		}
+
+		#endregion
 
 		#region Парсинг набора файлов
 
@@ -655,7 +667,7 @@ namespace Land.GUI
 				NewTextEditor.Text = File_Editor.Text;
 				OldTextEditor.Text = TreeSource;
 				//MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
-				AstDebugTreeView.ItemsSource = AstTreeView.ItemsSource;
+				AstDebugTreeView.ItemsSource = AstView.ItemsSource;
 			}
 		}
 
@@ -740,7 +752,7 @@ namespace Land.GUI
 
 			public string DocumentName { get; set; }
 
-			public SegmentsHighlighter SegmentsColorizer { get; set; }
+			public SegmentsBackgroundRenderer SegmentsColorizer { get; set; }
 		}
 
 		public EditorAdapter EditorAdapter { get; set; }
@@ -766,7 +778,7 @@ namespace Land.GUI
 			};
 
 			Documents[tab].Editor.TextArea.TextView.BackgroundRenderers
-				.Add(Documents[tab].SegmentsColorizer = new SegmentsHighlighter(Documents[tab].Editor.TextArea));
+				.Add(Documents[tab].SegmentsColorizer = new SegmentsBackgroundRenderer(Documents[tab].Editor.TextArea));
 
 			tab.Content = Documents[tab].Editor;
 			tab.Header = Path.GetFileName(Documents[tab].DocumentName);
