@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -63,12 +64,14 @@ namespace Land.Control
 		/// <summary>
 		/// Состояние контрола
 		/// </summary>
-		public ControlState State { get; set; } = new ControlState();
+		private ControlState State { get; set; } = new ControlState();
 
 		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
+
+		public Dictionary<string, BaseParser> Parsers { get; set; }
 
 
 		public LandExplorerControl()
@@ -90,8 +93,32 @@ namespace Land.Control
 			MarkupManager.GetText = Editor.GetDocumentText;
 			MarkupManagerAction(() =>
 			{
-				MarkupManager.Parsers = BuildParsers();
+				MarkupManager.Parsers = Parsers =
+					ThisFunction(() => BuildParsers());
 			});
+		}
+
+		public ObservableCollection<MarkupElement> GetMarkup()
+		{
+			return MarkupManager.Markup;
+		}
+
+		public Node GetTree(string fileName)
+		{
+			return MarkupManager.AstRoots.ContainsKey(fileName)
+				? MarkupManager.AstRoots[fileName] : null;
+		}
+
+		public string GetText(string fileName)
+		{
+			return MarkupManager.Sources.ContainsKey(fileName)
+				? MarkupManager.Sources[fileName] : null;
+		}
+
+		public BaseParser GetParser(string extension)
+		{
+			return Parsers.ContainsKey(extension)
+				? Parsers[extension] : null;
 		}
 
 		#region Commands
@@ -286,8 +313,8 @@ namespace Land.Control
 				SettingsObject = SettingsWindow.SettingsObject;
 				Editor.SaveSettings(SettingsObject);
 
-				MarkupManager.Parsers = BuildParsers();
-				Editor.ProcessMessages(Log, true, true);
+				MarkupManager.Parsers = Parsers = 
+					ThisFunction(() => BuildParsers());
 			}
 		}
 
@@ -789,6 +816,19 @@ namespace Land.Control
 		{
 			action();
 			Editor.ProcessMessages(MarkupManager.Log, skipTrace, true);
+		}
+
+		private T ThisFunction<T>(Func<T> func, bool skipTrace = true)
+		{
+			var result = func();
+			Editor.ProcessMessages(Log, skipTrace, true);
+			return result;
+		}
+
+		private void ThisAction(Action action, bool skipTrace = true)
+		{
+			action();
+			Editor.ProcessMessages(Log, skipTrace, true);
 		}
 
 		private Dictionary<string, BaseParser> BuildParsers()

@@ -275,10 +275,7 @@
                         <RowDefinition Height="70*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ToolBar Grid.Row="0">
-                        <Button Name="AddAllLandDebugButton" Content="Пометить все Land-сущности" Click="AddAllLandDebugButton_Click"></Button>
-                        <Separator></Separator>
                         <Button Name="ReplaceNewWithOldButton" Content="Очистить изменения" Click="ReplaceNewWithOldButton_Click"></Button>
-                        <Separator></Separator>
                     </ToolBar>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
@@ -286,63 +283,73 @@
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="15*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="35*"></ColumnDefinition>
+                            <ColumnDefinition Width="15*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="35*"></ColumnDefinition>
+                            <ColumnDefinition Width="30*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="30*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
-                            <TabControl>
-                                <TabItem Header="AST">
-                                    <TreeView Name="AstDebugTreeView" SelectedItemChanged="AstDebugTreeView_SelectedItemChanged">
-                                        <TreeView.ItemTemplate>
-                                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                                <TextBlock Text="{Binding .}" />
-                                            </HierarchicalDataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
-                                </TabItem>
-                                <TabItem Header="Разметка">
-                                    <TreeView Name="MarkupDebugTreeView" SelectedItemChanged="MarkupDebugTreeView_SelectedItemChanged">
-                                        <TreeView.Resources>
-                                            <Style TargetType="{x:Type TreeViewItem}"/>
-                                        </TreeView.Resources>
-                                        <TreeView.ItemTemplate>
-                                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
-                                                <TextBlock Text="{Binding Name}" />
-                                            </HierarchicalDataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
-                                </TabItem>
-                            </TabControl>
+                            <TreeView Name="MappingDebug_MarkupTreeView" 
+                                      SelectedItemChanged="MappingDebug_MarkupTreeView_SelectedItemChanged"
+                                      MouseDoubleClick="MappingDebug_MarkupTreeView_MouseDoubleClick">
+                                <TreeView.Resources>
+                                    <Style TargetType="{x:Type TreeViewItem}"/>
+                                </TreeView.Resources>
+                                <TreeView.ItemTemplate>
+                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </HierarchicalDataTemplate>
+                                </TreeView.ItemTemplate>
+                            </TreeView>
                         </Grid>
                         <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="2">
-                            <ListBox Name="SimilaritiesList" SelectionChanged="SimilaritiesList_SelectionChanged"></ListBox>
-                        </Grid>
+                        <TreeView Name="MappingDebug_OldAstView" SelectedItemChanged="MappingDebug_OldAstView_SelectedItemChanged" Grid.Column="2">
+                            <TreeView.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                    <TextBlock Text="{Binding .}" />
+                                </HierarchicalDataTemplate>
+                            </TreeView.ItemTemplate>
+                        </TreeView>
                         <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+                        <TabControl Grid.Column="4">
+                            <TabItem Header="AST">
+                                <TreeView Name="MappingDebug_NewAstView" SelectedItemChanged="MappingDebug_NewAstView_SelectedItemChanged" Grid.Column="2">
+                                    <TreeView.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                            <TextBlock Text="{Binding .}" />
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.ItemTemplate>
+                                </TreeView>
+                            </TabItem>
+                            <TabItem Header="Оценки">
+                                <ListBox Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
+                            </TabItem>
+                        </TabControl>
+                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
                         <avalonedit:TextEditor 
-                            Grid.Column="4" 
+                            Grid.Column="6" 
                             IsReadOnly="True"
-                            Name="OldTextEditor"
+                            Name="MappingDebug_OldTextEditor"
                             ShowLineNumbers="True"
                             FontFamily="Consolas"
                             FontSize="12pt">
                         </avalonedit:TextEditor>
-                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="6">
+                        <GridSplitter Grid.Column="7" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+                        <Grid Grid.Column="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="70*"></RowDefinition>
                                 <RowDefinition Height="30"></RowDefinition>
                             </Grid.RowDefinitions>
                             <avalonedit:TextEditor 
                                 Grid.Row="0"
-                                Name="NewTextEditor"
+                                Name="MappingDebug_NewTextEditor"
                                 ShowLineNumbers="True"
                                 FontFamily="Consolas"
                                 FontSize="12pt"
                                 TextChanged="NewTextEditor_TextChanged">
                             </avalonedit:TextEditor>
-                            <StatusBar Grid.Row="1" Name="NewFileParsingStatus"></StatusBar>
+                            <StatusBar Grid.Row="1" Name="MappingDebug_ParsingStatus"></StatusBar>
                         </Grid>
                     </Grid>
                 </Grid>

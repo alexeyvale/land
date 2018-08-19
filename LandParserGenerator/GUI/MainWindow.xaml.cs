@@ -628,7 +628,6 @@ namespace Land.GUI
 
 		#region Отладка перепривязки
 
-		private MarkupManager Markup { get; set; } = new MarkupManager();
 		private LandMapper Mapper { get; set; } = new LandMapper();
 
 		private Node NewTreeRoot { get; set; }
@@ -636,62 +635,80 @@ namespace Land.GUI
 
 		private void ReplaceNewWithOldButton_Click(object sender, RoutedEventArgs e)
 		{
-			NewTextEditor.Text = OldTextEditor.Text;
+			MappingDebug_NewTextEditor.Text = MappingDebug_OldTextEditor.Text;
 		}
 
-		private void AddAllLandDebugButton_Click(object sender, RoutedEventArgs e)
+		private void MappingDebug_MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			//AddAllLandButton_Click(null, null);
-			//MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
+			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint)
+			{
+				var point = (ConcernPoint)MappingDebug_MarkupTreeView.SelectedItem;
+
+				if (point.TreeNode != null)
+				{
+					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.FileName);
+					MappingDebug_OldAstView.ItemsSource = new List<Node>() { LandExplorer.GetTree(point.FileName) };
+
+					if(String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
+					{
+						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.FileName);
+					}
+
+					MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor, true);
+				}
+			}
 		}
 
 		private void MainPerspectiveTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (sender == e.Source && MappingDebugTab.IsSelected)
-			{
-				NewTextEditor.Text = File_Editor.Text;
-				OldTextEditor.Text = TreeSource;
-				//MarkupDebugTreeView.ItemsSource = MarkupTreeView.ItemsSource;
-				AstDebugTreeView.ItemsSource = AstView.ItemsSource;
-			}
+			MappingDebug_MarkupTreeView.ItemsSource = LandExplorer.GetMarkup();
 		}
 
-		private void AstDebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void MappingDebug_MarkupTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			if(AstDebugTreeView.SelectedItem != null)
+			if(MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint)
 			{
-				var node = (Node)AstDebugTreeView.SelectedItem;
-				ParseNewTextAndSelectMostSimilar(node);
+				MapPoint((ConcernPoint)MappingDebug_MarkupTreeView.SelectedItem);
 			}
 		}
 
-		private void MarkupDebugTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void MappingDebug_OldAstView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			if (MarkupDebugTreeView.SelectedItem is ConcernPoint)
+			if(MappingDebug_OldAstView.SelectedItem != null)
 			{
-				var node = ((ConcernPoint)MarkupDebugTreeView.SelectedItem).TreeNode;
-				ParseNewTextAndSelectMostSimilar(node);
+				MoveCaretToSource((Node)MappingDebug_OldAstView.SelectedItem, MappingDebug_OldTextEditor, true);
 			}
 		}
 
-		private void ParseNewTextAndSelectMostSimilar(Node node)
+		private void MappingDebug_NewAstView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			if (MappingDebug_NewAstView.SelectedItem != null)
+			{
+				MoveCaretToSource((Node)MappingDebug_NewAstView.SelectedItem, MappingDebug_NewTextEditor, true);
+			}
+		}
+
+		private void MapPoint(ConcernPoint point)
 		{
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
+				var parser = LandExplorer.GetParser(Path.GetExtension(point.FileName));
+
 				/// и при этом парсер сгенерирован
-				if (Parser != null)
+				if (parser != null)
 				{
 					/// пытаемся распарсить текст
-					NewTreeRoot = Parser.Parse(NewTextEditor.Text);
-					var noErrors = Parser.Log.All(l => l.Type != MessageType.Error);
+					NewTreeRoot = parser.Parse(MappingDebug_NewTextEditor.Text);
+					var noErrors = parser.Log.All(l => l.Type != MessageType.Error);
 
-					NewFileParsingStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
+					MappingDebug_ParsingStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
 
 					/// Если текст распарсился, ищем отображение из старого текста в новый
 					if (noErrors)
 					{
-						Mapper.Remap(Markup.AstRoots.Single().Value, NewTreeRoot);
+						MappingDebug_NewAstView.ItemsSource = new List<Node> { NewTreeRoot };
+						Mapper.Remap(LandExplorer.GetTree(point.FileName), NewTreeRoot);
 						NewTextChanged = false;
 					}
 				}
@@ -701,24 +718,26 @@ namespace Land.GUI
 			if (!NewTextChanged)
 			{
 				/// Заполняем список похожестей похожестями узлов нового дерева на выбранный узел старого дерева
-				SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(node) ? Mapper.Similarities[node] : null;
-				MoveCaretToSource(node, OldTextEditor);
+				MappingDebug_SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(point.TreeNode) 
+					? Mapper.Similarities[point.TreeNode] : null;
+				MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor);
 
 				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
-				if (SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(node))
+				if (MappingDebug_SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(point.TreeNode))
 				{
 					/// значит, в какой-то новый узел мы отобразили старый
-					SimilaritiesList.SelectedItem = Mapper.Similarities[node].FirstOrDefault(p => p.Key == Mapper.Mapping[node]);
+					MappingDebug_SimilaritiesList.SelectedItem = 
+						Mapper.Similarities[point.TreeNode].FirstOrDefault(p => p.Key == Mapper.Mapping[point.TreeNode]);
 				}
 			}
 		}
 
-		private void SimilaritiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void MappingDebug_SimilaritiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if(SimilaritiesList.SelectedItem != null)
+			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
-				var node = ((KeyValuePair<Node,double>)SimilaritiesList.SelectedItem).Key;
-				MoveCaretToSource(node, NewTextEditor);
+				var node = ((KeyValuePair<Node,double>)MappingDebug_SimilaritiesList.SelectedItem).Key;
+				MoveCaretToSource(node, MappingDebug_NewTextEditor);
 			}
 		}
 
