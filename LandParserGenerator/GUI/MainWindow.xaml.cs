@@ -702,7 +702,8 @@ namespace Land.GUI
 					NewTreeRoot = parser.Parse(MappingDebug_NewTextEditor.Text);
 					var noErrors = parser.Log.All(l => l.Type != MessageType.Error);
 
-					MappingDebug_ParsingStatus.Background = noErrors ? Brushes.LightGreen : LightRed;
+					MappingDebug_StatusBar.Background = noErrors ? Brushes.LightGreen : LightRed;
+					MappingDebug_StatusLabel.Content = noErrors ? String.Empty : "Ошибка при разборе нового текста";
 
 					/// Если текст распарсился, ищем отображение из старого текста в новый
 					if (noErrors)
