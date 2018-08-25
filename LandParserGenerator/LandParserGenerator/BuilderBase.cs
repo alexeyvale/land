@@ -113,7 +113,7 @@ namespace Land.Core
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
-		public static Grammar BuildGrammar(GrammarType type, string text, List<Message> errors)
+		public static Grammar BuildGrammar(GrammarType type, string text, List<Message> log)
 		{
 			var scanner = new SpecParsing.Scanner();
 			scanner.SetSource(text, 0);
@@ -123,8 +123,8 @@ namespace Land.Core
 
 			var success = specParser.Parse();
 
-			errors.AddRange(specParser.Errors);
-			errors.AddRange(scanner.Log);
+			log.AddRange(specParser.Log);
+			log.AddRange(scanner.Log);
 
 			if (!success)
 			{

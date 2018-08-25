@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 16.08.2018 21:48:09
+// DateTime: 26.08.2018 0:00:37
 // UserName: Алексей
-// Input file <./Land.y - 16.08.2018 21:48:08>
+// Input file <./Land.y - 26.08.2018 0:00:37>
 
 // options: no-lines gplex
 
@@ -74,14 +74,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 16.08.2018 21:48:08
+  // Verbatim content from ./Land.y - 26.08.2018 0:00:37
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
-    public List<Message> Errors = new List<Message>();
+    public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 16.08.2018 21:48:08
+  // End verbatim content from ./Land.y - 26.08.2018 0:00:37
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -246,7 +246,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 2: // lp_description -> structure, PROC, options
 { 
 			ConstructedGrammar.PostProcessing();
-			Errors.AddRange(ConstructedGrammar.CheckValidity()); 
+			Log.AddRange(ConstructedGrammar.CheckValidity()); 
 		}
         break;
       case 8: // terminal -> ENTITY_NAME, COLON, REGEX
@@ -338,7 +338,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 					MappingOption mapOpt;
 					if(!Enum.TryParse<MappingOption>(opt.Item1.ToUpper(), out mapOpt))
 					{
-						Errors.Add(Message.Error(
+						Log.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
 							LocationStack[LocationStack.Depth-5].Start,
 							"LanD"
@@ -355,7 +355,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 			{
 				if(ValueStack[ValueStack.Depth-4].strVal.StartsWith(Grammar.ANY_TOKEN_NAME))
 				{
-					Errors.Add(Message.Warning(
+					Log.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
 							LocationStack[LocationStack.Depth-5].Start,
 							"LanD"
@@ -403,7 +403,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 							
 							if(!String.IsNullOrEmpty(errorGroupName))
 							{
-								Errors.Add(Message.Error(
+								Log.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
 									LocationStack[LocationStack.Depth-5].Start,
@@ -489,7 +489,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 			OptionCategory optCategory;
 			if(!Enum.TryParse(ValueStack[ValueStack.Depth-4].strVal.ToUpper(), out optCategory))
 			{
-				Errors.Add(Message.Error(
+				Log.Add(Message.Error(
 					"Неизвестная категория опций '" + ValueStack[ValueStack.Depth-4].strVal + "'",
 					LocationStack[LocationStack.Depth-4].Start,
 					"LanD"
@@ -529,7 +529,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 			
 			if(!goodOption)
 			{
-				Errors.Add(Message.Error(
+				Log.Add(Message.Error(
 					"Опция '" + ValueStack[ValueStack.Depth-3].strVal + "' не определена для категории '" + ValueStack[ValueStack.Depth-4].strVal + "'",
 					LocationStack[LocationStack.Depth-3].Start,
 					"LanD"
@@ -606,7 +606,7 @@ private void SafeGrammarAction(Action action, PointLocation loc)
 	}
 	catch(IncorrectGrammarException ex)
 	{
-		Errors.Add(Message.Error(
+		Log.Add(Message.Error(
 			ex.Message,
 			loc,
 			"LanD"

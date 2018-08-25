@@ -2,7 +2,7 @@
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
-    public List<Message> Errors = new List<Message>();
+    public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
 %}
@@ -71,7 +71,7 @@ lp_description
 	: structure PROC options 
 		{ 
 			ConstructedGrammar.PostProcessing();
-			Errors.AddRange(ConstructedGrammar.CheckValidity()); 
+			Log.AddRange(ConstructedGrammar.CheckValidity()); 
 		}
 	;
 
@@ -182,7 +182,7 @@ body_element
 					MappingOption mapOpt;
 					if(!Enum.TryParse<MappingOption>(opt.Item1.ToUpper(), out mapOpt))
 					{
-						Errors.Add(Message.Error(
+						Log.Add(Message.Error(
 							"Неизвестная опция '" + opt.Item1 + "'",
 							@1.Start,
 							"LanD"
@@ -199,7 +199,7 @@ body_element
 			{
 				if($2.StartsWith(Grammar.ANY_TOKEN_NAME))
 				{
-					Errors.Add(Message.Warning(
+					Log.Add(Message.Warning(
 							"Использование квантификаторов с символом '" + Grammar.ANY_TOKEN_NAME + "' избыточно и не влияет на процесс разбора",
 							@1.Start,
 							"LanD"
@@ -247,7 +247,7 @@ body_element
 							
 							if(!String.IsNullOrEmpty(errorGroupName))
 							{
-								Errors.Add(Message.Error(
+								Log.Add(Message.Error(
 									"При описании '" + Grammar.ANY_TOKEN_NAME + "' использовано неизвестное имя группы '" 
 										+ errorGroupName + "', группа проигнорирована",
 									@1.Start,
@@ -338,7 +338,7 @@ option
 			OptionCategory optCategory;
 			if(!Enum.TryParse($1.ToUpper(), out optCategory))
 			{
-				Errors.Add(Message.Error(
+				Log.Add(Message.Error(
 					"Неизвестная категория опций '" + $1 + "'",
 					@1.Start,
 					"LanD"
@@ -378,7 +378,7 @@ option
 			
 			if(!goodOption)
 			{
-				Errors.Add(Message.Error(
+				Log.Add(Message.Error(
 					"Опция '" + $2 + "' не определена для категории '" + $1 + "'",
 					@2.Start,
 					"LanD"
@@ -440,7 +440,7 @@ private void SafeGrammarAction(Action action, PointLocation loc)
 	}
 	catch(IncorrectGrammarException ex)
 	{
-		Errors.Add(Message.Error(
+		Log.Add(Message.Error(
 			ex.Message,
 			loc,
 			"LanD"

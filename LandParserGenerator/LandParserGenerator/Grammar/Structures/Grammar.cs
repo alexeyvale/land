@@ -597,7 +597,7 @@ namespace Land.Core
             }	
 
 			/// Если в грамматике не фигурируют неопределённые символы
-			if (messages.Count == 0)
+			if (messages.All(m=>m.Type != MessageType.Error))
 			{
 				/// Проверяем наличие левой рекурсии для случая LL
 				if (Type == GrammarType.LL)
@@ -624,7 +624,7 @@ namespace Land.Core
 				));
 
 			/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
-			State = messages.Where(m=>m.Type == MessageType.Error).Count() > 0 ? GrammarState.Invalid : GrammarState.Valid;
+			State = messages.Any(m=>m.Type == MessageType.Error) ? GrammarState.Invalid : GrammarState.Valid;
 
 			return messages;
 		}
