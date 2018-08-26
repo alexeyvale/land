@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 26.08.2018 0:00:37
+// DateTime: 26.08.2018 17:41:29
 // UserName: Алексей
-// Input file <./Land.y - 26.08.2018 0:00:37>
+// Input file <./Land.y - 26.08.2018 17:41:29>
 
 // options: no-lines gplex
 
@@ -36,6 +36,7 @@ public struct ValueType
 	public bool boolVal;
 	public string strVal;
 	public Entry entryVal;
+	public Alternative altVal;
 	public ArgumentGroup argGroupVal;
 	public dynamic dynamicVal;
 	
@@ -74,50 +75,49 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 26.08.2018 0:00:37
+  // Verbatim content from ./Land.y - 26.08.2018 17:41:29
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 26.08.2018 0:00:37
+  // End verbatim content from ./Land.y - 26.08.2018 17:41:29
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
 #pragma warning restore 649
   private static Rule[] rules = new Rule[53];
-  private static State[] states = new State[77];
+  private static State[] states = new State[78];
   private static string[] nonTerms = new string[] {
-      "lp_description", "quantifier", "body_element_core", "body_element_atom", 
-      "group", "optional_alias", "body_element", "identifiers", "body", "prec_nonempty", 
-      "argument_group", "argument", "opt_args", "args", "context_opt_args", "body_element_args", 
-      "context_options", "pair_border_group_content", "pair_border", "$accept", 
-      "structure", "options", "element", "terminal", "nonterminal", "pair", "option", 
-      };
+      "lp_description", "quantifier", "entry_core", "group", "optional_alias", 
+      "entry", "identifiers", "body", "prec_nonempty", "argument_group", "argument", 
+      "alternative", "opt_args", "args", "context_opt_args", "entry_args", "context_options", 
+      "pair_border_group_content", "pair_border", "$accept", "structure", "options", 
+      "element", "terminal", "nonterminal", "pair", "option", };
 
   static Parser() {
-    states[0] = new State(new int[]{24,27},new int[]{-1,1,-21,3,-23,76,-24,26,-25,74,-26,75});
+    states[0] = new State(new int[]{24,27},new int[]{-1,1,-21,3,-23,77,-24,26,-25,75,-26,76});
     states[1] = new State(new int[]{3,2});
     states[2] = new State(-1);
-    states[3] = new State(new int[]{11,4,24,27},new int[]{-23,25,-24,26,-25,74,-26,75});
+    states[3] = new State(new int[]{11,4,24,27},new int[]{-23,25,-24,26,-25,75,-26,76});
     states[4] = new State(-39,new int[]{-22,5});
     states[5] = new State(new int[]{26,7,3,-2},new int[]{-27,6});
     states[6] = new State(-40);
     states[7] = new State(new int[]{23,8});
     states[8] = new State(new int[]{8,12,23,-43,26,-43,3,-43},new int[]{-13,9});
-    states[9] = new State(-52,new int[]{-8,10});
+    states[9] = new State(-52,new int[]{-7,10});
     states[10] = new State(new int[]{23,11,26,-41,3,-41});
     states[11] = new State(-51);
-    states[12] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,13,-12,23,-11,24});
+    states[12] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,13,-11,23,-10,24});
     states[13] = new State(new int[]{9,14,10,15});
     states[14] = new State(-42);
-    states[15] = new State(new int[]{28,17,22,18,23,19},new int[]{-12,16,-11,24});
+    states[15] = new State(new int[]{28,17,22,18,23,19},new int[]{-11,16,-10,24});
     states[16] = new State(-44);
     states[17] = new State(-46);
     states[18] = new State(-47);
     states[19] = new State(new int[]{7,20,9,-48,10,-48});
-    states[20] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,21,-12,23,-11,24});
+    states[20] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,21,-11,23,-10,24});
     states[21] = new State(new int[]{9,22,10,15});
     states[22] = new State(-50);
     states[23] = new State(-45);
@@ -127,53 +127,54 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
     states[27] = new State(new int[]{5,28,12,30});
     states[28] = new State(new int[]{20,29});
     states[29] = new State(-8);
-    states[30] = new State(new int[]{18,62,17,-18,4,-18,25,-18,22,-18,23,-18,8,-18,11,-18,24,-18},new int[]{-9,31});
-    states[31] = new State(new int[]{17,35,4,-20,11,-20,24,-20,25,-25,22,-25,23,-25,8,-25},new int[]{-6,32,-7,34,-17,37});
-    states[32] = new State(new int[]{4,33,11,-15,24,-15});
-    states[33] = new State(-17);
+    states[30] = new State(new int[]{18,63,17,-19,25,-19,22,-19,23,-19,8,-19,4,-19,11,-19,24,-19},new int[]{-8,31,-12,61});
+    states[31] = new State(new int[]{4,32,11,-15,24,-15});
+    states[32] = new State(-19,new int[]{-12,33});
+    states[33] = new State(new int[]{17,36,4,-21,11,-21,24,-21,9,-21,25,-26,22,-26,23,-26,8,-26},new int[]{-5,34,-6,35,-17,38});
     states[34] = new State(-16);
-    states[35] = new State(new int[]{23,36});
-    states[36] = new State(-19);
-    states[37] = new State(new int[]{25,49,22,55,23,56,8,58},new int[]{-3,38,-4,54,-5,57});
-    states[38] = new State(new int[]{7,46,29,-23,30,-23,31,-23,33,-23,17,-23,4,-23,25,-23,22,-23,23,-23,8,-23,11,-23,24,-23,9,-23},new int[]{-16,39});
-    states[39] = new State(new int[]{29,43,30,44,31,45,33,-33,17,-33,4,-33,25,-33,22,-33,23,-33,8,-33,11,-33,24,-33,9,-33},new int[]{-2,40});
-    states[40] = new State(new int[]{33,42,17,-29,4,-29,25,-29,22,-29,23,-29,8,-29,11,-29,24,-29,9,-29},new int[]{-10,41});
-    states[41] = new State(-21);
-    states[42] = new State(-28);
-    states[43] = new State(-30);
+    states[35] = new State(-18);
+    states[36] = new State(new int[]{23,37});
+    states[37] = new State(-20);
+    states[38] = new State(new int[]{25,50,22,55,23,56,8,58},new int[]{-3,39,-4,57});
+    states[39] = new State(new int[]{7,47,29,-24,30,-24,31,-24,33,-24,17,-24,25,-24,22,-24,23,-24,8,-24,4,-24,11,-24,24,-24,9,-24},new int[]{-16,40});
+    states[40] = new State(new int[]{29,44,30,45,31,46,33,-34,17,-34,25,-34,22,-34,23,-34,8,-34,4,-34,11,-34,24,-34,9,-34},new int[]{-2,41});
+    states[41] = new State(new int[]{33,43,17,-30,25,-30,22,-30,23,-30,8,-30,4,-30,11,-30,24,-30,9,-30},new int[]{-9,42});
+    states[42] = new State(-22);
+    states[43] = new State(-29);
     states[44] = new State(-31);
     states[45] = new State(-32);
-    states[46] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,47,-12,23,-11,24});
-    states[47] = new State(new int[]{9,48,10,15});
-    states[48] = new State(-22);
-    states[49] = new State(new int[]{6,51,25,-27,22,-27,23,-27,8,-27},new int[]{-15,50});
-    states[50] = new State(-24);
-    states[51] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,52,-12,23,-11,24});
-    states[52] = new State(new int[]{9,53,10,15});
-    states[53] = new State(-26);
-    states[54] = new State(-34);
-    states[55] = new State(-36);
-    states[56] = new State(-37);
-    states[57] = new State(-35);
-    states[58] = new State(-18,new int[]{-9,59});
-    states[59] = new State(new int[]{17,35,9,-20,4,-20,25,-25,22,-25,23,-25,8,-25},new int[]{-6,60,-7,34,-17,37});
-    states[60] = new State(new int[]{9,61,4,33});
-    states[61] = new State(-38);
-    states[62] = new State(new int[]{23,66,22,67,8,68},new int[]{-19,63});
-    states[63] = new State(new int[]{19,64});
-    states[64] = new State(new int[]{23,66,22,67,8,68},new int[]{-19,65});
-    states[65] = new State(-9);
-    states[66] = new State(-10);
-    states[67] = new State(-11);
-    states[68] = new State(new int[]{23,66,22,67,8,68},new int[]{-18,69,-19,73});
-    states[69] = new State(new int[]{9,70,4,71});
-    states[70] = new State(-12);
-    states[71] = new State(new int[]{23,66,22,67,8,68},new int[]{-19,72});
-    states[72] = new State(-14);
-    states[73] = new State(-13);
-    states[74] = new State(-6);
-    states[75] = new State(-7);
-    states[76] = new State(-4);
+    states[46] = new State(-33);
+    states[47] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,48,-11,23,-10,24});
+    states[48] = new State(new int[]{9,49,10,15});
+    states[49] = new State(-23);
+    states[50] = new State(new int[]{6,52,25,-28,22,-28,23,-28,8,-28},new int[]{-15,51});
+    states[51] = new State(-25);
+    states[52] = new State(new int[]{28,17,22,18,23,19},new int[]{-14,53,-11,23,-10,24});
+    states[53] = new State(new int[]{9,54,10,15});
+    states[54] = new State(-27);
+    states[55] = new State(-35);
+    states[56] = new State(-36);
+    states[57] = new State(-37);
+    states[58] = new State(-19,new int[]{-8,59,-12,61});
+    states[59] = new State(new int[]{9,60,4,32});
+    states[60] = new State(-38);
+    states[61] = new State(new int[]{17,36,4,-21,11,-21,24,-21,9,-21,25,-26,22,-26,23,-26,8,-26},new int[]{-5,62,-6,35,-17,38});
+    states[62] = new State(-17);
+    states[63] = new State(new int[]{23,67,22,68,8,69},new int[]{-19,64});
+    states[64] = new State(new int[]{19,65});
+    states[65] = new State(new int[]{23,67,22,68,8,69},new int[]{-19,66});
+    states[66] = new State(-9);
+    states[67] = new State(-10);
+    states[68] = new State(-11);
+    states[69] = new State(new int[]{23,67,22,68,8,69},new int[]{-18,70,-19,74});
+    states[70] = new State(new int[]{9,71,4,72});
+    states[71] = new State(-12);
+    states[72] = new State(new int[]{23,67,22,68,8,69},new int[]{-19,73});
+    states[73] = new State(-14);
+    states[74] = new State(-13);
+    states[75] = new State(-6);
+    states[76] = new State(-7);
+    states[77] = new State(-4);
 
     for (int sNo = 0; sNo < states.Length; sNo++) states[sNo].number = sNo;
 
@@ -191,44 +192,44 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
     rules[12] = new Rule(-19, new int[]{8,-18,9});
     rules[13] = new Rule(-18, new int[]{-19});
     rules[14] = new Rule(-18, new int[]{-18,4,-19});
-    rules[15] = new Rule(-25, new int[]{24,12,-9,-6});
-    rules[16] = new Rule(-9, new int[]{-9,-7});
-    rules[17] = new Rule(-9, new int[]{-9,-6,4});
-    rules[18] = new Rule(-9, new int[]{});
-    rules[19] = new Rule(-6, new int[]{17,23});
-    rules[20] = new Rule(-6, new int[]{});
-    rules[21] = new Rule(-7, new int[]{-17,-3,-16,-2,-10});
-    rules[22] = new Rule(-16, new int[]{7,-14,9});
-    rules[23] = new Rule(-16, new int[]{});
-    rules[24] = new Rule(-17, new int[]{-17,25,-15});
-    rules[25] = new Rule(-17, new int[]{});
-    rules[26] = new Rule(-15, new int[]{6,-14,9});
-    rules[27] = new Rule(-15, new int[]{});
-    rules[28] = new Rule(-10, new int[]{33});
-    rules[29] = new Rule(-10, new int[]{});
-    rules[30] = new Rule(-2, new int[]{29});
-    rules[31] = new Rule(-2, new int[]{30});
-    rules[32] = new Rule(-2, new int[]{31});
-    rules[33] = new Rule(-2, new int[]{});
-    rules[34] = new Rule(-3, new int[]{-4});
-    rules[35] = new Rule(-3, new int[]{-5});
-    rules[36] = new Rule(-4, new int[]{22});
-    rules[37] = new Rule(-4, new int[]{23});
-    rules[38] = new Rule(-5, new int[]{8,-9,-6,9});
+    rules[15] = new Rule(-25, new int[]{24,12,-8});
+    rules[16] = new Rule(-8, new int[]{-8,4,-12,-5});
+    rules[17] = new Rule(-8, new int[]{-12,-5});
+    rules[18] = new Rule(-12, new int[]{-12,-6});
+    rules[19] = new Rule(-12, new int[]{});
+    rules[20] = new Rule(-5, new int[]{17,23});
+    rules[21] = new Rule(-5, new int[]{});
+    rules[22] = new Rule(-6, new int[]{-17,-3,-16,-2,-9});
+    rules[23] = new Rule(-16, new int[]{7,-14,9});
+    rules[24] = new Rule(-16, new int[]{});
+    rules[25] = new Rule(-17, new int[]{-17,25,-15});
+    rules[26] = new Rule(-17, new int[]{});
+    rules[27] = new Rule(-15, new int[]{6,-14,9});
+    rules[28] = new Rule(-15, new int[]{});
+    rules[29] = new Rule(-9, new int[]{33});
+    rules[30] = new Rule(-9, new int[]{});
+    rules[31] = new Rule(-2, new int[]{29});
+    rules[32] = new Rule(-2, new int[]{30});
+    rules[33] = new Rule(-2, new int[]{31});
+    rules[34] = new Rule(-2, new int[]{});
+    rules[35] = new Rule(-3, new int[]{22});
+    rules[36] = new Rule(-3, new int[]{23});
+    rules[37] = new Rule(-3, new int[]{-4});
+    rules[38] = new Rule(-4, new int[]{8,-8,9});
     rules[39] = new Rule(-22, new int[]{});
     rules[40] = new Rule(-22, new int[]{-22,-27});
-    rules[41] = new Rule(-27, new int[]{26,23,-13,-8});
+    rules[41] = new Rule(-27, new int[]{26,23,-13,-7});
     rules[42] = new Rule(-13, new int[]{8,-14,9});
     rules[43] = new Rule(-13, new int[]{});
-    rules[44] = new Rule(-14, new int[]{-14,10,-12});
-    rules[45] = new Rule(-14, new int[]{-12});
-    rules[46] = new Rule(-12, new int[]{28});
-    rules[47] = new Rule(-12, new int[]{22});
-    rules[48] = new Rule(-12, new int[]{23});
-    rules[49] = new Rule(-12, new int[]{-11});
-    rules[50] = new Rule(-11, new int[]{23,7,-14,9});
-    rules[51] = new Rule(-8, new int[]{-8,23});
-    rules[52] = new Rule(-8, new int[]{});
+    rules[44] = new Rule(-14, new int[]{-14,10,-11});
+    rules[45] = new Rule(-14, new int[]{-11});
+    rules[46] = new Rule(-11, new int[]{28});
+    rules[47] = new Rule(-11, new int[]{22});
+    rules[48] = new Rule(-11, new int[]{23});
+    rules[49] = new Rule(-11, new int[]{-10});
+    rules[50] = new Rule(-10, new int[]{23,7,-14,9});
+    rules[51] = new Rule(-7, new int[]{-7,23});
+    rules[52] = new Rule(-7, new int[]{});
   }
 
   protected override void Initialize() {
@@ -284,49 +285,47 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 14: // pair_border_group_content -> pair_border_group_content, OR, pair_border
 { ValueStack[ValueStack.Depth-3].strSet.UnionWith(ValueStack[ValueStack.Depth-1].strSet); CurrentSemanticValue.strSet = ValueStack[ValueStack.Depth-3].strSet; }
         break;
-      case 15: // nonterminal -> ENTITY_NAME, EQUALS, body, optional_alias
+      case 15: // nonterminal -> ENTITY_NAME, EQUALS, body
 { 
-			ValueStack[ValueStack.Depth-2].altList[ValueStack[ValueStack.Depth-2].altList.Count-1].Alias = ValueStack[ValueStack.Depth-1].strVal;
 			var aliases = this.Aliases;
 			this.Aliases = new HashSet<string>(); 
 			
 			SafeGrammarAction(() => { 
-				ConstructedGrammar.DeclareNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].altList);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-4].strVal, LocationStack[LocationStack.Depth-4].Start);
+				ConstructedGrammar.DeclareNonterminal(ValueStack[ValueStack.Depth-3].strVal, ValueStack[ValueStack.Depth-1].altList);
+				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-3].strVal, LocationStack[LocationStack.Depth-3].Start);
 				
 				if(aliases.Count > 0)
-					ConstructedGrammar.AddAliases(ValueStack[ValueStack.Depth-4].strVal, aliases);
-			}, LocationStack[LocationStack.Depth-4].Start);
+					ConstructedGrammar.AddAliases(ValueStack[ValueStack.Depth-3].strVal, aliases);
+			}, LocationStack[LocationStack.Depth-3].Start);
 		}
         break;
-      case 16: // body -> body, body_element
+      case 16: // body -> body, OR, alternative, optional_alias
 { 
-			CurrentSemanticValue.altList = ValueStack[ValueStack.Depth-2].altList; 
-			CurrentSemanticValue.altList[CurrentSemanticValue.altList.Count-1].Add(ValueStack[ValueStack.Depth-1].entryVal); 	
+			CurrentSemanticValue.altList = ValueStack[ValueStack.Depth-4].altList; 
+			ValueStack[ValueStack.Depth-2].altVal.Alias = ValueStack[ValueStack.Depth-1].strVal; 
+			CurrentSemanticValue.altList.Add(ValueStack[ValueStack.Depth-2].altVal); 
 		}
         break;
-      case 17: // body -> body, optional_alias, OR
-{ 
-			ValueStack[ValueStack.Depth-3].altList[ValueStack[ValueStack.Depth-3].altList.Count-1].Alias = ValueStack[ValueStack.Depth-2].strVal;
-			
-			CurrentSemanticValue.altList = ValueStack[ValueStack.Depth-3].altList;
-			CurrentSemanticValue.altList.Add(new Alternative());		
-		}
-        break;
-      case 18: // body -> /* empty */
+      case 17: // body -> alternative, optional_alias
 { 
 			CurrentSemanticValue.altList = new List<Alternative>(); 
-			CurrentSemanticValue.altList.Add(new Alternative()); 
+			ValueStack[ValueStack.Depth-2].altVal.Alias = ValueStack[ValueStack.Depth-1].strVal; 
+			CurrentSemanticValue.altList.Add(ValueStack[ValueStack.Depth-2].altVal); 
 		}
         break;
-      case 19: // optional_alias -> ARROW, ID
+      case 18: // alternative -> alternative, entry
+{ CurrentSemanticValue.altVal = ValueStack[ValueStack.Depth-2].altVal; CurrentSemanticValue.altVal.Add(ValueStack[ValueStack.Depth-1].entryVal); }
+        break;
+      case 19: // alternative -> /* empty */
+{ CurrentSemanticValue.altVal = new Alternative(); }
+        break;
+      case 20: // optional_alias -> ARROW, ID
 { CurrentSemanticValue.strVal = ValueStack[ValueStack.Depth-1].strVal; this.Aliases.Add(ValueStack[ValueStack.Depth-1].strVal); }
         break;
-      case 20: // optional_alias -> /* empty */
+      case 21: // optional_alias -> /* empty */
 { CurrentSemanticValue.strVal = null; }
         break;
-      case 21: // body_element -> context_options, body_element_core, body_element_args, 
-               //                 quantifier, prec_nonempty
+      case 22: // entry -> context_options, entry_core, entry_args, quantifier, prec_nonempty
 { 		
 			var opts = new LocalOptions();
 			
@@ -422,65 +421,60 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 			}
 		}
         break;
-      case 22: // body_element_args -> ELEM_LPAR, args, RPAR
+      case 23: // entry_args -> ELEM_LPAR, args, RPAR
 { CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-2].dynamicList; }
         break;
-      case 23: // body_element_args -> /* empty */
+      case 24: // entry_args -> /* empty */
 { CurrentSemanticValue.dynamicList = new List<dynamic>(); }
         break;
-      case 24: // context_options -> context_options, OPTION_NAME, context_opt_args
+      case 25: // context_options -> context_options, OPTION_NAME, context_opt_args
 { 
 			CurrentSemanticValue.optionParamsList = ValueStack[ValueStack.Depth-3].optionParamsList; 
 			CurrentSemanticValue.optionParamsList.Add(new Tuple<string, List<dynamic>>(ValueStack[ValueStack.Depth-2].strVal, ValueStack[ValueStack.Depth-1].dynamicList)); 
 		}
         break;
-      case 25: // context_options -> /* empty */
+      case 26: // context_options -> /* empty */
 { CurrentSemanticValue.optionParamsList = new List<Tuple<string, List<dynamic>>>(); }
         break;
-      case 26: // context_opt_args -> OPT_LPAR, args, RPAR
+      case 27: // context_opt_args -> OPT_LPAR, args, RPAR
 { CurrentSemanticValue.dynamicList = ValueStack[ValueStack.Depth-2].dynamicList; }
         break;
-      case 27: // context_opt_args -> /* empty */
+      case 28: // context_opt_args -> /* empty */
 { CurrentSemanticValue.dynamicList = new List<dynamic>(); }
         break;
-      case 28: // prec_nonempty -> PREC_NONEMPTY
+      case 29: // prec_nonempty -> PREC_NONEMPTY
 { CurrentSemanticValue.boolVal = true; }
         break;
-      case 29: // prec_nonempty -> /* empty */
+      case 30: // prec_nonempty -> /* empty */
 { CurrentSemanticValue.boolVal = false; }
         break;
-      case 30: // quantifier -> OPTIONAL
+      case 31: // quantifier -> OPTIONAL
 { CurrentSemanticValue.optQuantVal = ValueStack[ValueStack.Depth-1].quantVal; }
         break;
-      case 31: // quantifier -> ZERO_OR_MORE
+      case 32: // quantifier -> ZERO_OR_MORE
 { CurrentSemanticValue.optQuantVal = ValueStack[ValueStack.Depth-1].quantVal; }
         break;
-      case 32: // quantifier -> ONE_OR_MORE
+      case 33: // quantifier -> ONE_OR_MORE
 { CurrentSemanticValue.optQuantVal = ValueStack[ValueStack.Depth-1].quantVal; }
         break;
-      case 33: // quantifier -> /* empty */
+      case 34: // quantifier -> /* empty */
 { CurrentSemanticValue.optQuantVal = null; }
         break;
-      case 34: // body_element_core -> body_element_atom
-{ CurrentSemanticValue.strVal = ValueStack[ValueStack.Depth-1].strVal; }
-        break;
-      case 35: // body_element_core -> group
-{ CurrentSemanticValue.strVal = ValueStack[ValueStack.Depth-1].strVal; }
-        break;
-      case 36: // body_element_atom -> STRING
+      case 35: // entry_core -> STRING
 { 
 			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
 			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;
-      case 37: // body_element_atom -> ID
+      case 36: // entry_core -> ID
 { CurrentSemanticValue.strVal = ValueStack[ValueStack.Depth-1].strVal; }
         break;
-      case 38: // group -> LPAR, body, optional_alias, RPAR
+      case 37: // entry_core -> group
+{ CurrentSemanticValue.strVal = ValueStack[ValueStack.Depth-1].strVal; }
+        break;
+      case 38: // group -> LPAR, body, RPAR
 { 
-			ValueStack[ValueStack.Depth-3].altList[ValueStack[ValueStack.Depth-3].altList.Count-1].Alias = ValueStack[ValueStack.Depth-2].strVal;
-			
-			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-3].altList);
+			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-2].altList);
 			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;

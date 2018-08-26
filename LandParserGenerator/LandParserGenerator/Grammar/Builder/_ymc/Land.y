@@ -23,6 +23,7 @@
 	public bool boolVal;
 	public string strVal;
 	public Entry entryVal;
+	public Alternative altVal;
 	public ArgumentGroup argGroupVal;
 	public dynamic dynamicVal;
 	
@@ -52,15 +53,16 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
-%type <strVal> body_element_core body_element_atom group optional_alias
-%type <entryVal> body_element
+%type <strVal> entry_core group optional_alias
+%type <entryVal> entry
 %type <strList> identifiers
 %type <altList> body
 %type <boolVal> prec_nonempty
 %type <argGroupVal> argument_group
 %type <dynamicVal> argument
+%type <altVal> alternative
 
-%type <dynamicList> opt_args args context_opt_args body_element_args
+%type <dynamicList> opt_args args context_opt_args entry_args
 %type <optionParamsList> context_options
 
 %type <strSet> pair_border_group_content pair_border
@@ -128,9 +130,8 @@ pair_border_group_content
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/
 nonterminal
-	: ENTITY_NAME EQUALS body optional_alias
+	: ENTITY_NAME EQUALS body
 		{ 
-			$3[$3.Count-1].Alias = $4;
 			var aliases = this.Aliases;
 			this.Aliases = new HashSet<string>(); 
 			
@@ -145,32 +146,32 @@ nonterminal
 	;
 	
 body
-	: body body_element 
+	: body OR alternative optional_alias 
 		{ 
 			$$ = $1; 
-			$$[$$.Count-1].Add($2); 	
+			$3.Alias = $4; 
+			$$.Add($3); 
 		}
-	| body optional_alias OR 
-		{ 
-			$1[$1.Count-1].Alias = $2;
-			
-			$$ = $1;
-			$$.Add(new Alternative());		
-		}
-	|  
+	| alternative optional_alias 
 		{ 
 			$$ = new List<Alternative>(); 
-			$$.Add(new Alternative()); 
+			$1.Alias = $2; 
+			$$.Add($1); 
 		}
 	;
-	
+
+alternative
+	: alternative entry { $$ = $1; $$.Add($2); }
+	| { $$ = new Alternative(); }
+	;
+
 optional_alias
 	: ARROW ID { $$ = $2; this.Aliases.Add($2); }
 	| { $$ = null; }
 	;
 	
-body_element
-	: context_options body_element_core body_element_args quantifier prec_nonempty
+entry
+	: context_options entry_core entry_args quantifier prec_nonempty
 		{ 		
 			var opts = new LocalOptions();
 			
@@ -267,7 +268,7 @@ body_element
 		}
 	;
 	
-body_element_args
+entry_args
 	: ELEM_LPAR args RPAR { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
@@ -298,14 +299,7 @@ quantifier
 	| { $$ = null; }
 	;
 	
-body_element_core
-	: body_element_atom
-		{ $$ = $1; }
-	| group 
-		{ $$ = $1; }
-	;
-	
-body_element_atom
+entry_core
 	: STRING
 		{ 
 			$$ = ConstructedGrammar.GenerateTerminal($1);
@@ -313,13 +307,13 @@ body_element_atom
 		}
 	| ID 
 		{ $$ = $1; }
+	| group 
+		{ $$ = $1; }
 	;
 	
 group
-	: LPAR body optional_alias RPAR 
+	: LPAR body RPAR
 		{ 
-			$2[$2.Count-1].Alias = $3;
-			
 			$$ = ConstructedGrammar.GenerateNonterminal($2);
 			ConstructedGrammar.AddAnchor($$, @$.Start);
 		}
