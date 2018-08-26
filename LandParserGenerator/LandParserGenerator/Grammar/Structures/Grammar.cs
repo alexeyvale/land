@@ -602,10 +602,23 @@ namespace Land.Core
 				/// Проверяем наличие левой рекурсии для случая LL
 				if (Type == GrammarType.LL)
 				{
-					foreach (var nt in FindLeftRecursion())
+					var emptyElementsRepetition = AutoRuleQuantifier.Where(kvp => 
+						(kvp.Value.Quantifier == Quantifier.ZERO_OR_MORE || kvp.Value.Quantifier == Quantifier.ONE_OR_MORE)
+						&& First(kvp.Value.Element).Contains(null)).Select(kvp => kvp.Key).ToList();
+
+					foreach (var nt in emptyElementsRepetition)
 					{
 						messages.Add(Message.Error(
-							$"Определение нетерминала {Userify(nt)} содержит левую рекурсию",
+							$"Определение нетерминала {Userify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
+							GetAnchor(nt),
+							"LanD"
+						));
+					}
+
+					foreach (var nt in FindLeftRecursion().Except(emptyElementsRepetition))
+					{
+						messages.Add(Message.Error(
+							$"Определение нетерминала {Userify(nt)} допускает левую рекурсию",
 							GetAnchor(nt),
 							"LanD"
 						));
