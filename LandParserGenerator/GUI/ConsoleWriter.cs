@@ -25,13 +25,13 @@ namespace Land.GUI
 
 		public override void Write(string value)
 		{
-			if (WriteEvent != null) WriteEvent(this, new ConsoleWriterEventArgs(value));
+			WriteEvent?.Invoke(this, new ConsoleWriterEventArgs(value));
 			base.Write(value);
 		}
 
 		public override void WriteLine(string value)
 		{
-			if (WriteLineEvent != null) WriteLineEvent(this, new ConsoleWriterEventArgs(value));
+			WriteLineEvent?.Invoke(this, new ConsoleWriterEventArgs(value));
 			base.WriteLine(value);
 		}
 

@@ -409,7 +409,7 @@ namespace Land.Core.Parsing.LL
 				if (skippedBuffer.Count > 0)
 				{
 					anyNode.SetAnchor(
-						anyNode.StartOffset.HasValue ? anyNode.StartOffset.Value : skippedBuffer.First().StartOffset,
+						anyNode.StartOffset ?? skippedBuffer.First().StartOffset,
 						skippedBuffer.Last().EndOffset
 					);
 				}
