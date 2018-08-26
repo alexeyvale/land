@@ -25,7 +25,6 @@ namespace Land.Core.Parsing
 			{
 				if (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol)
 					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)
-					|| node.Children[i].Symbol.StartsWith(Grammar.AUTO_RULE_PREFIX) 
 					||  node.Options.NodeOption == NodeOption.GHOST)
 				{
 					var smbToRemove = node.Children[i];

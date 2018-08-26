@@ -84,7 +84,10 @@
                                 </TabControl>
                             </Grid>
                         </TabItem>
-						<TabItem Header="Тестовый файл">
+						<TabItem>
+							<TabItem.Header>
+								<Label>Тестовый файл</Label>
+							</TabItem.Header>
 							<Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="65*"></RowDefinition>
