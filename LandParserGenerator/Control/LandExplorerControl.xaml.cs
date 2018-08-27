@@ -839,6 +839,16 @@ namespace Land.Control
 			/// указанных для грамматики
 			foreach (var pair in SettingsObject.Grammars)
 			{
+				if(!File.Exists(pair.GrammarPath))
+				{
+					Log.Add(Message.Error(
+						$"Файл {pair.GrammarPath} не существует, невозможно загрузить парсер для расширения {pair.ExtensionsString}",
+						null
+					));
+
+					continue;
+				}
+
 				var parser = BuilderLL.BuildParser(
 					File.ReadAllText(pair.GrammarPath),
 					Log
