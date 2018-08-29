@@ -1,0 +1,66 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '{' .*? '}'
+STRING_SKIP	: '\'\'' | '\\\\'
+STRING	: '\'' (STRING_SKIP|.)*? '\''
+ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
+
+
+round_bracketed = %left '(' %right ')'
+
+
+file	=	header? Any (
+				uses? outer_declaration* block '.' => program |
+				interface implementation initialization? finalization? 'end' '.'   => module
+			)
+
+header			=	('program'|'unit') ID ';'
+uses 			= 	'uses' name (',' name)* ';'
+
+outer_declaration	=	const|var|type|outer_routine
+inner_declaration	=	const|var|type
+const			=	'const' const_atom+
+type			=	'type' type_atom+
+var				=	'var' var_atom+
+const_atom		=	ID '=' Any ';'
+var_atom		=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
+type_atom		=	ID '=' (record_or_class | Any) ';'
+outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
+inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
+routine_header	=	('procedure'|'function'|'constructor'|'destructor') %priority(2) name %priority(2) routine_arguments? (':' name)?
+routine_arguments	=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
+routine_arguments_atom = ('var'|'const'|'params')? ID (',' ID)* ':' Any
+record_or_class	=	('record'|'class') Any ('public'|'protected'|'private'|inner_routine|Any)+ 'end'
+
+interface		=	'interface' uses? outer_declaration*
+implementation	=	'implementation' outer_declaration*
+initialization	=	('initialization'|'begin') operators
+finalization	=	'finalization' operators
+
+block		=	'begin' operators 'end'
+operators	=	operator (';' operator)*
+operator    =	assign_or_call|cycle|if|case|try|exception|block|
+assign_or_call	=	'var'? call (':' Any)? ((':='|'+='|'-='|'*=') Any)?
+cycle		=	('for'|'while'|'foreach') Any 'do' operator | 'repeat' operators 'until' Any ';'
+if			=	'if' Any 'then' operator ('else' operator)?!
+try			=	'try' operators 'except' operators 'end'
+exception	=	'on' Any 'do' operator
+call		=	name ('(' Any ')' name_tail_element*)?
+case		=	'case' Any 'of' case_option+ 'end'
+case_option	=	(case_label (',' case_label)* ':'|'else') operator ';'
+case_label	=	Any
+
+name		=	(ID|'('Any')') name_tail_element*
+name_tail_element	=	ID|'.'|'[' Any ']'|'<' ID '>'
+
+
+%%
+
+%parsing ignoreundefined
+%parsing start file
+%parsing ignorecase
+%parsing skip COMMENT
+
+%nodes leaf name
+
+%mapping land var_atom const_atom type_atom outer_routine inner_routine
