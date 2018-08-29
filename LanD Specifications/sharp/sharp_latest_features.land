@@ -7,7 +7,7 @@ COMMENT_ML	: '/*' .*? '*/'
 
 STRING		: STRING_STD|STRING_VERB|STRING_INT
 STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
-STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_VERB	: '@'('"' (~["]|'""')* '"')+
 STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
 STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
