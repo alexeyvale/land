@@ -44,8 +44,8 @@ namespace Land.Core
 
 			return new SegmentLocation()
 			{
-				Start = Start.Offset <= last.Start.Offset ? Start : last.Start,
-				End = End.Offset <= last.End.Offset ? last.End : End,
+				Start = Start,
+				End = last.End
 			};
 		}
 	}
