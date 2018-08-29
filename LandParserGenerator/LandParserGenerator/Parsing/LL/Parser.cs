@@ -189,10 +189,19 @@ namespace Land.Core.Parsing.LL
 
 				if (closed.Value != null)
 				{
-					if (Nesting.Count == 0 || Nesting.Peek() != closed.Value)
+					if (Nesting.Count == 0)
 					{
 						Log.Add(Message.Error(
 							$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
+							new PointLocation(token.Line, token.Column, token.StartOffset)
+						));
+
+						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					}
+					else if(Nesting.Peek() != closed.Value)
+					{
+						Log.Add(Message.Error(
+							$"Неожиданная закрывающая конструкция {GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", Nesting.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", Nesting.Peek().Left.Select(e=> GrammarObject.Userify(e)))}",
 							new PointLocation(token.Line, token.Column, token.StartOffset)
 						));
 
