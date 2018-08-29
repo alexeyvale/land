@@ -73,6 +73,9 @@ namespace Land.Core.Parsing.LL
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
 			{
+				if (token.Name == Grammar.ERROR_TOKEN_NAME)
+					break;
+
 				var stackTop = Stack.Peek();
 
 				Log.Add(Message.Trace(
@@ -90,10 +93,6 @@ namespace Land.Core.Parsing.LL
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
 						token = SkipAny(node, true);
-
-						/// Если при пропуске текста произошла ошибка, прерываем разбор
-						if (token.Name == Grammar.ERROR_TOKEN_NAME)
-							break;
 					}
 					/// иначе читаем следующий токен
 					else
@@ -157,9 +156,6 @@ namespace Land.Core.Parsing.LL
 					));
 
 					token = ErrorRecovery();
-
-					if (token.Name == Grammar.ERROR_TOKEN_NAME)
-						break;
 				}
 				/// Если непонятно, что делать с текущим токеном, и он конкретный
 				/// (не Any), заменяем его на Any
@@ -191,8 +187,22 @@ namespace Land.Core.Parsing.LL
 				var token = LexingStream.CurrentToken;
 				var closed = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
 
-				if (closed.Value != null && Nesting.Peek() == closed.Value)
-					Nesting.Pop();
+				if (closed.Value != null)
+				{
+					if (Nesting.Count == 0 || Nesting.Peek() != closed.Value)
+					{
+						Log.Add(Message.Error(
+							$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
+							new PointLocation(token.Line, token.Column, token.StartOffset)
+						));
+
+						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					}
+					else
+					{
+						Nesting.Pop();
+					}
+				}
 
 				var opened = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
 
@@ -211,7 +221,9 @@ namespace Land.Core.Parsing.LL
 			{
 				var next = GetNextToken();
 
-				if (Nesting.Count == level || next.Name == Grammar.EOF_TOKEN_NAME)
+				if (Nesting.Count == level 
+					|| next.Name == Grammar.EOF_TOKEN_NAME 
+					|| next.Name == Grammar.ERROR_TOKEN_NAME)
 					return next;
 				else
 					skipped.Add(next);
@@ -270,7 +282,8 @@ namespace Land.Core.Parsing.LL
 
 				while (!tokensAfterText.Contains(token.Name)
 					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
-					&& token.Name != Grammar.EOF_TOKEN_NAME)
+					&& token.Name != Grammar.EOF_TOKEN_NAME
+					&& token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					anyNode.Value.Add(token.Text);
 					endOffset = token.EndOffset;
@@ -281,8 +294,7 @@ namespace Land.Core.Parsing.LL
 					}
 					else
 					{
-						List<IToken> skippedBuffer;
-						token = GetNextToken(anyLevel, out skippedBuffer);
+						token = GetNextToken(anyLevel, out List<IToken> skippedBuffer);
 
 						/// Если при пропуске до токена на том же уровне
 						/// пропустили токены с более глубокой вложенностью
@@ -295,6 +307,9 @@ namespace Land.Core.Parsing.LL
 				}
 
 				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
+
+				if (token.Name == Grammar.ERROR_TOKEN_NAME)
+					return token;
 
 				/// Если дошли до конца входной строки, и это было не по плану
 				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
@@ -431,6 +446,8 @@ namespace Land.Core.Parsing.LL
 						$"Произведено восстановление на уровне {currentNode.Symbol}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
 						new PointLocation(token.Line, token.Column, token.StartOffset)
 					));
+
+					Statistics.RecoveryTimes += 1;
 
 					return token;
 				}
