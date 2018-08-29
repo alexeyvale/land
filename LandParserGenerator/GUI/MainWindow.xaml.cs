@@ -202,9 +202,33 @@ namespace Land.GUI
 			}
 
 			CurrentGrammarFilename = filename;
-			Grammar_Editor.Text = File.ReadAllText(filename);
+
+			using (var stream = new StreamReader(filename, GetEncoding(filename)))
+			{
+				Grammar_Editor.Text = stream.ReadToEnd();
+				Grammar_Editor.Encoding = stream.CurrentEncoding;
+			}
+
 			Grammar_SaveButton.IsEnabled = false;
 			SetAsCurrentGrammar(filename);
+		}
+
+		private Encoding GetEncoding(string filename)
+		{
+			using (FileStream fs = File.OpenRead(filename))
+			{
+				Ude.CharsetDetector cdet = new Ude.CharsetDetector();
+				cdet.Feed(fs);
+				cdet.DataEnd();
+				if (cdet.Charset != null)
+				{
+					return Encoding.GetEncoding(cdet.Charset);
+				}
+				else
+				{
+					return Encoding.Default;
+				}
+			}
 		}
 
 		private void Grammar_SaveButton_Click(object sender, RoutedEventArgs e)
@@ -362,13 +386,13 @@ namespace Land.GUI
 
 		private void OpenFile(string filename)
 		{
-			var stream = new StreamReader(filename, Encoding.Default, true);
-
 			File_NameLabel.Content = filename;
-			File_Editor.Text = stream.ReadToEnd();
-			File_Editor.Encoding = stream.CurrentEncoding;
 
-			stream.Close();
+			using (var stream = new StreamReader(filename, GetEncoding(filename)))
+			{
+				File_Editor.Text = stream.ReadToEnd();
+				File_Editor.Encoding = stream.CurrentEncoding;
+			}
 
 			File_ParseButton_Click(null, null);
 		}
