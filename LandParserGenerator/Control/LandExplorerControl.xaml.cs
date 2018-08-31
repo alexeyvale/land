@@ -849,7 +849,8 @@ namespace Land.Control
 					continue;
 				}
 
-				var parser = BuilderLL.BuildParser(
+				var parser = BuilderBase.BuildParser(
+					GrammarType.LL,
 					File.ReadAllText(pair.GrammarPath),
 					Log
 				);

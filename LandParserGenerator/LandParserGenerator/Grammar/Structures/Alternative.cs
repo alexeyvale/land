@@ -58,10 +58,8 @@ namespace Land.Core
 
 		public override bool Equals(object obj)
 		{
-			if (obj is Alternative)
+			if (obj is Alternative b)
 			{
-				var b = (Alternative)obj;
-
 				return NonterminalSymbolName == b.NonterminalSymbolName
 					&& b.Elements.SequenceEqual(this.Elements);
 			}
@@ -83,18 +81,5 @@ namespace Land.Core
 		{
 			return Elements.Any(e => e.Symbol == symbol);
 		}
-
-        public bool ReplaceFirst(string smb1, string smb2)
-        {
-            var idx = Elements.FindIndex(e => e.Symbol == smb1);
-
-            if (idx > -1)
-            {
-                Elements[idx] = new Entry(smb2);
-                return true;
-            }
-            else
-                return false;
-        }
     }
 }

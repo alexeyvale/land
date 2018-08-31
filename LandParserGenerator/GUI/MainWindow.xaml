@@ -45,10 +45,8 @@
                                         <Separator></Separator>
                                         <Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click">Сгенерировать парсер</Button>
                                         <Separator></Separator>
-                                        <ComboBox MinWidth="80" Name="Grammar_RecentFiles" ToolTip="Последние открытые грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
-                                        <RadioButton GroupName="Grammar_ParsingTypeRadioButton" Name="ParsingLL" Content="LL" IsChecked="True" Margin="20,0,0,0"/>
-                                        <RadioButton GroupName="Grammar_ParsingTypeRadioButton" Name="ParsingLR" Content="LR" IsEnabled="False" />
-                                    </ToolBar>
+										<ComboBox MinWidth="80" Name="Grammar_RecentFiles" ToolTip="Последние открытые грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+									</ToolBar>
                                     <avalonedit:TextEditor
                                         Grid.Row="1"
                                         Name="Grammar_Editor"

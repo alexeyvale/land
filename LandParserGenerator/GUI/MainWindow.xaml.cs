@@ -136,14 +136,7 @@ namespace Land.GUI
 			Parser = null;
 			var messages = new List<Message>();
 
-			if (ParsingLL.IsChecked == true)
-			{
-				Parser = BuilderLL.BuildParser(Grammar_Editor.Text, messages);
-			}
-			else if (ParsingLR.IsChecked == true)
-			{
-				Parser = BuilderLR.BuildParser(Grammar_Editor.Text, messages);
-			}
+			Parser = BuilderBase.BuildParser(GrammarType.LL, Grammar_Editor.Text, messages);
 
 			Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m=>m.Type == MessageType.Trace).Select(m=>m.Text));
 			Grammar_ErrorsList.ItemsSource = messages.Where(m=>m.Type == MessageType.Error || m.Type == MessageType.Warning);

@@ -26,7 +26,7 @@ namespace Land.Core
 	/// </summary>
 	public enum MappingOption { PRIORITY, LAND, BASEPRIORITY }
 
-	[Serializable]
+
 	public class OptionsManager
 	{
 		public const string GLOBAL_PARAMETERS_SYMBOL = "";
@@ -133,7 +133,6 @@ namespace Land.Core
 		}
 	}
 
-	[Serializable]
 	public class LocalOptions
 	{
 		public NodeOption? NodeOption { get; set; } = null;

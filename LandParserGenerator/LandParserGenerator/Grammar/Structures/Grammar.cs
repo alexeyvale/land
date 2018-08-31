@@ -460,58 +460,6 @@ namespace Land.Core
 
 		#endregion
 
-		/// <summary>
-		/// Замена символа во всех правилах
-		/// </summary>
-		/// <param name="from">Заменяемый символ</param>
-		/// <param name="to">Символ, на который заменяем</param>
-		private void ChangeSymbol(string from, string to)
-		{
-			foreach (var rule in Rules.Values)
-				foreach (var alt in rule.Alternatives)
-					foreach (var elem in alt.Elements)
-						if (elem.Symbol == from)
-							elem.Symbol = to;
-
-			if (Rules.ContainsKey(from))
-			{
-				var body = Rules[from];
-				Rules.Remove(from);
-				Rules.Add(to, body);
-			}
-			else if (Tokens.ContainsKey(from))
-			{
-				var body = Tokens[from];
-				Tokens.Remove(from);
-				Tokens.Add(to, body);
-			}
-
-			OnGrammarUpdate();
-		}
-
-		/// <summary>
-		/// Заменяет участок альтернативы на заданный символ 
-		/// </summary>
-		/// <param name="alt">Альтернатива</param>
-		/// <param name="startIdx">Стартовый индекс заменяемого участка</param>
-		/// <param name="length">Длина заменяемого участка</param>
-		/// <param name="symbol">Подставляемый символ</param>
-		public void Replace(Alternative alt, int startIdx, int length, params string[] symbols)
-		{
-			alt.Elements.RemoveRange(startIdx, length);
-			alt.Elements.InsertRange(startIdx, symbols.Select(s=>new Entry(s)));
-
-			OnGrammarUpdate();
-		}
-
-		public void Replace(Alternative alt, int startIdx, int length, params Entry[] symbols)
-		{
-			alt.Elements.RemoveRange(startIdx, length);
-			alt.Elements.InsertRange(startIdx, symbols);
-
-			OnGrammarUpdate();
-		}
-
 		public void PostProcessing()
 		{
 			/// Для LR грамматики добавляем фиктивный стартовый символ, чтобы произошла
