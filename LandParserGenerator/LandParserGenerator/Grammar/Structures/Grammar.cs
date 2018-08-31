@@ -14,10 +14,8 @@ namespace Land.Core
 
 	public enum AnyOption { Include, Except, Avoid, IgnorePairs }
 
-	[Serializable]
 	public class Grammar
 	{
-		[Serializable]
 		public class ElementQuantifierPair
 		{
 			public string Element { get; set; }
@@ -61,6 +59,9 @@ namespace Land.Core
 		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
 		private Dictionary<string, PointLocation> _symbolAnchors = new Dictionary<string, PointLocation>();
 
+		// Лог конструирования грамматики
+		public List<string> ConstructionLog = new List<string>();
+
 		public ISymbol this[string key]
 		{
 			get
@@ -84,10 +85,10 @@ namespace Land.Core
 			}
 		}
 
-		#region Создание грамматики
-
 		public Grammar(GrammarType type)
 		{
+			ConstructionLog.Add($"var grammar = new Grammar(GrammarType.{type});");
+
 			Type = type;
 
 			DeclareTerminal(new TerminalSymbol(ANY_TOKEN_NAME, null));
@@ -97,7 +98,7 @@ namespace Land.Core
 			State = GrammarState.Valid;
 		}
 
-		public void OnGrammarUpdate()
+		private void OnGrammarUpdate()
 		{
 			/// Если грамматика была изменена,
 			/// её корректность нужно перепроверить,
@@ -105,13 +106,12 @@ namespace Land.Core
 			State = GrammarState.Unknown;
 			FirstCacheConsistent = false;
 			FollowCacheConsistent = false;
-			SentenceTokensCacheConsistent = false;
 		}
-
-		#region Описание символов
 
 		public void AddAliases(string smb, HashSet<string> aliases)
 		{
+			ConstructionLog.Add($"grammar.AddAliases(\"{smb}\", new HashSet<string>() {{ {String.Join(", ", aliases.Select(a=>"\"" + a + "\""))} }});");
+
 			var intersectionWithSymbols = aliases.Intersect(Rules.Keys.Union(Tokens.Keys)).ToList();
 
 			if(intersectionWithSymbols.Count > 0)
@@ -145,53 +145,20 @@ namespace Land.Core
 				return _symbolAnchors[smb];
 			else
 				return null;
-		}
-
-		private string AlreadyDeclaredCheck(string name)
-		{
-			if (Rules.ContainsKey(name))
-			{
-				return $"Повторное определение: символ {name} определён как нетерминальный";
-			}
-
-			if (Tokens.ContainsKey(name))
-			{
-				return $"Повторное определение: символ {name} определён как терминальный";
-			}
-
-			if (Pairs.ContainsKey(name))
-			{
-				return $"Повторное определение: символ {name} определён как пара";
-			}
-
-			if (Aliases.Any(p=>p.Value.Contains(name)))
-			{
-				return $"Повторное определение: символ {name} определён как псевдоним";
-			}
-
-			return String.Empty;
-		}
-
-        public void DeclareNonterminal(NonterminalSymbol rule)
-		{
-			var checkingResult = AlreadyDeclaredCheck(rule.Name);
-
-			if (!String.IsNullOrEmpty(checkingResult))
-				throw new IncorrectGrammarException(checkingResult);
-            else
-                Rules[rule.Name] = rule;
-
-            OnGrammarUpdate();
-		}
+		}	
 
 		public void DeclareNonterminal(string name, List<Alternative> alternatives)
 		{
+			ConstructionLog.Add($"grammar.DeclareNonterminal(\"{name}\", new List<Alternative>() {{ {String.Join(", ", alternatives.Select(alt => GetConstructionLog(alt)))} }});");
+
 			var rule = new NonterminalSymbol(name, alternatives);
 			DeclareNonterminal(rule);
 		}
 
 		public string GenerateNonterminal(List<Alternative> alternatives)
 		{
+			ConstructionLog.Add($"grammar.GenerateNonterminal(new List<Alternative>() {{ {String.Join(", ", alternatives.Select(alt => GetConstructionLog(alt)))} }});");
+
 			if (Type == GrammarType.LR)
 			{
 				/// Проверяем, нет ли уже правила с такими альтернативами
@@ -210,6 +177,8 @@ namespace Land.Core
 		/// Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
 		public string GenerateNonterminal(string elemName, Quantifier quantifier, bool precNonEmpty = false)
 		{
+			ConstructionLog.Add($"grammar.GenerateNonterminal(\"{elemName}\", Quantifier.{quantifier}, {precNonEmpty.ToString().ToLower()});");
+
 			if (Type == GrammarType.LR)
 			{
 				var generated = Rules.Where(r => r.Key.StartsWith(AUTO_RULE_PREFIX))
@@ -314,6 +283,8 @@ namespace Land.Core
 		//Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
 		public string GenerateTerminal(string regex)
 		{
+			ConstructionLog.Add($"grammar.GenerateTerminal(\"{regex}\");");
+
 			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
 			foreach (var token in Tokens.Values)
 				if (token.Pattern != null && token.Pattern.Equals(regex))
@@ -324,31 +295,20 @@ namespace Land.Core
 			AutoTokenUserWrittenForm[newName] = regex;
 
 			return newName;
-		}
-
-		public void DeclareTerminal(TerminalSymbol terminal)
-		{
-			var checkingResult = AlreadyDeclaredCheck(terminal.Name);
-
-			if (!String.IsNullOrEmpty(checkingResult))
-				throw new IncorrectGrammarException(checkingResult);
-			else
-			{
-				TokenOrder.Add(terminal.Name);
-				Tokens[terminal.Name] = terminal;
-			}
-
-			OnGrammarUpdate();
-		}
+		}	
 
 		public void DeclareTerminal(string name,  string pattern)
 		{
+			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", \"{pattern}\");");
+
 			var terminal = new TerminalSymbol(name, pattern);
 			DeclareTerminal(terminal);
 		}
 
 		public void DeclarePair(string name, HashSet<string> left, HashSet<string> right)
 		{
+			ConstructionLog.Add($"grammar.DeclarePair(\"{name}\", new HashSet<string>(){{ {String.Join(", ", left.Select(l=>$"\"{l}\""))} }}, new HashSet<string>(){{ {String.Join(", ", right.Select(r => $"\"{r}\""))} }});");
+
 			var checkingResult = AlreadyDeclaredCheck(name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
@@ -366,74 +326,88 @@ namespace Land.Core
 			OnGrammarUpdate();
 		}
 
-		#endregion
-
-		#region Учёт опций
-
-		public void SetOption(NodeOption option, params string[] symbols)
+		public void PostProcessing()
 		{
-			Options.Set(option, symbols);
+			ConstructionLog.Add($"grammar.PostProcessing();");
 
-			var errorSymbols = CheckIfNonterminals(symbols).Intersect(СheckIfAliases(symbols)).ToList();
-			if (errorSymbols.Count > 0)
-				throw new IncorrectGrammarException(
-					$"Символы '{String.Join("', '", errorSymbols)}' не определены как нетерминальные или псевдонимы"
-				);
-		}
-
-		public void SetOption(ParsingOption option, params string[] symbols)
-		{
-			Options.Set(option, symbols);
-
-			switch(option)
+			/// Для LR грамматики добавляем фиктивный стартовый символ, чтобы произошла
+			/// финальная свёртка
+			if (Type == GrammarType.LR)
 			{
-				case ParsingOption.START:
-					StartSymbol = Options.GetSymbols(ParsingOption.START).FirstOrDefault();
-					if (CheckIfNonterminals(StartSymbol).Count > 0)
-						throw new IncorrectGrammarException(
-							$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
-						);
-					break;
-				case ParsingOption.SKIP:
-					var errorSymbols = CheckIfTerminals(symbols);
-					if (errorSymbols.Count > 0)
-						throw new IncorrectGrammarException(
-							$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
-						);
-					break;
-				default:
-					break;
+				if (!String.IsNullOrEmpty(StartSymbol))
+				{
+					var newStartName = AUTO_RULE_PREFIX + AutoRuleCounter++;
+
+					this.DeclareNonterminal(new NonterminalSymbol(newStartName, new string[][]
+					{
+						new string[]{ StartSymbol }
+					}));
+
+					this.Options.Clear(ParsingOption.START);
+					this.SetOption(ParsingOption.START, newStartName);
+				}
+			}
+
+			if (Options.IsSet(ParsingOption.IGNORECASE))
+			{
+				foreach (var token in Tokens.Where(t => t.Key.StartsWith(AUTO_TOKEN_PREFIX)))
+					token.Value.Pattern = String.Join("",
+						token.Value.Pattern.Trim('\'').Select(c => Char.IsLetter(c) ? $"[{Char.ToLower(c)}{Char.ToUpper(c)}]" : $"'{c}'"));
 			}
 		}
 
-		public void SetOption(MappingOption option, params string[] symbols)
-		{
-			Options.Set(option, symbols);
+		#region Private methods
 
-			var errorSymbols = CheckIfSymbols(symbols);
-			if (errorSymbols.Count > 0)
-				throw new IncorrectGrammarException(
-					$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
-				);
+		private string AlreadyDeclaredCheck(string name)
+		{
+			if (Rules.ContainsKey(name))
+			{
+				return $"Повторное определение: символ {name} определён как нетерминальный";
+			}
+
+			if (Tokens.ContainsKey(name))
+			{
+				return $"Повторное определение: символ {name} определён как терминальный";
+			}
+
+			if (Pairs.ContainsKey(name))
+			{
+				return $"Повторное определение: символ {name} определён как пара";
+			}
+
+			if (Aliases.Any(p => p.Value.Contains(name)))
+			{
+				return $"Повторное определение: символ {name} определён как псевдоним";
+			}
+
+			return String.Empty;
 		}
 
-		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
+		private void DeclareNonterminal(NonterminalSymbol rule)
 		{
-			if (symbols == null || symbols.Length == 0)
-			{
-				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
-				Options.Set(option, symbols, @params);
-			}
+			var checkingResult = AlreadyDeclaredCheck(rule.Name);
+
+			if (!String.IsNullOrEmpty(checkingResult))
+				throw new IncorrectGrammarException(checkingResult);
+			else
+				Rules[rule.Name] = rule;
+
+			OnGrammarUpdate();
+		}
+
+		private void DeclareTerminal(TerminalSymbol terminal)
+		{
+			var checkingResult = AlreadyDeclaredCheck(terminal.Name);
+
+			if (!String.IsNullOrEmpty(checkingResult))
+				throw new IncorrectGrammarException(checkingResult);
 			else
 			{
-				Options.Set(option, symbols, @params);
-
-				var errorSymbols = CheckIfSymbols(symbols);
-				if (errorSymbols.Count > 0)
-					throw new IncorrectGrammarException(
-						$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
-					);
+				TokenOrder.Add(terminal.Name);
+				Tokens[terminal.Name] = terminal;
 			}
+
+			OnGrammarUpdate();
 		}
 
 		private List<string> CheckIfNonterminals(params string[] symbols)
@@ -460,84 +434,89 @@ namespace Land.Core
 
 		#endregion
 
-		/// <summary>
-		/// Замена символа во всех правилах
-		/// </summary>
-		/// <param name="from">Заменяемый символ</param>
-		/// <param name="to">Символ, на который заменяем</param>
-		private void ChangeSymbol(string from, string to)
+		#region Учёт опций
+
+		public void SetOption(NodeOption option, params string[] symbols)
 		{
-			foreach (var rule in Rules.Values)
-				foreach (var alt in rule.Alternatives)
-					foreach (var elem in alt.Elements)
-						if (elem.Symbol == from)
-							elem.Symbol = to;
+			ConstructionLog.Add($"grammar.SetOption(NodeOption.{option}, {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))});");
 
-			if (Rules.ContainsKey(from))
-			{
-				var body = Rules[from];
-				Rules.Remove(from);
-				Rules.Add(to, body);
-			}
-			else if (Tokens.ContainsKey(from))
-			{
-				var body = Tokens[from];
-				Tokens.Remove(from);
-				Tokens.Add(to, body);
-			}
+			Options.Set(option, symbols);
 
-			OnGrammarUpdate();
+			var errorSymbols = CheckIfNonterminals(symbols).Intersect(СheckIfAliases(symbols)).ToList();
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определены как нетерминальные или псевдонимы"
+				);
 		}
 
-		/// <summary>
-		/// Заменяет участок альтернативы на заданный символ 
-		/// </summary>
-		/// <param name="alt">Альтернатива</param>
-		/// <param name="startIdx">Стартовый индекс заменяемого участка</param>
-		/// <param name="length">Длина заменяемого участка</param>
-		/// <param name="symbol">Подставляемый символ</param>
-		public void Replace(Alternative alt, int startIdx, int length, params string[] symbols)
+		public void SetOption(ParsingOption option, params string[] symbols)
 		{
-			alt.Elements.RemoveRange(startIdx, length);
-			alt.Elements.InsertRange(startIdx, symbols.Select(s=>new Entry(s)));
+			ConstructionLog.Add($"grammar.SetOption(ParsingOption.{option}, {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))});");
 
-			OnGrammarUpdate();
-		}
+			Options.Set(option, symbols);
 
-		public void Replace(Alternative alt, int startIdx, int length, params Entry[] symbols)
-		{
-			alt.Elements.RemoveRange(startIdx, length);
-			alt.Elements.InsertRange(startIdx, symbols);
-
-			OnGrammarUpdate();
-		}
-
-		public void PostProcessing()
-		{
-			/// Для LR грамматики добавляем фиктивный стартовый символ, чтобы произошла
-			/// финальная свёртка
-			if(Type == GrammarType.LR)
+			switch(option)
 			{
-				if (!String.IsNullOrEmpty(StartSymbol))
-				{
-					var newStartName = AUTO_RULE_PREFIX + AutoRuleCounter++;
-
-					this.DeclareNonterminal(new NonterminalSymbol(newStartName, new string[][]
-					{
-						new string[]{ StartSymbol }
-					}));
-
-					this.Options.Clear(ParsingOption.START);
-					this.SetOption(ParsingOption.START, newStartName);
-				}
+				case ParsingOption.START:
+					StartSymbol = Options.GetSymbols(ParsingOption.START).FirstOrDefault();
+					if (CheckIfNonterminals(StartSymbol).Count > 0)
+						throw new IncorrectGrammarException(
+							$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
+						);
+					break;
+				case ParsingOption.SKIP:
+					var errorSymbols = CheckIfTerminals(symbols);
+					if (errorSymbols.Count > 0)
+						throw new IncorrectGrammarException(
+							$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
+						);
+					break;
+				default:
+					break;
 			}
+		}
 
-			if(Options.IsSet(ParsingOption.IGNORECASE))
+		public void SetOption(MappingOption option, params string[] symbols)
+		{
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))});");
+
+			Options.Set(option, symbols);
+
+			var errorSymbols = CheckIfSymbols(symbols);
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
+				);
+		}
+
+		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
+		{
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, {String.Join(", ", @params.Select(param => param.ToString()))} );");
+
+			if (symbols == null || symbols.Length == 0)
 			{
-				foreach (var token in Tokens.Where(t => t.Key.StartsWith(AUTO_TOKEN_PREFIX)))
-					token.Value.Pattern = String.Join("",
-						token.Value.Pattern.Trim('\'').Select(c => Char.IsLetter(c) ? $"[{Char.ToLower(c)}{Char.ToUpper(c)}]" : $"'{c}'"));
-            }
+				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
+				Options.Set(option, symbols, @params);
+			}
+			else
+			{
+				Options.Set(option, symbols, @params);
+
+				var errorSymbols = CheckIfSymbols(symbols);
+				if (errorSymbols.Count > 0)
+					throw new IncorrectGrammarException(
+						$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
+					);
+			}
+		}
+
+		#endregion
+
+		#region Validation
+
+		public void ForceValid()
+		{
+			State = GrammarState.Valid;
 		}
 
 		public IEnumerable<Message> CheckValidity()
@@ -810,6 +789,10 @@ namespace Land.Core
 
 			return messages;
 		}
+
+		#endregion
+
+		#region Userification
 
 		public void RebuildUserificationCache()
 		{
@@ -1097,105 +1080,6 @@ namespace Land.Core
 
 		#endregion
 
-		#region Построение SentenceTokens
-
-		private bool SentenceTokensCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<string>> _sentenceTokens;
-		private Dictionary<string, HashSet<string>> SentenceTokensCache
-		{
-			get
-			{
-				if (_sentenceTokens == null || !SentenceTokensCacheConsistent)
-				{
-					SentenceTokensCacheConsistent = true;
-					try
-					{
-						BuildSentenceTokens();
-					}
-					catch
-					{
-						SentenceTokensCacheConsistent = false;
-						throw;
-					}
-				}
-
-				return _sentenceTokens;
-			}
-
-			set { _sentenceTokens = value; }
-		}
-
-		/// <summary>
-		/// Построение множеств SYMBOLS для нетерминалов
-		/// </summary>
-		private void BuildSentenceTokens()
-		{
-			_sentenceTokens = new Dictionary<string, HashSet<string>>();
-
-			/// Изначально множества пустые
-			foreach (var nt in Rules)
-			{
-				_sentenceTokens[nt.Key] = new HashSet<string>();
-			}
-
-			var changed = true;
-
-			/// Пока итеративно вносятся изменения
-			while (changed)
-			{
-				changed = false;
-
-				/// Проходим по всем альтернативам и пересчитываем FIRST 
-				foreach (var nt in Rules)
-				{
-					var oldCount = _sentenceTokens[nt.Key].Count;
-
-					foreach (var alt in nt.Value)
-					{
-						_sentenceTokens[nt.Key].UnionWith(SentenceTokens(alt));
-					}
-
-					if (!changed)
-					{
-						changed = oldCount != _sentenceTokens[nt.Key].Count;
-					}
-				}
-			}
-		}
-
-		public HashSet<string> SentenceTokens(Alternative alt)
-		{
-			if (alt.Count > 0)
-			{
-				var symbols = new HashSet<string>();
-				var elementsCounter = 0;
-
-				for (; elementsCounter < alt.Count; ++elementsCounter)
-				{
-					var elemFirst = SentenceTokens(alt[elementsCounter]);
-					symbols.UnionWith(elemFirst);
-				}
-
-				return symbols;
-			}
-			else
-			{
-				return new HashSet<string>() { };
-			}
-		}
-
-		public HashSet<string> SentenceTokens(string symbol)
-		{
-			var gramSymbol = this[symbol];
-
-			if (gramSymbol is NonterminalSymbol)
-				return new HashSet<string>(SentenceTokensCache[gramSymbol.Name]);
-			else
-				return new HashSet<string>() { gramSymbol.Name };
-		}
-
-		#endregion
-
 		#region For LR Parsing
 
 		/// <summary>
@@ -1321,6 +1205,11 @@ namespace Land.Core
 					}	
 
 			return result;
+		}
+
+		public string GetConstructionLog(Alternative alt)
+		{
+			return $"{Environment.NewLine}new Alternative() {{ Elements = new List<Entry>() {{ {String.Join($", ", alt.Elements.Select(entry => $"new Entry(\"{entry.Symbol}\", new LocalOptions() {{ NodeOption = {(entry.Options.NodeOption != null ? $"NodeOption.{entry.Options.NodeOption}" : "null")}, Priority = {(entry.Options.Priority != null ? $"{entry.Options.Priority}" : "null")}, IsLand = {entry.Options.IsLand.ToString().ToLower()}, AnyOptions = new Dictionary<AnyOption, HashSet<string>>() {{ {String.Join(", ", entry.Options.AnyOptions.Select(op=>$"(AnyOption.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v=>$"\"{v}\""))}}})"))} }} }})"))}}}}}";
 		}
 	}
 }

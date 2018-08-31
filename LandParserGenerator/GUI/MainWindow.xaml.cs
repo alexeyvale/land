@@ -160,6 +160,37 @@ namespace Land.GUI
 			}
 		}
 
+		private void Grammar_LibraryButton_Click(object sender, RoutedEventArgs e)
+		{
+			var librarySettings = new LibrarySettingsWindow();
+
+			if (librarySettings.ShowDialog() == true)
+			{
+				var messages = new List<Message>();
+				var success = ParserBuilder.GenerateLibrary(
+					GrammarType.LL, 
+					Grammar_Editor.Text, 
+					librarySettings.Input_Namespace.Text, 
+					librarySettings.Input_OutputDirectory.Text, 
+					messages
+				);			
+
+				Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m => m.Type == MessageType.Trace).Select(m => m.Text));
+				Grammar_ErrorsList.ItemsSource = messages.Where(m => m.Type == MessageType.Error || m.Type == MessageType.Warning);
+
+				if (!success)
+				{
+					Grammar_StatusBarLabel.Content = "Обнаружены ошибки в грамматике языка";
+					Grammar_StatusBar.Background = LightRed;
+				}
+				else
+				{
+					Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована";
+					Grammar_StatusBar.Background = Brushes.LightGreen;
+				}
+			}
+		}
+
 		private void Grammar_LoadGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (MayProceedClosingGrammar())
