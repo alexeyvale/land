@@ -64,14 +64,14 @@
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidLandExplorerPackage" value="{19d46d6a-fda1-46b3-af5c-188b9cd2d0ee}" />
+    <GuidSymbol name="guidLandExplorerPackage" value="{92dd57dc-aa42-446e-b5bc-9cd875a9e9ec}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidLandExplorerPackageCmdSet" value="{c78b6acb-d211-4831-aba0-b81559e71e89}">
+    <GuidSymbol name="guidLandExplorerPackageCmdSet" value="{c270b34a-9cfe-406d-b7e6-b240b52015b1}">
       <IDSymbol name="LandExplorerCommandId" value="0x0100" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{52e15459-d663-4b78-bfae-a0978697fae1}" >
+    <GuidSymbol name="guidImages" value="{9d205769-6597-4cb3-8c44-6127597fa831}" >
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />

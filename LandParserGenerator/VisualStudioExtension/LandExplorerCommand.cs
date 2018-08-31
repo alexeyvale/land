@@ -1,16 +1,13 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="LandExplorerCommand.cs" company="Company">
-//     Copyright (c) Company.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
 
-namespace Land.VSExtension
+namespace Land.VisualStudioExtension
 {
 	/// <summary>
 	/// Command handler
@@ -25,34 +22,27 @@ namespace Land.VSExtension
 		/// <summary>
 		/// Command menu group (command set GUID).
 		/// </summary>
-		public static readonly Guid CommandSet = new Guid("c78b6acb-d211-4831-aba0-b81559e71e89");
+		public static readonly Guid CommandSet = new Guid("c270b34a-9cfe-406d-b7e6-b240b52015b1");
 
 		/// <summary>
 		/// VS Package that provides this command, not null.
 		/// </summary>
-		private readonly Package package;
+		private readonly AsyncPackage package;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LandExplorerCommand"/> class.
 		/// Adds our command handlers for menu (commands must exist in the command table file)
 		/// </summary>
 		/// <param name="package">Owner package, not null.</param>
-		private LandExplorerCommand(Package package)
+		/// <param name="commandService">Command service to add command to, not null.</param>
+		private LandExplorerCommand(AsyncPackage package, OleMenuCommandService commandService)
 		{
-			if (package == null)
-			{
-				throw new ArgumentNullException("package");
-			}
+			this.package = package ?? throw new ArgumentNullException(nameof(package));
+			commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-			this.package = package;
-
-			OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-			if (commandService != null)
-			{
-				var menuCommandID = new CommandID(CommandSet, CommandId);
-				var menuItem = new MenuCommand(this.ShowToolWindow, menuCommandID);
-				commandService.AddCommand(menuItem);
-			}
+			var menuCommandID = new CommandID(CommandSet, CommandId);
+			var menuItem = new MenuCommand(this.Execute, menuCommandID);
+			commandService.AddCommand(menuItem);
 		}
 
 		/// <summary>
@@ -67,7 +57,7 @@ namespace Land.VSExtension
 		/// <summary>
 		/// Gets the service provider from the owner package.
 		/// </summary>
-		private IServiceProvider ServiceProvider
+		private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
 		{
 			get
 			{
@@ -79,9 +69,14 @@ namespace Land.VSExtension
 		/// Initializes the singleton instance of the command.
 		/// </summary>
 		/// <param name="package">Owner package, not null.</param>
-		public static void Initialize(Package package)
+		public static async Task InitializeAsync(AsyncPackage package)
 		{
-			Instance = new LandExplorerCommand(package);
+			// Switch to the main thread - the call to AddCommand in LandExplorerCommand's constructor requires
+			// the UI thread.
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+
+			OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
+			Instance = new LandExplorerCommand(package, commandService);
 		}
 
 		/// <summary>
@@ -89,8 +84,10 @@ namespace Land.VSExtension
 		/// </summary>
 		/// <param name="sender">The event sender.</param>
 		/// <param name="e">The event args.</param>
-		private void ShowToolWindow(object sender, EventArgs e)
+		private void Execute(object sender, EventArgs e)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			// Get the instance number 0 of this tool window. This window is single instance so this instance
 			// is actually the only one.
 			// The last flag is set to true so that if the tool window does not exists it will be created.

@@ -1,22 +1,19 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="LandExplorerPackage.cs" company="Company">
-//     Copyright (c) Company.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
+using Task = System.Threading.Tasks.Task;
 
-namespace Land.VSExtension
+namespace Land.VisualStudioExtension
 {
 	/// <summary>
 	/// This is the class that implements the package exposed by this assembly.
@@ -35,21 +32,21 @@ namespace Land.VSExtension
 	/// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
 	/// </para>
 	/// </remarks>
-	[PackageRegistration(UseManagedResourcesOnly = true)]
+	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	[ProvideToolWindow(typeof(LandExplorer))]
 	[Guid(LandExplorerPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-	public sealed class LandExplorerPackage : Package
+	public sealed class LandExplorerPackage : AsyncPackage
 	{
 		/// <summary>
 		/// LandExplorerPackage GUID string.
 		/// </summary>
-		public const string PackageGuidString = "19d46d6a-fda1-46b3-af5c-188b9cd2d0ee";
+		public const string PackageGuidString = "92dd57dc-aa42-446e-b5bc-9cd875a9e9ec";
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="LandExplorer"/> class.
+		/// Initializes a new instance of the <see cref="LandExplorerPackage"/> class.
 		/// </summary>
 		public LandExplorerPackage()
 		{
@@ -65,10 +62,15 @@ namespace Land.VSExtension
 		/// Initialization of the package; this method is called right after the package is sited, so this is the place
 		/// where you can put all the initialization code that rely on services provided by VisualStudio.
 		/// </summary>
-		protected override void Initialize()
+		/// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+		/// <param name="progress">A provider for progress updates.</param>
+		/// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
+		protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 		{
-			LandExplorerCommand.Initialize(this);
-			base.Initialize();
+			// When initialized asynchronously, the current thread may be a background thread at this point.
+			// Do any initialization that requires the UI thread after switching to the UI thread.
+			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+			await LandExplorerCommand.InitializeAsync(this);
 		}
 
 		#endregion

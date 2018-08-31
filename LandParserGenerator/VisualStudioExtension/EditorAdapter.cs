@@ -6,7 +6,7 @@ using Land.Core.Markup;
 using Land.Core;
 using Land.Control;
 
-namespace Land.VSExtension
+namespace Land.VisualStudioExtension
 {
 	public class EditorAdapter : IEditorAdapter
 	{

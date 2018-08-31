@@ -1,17 +1,9 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="LandExplorer.cs" company="Company">
-//     Copyright (c) Company.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
+﻿using Land.Control;
 
-using System.Collections.Generic;
-using Land.Control;
-
-namespace Land.VSExtension
+namespace Land.VisualStudioExtension
 {
 	using System;
 	using System.Runtime.InteropServices;
-
 	using Microsoft.VisualStudio.Shell;
 
 	/// <summary>
@@ -25,7 +17,7 @@ namespace Land.VSExtension
 	/// implementation of the IVsUIElementPane interface.
 	/// </para>
 	/// </remarks>
-	[Guid("792a106f-05b1-45db-8898-bbb91d346577")]
+	[Guid("531dabfc-7ad8-4373-8ff7-b73b0d9d748d")]
 	public class LandExplorer : ToolWindowPane
 	{
 		/// <summary>
