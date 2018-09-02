@@ -128,13 +128,6 @@ namespace Land.Core
 
 			if (!success)
 			{
-				//errors.Add(Message.Error(
-				//	$"При генерации парсера произошла ошибка: встречена неожиданная лексема {scanner.yytext}",
-				//	scanner.yylloc.StartLine,
-				//	scanner.yylloc.StartColumn,
-				//	"LanD"
-				//));
-
 				return null;
 			}
 
@@ -239,10 +232,11 @@ namespace Land.Core
 					File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
 
 					/// Компилируем библиотеку
-					var codeProvider = new CSharpCodeProvider();
-
+					var codeProvider = new CSharpCodeProvider(); ;
 					var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+
 					compilerParams.GenerateInMemory = false;
+					compilerParams.OutputAssembly = $"{@namespace}.dll";
 					compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
 					compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
 					compilerParams.ReferencedAssemblies.Add("System.dll");
@@ -310,6 +304,7 @@ namespace " + @namespace + @"
 		{
 			return
 @"
+using System;
 using System.Reflection;
 using Land.Core;
 using Land.Core.Parsing;
@@ -321,7 +316,7 @@ namespace " + @namespace + @"
 		public static BaseParser GetParser()
 		{
 			var grammar = GrammarProvider.GetGrammar();
-			var lexerType = Assembly.GetExecutingAssembly().GetType(""Lexer"");
+			var lexerType = Assembly.GetExecutingAssembly().GetType(""" + @namespace.Replace('.', '_') + @"_Lexer"");
 
 			BaseParser parser = null;
 
@@ -342,6 +337,8 @@ namespace " + @namespace + @"
 					);
 					break;
 			}
+
+			return parser;
 		}
 	}
 }";
