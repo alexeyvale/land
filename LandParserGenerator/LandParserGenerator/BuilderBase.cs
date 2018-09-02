@@ -236,7 +236,7 @@ namespace Land.Core
 					var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
 
 					compilerParams.GenerateInMemory = false;
-					compilerParams.OutputAssembly = $"{@namespace}.dll";
+					compilerParams.OutputAssembly = Path.Combine(path, $"{@namespace}.dll");
 					compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
 					compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
 					compilerParams.ReferencedAssemblies.Add("System.dll");

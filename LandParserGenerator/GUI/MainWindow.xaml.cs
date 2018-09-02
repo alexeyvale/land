@@ -14,6 +14,7 @@ using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 
 using Land.Core;
+using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
 using Land.Control;
@@ -156,7 +157,11 @@ namespace Land.GUI
 		private void Grammar_LibraryButton_Click(object sender, RoutedEventArgs e)
 		{
 			var librarySettings = new LibrarySettingsWindow();
-			//librarySettings.Input_Namespace = !String.IsNullOrEmpty(CurrentGrammarFilename) ?  Path.GetFileNameWithoutExtension(CurrentGrammarFilename) : null;
+
+			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(CurrentGrammarFilename) 
+				? Path.GetFileNameWithoutExtension(CurrentGrammarFilename)
+				: null;
+			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(CurrentGrammarFilename);
 
 			if (librarySettings.ShowDialog() == true)
 			{
