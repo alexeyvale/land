@@ -7,8 +7,8 @@
     <ProjectGuid>{F1276A3B-A504-47A3-B858-8224EF265795}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LandParserGenerator</RootNamespace>
-    <AssemblyName>LandParserGenerator</AssemblyName>
+    <RootNamespace>Land.Core</RootNamespace>
+    <AssemblyName>Land.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
