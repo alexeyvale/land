@@ -43,8 +43,10 @@
                                         <Separator></Separator>
                                         <Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click">Новая</Button>
                                         <Separator></Separator>
-                                        <Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click">Сгенерировать парсер</Button>
-                                        <Separator></Separator>
+										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click">Сгенерировать парсер</Button>
+										<Separator></Separator>
+										<Button Name="Grammar_LibraryButton" Click="Grammar_LibraryButton_Click">Создать библиотеку</Button>
+										<Separator></Separator>
 										<ComboBox MinWidth="80" Name="Grammar_RecentFiles" ToolTip="Последние открытые грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
 									</ToolBar>
                                     <avalonedit:TextEditor

@@ -8,7 +8,7 @@ using Land.Core.Parsing.LR;
 
 namespace Land.Core
 {
-	public enum GrammarState { Unknown, Valid, Invalid }
+	public enum GrammarState { Unknown, Valid, ForcedValid, Invalid }
 
 	public enum GrammarType { LL, LR }
 
@@ -61,6 +61,9 @@ namespace Land.Core
 		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
 		private Dictionary<string, PointLocation> _symbolAnchors = new Dictionary<string, PointLocation>();
 
+		// Лог конструирования грамматики
+		public List<string> ConstructionLog = new List<string>();
+
 		public ISymbol this[string key]
 		{
 			get
@@ -88,6 +91,8 @@ namespace Land.Core
 
 		public Grammar(GrammarType type)
 		{
+			ConstructionLog.Add($"var grammar = new Grammar(GrammarType.{type});");
+
 			Type = type;
 
 			DeclareTerminal(new TerminalSymbol(ANY_TOKEN_NAME, null));
@@ -112,6 +117,8 @@ namespace Land.Core
 
 		public void AddAliases(string smb, HashSet<string> aliases)
 		{
+			ConstructionLog.Add($"grammar.AddAliases(\"{smb}\", new HashSet<string>() {{ {String.Join(", ", aliases.Select(a => "\"" + a + "\""))} }});");
+
 			var intersectionWithSymbols = aliases.Intersect(Rules.Keys.Union(Tokens.Keys)).ToList();
 
 			if(intersectionWithSymbols.Count > 0)
@@ -172,26 +179,18 @@ namespace Land.Core
 			return String.Empty;
 		}
 
-        public void DeclareNonterminal(NonterminalSymbol rule)
-		{
-			var checkingResult = AlreadyDeclaredCheck(rule.Name);
-
-			if (!String.IsNullOrEmpty(checkingResult))
-				throw new IncorrectGrammarException(checkingResult);
-            else
-                Rules[rule.Name] = rule;
-
-            OnGrammarUpdate();
-		}
-
 		public void DeclareNonterminal(string name, List<Alternative> alternatives)
 		{
+			ConstructionLog.Add($"grammar.DeclareNonterminal(\"{name}\", new List<Alternative>() {{ {String.Join(", ", alternatives.Select(alt => GetConstructionLog(alt)))} }});");
+
 			var rule = new NonterminalSymbol(name, alternatives);
 			DeclareNonterminal(rule);
 		}
 
 		public string GenerateNonterminal(List<Alternative> alternatives)
 		{
+			ConstructionLog.Add($"grammar.GenerateNonterminal(new List<Alternative>() {{ {String.Join(", ", alternatives.Select(alt => GetConstructionLog(alt)))} }});");
+
 			if (Type == GrammarType.LR)
 			{
 				/// Проверяем, нет ли уже правила с такими альтернативами
@@ -210,6 +209,8 @@ namespace Land.Core
 		/// Формируем правило для списка элементов (если указан элемент и при нём - квантификатор)
 		public string GenerateNonterminal(string elemName, Quantifier quantifier, bool precNonEmpty = false)
 		{
+			ConstructionLog.Add($"grammar.GenerateNonterminal(\"{elemName}\", Quantifier.{quantifier}, {precNonEmpty.ToString().ToLower()});");
+
 			if (Type == GrammarType.LR)
 			{
 				var generated = Rules.Where(r => r.Key.StartsWith(AUTO_RULE_PREFIX))
@@ -312,21 +313,52 @@ namespace Land.Core
 		}
 
 		//Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
-		public string GenerateTerminal(string regex)
+		public string GenerateTerminal(string pattern)
 		{
+			ConstructionLog.Add($"grammar.GenerateTerminal(\"{pattern.Replace("\"", "\\\"")}\");");
+
 			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
 			foreach (var token in Tokens.Values)
-				if (token.Pattern != null && token.Pattern.Equals(regex))
+				if (token.Pattern != null && token.Pattern.Equals(pattern))
 					return token.Name;
 
 			var newName = AUTO_TOKEN_PREFIX + AutoTokenCounter++;
-			Tokens.Add(newName, new TerminalSymbol(newName, regex));
-			AutoTokenUserWrittenForm[newName] = regex;
+			Tokens.Add(newName, new TerminalSymbol(newName, pattern));
+			AutoTokenUserWrittenForm[newName] = pattern;
 
 			return newName;
 		}
 
-		public void DeclareTerminal(TerminalSymbol terminal)
+		public void DeclareTerminal(string name,  string pattern)
+		{
+			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", \"{pattern.Replace("\"", "\\\"")}\");");
+
+			var terminal = new TerminalSymbol(name, pattern);
+			DeclareTerminal(terminal);
+		}
+
+		public void DeclarePair(string name, HashSet<string> left, HashSet<string> right)
+		{
+			ConstructionLog.Add($"grammar.DeclarePair(\"{name}\", new HashSet<string>(){{ {String.Join(", ", left.Select(l => $"\"{l}\""))} }}, new HashSet<string>(){{ {String.Join(", ", right.Select(r => $"\"{r}\""))} }});");
+
+			var checkingResult = AlreadyDeclaredCheck(name);
+
+			if (!String.IsNullOrEmpty(checkingResult))
+				throw new IncorrectGrammarException(checkingResult);
+			else
+			{
+				Pairs[name] = new PairSymbol()
+				{
+					Left = left,
+					Right = right,
+					Name = name
+				};
+			}
+
+			OnGrammarUpdate();
+		}
+
+		private void DeclareTerminal(TerminalSymbol terminal)
 		{
 			var checkingResult = AlreadyDeclaredCheck(terminal.Name);
 
@@ -341,27 +373,14 @@ namespace Land.Core
 			OnGrammarUpdate();
 		}
 
-		public void DeclareTerminal(string name,  string pattern)
+		private void DeclareNonterminal(NonterminalSymbol rule)
 		{
-			var terminal = new TerminalSymbol(name, pattern);
-			DeclareTerminal(terminal);
-		}
-
-		public void DeclarePair(string name, HashSet<string> left, HashSet<string> right)
-		{
-			var checkingResult = AlreadyDeclaredCheck(name);
+			var checkingResult = AlreadyDeclaredCheck(rule.Name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
 				throw new IncorrectGrammarException(checkingResult);
 			else
-			{
-				Pairs[name] = new PairSymbol()
-				{
-					Left = left,
-					Right = right,
-					Name = name
-				};
-			}
+				Rules[rule.Name] = rule;
 
 			OnGrammarUpdate();
 		}
@@ -462,9 +481,11 @@ namespace Land.Core
 
 		public void PostProcessing()
 		{
+			ConstructionLog.Add($"grammar.PostProcessing();");
+
 			/// Для LR грамматики добавляем фиктивный стартовый символ, чтобы произошла
 			/// финальная свёртка
-			if(Type == GrammarType.LR)
+			if (Type == GrammarType.LR)
 			{
 				if (!String.IsNullOrEmpty(StartSymbol))
 				{
@@ -486,6 +507,13 @@ namespace Land.Core
 					token.Value.Pattern = String.Join("",
 						token.Value.Pattern.Trim('\'').Select(c => Char.IsLetter(c) ? $"[{Char.ToLower(c)}{Char.ToUpper(c)}]" : $"'{c}'"));
             }
+		}
+
+		#region Валидация
+
+		public void ForceValid()
+		{
+			State = GrammarState.ForcedValid;
 		}
 
 		public IEnumerable<Message> CheckValidity()
@@ -759,6 +787,10 @@ namespace Land.Core
 			return messages;
 		}
 
+		#endregion
+
+		#region Юзерификация
+
 		public void RebuildUserificationCache()
 		{
 			AutoRuleUserWrittenForm = new Dictionary<string, string>();
@@ -821,6 +853,8 @@ namespace Land.Core
 		{
 			return alt.Elements.Select(e => Userify(e)).ToList();
 		}
+
+		#endregion
 
 		#endregion
 
@@ -1144,7 +1178,7 @@ namespace Land.Core
 
 		#endregion
 
-		#region For LR Parsing
+		#region Замыкание пунктов и Goto
 
 		/// <summary>
 		/// Построение замыкания множества пунктов
@@ -1269,6 +1303,21 @@ namespace Land.Core
 					}	
 
 			return result;
+		}
+
+		public string GetConstructionLog(Alternative alt)
+		{
+			return $"{Environment.NewLine}new Alternative() {{ Elements = new List<Entry>() {{ {String.Join($", ", alt.Elements.Select(entry => GetConstructionLog(entry)))}}}}}";
+		}
+
+		public string GetConstructionLog(Entry entry)
+		{
+			return $"new Entry(\"{entry.Symbol}\", {GetConstructionLog(entry.Options)})";
+		}
+
+		public string GetConstructionLog(LocalOptions opts)
+		{
+			return $"new LocalOptions() {{ NodeOption = {(opts.NodeOption != null ? $"NodeOption.{opts.NodeOption}" : "null")}, Priority = {(opts.Priority != null ? $"{opts.Priority}" : "null")}, IsLand = {opts.IsLand.ToString().ToLower()}, AnyOptions = new Dictionary<AnyOption, HashSet<string>>() {{ {String.Join(", ", opts.AnyOptions.Select(op => $"(AnyOption.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}})"))} }} }}";
 		}
 	}
 }

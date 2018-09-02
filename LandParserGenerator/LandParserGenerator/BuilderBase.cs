@@ -194,5 +194,157 @@ namespace Land.Core
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// Генерация библиотеки с парсером
+		/// </summary>
+		/// <param name="type">Тип парсера (LL или LR)</param>
+		/// <param name="text">Грамматика разбираемого формата файлов</param>
+		/// <param name="namespace">Пространство имён для сгенерированного парсера</param>
+		/// <param name="path">Путь к файлу генерируемой библиотеки</param>
+		/// <param name="messages">Лог генерации парсера</param>
+		/// <returns>Признак успешности выполнения операции</returns>
+		public static bool GenerateLibrary(GrammarType type, string text, string @namespace, string path, List<Message> messages)
+		{
+			/// Строим объект грамматики и проверяем, корректно ли прошло построение
+			var builtGrammar = BuildGrammar(type, text, messages);
+
+			if (messages.Count(m => m.Type == MessageType.Error) == 0)
+			{
+				builtGrammar.RebuildUserificationCache();
+
+				/// Строим таблицу и проверяем, соответствует ли она указанному типу грамматики
+				BaseTable table = null;
+
+				switch (type)
+				{
+					case GrammarType.LL:
+						table = new TableLL1(builtGrammar);
+						break;
+					case GrammarType.LR:
+						table = new TableLR1(builtGrammar);
+						break;
+				}
+
+				messages.AddRange(table.CheckValidity());
+
+				if (messages.Count(m => m.Type == MessageType.Error) == 0)
+				{
+					var lexerFileName = $"{@namespace.Replace('.', '_')}_Lexer.cs";
+					var parserFileName = $"{@namespace.Replace('.', '_')}_Parser.cs";
+					var grammarFileName = $"{@namespace.Replace('.', '_')}_Grammar.cs";
+
+					BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
+					File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
+					File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
+
+					/// Компилируем библиотеку
+					var codeProvider = new CSharpCodeProvider();
+
+					var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+					compilerParams.GenerateInMemory = false;
+					compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
+					compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
+					compilerParams.ReferencedAssemblies.Add("System.dll");
+					compilerParams.ReferencedAssemblies.Add("System.Core.dll");
+					compilerParams.ReferencedAssemblies.Add("mscorlib.dll");
+
+					var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName);
+
+					if (compilationResult.Errors.Count == 0)
+					{
+						return true;
+					}
+					else
+					{
+						foreach(System.CodeDom.Compiler.CompilerError error in compilationResult.Errors)
+						{
+							if (error.IsWarning)
+							{
+								messages.Add(Message.Warning(
+									$"Предупреждение: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
+									null,
+									"C# Compiler"
+								));
+							}
+							else
+							{
+								messages.Add(Message.Error(
+									$"Ошибка: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
+									null,
+									"C# Compiler"
+								));
+							}
+						}
+
+						return messages.All(m => m.Type != MessageType.Error);
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private static string GetGrammarProviderText(Grammar grammar, string @namespace)
+		{
+			return
+@"
+using Land.Core;
+using System.Collections.Generic;
+
+namespace " + @namespace + @"
+{
+	public static class GrammarProvider
+	{
+		public static Grammar GetGrammar()
+		{
+" + String.Join(Environment.NewLine, grammar.ConstructionLog.Select(rec => $"\t\t\t{rec}")) + @"
+			grammar.ForceValid();
+			return grammar;
+		}
+	}
+}";
+		}
+
+		private static string GetParserProviderText(string @namespace)
+		{
+			return
+@"
+using System.Reflection;
+using Land.Core;
+using Land.Core.Parsing;
+
+namespace " + @namespace + @"
+{
+	public static class ParserProvider
+	{
+		public static BaseParser GetParser()
+		{
+			var grammar = GrammarProvider.GetGrammar();
+			var lexerType = Assembly.GetExecutingAssembly().GetType(""Lexer"");
+
+			BaseParser parser = null;
+
+			switch (grammar.Type)
+			{
+				case GrammarType.LL:
+					parser = new Land.Core.Parsing.LL.Parser(grammar,
+						new AntlrLexerAdapter(
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+						)
+					);
+					break;
+				case GrammarType.LR:
+					parser = new Land.Core.Parsing.LR.Parser(grammar,
+						new AntlrLexerAdapter(
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+						)
+					);
+					break;
+			}
+		}
+	}
+}";
+		}
 	}
 }

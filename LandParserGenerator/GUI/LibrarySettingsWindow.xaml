@@ -1,0 +1,19 @@
+﻿<Window x:Class="Land.GUI.LibrarySettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Land.GUI"
+        mc:Ignorable="d"
+        Title="Настройки генерации библиотеки" Height="250" Width="500" ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical" Margin="15px">
+		<Label>Пространство имён</Label>
+		<TextBox Name="Input_Namespace"></TextBox>
+		<Label>Выходной каталог</Label>
+		<TextBox Name="Input_OutputDirectory"></TextBox>
+		<StackPanel Orientation="Horizontal" Margin="0, 15, 0, 0">
+			<Button Name="Button_Ok"  Margin="0, 0, 15, 0" Padding="2px" Width="50px" Click="Button_Ok_Click">ОК</Button>
+			<Button Name="Button_Cancel"  Padding="2px" Width="50px" Click="Button_Cancel_Click">Отмена</Button>
+		</StackPanel>
+    </StackPanel>
+</Window>
