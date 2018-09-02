@@ -391,6 +391,8 @@ namespace Land.Core
 
 		public void SetOption(NodeOption option, params string[] symbols)
 		{
+			ConstructionLog.Add($"grammar.SetOption(NodeOption.{option}, new string[]{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }});");
+
 			Options.Set(option, symbols);
 
 			var errorSymbols = CheckIfNonterminals(symbols).Intersect(СheckIfAliases(symbols)).ToList();
@@ -402,6 +404,8 @@ namespace Land.Core
 
 		public void SetOption(ParsingOption option, params string[] symbols)
 		{
+			ConstructionLog.Add($"grammar.SetOption(ParsingOption.{option}, new string[]{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }});");
+
 			Options.Set(option, symbols);
 
 			switch(option)
@@ -427,6 +431,8 @@ namespace Land.Core
 
 		public void SetOption(MappingOption option, params string[] symbols)
 		{
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[]{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))}}});");
+
 			Options.Set(option, symbols);
 
 			var errorSymbols = CheckIfSymbols(symbols);
@@ -438,6 +444,8 @@ namespace Land.Core
 
 		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
 		{
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param.ToString()))}}} );");
+
 			if (symbols == null || symbols.Length == 0)
 			{
 				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
