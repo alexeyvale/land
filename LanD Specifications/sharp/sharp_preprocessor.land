@@ -11,16 +11,21 @@ ID			: [_a-zA-Z][_0-9a-zA-Z]*
 
 file	=	(if|define|undef|Any)+
 
-if		=	'#if' condition ('#elif' condition)* '#else' '#endif'
+if_part		=	'#if' condition (Any|if)+
+elif_part	=	'#elif' condition (Any|if)+
+else_part	=	'#else' (Any|if)+
+endif_part	=	'#endif'
+
+if		=	if_part elif_part* else_part? endif_part
 define	=	'#define' ID
 undef	=	'#undef' ID
 
-condition	=	T A
-A	=	| '||' T A
-T	=	M B
-B	=	| '&&' M B
-M	=	atom | '!' atom
-atom	=	ID | '(' condition ')'
+condition	=	ands or_right
+or_right	=	| '||' ands or_right
+ands		=	atom_or_neg and_right
+and_right	=	| '&&' atom_or_neg and_right
+atom_or_neg	=	atom | '!' atom
+atom		=	ID | '(' condition ')'
 
 %%
 
@@ -28,6 +33,4 @@ atom	=	ID | '(' condition ')'
 %parsing ignoreundefined
 %parsing start file
 %parsing skip COMMENT STRING CHAR
-
-%nodes ghost A T B M
  

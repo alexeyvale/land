@@ -45,10 +45,8 @@ namespace Land.Core.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		public override Node Parse(string text)
+		public override Node ParseBody(string text)
 		{
-			/// Логирование, статистика
-			Log = new List<Message>();
 			Statistics = new Statistics();
 			var parsingStarted = DateTime.Now;
 

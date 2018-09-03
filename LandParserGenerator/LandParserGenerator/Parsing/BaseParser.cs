@@ -13,6 +13,7 @@ namespace Land.Core.Parsing
 	{
 		protected ILexer Lexer { get; set; }
 		public Grammar GrammarObject { get; protected set; }
+		private BasePreprocessor Preproc { get; set; }
 
 		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }
@@ -23,7 +24,38 @@ namespace Land.Core.Parsing
 			Lexer = lexer;
 		}
 
-		public abstract Node Parse(string text);
+		public Node Parse(string text)
+		{
+			Log = new List<Message>();
+
+			/// Если парсеру передан препроцессор
+			if(Preproc != null)
+			{
+				/// Предобрабатываем текст
+				text = Preproc.Preprocess(text, out bool success);
+
+				/// Если препроцессор сработал успешно, можно парсить
+				if(success)
+				{
+					var root = ParseBody(text);
+					Preproc.Postprocess(root, Log);
+					return root;
+				}
+				else
+				{
+					return null;
+				}
+			}
+
+			return ParseBody(text);
+		}
+
+		public abstract Node ParseBody(string text);
+
+		public void SetPreprocessor(BasePreprocessor preproc)
+		{
+			Preproc = preproc;
+		}
 
 		protected void TreePostProcessing(Node root)
 		{

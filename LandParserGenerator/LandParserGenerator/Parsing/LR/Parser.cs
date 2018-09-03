@@ -22,10 +22,8 @@ namespace Land.Core.Parsing.LR
 			Table = new TableLR1(g);
 		}
 
-		public override Node Parse(string text)
+		public override Node ParseBody(string text)
 		{
-			Log = new List<Message>();
-
 			Statistics = new Statistics();
 			var parsingStarted = DateTime.Now;
 

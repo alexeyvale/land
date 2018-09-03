@@ -11,15 +11,18 @@ namespace Land.Core.Parsing
 {
 	public abstract class BasePreprocessor
 	{
-		public abstract string Preprocess(string text);
+		public virtual List<Message> Log { get; set; } = new List<Message>();
+
+		public abstract string Preprocess(string text, out bool success);
 
 		public abstract void Postprocess(Node root, List<Message> log);
 	}
 
 	public class NoopPreprocessor: BasePreprocessor
 	{
-		public override string Preprocess(string source)
+		public override string Preprocess(string source, out bool success)
 		{
+			success = true;
 			return source;
 		}
 
@@ -36,12 +39,22 @@ namespace Land.Core.Parsing
 				Preprocs.Add(preproc);
 		}
 
-		public override string Preprocess(string source)
+		public override string Preprocess(string source, out bool success)
 		{
-			foreach (var preproc in Preprocs)
-				source = preproc.Preprocess(source);
+			var preprocessed = source;
+			success = true;
+			Log = new List<Message>();
 
-			return source;
+			foreach (var preproc in Preprocs)
+			{
+				preprocessed = preproc.Preprocess(preprocessed, out success);
+				Log.AddRange(preproc.Log);
+
+				if (!success)
+					return source;
+			}
+
+			return preprocessed;
 		}
 
 		public override void Postprocess(Node root, List<Message> log)

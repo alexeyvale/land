@@ -8,9 +8,13 @@ namespace TestNamespace
 	{
 		public int TestField = 42;
 		
+		#if false
+		
 		public int? TestMethod(int a, int b)
 		{
 			return a+b;
 		}
+		
+		#endif
 	}
 }

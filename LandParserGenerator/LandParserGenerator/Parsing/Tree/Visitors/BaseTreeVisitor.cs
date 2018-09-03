@@ -13,7 +13,7 @@ namespace Land.Core.Parsing.Tree
 		public virtual void Visit(Node node)
 		{
 			foreach (var child in node.Children)
-				Visit(child);
+				child.Accept(this);
 		}
 	}
 }

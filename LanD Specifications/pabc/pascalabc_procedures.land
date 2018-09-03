@@ -2,8 +2,10 @@ COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '{' .*? '}'
 STRING_SKIP	: '\'\'' | '\\\\'
-STRING	: '\'' (STRING_SKIP|.)*? '\''
-ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
+STRING		: '\'' (STRING_SKIP|.)*? '\''
+MODIFIER	: 'internal'|'private'|'protected'|'public'
+ROUTINE_TYPE	: 'procedure'|'function'|'constructor'|'destructor'
+ID			: '&'?[_a-zA-Z][_0-9a-zA-Z]*
 
 //round_bracketed = %left '(' %right ')'
 //code_bracketed	= %left ('try'|'case'|'begin'|'record'|'class') %right 'end'
@@ -19,12 +21,12 @@ var_atom		=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
 type_atom		=	ID '=' (record_or_class | Any) ';'
 outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
 inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
-routine_header	=	('procedure'|'function'|'constructor'|'destructor') %priority(2) name %priority(2) routine_arguments? (':' name)?
-routine_arguments	=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
-routine_arguments_atom = ('var'|'const'|'params')? ID (',' ID)* ':' Any
-record_or_class	=	('record'|'class') Any ('public'|'protected'|'private'|inner_routine|Any)+ 'end'
+routine_header	=	ROUTINE_TYPE %priority(2) name %priority(2) routine_arguments? (':' name)?
+routine_arguments		=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
+routine_arguments_atom	=	('var'|'const'|'params')? ID (',' ID)* ':' Any
+record_or_class	=	('record'|'class') Any (MODIFIER|inner_routine|Any)+ 'end'
 
-block		=	'begin' (block|Any)+ 'end'
+block		=	('begin'|'case'|'try') (block|Any)+ 'end'
 name_atom	=	ID
 name_tail_element	=	(('.'|'::') name_atom)
 name		=	name_atom (name_tail_element | '<' Any '>')*

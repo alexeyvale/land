@@ -57,12 +57,13 @@ namespace Land.Core.Parsing.Tree
 		public int Id { get; set; }
 
 		protected Location Anchor { get; set; }
+		private bool AnchorReady { get; set; } = false;
 
 		public int? StartOffset
 		{
 			get
 			{
-				if (Anchor == null)
+				if (!AnchorReady)
 					GetAnchorFromChildren();
 				return Anchor?.StartOffset;
 			}
@@ -71,7 +72,7 @@ namespace Land.Core.Parsing.Tree
 		{
 			get
 			{
-				if (Anchor == null)
+				if (!AnchorReady)
 					GetAnchorFromChildren();
 				return Anchor?.EndOffset;
 			}
@@ -94,6 +95,8 @@ namespace Land.Core.Parsing.Tree
 						Anchor = Anchor.Merge(child.Anchor);
 				}
 			}
+
+			AnchorReady = true;
 		}
 
 		/// <summary>
@@ -112,20 +115,26 @@ namespace Land.Core.Parsing.Tree
 		{
 			Children.Add(child);
 			child.Parent = this;
-			Anchor = null;
+			ResetAnchor();
 		}
 
 		public void AddFirstChild(Node child)
 		{
 			Children.Insert(0, child);
 			child.Parent = this;
-			Anchor = null;
+			ResetAnchor();
 		}
 
 		public void ResetChildren()
 		{
 			Children = new List<Node>();
+			ResetAnchor();
+		}
+
+		public void ResetAnchor()
+		{
 			Anchor = null;
+			AnchorReady = false;
 		}
 
 		public void Reset()
@@ -141,6 +150,8 @@ namespace Land.Core.Parsing.Tree
 				StartOffset = start,
 				EndOffset = end
 			};
+
+			AnchorReady = true;
 		}
 
 		public void SetValue(params string[] vals)

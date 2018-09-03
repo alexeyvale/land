@@ -109,6 +109,7 @@
                                         <Separator></Separator>
                                         <Button Name="File_ParseButton" Click="File_ParseButton_Click">Запустить парсер</Button>
                                         <Separator></Separator>
+										<ToggleButton Name="File_PreprocessToggle">Препроцессор</ToggleButton>
                                         <Separator></Separator>
                                         <Label Name="File_NameLabel"></Label>
                                     </ToolBar>

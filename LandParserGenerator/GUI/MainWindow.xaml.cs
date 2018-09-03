@@ -352,6 +352,25 @@ namespace Land.GUI
 		private Node TreeRoot { get; set; }
 		private string TreeSource { get; set; }
 
+		private Node File_Parse(string fileName, string text)
+		{
+			BasePreprocessor preproc = null;
+			
+			/// Если известно имя файла, по расширению можем выбрать препроцессор
+			if ((File_PreprocessToggle.IsChecked ?? false) && !String.IsNullOrEmpty(fileName))
+			{
+				switch (Path.GetExtension(fileName))
+				{
+					case ".cs":
+						preproc = new SharpPreprocessor.SharpPreprocessor();
+						break;
+				}
+			}
+
+			Parser?.SetPreprocessor(preproc);
+			return Parser?.Parse(text);
+		}
+
 		private void File_ParseButton_Click(object sender, RoutedEventArgs e)
 		{
             if (Parser != null)
@@ -360,11 +379,11 @@ namespace Land.GUI
 
 				try
 				{
-					root = Parser.Parse(File_Editor.Text);
+					root = File_Parse((string)File_NameLabel.Content, File_Editor.Text);
 				}
 				catch(Exception ex)
 				{
-					Parser.Log.Add(Message.Error(ex.ToString(), null));
+					Parser.Log?.Add(Message.Error(ex.ToString(), null));
 				}
 
 				File_Statistics.Text = Parser.Statistics?.ToString();
@@ -550,7 +569,7 @@ namespace Land.GUI
 			{
 				try
 				{
-					FrontendUpdateDispatcher.Invoke((Action)(() => { Parser.Parse(File.ReadAllText(files[counter])); }));
+					FrontendUpdateDispatcher.Invoke((Action)(() => { File_Parse(files[counter], File.ReadAllText(files[counter])); }));
 
 					if (Parser.Log.Any(l=>l.Type == MessageType.Error))
 					{
