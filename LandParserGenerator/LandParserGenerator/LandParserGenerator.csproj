@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AntlrTokenAdapter.cs" />
     <Compile Include="BuilderBase.cs" />
     <Compile Include="Grammar\Structures\PairSymbol.cs" />
     <Compile Include="Grammar\Structures\Common\Location.cs" />
