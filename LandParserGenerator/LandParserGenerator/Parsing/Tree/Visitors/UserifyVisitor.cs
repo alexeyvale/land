@@ -5,9 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Land.Core.Lexing;
-using Land.Core.Parsing.Tree;
 
-namespace Land.Core.Parsing
+namespace Land.Core.Parsing.Tree
 {
 	public class UserifyVisitor: BaseTreeVisitor
 	{
