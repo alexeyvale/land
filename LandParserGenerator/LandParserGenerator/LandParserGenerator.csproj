@@ -87,6 +87,7 @@
     <Compile Include="Markup\MarkupVisitors\RemapVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LinkRecoveryVisitor.cs" />
+    <Compile Include="Parsing\BasePreprocessor.cs" />
     <Compile Include="Parsing\Statistics.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />

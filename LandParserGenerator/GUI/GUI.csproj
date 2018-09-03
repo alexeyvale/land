@@ -133,6 +133,10 @@
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SharpPreprocessor\SharpPreprocessor.csproj">
+      <Project>{3ac961fa-ce34-4c61-8e32-4175d348a03b}</Project>
+      <Name>SharpPreprocessor</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AppIcon.ico" />
