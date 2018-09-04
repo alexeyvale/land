@@ -21,3 +21,7 @@ LandParserGenerator/MarkupControl/bin/
 LandParserGenerator/MarkupControl/obj/
 LandParserGenerator/Control/obj/
 LandParserGenerator/Control/bin/
+LandParserGenerator/VisualStudioExtension/bin/
+LandParserGenerator/VisualStudioExtension/obj/
+LandParserGenerator/SharpPreprocessor/obj/
+LandParserGenerator/SharpPreprocessor/bin/

@@ -706,8 +706,6 @@ namespace Land.GUI
 
 		#region Отладка перепривязки
 
-		private LandMapper Mapper { get; set; } = new LandMapper();
-
 		private Node NewTreeRoot { get; set; }
 		private bool NewTextChanged { get; set; }
 
@@ -724,12 +722,12 @@ namespace Land.GUI
 
 				if (point.TreeNode != null)
 				{
-					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.FileName);
-					MappingDebug_OldAstView.ItemsSource = new List<Node>() { LandExplorer.GetTree(point.FileName) };
+					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
+					MappingDebug_OldAstView.ItemsSource = new List<Node>() { LandExplorer.GetTree(point.Context.FileName) };
 
 					if(String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
-						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.FileName);
+						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 					}
 
 					MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor, true);
@@ -771,7 +769,7 @@ namespace Land.GUI
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
-				var parser = LandExplorer.GetParser(Path.GetExtension(point.FileName));
+				var parser = LandExplorer.GetParser(Path.GetExtension(point.Context.FileName));
 
 				/// и при этом парсер сгенерирован
 				if (parser != null)
@@ -787,7 +785,7 @@ namespace Land.GUI
 					if (noErrors)
 					{
 						MappingDebug_NewAstView.ItemsSource = new List<Node> { NewTreeRoot };
-						Mapper.Remap(LandExplorer.GetTree(point.FileName), NewTreeRoot);
+						// todo отладка перепривязки
 						NewTextChanged = false;
 					}
 				}
@@ -797,17 +795,17 @@ namespace Land.GUI
 			if (!NewTextChanged)
 			{
 				/// Заполняем список похожестей похожестями узлов нового дерева на выбранный узел старого дерева
-				MappingDebug_SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(point.TreeNode) 
-					? Mapper.Similarities[point.TreeNode] : null;
-				MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor);
+				//MappingDebug_SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(point.TreeNode) 
+				//	? Mapper.Similarities[point.TreeNode] : null;
+				//MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor);
 
-				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
-				if (MappingDebug_SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(point.TreeNode))
-				{
-					/// значит, в какой-то новый узел мы отобразили старый
-					MappingDebug_SimilaritiesList.SelectedItem = 
-						Mapper.Similarities[point.TreeNode].FirstOrDefault(p => p.Key == Mapper.Mapping[point.TreeNode]);
-				}
+				///// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
+				//if (MappingDebug_SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(point.TreeNode))
+				//{
+				//	/// значит, в какой-то новый узел мы отобразили старый
+				//	MappingDebug_SimilaritiesList.SelectedItem = 
+				//		Mapper.Similarities[point.TreeNode].FirstOrDefault(p => p.Key == Mapper.Mapping[point.TreeNode]);
+				//}
 			}
 		}
 

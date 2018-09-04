@@ -50,3 +50,5 @@ arguments			=	'(' (Any|arguments)* ')'
 
 %nodes ghost  name_tail_element keyword_marked_entities initializer
 %nodes leaf name
+
+%mapping land enum class_struct_interface operator event namespace namespace_member

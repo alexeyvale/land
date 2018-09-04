@@ -16,7 +16,6 @@ namespace Land.Core.Parsing.LL
 		private TableLL1 Table { get; set; }
 		private Stack<Node> Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
-		private NodeGenerator Generator { get; set; }
 
 		/// <summary>
 		/// Стек открытых на момент прочтения последнего токена пар
@@ -58,11 +57,10 @@ namespace Land.Core.Parsing.LL
 			/// Готовим лексер и стеки
 			LexingStream = new TokenStream(Lexer, text);
 			Stack = new Stack<Node>();
-			Generator = new NodeGenerator();
 
 			/// Кладём на стек стартовый символ
-			var root = Generator.CreateNode(GrammarObject.StartSymbol);
-			Stack.Push(Generator.CreateNode(Grammar.EOF_TOKEN_NAME));
+			var root = new Node(GrammarObject.StartSymbol);
+			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
@@ -132,7 +130,7 @@ namespace Land.Core.Parsing.LL
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
-							var newNode = Generator.CreateNode(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
+							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
 
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
@@ -421,7 +419,7 @@ namespace Land.Core.Parsing.LL
 				}
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
-				var anyNode = Generator.CreateNode(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
+				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
 
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));

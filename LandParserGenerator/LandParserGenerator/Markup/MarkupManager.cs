@@ -13,7 +13,6 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[Serializable]
 	public class MarkupManager
 	{
 		/// <summary>
@@ -29,30 +28,22 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Деревья для файлов, к которым осуществлена привязка
 		/// </summary>
-		[NonSerialized]
 		public Dictionary<string, Node> AstRoots = new Dictionary<string, Node>();
 
 		/// <summary>
 		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
 		/// </summary>
-		[NonSerialized]
 		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
 
 		/// <summary>
 		/// Контроль количества ссылок на файлы
 		/// </summary>
-		[NonSerialized]
 		public Dictionary<string, int> Links = new Dictionary<string, int>();
 
-		[NonSerialized]
 		public List<Message> Log = new List<Message>();
 
-		[NonSerialized]
 		public GetTextDelegate GetText;
 		public delegate string GetTextDelegate(string fileName);
-
-		[NonSerialized]
-		private BaseTreeMapper Mapper = new LandMapper();
 
 		public void Clear()
 		{
@@ -72,17 +63,15 @@ namespace Land.Core.Markup
 			else
 				Markup.Remove(elem);
 
-			if (elem is ConcernPoint)
+			if (elem is ConcernPoint point)
 			{
-				var point = (ConcernPoint)elem;
+				Links[point.Context.FileName] -= 1;
 
-				Links[point.FileName] -= 1;
-
-				if(Links[point.FileName] == 0)
+				if (Links[point.Context.FileName] == 0)
 				{
-					Links.Remove(point.FileName);
-					AstRoots.Remove(point.FileName);
-					Sources.Remove(point.FileName);
+					Links.Remove(point.Context.FileName);
+					AstRoots.Remove(point.Context.FileName);
+					Sources.Remove(point.Context.FileName);
 				}
 			}
 		}
@@ -172,20 +161,19 @@ namespace Land.Core.Markup
 		{
 			Log.Clear();
 
-			if (point.FileName != fileName)
+			if (point.Context.FileName != fileName)
 			{
-				Links[point.FileName] -= 1;
+				Links[point.Context.FileName] -= 1;
 
-				if (Links[point.FileName] == 0)
+				if (Links[point.Context.FileName] == 0)
 				{
-					Links.Remove(point.FileName);
-					AstRoots.Remove(point.FileName);
-					Sources.Remove(point.FileName);
+					Links.Remove(point.Context.FileName);
+					AstRoots.Remove(point.Context.FileName);
+					Sources.Remove(point.Context.FileName);
 				}
 			}
 
-			point.TreeNode = node;
-			point.FileName = fileName;		
+			point.Relink(fileName, node);
 		}
 
 		public void MoveTo(Concern newParent, MarkupElement elem)
@@ -219,15 +207,7 @@ namespace Land.Core.Markup
 				/// Если удалось перепарсить файл
 				if (Parse(fileName, File.ReadAllText(fileName)))
 				{
-					Mapper.Remap(oldRoot, AstRoots[fileName]);
-
-					/// Обходим результат сопоставления и перепривязываем
-					/// элементы разметки к узлам нового дерева
-					var visitor = new RemapVisitor(Mapper.Mapping);
-					for (int i = 0; i < Markup.Count; ++i)
-					{
-						Markup[i].Accept(visitor);
-					}
+					// todo логика перепривязки всех точек
 				}
 				else
 				{
@@ -249,8 +229,11 @@ namespace Land.Core.Markup
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
 				{
-					BinaryFormatter serializer = new BinaryFormatter();
-					serializer.Serialize(gZipStream, this);
+					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
+						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(InnerContextElement), typeof(OuterContextElement)
+					});
+
+					serializer.WriteObject(gZipStream, Markup);
 				}
 			}
 		}
@@ -263,27 +246,11 @@ namespace Land.Core.Markup
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
 				{
-					BinaryFormatter serializer = new BinaryFormatter();
-					var result = (MarkupManager)serializer.Deserialize(gZipStream);
+					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
+						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(InnerContextElement), typeof(OuterContextElement)
+					});
 
-					this.Sources = result.Sources;
-					this.Markup = result.Markup;
-				}
-			}
-
-			var visitor = new GroupPointsVisitor();
-
-			foreach (var elem in this.Markup)
-				elem.Accept(visitor);
-
-			foreach(var pathGroup in visitor.Points)
-			{
-				Links[pathGroup.Key] = pathGroup.Value.Sum(v=>v.Value.Count);
-
-				if(Parse(pathGroup.Key, Sources[pathGroup.Key]))
-				{
-					var recoveryVisitor = new LinkRecoveryVisitor(pathGroup.Value);
-					recoveryVisitor.Visit(AstRoots[pathGroup.Key]);
+					this.Markup = (ObservableCollection<MarkupElement>)serializer.ReadObject(gZipStream);
 				}
 			}
 		}
@@ -295,14 +262,12 @@ namespace Land.Core.Markup
 			else
 				elem.Parent.Elements.Add(elem);
 
-			if (elem is ConcernPoint)
+			if (elem is ConcernPoint point)
 			{
-				var point = (ConcernPoint)elem;
-
-				if (!Links.ContainsKey(point.FileName))
-					Links[point.FileName] = 1;
+				if (!Links.ContainsKey(point.Context.FileName))
+					Links[point.Context.FileName] = 1;
 				else
-					Links[point.FileName] += 1;
+					Links[point.Context.FileName] += 1;
 			}
 		}
 
@@ -321,7 +286,6 @@ namespace Land.Core.Markup
 					if (success)
 					{
 						AstRoots[fileName] = root;
-						Sources[fileName] = text;
 					}
 
 					Parsers[extension].Log.ForEach(l => l.FileName = fileName);

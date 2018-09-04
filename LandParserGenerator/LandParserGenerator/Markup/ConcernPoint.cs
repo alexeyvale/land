@@ -2,30 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[Serializable]
+	[DataContract(IsReference = true)]
 	public class ConcernPoint: MarkupElement
 	{
-		[NonSerialized]
-		private Node _treeNode = null;
+		[DataMember]
+		public PointContext Context { get; set; }
 
-		public Node TreeNode
-		{
-			get { return _treeNode; }
-			set { _treeNode = value; TreeNodeId = value?.Id; }
-		}
-
-		public int? TreeNodeId { get; set; }
-
-		public string FileName { get; set; }
+		public Node TreeNode { get; set; }
 
 		public ConcernPoint(string fileName, Node node, Concern parent = null)
 		{
-			FileName = fileName;
+			Context = new PointContext(node, fileName);
 			TreeNode = node;
 			Parent = parent;
 			Name = String.IsNullOrEmpty(node.Alias) ? node.Symbol : node.Alias;
@@ -45,9 +38,14 @@ namespace Land.Core.Markup
 		public ConcernPoint(string name, string fileName, Node node, Concern parent = null)
 		{
 			Name = name;
-			FileName = fileName;
-			TreeNode = node;
+			Context = new PointContext(node, fileName);
 			Parent = parent;
+		}
+
+		public void Relink(string fileName, Node node)
+		{
+			TreeNode = node;
+			Context = new PointContext(node, fileName);
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)

@@ -391,7 +391,7 @@ namespace Land.Control
 					var concernPoint = (ConcernPoint)item.DataContext;
 
 					Editor.SetActiveDocumentAndOffset(
-						concernPoint.FileName, 
+						concernPoint.Context.FileName, 
 						new PointLocation(concernPoint.TreeNode.StartOffset.Value)
 					);
 
@@ -422,7 +422,7 @@ namespace Land.Control
 								var concernPoint = (ConcernPoint)item.DataContext;
 
 								Editor.SetActiveDocumentAndOffset(
-									concernPoint.FileName, 
+									concernPoint.Context.FileName, 
 									new PointLocation(concernPoint.TreeNode.StartOffset.Value)
 								);
 							}
@@ -886,7 +886,7 @@ namespace Land.Control
 							var cp = (ConcernPoint)element;
 							segments.Add(new DocumentSegment()
 							{
-								FileName = cp.FileName,
+								FileName = cp.Context.FileName,
 								StartOffset = cp.TreeNode.StartOffset.Value,
 								EndOffset = cp.TreeNode.EndOffset.Value,
 								CaptureWholeLine = captureWholeLine
@@ -903,7 +903,7 @@ namespace Land.Control
 
 				segments.Add(new DocumentSegment()
 				{
-					FileName = concernPoint.FileName,
+					FileName = concernPoint.Context.FileName,
 					StartOffset = concernPoint.TreeNode.StartOffset.Value,
 					EndOffset = concernPoint.TreeNode.EndOffset.Value,
 					CaptureWholeLine = captureWholeLine

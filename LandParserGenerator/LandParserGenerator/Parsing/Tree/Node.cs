@@ -6,21 +6,6 @@ using System.Threading.Tasks;
 
 namespace Land.Core.Parsing.Tree
 {
-	public class NodeGenerator
-	{
-		public int NodesCreated { get; private set; } = 0;
-
-		public Node CreateNode(string symbol, LocalOptions opts = null)
-		{
-			return new Node()
-			{
-				Symbol = symbol,
-				Options = opts ?? new LocalOptions(),
-				Id = NodesCreated++
-			};
-		}
-	}
-
 	public class Node
 	{
 		/// <summary>
@@ -54,7 +39,7 @@ namespace Land.Core.Parsing.Tree
 		/// </summary>
 		public LocalOptions Options { get; set; }
 
-		public int Id { get; set; }
+		public string Type => !String.IsNullOrEmpty(Alias) ? Alias : Symbol;
 
 		protected Location Anchor { get; set; }
 		private bool AnchorReady { get; set; } = false;
@@ -76,6 +61,12 @@ namespace Land.Core.Parsing.Tree
 					GetAnchorFromChildren();
 				return Anchor?.EndOffset;
 			}
+		}
+
+		public Node(string symbol, LocalOptions opts = null)
+		{
+			Symbol = symbol;
+			Options = opts ?? new LocalOptions();
 		}
 
 		protected void GetAnchorFromChildren()

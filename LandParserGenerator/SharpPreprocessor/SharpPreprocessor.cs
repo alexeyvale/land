@@ -23,7 +23,7 @@ namespace SharpPreprocessor
 		private BaseParser Parser { get; set; }
 		public override List<Message> Log { get { return Parser?.Log; } }
 
-		public List<Segment> SegmentsToSkip { get; set; } = new List<Segment>();
+		public List<Segment> Excluded { get; set; } = new List<Segment>();
 
 		public SharpPreprocessor()
 		{
@@ -55,14 +55,14 @@ namespace SharpPreprocessor
 						length
 					);
 
-					SegmentsToSkip.Add(new Segment()
+					Excluded.Add(new Segment()
 					{
 						Length = length,
 						StartOffset = visitor.SectionsToExclude[i].Item1
 					});
 				}
 
-				SegmentsToSkip.Reverse();
+				Excluded.Reverse();
 
 				return text;
 			}
@@ -74,10 +74,19 @@ namespace SharpPreprocessor
 
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			var visitor = new PostprocessVisitor(SegmentsToSkip);
+			var visitor = new PostprocessVisitor(Excluded);
 			root.Accept(visitor);
 
+			//var includedCharsCount = 0;
+			//var segmentIndex = 0;
 
+			//foreach (var logRecord in log)
+			//{
+			//	for (; segmentIndex < Excluded.Count; ++segmentIndex)
+			//	{
+
+			//	}
+			//}
 		}
 	}
 }
