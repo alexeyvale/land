@@ -44,6 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PostprocessVisitor.cs" />
+    <Compile Include="DirectivesVisitor.cs" />
     <Compile Include="SharpPreprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

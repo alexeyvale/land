@@ -12,7 +12,26 @@
         Closing="Window_Closing"
         Icon="AppIcon.png">
 
-    <Grid>
+	<Window.Resources>
+		<FontFamily x:Key="FontAwesomeRegular">Fonts/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
+		<FontFamily x:Key="FontAwesomeSolid">Fonts/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
+
+		<Style x:Key="IconButtonStyle" TargetType="{x:Type Button}">
+			<Setter Property="FontSize" Value="14pt"/>
+			<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+			<Setter Property="Foreground" Value="Black"/>
+			<Setter Property="IsEnabled" Value="True"/>
+			<Setter Property="Width" Value="35"/>
+			<Setter Property="Height" Value="35"/>
+			<Style.Triggers>
+				<Trigger Property="IsEnabled" Value="false">
+					<Setter Property="Foreground" Value="DarkGray"/>
+				</Trigger>
+			</Style.Triggers>
+		</Style>
+	</Window.Resources>
+	
+	<Grid>
         <TabControl SelectionChanged="MainPerspectiveTabs_SelectionChanged" Name="MainPerspectiveTabs">
             <TabItem Header="Парсинг">
                 <Grid>
@@ -32,17 +51,17 @@
                                 </Grid.RowDefinitions>
                                 <Grid Grid.Row="0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="35"></RowDefinition>
                                         <RowDefinition Height="100*"></RowDefinition>
                                         <RowDefinition Height="31"></RowDefinition>
                                     </Grid.RowDefinitions>
                                     <ToolBar Grid.Row="0">
-                                        <Button Name="Grammar_LoadGrammarButton" Content="Открыть" Click="Grammar_LoadGrammarButton_Click"/>
+										<Button Name="Grammar_LoadGrammarButton" Click="Grammar_LoadGrammarButton_Click" ToolTip="Открыть" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
-                                        <Button Name="Grammar_SaveButton" Click="Grammar_SaveButton_Click">Сохранить</Button>
-                                        <Separator></Separator>
-                                        <Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click">Новая</Button>
-                                        <Separator></Separator>
+										<Button Name="Grammar_SaveButton" Click="Grammar_SaveButton_Click" Content="&#xf0c7;" ToolTip="Сохранить" Style="{StaticResource IconButtonStyle}"/>
+										<Separator></Separator>
+										<Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click" Content="&#xf15b;" ToolTip="Новая" Style="{StaticResource IconButtonStyle}"/>
+										<Separator></Separator>
 										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click">Сгенерировать парсер</Button>
 										<Separator></Separator>
 										<Button Name="Grammar_LibraryButton" Click="Grammar_LibraryButton_Click">Создать библиотеку</Button>
@@ -96,16 +115,16 @@
                                 </Grid.RowDefinitions>
                                 <Grid Grid.Row="0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="30"></RowDefinition>
+                                        <RowDefinition Height="35"></RowDefinition>
                                         <RowDefinition Height="100*"></RowDefinition>
                                         <RowDefinition Height="31"></RowDefinition>
                                     </Grid.RowDefinitions>
                                     <ToolBar Grid.Row="0">
-                                        <Button Name="File_OpenButton" Content="Открыть" Click="File_OpenButton_Click"/>
+										<Button Name="File_OpenButton" Click="File_OpenButton_Click" ToolTip="Открыть" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
-                                        <Button Name="File_SaveButton" Content="Сохранить" Click="File_SaveButton_Click"/>
+										<Button Name="File_SaveButton" Click="File_SaveButton_Click" Content="&#xf0c7;" ToolTip="Сохранить" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
-                                        <Button Name="File_ClearButton" Content="Очистить" Click="File_ClearButton_Click"/>
+										<Button Name="File_ClearButton" Click="File_ClearButton_Click" Content="&#xf15b;" ToolTip="Очистить" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
                                         <Button Name="File_ParseButton" Click="File_ParseButton_Click">Запустить парсер</Button>
                                         <Separator></Separator>
@@ -161,7 +180,7 @@
                                     <RowDefinition Height="31"></RowDefinition>
                                 </Grid.RowDefinitions>
                                 <ToolBar Grid.Row="0">
-                                    <Button Name="Batch_ChooseFolderButton" Content="Выбрать каталог для парсинга" Click="Batch_ChooseFolderButton_Click"/>
+                                    <Button Name="Batch_ChooseFolderButton" Content="Выбрать каталог" Click="Batch_ChooseFolderButton_Click"/>
                                     <Separator></Separator>
                                     <Label>Целевые расширения</Label>
                                     <TextBox Width="60" BorderBrush="Black" Name="Batch_TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>

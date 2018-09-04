@@ -9,14 +9,12 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: [_a-zA-Z][_0-9a-zA-Z]*
 
-file	=	(if|define|undef|Any)+
+file	=	(if|elif|else|endif|define|undef|Any)+
 
-if_part		=	'#if' condition (Any|if)+
-elif_part	=	'#elif' condition (Any|if)+
-else_part	=	'#else' (Any|if)+
-endif_part	=	'#endif'
-
-if		=	if_part elif_part* else_part? endif_part
+if		=	'#if' condition
+elif	=	'#elif' condition
+else	=	'#else'
+endif	=	'#endif'
 define	=	'#define' ID
 undef	=	'#undef' ID
 
