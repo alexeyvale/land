@@ -16,8 +16,15 @@ namespace SharpPreprocessor
 	{
 		private List<Segment> SkippedSegments { get; set; }
 
-		private int LastSum { get; set; } = 0;
-		private int LastIdx { get; set; } = 0;
+		/// <summary>
+		/// Сколько исключенных из компиляции символов было учтено на данный момент 
+		/// </summary>
+		private int IncludedCharsCount { get; set; } = 0;
+
+		/// <summary>
+		/// Сколько исключенных из компиляции участков было учтено на данный момент 
+		/// </summary>
+		private int IncludedSegmentsCount { get; set; } = 0;
 
 		public PostprocessVisitor(List<Segment> segments)
 		{
@@ -26,6 +33,8 @@ namespace SharpPreprocessor
 
 		public override void Visit(Node node)
 		{
+			/// У нелистового узла сбрасываем якорь, его нужно перевычислить
+			/// после правки якорей листьев-потомков
 			if (node.Children.Count > 0)
 			{
 				node.ResetAnchor();
@@ -34,16 +43,20 @@ namespace SharpPreprocessor
 			{
 				if (node.StartOffset.HasValue)
 				{
-					var start = node.StartOffset.Value + LastSum;
+					var start = node.StartOffset.Value + IncludedCharsCount;
 
-					while (LastIdx < SkippedSegments.Count && SkippedSegments[LastIdx].StartOffset <= start)
+					/// Пока начало содержимого узла в текущих координатах лежит правее
+					/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
+					/// поправляем текущие координаты с учётом добавления этого сегмента
+					while (IncludedSegmentsCount < SkippedSegments.Count 
+						&& SkippedSegments[IncludedSegmentsCount].StartOffset <= start)
 					{
-						LastSum += SkippedSegments[LastIdx].Length;
-						start += SkippedSegments[LastIdx].Length;
-						LastIdx += 1;
+						IncludedCharsCount += SkippedSegments[IncludedSegmentsCount].Length;
+						start += SkippedSegments[IncludedSegmentsCount].Length;
+						IncludedSegmentsCount += 1;
 					}
 
-					node.SetAnchor(start, node.EndOffset.Value + LastSum);
+					node.SetAnchor(start, node.EndOffset.Value + IncludedCharsCount);
 				}
 			}
 

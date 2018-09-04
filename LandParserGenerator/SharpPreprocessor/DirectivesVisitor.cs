@@ -32,17 +32,37 @@ namespace SharpPreprocessor
 			public bool NestedInExcluded { get; set; }
 		}
 
+		/// <summary>
+		/// Текст, в котором нужно найти исключаемые участки
+		/// </summary>
 		private string Text { get; set; }
+
+		/// <summary>
+		/// Уровни вложенности директив
+		/// </summary>
 		public Stack<LevelInfo> Levels { get; set; } = new Stack<LevelInfo>();
 
-		public List<Tuple<int, int>> SectionsToSkip = new List<Tuple<int, int>>();
-		public int SkippingSectionStart { get; set; }
+		/// <summary>
+		/// Области, которые нужно исключить из компиляции
+		/// </summary>
+		public List<Tuple<int, int>> SectionsToExclude = new List<Tuple<int, int>>();
 
+		/// <summary>
+		/// Буфер для запоминания начала исключаемой секции
+		/// </summary>
+		public int SectionStart { get; set; }
+
+		/// <summary>
+		/// Определённые в текущем месте программы символы
+		/// </summary>
 		public HashSet<string> SymbolsDefined = new HashSet<string>();
 
-		public DirectivesVisitor(string text)
+		public DirectivesVisitor(string text, params string[] predefined)
 		{
 			Text = text;
+
+			foreach (var smb in predefined)
+				SymbolsDefined.Add(smb);
 		}
 
 		public override void Visit(Node node)
@@ -61,7 +81,7 @@ namespace SharpPreprocessor
 					});
 
 					if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSection)
-						SkippingSectionStart = node.StartOffset.Value;
+						SectionStart = node.StartOffset.Value;
 					break;
 				case "elif":
 				case "else":
@@ -74,7 +94,7 @@ namespace SharpPreprocessor
 							/// всё продолжение будет некомпилируемое
 							Levels.Peek().ExcludeToEnd = true;
 							Levels.Peek().IncludeCurrentSection = false;
-							SkippingSectionStart = node.StartOffset.Value;
+							SectionStart = node.StartOffset.Value;
 						}
 						else
 						{
@@ -85,8 +105,8 @@ namespace SharpPreprocessor
 							/// иначе пропустим её одним блоком с предыдущей
 							if (Levels.Peek().IncludeCurrentSection)
 							{
-								SectionsToSkip.Add(
-									new Tuple<int, int>(SkippingSectionStart, Text.IndexOf('\n', node.StartOffset.Value))
+								SectionsToExclude.Add(
+									new Tuple<int, int>(SectionStart, Text.IndexOf('\n', node.StartOffset.Value))
 								);
 							}
 						}
@@ -94,7 +114,7 @@ namespace SharpPreprocessor
 					break;
 				case "endif":
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSection)
-						SectionsToSkip.Add(new Tuple<int, int>(SkippingSectionStart, Text.IndexOf('\n', node.StartOffset.Value)));
+						SectionsToExclude.Add(new Tuple<int, int>(SectionStart, Text.IndexOf('\n', node.StartOffset.Value)));
 					Levels.Pop();
 					break;
 				case "define":

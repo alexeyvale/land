@@ -45,20 +45,20 @@ namespace SharpPreprocessor
 				var visitor = new DirectivesVisitor(text);
 				root.Accept(visitor);
 
-				for (var i = visitor.SectionsToSkip.Count - 1; i >= 0; --i)
+				for (var i = visitor.SectionsToExclude.Count - 1; i >= 0; --i)
 				{
-					var length = text.IndexOf('\n', visitor.SectionsToSkip[i].Item2)
-						- visitor.SectionsToSkip[i].Item1 + 1;
+					var length = text.IndexOf('\n', visitor.SectionsToExclude[i].Item2)
+						- visitor.SectionsToExclude[i].Item1 + 1;
 
 					text = text.Remove(
-						visitor.SectionsToSkip[i].Item1,
+						visitor.SectionsToExclude[i].Item1,
 						length
 					);
 
 					SegmentsToSkip.Add(new Segment()
 					{
 						Length = length,
-						StartOffset = visitor.SectionsToSkip[i].Item1
+						StartOffset = visitor.SectionsToExclude[i].Item1
 					});
 				}
 
@@ -76,6 +76,8 @@ namespace SharpPreprocessor
 		{
 			var visitor = new PostprocessVisitor(SegmentsToSkip);
 			root.Accept(visitor);
+
+
 		}
 	}
 }

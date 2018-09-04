@@ -560,6 +560,7 @@ namespace Land.GUI
 			var files = (List<string>) e.Argument;
 			var errorCounter = 0;
 			var counter = 0;
+			var timeSpent = new TimeSpan();
 			var errorFiles = new List<string>();
 
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
@@ -570,6 +571,8 @@ namespace Land.GUI
 				try
 				{
 					FrontendUpdateDispatcher.Invoke((Action)(() => { File_Parse(files[counter], File.ReadAllText(files[counter])); }));
+
+					timeSpent += Parser.Statistics.TimeSpent;
 
 					if (Parser.Log.Any(l=>l.Type == MessageType.Error))
 					{
@@ -595,7 +598,7 @@ namespace Land.GUI
 				}
 
 				(sender as System.ComponentModel.BackgroundWorker).ReportProgress((counter + 1) * 100 / files.Count);
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, files.Count, counter + 1, errorCounter);
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, files.Count, counter + 1, errorCounter, timeSpent);
 
 				if(PackageParsingWorker.CancellationPending)
 				{
@@ -604,8 +607,10 @@ namespace Land.GUI
 				}
 			}
 
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+
 			/// Выводим предупреждения о наиболее долго разбираемых файлах
-			foreach(var file in timePerFile.OrderByDescending(f=>f.Value).Take(10))
+			foreach (var file in timePerFile.OrderByDescending(f=>f.Value).Take(10))
 			{
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{Message.Warning(file.Value.ToString(@"hh\:mm\:ss\:ff"), null)}");
@@ -613,23 +618,23 @@ namespace Land.GUI
 
 			//visitor.Finish();
 
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter);
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter, timeSpent);
 		}
 
-		private delegate void UpdatePackageParsingStatusDelegate(int total, int parsed, int errorsCount);
+		private delegate void UpdatePackageParsingStatusDelegate(int total, int parsed, int errorsCount, TimeSpan tipeSpent);
 
 		private UpdatePackageParsingStatusDelegate OnPackageFileParsed { get; set; }
 			
-		private void UpdatePackageParsingStatus(int total, int parsed, int errorsCount)
+		private void UpdatePackageParsingStatus(int total, int parsed, int errorsCount, TimeSpan timeSpent)
 		{
 			if (total == parsed)
 			{
-				Batch_StatusBarLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				Batch_StatusBarLabel.Content = $"Разобрано: {parsed}; С ошибками: {errorsCount}; Время: {timeSpent.ToString(@"hh\:mm\:ss\:ff")}{Environment.NewLine}";
 				Batch_StatusBar.Background = errorsCount == 0 ? Brushes.LightGreen : LightRed;
 			}
 			else
 			{
-				Batch_StatusBarLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount} {Environment.NewLine}";
+				Batch_StatusBarLabel.Content = $"Всего: {total}; Разобрано: {parsed}; С ошибками: {errorsCount}; Время: {timeSpent.ToString(@"hh\:mm\:ss\:ff")}{Environment.NewLine}";
 			}
 		}
 
