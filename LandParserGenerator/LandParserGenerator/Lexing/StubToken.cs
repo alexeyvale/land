@@ -8,14 +8,15 @@ namespace Land.Core.Lexing
 {
 	public class StubToken: IToken
 	{
-        public int Column { get; set; } = 0;
-        public int Line { get; set; } = 0;
-        public int StartOffset { get; set; } = 0;
-        public int EndOffset { get; set; } = 0;
         public string Text { get; set; } = String.Empty;
         public string Name { get; private set; }
+		public SegmentLocation Location { get; set; } = new SegmentLocation()
+		{
+			Start = new PointLocation(0, 0, 0),
+			End = new PointLocation(0, 0, 0)
+		};
 
-        public StubToken(string name)
+		public StubToken(string name)
         {
             Name = name;
         }

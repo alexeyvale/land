@@ -85,10 +85,10 @@ namespace Land.GUI
 
 		private void MoveCaretToSource(Node node, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
 		{
-			if (node != null && node.StartOffset.HasValue && node.EndOffset.HasValue)
+			if (node != null && node.Anchor != null)
 			{
-				var start = node.StartOffset.Value;
-				var end = node.EndOffset.Value;
+				var start = node.Anchor.Start.Offset;
+				var end = node.Anchor.End.Offset;
 				editor.ScrollToLine(editor.Document.GetLocation(start).Line);
 
 				if (selectText)
@@ -312,13 +312,13 @@ namespace Land.GUI
 					/// иначе ставим курсор в позицию после последнего элемента последней строки
 					int start = 0;
 					if(msg.Location.Line <= Grammar_Editor.Document.LineCount)
-						start = Grammar_Editor.Document.GetOffset(msg.Location.Line.Value, msg.Location.Column.Value);
+						start = Grammar_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					else
 						start = Grammar_Editor.Document.GetOffset(Grammar_Editor.Document.LineCount, Grammar_Editor.Document.Lines[Grammar_Editor.Document.LineCount-1].Length + 1);
 
 					Grammar_Editor.Focus();
 					Grammar_Editor.Select(start, 0);
-					Grammar_Editor.ScrollToLine(msg.Location.Line.Value);
+					Grammar_Editor.ScrollToLine(msg.Location.Line);
 				}
 			}
 		}
@@ -463,7 +463,7 @@ namespace Land.GUI
 				var msg = (Land.Core.Message)lb.SelectedItem;
 				if (msg.Location != null)
 				{
-					var start = File_Editor.Document.GetOffset(msg.Location.Line.Value, msg.Location.Column.Value);
+					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					File_Editor.Focus();
 					File_Editor.Select(start, 0);
 					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
@@ -482,13 +482,13 @@ namespace Land.GUI
 				{
 					if (child.Symbol == Grammar.ANY_TOKEN_NAME)
 					{
-						if (child.StartOffset.HasValue)
-							AnySegments.Add(new Tuple<int, int>(child.StartOffset.Value, child.EndOffset.Value));
+						if (child.Anchor != null)
+							AnySegments.Add(new Tuple<int, int>(child.Anchor.Start.Offset, child.Anchor.End.Offset));
 					}
 					else
 					{
-						if (!child.Options.IsLand && child.StartOffset.HasValue)
-							TypedWaterSegments.Add(new Tuple<int, int>(child.StartOffset.Value, child.EndOffset.Value));
+						if (!child.Options.IsLand && child.Anchor != null)
+							TypedWaterSegments.Add(new Tuple<int, int>(child.Anchor.Start.Offset, child.Anchor.End.Offset));
 					}
 
 					Visit(child);

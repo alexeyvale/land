@@ -12,22 +12,27 @@ namespace Land.Core
 	{
 		private int COLUMN_NUMBER_CORRECTION = 1;
 
-		public int? Line { get; set; }
-		public int? Column { get; set; }
+		public int Line { get; set; }
+		public int Column { get; set; }
 		public int Offset { get; set; }
-
-		public PointLocation(int offset)
-		{
-			Line = null;
-			Column = null;
-			Offset = offset;
-		}
 
 		public PointLocation(int ln, int col, int offset)
 		{
 			Line = ln;
 			Column = col + COLUMN_NUMBER_CORRECTION;
 			Offset = offset;
+		}
+
+		public void ShiftLine(int lnDelta, int offsetDelta)
+		{
+			Line += lnDelta;
+			Offset += offsetDelta;
+
+			if (Line <= 0 || Offset < 0)
+			{
+				Line = 1;
+				Offset = 0;
+			}
 		}
 	}
 
@@ -47,6 +52,30 @@ namespace Land.Core
 				Start = Start,
 				End = last.End
 			};
+		}
+
+		public SegmentLocation SmartMerge(SegmentLocation loc)
+		{
+			if (loc == null)
+			{
+				return this;
+			}
+			else
+			{
+				return new SegmentLocation()
+				{
+					Start = this.Start.Offset < loc.Start.Offset ? this.Start : loc.Start,
+					End = this.End.Offset > loc.End.Offset ? this.End : loc.End,
+				};
+			}
+		}
+
+		public int? Length => Start != null && End != null ? End.Offset - Start.Offset + 1 : (int?)null;
+
+		public void ShiftLine(int lnDelta, int offsetDelta)
+		{
+			Start.ShiftLine(lnDelta, offsetDelta);
+			End.ShiftLine(lnDelta, offsetDelta);
 		}
 	}
 }

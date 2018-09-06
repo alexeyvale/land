@@ -21,11 +21,8 @@ namespace Land.Core.Parsing.LR
 			Table = new TableLR1(g);
 		}
 
-		public override Node ParseBody(string text)
+		protected override Node ParsingAlgorithm(string text)
 		{
-			Statistics = new Statistics();
-			var parsingStarted = DateTime.Now;
-
 			Node root = null;	
 
 			/// Готовим лексер
@@ -43,7 +40,7 @@ namespace Land.Core.Parsing.LR
 				if(token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
 						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
-						new PointLocation(token.Line, token.Column, token.StartOffset)
+						token.Location.Start
 					));
 
 				/// Знаем, что предпринять, если действие однозначно
@@ -68,7 +65,7 @@ namespace Land.Core.Parsing.LR
 					if (action is ShiftAction)
 					{
 						var tokenNode = new Node(token.Name);
-						tokenNode.SetAnchor(token.StartOffset, token.EndOffset);
+						tokenNode.SetAnchor(token.Location.Start, token.Location.End);
 
 						var shift = (ShiftAction)action;
 						/// Вносим в стек новое состояние
@@ -76,7 +73,7 @@ namespace Land.Core.Parsing.LR
 
 						Log.Add(Message.Trace(
 							$"Перенос",
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 
 						token = LexingStream.NextToken();
@@ -103,7 +100,7 @@ namespace Land.Core.Parsing.LR
 
 						Log.Add(Message.Trace(
 							$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 
 						continue;
@@ -119,7 +116,7 @@ namespace Land.Core.Parsing.LR
 					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
 						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						new PointLocation(errorToken.Line, errorToken.Column, errorToken.StartOffset)
+						token.Location.Start
 					);
 
 					token = ErrorRecovery();
@@ -146,7 +143,7 @@ namespace Land.Core.Parsing.LR
 					{
 						Log.Add(Message.Trace(
 							$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 
 						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
@@ -156,8 +153,6 @@ namespace Land.Core.Parsing.LR
 
 			if(root != null)
 				TreePostProcessing(root);
-
-			Statistics.TimeSpent = DateTime.Now - parsingStarted;
 
 			return root;
 		}
@@ -205,24 +200,24 @@ namespace Land.Core.Parsing.LR
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 
-			int startOffset = anyNode.StartOffset.HasValue 
-				? anyNode.StartOffset.Value 
-				: token.StartOffset;
-			int? endOffset = anyNode.EndOffset.HasValue
-				? anyNode.EndOffset.Value
-				: (int?)null;
+			PointLocation startLocation = anyNode.Anchor != null
+				? anyNode.Anchor.Start 
+				: token.Location.Start;
+			PointLocation endLocation = anyNode.Anchor != null
+				? anyNode.Anchor.End
+				: null;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
 			while (Table[Stack.PeekState(), token.Name].Count == 0
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
-				endOffset = token.EndOffset;
+				endLocation = token.Location.End;
 				token = LexingStream.NextToken();
 			}
 
-			if(endOffset.HasValue)
-				anyNode.SetAnchor(startOffset, endOffset.Value);
+			if(endLocation != null)
+				anyNode.SetAnchor(startLocation, endLocation);
 
 			/// Если дошли до конца входной строки, и это было не по плану
 			if (token.Name == Grammar.EOF_TOKEN_NAME
@@ -241,20 +236,20 @@ namespace Land.Core.Parsing.LR
 
 		private IToken ErrorRecovery()
 		{
-			int? startOffset = null;
-			int? endOffset = null;
+			PointLocation startLocation = null;
+			PointLocation endLocation = null;
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any
 			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count == 1
 				&& m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null)
 			{
-				if (Stack.CountSymbols > 0 && Stack.PeekSymbol().StartOffset.HasValue)
+				if (Stack.CountSymbols > 0 && Stack.PeekSymbol().Anchor != null)
 				{
-					startOffset = Stack.PeekSymbol().StartOffset;
-					if(!endOffset.HasValue)
+					startLocation = Stack.PeekSymbol().Anchor.Start;
+					if(endLocation == null)
 					{
-						endOffset = Stack.PeekSymbol().EndOffset;
+						endLocation = Stack.PeekSymbol().Anchor.End;
 					}
 				}
 
@@ -267,8 +262,8 @@ namespace Land.Core.Parsing.LR
 				/// Any захватывает участок с начала последнего 
 				/// снятого со стека символа до места восстановления
 				var anyNode = new Node(Grammar.ANY_TOKEN_NAME);
-				if(startOffset.HasValue)
-					anyNode.SetAnchor(startOffset.Value, startOffset.Value);
+				if(startLocation != null)
+					anyNode.SetAnchor(startLocation, startLocation);
 
 				var token = SkipAny(anyNode);
 

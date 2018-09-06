@@ -134,15 +134,8 @@ namespace Land.GUI
 
 			if (location != null)
 			{
-				if (!location.Line.HasValue)
-				{
-					var locationFromEditor = documentTab.Editor.Document.GetLocation(location.Offset);
-					location.Line = locationFromEditor.Line;
-					location.Column = locationFromEditor.Column;
-				}
-
 				documentTab.Editor.CaretOffset = location.Offset;
-				documentTab.Editor.ScrollTo(location.Line.Value, location.Column.Value);
+				documentTab.Editor.ScrollTo(location.Line, location.Column);
 			}
 		}
 

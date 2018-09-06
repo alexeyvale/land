@@ -37,9 +37,12 @@ namespace Land.Core.Parsing.Tree
 				}
 
 				/// Перед тем, как удалить дочерние узлы, вычисляем соответствие нового листа тексту
-				var temp = node.StartOffset;
+				var tmp = node.Anchor;
 
 				node.Children.Clear();
+
+				if(node.Anchor != null)
+					node.SetAnchor(tmp.Start, tmp.End);
 			}
 			else
 				base.Visit(node);

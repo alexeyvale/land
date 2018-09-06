@@ -8,10 +8,7 @@ namespace Land.Core.Lexing
 {
 	public interface IToken
 	{
-		int Column { get; }
-		int Line { get; }
-		int StartOffset { get; }
-		int EndOffset { get; }
+		SegmentLocation Location { get; }
 		string Text { get; }
 		string Name { get; }
 	}

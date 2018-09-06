@@ -44,11 +44,8 @@ namespace Land.Core.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		public override Node ParseBody(string text)
+		protected override Node ParsingAlgorithm(string text)
 		{
-			Statistics = new Statistics();
-			var parsingStarted = DateTime.Now;
-
 			/// Контроль вложенностей пар
 			Nesting = new Stack<PairSymbol>();
 			NestingLevel = new Dictionary<Node, int>();
@@ -76,7 +73,7 @@ namespace Land.Core.Parsing.LL
 
 				Log.Add(Message.Trace(
 					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
-					new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+					LexingStream.CurrentToken.Location.Start
 				));
 
                 /// Если символ на вершине стека совпадает с текущим токеном
@@ -93,7 +90,7 @@ namespace Land.Core.Parsing.LL
 					/// иначе читаем следующий токен
 					else
 					{
-						node.SetAnchor(token.StartOffset, token.EndOffset);
+						node.SetAnchor(token.Location.Start, token.Location.End);
 						node.SetValue(token.Text);
 
 						token = GetNextToken();
@@ -113,7 +110,7 @@ namespace Land.Core.Parsing.LL
 					{
 						Log.Add(Message.Error(
 							$"Неоднозначная грамматика: для нетерминала {GrammarObject.Userify(stackTop.Symbol)} и входного символа {GrammarObject.Userify(token.Name)} допустимо несколько альтернатив",
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 						break;
 					}
@@ -148,7 +145,7 @@ namespace Land.Core.Parsing.LL
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
 							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
-						new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+						LexingStream.CurrentToken.Location.Start
 					));
 
 					token = ErrorRecovery();
@@ -171,8 +168,6 @@ namespace Land.Core.Parsing.LL
 
 			TreePostProcessing(root);
 
-			Statistics.TimeSpent = DateTime.Now - parsingStarted;
-
 			return root;
 		}
 
@@ -189,7 +184,7 @@ namespace Land.Core.Parsing.LL
 					{
 						Log.Add(Message.Error(
 							$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
@@ -198,7 +193,7 @@ namespace Land.Core.Parsing.LL
 					{
 						Log.Add(Message.Error(
 							$"Неожиданная закрывающая конструкция {GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", Nesting.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", Nesting.Peek().Left.Select(e=> GrammarObject.Userify(e)))}",
-							new PointLocation(token.Line, token.Column, token.StartOffset)
+							token.Location.Start
 						));
 
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
@@ -278,11 +273,11 @@ namespace Land.Core.Parsing.LL
 			if (!tokensAfterText.Contains(token.Name))
 			{
 				/// Проверка на случай, если допропускаем текст в процессе восстановления
-				if (!anyNode.StartOffset.HasValue)
-					anyNode.SetAnchor(token.StartOffset, token.EndOffset);
+				if (anyNode.Anchor == null)
+					anyNode.SetAnchor(token.Location.Start, token.Location.End);
 
 				/// Смещение для участка, подобранного как текст
-				int endOffset = token.EndOffset;
+				var endLocation = token.Location.End;
 				var anyLevel = Nesting.Count;
 
 				while (!tokensAfterText.Contains(token.Name)
@@ -291,7 +286,7 @@ namespace Land.Core.Parsing.LL
 					&& token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					anyNode.Value.Add(token.Text);
-					endOffset = token.EndOffset;
+					endLocation = token.Location.End;
 
 					if (anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs))
 					{
@@ -306,12 +301,12 @@ namespace Land.Core.Parsing.LL
 						if (skippedBuffer.Count > 0)
 						{
 							anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
-							endOffset = skippedBuffer.Last().EndOffset;
+							endLocation = skippedBuffer.Last().Location.End;
 						}
 					}
 				}
 
-				anyNode.SetAnchor(anyNode.StartOffset.Value, endOffset);
+				anyNode.SetAnchor(anyNode.Anchor.Start, endLocation);
 
 				if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					return token;
@@ -322,7 +317,7 @@ namespace Land.Core.Parsing.LL
 				{
 					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => GrammarObject.Userify(t))) }",
-						new PointLocation(token.Line, token.Column, token.StartOffset)
+						token.Location.Start
 					);
 
 					if (enableRecovery)
@@ -356,7 +351,7 @@ namespace Land.Core.Parsing.LL
 			{
 				Log.Add(Message.Error(
 					$"Возобновление разбора невозможно: восстановление в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
-					new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+					LexingStream.CurrentToken.Location.Start
 				));
 
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
@@ -364,7 +359,7 @@ namespace Land.Core.Parsing.LL
 
 			Log.Add(Message.Warning(
 				$"Процесс восстановления запущен в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)}",
-				new PointLocation(LexingStream.CurrentToken.Line, LexingStream.CurrentToken.Column, LexingStream.CurrentToken.StartOffset)
+				LexingStream.CurrentToken.Location.Start
 			));
 
 			/// То, что мы хотели разобрать, и не смогли
@@ -424,13 +419,13 @@ namespace Land.Core.Parsing.LL
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
-				if (currentNode.StartOffset.HasValue)
-					anyNode.SetAnchor(currentNode.StartOffset.Value, currentNode.EndOffset.Value);
+				if (currentNode.Anchor != null)
+					anyNode.SetAnchor(currentNode.Anchor.Start, currentNode.Anchor.End);
 				if (skippedBuffer.Count > 0)
 				{
 					anyNode.SetAnchor(
-						anyNode.StartOffset ?? skippedBuffer.First().StartOffset,
-						skippedBuffer.Last().EndOffset
+						anyNode.Anchor?.Start ?? skippedBuffer.First().Location.Start,
+						skippedBuffer.Last().Location.End
 					);
 				}
 
@@ -449,7 +444,7 @@ namespace Land.Core.Parsing.LL
 
 					Log.Add(Message.Warning(
 						$"Произведено восстановление на уровне {currentNode.Symbol}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
-						new PointLocation(token.Line, token.Column, token.StartOffset)
+						token.Location.Start
 					));
 
 					Statistics.RecoveryTimes += 1;

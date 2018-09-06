@@ -12,18 +12,12 @@ using sharp_preprocessor;
 
 namespace SharpPreprocessor
 {
-	public class Segment
-	{
-		public int StartOffset { get; set; }
-		public int Length { get; set; }
-	}
-
 	public class SharpPreprocessor: BasePreprocessor
     {		
 		private BaseParser Parser { get; set; }
 		public override List<Message> Log { get { return Parser?.Log; } }
 
-		public List<Segment> Excluded { get; set; } = new List<Segment>();
+		public List<SegmentLocation> Excluded { get; set; } = new List<SegmentLocation>();
 
 		public SharpPreprocessor()
 		{
@@ -45,23 +39,18 @@ namespace SharpPreprocessor
 				var visitor = new DirectivesVisitor(text);
 				root.Accept(visitor);
 
-				for (var i = visitor.SectionsToExclude.Count - 1; i >= 0; --i)
+				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)
 				{
-					var length = text.IndexOf('\n', visitor.SectionsToExclude[i].Item2)
-						- visitor.SectionsToExclude[i].Item1 + 1;
+					var length = text.IndexOf('\n', visitor.SegmentsToExclude[i].End.Offset)
+						- visitor.SegmentsToExclude[i].Start.Offset + 1;
 
 					text = text.Remove(
-						visitor.SectionsToExclude[i].Item1,
+						visitor.SegmentsToExclude[i].Start.Offset,
 						length
 					);
-
-					Excluded.Add(new Segment()
-					{
-						Length = length,
-						StartOffset = visitor.SectionsToExclude[i].Item1
-					});
 				}
 
+				Excluded = visitor.SegmentsToExclude;
 				Excluded.Reverse();
 
 				return text;

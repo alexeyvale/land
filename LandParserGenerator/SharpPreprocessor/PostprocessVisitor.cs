@@ -14,7 +14,7 @@ namespace SharpPreprocessor
 {
 	internal class PostprocessVisitor : BaseTreeVisitor
 	{
-		private List<Segment> SkippedSegments { get; set; }
+		private List<SegmentLocation> SkippedSegments { get; set; }
 
 		/// <summary>
 		/// Сколько исключенных из компиляции символов было учтено на данный момент 
@@ -22,11 +22,16 @@ namespace SharpPreprocessor
 		private int IncludedCharsCount { get; set; } = 0;
 
 		/// <summary>
+		/// Сколько исключенных из компиляции строк было учтено на данный момент 
+		/// </summary>
+		private int IncludedLinesCount { get; set; } = 0;
+
+		/// <summary>
 		/// Сколько исключенных из компиляции участков было учтено на данный момент 
 		/// </summary>
 		private int IncludedSegmentsCount { get; set; } = 0;
 
-		public PostprocessVisitor(List<Segment> segments)
+		public PostprocessVisitor(List<SegmentLocation> segments)
 		{
 			SkippedSegments = segments;
 		}
@@ -41,22 +46,23 @@ namespace SharpPreprocessor
 			}
 			else
 			{
-				if (node.StartOffset.HasValue)
+				if (node.Anchor != null)
 				{
-					var start = node.StartOffset.Value + IncludedCharsCount;
+					var start = node.Anchor.Start.Offset + IncludedCharsCount;
 
 					/// Пока начало содержимого узла в текущих координатах лежит правее
 					/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
 					/// поправляем текущие координаты с учётом добавления этого сегмента
 					while (IncludedSegmentsCount < SkippedSegments.Count 
-						&& SkippedSegments[IncludedSegmentsCount].StartOffset <= start)
+						&& SkippedSegments[IncludedSegmentsCount].Start.Offset <= start)
 					{
-						IncludedCharsCount += SkippedSegments[IncludedSegmentsCount].Length;
-						start += SkippedSegments[IncludedSegmentsCount].Length;
+						IncludedCharsCount += SkippedSegments[IncludedSegmentsCount].Length.Value;
+						IncludedLinesCount += SkippedSegments[IncludedSegmentsCount].End.Line - SkippedSegments[IncludedSegmentsCount].Start.Line + 1;
+						start += SkippedSegments[IncludedSegmentsCount].Length.Value;
 						IncludedSegmentsCount += 1;
 					}
 
-					node.SetAnchor(start, node.EndOffset.Value + IncludedCharsCount);
+					node.Anchor.ShiftLine(IncludedLinesCount, IncludedCharsCount);
 				}
 			}
 

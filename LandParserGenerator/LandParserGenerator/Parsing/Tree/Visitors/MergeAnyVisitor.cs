@@ -23,12 +23,11 @@ namespace Land.Core.Parsing.Tree
 			{
 				if (node.Children[i].Symbol == Grammar.ANY_TOKEN_NAME
 					&& node.Children[i - 1].Symbol == Grammar.ANY_TOKEN_NAME
-					&& node.Children[i].StartOffset.HasValue
-					&& node.Children[i].EndOffset.HasValue)
+					&& node.Children[i].Anchor != null)
 				{
 					node.Children[i - 1].SetAnchor(
-						node.Children[i - 1].StartOffset.HasValue ? node.Children[i - 1].StartOffset.Value : node.Children[i].StartOffset.Value,
-						node.Children[i].EndOffset.Value
+						node.Children[i - 1].Anchor != null ? node.Children[i - 1].Anchor.Start : node.Children[i].Anchor.Start,
+						node.Children[i].Anchor.End
 					);
 
 					node.Children[i - 1].Value.AddRange(node.Children[i].Value);

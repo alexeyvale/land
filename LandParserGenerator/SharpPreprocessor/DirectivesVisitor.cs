@@ -12,6 +12,7 @@ using sharp_preprocessor;
 
 namespace SharpPreprocessor
 {
+
 	internal class DirectivesVisitor : BaseTreeVisitor
 	{
 		public class LevelInfo
@@ -19,7 +20,7 @@ namespace SharpPreprocessor
 			/// <summary>
 			/// Нужно ли включать в компилируемый код текущую секцию директивы #if
 			/// </summary>
-			public bool IncludeCurrentSection { get; set; }
+			public bool IncludeCurrentSegment { get; set; }
 
 			/// <summary>
 			/// Нужно ли исключить из компиляции всё от текущего места до конца
@@ -45,12 +46,12 @@ namespace SharpPreprocessor
 		/// <summary>
 		/// Области, которые нужно исключить из компиляции
 		/// </summary>
-		public List<Tuple<int, int>> SectionsToExclude = new List<Tuple<int, int>>();
+		public List<SegmentLocation> SegmentsToExclude = new List<SegmentLocation>();
 
 		/// <summary>
-		/// Буфер для запоминания начала исключаемой секции
+		/// Текущая исключаемая секция
 		/// </summary>
-		public int SectionStart { get; set; }
+		public SegmentLocation CurrentSegment { get; set; }
 
 		/// <summary>
 		/// Определённые в текущем месте программы символы
@@ -65,23 +66,39 @@ namespace SharpPreprocessor
 				SymbolsDefined.Add(smb);
 		}
 
+		private void InitCurrentSegment(PointLocation start)
+		{
+			CurrentSegment = new SegmentLocation()
+			{
+				Start = start
+			};
+		}
+
+		private void FinCurrentSegment(PointLocation end)
+		{
+			var lineEndOffset = Text.IndexOf('\n', end.Offset);
+
+			CurrentSegment.End = new PointLocation(end.Line, end.Column, lineEndOffset);
+		}
+
 		public override void Visit(Node node)
 		{
 			switch (node.Symbol)
 			{
 				case "if":
 					/// Весь if нужно пропустить, если он вложен в пропускаемую секцию
-					var nestedInExcluded = Levels.Count != 0 && !Levels.Peek().IncludeCurrentSection;
+					var nestedInExcluded = Levels.Count != 0 && !Levels.Peek().IncludeCurrentSegment;
 
 					Levels.Push(new LevelInfo()
 					{
-						IncludeCurrentSection = !nestedInExcluded && VisitCondition(node.Children[1]),
+						IncludeCurrentSegment = !nestedInExcluded && VisitCondition(node.Children[1]),
 						ExcludeToEnd = nestedInExcluded,
 						NestedInExcluded = nestedInExcluded
 					});
 
-					if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSection)
-						SectionStart = node.StartOffset.Value;
+					if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
+						InitCurrentSegment(node.Anchor.Start);
+
 					break;
 				case "elif":
 				case "else":
@@ -89,32 +106,34 @@ namespace SharpPreprocessor
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().ExcludeToEnd)
 					{
 						/// и предыдущая секция компилируемая
-						if (Levels.Peek().IncludeCurrentSection)
+						if (Levels.Peek().IncludeCurrentSegment)
 						{
 							/// всё продолжение будет некомпилируемое
 							Levels.Peek().ExcludeToEnd = true;
-							Levels.Peek().IncludeCurrentSection = false;
-							SectionStart = node.StartOffset.Value;
+							Levels.Peek().IncludeCurrentSegment = false;
+							InitCurrentSegment(node.Anchor.Start);
 						}
 						else
 						{
-							Levels.Peek().IncludeCurrentSection 
+							Levels.Peek().IncludeCurrentSegment 
 								= node.Symbol == "else" || VisitCondition(node.Children[1]);
 
 							/// Если текущая секция компилируемая, добавляем предыдущую к списку пропускаемых областей
 							/// иначе пропустим её одним блоком с предыдущей
-							if (Levels.Peek().IncludeCurrentSection)
+							if (Levels.Peek().IncludeCurrentSegment)
 							{
-								SectionsToExclude.Add(
-									new Tuple<int, int>(SectionStart, Text.IndexOf('\n', node.StartOffset.Value))
-								);
+								FinCurrentSegment(node.Anchor.End);
+								SegmentsToExclude.Add(CurrentSegment);
 							}
 						}
 					}
 					break;
 				case "endif":
-					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSection)
-						SectionsToExclude.Add(new Tuple<int, int>(SectionStart, Text.IndexOf('\n', node.StartOffset.Value)));
+					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
+					{
+						FinCurrentSegment(node.Anchor.End);
+						SegmentsToExclude.Add(CurrentSegment);
+					}
 					Levels.Pop();
 					break;
 				case "define":

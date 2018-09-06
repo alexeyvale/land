@@ -102,7 +102,6 @@
     <Compile Include="Parsing\LR\ParsingStack.cs" />
     <Compile Include="Parsing\LR\TableLR1.cs" />
     <Compile Include="Parsing\BaseParser.cs" />
-    <Compile Include="Parsing\Tree\Location.cs" />
     <Compile Include="Parsing\Tree\Node.cs" />
     <Compile Include="Parsing\LL\Parser.cs" />
     <Compile Include="Parsing\LL\TableLL1.cs" />

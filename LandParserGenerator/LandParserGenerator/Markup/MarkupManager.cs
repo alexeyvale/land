@@ -147,8 +147,8 @@ namespace Land.Core.Markup
 					if (currentNode.Options.IsLand)
 						pointCandidates.AddFirst(currentNode);
 
-					currentNode = currentNode.Children.Where(c => c.StartOffset.HasValue && c.EndOffset.HasValue
-						&& c.StartOffset <= offset && c.EndOffset >= offset).FirstOrDefault();
+					currentNode = currentNode.Children.Where(c => c.Anchor != null && c.Anchor.Start != null && c.Anchor.End != null
+						&& c.Anchor.Start.Offset <= offset && c.Anchor.End.Offset >= offset).FirstOrDefault();
 				}
 
 				return pointCandidates;

@@ -8,9 +8,16 @@ namespace TestNamespace
 	{
 		public int TestField = 42;
 		
-		#if false
+		#if DEBUG
 		
-		public int? TestMethod(int a, int b)
+		public int? TestMethod1(int a, int b)
+		{
+			return a+b;
+		}
+		
+		#elif RELEASE
+		
+		public int? TestMethod2(int a, int b)
 		{
 			return a+b;
 		}

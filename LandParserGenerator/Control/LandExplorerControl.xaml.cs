@@ -369,7 +369,7 @@ namespace Land.Control
 
 				Editor.SetActiveDocumentAndOffset(
 					State.PendingCommandDocument, 
-					new PointLocation(node.StartOffset.Value)
+					node.Anchor.Start
 				);
 			}
 		}
@@ -392,7 +392,7 @@ namespace Land.Control
 
 					Editor.SetActiveDocumentAndOffset(
 						concernPoint.Context.FileName, 
-						new PointLocation(concernPoint.TreeNode.StartOffset.Value)
+						concernPoint.TreeNode.Anchor.Start
 					);
 
 					e.Handled = true;
@@ -423,7 +423,7 @@ namespace Land.Control
 
 								Editor.SetActiveDocumentAndOffset(
 									concernPoint.Context.FileName, 
-									new PointLocation(concernPoint.TreeNode.StartOffset.Value)
+									concernPoint.TreeNode.Anchor.Start
 								);
 							}
 						}
@@ -887,8 +887,8 @@ namespace Land.Control
 							segments.Add(new DocumentSegment()
 							{
 								FileName = cp.Context.FileName,
-								StartOffset = cp.TreeNode.StartOffset.Value,
-								EndOffset = cp.TreeNode.EndOffset.Value,
+								StartOffset = cp.TreeNode.Anchor.Start.Offset,
+								EndOffset = cp.TreeNode.Anchor.End.Offset,
 								CaptureWholeLine = captureWholeLine
 							});
 						}
@@ -904,8 +904,8 @@ namespace Land.Control
 				segments.Add(new DocumentSegment()
 				{
 					FileName = concernPoint.Context.FileName,
-					StartOffset = concernPoint.TreeNode.StartOffset.Value,
-					EndOffset = concernPoint.TreeNode.EndOffset.Value,
+					StartOffset = concernPoint.TreeNode.Anchor.Start.Offset,
+					EndOffset = concernPoint.TreeNode.Anchor.End.Offset,
 					CaptureWholeLine = captureWholeLine
 				});
 			}

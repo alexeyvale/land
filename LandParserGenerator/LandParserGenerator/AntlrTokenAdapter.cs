@@ -15,11 +15,30 @@ namespace Land.Core
 		private IToken Token { get; set; }
 		private Lexer Lexer { get; set; }
 
-		public int Column { get { return Token.Column; } }
-		public int Line { get { return Token.Line; } }
+		private SegmentLocation _location = null;
+		public SegmentLocation Location
+		{
+			get
+			{
+				if (_location == null)
+				{
+					var lines = Token.Text.Split('\n');
+					var emptyAfterLastEnd = lines[lines.Length - 1].Length == 0;
 
-		public int StartOffset { get { return Token.StartIndex; } }
-		public int EndOffset { get { return Token.StopIndex; } }
+					_location = new SegmentLocation()
+					{
+						Start = new PointLocation(Token.Line, Token.Column, Token.StartIndex),
+						End = new PointLocation(
+							Token.Line + (emptyAfterLastEnd ? lines.Length : lines.Length - 1),
+							emptyAfterLastEnd ? lines[lines.Length - 2].Length - 1 : lines[lines.Length - 1].Length - 1,
+							Token.StopIndex
+						)
+					};
+				}
+
+				return _location;
+			}
+		}
 
 		public string Text { get { return Token.Text; } }
 

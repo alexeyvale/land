@@ -27,9 +27,13 @@ namespace Land.Core.Parsing
 		public Node Parse(string text)
 		{
 			Log = new List<Message>();
+			Statistics = new Statistics();
+
+			var parsingStarted = DateTime.Now;
+			Node root = null;
 
 			/// Если парсеру передан препроцессор
-			if(Preproc != null)
+			if (Preproc != null)
 			{
 				/// Предобрабатываем текст
 				text = Preproc.Preprocess(text, out bool success);
@@ -37,20 +41,21 @@ namespace Land.Core.Parsing
 				/// Если препроцессор сработал успешно, можно парсить
 				if(success)
 				{
-					var root = ParseBody(text);
+					root = ParsingAlgorithm(text);
 					Preproc.Postprocess(root, Log);
-					return root;
-				}
-				else
-				{
-					return null;
 				}
 			}
+			else
+			{
+				root = ParsingAlgorithm(text);
+			}
 
-			return ParseBody(text);
+			Statistics.TimeSpent = DateTime.Now - parsingStarted;
+
+			return root;
 		}
 
-		public abstract Node ParseBody(string text);
+		protected abstract Node ParsingAlgorithm(string text);
 
 		public void SetPreprocessor(BasePreprocessor preproc)
 		{

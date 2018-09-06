@@ -41,25 +41,15 @@ namespace Land.Core.Parsing.Tree
 
 		public string Type => !String.IsNullOrEmpty(Alias) ? Alias : Symbol;
 
-		protected Location Anchor { get; set; }
+		protected SegmentLocation _anchor;
 		private bool AnchorReady { get; set; } = false;
-
-		public int? StartOffset
+		public SegmentLocation Anchor
 		{
 			get
 			{
 				if (!AnchorReady)
 					GetAnchorFromChildren();
-				return Anchor?.StartOffset;
-			}
-		}
-		public int? EndOffset
-		{
-			get
-			{
-				if (!AnchorReady)
-					GetAnchorFromChildren();
-				return Anchor?.EndOffset;
+				return _anchor;
 			}
 		}
 
@@ -73,17 +63,17 @@ namespace Land.Core.Parsing.Tree
 		{
 			if (Children.Count > 0)
 			{
-				Anchor = Children[0].Anchor;
+				_anchor = Children[0].Anchor;
 
 				foreach (var child in Children)
 				{
 					if (child.Anchor == null)
 						child.GetAnchorFromChildren();
 
-					if (Anchor == null)
-						Anchor = child.Anchor;
+					if (_anchor == null)
+						_anchor = child.Anchor;
 					else
-						Anchor = Anchor.Merge(child.Anchor);
+						_anchor = _anchor.SmartMerge(child.Anchor);
 				}
 			}
 
@@ -124,7 +114,7 @@ namespace Land.Core.Parsing.Tree
 
 		public void ResetAnchor()
 		{
-			Anchor = null;
+			_anchor = null;
 			AnchorReady = false;
 		}
 
@@ -134,12 +124,12 @@ namespace Land.Core.Parsing.Tree
 			Value.Clear();
 		}
 
-		public void SetAnchor(int start, int end)
+		public void SetAnchor(PointLocation start, PointLocation end)
 		{
-			Anchor = new Location()
+			_anchor = new SegmentLocation()
 			{
-				StartOffset = start,
-				EndOffset = end
+				Start = start,
+				End = end
 			};
 
 			AnchorReady = true;
