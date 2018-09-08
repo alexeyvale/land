@@ -138,11 +138,11 @@ namespace SharpPreprocessor
 					break;
 				case "define":
 					for (var i = 1; i < node.Children.Count; ++i)
-						SymbolsDefined.Add(node.Children[i].Symbol);
+						SymbolsDefined.Add(node.Children[i].Value[0]);
 					break;
 				case "undef":
 					for (var i = 1; i < node.Children.Count; ++i)
-						SymbolsDefined.Remove(node.Children[i].Symbol);
+						SymbolsDefined.Remove(node.Children[i].Value[0]);
 					break;
 				default:
 					base.Visit(node);
