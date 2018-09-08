@@ -565,12 +565,14 @@ namespace Land.GUI
 
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
 			var timePerFile = new Dictionary<string, TimeSpan>();
+			var landFound = new Dictionary<string, int>();
 
 			for (; counter < files.Count; ++counter)
 			{
 				try
 				{
-					FrontendUpdateDispatcher.Invoke((Action)(() => { File_Parse(files[counter], File.ReadAllText(files[counter])); }));
+					Node root = null;
+					FrontendUpdateDispatcher.Invoke((Action)(() => { root = File_Parse(files[counter], File.ReadAllText(files[counter])); }));
 
 					timeSpent += Parser.Statistics.TimeSpent;
 
@@ -585,6 +587,10 @@ namespace Land.GUI
 					else
 					{
 						timePerFile[files[counter]] = Parser.Statistics.TimeSpent;
+
+						var visitor = new CountLandNodesVisitor();
+						root.Accept(visitor);
+						landFound = CountLandNodesVisitor.Merge(landFound, visitor.Counted);
 					}
 				}
 				catch (Exception ex)
@@ -616,7 +622,12 @@ namespace Land.GUI
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{Message.Warning(file.Value.ToString(@"hh\:mm\:ss\:ff"), null)}");
 			}
 
-			//visitor.Finish();
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+
+			foreach (var pair in landFound)
+			{
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
+			}
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter, timeSpent);
 		}

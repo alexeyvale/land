@@ -95,6 +95,7 @@
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\RemoveAutoVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\CountLandNodesVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\UserifyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\BaseTreeVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\GhostListOptionProcessingVisitor.cs" />
