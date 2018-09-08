@@ -20,6 +20,8 @@ curve_bracketed	= %left '{' %right '}'
 round_bracketed	= %left '(' %right ')'
 square_bracketed = %left '[' %right ']'
 
+corner_bracketed = '<' (Any|corner_bracketed)+ '>'
+
  
 namespace_content	=	opening_directive*! (namespace|entity)*
 opening_directive	=	('using'|'extern') Any ';'
@@ -33,21 +35,21 @@ entity =
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
 			%priority(2) type %priority(3) name
 			(
-		  		arguments Any (init_expression | ';' | block)	=> method	|
-		  		(';'| init_value)								=> field	|
-		  		(block init_value? | init_expression)			=> property
+		  		arguments Any (init_expression? ';' | block)	=> method	|
+		  		init_value? (',' name init_value?)* ';'			=> field	|
+		  		(block (init_value ';')? | init_expression ';')			=> property
 		  	)
 		) | Any
 
-init_expression		=	'=>' Any ';'
-init_value			=	'=' Any ';'
+init_expression		=	'=>' (Any|corner_bracketed)+
+init_value			=	'=' (Any|corner_bracketed)+
 
 name_atom	=	ID | MODIFIER
 name		=	name_atom ((('.'|'::') name_atom) | '<' types_list '>')*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	'unsigned'? ID | tuple
+type_atom	=	'unsigned'? ID '?'? | tuple
 type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' ','* ']'))*!
 types_list	=	type (',' type)*
 
@@ -57,7 +59,7 @@ block		=	'{' Any '}'
 %%
 
 %parsing fragment STRING_INT_CODE
-%parsing ignoreundefined
+//%parsing ignoreundefined
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 

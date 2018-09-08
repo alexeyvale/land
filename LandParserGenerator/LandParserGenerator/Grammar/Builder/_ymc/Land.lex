@@ -12,8 +12,6 @@
 
 %x in_terminal_declaration
 %x in_options
-%x in_skip
-%x in_regex
 %x before_option_args
 %x before_body_element_args
 
@@ -29,8 +27,10 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 %%
 
-{LINE_COMMENT} |
-{MULTILINE_COMMENT} {}
+<0, in_options> {
+	{LINE_COMMENT} |
+	{MULTILINE_COMMENT} {}
+}
 
 // Группа и все возможные квантификаторы
 

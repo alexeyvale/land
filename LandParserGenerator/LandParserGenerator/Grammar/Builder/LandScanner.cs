@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 26.08.2018 17:41:29
+//  DateTime: 09.09.2018 0:27:19
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 26.08.2018 17:41:29>
+//  GPLEX input file <./Land.lex - 09.09.2018 0:27:19>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -136,10 +136,8 @@ namespace Land.Core.Builder
         const int INITIAL = 0;
         const int in_terminal_declaration = 1;
         const int in_options = 2;
-        const int in_skip = 3;
-        const int in_regex = 4;
-        const int before_option_args = 5;
-        const int before_body_element_args = 6;
+        const int before_option_args = 3;
+        const int before_body_element_args = 4;
 
 #region user code
 public List<Message> Log = new List<Message>();
@@ -174,11 +172,9 @@ public List<Message> Log = new List<Message>();
         }
     };
 
-    static int[] startState = new int[] {38, 48, 49, 51, 51, 52, 
-        53, 0};
+    static int[] startState = new int[] {38, 48, 49, 51, 52, 0};
 
-   static int[] anchorState = new int[] {39, 48, 49, 51, 51, 52, 
-        53, 0};
+   static int[] anchorState = new int[] {39, 48, 49, 51, 52, 0};
 
 #region CompressedCharacterMap
     //
@@ -207,7 +203,7 @@ public List<Message> Log = new List<Message>();
     }
 #endregion
 
-    static Table[] NxS = new Table[54] {
+    static Table[] NxS = new Table[53] {
 /* NxS[   0] */ new Table(0, 0, 0, null),
 /* NxS[   1] */ new Table(0, 0, -1, null),
 /* NxS[   2] */ new Table(0, 0, -1, null),
@@ -279,13 +275,12 @@ public List<Message> Log = new List<Message>();
 /* NxS[  47] */ new Table(10, 11, -1, new sbyte[] {15, -1, -1, 17, 15, 15, 
           15, 18, 15, 15, 15}),
 /* NxS[  48] */ new Table(0, 1, 33, new sbyte[] {-1}),
-/* NxS[  49] */ new Table(10, 18, -1, new sbyte[] {34, 8, 50, 34, 34, 34, 
-          34, 34, 34, 34, 34, -1, -1, -1, -1, -1, 12, 13}),
+/* NxS[  49] */ new Table(10, 21, -1, new sbyte[] {34, 8, 50, 34, 34, 34, 
+          34, 34, 34, 34, 34, -1, -1, -1, -1, -1, 12, 13, -1, -1, 40}),
 /* NxS[  50] */ new Table(10, 11, -1, new sbyte[] {35, -1, -1, 35, 35, 35, 
           35, 35, 35, 35, 35}),
-/* NxS[  51] */ new Table(0, 0, -1, null),
-/* NxS[  52] */ new Table(26, 1, -1, new sbyte[] {36}),
-/* NxS[  53] */ new Table(26, 1, -1, new sbyte[] {37}),
+/* NxS[  51] */ new Table(26, 1, -1, new sbyte[] {36}),
+/* NxS[  52] */ new Table(26, 1, -1, new sbyte[] {37}),
     };
 
 int NextState() {

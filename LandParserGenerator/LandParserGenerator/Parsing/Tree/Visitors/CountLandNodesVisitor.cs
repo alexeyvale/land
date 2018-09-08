@@ -10,34 +10,46 @@ namespace Land.Core.Parsing.Tree
 {
 	public class CountLandNodesVisitor: BaseTreeVisitor
 	{
-		public Dictionary<string, int> Counted { get; set; } = new Dictionary<string, int>(); 
+		public Dictionary<string, int> Counts { get; set; } = new Dictionary<string, int>();
+		public Dictionary<string, List<string>> Values { get; set; } = new Dictionary<string, List<string>>();
+
+		public HashSet<string> ChildrenWithValues { get; set; }
+
+		public CountLandNodesVisitor(params string[] childrenWithValues)
+		{
+			ChildrenWithValues = new HashSet<string>(childrenWithValues);
+		}
 
 		public override void Visit(Node node)
 		{
 			if(node.Options.IsLand)
 			{
-				if (!Counted.ContainsKey(node.Type))
-					Counted[node.Type] = 0;
+				if (!Counts.ContainsKey(node.Type))
+				{
+					Counts[node.Type] = 0;
+					Values[node.Type] = new List<string>();
+				}
 
-				Counted[node.Type] += 1;
+				Counts[node.Type] += 1;
+				Values[node.Type].Add(String.Join(" ", node.Children.Where(c=> ChildrenWithValues.Contains(c.Type)).Select(c=>String.Join("", c.Value))));
 			}
 
 			base.Visit(node);
 		}
 
-		public static Dictionary<string, int> Merge(Dictionary<string, int> a, Dictionary<string, int> b)
+		public void MergeIn(Dictionary<string, int> targetCounts, Dictionary<string, List<string>> targetValues)
 		{
-			var result = new Dictionary<string, int>(a);
-
-			foreach(var pair in b)
+			foreach(var pair in Counts)
 			{
-				if (!result.ContainsKey(pair.Key))
-					result[pair.Key] = 0;
+				if (!targetCounts.ContainsKey(pair.Key))
+				{
+					targetCounts[pair.Key] = 0;
+					targetValues[pair.Key] = new List<string>();
+				}
 
-				result[pair.Key] += pair.Value;
+				targetCounts[pair.Key] += pair.Value;
+				targetValues[pair.Key].AddRange(Values[pair.Key]);
 			}
-
-			return result;
 		}
 	}
 }

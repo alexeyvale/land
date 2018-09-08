@@ -395,7 +395,7 @@ namespace Land.Core
 
 			Options.Set(option, symbols);
 
-			var errorSymbols = CheckIfNonterminals(symbols).Intersect(СheckIfAliases(symbols)).ToList();
+			var errorSymbols = CheckIfNonterminals(symbols).Intersect(CheckIfAliases(symbols)).ToList();
 			if (errorSymbols.Count > 0)
 				throw new IncorrectGrammarException(
 					$"Символы '{String.Join("', '", errorSymbols)}' не определены как нетерминальные или псевдонимы"
@@ -473,7 +473,7 @@ namespace Land.Core
 			return symbols.Where(s => !this.Tokens.ContainsKey(s)).ToList();
 		}
 
-		private List<string> СheckIfAliases(params string[] symbols)
+		private List<string> CheckIfAliases(params string[] symbols)
 		{
 			return symbols.Where(s => !this.Aliases.Any(a => a.Value.Contains(s))).ToList();
 		}
@@ -482,7 +482,7 @@ namespace Land.Core
 		{
 			return CheckIfNonterminals(symbols)
 				.Intersect(CheckIfTerminals(symbols))
-				.Intersect(СheckIfAliases(symbols)).ToList();
+				.Intersect(CheckIfAliases(symbols)).ToList();
 		}
 
 		#endregion

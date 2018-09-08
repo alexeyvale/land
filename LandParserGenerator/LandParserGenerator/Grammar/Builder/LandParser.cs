@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 26.08.2018 17:41:29
+// DateTime: 09.09.2018 0:27:19
 // UserName: Алексей
-// Input file <./Land.y - 26.08.2018 17:41:29>
+// Input file <./Land.y - 09.09.2018 0:27:19>
 
 // options: no-lines gplex
 
@@ -75,14 +75,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 26.08.2018 17:41:29
+  // Verbatim content from ./Land.y - 09.09.2018 0:27:19
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 26.08.2018 17:41:29
+  // End verbatim content from ./Land.y - 09.09.2018 0:27:19
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
