@@ -90,7 +90,7 @@ namespace Land.Core.Markup
 						ChildrenContextSimilarity(ancestor.ChildrenContext, candidateAncestor.ChildrenContext);
 				}
 
-				var bestCandidate = similarities.OrderBy(s => s.Value).FirstOrDefault();
+				var bestCandidate = similarities.OrderByDescending(s => s.Value).FirstOrDefault();
 
 				if (bestCandidate.Key != null)
 				{
@@ -117,7 +117,7 @@ namespace Land.Core.Markup
 				foreach (var candidateChild in candidateChildrenContext[child.Type])
 					similarities[candidateChild] = Levenshtein(child.Value, candidateChild.Value);
 
-				var bestCandidate = similarities.OrderBy(s => s.Value).FirstOrDefault();
+				var bestCandidate = similarities.OrderByDescending(s => s.Value).FirstOrDefault();
 
 				if (bestCandidate.Key != null)
 				{
