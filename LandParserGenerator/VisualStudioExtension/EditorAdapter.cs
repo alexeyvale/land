@@ -74,5 +74,10 @@ namespace Land.VisualStudioExtension
 		{
 			throw new NotImplementedException();
 		}
+
+		public void RegisterOnDocumentChanged(Action<string> callback)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

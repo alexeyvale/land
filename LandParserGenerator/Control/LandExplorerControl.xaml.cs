@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -67,11 +66,19 @@ namespace Land.Control
 		private ControlState State { get; set; } = new ControlState();
 
 		/// <summary>
+		/// Деревья для файлов, к которым осуществлена привязка
+		/// </summary>
+		public Dictionary<string, Node> AstRoots = new Dictionary<string, Node>();
+
+		/// <summary>
+		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
+		/// </summary>
+		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
+
+		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
-
-		public Dictionary<string, BaseParser> Parsers { get; set; }
 
 
 		public LandExplorerControl()
@@ -87,14 +94,13 @@ namespace Land.Control
 			SettingsObject = adapter.LoadSettings() ?? new LandExplorerSettings();
 
 			Editor = adapter;
-			Editor.RegisterOnDocumentSaved(DocumentSavedHandler);
+			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
-			MarkupManager.GetText = Editor.GetDocumentText;
-			MarkupManagerAction(() =>
+
+			LogAction(() =>
 			{
-				MarkupManager.Parsers = Parsers =
-					ThisFunction(() => BuildParsers());
+				Parsers = BuildParsers();
 			});
 		}
 
@@ -105,14 +111,13 @@ namespace Land.Control
 
 		public Node GetTree(string fileName)
 		{
-			return MarkupManager.AstRoots.ContainsKey(fileName)
-				? MarkupManager.AstRoots[fileName] : null;
+			return AstRoots.ContainsKey(fileName) ? AstRoots[fileName] : null;
 		}
 
 		public string GetText(string fileName)
 		{
-			return MarkupManager.Sources.ContainsKey(fileName)
-				? MarkupManager.Sources[fileName] : null;
+			return Editor.GetDocumentText(fileName) ?? 
+				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
 		public BaseParser GetParser(string extension)
@@ -125,36 +130,37 @@ namespace Land.Control
 
 		private void Command_Delete_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManagerAction(() =>
-			{
-				MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
-			});
+			MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
 		}
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
-			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
+			var root = GetRoot(documentName);
 
-			if (!String.IsNullOrEmpty(documentName))
+			if (root != null)
 			{
-				State.PendingCommandTarget = State.SelectedItem;
-				State.PendingCommandDocument = documentName;
-				State.PendingCommand = LandExplorerCommand.AddPoint;
+				var offset = Editor.GetActiveDocumentOffset();			
 
-				ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+				if (!String.IsNullOrEmpty(documentName))
 				{
-					return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
-				});
+					State.PendingCommandTarget = State.SelectedItem;
+					State.PendingCommandDocument = documentName;
+					State.PendingCommand = LandExplorerCommand.AddPoint;
+
+					ConcernPointCandidatesList.ItemsSource =
+						MarkupManager.GetConcernPointCandidates(root, offset.Value);
+				}
 			}
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManagerAction(() =>
-			{
-				MarkupManager.AddLand(Editor.GetActiveDocumentName());
-			});
+			var fileName = Editor.GetActiveDocumentName();
+			var root = GetRoot(fileName);
+
+			if(root != null)
+				MarkupManager.AddLand(fileName, root);
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -182,10 +188,7 @@ namespace Land.Control
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				MarkupManagerAction(() =>
-				{
-					MarkupManager.Serialize(saveFileDialog.FileName);
-				});
+				MarkupManager.Serialize(saveFileDialog.FileName);
 			}
 		}
 
@@ -200,11 +203,8 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				MarkupManagerAction(() =>
-				{
-					MarkupManager.Deserialize(openFileDialog.FileName);
-					MarkupTreeView.ItemsSource = MarkupManager.Markup;
-				});
+				MarkupManager.Deserialize(openFileDialog.FileName);
+				MarkupTreeView.ItemsSource = MarkupManager.Markup;
 			}
 		}
 
@@ -215,19 +215,22 @@ namespace Land.Control
 
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
-			var offset = Editor.GetActiveDocumentOffset();
 			var documentName = Editor.GetActiveDocumentName();
+			var root = GetRoot(documentName);
 
-			if (!String.IsNullOrEmpty(documentName))
+			if (root != null)
 			{
-				State.PendingCommandTarget = State.SelectedItem;
-				State.PendingCommandDocument = documentName;
-				State.PendingCommand = LandExplorerCommand.Relink;
+				var offset = Editor.GetActiveDocumentOffset();
 
-				ConcernPointCandidatesList.ItemsSource = MarkupManagerFunction(() =>
+				if (!String.IsNullOrEmpty(documentName))
 				{
-					return MarkupManager.GetConcernPointCandidates(documentName, offset.Value);
-				});
+					State.PendingCommandTarget = State.SelectedItem;
+					State.PendingCommandDocument = documentName;
+					State.PendingCommand = LandExplorerCommand.Relink;
+
+					ConcernPointCandidatesList.ItemsSource =
+						MarkupManager.GetConcernPointCandidates(root, offset.Value);
+				}
 			}
 		}
 
@@ -313,19 +316,20 @@ namespace Land.Control
 				SettingsObject = SettingsWindow.SettingsObject;
 				Editor.SaveSettings(SettingsObject);
 
-				MarkupManager.Parsers = Parsers = 
-					ThisFunction(() => BuildParsers());
+				Parsers = LogFunction(() => BuildParsers());
 			}
 		}
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
-			//foreach (var nameRootPair in MarkupManager.AstRoots)
-			//{
-			//	var newTreeRoot = ParseDocument(nameRootPair.Key);
-			//	Mapper.Remap(nameRootPair.Value, newTreeRoot);
-			//	MarkupManager.Remap(nameRootPair.Key, newTreeRoot, Mapper.Mapping);
-			//}
+			var referenced = MarkupManager.GetReferencedFiles();
+			var forest = new Dictionary<string, Node>();
+
+			foreach (var documentName in referenced)
+				forest[documentName] = TryParse(documentName, out bool success);
+
+			MarkupManager.Remap(forest);
+
 		}
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -386,14 +390,30 @@ namespace Land.Control
 			if (item != null && State.EditedItem != item && e.ChangedButton == MouseButton.Left)
 			{
 				/// При клике по точке переходим к ней
-				if (item.DataContext is ConcernPoint)
+				if (item.DataContext is ConcernPoint concernPoint)
 				{
-					var concernPoint = (ConcernPoint)item.DataContext;
+					if(!AstRoots.ContainsKey(concernPoint.Context.FileName) 
+						|| AstRoots[concernPoint.Context.FileName] == null)
+					{
+						AstRoots[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
 
-					Editor.SetActiveDocumentAndOffset(
-						concernPoint.Context.FileName, 
-						concernPoint.TreeNode.Anchor.Start
-					);
+						if (AstRoots[concernPoint.Context.FileName] != null)
+						{
+							MarkupManager.Remap(
+								concernPoint, 
+								concernPoint.Context.FileName, 
+								AstRoots[concernPoint.Context.FileName]
+							);
+						}
+					}
+
+					if (concernPoint.TreeNode != null)
+					{
+						Editor.SetActiveDocumentAndOffset(
+							concernPoint.Context.FileName,
+							concernPoint.TreeNode.Anchor.Start
+						);
+					}
 
 					e.Handled = true;
 				}
@@ -417,12 +437,10 @@ namespace Land.Control
 						}
 						else
 						{
-							if (item.DataContext is ConcernPoint)
+							if (item.DataContext is ConcernPoint concernPoint)
 							{
-								var concernPoint = (ConcernPoint)item.DataContext;
-
 								Editor.SetActiveDocumentAndOffset(
-									concernPoint.Context.FileName, 
+									concernPoint.Context.FileName,
 									concernPoint.TreeNode.Anchor.Start
 								);
 							}
@@ -797,35 +815,64 @@ namespace Land.Control
 
 		#region Helpers
 
-		private void DocumentSavedHandler(string fileName)
+		private void DocumentChangedHandler(string fileName)
 		{
-			MarkupManagerAction(() =>
+			if (AstRoots.ContainsKey(fileName))
 			{
-				MarkupManager.Remap(fileName);
-			});
+				AstRoots.Remove(fileName);
+				MarkupManager.InvalidatePoints(fileName);
+			}
 		}
 
-		private T MarkupManagerFunction<T>(Func<T> func, bool skipTrace = true)
+		private Node GetRoot(string documentName)
 		{
-			var result = func();
-			Editor.ProcessMessages(MarkupManager.Log, skipTrace, true);
-			return result;
+			return !String.IsNullOrEmpty(documentName)
+				? AstRoots.ContainsKey(documentName) && AstRoots[documentName] != null
+					? AstRoots[documentName]
+					: TryParse(documentName, out bool success)
+				: null;
 		}
 
-		private void MarkupManagerAction(Action action, bool skipTrace = true)
+		private Node TryParse(string fileName, out bool success)
 		{
-			action();
-			Editor.ProcessMessages(MarkupManager.Log, skipTrace, true);
+			if (!String.IsNullOrEmpty(fileName))
+			{
+				var extension = Path.GetExtension(fileName);
+
+				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
+				{
+					var text = GetText(fileName);
+					var root = Parsers[extension].Parse(text);
+					success = Parsers[extension].Log.All(l => l.Type != MessageType.Error && l.Type != MessageType.Warning);
+
+					if (success)
+					{
+						AstRoots[fileName] = root;
+					}
+
+					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
+					Log.AddRange(Parsers[extension].Log);
+
+					return root;
+				}
+				else
+				{
+					Log.Add(Message.Error($"Отсутствует парсер для файлов с расширением '{extension}'", null));
+				}
+			}
+
+			success = false;
+			return null;
 		}
 
-		private T ThisFunction<T>(Func<T> func, bool skipTrace = true)
+		private T LogFunction<T>(Func<T> func, bool skipTrace = true)
 		{
 			var result = func();
 			Editor.ProcessMessages(Log, skipTrace, true);
 			return result;
 		}
 
-		private void ThisAction(Action action, bool skipTrace = true)
+		private void LogAction(Action action, bool skipTrace = true)
 		{
 			action();
 			Editor.ProcessMessages(Log, skipTrace, true);
@@ -868,9 +915,8 @@ namespace Land.Control
 		{
 			var segments = new List<DocumentSegment>();
 
-			if (elem is Concern)
+			if (elem is Concern concern)
 			{
-				var concern = (Concern)elem;
 				var concernsQueue = new Queue<Concern>();
 				concernsQueue.Enqueue(concern);
 
@@ -881,16 +927,21 @@ namespace Land.Control
 
 					foreach (var element in currentConcern.Elements)
 					{
-						if (element is ConcernPoint)
+						if (element is ConcernPoint cp)
 						{
-							var cp = (ConcernPoint)element;
-							segments.Add(new DocumentSegment()
+							if (cp.TreeNode == null)
+								MarkupManager.Remap(cp, cp.Context.FileName, GetRoot(cp.Context.FileName));
+
+							if (cp.TreeNode != null)
 							{
-								FileName = cp.Context.FileName,
-								StartOffset = cp.TreeNode.Anchor.Start.Offset,
-								EndOffset = cp.TreeNode.Anchor.End.Offset,
-								CaptureWholeLine = captureWholeLine
-							});
+								segments.Add(new DocumentSegment()
+								{
+									FileName = cp.Context.FileName,
+									StartOffset = cp.TreeNode.Anchor.Start.Offset,
+									EndOffset = cp.TreeNode.Anchor.End.Offset,
+									CaptureWholeLine = captureWholeLine
+								});
+							}
 						}
 						else
 							concernsQueue.Enqueue((Concern)element);
@@ -901,13 +952,16 @@ namespace Land.Control
 			{
 				var concernPoint = (ConcernPoint)elem;
 
-				segments.Add(new DocumentSegment()
+				if (concernPoint.TreeNode != null)
 				{
-					FileName = concernPoint.Context.FileName,
-					StartOffset = concernPoint.TreeNode.Anchor.Start.Offset,
-					EndOffset = concernPoint.TreeNode.Anchor.End.Offset,
-					CaptureWholeLine = captureWholeLine
-				});
+					segments.Add(new DocumentSegment()
+					{
+						FileName = concernPoint.Context.FileName,
+						StartOffset = concernPoint.TreeNode.Anchor.Start.Offset,
+						EndOffset = concernPoint.TreeNode.Anchor.End.Offset,
+						CaptureWholeLine = captureWholeLine
+					});
+				}
 			}
 
 			return segments;

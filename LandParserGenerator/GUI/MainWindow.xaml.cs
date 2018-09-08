@@ -83,12 +83,12 @@ namespace Land.GUI
 			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
 		}
 
-		private void MoveCaretToSource(Node node, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
+		private void MoveCaretToSource(SegmentLocation loc, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
 		{
-			if (node != null && node.Anchor != null)
+			if (loc != null)
 			{
-				var start = node.Anchor.Start.Offset;
-				var end = node.Anchor.End.Offset;
+				var start = loc.Start.Offset;
+				var end = loc.End.Offset;
 				editor.ScrollToLine(editor.Document.GetLocation(start).Line);
 
 				if (selectText)
@@ -408,7 +408,7 @@ namespace Land.GUI
 		{
 			var treeView = (TreeView)sender;
 
-			MoveCaretToSource((Node)treeView.SelectedItem, File_Editor, true, 1);
+			MoveCaretToSource(((Node)treeView.SelectedItem).Anchor, File_Editor, true, 1);
 		}
 
 		private void File_OpenButton_Click(object sender, RoutedEventArgs e)
@@ -716,21 +716,19 @@ namespace Land.GUI
 
 		private void MappingDebug_MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint)
+			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint point)
 			{
-				var point = (ConcernPoint)MappingDebug_MarkupTreeView.SelectedItem;
-
-				if (point.TreeNode != null)
+				if (point.TreeNode != null && point.TreeNode.Anchor != null)
 				{
 					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 					MappingDebug_OldAstView.ItemsSource = new List<Node>() { LandExplorer.GetTree(point.Context.FileName) };
 
-					if(String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
+					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
 						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 					}
 
-					MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor, true);
+					MoveCaretToSource(point.TreeNode.Anchor, MappingDebug_OldTextEditor, true);
 				}
 			}
 		}
@@ -752,7 +750,7 @@ namespace Land.GUI
 		{
 			if(MappingDebug_OldAstView.SelectedItem != null)
 			{
-				MoveCaretToSource((Node)MappingDebug_OldAstView.SelectedItem, MappingDebug_OldTextEditor, true);
+				MoveCaretToSource(((Node)MappingDebug_OldAstView.SelectedItem).Anchor, MappingDebug_OldTextEditor, true);
 			}
 		}
 
@@ -760,7 +758,7 @@ namespace Land.GUI
 		{
 			if (MappingDebug_NewAstView.SelectedItem != null)
 			{
-				MoveCaretToSource((Node)MappingDebug_NewAstView.SelectedItem, MappingDebug_NewTextEditor, true);
+				MoveCaretToSource(((Node)MappingDebug_NewAstView.SelectedItem).Anchor, MappingDebug_NewTextEditor, true);
 			}
 		}
 
@@ -814,7 +812,7 @@ namespace Land.GUI
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
 				var node = ((KeyValuePair<Node,double>)MappingDebug_SimilaritiesList.SelectedItem).Key;
-				MoveCaretToSource(node, MappingDebug_NewTextEditor);
+				MoveCaretToSource(node.Anchor, MappingDebug_NewTextEditor);
 			}
 		}
 
@@ -827,8 +825,8 @@ namespace Land.GUI
 
 		#region Тестирование панели разметки
 
-		public event DocumentSavedHandler OnDocumenSaved;
-		public delegate void DocumentSavedHandler(string documentName);
+		//public delegate void DocumentChangedHandler(string documentName);
+		public Action<string> DocumentChangedCallback;
 
 		public class DocumentTab
 		{
@@ -863,6 +861,7 @@ namespace Land.GUI
 
 			Documents[tab].Editor.TextArea.TextView.BackgroundRenderers
 				.Add(Documents[tab].SegmentsColorizer = new SegmentsBackgroundRenderer(Documents[tab].Editor.TextArea));
+			Documents[tab].Editor.TextChanged += Editor_TextChanged;
 
 			tab.Content = Documents[tab].Editor;
 			tab.Header = Path.GetFileName(Documents[tab].DocumentName);
@@ -870,6 +869,15 @@ namespace Land.GUI
 			DocumentTabs.SelectedItem = tab;
 
 			return Documents[tab];
+		}
+
+		private void Editor_TextChanged(object sender, EventArgs e)
+		{
+			var document = Documents.Values.FirstOrDefault(d => d.Editor == sender);
+
+			if (document != null && !String.IsNullOrEmpty(document.DocumentName) 
+				&& DocumentChangedCallback != null)
+				DocumentChangedCallback(document.DocumentName);
 		}
 
 		public DocumentTab OpenDocument(string documentName)
@@ -907,9 +915,6 @@ namespace Land.GUI
 						File.WriteAllText(saveFileDialog.FileName, Documents[activeTab].Editor.Text);
 						Documents[activeTab].DocumentName = saveFileDialog.FileName;
 						activeTab.Header = Path.GetFileName(saveFileDialog.FileName);
-
-						if(OnDocumenSaved != null)
-							OnDocumenSaved(Documents[activeTab].DocumentName);
 					}
 				}
 				else
@@ -918,9 +923,6 @@ namespace Land.GUI
 						Documents[activeTab].DocumentName, 
 						Documents[activeTab].Editor.Text
 					);
-
-					if (OnDocumenSaved != null)
-						OnDocumenSaved(Documents[activeTab].DocumentName);
 				}
 			}
 		}

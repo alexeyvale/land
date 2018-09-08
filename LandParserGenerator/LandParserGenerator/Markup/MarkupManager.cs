@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 
-using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
@@ -21,165 +18,130 @@ namespace Land.Core.Markup
 		public ObservableCollection<MarkupElement> Markup = new ObservableCollection<MarkupElement>();
 
 		/// <summary>
-		/// Исходные тексты файлов, к которым осуществлена привязка
+		/// Очистка разметки
 		/// </summary>
-		public Dictionary<string, string> Sources = new Dictionary<string, string>();
-
-		/// <summary>
-		/// Деревья для файлов, к которым осуществлена привязка
-		/// </summary>
-		public Dictionary<string, Node> AstRoots = new Dictionary<string, Node>();
-
-		/// <summary>
-		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
-		/// </summary>
-		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
-
-		/// <summary>
-		/// Контроль количества ссылок на файлы
-		/// </summary>
-		public Dictionary<string, int> Links = new Dictionary<string, int>();
-
-		public List<Message> Log = new List<Message>();
-
-		public GetTextDelegate GetText;
-		public delegate string GetTextDelegate(string fileName);
-
 		public void Clear()
 		{
 			Markup.Clear();
-			AstRoots.Clear();
-			Sources.Clear();
-			Links.Clear();
-			Log.Clear();
 		}
 
+		/// <summary>
+		/// Сброс узлов дерева у всех точек, связанных с указанным файлом
+		/// </summary>
+		public void InvalidatePoints(string fileName)
+		{
+			DoWithMarkup((MarkupElement elem) =>
+			{
+				if(elem is ConcernPoint concernPoint 
+					&& concernPoint.Context.FileName == fileName)
+				{
+					concernPoint.TreeNode = null;
+				}
+			});
+		}
+
+		/// <summary>
+		/// Удаление элемента разметки
+		/// </summary>
 		public void RemoveElement(MarkupElement elem)
 		{
-			Log.Clear();
-
 			if (elem.Parent != null)
 				elem.Parent.Elements.Remove(elem);
 			else
 				Markup.Remove(elem);
-
-			if (elem is ConcernPoint point)
-			{
-				Links[point.Context.FileName] -= 1;
-
-				if (Links[point.Context.FileName] == 0)
-				{
-					Links.Remove(point.Context.FileName);
-					AstRoots.Remove(point.Context.FileName);
-					Sources.Remove(point.Context.FileName);
-				}
-			}
 		}
 
+		/// <summary>
+		/// Добавление функциональности
+		/// </summary>
 		public Concern AddConcern(string name, Concern parent = null)
 		{
-			Log.Clear();
-
 			var concern = new Concern(name, parent);
 			AddElement(concern);
 			return concern;
 		}
 
+		/// <summary>
+		/// Добавление точки привязки
+		/// </summary>
 		public ConcernPoint AddConcernPoint(string fileName, Node node, string name = null, Concern parent = null)
 		{
-			Log.Clear();
-
 			var point = new ConcernPoint(fileName, node, parent);
 			AddElement(point);
 			return point;
 		}
 
-		public void AddLand(string fileName)
+		/// <summary>
+		/// Добавление всей "суши", присутствующей в дереве разбора
+		/// </summary>
+		public void AddLand(string fileName, Node root)
 		{
-			Log.Clear();
+			var visitor = new LandExplorerVisitor();
+			root.Accept(visitor);
 
-			if (!AstRoots.ContainsKey(fileName) && Parse(fileName, GetText(fileName)))
+			/// Группируем land-сущности по типу (символу)
+			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
 			{
-				var visitor = new LandExplorerVisitor();
-				AstRoots[fileName].Accept(visitor);
+				var concern = AddConcern(group.Key);
 
-				/// Группируем land-сущности по типу (символу)
-				foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
+				/// В пределах символа группируем по псевдониму
+				var subgroups = group.GroupBy(g => g.Alias);
+
+				/// Для всех точек, для которых указан псевдоним
+				foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
 				{
-					var concern = AddConcern(group.Key);
+					/// создаём подфункциональность
+					var subconcern = AddConcern(subgroup.Key, concern);
 
-					/// В пределах символа группируем по псевдониму
-					var subgroups = group.GroupBy(g => g.Alias);
-
-					/// Для всех точек, для которых указан псевдоним
-					foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
-					{
-						/// создаём подфункциональность
-						var subconcern = AddConcern(subgroup.Key, concern);
-
-						foreach (var point in subgroup)
-							AddElement(new ConcernPoint(fileName, point, subconcern));
-					}
-
-					/// Остальные добавляются напрямую к функциональности, соответствующей символу
-					var points = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
-						.SelectMany(s => s).ToList();
-
-					foreach (var point in points)
-						AddElement(new ConcernPoint(fileName, point, concern));
+					foreach (var point in subgroup)
+						AddElement(new ConcernPoint(fileName, point, subconcern));
 				}
+
+				/// Остальные добавляются напрямую к функциональности, соответствующей символу
+				var points = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
+					.SelectMany(s => s).ToList();
+
+				foreach (var point in points)
+					AddElement(new ConcernPoint(fileName, point, concern));
 			}
 		}
 
-		public LinkedList<Node> GetConcernPointCandidates(string fileName, int offset)
+		/// <summary>
+		/// Получение всех узлов, к которым можно привязаться,
+		/// если команда привязки была вызвана в позиции offset
+		/// </summary>
+		public LinkedList<Node> GetConcernPointCandidates(Node root, int offset)
 		{
-			Log.Clear();
+			var pointCandidates = new LinkedList<Node>();
+			var currentNode = root;
 
-			if (AstRoots.ContainsKey(fileName) || Parse(fileName, GetText(fileName)))
+			/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
+			/// содержащие текущую позицию каретки
+			while (currentNode != null)
 			{
-				var pointCandidates = new LinkedList<Node>();
-				var currentNode = AstRoots[fileName];
+				if (currentNode.Options.IsLand)
+					pointCandidates.AddFirst(currentNode);
 
-				/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
-				/// содержащие текущую позицию каретки
-				while (currentNode != null)
-				{
-					if (currentNode.Options.IsLand)
-						pointCandidates.AddFirst(currentNode);
-
-					currentNode = currentNode.Children.Where(c => c.Anchor != null && c.Anchor.Start != null && c.Anchor.End != null
-						&& c.Anchor.Start.Offset <= offset && c.Anchor.End.Offset >= offset).FirstOrDefault();
-				}
-
-				return pointCandidates;
+				currentNode = currentNode.Children.Where(c => c.Anchor != null && c.Anchor.Start != null && c.Anchor.End != null
+					&& c.Anchor.Start.Offset <= offset && c.Anchor.End.Offset >= offset).FirstOrDefault();
 			}
 
-			return new LinkedList<Node>();
+			return pointCandidates;
 		}
 
+		/// <summary>
+		/// Смена узла, к которому привязана точка
+		/// </summary>
 		public void RelinkConcernPoint(ConcernPoint point, string fileName, Node node)
 		{
-			Log.Clear();
-
-			if (point.Context.FileName != fileName)
-			{
-				Links[point.Context.FileName] -= 1;
-
-				if (Links[point.Context.FileName] == 0)
-				{
-					Links.Remove(point.Context.FileName);
-					AstRoots.Remove(point.Context.FileName);
-					Sources.Remove(point.Context.FileName);
-				}
-			}
-
 			point.Relink(fileName, node);
 		}
 
+		/// <summary>
+		/// Перемещение элемента разметки к новому родителю
+		/// </summary>
 		public void MoveTo(Concern newParent, MarkupElement elem)
 		{
-			Log.Clear();
-
 			if (elem.Parent != null)
 				elem.Parent.Elements.Remove(elem);
 			else
@@ -193,38 +155,8 @@ namespace Land.Core.Markup
 				Markup.Add(elem);
 		}
 
-		public bool Remap(string fileName)
-		{
-			Log.Clear();
-
-			/// Если на файл с указанным именем ссылаются точки привязки
-			if (Links.ContainsKey(fileName))
-			{
-				/// Запоминаем старую версию дерева и текста
-				var oldRoot = AstRoots[fileName];
-				var oldText = Sources[fileName];
-
-				/// Если удалось перепарсить файл
-				if (Parse(fileName, File.ReadAllText(fileName)))
-				{
-					// todo логика перепривязки всех точек
-				}
-				else
-				{
-					AstRoots[fileName] = oldRoot;
-					Sources[fileName] = oldText;
-
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		public void Serialize(string fileName)
 		{
-			Log.Clear();
-
 			using (FileStream fs = new FileStream(fileName, FileMode.Create))
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
@@ -255,51 +187,99 @@ namespace Land.Core.Markup
 			}
 		}
 
+		/// <summary>
+		/// Поиск узла дерева, которому соответствует заданная точка привязки
+		/// </summary>
+		public NodeSimilarityPair Find(ConcernPoint point, string fileName, Node root)
+		{
+			return ContextFinder.Find(point.Context, fileName, root).FirstOrDefault();
+		}
+
+		/// <summary>
+		/// Получение списка файлов, в которых есть точки привязки
+		/// </summary>
+		public List<string> GetReferencedFiles()
+		{
+			var groupVisitor = new GroupPointsVisitor();
+
+			foreach (var elem in this.Markup)
+				elem.Accept(groupVisitor);
+
+			return groupVisitor.Points.Select(p => p.Key).Distinct().ToList();
+		}
+
+		/// <summary>
+		/// Перепривязка точки
+		/// </summary>
+		public void Remap(ConcernPoint point, string fileName, Node root)
+		{
+			var candidate = Find(point, fileName, root);
+
+			point.Context = candidate.Context;
+			point.TreeNode = candidate.Node;
+		}
+
+		/// <summary>
+		/// Перепривязка разметки
+		/// </summary>
+		public void Remap(Dictionary<string, Node> roots)
+		{
+			var groupVisitor = new GroupPointsVisitor();
+
+			foreach (var elem in this.Markup)
+				elem.Accept(groupVisitor);
+
+			foreach (var group in groupVisitor.Points)
+			{
+				if (roots.ContainsKey(group.Key) && roots[group.Key] != null)
+				{
+					var visitor = new RemapVisitor(group.Key, roots[group.Key]);
+
+					foreach (var elem in Markup)
+						elem.Accept(visitor);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Обобщённое добавление элемента разметки
+		/// </summary>
+		/// <param name="elem"></param>
 		private void AddElement(MarkupElement elem)
 		{
 			if (elem.Parent == null)
 				Markup.Add(elem);
 			else
 				elem.Parent.Elements.Add(elem);
-
-			if (elem is ConcernPoint point)
-			{
-				if (!Links.ContainsKey(point.Context.FileName))
-					Links[point.Context.FileName] = 1;
-				else
-					Links[point.Context.FileName] += 1;
-			}
 		}
 
-		private bool Parse(string fileName, string text)
+		/// <summary>
+		/// Совершение заданного действия со всеми элементами разметки
+		/// </summary>
+		private void DoWithMarkup(Action<MarkupElement> action)
 		{
-			if (!String.IsNullOrEmpty(fileName))
+			foreach (var elem in Markup)
+				DoWithMarkupSubtree(action, elem);
+		}
+
+		/// <summary>
+		/// Совершение заданного действия со всеми элементами поддерева разметки
+		/// </summary>
+		private void DoWithMarkupSubtree(Action<MarkupElement> action, MarkupElement root)
+		{
+			var elements = new Queue<MarkupElement>();
+			elements.Enqueue(root);
+
+			while (elements.Count > 0)
 			{
-				var extension = Path.GetExtension(fileName);
+				var elem = elements.Dequeue();
 
-				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
-				{
-					var root = Parsers[extension].Parse(text);
-					var success = Parsers[extension].Log
-						.All(l => l.Type != MessageType.Error && l.Type != MessageType.Warning);
+				if (elem is Concern concern)
+					foreach (var child in concern.Elements)
+						elements.Enqueue(child);
 
-					if (success)
-					{
-						AstRoots[fileName] = root;
-					}
-
-					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
-					Log.AddRange(Parsers[extension].Log);
-
-					return success;
-				}
-				else
-				{
-					Log.Add(Message.Error($"Отсутствует парсер для файлов с расширением '{extension}'", null));
-				}
+				action(elem);
 			}
-
-			return false;
 		}
 	}
 }

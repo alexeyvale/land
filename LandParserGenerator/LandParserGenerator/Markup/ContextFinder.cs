@@ -22,45 +22,95 @@ namespace Land.Core.Markup
 		private const double DeletionCost = 1;
 		private const double SubstitutionCost = 1;
 
+		private const double ChildrenContextWeight = 1;
+		private const double AncestorsContextWeight = 1;
+		private const double SiblingsContextWeight = 0.5;
+
 		/// <summary>
 		/// Поиск узла дерева, соответствующего заданному контексту
 		/// </summary>
 		/// <param name="context"></param>
 		/// <param name="tree"></param>
 		/// <returns>Список кандидатов, отсортированных по степени похожести</returns>
-		public static List<NodeSimilarityPair> Find(PointContext context, Node tree)
+		public static List<NodeSimilarityPair> Find(PointContext context, string fileName, Node tree)
 		{
 			var result = new List<NodeSimilarityPair>();
 			var groupVisitor = new GroupNodesByTypeVisitor(context.NodeType);
 
 			tree.Accept(groupVisitor);
 
-			foreach(var node in groupVisitor.Grouped[context.NodeType])
+			if (groupVisitor.Grouped.ContainsKey(context.NodeType))
 			{
-				var nodeContext = new PointContext(node, String.Empty);
-
-				result.Add(new NodeSimilarityPair()
+				foreach (var node in groupVisitor.Grouped[context.NodeType])
 				{
-					Node = node,
-					Context = nodeContext,
-					Similarity = Similarity(context, nodeContext)
-				});
+					var nodeContext = new PointContext(node, fileName);
+
+					result.Add(new NodeSimilarityPair()
+					{
+						Node = node,
+						Context = nodeContext,
+						Similarity = Similarity(context, nodeContext)
+					});
+				}
 			}
 
 			return result.OrderByDescending(p=>p.Similarity).ToList();
 		}
 
-
 		/// Возвращает оценку похожести контекста на контекст переданного узла
 		private static double Similarity(PointContext context, PointContext candidateContext)
 		{
 			/// Сравниваем контекст потомков
-			var candidateChildrenContext = candidateContext.ChildrenContext
-				.GroupBy(c => c.Type).ToDictionary(g=>g.Key, g=>g);
+			var childrenSimilarity = 
+				ChildrenContextSimilarity(context.ChildrenContext, candidateContext.ChildrenContext);
+
+			/// Сравниваем контекст предков
+			var ancestorsSimilarity = 
+				AncestorsContextSimilarity(context.AncestorsContext, candidateContext.AncestorsContext);
+
+			return (childrenSimilarity * ChildrenContextWeight + ancestorsSimilarity * AncestorsContextWeight) 
+				/ (AncestorsContextWeight + ChildrenContextWeight);
+		}
+
+		private static double AncestorsContextSimilarity(List<OuterContextElement> originContext, List<OuterContextElement> candidateContext)
+		{
+			var candidateAncestorsContext =
+				candidateContext.GroupBy(c => c.Type).ToDictionary(g => g.Key, g => g);
+			var ancestorsMapping = new Dictionary<OuterContextElement, OuterContextElement>();
+			var rawSimilarity = 0.0;
+
+			foreach (var ancestor in originContext
+				.Where(oc => candidateAncestorsContext.ContainsKey(oc.Type)))
+			{
+				var similarities = new Dictionary<OuterContextElement, double>();
+
+				foreach (var candidateAncestor in candidateAncestorsContext[ancestor.Type])
+				{
+					similarities[candidateAncestor] =
+						ChildrenContextSimilarity(ancestor.ChildrenContext, candidateAncestor.ChildrenContext);
+				}
+
+				var bestCandidate = similarities.OrderBy(s => s.Value).FirstOrDefault();
+
+				if (bestCandidate.Key != null)
+				{
+					ancestorsMapping[ancestor] = bestCandidate.Key;
+					rawSimilarity += bestCandidate.Value;
+				}
+			}
+
+			return rawSimilarity / originContext.Count;
+		}
+
+		private static double ChildrenContextSimilarity(List<InnerContextElement> originContext, List<InnerContextElement> candidateContext)
+		{
+			var candidateChildrenContext = 
+				candidateContext.GroupBy(c => c.Type).ToDictionary(g => g.Key, g => g);
 			var childrenMapping = new Dictionary<InnerContextElement, InnerContextElement>();
 			var rawSimilarity = 0.0;
 
-			foreach(var child in context.ChildrenContext)
+			foreach (var child in originContext
+				.Where(oc=>candidateChildrenContext.ContainsKey(oc.Type)))
 			{
 				var similarities = new Dictionary<InnerContextElement, double>();
 
@@ -76,7 +126,7 @@ namespace Land.Core.Markup
 				}
 			}
 
-			return rawSimilarity / context.ChildrenContext.Sum(c=>c.Priority);
+			return rawSimilarity / originContext.Sum(c => c.Priority);
 		}
 
 		///  Похожесть на основе расстояния Левенштейна

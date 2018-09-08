@@ -146,6 +146,8 @@ namespace Land.Control
 
 		void RegisterOnDocumentSaved(Action<string> callback);
 
+		void RegisterOnDocumentChanged(Action<string> callback);
+
 		#endregion
 	}
 }

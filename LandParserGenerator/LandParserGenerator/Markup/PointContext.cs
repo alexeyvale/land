@@ -25,7 +25,7 @@ namespace Land.Core.Markup
 		{
 			return new InnerContextElement()
 			{
-				Type = node.Symbol,
+				Type = node.Type,
 				Value = node.Value,
 				Priority = node.Options.Priority.Value
 			};
@@ -45,7 +45,7 @@ namespace Land.Core.Markup
 		{
 			return new OuterContextElement()
 			{
-				Type = node.Symbol,
+				Type = node.Type,
 				ChildrenContext = node.Children.Select(c => (InnerContextElement)c).ToList()
 		};
 		}

@@ -198,7 +198,12 @@ namespace Land.GUI
 
 		public void RegisterOnDocumentSaved(Action<string> callback)
 		{
-			EditorWindow.OnDocumenSaved += new MainWindow.DocumentSavedHandler(callback);
+			throw new NotImplementedException();
+		}
+
+		public void RegisterOnDocumentChanged(Action<string> callback)
+		{
+			EditorWindow.DocumentChangedCallback = callback;
 		}
 
 		#endregion
