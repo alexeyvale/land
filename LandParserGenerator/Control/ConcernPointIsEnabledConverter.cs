@@ -15,7 +15,7 @@ namespace Land.Control
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
 			return (value is ConcernPoint)
-				? ((ConcernPoint)value).TreeNode != null
+				? ((ConcernPoint)value).Location != null
 				: true;
 		}
 

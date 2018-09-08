@@ -35,7 +35,7 @@ namespace Land.Core.Markup
 				if(elem is ConcernPoint concernPoint 
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.TreeNode = null;
+					concernPoint.Location = null;
 				}
 			});
 		}
@@ -190,9 +190,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public NodeSimilarityPair Find(ConcernPoint point, string fileName, Node root)
+		public List<NodeSimilarityPair> Find(ConcernPoint point, string fileName, Node root)
 		{
-			return ContextFinder.Find(point.Context, fileName, root).FirstOrDefault();
+			return ContextFinder.Find(point.Context, fileName, root);
 		}
 
 		/// <summary>
@@ -213,10 +213,17 @@ namespace Land.Core.Markup
 		/// </summary>
 		public void Remap(ConcernPoint point, string fileName, Node root)
 		{
-			var candidate = Find(point, fileName, root);
+			var candidate = Find(point, fileName, root).FirstOrDefault();
 
-			point.Context = candidate.Context;
-			point.TreeNode = candidate.Node;
+			if(candidate != null)
+			{
+				point.Context = candidate.Context;
+				point.Location = candidate.Node.Anchor;
+			}
+			else
+			{
+				point.Location = null;
+			}
 		}
 
 		/// <summary>

@@ -28,11 +28,11 @@ namespace Land.Core.Markup
 				if (candidate != null && candidate.Similarity > MIN_SIMILARITY)
 				{
 					point.Context = candidate.Context;
-					point.TreeNode = candidate.Node;
+					point.Location = candidate.Node.Anchor;
 				}
 				else
 				{
-					point.TreeNode = null;
+					point.Location = null;
 				}
 			}
 		}

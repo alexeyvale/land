@@ -300,10 +300,8 @@
                             <ColumnDefinition Width="15*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="15*"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="15*"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="30*"></ColumnDefinition>
+							<ColumnDefinition Width="Auto"></ColumnDefinition>
+							<ColumnDefinition Width="30*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"></ColumnDefinition>
                             <ColumnDefinition Width="30*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
@@ -327,45 +325,17 @@
                                 </TreeView.ItemTemplate>
                             </TreeView>
                         </Grid>
-                        <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"></RowDefinition>
-                                <RowDefinition Height="100*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0">Исходное AST</Label>
-                            <TreeView Grid.Row="1" Name="MappingDebug_OldAstView" SelectedItemChanged="MappingDebug_OldAstView_SelectedItemChanged" Grid.Column="2">
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                        <TextBlock Text="{Binding .}" />
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
-                        </Grid>
-                        <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="4">
+						<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+						<Grid Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="26"></RowDefinition>
                                 <RowDefinition Height="100*"></RowDefinition>
                             </Grid.RowDefinitions>
                             <Label Grid.Row="0">Перепривязка</Label>
-                            <TabControl Grid.Row="1">
-                                <TabItem Header="AST">
-                                    <TreeView Name="MappingDebug_NewAstView" SelectedItemChanged="MappingDebug_NewAstView_SelectedItemChanged" Grid.Column="2">
-                                        <TreeView.ItemTemplate>
-                                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                                <TextBlock Text="{Binding .}" />
-                                            </HierarchicalDataTemplate>
-                                        </TreeView.ItemTemplate>
-                                    </TreeView>
-                                </TabItem>
-                                <TabItem Header="Оценки">
-                                    <ListBox Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
-                                </TabItem>
-                            </TabControl>
+							<ListBox Grid.Row="1" Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
                         </Grid>
-                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="6">
+                        <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+                        <Grid Grid.Column="4">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="26"></RowDefinition>
                                 <RowDefinition Height="100*"></RowDefinition>
@@ -380,8 +350,8 @@
                                 FontSize="12pt">
                             </avalonedit:TextEditor>
                         </Grid>
-                        <GridSplitter Grid.Column="7" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="8">
+                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+                        <Grid Grid.Column="6">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="26"></RowDefinition>
                                 <RowDefinition Height="100*"></RowDefinition>

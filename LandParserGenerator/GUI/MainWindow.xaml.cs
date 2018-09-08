@@ -718,17 +718,16 @@ namespace Land.GUI
 		{
 			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint point)
 			{
-				if (point.TreeNode != null && point.TreeNode.Anchor != null)
+				if (point.Location != null)
 				{
 					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
-					MappingDebug_OldAstView.ItemsSource = new List<Node>() { LandExplorer.GetTree(point.Context.FileName) };
 
 					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
 						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 					}
 
-					MoveCaretToSource(point.TreeNode.Anchor, MappingDebug_OldTextEditor, true);
+					MoveCaretToSource(point.Location, MappingDebug_OldTextEditor, true);
 				}
 			}
 		}
@@ -743,22 +742,6 @@ namespace Land.GUI
 			if(MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint)
 			{
 				MapPoint((ConcernPoint)MappingDebug_MarkupTreeView.SelectedItem);
-			}
-		}
-
-		private void MappingDebug_OldAstView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			if(MappingDebug_OldAstView.SelectedItem != null)
-			{
-				MoveCaretToSource(((Node)MappingDebug_OldAstView.SelectedItem).Anchor, MappingDebug_OldTextEditor, true);
-			}
-		}
-
-		private void MappingDebug_NewAstView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			if (MappingDebug_NewAstView.SelectedItem != null)
-			{
-				MoveCaretToSource(((Node)MappingDebug_NewAstView.SelectedItem).Anchor, MappingDebug_NewTextEditor, true);
 			}
 		}
 
@@ -782,8 +765,6 @@ namespace Land.GUI
 					/// Если текст распарсился, ищем отображение из старого текста в новый
 					if (noErrors)
 					{
-						MappingDebug_NewAstView.ItemsSource = new List<Node> { NewTreeRoot };
-						// todo отладка перепривязки
 						NewTextChanged = false;
 					}
 				}
@@ -792,18 +773,18 @@ namespace Land.GUI
 			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
-				/// Заполняем список похожестей похожестями узлов нового дерева на выбранный узел старого дерева
-				//MappingDebug_SimilaritiesList.ItemsSource = Mapper.Similarities.ContainsKey(point.TreeNode) 
-				//	? Mapper.Similarities[point.TreeNode] : null;
-				//MoveCaretToSource(point.TreeNode, MappingDebug_OldTextEditor);
+				var similarities = LandExplorer.GetMappingCandidates(point, NewTreeRoot).ToDictionary(e=>e.Node, e=>e.Similarity);
+				MappingDebug_SimilaritiesList.ItemsSource = similarities;
 
-				///// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
-				//if (MappingDebug_SimilaritiesList.ItemsSource != null && Mapper.Mapping.ContainsKey(point.TreeNode))
-				//{
-				//	/// значит, в какой-то новый узел мы отобразили старый
-				//	MappingDebug_SimilaritiesList.SelectedItem = 
-				//		Mapper.Similarities[point.TreeNode].FirstOrDefault(p => p.Key == Mapper.Mapping[point.TreeNode]);
-				//}
+				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);
+
+				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
+				if (MappingDebug_SimilaritiesList.ItemsSource != null)
+				{
+					/// значит, в какой-то новый узел мы отобразили старый
+					MappingDebug_SimilaritiesList.SelectedItem = similarities.FirstOrDefault(e=>e.Value == similarities.Max(el=>el.Value));
+					MoveCaretToSource(((KeyValuePair<Node, double>)MappingDebug_SimilaritiesList.SelectedItem).Key.Anchor, MappingDebug_NewTextEditor);
+				}
 			}
 		}
 

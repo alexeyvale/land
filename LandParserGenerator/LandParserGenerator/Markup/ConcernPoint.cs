@@ -14,12 +14,12 @@ namespace Land.Core.Markup
 		[DataMember]
 		public PointContext Context { get; set; }
 
-		public Node TreeNode { get; set; }
+		public SegmentLocation Location { get; set; }
 
 		public ConcernPoint(string fileName, Node node, Concern parent = null)
 		{
 			Context = new PointContext(node, fileName);
-			TreeNode = node;
+			Location = node.Anchor;
 			Parent = parent;
 			Name = String.IsNullOrEmpty(node.Alias) ? node.Symbol : node.Alias;
 
@@ -44,7 +44,7 @@ namespace Land.Core.Markup
 
 		public void Relink(string fileName, Node node)
 		{
-			TreeNode = node;
+			Location = node.Anchor;
 			Context = new PointContext(node, fileName);
 		}
 
