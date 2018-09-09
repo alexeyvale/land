@@ -13,7 +13,7 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
-ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]* | '$'ID'$'
  
  
 curve_bracketed	= %left '{' %right '}'
@@ -24,7 +24,6 @@ square_bracketed = %left '[' %right ']'
 namespace_content	=	opening_directive*! (namespace|entity)*
 opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
-
 
 entity =
 		(MODIFIER|'extern')*
@@ -37,28 +36,27 @@ entity =
 		  		init_value? (',' name init_value?)* ';'			=> field	|
 		  		(block (init_value ';')? | init_expression ';')	=> property
 		  	)
-		) | Any
+		) | AnyInclude('operator')
 
-corner_bracketed	=	'<' (Any|corner_bracketed)+ '>'
-init_expression		=	'=>' (Any|corner_bracketed)+
-init_value			=	'=' (Any|corner_bracketed)+
+init_expression		=	'=>' (Any | %ghost type)+
+init_value			=	'=' (Any | %ghost type)+
 
-name_atom	=	ID | MODIFIER
-name		=	name_atom ((('.'|'::') name_atom) | '<' types_list '>')*
+name_atom	=	(ID | MODIFIER) ('<' types_list? '>')?
+name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	'unsigned'? ID '?'? | tuple
-type		=	type_atom ((('.'|'::') type_atom) | ('<' types_list '>' | '[' ','* ']'))*!
-types_list	=	type (',' type)*
+type_atom	=	('unsigned'? ID | tuple) ('<' types_list? '>')? '?'?
+type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
+types_list	=	attribute* type (',' attribute* type)*
 
 arguments	=	'(' Any ')'
+attribute	=	'[' Any ']'
 block		=	'{' Any '}'
 
 %%
 
 %parsing fragment STRING_INT_CODE
-//%parsing ignoreundefined
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 

@@ -443,7 +443,7 @@ namespace Land.Core.Parsing.LL
 						currentNode.Alias = alternativeToApply.Alias;
 
 					Log.Add(Message.Warning(
-						$"Произведено восстановление на уровне {currentNode.Symbol}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
+						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
 						token.Location.Start
 					));
 
