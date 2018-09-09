@@ -28,5 +28,9 @@
 				<Span begin="\\" end="." />
 			</RuleSet>
 		</Span>
+		
+		<Span foreground="Green">
+			<Begin>//</Begin>
+		</Span>
 	</RuleSet>
 </SyntaxDefinition>
