@@ -372,7 +372,22 @@ namespace Land.Core.Parsing.LL
 			if(currentNode.Symbol == Grammar.ANY_TOKEN_NAME 
 				&& currentNode.Parent.Children.Count == 1)
 			{
-				currentNode = currentNode.Parent.Parent;
+				/// Сместились к узлу, потомком которого было Any, 
+				/// в нём точно не восстановимся, нужно подниматься дальше
+				currentNode = currentNode.Parent;
+
+				if (currentNode.Parent != null)
+				{
+					var childIndex = currentNode.Parent.Children.IndexOf(currentNode);
+
+					/// Снимаем со стека всех неразобранных потомков родителя этого узла,
+					/// для текущего узла они являются правыми братьями
+					for (var i = 0; i < currentNode.Parent.Children.Count - childIndex - 1; ++i)
+						Stack.Pop();
+				}
+
+				/// Поднимаемся к родителю
+				currentNode = currentNode.Parent;
 			}
 
 			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
@@ -385,8 +400,6 @@ namespace Land.Core.Parsing.LL
 				{
 					var childIndex = currentNode.Parent.Children.IndexOf(currentNode);
 
-					/// Снимаем со стека всех неразобранных потомков родителя текущего узла,
-					/// для текущего узла они являются правыми братьями
 					for (var i = 0; i < currentNode.Parent.Children.Count - childIndex - 1; ++i)
 						Stack.Pop();
 				}
