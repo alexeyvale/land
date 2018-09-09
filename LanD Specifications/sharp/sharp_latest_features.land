@@ -20,8 +20,6 @@ curve_bracketed	= %left '{' %right '}'
 round_bracketed	= %left '(' %right ')'
 square_bracketed = %left '[' %right ']'
 
-corner_bracketed = '<' (Any|corner_bracketed)+ '>'
-
  
 namespace_content	=	opening_directive*! (namespace|entity)*
 opening_directive	=	('using'|'extern') Any ';'
@@ -37,10 +35,11 @@ entity =
 			(
 		  		arguments Any (init_expression? ';' | block)	=> method	|
 		  		init_value? (',' name init_value?)* ';'			=> field	|
-		  		(block (init_value ';')? | init_expression ';')			=> property
+		  		(block (init_value ';')? | init_expression ';')	=> property
 		  	)
 		) | Any
 
+corner_bracketed	=	'<' (Any|corner_bracketed)+ '>'
 init_expression		=	'=>' (Any|corner_bracketed)+
 init_value			=	'=' (Any|corner_bracketed)+
 
