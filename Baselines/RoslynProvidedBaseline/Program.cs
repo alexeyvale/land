@@ -36,18 +36,42 @@ namespace RoslynParserTest
 				{
 					var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(filename), new CSharpParseOptions());
 
-					foreach (var node in tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>())
-						enumOutput.WriteLine(node.Identifier);
+					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().ToList();
+					if (enums.Count > 0)
+					{
+						enumOutput.WriteLine(filename);
 
-					foreach (var node in tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>())
-						foreach (var variable in node.Declaration.Variables)
-							fieldOutput.WriteLine(variable.Identifier);
+						foreach (var node in enums)
+							enumOutput.WriteLine(node.Identifier);
+					}
 
-					foreach (var node in tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>())
-						propertyOutput.WriteLine(node.Identifier);
+					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+					if (fields.Count > 0)
+					{
+						fieldOutput.WriteLine(filename);
 
-					foreach (var node in tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>())
-						methodOutput.WriteLine(node.Identifier);
+						foreach (var node in fields)
+							foreach (var variable in node.Declaration.Variables)
+								fieldOutput.WriteLine(variable.Identifier);
+					}
+
+					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
+					if (properties.Count > 0)
+					{
+						propertyOutput.WriteLine(filename);
+
+						foreach (var node in properties)
+							propertyOutput.WriteLine(node.Identifier);
+					}
+
+					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
+					if (methods.Count > 0)
+					{
+						methodOutput.WriteLine(filename);
+
+						foreach (var node in methods)
+							methodOutput.WriteLine(node.Identifier);
+					}
 
 					enumsCounter += tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().Count();
 					classesCounter += tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Count()

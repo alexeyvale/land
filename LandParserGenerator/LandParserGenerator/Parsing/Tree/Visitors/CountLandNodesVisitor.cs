@@ -36,20 +36,5 @@ namespace Land.Core.Parsing.Tree
 
 			base.Visit(node);
 		}
-
-		public void MergeIn(Dictionary<string, int> targetCounts, Dictionary<string, List<string>> targetValues)
-		{
-			foreach(var pair in Counts)
-			{
-				if (!targetCounts.ContainsKey(pair.Key))
-				{
-					targetCounts[pair.Key] = 0;
-					targetValues[pair.Key] = new List<string>();
-				}
-
-				targetCounts[pair.Key] += pair.Value;
-				targetValues[pair.Key].AddRange(Values[pair.Key]);
-			}
-		}
 	}
 }

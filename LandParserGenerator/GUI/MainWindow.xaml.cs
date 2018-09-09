@@ -566,7 +566,7 @@ namespace Land.GUI
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
 			var timePerFile = new Dictionary<string, TimeSpan>();
 			var landCounts = new Dictionary<string, int>();
-			var landValues = new Dictionary<string, List<string>>();
+			var landValues = new Dictionary<string, Dictionary<string, List<string>>>();
 
 			for (; counter < files.Count; ++counter)
 			{
@@ -591,7 +591,18 @@ namespace Land.GUI
 
 						var visitor = new CountLandNodesVisitor("name");
 						root.Accept(visitor);
-						visitor.MergeIn(landCounts, landValues);
+
+						foreach (var pair in visitor.Counts)
+						{
+							if (!landCounts.ContainsKey(pair.Key))
+							{
+								landCounts[pair.Key] = 0;
+								landValues[pair.Key] = new Dictionary<string, List<string>>();
+							}
+
+							landCounts[pair.Key] += pair.Value;
+							landValues[pair.Key][files[counter]] = new List<string>(visitor.Values[pair.Key]);
+						}
 
 					}
 				}
@@ -630,7 +641,16 @@ namespace Land.GUI
 			{
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
 
-				File.WriteAllLines($"{pair.Key}.txt", landValues[pair.Key].SelectMany(str=>str.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries )));
+				using (var fs = new StreamWriter($"{pair.Key}.txt", false))
+				{
+					foreach(var fileData in landValues[pair.Key].Where(p=>p.Value.Count > 0))
+					{
+						fs.WriteLine(fileData.Key);
+
+						foreach(var line in fileData.Value.SelectMany(str => str.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)))
+							fs.WriteLine(line);
+					}
+				}
 			}
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, counter, counter, errorCounter, timeSpent);
