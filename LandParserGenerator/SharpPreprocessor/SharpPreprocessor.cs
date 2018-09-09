@@ -63,19 +63,40 @@ namespace SharpPreprocessor
 
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			var visitor = new PostprocessVisitor(Excluded);
-			root.Accept(visitor);
+			var getLocationsVisitor = new GatherAnchorsVisitor();
+			root.Accept(getLocationsVisitor);
 
-			//var includedCharsCount = 0;
-			//var segmentIndex = 0;
+			var locations = log.Where(l => l.Location != null)
+				.Select(l => l.Location)
+				.Concat(getLocationsVisitor.Locations)
+				.Distinct()
+				.OrderBy(l => l.Offset);
 
-			//foreach (var logRecord in log)
-			//{
-			//	for (; segmentIndex < Excluded.Count; ++segmentIndex)
-			//	{
+			/// Сколько исключенных из компиляции символов было учтено на данный момент 
+			var includedCharsCount = 0;
+			/// Сколько исключенных из компиляции строк было учтено на данный момент 
+			var includedLinesCount = 0;
+			/// Сколько исключенных из компиляции участков было учтено на данный момент 
+			var includedSegmentsCount = 0;
 
-			//	}
-			//}
+			foreach (var loc in locations)
+			{
+				var start = loc.Offset + includedCharsCount;
+
+				/// Пока начало содержимого узла в текущих координатах лежит правее
+				/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
+				/// поправляем текущие координаты с учётом добавления этого сегмента
+				while (includedSegmentsCount < Excluded.Count
+					&& Excluded[includedSegmentsCount].Start.Offset <= start)
+				{
+					includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
+					includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line + 1;
+					start += Excluded[includedSegmentsCount].Length.Value;
+					includedSegmentsCount += 1;
+				}
+
+				loc.ShiftLine(includedLinesCount, includedCharsCount);
+			}
 		}
 	}
 }

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GatherAnchorsVisitor.cs" />
     <Compile Include="PostprocessVisitor.cs" />
     <Compile Include="DirectivesVisitor.cs" />
     <Compile Include="SharpPreprocessor.cs" />
