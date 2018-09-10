@@ -27,10 +27,10 @@ namespace RoslynParserTest
 				var methodsCounter = 0;
 				var fieldsCounter = 0;
 
-				var enumOutput = new StreamWriter("_enumOutput.txt", false);
-				var propertyOutput = new StreamWriter("_propertyOutput.txt", false);
-				var fieldOutput = new StreamWriter("_fieldOutput.txt", false);
-				var methodOutput = new StreamWriter("_methodOutput.txt", false);
+				var enumOutput = new StreamWriter("_roslynCSharpEnumOutput.txt", false);
+				var propertyOutput = new StreamWriter("_roslynCSharpPropertyOutput.txt", false);
+				var fieldOutput = new StreamWriter("_roslynCSharpFieldOutput.txt", false);
+				var methodOutput = new StreamWriter("_roslynCSharpMethodOutput.txt", false);
 
 				foreach (var filename in package)
 				{
@@ -73,13 +73,13 @@ namespace RoslynParserTest
 							methodOutput.WriteLine(node.Identifier);
 					}
 
-					enumsCounter += tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().Count();
+					enumsCounter += enums.Count();
 					classesCounter += tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Count()
 						+ tree.GetRoot().DescendantNodes().OfType<StructDeclarationSyntax>().Count()
 						+ tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>().Count();
-					fieldsCounter += tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().Sum(node => node.Declaration.Variables.Count);
-					propertiesCounter += tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().Count();
-					methodsCounter += tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().Count();
+					fieldsCounter += fields.Sum(node => node.Declaration.Variables.Count);
+					propertiesCounter += properties.Count();
+					methodsCounter += methods.Count();
 				}
 
 				enumOutput.Close();
