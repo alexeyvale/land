@@ -137,12 +137,18 @@ namespace SharpPreprocessor
 					Levels.Pop();
 					break;
 				case "define":
-					for (var i = 1; i < node.Children.Count; ++i)
-						SymbolsDefined.Add(node.Children[i].Value[0]);
+					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
+					{
+						for (var i = 1; i < node.Children.Count; ++i)
+							SymbolsDefined.Add(node.Children[i].Value[0]);
+					}
 					break;
 				case "undef":
-					for (var i = 1; i < node.Children.Count; ++i)
-						SymbolsDefined.Remove(node.Children[i].Value[0]);
+					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
+					{
+						for (var i = 1; i < node.Children.Count; ++i)
+							SymbolsDefined.Remove(node.Children[i].Value[0]);
+					}
 					break;
 				default:
 					base.Visit(node);
