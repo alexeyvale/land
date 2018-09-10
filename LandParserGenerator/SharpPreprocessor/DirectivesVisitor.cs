@@ -76,7 +76,7 @@ namespace SharpPreprocessor
 
 		private void FinCurrentSegment(PointLocation end)
 		{
-			var lineEndOffset = Text.IndexOf('\n', end.Offset);
+			var lineEndOffset = Math.Max(Text.IndexOf('\n', end.Offset), end.Offset);
 
 			CurrentSegment.End = new PointLocation(end.Line, end.Column, lineEndOffset);
 		}

@@ -41,8 +41,10 @@ namespace SharpPreprocessor
 
 				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)
 				{
-					var length = text.IndexOf('\n', visitor.SegmentsToExclude[i].End.Offset)
-						- visitor.SegmentsToExclude[i].Start.Offset + 1;
+					var length = Math.Max(
+							text.IndexOf('\n', visitor.SegmentsToExclude[i].End.Offset), 
+							visitor.SegmentsToExclude[i].End.Offset
+						) - visitor.SegmentsToExclude[i].Start.Offset + 1;
 
 					text = text.Remove(
 						visitor.SegmentsToExclude[i].Start.Offset,

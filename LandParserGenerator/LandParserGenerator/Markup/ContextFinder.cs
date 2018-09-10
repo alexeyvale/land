@@ -142,8 +142,8 @@ namespace Land.Core.Markup
 			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count() 
 				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
 				++commonPrefixLength;
-			a = a.Skip(commonPrefixLength);
-			b = b.Skip(commonPrefixLength);
+			a = a.Skip(commonPrefixLength).ToList();
+			b = b.Skip(commonPrefixLength).ToList();
 
 			var commonSuffixLength = 0;
 			while (commonSuffixLength < a.Count() && commonSuffixLength < b.Count()
