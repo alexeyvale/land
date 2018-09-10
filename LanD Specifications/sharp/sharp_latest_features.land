@@ -1,5 +1,4 @@
 DIRECTIVE	: '#' ~[\n\r]*
-DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
 
 COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
@@ -58,7 +57,7 @@ block		=	'{' Any '}'
 
 %parsing fragment STRING_INT_CODE
 %parsing start namespace_content
-%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+%parsing skip COMMENT STRING DIRECTIVE
 
 %nodes ghost  names_list
 %nodes leaf name type

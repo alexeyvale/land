@@ -1,4 +1,4 @@
-namespace Guesser
+namespace SimpleFile
 {   
     public enum Tokens
     { 
