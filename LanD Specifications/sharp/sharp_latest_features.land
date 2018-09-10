@@ -46,7 +46,7 @@ name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	('unsigned'? ID | tuple) ('<' types_list '>')? '?'?
+type_atom	=	('unsigned'? ID | tuple) ('<' types_list '>')? '?'? '*'*
 type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
 types_list	=	(attribute|'in'|'out')* type? (',' (attribute|'in'|'out')* type?)*
 
