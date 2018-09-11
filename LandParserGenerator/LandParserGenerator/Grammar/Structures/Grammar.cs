@@ -1325,7 +1325,7 @@ namespace Land.Core
 
 		public string GetConstructionLog(LocalOptions opts)
 		{
-			return $"new LocalOptions() {{ NodeOption = {(opts.NodeOption != null ? $"NodeOption.{opts.NodeOption}" : "null")}, Priority = {(opts.Priority != null ? $"{opts.Priority}" : "null")}, IsLand = {opts.IsLand.ToString().ToLower()}, AnyOptions = new Dictionary<AnyOption, HashSet<string>>() {{ {String.Join(", ", opts.AnyOptions.Select(op => $"{{AnyOption.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}}}}"))} }} }}";
+			return $"new LocalOptions() {{ NodeOption = {(opts.NodeOption != null ? $"NodeOption.{opts.NodeOption}" : "null")}, Priority = {(opts.Priority != null ? $"{opts.Priority.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}" : "null")}, IsLand = {opts.IsLand.ToString().ToLower()}, AnyOptions = new Dictionary<AnyOption, HashSet<string>>() {{ {String.Join(", ", opts.AnyOptions.Select(op => $"{{AnyOption.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}}}}"))} }} }}";
 		}
 	}
 }
