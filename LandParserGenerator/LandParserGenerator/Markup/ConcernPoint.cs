@@ -18,7 +18,8 @@ namespace Land.Core.Markup
 
 		public ConcernPoint(string fileName, Node node, Concern parent = null)
 		{
-			Context = new PointContext(node, fileName);
+			Context = PointContext.Create(fileName, node);
+
 			Location = node.Anchor;
 			Parent = parent;
 			Name = String.IsNullOrEmpty(node.Alias) ? node.Symbol : node.Alias;
@@ -38,14 +39,14 @@ namespace Land.Core.Markup
 		public ConcernPoint(string name, string fileName, Node node, Concern parent = null)
 		{
 			Name = name;
-			Context = new PointContext(node, fileName);
+			Context = PointContext.Create(fileName, node);
 			Parent = parent;
 		}
 
 		public void Relink(string fileName, Node node)
 		{
 			Location = node.Anchor;
-			Context = new PointContext(node, fileName);
+			Context = PointContext.Create(fileName, node);
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)

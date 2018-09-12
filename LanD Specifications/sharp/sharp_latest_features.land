@@ -29,7 +29,7 @@ entity =
 		(
 		 	'enum' name Any '{' Any '}' ';'? 								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
-			%priority(2) type %priority(3) name
+			%priority(2) type name
 			(
 		  		arguments Any (init_expression? ';' | block)	=> method	|
 		  		init_value? (',' name init_value?)* ';'			=> field	|
@@ -63,4 +63,5 @@ block		=	'{' Any '}'
 %nodes leaf name type
 
 %mapping land namespace enum class_struct_interface method field property
+%mapping priority(3) name
  

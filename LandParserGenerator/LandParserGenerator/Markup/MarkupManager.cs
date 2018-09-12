@@ -162,7 +162,7 @@ namespace Land.Core.Markup
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
 				{
 					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
-						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(InnerContextElement), typeof(OuterContextElement)
+						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(HeaderContextElement), typeof(AncestorsContextElement)
 					});
 
 					serializer.WriteObject(gZipStream, Markup);
@@ -179,7 +179,7 @@ namespace Land.Core.Markup
 				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
 				{
 					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
-						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(InnerContextElement), typeof(OuterContextElement)
+						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(HeaderContextElement), typeof(AncestorsContextElement)
 					});
 
 					this.Markup = (ObservableCollection<MarkupElement>)serializer.ReadObject(gZipStream);
