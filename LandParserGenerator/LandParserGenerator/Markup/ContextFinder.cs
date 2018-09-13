@@ -11,7 +11,7 @@ namespace Land.Core.Markup
 	public class NodeSimilarityPair
 	{
 		private const double HeaderContextWeight = 1;
-		private const double AncestorsContextWeight = 0.7;
+		private const double AncestorsContextWeight = 0.5;
 		private const double InnerContextWeight = 0.7;
 		private const double SiblingsContextWeight = 0.4;
 
@@ -25,10 +25,10 @@ namespace Land.Core.Markup
 
 		public double Similarity => 
 			((HeaderSimilarity ?? 1) * HeaderContextWeight 
-			+ (AncestorSimilarity ?? 1) * AncestorsContextWeight
-			+ (InnerSimilarity ?? 1) * InnerContextWeight
-			+ (SiblingsSimilarity ?? 1) * SiblingsContextWeight)
-			/ (HeaderContextWeight + AncestorsContextWeight + InnerContextWeight + SiblingsContextWeight);
+			+ (AncestorSimilarity ?? 1) * AncestorsContextWeight)
+			//+ (InnerSimilarity ?? 1) * InnerContextWeight
+			//+ (SiblingsSimilarity ?? 1) * SiblingsContextWeight)
+			/ (HeaderContextWeight + AncestorsContextWeight /*+ InnerContextWeight + SiblingsContextWeight*/);
 	}
 
 	public static class ContextFinder
@@ -180,11 +180,9 @@ namespace Land.Core.Markup
 			if (a.Count() == 0 && b.Count() == 0)
 				return 1;
 
-			var denominator = Denominator(a, b);
-
 			/// Сразу отбрасываем общие префиксы и суффиксы
 			var commonPrefixLength = 0;
-			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count() 
+			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count()
 				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
 				++commonPrefixLength;
 			a = a.Skip(commonPrefixLength).ToList();
@@ -206,24 +204,23 @@ namespace Land.Core.Markup
 
 			/// Заполняем первую строку и первый столбец
 			for (int i = 1; i <= a.Count(); ++i)
-				distances[i, 0] = distances[i - 1, 0] + PriorityCoefficient(a.ElementAt(i - 1)) * DeletionCost;
+				distances[i, 0] = distances[i - 1, 0] + DeletionCost;
 			for (int j = 1; j <= b.Count(); ++j)
 				distances[0, j] = distances[0, j - 1] + InsertionCost;
 
 			for (int i = 1; i <= a.Count(); i++)
 				for (int j = 1; j <= b.Count(); j++)
 				{
-					var priorityCoefficient = PriorityCoefficient(a.ElementAt(i - 1));
-					var cost = b.ElementAt(j - 1).Equals(a.ElementAt(i - 1)) ? 0.0 
-						: (priorityCoefficient - priorityCoefficient * DispatchLevenstein(a.ElementAt(i - 1), b.ElementAt(j - 1)));
-
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = 1 - DispatchLevenstein(a.ElementAt(i - 1), b.ElementAt(j - 1));
 					distances[i, j] = Math.Min(Math.Min(
-						distances[i - 1, j] + priorityCoefficient * DeletionCost, 
+						distances[i - 1, j] + DeletionCost,
 						distances[i, j - 1] + InsertionCost),
 						distances[i - 1, j - 1] + cost);
 				}
 
-			return 1 - distances[a.Count(), b.Count()] / denominator;
+			return 1 - distances[a.Count(), b.Count()] /
+				Math.Max(a.Count() + commonSuffixLength + commonPrefixLength, b.Count() + commonSuffixLength + commonPrefixLength);
 		}
 
 		private static double Denominator<T>(IEnumerable<T> a, IEnumerable<T> b)
