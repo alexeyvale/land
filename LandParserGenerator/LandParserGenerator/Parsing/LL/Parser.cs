@@ -238,7 +238,7 @@ namespace Land.Core.Parsing.LL
 		/// </returns>
 		private IToken SkipAny(Node anyNode, bool enableRecovery)
 		{
-			var nestingCopy = new Stack<PairSymbol>(Nesting);
+			var nestingCopy = new Stack<PairSymbol>(Nesting.Reverse());
 			var tokenIndex = LexingStream.CurrentIndex;
 
 			IToken token = LexingStream.CurrentToken;
