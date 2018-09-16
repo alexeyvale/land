@@ -509,12 +509,60 @@ namespace Land.Core
 				}
 			}
 
+			/// Игнорируем регистр в строковых литералах, исключая экранированные символы
+			/// и символы Юникод в формате \uXXXX
 			if(Options.IsSet(ParsingOption.IGNORECASE))
 			{
-				foreach (var token in Tokens.Where(t => t.Key.StartsWith(AUTO_TOKEN_PREFIX)))
-					token.Value.Pattern = String.Join("",
-						token.Value.Pattern.Trim('\'').Select(c => Char.IsLetter(c) ? $"[{Char.ToLower(c)}{Char.ToUpper(c)}]" : $"'{c}'"));
-            }
+				var regex = new Regex(@"'([^'\\]*|(\\\\)+|\\[^\\])*'");
+
+				foreach (var token in Tokens.Values.Where(t => !String.IsNullOrEmpty(t.Pattern)))
+				{
+					var newPattern = new System.Text.StringBuilder();
+					var currentPosition = 0;
+
+					foreach(Match match in regex.Matches(token.Pattern))
+					{
+						newPattern.Append(token.Pattern.Substring(currentPosition, match.Index - currentPosition));
+
+						var precededByBackslash = false;
+						var stringOpened = false;
+
+						/// Обрезаем начальную и конечную кавычку
+						foreach (var chr in match.Value.Substring(1, match.Value.Length - 2))
+						{
+							/// не трогаем экранированные символы
+							if(!precededByBackslash && Char.IsLetter(chr))
+							{
+								if (stringOpened)
+								{
+									newPattern.Append("'");
+									stringOpened = false;
+								}
+								newPattern.Append($"[{Char.ToLower(chr)}{Char.ToUpper(chr)}]");
+							}
+							else
+							{
+								if(!stringOpened)
+								{
+									newPattern.Append("'");
+									stringOpened = true;
+								}
+								newPattern.Append(chr);
+							}
+
+							/// Учёт подряд идущих обратных слешей
+							precededByBackslash = !precededByBackslash && chr == '\\';
+						}
+
+						if(stringOpened)
+							newPattern.Append("'");
+
+						currentPosition = match.Index + match.Length;
+					}
+
+					token.Pattern = newPattern.Append(token.Pattern.Substring(currentPosition)).ToString();
+				}
+			}
 		}
 
 		#region Валидация

@@ -5,31 +5,37 @@ STRING_SKIP	: '\'\'' | '\\\\'
 STRING		: '\'' (STRING_SKIP|.)*? '\''
 MODIFIER	: 'internal'|'private'|'protected'|'public'
 ROUTINE_TYPE	: 'procedure'|'function'|'constructor'|'destructor'
+FALSE_BEGIN	: '.begin'
 ID			: '&'?[_a-zA-Z][_0-9a-zA-Z]*
 
 //round_bracketed = %left '(' %right ')'
 //code_bracketed	= %left ('try'|'case'|'begin'|'record'|'class') %right 'end'
 
-file			=	(Any|outer_declaration)+
+file			=	(Any | block '.' | outer_declaration)+
 outer_declaration	=	const|var|type|outer_routine
 inner_declaration	=	const|var|type
+
 const			=	'const' const_atom+
 type			=	'type' type_atom+
 var				=	'var' var_atom+
-const_atom		=	ID '=' Any ';'
-var_atom		=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
+const_atom		=	name '=' Any ';'
+var_atom		=	(names_list (':' Any)? (':=' Any)? ';')
 type_atom		=	ID '=' (record_or_class | Any) ';'
+
 outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
 inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
 routine_header	=	ROUTINE_TYPE %priority(2) name %priority(2) routine_arguments? (':' name)?
 routine_arguments		=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
 routine_arguments_atom	=	('var'|'const'|'params')? ID (',' ID)* ':' Any
-record_or_class	=	('record'|'class') Any (MODIFIER|inner_routine|Any)+ 'end'
+field			=	names_list ':' Any ';'
+property		=	'property' name ':' Any ';'
+record_or_class	=	('record'|'class') Any (MODIFIER|inner_routine|field|property|Any)+ 'end'
 
 block		=	('begin'|'case'|'try') (block|Any)+ 'end'
-name_atom	=	ID
+name_atom	=	'^'? ID
 name_tail_element	=	(('.'|'::') name_atom)
 name		=	name_atom (name_tail_element | '<' Any '>')*
+names_list	=	name (',' name)*
 
 %%
 
@@ -39,5 +45,6 @@ name		=	name_atom (name_tail_element | '<' Any '>')*
 %parsing skip COMMENT
 
 %nodes leaf name
+%nodes ghost outer_declaration inner_declaration names_list
 
-%mapping land var_atom const_atom type_atom outer_routine inner_routine
+%mapping land var_atom const_atom type_atom outer_routine inner_routine property field
