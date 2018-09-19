@@ -526,32 +526,48 @@ namespace Land.Core
 
 						var precededByBackslash = false;
 						var stringOpened = false;
+						var unicodeCodeCounter = 0;
 
 						/// Обрезаем начальную и конечную кавычку
 						foreach (var chr in match.Value.Substring(1, match.Value.Length - 2))
 						{
-							/// не трогаем экранированные символы
-							if(!precededByBackslash && Char.IsLetter(chr))
+							/// Если пропускаем код Unicode, добавляем символ
+							/// без дополнительных рассуждений
+							if (unicodeCodeCounter > 0)
 							{
-								if (stringOpened)
-								{
-									newPattern.Append("'");
-									stringOpened = false;
-								}
-								newPattern.Append($"[{Char.ToLower(chr)}{Char.ToUpper(chr)}]");
+								newPattern.Append(chr);
+								--unicodeCodeCounter;
 							}
 							else
 							{
-								if(!stringOpened)
+								/// не трогаем экранированные символы
+								if (!precededByBackslash && Char.IsLetter(chr))
 								{
-									newPattern.Append("'");
-									stringOpened = true;
+									if (stringOpened)
+									{
+										newPattern.Append("'");
+										stringOpened = false;
+									}
+									newPattern.Append($"[{Char.ToLower(chr)}{Char.ToUpper(chr)}]");
 								}
-								newPattern.Append(chr);
-							}
+								else
+								{
+									/// Встретили код \uXXXX
+									if (precededByBackslash && chr == 'u')
+									{
+										unicodeCodeCounter = 4;
+									}
+									else if (!stringOpened)
+									{
+										newPattern.Append("'");
+										stringOpened = true;
+									}
+									newPattern.Append(chr);
+								}
 
-							/// Учёт подряд идущих обратных слешей
-							precededByBackslash = !precededByBackslash && chr == '\\';
+								/// Учёт подряд идущих обратных слешей
+								precededByBackslash = !precededByBackslash && chr == '\\';
+							}
 						}
 
 						if(stringOpened)
