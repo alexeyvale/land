@@ -98,10 +98,7 @@ namespace Land.Control
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 
-			LogAction(() =>
-			{
-				Parsers = BuildParsers();
-			});
+			Parsers = LogFunction(() => BuildParsers(), true, true);
 		}
 
 		public ObservableCollection<MarkupElement> GetMarkup()
@@ -138,11 +135,11 @@ namespace Land.Control
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
 			var documentName = Editor.GetActiveDocumentName();
-			var root = GetRoot(documentName);
+			var root = LogFunction(() => GetRoot(documentName), true, false);
 
 			if (root != null)
 			{
-				var offset = Editor.GetActiveDocumentOffset();			
+				var offset = Editor.GetActiveDocumentOffset();
 
 				if (!String.IsNullOrEmpty(documentName))
 				{
@@ -159,9 +156,9 @@ namespace Land.Control
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
 			var fileName = Editor.GetActiveDocumentName();
-			var root = GetRoot(fileName);
+			var root = LogFunction(() => GetRoot(fileName), true, false);
 
-			if(root != null)
+			if (root != null)
 				MarkupManager.AddLand(fileName, root);
 		}
 
@@ -218,7 +215,7 @@ namespace Land.Control
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
 			var documentName = Editor.GetActiveDocumentName();
-			var root = GetRoot(documentName);
+			var root = LogFunction(() => GetRoot(documentName), true, false);
 
 			if (root != null)
 			{
@@ -318,20 +315,22 @@ namespace Land.Control
 				SettingsObject = SettingsWindow.SettingsObject;
 				Editor.SaveSettings(SettingsObject);
 
-				Parsers = LogFunction(() => BuildParsers());
+				Parsers = LogFunction(() => BuildParsers(), true, true);
 			}
 		}
 
 		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
 		{
-			var referenced = MarkupManager.GetReferencedFiles();
-			var forest = new Dictionary<string, Node>();
+			LogAction(() =>
+			{
+				var referenced = MarkupManager.GetReferencedFiles();
+				var forest = new Dictionary<string, Node>();
 
-			foreach (var documentName in referenced)
-				forest[documentName] = TryParse(documentName, out bool success);
+				foreach (var documentName in referenced)
+					forest[documentName] = TryParse(documentName, out bool success);
 
-			MarkupManager.Remap(forest);
-
+				MarkupManager.Remap(forest);
+			}, true, false);
 		}
 
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -868,17 +867,27 @@ namespace Land.Control
 			return null;
 		}
 
-		private T LogFunction<T>(Func<T> func, bool skipTrace = true)
+		private T LogFunction<T>(Func<T> func, bool resetPrevious, bool skipTrace)
 		{
+			if(resetPrevious)
+			{
+				Log.Clear();
+			}
+
 			var result = func();
-			Editor.ProcessMessages(Log, skipTrace, true);
+			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
 			return result;
 		}
 
-		private void LogAction(Action action, bool skipTrace = true)
+		private void LogAction(Action action, bool resetPrevious, bool skipTrace)
 		{
+			if (resetPrevious)
+			{
+				Log.Clear();
+			}
+
 			action();
-			Editor.ProcessMessages(Log, skipTrace, true);
+			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
 		}
 
 		private Dictionary<string, BaseParser> BuildParsers()
