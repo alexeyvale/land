@@ -20,7 +20,7 @@ type			=	'type' type_atom+
 var				=	'var' var_atom+
 const_atom		=	name '=' Any ';'
 var_atom		=	(names_list (':' Any)? (':=' Any)? ';')
-type_atom		=	ID '=' (record_or_class | Any) ';'
+type_atom		=	name '=' (record_or_class | Any) ';'
 
 outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
 inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
@@ -47,4 +47,4 @@ names_list	=	name (',' name)*
 %nodes leaf name
 %nodes ghost outer_declaration inner_declaration names_list
 
-%mapping land var_atom const_atom type_atom outer_routine inner_routine property field
+%mapping land var_atom const_atom type_atom outer_routine inner_routine property field record_or_class

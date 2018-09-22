@@ -31,16 +31,43 @@ namespace PascalABCProvidedBaseline
 				{
 					var tree = parser.BuildTree(filename, File.ReadAllText(filename), PascalABCCompiler.Parsers.ParseMode.Normal);
 
-					var procedures = tree.DescendantNodes().OfType<procedure_definition>().ToList();
-					if (procedures.Count > 0)
+					if (tree != null)
 					{
-						procedureOutput.WriteLine(filename);
+						var procedures = tree.DescendantNodes().OfType<procedure_definition>().ToList();
+						if (procedures.Count > 0)
+						{
+							procedureOutput.WriteLine(filename);
 
-						foreach (var node in procedures)
-							procedureOutput.WriteLine(node.proc_header.name);
+							foreach (var node in procedures)
+								procedureOutput.WriteLine(node.proc_header.name);
+						}
+
+						proceduresCounter += procedures.Count();
+
+						var classes = tree.DescendantNodes().OfType<class_definition>().ToList();
+						if (classes.Count > 0)
+						{
+							classOutput.WriteLine(filename);
+
+							foreach (var node in classes)
+							{
+								if (node.Parent is type_declaration)
+								{
+									classOutput.WriteLine(((type_declaration)node.Parent).type_name);
+								}
+							}
+						}
+
+						classesCounter += classes.Count();
 					}
-
-					proceduresCounter += procedures.Count();
+					else
+					{
+						Console.WriteLine(filename);
+						foreach (var error in parser.Errors)
+						{
+							Console.WriteLine(error.Message);
+						}
+					}
 				}
 
 				procedureOutput.Close();
