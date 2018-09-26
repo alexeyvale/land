@@ -88,7 +88,10 @@
     <Compile Include="Markup\MarkupVisitors\RemapVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
-    <Compile Include="Parsing\BasePreprocessor.cs" />
+    <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />
+    <Compile Include="Parsing\Preprocessing\PreprocessorSettings.cs" />
+    <Compile Include="Parsing\Preprocessing\PipelinePreprocessor.cs" />
+    <Compile Include="Parsing\Preprocessing\BasePreprocessor.cs" />
     <Compile Include="Parsing\Statistics.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />

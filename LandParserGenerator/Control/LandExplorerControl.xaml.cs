@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ using Microsoft.Win32;
 using Land.Core;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
+using Land.Core.Parsing.Preprocessing;
 using Land.Core.Markup;
 
 namespace Land.Control
@@ -896,12 +898,12 @@ namespace Land.Control
 
 			/// Генерируем парсер и связываем его с каждым из расширений, 
 			/// указанных для грамматики
-			foreach (var pair in SettingsObject.Grammars)
+			foreach (var parserSettings in SettingsObject.Parsers)
 			{
-				if(!File.Exists(pair.GrammarPath))
+				if(!File.Exists(parserSettings.GrammarPath))
 				{
 					Log.Add(Message.Error(
-						$"Файл {pair.GrammarPath} не существует, невозможно загрузить парсер для расширения {pair.ExtensionsString}",
+						$"Файл {parserSettings.GrammarPath} не существует, невозможно загрузить парсер для расширения {parserSettings.ExtensionsString}",
 						null
 					));
 
@@ -910,15 +912,33 @@ namespace Land.Control
 
 				var parser = BuilderBase.BuildParser(
 					GrammarType.LL,
-					File.ReadAllText(pair.GrammarPath),
+					File.ReadAllText(parserSettings.GrammarPath),
 					Log
 				);
 
-				foreach(var key in pair.Extensions)
+                foreach (var key in parserSettings.Extensions)
 				{
 					parsers[key] = parser;
 				}
-			}
+
+                if (!File.Exists(parserSettings.PreprocessorPath))
+                {
+                    Log.Add(Message.Error(
+                        $"Файл {parserSettings.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {parserSettings.ExtensionsString}",
+                        null
+                    ));
+                }
+                else
+                {
+                    var preprocessor = (BasePreprocessor)Assembly.LoadFile(parserSettings.PreprocessorPath)
+                        .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
+                        .GetConstructor(Type.EmptyTypes).Invoke(null);
+
+                    preprocessor.Settings = parserSettings.PreprocessorSettings;
+
+                    parser.SetPreprocessor(preprocessor);
+                }
+            }
 
 			return parsers;
 		}

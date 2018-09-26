@@ -7,6 +7,7 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
+using Land.Core.Parsing.Preprocessing;
 
 using sharp_preprocessor;
 
@@ -28,7 +29,7 @@ namespace SharpPreprocessor
 		{
 			/// Разбираем файл, находим директивы препроцессора
 			var root = Parser.Parse(text);
-			success = Parser.Log[Parser.Log.Count - 1].Type != MessageType.Error;
+			success = Parser.Log.Count == 0 || Parser.Log[Parser.Log.Count - 1].Type != MessageType.Error;
 
 			/// Правим источник сообщений в логе
 			foreach (var rec in Log)
@@ -36,7 +37,8 @@ namespace SharpPreprocessor
 
 			if (success)
 			{
-				var visitor = new DirectivesVisitor(text);
+				var visitor = new DirectivesVisitor(text, 
+                    ((SharpPreprocessorSettings)Settings)?.PredefinedSymbols);
 				root.Accept(visitor);
 
 				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)

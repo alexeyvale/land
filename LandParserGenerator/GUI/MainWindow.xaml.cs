@@ -14,7 +14,7 @@ using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 
 using Land.Core;
-using Land.Core.Parsing;
+using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
 using Land.Control;
@@ -536,8 +536,8 @@ namespace Land.GUI
 			PackageParsingWorker = new System.ComponentModel.BackgroundWorker();
 			PackageParsingWorker.WorkerReportsProgress = true;
 			PackageParsingWorker.WorkerSupportsCancellation = true;
-			PackageParsingWorker.DoWork += worker_DoWork;
-			PackageParsingWorker.ProgressChanged += worker_ProgressChanged;
+			PackageParsingWorker.DoWork += Worker_DoWork;
+			PackageParsingWorker.ProgressChanged += Worker_ProgressChanged;
 		}
 
 		private void Batch_ChooseFolderButton_Click(object sender, RoutedEventArgs e)
@@ -552,7 +552,7 @@ namespace Land.GUI
 			}
 		}
 
-		void worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+		void Worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
 		{
 			OnPackageFileParsingError = AddRecordToPackageParsingLog;
 			OnPackageFileParsed = UpdatePackageParsingStatus;
@@ -682,7 +682,7 @@ namespace Land.GUI
 			Batch_Log.Items.Add(record);
 		}
 
-		void worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+		void Worker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
 		{
 			Batch_ParsingProgress.Value = e.ProgressPercentage;
 		}

@@ -36,6 +36,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,6 +48,7 @@
     <Compile Include="GatherAnchorsVisitor.cs" />
     <Compile Include="PostprocessVisitor.cs" />
     <Compile Include="DirectivesVisitor.cs" />
+    <Compile Include="SharpPreprocessorSettings.cs" />
     <Compile Include="SharpPreprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

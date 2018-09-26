@@ -171,7 +171,7 @@ namespace Land.GUI
 
 		public void SaveSettings(LandExplorerSettings settings)
 		{
-			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ExtensionGrammarPair) });
+			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsBlock) });
 
 			using (FileStream fs = new FileStream(SettingsPath, FileMode.Create))
 			{
@@ -183,7 +183,7 @@ namespace Land.GUI
 		{
 			if (File.Exists(SettingsPath))
 			{
-				DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ExtensionGrammarPair) });
+				DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsBlock) });
 
 				using (FileStream fs = new FileStream(SettingsPath, FileMode.Open))
 				{

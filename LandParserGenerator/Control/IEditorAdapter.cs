@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Runtime.Serialization;
 
 using Land.Core;
+using Land.Core.Parsing.Preprocessing;
 
 namespace Land.Control
 {
@@ -15,56 +16,6 @@ namespace Land.Control
 		public int StartOffset { get; set; }
 		public int EndOffset { get; set; }
 		public bool CaptureWholeLine { get; set; }
-	}
-
-	[DataContract]
-	public class ExtensionGrammarPair
-	{
-		[DataMember]
-		public List<string> Extensions { get; set; } = new List<string>();
-
-		[DataMember]
-		public string GrammarPath { get; set; }
-
-		public string ExtensionsString
-		{
-			get { return String.Join("; ", Extensions); }
-
-			set
-			{
-				/// Разбиваем строку на отдельные расширения, добавляем точку, если она отсутствует
-				Extensions = value.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-					.Select(ext => ext.StartsWith(".") ? ext : '.' + ext).ToList();
-			}
-		}
-
-		public ExtensionGrammarPair Clone()
-		{
-			return new ExtensionGrammarPair()
-			{
-				Extensions = Extensions,
-				GrammarPath = GrammarPath
-			};
-		}
-	}
-
-	[DataContract]
-	public class LandExplorerSettings
-	{
-		[DataMember]
-		public bool HighlightSelectedElement { get; set; }
-
-		[DataMember]
-		public ObservableCollection<ExtensionGrammarPair> Grammars { get; set; } = new ObservableCollection<ExtensionGrammarPair>();
-
-		public LandExplorerSettings Clone()
-		{
-			return new LandExplorerSettings()
-			{
-				HighlightSelectedElement = HighlightSelectedElement,
-				Grammars = new ObservableCollection<ExtensionGrammarPair>(Grammars.Select(g => g.Clone()))
-			};
-		}
 	}
 
 	public interface IEditorAdapter

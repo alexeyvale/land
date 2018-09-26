@@ -58,12 +58,12 @@ namespace SharpPreprocessor
 		/// </summary>
 		public HashSet<string> SymbolsDefined = new HashSet<string>();
 
-		public DirectivesVisitor(string text, params string[] predefined)
+		public DirectivesVisitor(string text, HashSet<string> predefined = null)
 		{
 			Text = text;
 
-			foreach (var smb in predefined)
-				SymbolsDefined.Add(smb);
+			if (predefined != null)
+				SymbolsDefined.UnionWith(predefined);
 		}
 
 		private void InitCurrentSegment(PointLocation start)
