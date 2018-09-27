@@ -28,9 +28,10 @@ namespace SharpPreprocessor
 		}
 
 		[DataMember]
+		[PropertyToSet]
 		[DisplayedName("Символы условной компиляции")]
 		[Converter(typeof(PredefinedSymbolsConverter))]
-		public HashSet<string> PredefinedSymbols { get; set; }
+		public HashSet<string> PredefinedSymbols { get; set; } = new HashSet<string>();
 
         public override object Clone()
         {

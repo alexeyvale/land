@@ -930,13 +930,22 @@ namespace Land.Control
                 }
                 else
                 {
-                    var preprocessor = (BasePreprocessor)Assembly.LoadFile(parserSettings.PreprocessorPath)
+					var preprocessor = (BasePreprocessor)Assembly.LoadFile(parserSettings.PreprocessorPath)
                         .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-                        .GetConstructor(Type.EmptyTypes).Invoke(null);
+                        ?.GetConstructor(Type.EmptyTypes).Invoke(null);
 
-                    preprocessor.Properties = parserSettings.PreprocessorSettings;
-
-                    parser.SetPreprocessor(preprocessor);
+					if(preprocessor != null)
+					{
+						preprocessor.Properties = parserSettings.PreprocessorSettings;
+						parser.SetPreprocessor(preprocessor);
+					}
+					else
+					{
+						Log.Add(Message.Error(
+							$"Библиотека {parserSettings.PreprocessorPath} не содержит описание препроцессора для расширения {parserSettings.ExtensionsString}",
+							null
+						));
+					}               
                 }
             }
 

@@ -239,7 +239,7 @@ namespace Land.Core
 						ProcessStartInfo startInfo = new ProcessStartInfo()
 						{
 							FileName = "cmd.exe",
-							Arguments = $"/C \"../../../components/Microsoft SDK/sn.exe\" -k \"{keyPath}\"",
+							Arguments = $"/C chcp 1251 | \"../../../components/Microsoft SDK/sn.exe\" -k \"{keyPath}\"",
 							CreateNoWindow = true,
 							RedirectStandardOutput = true,
 							UseShellExecute = false
