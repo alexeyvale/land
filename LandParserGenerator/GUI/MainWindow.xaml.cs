@@ -170,7 +170,12 @@ namespace Land.GUI
 					GrammarType.LL, 
 					Grammar_Editor.Text, 
 					librarySettings.Input_Namespace.Text, 
-					librarySettings.Input_OutputDirectory.Text, 
+					librarySettings.Input_OutputDirectory.Text,
+					librarySettings.Input_IsSignedAssembly.IsChecked == true 
+						? String.IsNullOrWhiteSpace(librarySettings.Input_KeysFile.Text)
+							? Path.Combine(librarySettings.Input_OutputDirectory.Text, $"{librarySettings.Input_Namespace.Text}.snk")
+							: librarySettings.Input_KeysFile.Text
+						: null,
 					messages
 				);			
 

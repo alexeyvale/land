@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Preprocessing;
+using Land.Control.Helpers;
 
 using sharp_preprocessor;
 
 namespace SharpPreprocessor
 {
 	[DataContract]
-	public class SharpPreprocessorSettings: PreprocessorSettings
+	public class SharpPreprocessorProperties: PreprocessorSettings
 	{
-		public class PredefinedSymbolsConverter: SettingsPropertyConverter
+		public class PredefinedSymbolsConverter: PropertyConverter
 		{
 			public override string ToString(object val)
 			{
@@ -33,7 +34,7 @@ namespace SharpPreprocessor
 
         public override object Clone()
         {
-            return new SharpPreprocessorSettings()
+            return new SharpPreprocessorProperties()
             {
                 PredefinedSymbols = new HashSet<string>(PredefinedSymbols)
             };

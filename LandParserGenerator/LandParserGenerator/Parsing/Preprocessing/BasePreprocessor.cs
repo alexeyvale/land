@@ -13,7 +13,7 @@ namespace Land.Core.Parsing.Preprocessing
 
 		public abstract void Postprocess(Node root, List<Message> log);
 
-		public PreprocessorSettings Settings { get; set; }
+		public PreprocessorSettings Properties { get; set; }
 	}
 
     public abstract class PreprocessorSettings : ICloneable

@@ -21,3 +21,5 @@ Baselines/RoslynProvidedBaseline/packages/
 Baselines/PascalABCProvidedBaseline/.vs/
 Baselines/PascalABCProvidedBaseline/bin/
 Baselines/PascalABCProvidedBaseline/obj/
+LandParserGenerator/Control.Helpers/bin/
+LandParserGenerator/Control.Helpers/obj/

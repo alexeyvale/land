@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
+using System.Text;
 
 using Microsoft.CSharp;
 
@@ -197,7 +198,7 @@ namespace Land.Core
 		/// <param name="path">Путь к файлу генерируемой библиотеки</param>
 		/// <param name="messages">Лог генерации парсера</param>
 		/// <returns>Признак успешности выполнения операции</returns>
-		public static bool GenerateLibrary(GrammarType type, string text, string @namespace, string path, List<Message> messages)
+		public static bool GenerateLibrary(GrammarType type, string text, string @namespace, string path, string keyPath, List<Message> messages)
 		{
 			/// Строим объект грамматики и проверяем, корректно ли прошло построение
 			var builtGrammar = BuildGrammar(type, text, messages);
@@ -231,6 +232,24 @@ namespace Land.Core
 					File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
 					File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
 
+					if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
+					{
+						/// Создаём файл ключа
+						Process process = new Process();
+						ProcessStartInfo startInfo = new ProcessStartInfo()
+						{
+							FileName = "cmd.exe",
+							Arguments = $"/C \"../../../components/Microsoft SDK/sn.exe\" -k \"{keyPath}\"",
+							CreateNoWindow = true,
+							RedirectStandardOutput = true,
+							UseShellExecute = false
+						};
+						process.StartInfo = startInfo;
+						process.Start();
+
+						process.WaitForExit();
+					}
+
 					/// Компилируем библиотеку
 					var codeProvider = new CSharpCodeProvider(); ;
 					var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
@@ -242,6 +261,9 @@ namespace Land.Core
 					compilerParams.ReferencedAssemblies.Add("System.dll");
 					compilerParams.ReferencedAssemblies.Add("System.Core.dll");
 					compilerParams.ReferencedAssemblies.Add("mscorlib.dll");
+
+					if(!String.IsNullOrEmpty(keyPath))
+						compilerParams.CompilerOptions = $"/keyfile:\"{keyPath}\"";
 
 					var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName);
 

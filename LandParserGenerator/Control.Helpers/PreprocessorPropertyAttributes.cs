@@ -1,34 +1,34 @@
 ﻿using System;
 
-namespace Land.Core.Parsing.Preprocessing
+namespace Land.Control.Helpers
 {
 	[AttributeUsage(AttributeTargets.Property)]
-	public class DisplayedName : Attribute
+	public class DisplayedNameAttribute : Attribute
 	{
 		public string Text;
 
-		public DisplayedName(string text)
+		public DisplayedNameAttribute(string text)
 		{
 			this.Text = text;
 		}
 	}
 
 	[AttributeUsage(AttributeTargets.Property)]
-	public class Converter : Attribute
+	public class ConverterAttribute : Attribute
 	{
 		public Type ConverterType;
 
-		public Converter(Type type)
+		public ConverterAttribute(Type type)
 		{
 			this.ConverterType = type;
 		}
 	}
 
     [AttributeUsage(AttributeTargets.Property)]
-    public class PropertyToSet : Attribute
+    public class PropertyToSetAttribute : Attribute
     { }
 
-    public abstract class SettingsPropertyConverter
+    public abstract class PropertyConverter
 	{
 		public abstract string ToString(object val);
 

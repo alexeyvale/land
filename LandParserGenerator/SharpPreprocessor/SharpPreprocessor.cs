@@ -23,6 +23,7 @@ namespace SharpPreprocessor
 		public SharpPreprocessor()
 		{
 			Parser = ParserProvider.GetParser();
+			Properties = new SharpPreprocessorProperties();
 		}
 
 		public override string Preprocess(string text, out bool success)
@@ -38,7 +39,7 @@ namespace SharpPreprocessor
 			if (success)
 			{
 				var visitor = new DirectivesVisitor(text, 
-                    ((SharpPreprocessorSettings)Settings)?.PredefinedSymbols);
+                    ((SharpPreprocessorProperties)Properties).PredefinedSymbols);
 				root.Accept(visitor);
 
 				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)

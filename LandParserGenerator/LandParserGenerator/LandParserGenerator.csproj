@@ -39,7 +39,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>land_library_keys.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr4.Runtime.Standard, Version=4.7.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
@@ -89,7 +89,6 @@
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />
-    <Compile Include="Parsing\Preprocessing\PreprocessorSettings.cs" />
     <Compile Include="Parsing\Preprocessing\PipelinePreprocessor.cs" />
     <Compile Include="Parsing\Preprocessing\BasePreprocessor.cs" />
     <Compile Include="Parsing\Statistics.cs" />
@@ -120,7 +119,7 @@
     <None Include="App.config" />
     <None Include="Grammar\Builder\_ymc\Land.lex" />
     <None Include="Grammar\Builder\_ymc\Land.y" />
-    <None Include="land_library_keys.snk" />
+    <None Include="keys.snk" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

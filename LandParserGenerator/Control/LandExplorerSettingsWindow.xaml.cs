@@ -11,17 +11,26 @@ using System.IO;
 using Microsoft.Win32;
 
 using Land.Core.Parsing.Preprocessing;
+using Land.Control.Helpers;
 
 namespace Land.Control
 {
 	/// <summary>
 	/// Логика взаимодействия для Settings.xaml
 	/// </summary>
-	public partial class SettingsWindow : Window
+	public partial class LandExplorerSettingsWindow : Window
 	{
+		public class PreprocessorProperty
+		{
+			public string DisplayedName { get; set; }
+			public PropertyConverter Converter { get; set; }
+			public string ValueString { get; set; }
+			public PropertyInfo Property { get; set; }
+		}
+
 		public LandExplorerSettings SettingsObject { get; private set; }
 
-		public SettingsWindow(LandExplorerSettings settingsObject)
+		public LandExplorerSettingsWindow(LandExplorerSettings settingsObject)
 		{
 			SettingsObject = settingsObject;
 			InitializeComponent();
@@ -90,9 +99,7 @@ namespace Land.Control
 
 					break;
 				}
-			}
-
-			
+			}			
 		}
 
 		private void GrammarsGrid_SelectPreprocessorFile_Click(object sender, RoutedEventArgs e)
@@ -137,11 +144,43 @@ namespace Land.Control
 					{
 						var propertiesToSet = Assembly.LoadFile(item.PreprocessorPath)
 							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)))
-                            ?.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PropertyToSet))).ToList();
+                            ?.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PropertyToSetAttribute))).ToList();
 
                         if (propertiesToSet != null && propertiesToSet.Count > 0)
 						{
+							var propertiesViewModel = new List<PreprocessorProperty>();
 
+							foreach(var p in propertiesToSet)
+							{
+								var converter = (PropertyConverter)(((ConverterAttribute)p.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
+									.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+								propertiesViewModel.Add(new PreprocessorProperty()
+								{
+									Converter = converter,
+									DisplayedName = ((DisplayedNameAttribute)p.GetCustomAttribute(typeof(DisplayedNameAttribute))).Text,
+									ValueString = converter.ToString(p.GetValue(item.PreprocessorSettings)),
+									Property = p
+								});
+							}
+
+							var settingsWindow = new PreprocessorPropertiesWindow(propertiesViewModel);
+							settingsWindow.Owner = this;
+
+							if (settingsWindow.ShowDialog() == true)
+							{
+								foreach(var p in settingsWindow.Properties)
+									p.Property.SetValue(item.PreprocessorSettings, p.Converter.ToValue(p.ValueString));
+							}
+						}
+						else
+						{
+							MessageBox.Show(
+								"Данный препроцессор не имеет настраиваемых параметров",
+								"Настройки препроцессора",
+								MessageBoxButton.OK,
+								MessageBoxImage.Information
+							);
 						}
 					}
 

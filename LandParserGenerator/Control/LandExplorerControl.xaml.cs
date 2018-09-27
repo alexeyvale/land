@@ -50,7 +50,7 @@ namespace Land.Control
 		/// <summary>
 		/// Окно настроек
 		/// </summary>
-		private SettingsWindow SettingsWindow { get; set; }
+		private LandExplorerSettingsWindow SettingsWindow { get; set; }
 
 		/// <summary>
 		/// Адаптер редактора, с которым взаимодействует панель
@@ -309,7 +309,7 @@ namespace Land.Control
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
-			SettingsWindow = new SettingsWindow(SettingsObject.Clone());
+			SettingsWindow = new LandExplorerSettingsWindow(SettingsObject.Clone());
 			SettingsWindow.Owner = Window.GetWindow(this);
 
 			if (SettingsWindow.ShowDialog() ?? false)
@@ -934,7 +934,7 @@ namespace Land.Control
                         .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
                         .GetConstructor(Type.EmptyTypes).Invoke(null);
 
-                    preprocessor.Settings = parserSettings.PreprocessorSettings;
+                    preprocessor.Properties = parserSettings.PreprocessorSettings;
 
                     parser.SetPreprocessor(preprocessor);
                 }

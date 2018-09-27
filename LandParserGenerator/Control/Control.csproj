@@ -36,7 +36,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>land_control_library_keys.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -59,8 +59,11 @@
     <Compile Include="ConcernPointIsEnabledConverter.cs" />
     <Compile Include="LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
-    <Compile Include="SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    <Compile Include="PreprocessorPropertiesWindow.xaml.cs">
+      <DependentUpon>PreprocessorPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LandExplorerSettingsWindow.xaml.cs">
+      <DependentUpon>LandExplorerSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="LandExplorerControl.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -71,7 +74,11 @@
       <DependentUpon>LandExplorerControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SettingsWindow.xaml">
+    <Page Include="PreprocessorPropertiesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="LandExplorerSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -94,7 +101,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="land_control_library_keys.snk" />
+    <None Include="keys.snk" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -104,6 +111,10 @@
     <Resource Include="Resources\Font-Awesome-5-Solid-900.otf" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Control.Helpers\Control.Helpers.csproj">
+      <Project>{e45c5fce-03bf-44e8-b9b2-ba3c98350856}</Project>
+      <Name>Control.Helpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LandParserGenerator\LandParserGenerator.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>

@@ -5,12 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Land.GUI"
         mc:Ignorable="d"
-        Title="Настройки генерации библиотеки" Height="200" Width="600" ResizeMode="NoResize">
+        Title="Настройки генерации библиотеки" Height="280" Width="600" ResizeMode="NoResize">
     <StackPanel Orientation="Vertical" Margin="15px">
 		<Label>Пространство имён</Label>
 		<TextBox Name="Input_Namespace"></TextBox>
 		<Label>Выходной каталог</Label>
 		<TextBox Name="Input_OutputDirectory"></TextBox>
+		<CheckBox Name="Input_IsSignedAssembly" Margin="0,20,0,5" IsChecked="False" Checked="Input_IsSignedAssembly_Checked">Генерировать строго именованную сборку</CheckBox>
+		<Label>Файл ключей</Label>
+		<Grid>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="100*"></ColumnDefinition>
+				<ColumnDefinition Width="20"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			<TextBox Grid.Column="0" Name="Input_KeysFile" IsEnabled="{Binding ElementName=Input_IsSignedAssembly, Path=IsChecked, TargetNullValue=false}"/>
+			<Button Grid.Column="1" Name="Button_KeysFileSelect" Click="Button_KeysFileSelect_Click" IsEnabled="{Binding ElementName=Input_IsSignedAssembly, Path=IsChecked, TargetNullValue=false}">...</Button>
+		</Grid>
 		<StackPanel Orientation="Horizontal" Margin="0, 15, 0, 0">
 			<Button Name="Button_Ok"  Margin="0, 0, 15, 0" Padding="2px" Width="60px" Click="Button_Ok_Click">ОК</Button>
 			<Button Name="Button_Cancel"  Padding="2px" Width="60px" Click="Button_Cancel_Click">Отмена</Button>
