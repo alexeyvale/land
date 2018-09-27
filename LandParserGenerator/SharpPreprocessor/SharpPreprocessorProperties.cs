@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Preprocessing;
 using Land.Control.Helpers;
@@ -9,7 +8,6 @@ using sharp_preprocessor;
 
 namespace SharpPreprocessor
 {
-	[DataContract]
 	public class SharpPreprocessorProperties: PreprocessorSettings
 	{
 		public class PredefinedSymbolsConverter: PropertyConverter
@@ -27,7 +25,6 @@ namespace SharpPreprocessor
 			}
 		}
 
-		[DataMember]
 		[PropertyToSet]
 		[DisplayedName("Символы условной компиляции")]
 		[Converter(typeof(PredefinedSymbolsConverter))]

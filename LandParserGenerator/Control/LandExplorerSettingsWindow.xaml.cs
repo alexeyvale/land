@@ -20,14 +20,6 @@ namespace Land.Control
 	/// </summary>
 	public partial class LandExplorerSettingsWindow : Window
 	{
-		public class PreprocessorProperty
-		{
-			public string DisplayedName { get; set; }
-			public PropertyConverter Converter { get; set; }
-			public string ValueString { get; set; }
-			public PropertyInfo Property { get; set; }
-		}
-
 		public LandExplorerSettings SettingsObject { get; private set; }
 
 		public LandExplorerSettingsWindow(LandExplorerSettings settingsObject)
@@ -43,13 +35,16 @@ namespace Land.Control
 
 		private void DialogResult_Ok_Click(object sender, RoutedEventArgs e)
 		{
-			SettingsObject.Parsers = new ObservableCollection<ParserSettingsBlock>(SettingsObject.Parsers
-				.GroupBy(gr => new { GrammmarPath = gr.GrammarPath.Trim(), PreprocessorPath = gr.PreprocessorPath.Trim() }).Select(g => new ParserSettingsBlock()
+			foreach (var item in SettingsObject.Parsers)
+				SyncPreprocessorAndProperties(item, out string message);
+
+			SettingsObject.Parsers = new ObservableCollection<ParserSettingsItem>(SettingsObject.Parsers
+				.GroupBy(gr => new { GrammmarPath = gr.GrammarPath.Trim(), PreprocessorPath = gr.PreprocessorPath.Trim() }).Select(g => new ParserSettingsItem()
 				{
 					GrammarPath = g.Key.GrammmarPath,
 					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),
                     PreprocessorPath = g.Key.PreprocessorPath,
-                    PreprocessorSettings = g.Select(el=>el.PreprocessorSettings).FirstOrDefault()
+                    PreprocessorProperties = g.Select(el=>el.PreprocessorProperties).FirstOrDefault()
 				})
 			);
 
@@ -63,14 +58,14 @@ namespace Land.Control
 
 		private void GrammarsGrid_Add_Click(object sender, RoutedEventArgs e)
 		{
-			SettingsObject.Parsers.Add(new ParserSettingsBlock());
+			SettingsObject.Parsers.Add(new ParserSettingsItem());
 		}
 
 		private void GrammarsGrid_Delete_Click(object sender, RoutedEventArgs e)
 		{
 			if(GrammarsGrid.SelectedItem != null)
 			{
-				SettingsObject.Parsers.Remove((ParserSettingsBlock)GrammarsGrid.SelectedItem);
+				SettingsObject.Parsers.Remove((ParserSettingsItem)GrammarsGrid.SelectedItem);
 			}
 		}
 
@@ -91,7 +86,7 @@ namespace Land.Control
 
 					if (openFileDialog.ShowDialog() == true)
 					{
-						var item = (ParserSettingsBlock)((DataGridRow)vis).Item;
+						var item = (ParserSettingsItem)((DataGridRow)vis).Item;
 						item.GrammarPath = openFileDialog.FileName;
 
 						GrammarsGrid.Items.Refresh();
@@ -119,7 +114,7 @@ namespace Land.Control
 
 					if (openFileDialog.ShowDialog() == true)
 					{
-						var item = (ParserSettingsBlock)((DataGridRow)vis).Item;
+						var item = (ParserSettingsItem)((DataGridRow)vis).Item;
 						item.PreprocessorPath = openFileDialog.FileName;
 
 						GrammarsGrid.Items.Refresh();
@@ -138,55 +133,81 @@ namespace Land.Control
 				{
 					GrammarsGrid.CommitEdit();
 
-					var item = (ParserSettingsBlock)((DataGridRow)vis).Item;
+					/// Находим строчку, в которой нажали на кнопку настроек препроцессора
+					var item = (ParserSettingsItem)((DataGridRow)vis).Item;
 
-					if (!String.IsNullOrEmpty(item.PreprocessorPath))
+					if (SyncPreprocessorAndProperties(item, out string message))
 					{
-						var propertiesToSet = Assembly.LoadFile(item.PreprocessorPath)
-							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)))
-                            ?.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PropertyToSetAttribute))).ToList();
+						var settingsWindow = new PreprocessorPropertiesWindow(item.PreprocessorProperties.Select(p => p.Clone()).ToList());
+						settingsWindow.Owner = this;
 
-                        if (propertiesToSet != null && propertiesToSet.Count > 0)
+						if (settingsWindow.ShowDialog() == true)
+							item.PreprocessorProperties = settingsWindow.Properties;
+					}
+					else
+					{
+						MessageBox.Show(
+							message,
+							"Настройки препроцессора",
+							MessageBoxButton.OK,
+							MessageBoxImage.Information
+						);
+					}
+				}
+
+				break;
+			}
+		}
+
+		private bool SyncPreprocessorAndProperties(ParserSettingsItem item, out string message)
+		{
+			message = String.Empty;
+
+			/// Если препроцессор задан
+			if (File.Exists(item.PreprocessorPath))
+			{
+				/// Получаем тип препроцессора из библиотеки
+				var propertiesObjectType = Assembly.LoadFile(item.PreprocessorPath)
+					.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
+				/// Получаем типы свойств препроцессора
+				var propertyTypes = propertiesObjectType?.GetProperties()
+					.Where(prop => Attribute.IsDefined(prop, typeof(PropertyToSetAttribute))).ToList();
+
+				/// Если свойства есть, их можно настраивать
+				if (propertyTypes != null && propertyTypes.Count > 0)
+				{
+					/// Получаем дефолтный объект свойств препроцессора
+					var defaultPropertiesObject = propertiesObjectType.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+					var newPropertiesList = new List<PreprocessorProperty>();
+
+					foreach (var p in propertyTypes)
+					{
+						var converter = (PropertyConverter)(((ConverterAttribute)p.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
+							.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+						newPropertiesList.Add(new PreprocessorProperty()
 						{
-							var propertiesViewModel = new List<PreprocessorProperty>();
-
-							foreach(var p in propertiesToSet)
-							{
-								var converter = (PropertyConverter)(((ConverterAttribute)p.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-									.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-								propertiesViewModel.Add(new PreprocessorProperty()
-								{
-									Converter = converter,
-									DisplayedName = ((DisplayedNameAttribute)p.GetCustomAttribute(typeof(DisplayedNameAttribute))).Text,
-									ValueString = converter.ToString(p.GetValue(item.PreprocessorSettings)),
-									Property = p
-								});
-							}
-
-							var settingsWindow = new PreprocessorPropertiesWindow(propertiesViewModel);
-							settingsWindow.Owner = this;
-
-							if (settingsWindow.ShowDialog() == true)
-							{
-								foreach(var p in settingsWindow.Properties)
-									p.Property.SetValue(item.PreprocessorSettings, p.Converter.ToValue(p.ValueString));
-							}
-						}
-						else
-						{
-							MessageBox.Show(
-								"Данный препроцессор не имеет настраиваемых параметров",
-								"Настройки препроцессора",
-								MessageBoxButton.OK,
-								MessageBoxImage.Information
-							);
-						}
+							DisplayedName = ((DisplayedNameAttribute)p.GetCustomAttribute(typeof(DisplayedNameAttribute))).Text,
+							ValueString = item.PreprocessorProperties?.FirstOrDefault(prop => prop.PropertyName == p.Name)?.ValueString
+								?? converter.ToString(p.GetValue(defaultPropertiesObject)),
+							PropertyName = p.Name
+						});
 					}
 
-					break;
+					return true;
+				}
+				else
+				{
+					message = "Данный препроцессор не имеет настраиваемых параметров";
 				}
 			}
+			else
+			{
+				message = "Указанный в качестве библиотеки препроцессора файл не существует";
+			}
+
+			return false;
 		}
 	}
 }

@@ -16,6 +16,7 @@ using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Markup;
+using Land.Control.Helpers;
 
 namespace Land.Control
 {
@@ -898,12 +899,12 @@ namespace Land.Control
 
 			/// Генерируем парсер и связываем его с каждым из расширений, 
 			/// указанных для грамматики
-			foreach (var parserSettings in SettingsObject.Parsers)
+			foreach (var item in SettingsObject.Parsers)
 			{
-				if(!File.Exists(parserSettings.GrammarPath))
+				if(!File.Exists(item.GrammarPath))
 				{
 					Log.Add(Message.Error(
-						$"Файл {parserSettings.GrammarPath} не существует, невозможно загрузить парсер для расширения {parserSettings.ExtensionsString}",
+						$"Файл {item.GrammarPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
 						null
 					));
 
@@ -912,37 +913,58 @@ namespace Land.Control
 
 				var parser = BuilderBase.BuildParser(
 					GrammarType.LL,
-					File.ReadAllText(parserSettings.GrammarPath),
+					File.ReadAllText(item.GrammarPath),
 					Log
 				);
 
-                foreach (var key in parserSettings.Extensions)
-				{
+                foreach (var key in item.Extensions)
 					parsers[key] = parser;
-				}
 
-                if (!File.Exists(parserSettings.PreprocessorPath))
+                if (!File.Exists(item.PreprocessorPath))
                 {
                     Log.Add(Message.Error(
-                        $"Файл {parserSettings.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {parserSettings.ExtensionsString}",
+                        $"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
                         null
                     ));
                 }
                 else
                 {
-					var preprocessor = (BasePreprocessor)Assembly.LoadFile(parserSettings.PreprocessorPath)
+					var preprocessor = (BasePreprocessor)Assembly.LoadFile(item.PreprocessorPath)
                         .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
                         ?.GetConstructor(Type.EmptyTypes).Invoke(null);
 
 					if(preprocessor != null)
 					{
-						preprocessor.Properties = parserSettings.PreprocessorSettings;
+						if(item.PreprocessorProperties != null 
+							&& item.PreprocessorProperties.Count > 0)
+						{
+							/// Получаем тип препроцессора из библиотеки
+							var propertiesObjectType = Assembly.LoadFile(item.PreprocessorPath)
+								.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
+
+							/// Для каждой настройки препроцессора
+							foreach(var property in item.PreprocessorProperties)
+							{
+								/// проверяем, есть ли такое свойство у объекта
+								var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
+								
+								if(propertyInfo != null)
+								{
+									var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
+										.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
+										.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+									propertyInfo.SetValue(preprocessor, converter.ToValue(property.ValueString));
+								}
+							}
+						}
+
 						parser.SetPreprocessor(preprocessor);
 					}
 					else
 					{
 						Log.Add(Message.Error(
-							$"Библиотека {parserSettings.PreprocessorPath} не содержит описание препроцессора для расширения {parserSettings.ExtensionsString}",
+							$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
 							null
 						));
 					}               

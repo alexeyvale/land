@@ -12,9 +12,9 @@ namespace Land.Control
 {
 	public partial class PreprocessorPropertiesWindow : Window
 	{
-		public List<LandExplorerSettingsWindow.PreprocessorProperty> Properties { get; private set; }
+		public List<PreprocessorProperty> Properties { get; private set; }
 
-		public PreprocessorPropertiesWindow(List<LandExplorerSettingsWindow.PreprocessorProperty> properties)
+		public PreprocessorPropertiesWindow(List<PreprocessorProperty> properties)
 		{
 			Properties = properties;
 			InitializeComponent();

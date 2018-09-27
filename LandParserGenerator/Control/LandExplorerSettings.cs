@@ -10,7 +10,7 @@ using Land.Core.Parsing.Preprocessing;
 namespace Land.Control
 {
 	[DataContract]
-	public class ParserSettingsBlock
+	public class ParserSettingsItem
 	{
 		[DataMember]
 		public List<string> Extensions { get; set; } = new List<string>();
@@ -22,7 +22,7 @@ namespace Land.Control
 		public string PreprocessorPath { get; set; }
 
 		[DataMember]
-		public PreprocessorSettings PreprocessorSettings { get; set; }
+		public List<PreprocessorProperty> PreprocessorProperties { get; set; } = new List<PreprocessorProperty>();
 
 		public string ExtensionsString
 		{
@@ -36,14 +36,14 @@ namespace Land.Control
 			}
 		}
 
-		public ParserSettingsBlock Clone()
+		public ParserSettingsItem Clone()
 		{
-			return new ParserSettingsBlock()
+			return new ParserSettingsItem()
 			{
 				Extensions = Extensions,
 				GrammarPath = GrammarPath,
                 PreprocessorPath = PreprocessorPath,
-                PreprocessorSettings = (PreprocessorSettings)PreprocessorSettings?.Clone()
+                PreprocessorProperties = new List<PreprocessorProperty>(PreprocessorProperties)
 			};
 		}
 	}
@@ -55,14 +55,14 @@ namespace Land.Control
 		public bool HighlightSelectedElement { get; set; }
 
 		[DataMember]
-		public ObservableCollection<ParserSettingsBlock> Parsers { get; set; } = new ObservableCollection<ParserSettingsBlock>();
+		public ObservableCollection<ParserSettingsItem> Parsers { get; set; } = new ObservableCollection<ParserSettingsItem>();
 
 		public LandExplorerSettings Clone()
 		{
 			return new LandExplorerSettings()
 			{
 				HighlightSelectedElement = HighlightSelectedElement,
-				Parsers = new ObservableCollection<ParserSettingsBlock>(Parsers.Select(g => g.Clone()))
+				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};
 		}
 	}

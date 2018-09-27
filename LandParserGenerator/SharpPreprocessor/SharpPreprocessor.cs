@@ -56,7 +56,6 @@ namespace SharpPreprocessor
 				}
 
 				Excluded = visitor.SegmentsToExclude;
-				Excluded.Reverse();
 
 				return text;
 			}
