@@ -21,7 +21,7 @@ namespace Land.Core.Parsing.LR
 			Table = new TableLR1(g);
 		}
 
-		protected override Node ParsingAlgorithm(string text)
+		protected override Node ParsingAlgorithm(string text, bool enableTracing)
 		{
 			Node root = null;	
 
@@ -37,7 +37,7 @@ namespace Land.Core.Parsing.LR
 			{
 				var currentState = Stack.PeekState();
 
-				if(token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
+				if(enableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
 						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Location.Start
@@ -71,17 +71,19 @@ namespace Land.Core.Parsing.LR
 						/// Вносим в стек новое состояние
 						Stack.Push(tokenNode, shift.TargetItemIndex);
 
-						Log.Add(Message.Trace(
-							$"Перенос",
-							token.Location.Start
-						));
+						if (enableTracing)
+						{
+							Log.Add(Message.Trace(
+								$"Перенос",
+								token.Location.Start
+							));
+						}
 
 						token = LexingStream.NextToken();
 					}
 					/// Если нужно произвести свёртку
-					else if (action is ReduceAction)
+					else if (action is ReduceAction reduce)
 					{
-						var reduce = (ReduceAction)action;
 						var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
 
 						/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
@@ -98,10 +100,13 @@ namespace Land.Core.Parsing.LR
 							Table.Transitions[currentState][reduce.ReductionAlternative.NonterminalSymbolName]
 						);
 
-						Log.Add(Message.Trace(
-							$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
-							token.Location.Start
-						));
+						if (enableTracing)
+						{
+							Log.Add(Message.Trace(
+								$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
+								token.Location.Start
+							));
+						}
 
 						continue;
 					}
@@ -141,10 +146,13 @@ namespace Land.Core.Parsing.LR
 					}
 					else
 					{
-						Log.Add(Message.Trace(
-							$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-							token.Location.Start
-						));
+						if (enableTracing)
+						{
+							Log.Add(Message.Trace(
+								$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+								token.Location.Start
+							));
+						}
 
 						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
 					}

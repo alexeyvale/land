@@ -44,7 +44,7 @@ namespace Land.Core.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		protected override Node ParsingAlgorithm(string text)
+		protected override Node ParsingAlgorithm(string text, bool enableTracing)
 		{
 			/// Контроль вложенностей пар
 			Nesting = new Stack<PairSymbol>();
@@ -71,10 +71,13 @@ namespace Land.Core.Parsing.LL
 
 				var stackTop = Stack.Peek();
 
-				Log.Add(Message.Trace(
-					$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
-					LexingStream.CurrentToken.Location.Start
-				));
+				if (enableTracing)
+				{
+					Log.Add(Message.Trace(
+						$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
+						LexingStream.CurrentToken.Location.Start
+					));
+				}
 
                 /// Если символ на вершине стека совпадает с текущим токеном
                 if(stackTop.Symbol == token.Name)

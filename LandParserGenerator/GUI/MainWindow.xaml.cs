@@ -357,7 +357,7 @@ namespace Land.GUI
 		private Node TreeRoot { get; set; }
 		private string TreeSource { get; set; }
 
-		private Node File_Parse(string fileName, string text)
+		private Node File_Parse(string fileName, string text, bool enableTracing = false)
 		{
 			BasePreprocessor preproc = null;
 			
@@ -373,7 +373,7 @@ namespace Land.GUI
 			}
 
 			Parser?.SetPreprocessor(preproc);
-			return Parser?.Parse(text);
+			return Parser?.Parse(text, enableTracing);
 		}
 
 		private void File_ParseButton_Click(object sender, RoutedEventArgs e)
@@ -384,7 +384,7 @@ namespace Land.GUI
 
 				try
 				{
-					root = File_Parse((string)File_NameLabel.Content, File_Editor.Text);
+					root = File_Parse((string)File_NameLabel.Content, File_Editor.Text, true);
 				}
 				catch(Exception ex)
 				{

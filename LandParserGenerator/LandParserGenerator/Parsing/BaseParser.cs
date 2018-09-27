@@ -25,7 +25,7 @@ namespace Land.Core.Parsing
 			Lexer = lexer;
 		}
 
-		public Node Parse(string text)
+		public Node Parse(string text, bool enableTracing = false)
 		{
 			Log = new List<Message>();
 			Statistics = new Statistics();
@@ -42,13 +42,13 @@ namespace Land.Core.Parsing
 				/// Если препроцессор сработал успешно, можно парсить
 				if(success)
 				{
-					root = ParsingAlgorithm(text);
+					root = ParsingAlgorithm(text, enableTracing);
 					Preproc.Postprocess(root, Log);
 				}
 			}
 			else
 			{
-				root = ParsingAlgorithm(text);
+				root = ParsingAlgorithm(text, enableTracing);
 			}
 
 			Statistics.TimeSpent = DateTime.Now - parsingStarted;
@@ -56,7 +56,7 @@ namespace Land.Core.Parsing
 			return root;
 		}
 
-		protected abstract Node ParsingAlgorithm(string text);
+		protected abstract Node ParsingAlgorithm(string text, bool enableTracing);
 
 		public void SetPreprocessor(BasePreprocessor preproc)
 		{
