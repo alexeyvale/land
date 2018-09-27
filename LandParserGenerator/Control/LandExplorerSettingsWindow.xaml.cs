@@ -178,7 +178,6 @@ namespace Land.Control
 				{
 					/// Получаем дефолтный объект свойств препроцессора
 					var defaultPropertiesObject = propertiesObjectType.GetConstructor(Type.EmptyTypes).Invoke(null);
-
 					var newPropertiesList = new List<PreprocessorProperty>();
 
 					foreach (var p in propertyTypes)
@@ -194,6 +193,8 @@ namespace Land.Control
 							PropertyName = p.Name
 						});
 					}
+
+					item.PreprocessorProperties = newPropertiesList;
 
 					return true;
 				}

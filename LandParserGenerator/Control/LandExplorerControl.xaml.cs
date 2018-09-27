@@ -954,7 +954,17 @@ namespace Land.Control
 										.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
 										.GetConstructor(Type.EmptyTypes).Invoke(null);
 
-									propertyInfo.SetValue(preprocessor, converter.ToValue(property.ValueString));
+									try
+									{
+										propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
+									}
+									catch
+									{
+										Log.Add(Message.Error(
+											$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
+											null
+										));
+									}
 								}
 							}
 						}
