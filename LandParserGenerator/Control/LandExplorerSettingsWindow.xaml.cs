@@ -153,9 +153,9 @@ namespace Land.Control
 							MessageBoxImage.Information
 						);
 					}
-				}
 
-				break;
+					break;
+				}
 			}
 		}
 
