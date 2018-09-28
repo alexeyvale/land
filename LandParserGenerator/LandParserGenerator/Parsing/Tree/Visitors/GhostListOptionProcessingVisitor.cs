@@ -22,9 +22,10 @@ namespace Land.Core.Parsing.Tree
 			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				if (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol)
-					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)
-					||  node.Options.NodeOption == NodeOption.GHOST)
+				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
+				if (node.Options.NodeOption == NodeOption.GHOST || node.Options.NodeOption == null 
+					&& (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
+					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
@@ -43,7 +44,8 @@ namespace Land.Core.Parsing.Tree
 			var listForSymbol = grammar.Options.IsSet(NodeOption.LIST, node.Symbol);
 
 			// Если символ помечен как List, убираем подузлы того же типа
-			if (listForAlias || listForSymbol || node.Options.NodeOption == NodeOption.LIST)
+			if (node.Options.NodeOption == NodeOption.LIST 
+				|| node.Options.NodeOption == null && (listForAlias || listForSymbol))
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
 				{

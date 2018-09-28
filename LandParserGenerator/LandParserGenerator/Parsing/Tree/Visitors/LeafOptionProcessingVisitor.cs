@@ -25,10 +25,8 @@ namespace Land.Core.Parsing.Tree
 		private void Visit(Node node, bool computeValue)
 		{
 			/// Если текущий узел должен быть листовым
-			if (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol)
-				|| !String.IsNullOrEmpty(node.Alias) &&  grammar.Options.IsSet(NodeOption.LEAF, node.Alias)
-				|| node.Options.NodeOption == NodeOption.LEAF
-				|| computeValue)
+			if (node.Options.NodeOption == NodeOption.LEAF || node.Options.NodeOption == null && (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol)
+				|| !String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LEAF, node.Alias)) || computeValue)
 			{
 				foreach (var child in node.Children)
 				{
