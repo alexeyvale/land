@@ -22,15 +22,23 @@ namespace Land.Core
 			{
 				if (_location == null)
 				{
-					var lines = Token.Text.Split('\n');
-					var emptyAfterLastEnd = lines[lines.Length - 1].Length == 0;
+					/// Разбиваем текст токена на части, расположенные на разных строках
+					var partsOnSeparateLines = Token.Text.Split('\n');
+					/// Заканчивается ли последняя часть переходом на новую строке
+					var endsWithEol = Token.Text.EndsWith("\n");
+					/// Если да, то в нашем разбиении последняя часть - это предпоследний элемент
+					var lastPartLength = endsWithEol
+						? partsOnSeparateLines[partsOnSeparateLines.Length - 2].Length + 1
+						: partsOnSeparateLines[partsOnSeparateLines.Length - 1].Length;
+					/// Количество переходов на новую строку, входящих в текст токена
+					var eolCount = Token.Text.Count(c => c == '\n');
 
 					_location = new SegmentLocation()
 					{
 						Start = new PointLocation(Token.Line, Token.Column, Token.StartIndex),
 						End = new PointLocation(
-							Token.Line + (emptyAfterLastEnd ? lines.Length : lines.Length - 1),
-							emptyAfterLastEnd ? lines[lines.Length - 2].Length - 1 : lines[lines.Length - 1].Length - 1,
+							Token.Line + (endsWithEol ? eolCount - 1 : eolCount),
+							eolCount == 0 || eolCount == 1 && endsWithEol ? Token.Column + lastPartLength - 1 : lastPartLength - 1,
 							Token.StopIndex
 						)
 					};

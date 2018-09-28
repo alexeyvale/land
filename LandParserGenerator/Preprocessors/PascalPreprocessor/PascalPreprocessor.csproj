@@ -52,7 +52,6 @@
   <ItemGroup>
     <Compile Include="Visitors\DirectivesVisitor.cs" />
     <Compile Include="Visitors\GatherAnchorsVisitor.cs" />
-    <Compile Include="Visitors\PostprocessVisitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PascalPreprocessor.cs" />
   </ItemGroup>
