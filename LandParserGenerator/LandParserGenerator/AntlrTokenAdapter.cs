@@ -31,7 +31,7 @@ namespace Land.Core
 						? partsOnSeparateLines[partsOnSeparateLines.Length - 2].Length + 1
 						: partsOnSeparateLines[partsOnSeparateLines.Length - 1].Length;
 					/// Количество переходов на новую строку, входящих в текст токена
-					var eolCount = Token.Text.Count(c => c == '\n');
+					var eolCount = partsOnSeparateLines.Length - 1;
 
 					_location = new SegmentLocation()
 					{
