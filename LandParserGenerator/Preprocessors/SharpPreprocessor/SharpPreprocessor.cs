@@ -99,7 +99,7 @@ namespace SharpPreprocessor
 					includedSegmentsCount += 1;
 				}
 
-				loc.ShiftLine(includedLinesCount, includedCharsCount);
+				loc.Shift(includedLinesCount, 0, includedCharsCount);
 			}
 		}
 	}

@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="pascalabc_preprocessor">
-      <HintPath>..\..\LanD Specifications\pabc\pascalabc_preprocessor.dll</HintPath>
+      <HintPath>..\..\..\LanD Specifications\pabc\pascalabc_preprocessor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

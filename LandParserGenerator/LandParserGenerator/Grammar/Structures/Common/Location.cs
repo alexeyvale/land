@@ -23,9 +23,10 @@ namespace Land.Core
 			Offset = offset;
 		}
 
-		public void ShiftLine(int lnDelta, int offsetDelta)
+		public void Shift(int lnDelta, int colDelta, int offsetDelta)
 		{
 			Line += lnDelta;
+			Column += colDelta;
 			Offset += offsetDelta;
 
 			if (Line <= 0 || Offset < 0)
@@ -72,10 +73,10 @@ namespace Land.Core
 
 		public int? Length => Start != null && End != null ? End.Offset - Start.Offset + 1 : (int?)null;
 
-		public void ShiftLine(int lnDelta, int offsetDelta)
+		public void Shift(int lnDelta, int colDelta, int offsetDelta)
 		{
-			Start.ShiftLine(lnDelta, offsetDelta);
-			End.ShiftLine(lnDelta, offsetDelta);
+			Start.Shift(lnDelta, colDelta, offsetDelta);
+			End.Shift(lnDelta, colDelta, offsetDelta);
 		}
 	}
 }

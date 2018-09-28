@@ -78,8 +78,12 @@ namespace PascalPreprocessor
 			var includedCharsCount = 0;
 			/// Сколько исключенных из компиляции строк было учтено на данный момент 
 			var includedLinesCount = 0;
+			/// Сколько исключенных из компиляции строк было учтено на данный момент для текущей строки
+			var includedColumnsCount = 0;
 			/// Сколько исключенных из компиляции участков было учтено на данный момент 
 			var includedSegmentsCount = 0;
+			/// Номер последней строки, в которую включили удалённый сегмент
+			var currentLineIndex = -1;
 
 			foreach (var loc in locations)
 			{
@@ -97,7 +101,7 @@ namespace PascalPreprocessor
 					includedSegmentsCount += 1;
 				}
 
-				loc.ShiftLine(includedLinesCount, includedCharsCount);
+				loc.Shift(includedLinesCount, includedColumnsCount, includedCharsCount);
 			}
 		}
 	}

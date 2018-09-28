@@ -37,9 +37,8 @@
     <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="sharp_preprocessor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\LanD Specifications\sharp\sharp_preprocessor.dll</HintPath>
+    <Reference Include="sharp_preprocessor">
+      <HintPath>..\..\..\LanD Specifications\sharp\sharp_preprocessor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -129,15 +129,13 @@ namespace PascalPreprocessor
 					case "define":
 						if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 						{
-							for (var i = 2; i < node.Children.Count; ++i)
-								SymbolsDefined.Add(node.Children[i].Value[0]);
+							SymbolsDefined.Add(node.Children[2].Value[0]);
 						}
 						break;
 					case "undef":
 						if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 						{
-							for (var i = 2; i < node.Children.Count; ++i)
-								SymbolsDefined.Remove(node.Children[i].Value[0]);
+							SymbolsDefined.Remove(node.Children[2].Value[0]);
 						}
 						break;
 				}
