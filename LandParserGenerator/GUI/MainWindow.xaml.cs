@@ -369,6 +369,9 @@ namespace Land.GUI
 					case ".cs":
 						preproc = new SharpPreprocessor.SharpPreprocessor();
 						break;
+					case ".pas":
+						preproc = new PascalPreprocessor.PascalPreprocessor();
+						break;
 				}
 			}
 

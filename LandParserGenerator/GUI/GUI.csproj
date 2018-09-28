@@ -133,7 +133,11 @@
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharpPreprocessor\SharpPreprocessor.csproj">
+    <ProjectReference Include="..\Preprocessors\PascalPreprocessor\PascalPreprocessor.csproj">
+      <Project>{9d1f2e8f-dcf1-44bf-a515-1e7d97fec1db}</Project>
+      <Name>PascalPreprocessor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Preprocessors\SharpPreprocessor\SharpPreprocessor.csproj">
       <Project>{3ac961fa-ce34-4c61-8e32-4175d348a03b}</Project>
       <Name>SharpPreprocessor</Name>
     </ProjectReference>

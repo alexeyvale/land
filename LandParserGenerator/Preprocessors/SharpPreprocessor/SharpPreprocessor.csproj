@@ -52,19 +52,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GatherAnchorsVisitor.cs" />
-    <Compile Include="PostprocessVisitor.cs" />
-    <Compile Include="DirectivesVisitor.cs" />
+    <Compile Include="Visitors\GatherAnchorsVisitor.cs" />
+    <Compile Include="Visitors\PostprocessVisitor.cs" />
+    <Compile Include="Visitors\DirectivesVisitor.cs" />
     <Compile Include="SharpPreprocessorProperties.cs" />
     <Compile Include="SharpPreprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Control.Helpers\Control.Helpers.csproj">
+    <ProjectReference Include="..\..\Control.Helpers\Control.Helpers.csproj">
       <Project>{e45c5fce-03bf-44e8-b9b2-ba3c98350856}</Project>
       <Name>Control.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LandParserGenerator\LandParserGenerator.csproj">
+    <ProjectReference Include="..\..\LandParserGenerator\LandParserGenerator.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
     </ProjectReference>

@@ -23,3 +23,7 @@ Baselines/PascalABCProvidedBaseline/bin/
 Baselines/PascalABCProvidedBaseline/obj/
 LandParserGenerator/Control.Helpers/bin/
 LandParserGenerator/Control.Helpers/obj/
+LandParserGenerator/Preprocessors/PascalPreprocessor/bin/
+LandParserGenerator/Preprocessors/PascalPreprocessor/obj/
+LandParserGenerator/Preprocessors/SharpPreprocessor/obj/
+LandParserGenerator/Preprocessors/SharpPreprocessor/bin/

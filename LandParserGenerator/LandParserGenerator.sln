@@ -11,9 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Control", "Control\Control.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisualStudioExtension", "VisualStudioExtension\VisualStudioExtension.csproj", "{5D68BFC3-7665-4A9B-85D2-388E6678B03D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpPreprocessor", "SharpPreprocessor\SharpPreprocessor.csproj", "{3AC961FA-CE34-4C61-8E32-4175D348A03B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpPreprocessor", "Preprocessors\SharpPreprocessor\SharpPreprocessor.csproj", "{3AC961FA-CE34-4C61-8E32-4175D348A03B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Control.Helpers", "Control.Helpers\Control.Helpers.csproj", "{E45C5FCE-03BF-44E8-B9B2-BA3C98350856}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Preprocessors", "Preprocessors", "{899CF61B-BCD1-472E-812E-14915A07F59A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPreprocessor", "Preprocessors\PascalPreprocessor\PascalPreprocessor.csproj", "{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,9 +49,17 @@ Global
 		{E45C5FCE-03BF-44E8-B9B2-BA3C98350856}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E45C5FCE-03BF-44E8-B9B2-BA3C98350856}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E45C5FCE-03BF-44E8-B9B2-BA3C98350856}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3AC961FA-CE34-4C61-8E32-4175D348A03B} = {899CF61B-BCD1-472E-812E-14915A07F59A}
+		{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB} = {899CF61B-BCD1-472E-812E-14915A07F59A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD7950FE-7FC3-4DA2-9B6B-4B3E76CBD3C2}

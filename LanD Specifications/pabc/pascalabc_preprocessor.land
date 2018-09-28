@@ -1,0 +1,16 @@
+COMMENT_L	: '//' ~[\n\r]*
+STRING_SKIP	: '\'\'' | '\\\\'
+STRING		: '\'' (STRING_SKIP|.)*? '\''
+ID			: [_a-zA-Z][_0-9a-zA-Z]*
+
+file		=	(directive|comment_ml|Any)+
+comment_ml	=	'{' Any '}'
+
+directive	=	'{$' (('ifdef'|'ifndef'|'define'|'undef') ID | 'else' | 'endif') '}'
+
+%%
+
+%parsing ignoreundefined
+%parsing start file
+%parsing skip COMMENT_L STRING
+ 
