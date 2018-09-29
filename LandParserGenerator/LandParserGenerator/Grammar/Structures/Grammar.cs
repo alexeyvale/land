@@ -801,10 +801,11 @@ namespace Land.Core
 				foreach (var alt in rule)
 					for (var i = 0; i < alt.Count; ++i)
 					{
-						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME
-							&& !alt[i].Options.AnyOptions.ContainsKey(AnyOption.Except))
+						if (alt[i].Symbol == Grammar.ANY_TOKEN_NAME)
 						{
-							var newName = Grammar.ANY_TOKEN_NAME + anys.Count;
+							var newName = alt[i].Options.AnyOptions.ContainsKey(AnyOption.Except)
+								? Grammar.ANY_TOKEN_NAME + AnyOption.Except.ToString() + anys.Count
+								: Grammar.ANY_TOKEN_NAME + anys.Count;
 							anys[newName] = new Tuple<Alternative, int>(alt, i);
 							alt[i].Symbol = newName;
 							Tokens.Add(newName, new TerminalSymbol(newName, String.Empty));
@@ -813,9 +814,10 @@ namespace Land.Core
 			BuildFirst();
 			BuildFollow();
 
-			/// Для каждого Any находим Any, которые могут идти после него
+			/// Для каждого Any, не являющегося AnyExcept, 
+			/// находим Any, которые могут идти после него 
 			/// и не являются этим же самым Any
-			foreach(var pair in anys.Values)
+			foreach(var pair in anys.Where(kvp=>!kvp.Key.Contains(AnyOption.Except.ToString())).Select(kvp=>kvp.Value))
 			{
 				var nextTokens = First(pair.Item1.Subsequence(pair.Item2 + 1));
 				if (nextTokens.Contains(null))
@@ -825,11 +827,12 @@ namespace Land.Core
 				}
 
 				/// Множество токенов Any, о которых надо предупредить разработчика грамматики
-				var warningTokens = nextTokens.Where(t => t.StartsWith(Grammar.ANY_TOKEN_NAME) && t != pair.Item1[pair.Item2]);
+				var warningTokens = nextTokens.Where(t => t.StartsWith(Grammar.ANY_TOKEN_NAME) 
+					&& t != pair.Item1[pair.Item2]);
 
 				if (warningTokens.Count() > 0)
 				{
-					var anyUserifyRegex = $"{Grammar.ANY_TOKEN_NAME}\\d+";
+					var anyUserifyRegex = $"{Grammar.ANY_TOKEN_NAME}({AnyOption.Except.ToString()})?\\d+";
 					var fromAltUserified = Regex.Replace(Userify(pair.Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
 					var fromNontermUserified = Regex.Replace(Userify(pair.Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
 
