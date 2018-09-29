@@ -73,9 +73,9 @@ namespace SharpPreprocessor
 
 		private void FinCurrentSegment(PointLocation end)
 		{
-			var lineEndOffset = Math.Max(Text.IndexOf('\n', end.Offset), end.Offset);
+			var delta = Text.IndexOf('\n', end.Offset) - end.Offset;
 
-			CurrentSegment.End = new PointLocation(end.Line, end.Column, lineEndOffset);
+			CurrentSegment.End = new PointLocation(end.Line, end.Column + delta - 1, end.Offset + delta);
 		}
 
 		public override void Visit(Node node)

@@ -10,7 +10,7 @@ namespace Land.Core
 {
 	public class PointLocation
 	{
-		private int COLUMN_NUMBER_CORRECTION = 1;
+		public static int COLUMN_NUMBER_CORRECTION = 1;
 
 		public int Line { get; set; }
 		public int Column { get; set; }

@@ -13,12 +13,17 @@ using pascalabc_preprocessor;
 
 namespace PascalPreprocessor
 {
+	public class ExcludedSegmentLocation: SegmentLocation
+	{
+		public bool EndsOnEol { get; set; }
+	}
+
 	public class PascalPreprocessor: BasePreprocessor
     {		
 		private BaseParser Parser { get; set; }
 		public override List<Message> Log { get { return Parser?.Log; } }
 
-		public List<SegmentLocation> Excluded { get; set; } = new List<SegmentLocation>();
+		public List<ExcludedSegmentLocation> Excluded { get; set; } = new List<ExcludedSegmentLocation>();
 
 		public PascalPreprocessor()
 		{
@@ -42,14 +47,9 @@ namespace PascalPreprocessor
 
 				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)
 				{
-					var length = Math.Max(
-							text.IndexOf('\n', visitor.SegmentsToExclude[i].End.Offset), 
-							visitor.SegmentsToExclude[i].End.Offset
-						) - visitor.SegmentsToExclude[i].Start.Offset + 1;
-
 					text = text.Remove(
 						visitor.SegmentsToExclude[i].Start.Offset,
-						length
+						visitor.SegmentsToExclude[i].Length.Value
 					);
 				}
 
@@ -65,43 +65,65 @@ namespace PascalPreprocessor
 
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			var getLocationsVisitor = new GatherAnchorsVisitor();
-			root.Accept(getLocationsVisitor);
-
-			var locations = log.Where(l => l.Location != null)
-				.Select(l => l.Location)
-				.Concat(getLocationsVisitor.Locations)
-				.Distinct()
-				.OrderBy(l => l.Offset);
-
-			/// Сколько исключенных из компиляции символов было учтено на данный момент 
-			var includedCharsCount = 0;
-			/// Сколько исключенных из компиляции строк было учтено на данный момент 
-			var includedLinesCount = 0;
-			/// Сколько исключенных из компиляции строк было учтено на данный момент для текущей строки
-			var includedColumnsCount = 0;
-			/// Сколько исключенных из компиляции участков было учтено на данный момент 
-			var includedSegmentsCount = 0;
-			/// Номер последней строки, в которую включили удалённый сегмент
-			var currentLineIndex = -1;
-
-			foreach (var loc in locations)
+			if (Excluded.Count > 0)
 			{
-				var start = loc.Offset + includedCharsCount;
+				var getLocationsVisitor = new GatherAnchorsVisitor();
+				root.Accept(getLocationsVisitor);
 
-				/// Пока начало содержимого узла в текущих координатах лежит правее
-				/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
-				/// поправляем текущие координаты с учётом добавления этого сегмента
-				while (includedSegmentsCount < Excluded.Count
-					&& Excluded[includedSegmentsCount].Start.Offset <= start)
+				var locations = log.Where(l => l.Location != null)
+					.Select(l => l.Location)
+					.Concat(getLocationsVisitor.Locations)
+					.Distinct()
+					.OrderBy(l => l.Offset);
+
+				/// Сколько исключенных из компиляции символов было учтено на данный момент 
+				var includedCharsCount = 0;
+				/// Сколько исключенных из компиляции строк было учтено на данный момент 
+				var includedLinesCount = 0;
+				/// Сколько исключенных из компиляции строк было учтено на данный момент для текущей строки
+				var includedColumnsCount = 0;
+				/// Сколько исключенных из компиляции участков было учтено на данный момент 
+				var includedSegmentsCount = 0;
+				/// Номер последней строки, в которую включили удалённый сегмент
+				var currentLineIndex = -1;
+
+				foreach (var loc in locations)
 				{
-					includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
-					includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line + 1;
-					start += Excluded[includedSegmentsCount].Length.Value;
-					includedSegmentsCount += 1;
-				}
+					var start = loc.Offset + includedCharsCount;
 
-				loc.Shift(includedLinesCount, includedColumnsCount, includedCharsCount);
+					/// Пока начало содержимого узла в текущих координатах лежит правее
+					/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
+					/// поправляем текущие координаты с учётом добавления этого сегмента
+					while (includedSegmentsCount < Excluded.Count
+						&& Excluded[includedSegmentsCount].Start.Offset <= start)
+					{
+						includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
+						includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line +
+							(Excluded[includedSegmentsCount].EndsOnEol ? 1 : 0);
+
+						if (Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
+							&& Excluded[includedSegmentsCount].Start.Line == currentLineIndex)
+						{
+							includedColumnsCount += Excluded[includedSegmentsCount].Length.Value;
+						}
+						else
+						{
+							currentLineIndex = Excluded[includedSegmentsCount].End.Line;
+							includedColumnsCount = Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
+								? Excluded[includedSegmentsCount].Length.Value
+								: Excluded[includedSegmentsCount].End.Column + 1;
+						}
+
+						start += Excluded[includedSegmentsCount].Length.Value;
+						includedSegmentsCount += 1;
+					}
+
+					loc.Shift(
+						includedLinesCount,
+						loc.Line + includedLinesCount == currentLineIndex ? includedColumnsCount : 0,
+						includedCharsCount
+					);
+				}
 			}
 		}
 	}

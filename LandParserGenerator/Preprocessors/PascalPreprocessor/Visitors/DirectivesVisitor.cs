@@ -43,12 +43,12 @@ namespace PascalPreprocessor
 		/// <summary>
 		/// Области, которые нужно исключить из компиляции
 		/// </summary>
-		public List<SegmentLocation> SegmentsToExclude = new List<SegmentLocation>();
+		public List<ExcludedSegmentLocation> SegmentsToExclude = new List<ExcludedSegmentLocation>();
 
 		/// <summary>
 		/// Текущая исключаемая секция
 		/// </summary>
-		public SegmentLocation CurrentSegment { get; set; }
+		public ExcludedSegmentLocation CurrentSegment { get; set; }
 
 		/// <summary>
 		/// Определённые в текущем месте программы символы
@@ -74,14 +74,13 @@ namespace PascalPreprocessor
 						Levels.Push(new LevelInfo()
 						{
 							IncludeCurrentSegment = !nestedInExcluded
-								&& (node.Symbol == "ifdef" && SymbolsDefined.Contains(node.Children[2].Value[0])
-								|| node.Symbol == "ifndef" && !SymbolsDefined.Contains(node.Children[2].Value[0])),
+								&& !(node.Children[1].Value[0] == "ifdef" ^ SymbolsDefined.Contains(node.Children[2].Value[0])),
 							ExcludeToEnd = nestedInExcluded,
 							NestedInExcluded = nestedInExcluded
 						});
 
 						if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
-							CurrentSegment = new SegmentLocation() { Start = node.Anchor.Start };
+							CurrentSegment = new ExcludedSegmentLocation() { Start = node.Anchor.Start };
 
 						break;
 					case "else":
@@ -94,7 +93,7 @@ namespace PascalPreprocessor
 								/// всё продолжение будет некомпилируемое
 								Levels.Peek().ExcludeToEnd = true;
 								Levels.Peek().IncludeCurrentSegment = false;
-								CurrentSegment = new SegmentLocation() { Start = node.Anchor.Start };
+								CurrentSegment = new ExcludedSegmentLocation() { Start = node.Anchor.Start };
 							}
 							else
 							{
@@ -104,11 +103,9 @@ namespace PascalPreprocessor
 								/// иначе пропустим её одним блоком с предыдущей
 								if (Levels.Peek().IncludeCurrentSegment)
 								{
-									CurrentSegment.End = new PointLocation(
-										node.Anchor.End.Line,
-										node.Anchor.End.Column,
-										node.Anchor.End.Offset
-									);
+									CurrentSegment.End = node.Anchor.End;
+									CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
+
 									SegmentsToExclude.Add(CurrentSegment);
 								}
 							}
@@ -117,11 +114,9 @@ namespace PascalPreprocessor
 					case "endif":
 						if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 						{
-							CurrentSegment.End = new PointLocation(
-								node.Anchor.End.Line,
-								node.Anchor.End.Column,
-								node.Anchor.End.Offset
-							);
+							CurrentSegment.End = node.Anchor.End;
+							CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
+
 							SegmentsToExclude.Add(CurrentSegment);
 						}
 						Levels.Pop();
