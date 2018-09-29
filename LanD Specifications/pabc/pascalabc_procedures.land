@@ -4,12 +4,12 @@ COMMENT_ML	: '{' .*? '}'
 STRING_SKIP	: '\'\'' | '\\\\'
 STRING		: '\'' (STRING_SKIP|.)*? '\''
 MODIFIER	: 'internal'|'private'|'protected'|'public'
-ROUTINE_TYPE	: 'procedure'|'function'|'constructor'|'destructor'
+ROUTINE_TYPE: 'procedure'|'function'|'constructor'|'destructor'
 FALSE_BEGIN	: '.begin'
-ID			: '&'?[_a-zA-Z][_0-9a-zA-Z]*
+ID			: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 
-//round_bracketed = %left '(' %right ')'
-//code_bracketed	= %left ('try'|'case'|'begin'|'record'|'class') %right 'end'
+square_bracketed = %left '[' %right ']'
+round_bracketed = %left '(' %right ')'
 
 file			=	(Any | block '.' | outer_declaration)+
 outer_declaration	=	const|var|type|outer_routine
@@ -19,24 +19,26 @@ const			=	'const' const_atom+
 type			=	'type' type_atom+
 var				=	'var' var_atom+
 const_atom		=	name '=' Any ';'
-var_atom		=	(names_list (':' Any)? (':=' Any)? ';')
+var_atom		=	names_list (':' Any)? (':=' Any)? ';'
 type_atom		=	name '=' Any (record_or_class_body ';' => record_or_class | Any ';')
 
-record_or_class_body	=	('record'|'class') Any (MODIFIER|inner_routine|field|property|Any)+ 'end'
+record_or_class_body	=	('record'|'class') (Any (MODIFIER|inner_routine|field|property|attribute|Any)+ 'end')?
 
-outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
-inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
-routine_header	=	ROUTINE_TYPE %priority(2) name %priority(2) routine_arguments? (':' name)?
-routine_arguments		=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
+outer_routine	=	routine_header (':=' (Any|block))? ';' AnyInclude(ID) (outer_declaration* (block ';'))?!
+inner_routine	=	routine_header (':=' (Any|block))? ';' AnyInclude(ID) (inner_declaration* (block ';'))?!
+routine_header	=	(('procedure'|'function') %priority(2) name | ('constructor'|'destructor') %priority(2) name?) Any %priority(2) routine_arguments? (':' name)?
+routine_arguments		=	'(' (routine_arguments_atom (';' routine_arguments_atom)*)?  ')'
 routine_arguments_atom	=	('var'|'const'|'params')? ID (',' ID)* ':' Any
-field			=	names_list ':' Any ';'
-property		=	'property' name ':' Any ';'
+field			=	%ghost var_atom
+property		=	'property' name Any ':' Any ';'
 
 block		=	('begin'|'case'|'try') (block|Any)+ 'end'
 name_atom	=	'^'? ID
 name_tail_element	=	(('.'|'::') name_atom)
-name		=	name_atom (name_tail_element | '<' Any '>')*
+name		=	('array' 'of')? name_atom (name_tail_element | '<' Any '>')*
 names_list	=	name (',' name)*
+
+attribute	=	'[' Any ']'
 
 %%
 
