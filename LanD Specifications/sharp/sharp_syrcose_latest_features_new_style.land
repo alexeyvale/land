@@ -45,6 +45,7 @@ block		=	'{' Any '}'
 
 %%
 
+%parsing recovery
 %parsing ignoreundefined
 %parsing fragment STRING_INT_CODE
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE

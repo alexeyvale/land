@@ -27,6 +27,7 @@ atom		=	ID | '(' condition ')'
 
 %%
 
+%parsing recovery
 %parsing fragment STRING_INT_CODE
 %parsing ignoreundefined
 %parsing start file

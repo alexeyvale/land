@@ -19,7 +19,7 @@ namespace Land.Core
 	/// <summary>
 	/// Опции, касающиеся процесса разбора
 	/// </summary>
-	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, IGNOREUNDEFINED }
+	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, IGNOREUNDEFINED, RECOVERY }
 
 	/// <summary>
 	/// Опции, касающиеся отображения старого дерева в новое (изменённое) дерево

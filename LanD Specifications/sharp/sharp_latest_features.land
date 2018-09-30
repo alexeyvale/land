@@ -55,6 +55,7 @@ block		=	'{' Any '}'
 
 %%
 
+%parsing recovery
 %parsing fragment STRING_INT_CODE
 %parsing start namespace_content
 %parsing skip COMMENT STRING DIRECTIVE

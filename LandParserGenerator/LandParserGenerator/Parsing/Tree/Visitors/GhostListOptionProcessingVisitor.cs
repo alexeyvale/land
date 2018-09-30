@@ -23,7 +23,7 @@ namespace Land.Core.Parsing.Tree
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
 				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
-				if (node.Options.NodeOption == NodeOption.GHOST || node.Options.NodeOption == null 
+				if (node.Children[i].Options.NodeOption == NodeOption.GHOST || node.Children[i].Options.NodeOption == null 
 					&& (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
 					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)))
 				{

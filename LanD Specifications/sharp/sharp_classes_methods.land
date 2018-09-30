@@ -35,6 +35,7 @@ arguments	=	'(' (argument (',' argument)*)? ')'
 
 %%
 
+%parsing recovery
 %parsing fragment STRING_INT_CODE
 %parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
 %parsing start program

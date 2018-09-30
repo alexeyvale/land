@@ -350,6 +350,16 @@ namespace Land.Core.Parsing.LL
 
 		private IToken ErrorRecovery()
 		{
+			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			{
+				Log.Add(Message.Error(
+					$"Возобновление разбора в случае ошибки отключено",
+					LexingStream.CurrentToken.Location.Start
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
+
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(

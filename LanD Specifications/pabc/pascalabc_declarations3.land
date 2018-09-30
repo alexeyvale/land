@@ -1,0 +1,54 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '{' .*? '}'
+STRING_SKIP	: '\'\'' | '\\\\'
+STRING		: '\'' (STRING_SKIP|.)*? '\''
+
+ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
+ROUTINE_MODIFIER	: 'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'|'external'|'forward'
+
+ID			: '.'? '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+
+square_bracketed = %left '[' %right ']'
+round_bracketed = %left '(' %right ')'
+
+file			=	(Any|declaration)* 'end'? '.' 
+declaration		=	const|type|var|routine_part ';'|attribute|block
+const			=	'const' (const_atom ';'|attribute|Any)+!
+type			=	'type' (type_atom ';'|attribute|Any)+!
+var				=	'var' (var_atom ';'|attribute|Any)+!
+const_atom		=	name (':' Any)? '=' Any
+var_atom		=	names_list (':' Any class?)? (':=' Any)?
+type_atom		=	name '=' Any (class => class_type |)
+
+class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (class_members? 'end')?!
+class_members	=	class_member (';' class_member)*
+class_member	=	('internal'|'private'|'protected'|'public'|attribute)* ('class'|'static')? (routine_part|field|property|block) | Any
+
+routine_part	=	routine_header (':=' (Any|block))?|ROUTINE_MODIFIER Any (':=' (Any|block))?
+routine_header	=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
+
+field			=	%ghost var_atom
+property		=	'property' name Any ':' (block|Any)+
+
+name_atom			=	'^'? ID
+name_tail_element	=	('.'|'::') (name_atom|'operator')
+name		=	(('array'|'sequence') Any 'of')? name_atom (name_tail_element | '<' Any '>' | '[' Any ']')*
+names_list	=	name (',' name)*
+
+block		=	('begin'|'case'|'try'|'match') (block|Any)+ 'end'
+attribute	=	'[' Any ']'
+
+
+%%
+
+%parsing recovery
+%parsing ignoreundefined
+%parsing start file
+%parsing ignorecase
+%parsing skip COMMENT
+
+%nodes leaf name
+%nodes ghost declaration class class_members class_member
+
+%mapping land routine_header block class_type field property
