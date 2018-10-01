@@ -23,12 +23,11 @@ namespace Land.Core
 			var grammarOutput = new StreamWriter($"{lexerName}.g4");
 
 			grammarOutput.WriteLine($"lexer grammar {lexerName};");
-			grammarOutput.WriteLine();
-			grammarOutput.WriteLine(@"WS: [ \n\r\t]+ -> skip ;");
+			grammarOutput.WriteLine();	
 
 			/// Запоминаем соответствия между строчкой в генерируемом файле 
 			/// и тем терминалом, который оказывается на этой строчке
-			var linesCounter = 3;
+			var linesCounter = 2;
 			var tokensForLines = new Dictionary<int, string>();
 
 			foreach (var token in grammar.Tokens.Values.Where(t => t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
@@ -44,7 +43,9 @@ namespace Land.Core
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 
-			if(grammar.Options.IsSet(ParsingOption.IGNOREUNDEFINED))
+			grammarOutput.WriteLine(@"WS: [ \n\r\t] -> skip ;");
+
+			if (grammar.Options.IsSet(ParsingOption.IGNOREUNDEFINED))
 				grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
 			else
 				grammarOutput.WriteLine(@"UNDEFINED: . ;");

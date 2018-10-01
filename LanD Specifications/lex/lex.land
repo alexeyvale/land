@@ -1,0 +1,45 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING_ESC	: '@'('"' ~["]* '"')+
+
+ID	: [a-zA-Z0-9_]+
+
+REGEX_REPETITION : '{'[0-9]+(','[0-9]*)?'}'
+REGEX_CLASS : '{'ID'}'
+REGEX_PREDEFINED_CHAR_CLASS	: '['':'ID':'']'
+REGEX_CHAR_CLASS : '['(~[[\]\r\n]|REGEX_PREDEFINED_CHAR_CLASS)+']'
+REGEX_ESCAPE_CHAR : '\\'~[\r\n]
+REGEX_LITERAL_STR : '"'(~["]|'\\"')*'"'
+REGEX_SET_OP : '{-}'|'{+}'|'{*}'
+REGEX_ITEM :  REGEX_REPETITION|REGEX_CLASS|REGEX_PREDEFINED_CHAR_CLASS|REGEX_CHAR_CLASS|REGEX_ESCAPE_CHAR|REGEX_LITERAL_STR|REGEX_SET_OP|'<<EOF>>'
+
+LINE_END	: '\n'
+OTHER_SPACE_SYMBOL : [\r\t\f ]
+
+file	=	declarations '%%' rules '%%' Any
+
+declarations		=	(state_declaration|regex_declaration|direct_code|'%' Any LINE_END)*
+state_declaration	=	('%x'|'%s') id_list LINE_END
+regex_declaration	=	ID regex_from_decl LINE_END
+regex_from_decl		=	Any
+
+rules			=	(states? (group|rule)|direct_code)*
+states			=	'<' (id_list|'*') '>'
+id_list			=	ID (','? ID)*
+group			=	'{' (group|rule)* '}'
+rule			=	regex_from_rule (LINE_END|OTHER_SPACE_SYMBOL) (context_code|Any) LINE_END
+regex_from_rule	=	(REGEX_ITEM|Any)+
+
+context_code	=	'{' (AnyInclude('\'{\'', '\'}\'')|context_code)* '}'
+direct_code		=	'%{' Any '%}'
+
+%%
+
+%parsing start file
+%parsing skip COMMENT LINE_END OTHER_SPACE_SYMBOL
+%parsing fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
+
+%nodes leaf regex_from_decl regex_from_rule
+
+%mapping land group rule
