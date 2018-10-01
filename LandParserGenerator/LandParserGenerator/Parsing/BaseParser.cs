@@ -40,10 +40,14 @@ namespace Land.Core.Parsing
 				text = Preproc.Preprocess(text, out bool success);
 
 				/// Если препроцессор сработал успешно, можно парсить
-				if(success)
+				if (success)
 				{
 					root = ParsingAlgorithm(text, enableTracing);
 					Preproc.Postprocess(root, Log);
+				}
+				else
+				{
+					Log.AddRange(Preproc.Log);
 				}
 			}
 			else
