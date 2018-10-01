@@ -592,100 +592,106 @@ namespace Land.Core
 		{
 			var messages = new List<Message>();
 
-            foreach (var rule in Rules.Values)
-            {
-				messages.Add(Message.Trace(
-					rule.ToString(),
-					GetAnchor(rule.Name),
-					"LanD"
-				));
-
-				foreach (var alt in rule)
-                    foreach (var smb in alt)
-                    {
-                        if (this[smb] == null)
-							messages.Add(Message.Error(
-								$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
-								GetAnchor(rule.Name),
-								"LanD"
-							));
-
-						if(smb == Grammar.ANY_TOKEN_NAME)
-						{
-							var union = new HashSet<string>();
-
-							/// Проверяем, что в качестве аргументов для Any не указаны
-							/// имена неизвестных символов
-							foreach (var kvp in smb.Options.AnyOptions)
-							{
-								union.UnionWith(kvp.Value);
-								foreach (var arg in kvp.Value)
-								{
-									if (this[arg] == null)
-										messages.Add(Message.Error(
-											$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
-											GetAnchor(rule.Name),
-											"LanD"
-										));
-								}
-							}
-
-							/// Проверяем, что не существует символов, указанных
-							/// сразу в нескольких опциях
-							if (union.Count < smb.Options.AnyOptions.Sum(o => o.Value.Count))
-							{
-								messages.Add(Message.Error(
-											$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)} пересекаются",
-											GetAnchor(rule.Name),
-											"LanD"
-										));
-							}
-						}
-                    }
-            }	
-
-			/// Если в грамматике не фигурируют неопределённые символы
-			if (messages.All(m=>m.Type != MessageType.Error))
-			{
-				/// Проверяем наличие левой рекурсии для случая LL
-				if (Type == GrammarType.LL)
-				{
-					var emptyElementsRepetition = AutoRuleQuantifier.Where(kvp => 
-						(kvp.Value.Quantifier == Quantifier.ZERO_OR_MORE || kvp.Value.Quantifier == Quantifier.ONE_OR_MORE)
-						&& First(kvp.Value.Element).Contains(null)).Select(kvp => kvp.Key).ToList();
-
-					foreach (var nt in emptyElementsRepetition)
-					{
-						messages.Add(Message.Error(
-							$"Определение нетерминала {Userify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
-							GetAnchor(nt),
-							"LanD"
-						));
-					}
-
-					foreach (var nt in FindLeftRecursion().Except(emptyElementsRepetition))
-					{
-						messages.Add(Message.Error(
-							$"Определение нетерминала {Userify(nt)} допускает левую рекурсию",
-							GetAnchor(nt),
-							"LanD"
-						));
-					}
-				}
-
-				/// Также добавляем предупреждения о последовательно идущих Any
-				messages.AddRange(CheckConsecutiveAny());
-			}
-
+			/// Задан ли стартовый символ
 			if (String.IsNullOrEmpty(StartSymbol))
+			{
 				messages.Add(Message.Error(
 					$"Не задан стартовый символ",
 					null,
 					"LanD"
 				));
+			}
+			else
+			{
+				/// Проверяем грамматику на использование неопределённых символов
+				foreach (var rule in Rules.Values)
+				{
+					messages.Add(Message.Trace(
+						rule.ToString(),
+						GetAnchor(rule.Name),
+						"LanD"
+					));
 
-			/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
-			State = messages.Any(m=>m.Type == MessageType.Error) ? GrammarState.Invalid : GrammarState.Valid;
+					foreach (var alt in rule)
+						foreach (var smb in alt)
+						{
+							if (this[smb] == null)
+								messages.Add(Message.Error(
+									$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
+									GetAnchor(rule.Name),
+									"LanD"
+								));
+
+							if (smb == Grammar.ANY_TOKEN_NAME)
+							{
+								var union = new HashSet<string>();
+
+								/// Проверяем, что в качестве аргументов для Any не указаны
+								/// имена неизвестных символов
+								foreach (var kvp in smb.Options.AnyOptions)
+								{
+									union.UnionWith(kvp.Value);
+									foreach (var arg in kvp.Value)
+									{
+										if (this[arg] == null)
+											messages.Add(Message.Error(
+												$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
+												GetAnchor(rule.Name),
+												"LanD"
+											));
+									}
+								}
+
+								/// Проверяем, что не существует символов, указанных
+								/// сразу в нескольких опциях
+								if (union.Count < smb.Options.AnyOptions.Sum(o => o.Value.Count))
+								{
+									messages.Add(Message.Error(
+												$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)} пересекаются",
+												GetAnchor(rule.Name),
+												"LanD"
+											));
+								}
+							}
+						}
+				}
+
+				/// Если в грамматике не фигурируют неопределённые символы
+				if (messages.All(m => m.Type != MessageType.Error))
+				{
+					/// Проверяем наличие левой рекурсии для случая LL
+					if (Type == GrammarType.LL)
+					{
+						var emptyElementsRepetition = AutoRuleQuantifier.Where(kvp =>
+							(kvp.Value.Quantifier == Quantifier.ZERO_OR_MORE || kvp.Value.Quantifier == Quantifier.ONE_OR_MORE)
+							&& First(kvp.Value.Element).Contains(null)).Select(kvp => kvp.Key).ToList();
+
+						foreach (var nt in emptyElementsRepetition)
+						{
+							messages.Add(Message.Error(
+								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
+								GetAnchor(nt),
+								"LanD"
+							));
+						}
+
+						foreach (var nt in FindLeftRecursion().Except(emptyElementsRepetition))
+						{
+							messages.Add(Message.Error(
+								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию",
+								GetAnchor(nt),
+								"LanD"
+							));
+						}
+					}
+
+					/// Также добавляем предупреждения о последовательно идущих Any
+					messages.AddRange(CheckConsecutiveAny());
+				}
+
+				/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
+				State = messages.Any(m => m.Type == MessageType.Error) ? GrammarState.Invalid : GrammarState.Valid;
+			}
 
 			return messages;
 		}
