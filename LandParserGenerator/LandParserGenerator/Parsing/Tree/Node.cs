@@ -148,7 +148,7 @@ namespace Land.Core.Parsing.Tree
 		public override string ToString()
 		{
 			return (String.IsNullOrEmpty(Alias) ? Symbol : Alias) 
-				+ (Value.Count > 0 ? ": " + String.Join(" ", Value) : "");
+				+ (Value.Count > 0 ? ": " + String.Join(" ", Value.Select(v=>v.Trim())) : "");
 		}
 	}
 }
