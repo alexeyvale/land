@@ -581,7 +581,10 @@ namespace Land.GUI
 				try
 				{
 					Node root = null;
-					FrontendUpdateDispatcher.Invoke((Action)(() => { root = File_Parse(files[counter], File.ReadAllText(files[counter])); }));
+					FrontendUpdateDispatcher.Invoke((Action)(() => 
+					{
+						root = File_Parse(files[counter], File.ReadAllText(files[counter], GetEncoding(files[counter])));
+					}));
 
 					timeSpent += Parser.Statistics.TimeSpent;
 

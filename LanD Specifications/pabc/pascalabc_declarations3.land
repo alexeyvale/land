@@ -6,14 +6,16 @@ STRING		: '\'' (STRING_SKIP|.)*? '\''
 
 ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
 ROUTINE_MODIFIER	: 'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'|'external'|'forward'
+ACCESS_MODIFIER		: 'internal'|'private'|'protected'|'public'
 
-ID			: '.'? '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+ID					: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+CLASS_MEMBER_USAGE	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 
 square_bracketed = %left '[' %right ']'
 round_bracketed = %left '(' %right ')'
 
-file			=	(Any|declaration)* 'end'? '.' 
-declaration		=	const|type|var|routine_part ';'|attribute|block
+file			=	(Any|'interface'|'implementation'|declaration)* ('end' '.' )?
+declaration		=	const|type|var|routine_part ';'|attribute|block '.'?
 const			=	'const' (const_atom ';'|attribute|Any)+!
 type			=	'type' (type_atom ';'|attribute|Any)+!
 var				=	'var' (var_atom ';'|attribute|Any)+!
@@ -23,7 +25,7 @@ type_atom		=	name '=' Any (class => class_type |)
 
 class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (class_members? 'end')?!
 class_members	=	class_member (';' class_member)*
-class_member	=	('internal'|'private'|'protected'|'public'|attribute)* ('class'|'static')? (routine_part|field|property|block) | Any
+class_member	=	(ACCESS_MODIFIER|attribute)* ('class'|'static')? (routine_part|field|property|block) | Any
 
 routine_part	=	routine_header (':=' (Any|block))?|ROUTINE_MODIFIER Any (':=' (Any|block))?
 routine_header	=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
@@ -32,7 +34,7 @@ field			=	%ghost var_atom
 property		=	'property' name Any ':' (block|Any)+
 
 name_atom			=	'^'? ID
-name_tail_element	=	('.'|'::') (name_atom|'operator')
+name_tail_element	=	'::' name_atom | CLASS_MEMBER_USAGE
 name		=	(('array'|'sequence') Any 'of')? name_atom (name_tail_element | '<' Any '>' | '[' Any ']')*
 names_list	=	name (',' name)*
 
