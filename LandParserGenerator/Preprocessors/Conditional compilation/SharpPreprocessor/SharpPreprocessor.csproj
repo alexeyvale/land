@@ -7,8 +7,8 @@
     <ProjectGuid>{3AC961FA-CE34-4C61-8E32-4175D348A03B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpPreprocessor</RootNamespace>
-    <AssemblyName>SharpPreprocessor</AssemblyName>
+    <RootNamespace>SharpPreprocessing.ConditionalCompilation</RootNamespace>
+    <AssemblyName>SharpPreprocessing.ConditionalCompilation</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="sharp_preprocessor">
-      <HintPath>..\..\..\LanD Specifications\sharp\sharp_preprocessor.dll</HintPath>
+      <HintPath>..\..\..\..\LanD Specifications\sharp\sharp_preprocessor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

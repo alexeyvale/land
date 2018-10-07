@@ -7,8 +7,8 @@
     <ProjectGuid>{5BB7C445-36C4-4686-B17A-A163385848A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PascalPreprocessor</RootNamespace>
-    <AssemblyName>PascalPreprocessor</AssemblyName>
+    <RootNamespace>PascalPreprocessing.TreePostprocessing</RootNamespace>
+    <AssemblyName>PascalPreprocessing.TreePostprocessing</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="pascalabc_declarations3">
-      <HintPath>..\..\..\..\LanD Specifications\pabc\pascalabc_declarations3.dll</HintPath>
+    <Reference Include="pascalabc_declarations">
+      <HintPath>..\..\..\..\LanD Specifications\pabc\pascalabc_declarations.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RoutineAggregationVisitor.cs" />
     <Compile Include="PascalPreprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

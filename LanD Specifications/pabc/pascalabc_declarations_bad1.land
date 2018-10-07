@@ -1,0 +1,62 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '{' .*? '}'
+STRING_SKIP	: '\'\'' | '\\\\'
+STRING		: '\'' (STRING_SKIP|.)*? '\''
+ACCESS_MODIFIER		: 'internal'|'private'|'protected'|'public'
+ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
+ROUTINE_MODIFIER	: 'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'
+ID			: '.'? '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+
+square_bracketed = %left '[' %right ']'
+round_bracketed = %left '(' %right ')'
+
+file					=	(Any ';'|'initialization'|'finalization'|interface_section|outer_declaration)+ (block | 'end') '.'
+interface_section		=	'interface' (interface_declaration|Any)* 'implementation'
+outer_declaration		=	const|var|type|outer_routine|label
+inner_declaration		=	const|var|type
+interface_declaration	=	const|var|type|routine_header ';'
+
+label			=	'label' Any ';'
+const			=	'const' (const_atom|attribute|Any)+
+type			=	'type' (type_atom|attribute|Any)+
+var				=	'var' (var_atom|attribute|Any)+
+const_atom		=	name (':' Any)? '=' Any ';'
+var_atom		=	names_list (':' Any)? (':=' Any)? ';'
+type_atom		=	name '=' Any (record_class_interface_body ';' => record_class_interface | ';')
+
+record_class_interface_body	=	('record'|'class'|'typeclass'|'instance'|'interface') Any 
+								((ACCESS_MODIFIER|('class'|'static')? (inner_routine|field|property)|attribute|Any)* 'end')?
+
+outer_routine_tail	=	';' (ROUTINE_MODIFIER Any outer_routine_tail | ('forward'|'external') Any ';' | outer_declaration* block ';') | ':=' (Any|block) ';'
+inner_routine_tail	=	';' (ROUTINE_MODIFIER Any inner_routine_tail | inner_declaration* block ';')?! | ':=' (Any|block) ';'
+outer_routine	=	routine_header outer_routine_tail
+inner_routine	=	routine_header inner_routine_tail
+
+routine_header	=	ROUTINE_TYPE %priority(2) (name | 'operator')? Any %priority(2) routine_arguments? (':' Any)?
+routine_arguments		=	'(' (routine_arguments_atom (';' routine_arguments_atom)*)?  ')'
+routine_arguments_atom	=	('var'|'const'|'params')? ID (',' ID)* ':' Any
+field			=	%ghost var_atom
+property		=	'property' name Any ':' (block|Any)+ ';'
+
+block		=	('begin'|'case'|'try'|'match') (block|Any)+ 'end'
+
+name_atom			=	'^'? ID
+name_tail_element	=	('.'|'::') (name_atom|'operator')
+name		=	(('array'|'sequence') Any 'of')? name_atom (name_tail_element | '<' Any '>' | '[' Any ']')*
+names_list	=	name (',' name)*
+
+attribute	=	'[' Any ']'
+
+%%
+
+//%parsing recovery
+%parsing ignoreundefined
+%parsing start file
+%parsing ignorecase
+%parsing skip COMMENT
+
+%nodes leaf name
+%nodes ghost outer_declaration inner_declaration interface_declaration interface_section names_list record_class_interface_body inner_routine_tail outer_routine_tail
+
+%mapping land var_atom const_atom type_atom outer_routine inner_routine property field record_class_interface

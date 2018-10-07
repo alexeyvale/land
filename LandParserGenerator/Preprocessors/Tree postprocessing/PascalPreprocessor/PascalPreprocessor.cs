@@ -8,9 +8,7 @@ using Land.Core;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
 
-using pascalabc_declarations3;
-
-namespace PascalPreprocessor.TreePostprocessing
+namespace PascalPreprocessing.TreePostprocessing
 {
 	public class PascalPreprocessor : BasePreprocessor
 	{
@@ -34,7 +32,7 @@ namespace PascalPreprocessor.TreePostprocessing
 	{
 		public override void Postprocess(Node root, List<Message> log)
 		{
-
+			root.Accept(new RoutineAggregationVisitor());
 		}
 
 		public override string Preprocess(string text, out bool success)

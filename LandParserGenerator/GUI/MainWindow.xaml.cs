@@ -27,11 +27,12 @@ namespace Land.GUI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string RECENT_GRAMMARS_FILE = "./recent_grammars.land.ide";
-		private string RECENT_PREPROCS_FILE = "./recent_preprocs.land.ide";
+		private const string RECENT_GRAMMARS_FILE = "./recent_grammars.land.ide";
+		private const string RECENT_PREPROCS_FILE = "./recent_preprocs.land.ide";
 
-		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
+		private string TmpFilesFolder { get; set; } = Path.Combine(Path.GetTempPath(), "LanD");
 
+		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
 		private SegmentsBackgroundRenderer File_SegmentColorizer { get; set; }
 
@@ -41,6 +42,8 @@ namespace Land.GUI
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			Directory.CreateDirectory(TmpFilesFolder);
 
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
 				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
@@ -105,6 +108,9 @@ namespace Land.GUI
 				listContent.Add(item.ToString());
 
 			File.WriteAllLines(RECENT_PREPROCS_FILE, listContent.Take(10));
+
+			/// Очищаем директорию со временными файлами
+			Directory.Delete(TmpFilesFolder, true);
 		}
 
 		private void MoveCaretToSource(SegmentLocation loc, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
@@ -235,6 +241,7 @@ namespace Land.GUI
 			/// Копируем сборку во временный файл и загружаем её оттуда,
 			/// чтобы не блокировать доступ к исходной dll
 			var tmpName = Path.GetTempFileName();
+			File.Move(tmpName, tmpName = Path.Combine(TmpFilesFolder, Path.GetFileName(tmpName)));
 			File.Copy(path, tmpName, true);
 
 			return Assembly.LoadFile(tmpName);

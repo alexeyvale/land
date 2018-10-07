@@ -7,8 +7,8 @@
     <ProjectGuid>{9D1F2E8F-DCF1-44BF-A515-1E7D97FEC1DB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PascalPreprocessor</RootNamespace>
-    <AssemblyName>PascalPreprocessor</AssemblyName>
+    <RootNamespace>PascalPreprocessing.ConditionalCompilation</RootNamespace>
+    <AssemblyName>PascalPreprocessing.ConditionalCompilation</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -38,7 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="pascalabc_preprocessor">
-      <HintPath>..\..\..\LanD Specifications\pabc\pascalabc_preprocessor.dll</HintPath>
+      <HintPath>..\..\..\..\LanD Specifications\pabc\pascalabc_preprocessor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
