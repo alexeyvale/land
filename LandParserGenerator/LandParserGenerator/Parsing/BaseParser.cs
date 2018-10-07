@@ -13,16 +13,24 @@ namespace Land.Core.Parsing
 	public abstract class BaseParser
 	{
 		protected ILexer Lexer { get; set; }
+		protected BaseNodeGenerator NodeGenerator { get; set; }
+		protected BaseNodeRetypingVisitor NodeRetypingVisitor { get; set; }
+
 		public Grammar GrammarObject { get; protected set; }
 		private BasePreprocessor Preproc { get; set; }
 
 		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }
 
-		public BaseParser(Grammar g, ILexer lexer)
+		public BaseParser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null, BaseNodeRetypingVisitor retypeVisitor = null)
 		{
 			GrammarObject = g;
 			Lexer = lexer;
+
+			NodeGenerator = nodeGen 
+				?? new BaseNodeGenerator(g);
+			NodeRetypingVisitor = retypeVisitor 
+				?? new BaseNodeRetypingVisitor(g);
 		}
 
 		public Node Parse(string text, bool enableTracing = false)
@@ -74,6 +82,11 @@ namespace Land.Core.Parsing
 			root.Accept(new LeafOptionProcessingVisitor(GrammarObject));
 			root.Accept(new MergeAnyVisitor(GrammarObject));
 			root.Accept(new MappingOptionsProcessingVisitor(GrammarObject));
+
+			NodeRetypingVisitor.Root = root;
+			root.Accept(NodeRetypingVisitor);
+			root = NodeRetypingVisitor.Root;
+
 			root.Accept(new UserifyVisitor(GrammarObject));
 		}
 

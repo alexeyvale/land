@@ -7,6 +7,8 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 
+using sharp_preprocessor;
+
 namespace SharpPreprocessor
 {
 
@@ -80,9 +82,9 @@ namespace SharpPreprocessor
 
 		public override void Visit(Node node)
 		{
-			switch (node.Symbol)
+			switch (node)
 			{
-				case "if":
+				case if_node if_nd:
 					/// Весь if нужно пропустить, если он вложен в пропускаемую секцию
 					var nestedInExcluded = Levels.Count != 0 && !Levels.Peek().IncludeCurrentSegment;
 
@@ -97,8 +99,8 @@ namespace SharpPreprocessor
 						InitCurrentSegment(node.Anchor.Start);
 
 					break;
-				case "elif":
-				case "else":
+				case elif_node elif_nd:
+				case else_node else_nd:
 					/// Если не нужно пропустить всю оставшуюся часть текущего if
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().ExcludeToEnd)
 					{
@@ -113,7 +115,7 @@ namespace SharpPreprocessor
 						else
 						{
 							Levels.Peek().IncludeCurrentSegment 
-								= node.Symbol == "else" || VisitCondition(node.Children[1]);
+								= node is else_node || VisitCondition(node.Children[1]);
 
 							/// Если текущая секция компилируемая, добавляем предыдущую к списку пропускаемых областей
 							/// иначе пропустим её одним блоком с предыдущей
@@ -125,7 +127,7 @@ namespace SharpPreprocessor
 						}
 					}
 					break;
-				case "endif":
+				case endif_node endif_nd:
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 					{
 						FinCurrentSegment(node.Anchor.End);
@@ -133,14 +135,14 @@ namespace SharpPreprocessor
 					}
 					Levels.Pop();
 					break;
-				case "define":
+				case define_node define_nd:
 					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 					{
 						for (var i = 1; i < node.Children.Count; ++i)
 							SymbolsDefined.Add(node.Children[i].Value[0]);
 					}
 					break;
-				case "undef":
+				case undef_node undef_nd:
 					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 					{
 						for (var i = 1; i < node.Children.Count; ++i)
@@ -155,21 +157,21 @@ namespace SharpPreprocessor
 
 		public bool VisitCondition(Node node)
 		{
-			switch (node.Symbol)
+			switch (node)
 			{
-				case "condition":
+				case condition_node nd:
 					return VisitCondition(node.Children[0]) || VisitCondition(node.Children[1]);
-				case "or_right":
+				case or_right_node nd:
 					return node.Children.Count > 0 ? VisitCondition(node.Children[1]) || VisitCondition(node.Children[2]) : false;
-				case "ands":
+				case ands_node nd:
 					return VisitCondition(node.Children[0]) && VisitCondition(node.Children[1]);
-				case "and_right":
+				case and_right_node nd:
 					return node.Children.Count > 0 ? VisitCondition(node.Children[1]) || VisitCondition(node.Children[2]) : true;
-				case "atom_or_neg":
+				case atom_or_neg_node nd:
 					return node.Children.Count > 1 ? !VisitCondition(node.Children[1]) : VisitCondition(node.Children[0]);
-				case "atom":
+				case atom_node nd:
 					return node.Children.Count > 1 ? VisitCondition(node.Children[1]) : VisitCondition(node.Children[0]);
-				case "ID":
+				case ID_node nd:
 					return node.Value[0] == "true" || SymbolsDefined.Contains(node.Value[0]);
 				default:
 					return false;

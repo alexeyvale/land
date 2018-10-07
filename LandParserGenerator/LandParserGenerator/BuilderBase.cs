@@ -228,10 +228,12 @@ namespace Land.Core
 					var lexerFileName = $"{@namespace.Replace('.', '_')}_Lexer.cs";
 					var parserFileName = $"{@namespace.Replace('.', '_')}_Parser.cs";
 					var grammarFileName = $"{@namespace.Replace('.', '_')}_Grammar.cs";
+					var nodeGeneratorFileName = $"{@namespace.Replace('.', '_')}_NodeGenerator.cs";
 
 					BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
 					File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
 					File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
+					File.WriteAllText(nodeGeneratorFileName, GetNodeGeneratorText(builtGrammar, @namespace));
 
 					if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
 					{
@@ -266,7 +268,7 @@ namespace Land.Core
 					if(!String.IsNullOrEmpty(keyPath))
 						compilerParams.CompilerOptions = $"/keyfile:\"{keyPath}\"";
 
-					var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName);
+					var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName, nodeGeneratorFileName);
 
 					if (compilationResult.Errors.Count == 0)
 					{
@@ -349,14 +351,16 @@ namespace " + @namespace + @"
 					parser = new Land.Core.Parsing.LL.Parser(grammar,
 						new AntlrLexerAdapter(
 							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-						)
+						),
+						new NodeGenerator(grammar)
 					);
 					break;
 				case GrammarType.LR:
 					parser = new Land.Core.Parsing.LR.Parser(grammar,
 						new AntlrLexerAdapter(
 							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-						)
+						),
+						new NodeGenerator(grammar)
 					);
 					break;
 			}
@@ -365,6 +369,115 @@ namespace " + @namespace + @"
 		}
 	}
 }";
+		}
+
+		private static string GetNodeGeneratorText(Grammar grammar, string @namespace)
+		{
+			var nodeCLassesSource = new StringBuilder();
+
+			nodeCLassesSource.AppendLine("using System;");
+			nodeCLassesSource.AppendLine("using System.Collections.Generic;");
+			nodeCLassesSource.AppendLine("using System.Linq;");
+			nodeCLassesSource.AppendLine("using System.Reflection;");
+
+			nodeCLassesSource.AppendLine("using Land.Core;");
+			nodeCLassesSource.AppendLine("using Land.Core.Parsing.Tree;");
+
+			nodeCLassesSource.AppendLine($"namespace {@namespace} {{");
+
+			nodeCLassesSource.AppendLine(@"
+	public class NodeGenerator : BaseNodeGenerator 
+	{
+		public NodeGenerator(Grammar grammar): base(grammar)
+		{
+			foreach (var smb in grammar.Rules.Keys.Where(key => !key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
+			{
+				var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
+				Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_NODE_TYPE];
+			}
+
+			foreach (var smb in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+			{
+				var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
+				Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_NODE_TYPE];
+			}
+		}
+	}");
+
+			nodeCLassesSource.AppendLine(@"
+	public class NodeRetypingVisitor : BaseNodeRetypingVisitor
+	{
+		private Dictionary<string, ConstructorInfo> Cache { get; set; }
+
+		public NodeRetypingVisitor(Grammar grammar): base(grammar)
+		{
+			Cache = new Dictionary<string, ConstructorInfo>();
+
+			foreach (var kvp in grammar.Aliases)
+				foreach (var alias in kvp.Value)
+				{
+					var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + alias + ""_node"");
+
+					if(type != null)
+						Cache[alias] = type.GetConstructor(new Type[] { typeof(Node) });
+				}
+		}
+
+		public override void Visit(Node node)
+		{
+			if(Cache.ContainsKey(node.Alias))
+			{
+				var newNode = (Node)Cache[node.Alias].Invoke(new object[] { node });
+
+				if(node.Parent != null)
+				{
+					var idx = node.Parent.Children.IndexOf(node);
+					node.Parent.Children.RemoveAt(idx);
+					node.Parent.Children.Insert(idx, newNode);
+				}
+				else
+					Root = newNode;
+				
+				foreach(var child in newNode.Children)
+					child.Parent = newNode;
+
+				node = newNode;
+			}
+			
+			foreach (var child in node.Children)
+				child.Accept(this);
+		}
+	}");
+
+
+			foreach (var name in grammar.Rules.Keys.Where(key=>!key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
+				nodeCLassesSource.AppendLine(@"
+	public class " + name + @"_node : Node 
+	{
+		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + name + @"_node(Node node): base(node) {}
+	}");
+
+			foreach (var kvp in grammar.Aliases)
+				foreach (var alias in kvp.Value)
+					nodeCLassesSource.AppendLine(@"
+	public class " + alias + @"_node : " + kvp.Key + @"_node 
+	{
+		public " + alias + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + alias + @"_node(Node node): base(node) {}
+	}");
+
+			foreach (var name in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+				nodeCLassesSource.AppendLine(@"
+	public class " + name + @"_node : Node 
+	{
+		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + name + @"_node(Node node): base(node) {}
+	}");
+
+			nodeCLassesSource.AppendLine("}");
+
+			return nodeCLassesSource.ToString();
 		}
 	}
 }

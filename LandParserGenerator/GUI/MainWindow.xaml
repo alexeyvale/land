@@ -16,7 +16,7 @@
 		<FontFamily x:Key="FontAwesomeRegular">Fonts/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Fonts/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 
-		<Style x:Key="IconButtonStyle" TargetType="{x:Type Button}">
+		<Style x:Key="IconStyle" TargetType="{x:Type Control}">
 			<Setter Property="FontSize" Value="14pt"/>
 			<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
 			<Setter Property="Foreground" Value="Black"/>
@@ -29,6 +29,9 @@
 				</Trigger>
 			</Style.Triggers>
 		</Style>
+
+		<Style x:Key="IconToggleButtonStyle" TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource IconStyle}"></Style>
+		<Style x:Key="IconButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource IconStyle}"></Style>
 	</Window.Resources>
 	
 	<Grid>
@@ -55,18 +58,27 @@
                                         <RowDefinition Height="100*"></RowDefinition>
                                         <RowDefinition Height="31"></RowDefinition>
                                     </Grid.RowDefinitions>
-                                    <ToolBar Grid.Row="0">
+									<ToolBar Grid.Row="0">
+										<Label Padding="10,7,10,0">ГРАММАТИКА</Label>
 										<Button Name="Grammar_LoadGrammarButton" Click="Grammar_LoadGrammarButton_Click" ToolTip="Открыть" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
 										<Button Name="Grammar_SaveButton" Click="Grammar_SaveButton_Click" Content="&#xf0c7;" ToolTip="Сохранить" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
 										<Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click" Content="&#xf15b;" ToolTip="Новая" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click">Сгенерировать парсер</Button>
+										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click" Content="&#xf093;" ToolTip="Сгенерировать и загрузить парсер" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<Button Name="Grammar_LibraryButton" Click="Grammar_LibraryButton_Click">Создать библиотеку</Button>
+										<Button Name="Grammar_RebuildButton" Click="Grammar_RebuildButton_Click" Content="&#xf01e;" ToolTip="Перегенерировать парсер" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<ComboBox MinWidth="80" Name="Grammar_RecentFiles" ToolTip="Последние открытые грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+										<ComboBox MinWidth="80" MaxWidth="200" Margin="0, 0, 10, 0" Name="Grammar_RecentGrammars" ToolTip="Недавние грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+										<Separator></Separator>
+										<Separator></Separator>
+										<Label Padding="10,7,10,0">ПРЕПРОЦЕССОР</Label>
+										<Button Name="Grammar_LoadPreprocButton" Click="Grammar_LoadPreprocButton_Click" ToolTip="Выбрать препроцессор" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
+										<Separator></Separator>
+										<ComboBox MinWidth="80" MaxWidth="200" Name="Grammar_RecentPreprocs" ToolTip="Недавние препроцессоры" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+										<Separator></Separator>
+										<ToggleButton Name="Grammar_DisablePreprocButton" ToolTip="Отключить препроцессор" Content="&#xf057;" Checked="Grammar_DisablePreprocButton_Checked" Unchecked="Grammar_DisablePreprocButton_Checked" Style="{StaticResource IconToggleButtonStyle}"/>
 									</ToolBar>
                                     <avalonedit:TextEditor
                                         Grid.Row="1"
@@ -127,10 +139,8 @@
 										<Button Name="File_ClearButton" Click="File_ClearButton_Click" Content="&#xf15b;" ToolTip="Очистить" Style="{StaticResource IconButtonStyle}"/>
                                         <Separator></Separator>
                                         <Button Name="File_ParseButton" Click="File_ParseButton_Click">Запустить парсер</Button>
-                                        <Separator></Separator>
-										<ToggleButton Name="File_PreprocessToggle">Препроцессор</ToggleButton>
-                                        <Separator></Separator>
-                                        <Label Name="File_NameLabel"></Label>
+										<Separator></Separator>
+										<Label Name="File_NameLabel"></Label>
                                     </ToolBar>
                                     <avalonedit:TextEditor
                                         Name="File_Editor"
@@ -332,7 +342,14 @@
                                 <RowDefinition Height="100*"></RowDefinition>
                             </Grid.RowDefinitions>
                             <Label Grid.Row="0">Перепривязка</Label>
-							<ListBox Grid.Row="1" Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
+							<Grid Grid.Row="1">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="50*"></RowDefinition>
+									<RowDefinition Height="50*"></RowDefinition>
+								</Grid.RowDefinitions>
+								<ListBox Grid.Row="0" Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
+								<TextBox Grid.Row="1" Name="MappingDebug_SimilarityInfo"></TextBox>
+							</Grid>
                         </Grid>
                         <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
                         <Grid Grid.Column="4">

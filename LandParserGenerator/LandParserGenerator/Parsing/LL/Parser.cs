@@ -29,13 +29,13 @@ namespace Land.Core.Parsing.LL
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
-		public Parser(Grammar g, ILexer lexer): base(g, lexer)
+		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLL1(g);
 
-            /// В ходе парсинга потребуется First,
-            /// учитывающее возможную пустоту ANY
-            g.UseModifiedFirst = true;
+			/// В ходе парсинга потребуется First,
+			/// учитывающее возможную пустоту ANY
+			g.UseModifiedFirst = true;
 		}
 
 		/// <summary>
@@ -54,10 +54,9 @@ namespace Land.Core.Parsing.LL
 			/// Готовим лексер и стеки
 			LexingStream = new TokenStream(Lexer, text);
 			Stack = new Stack<Node>();
-
 			/// Кладём на стек стартовый символ
-			var root = new Node(GrammarObject.StartSymbol);
-			Stack.Push(new Node(Grammar.EOF_TOKEN_NAME));
+			var root = NodeGenerator.Generate(GrammarObject.StartSymbol);
+			Stack.Push(NodeGenerator.Generate(Grammar.EOF_TOKEN_NAME));
 			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
@@ -130,7 +129,7 @@ namespace Land.Core.Parsing.LL
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
-							var newNode = new Node(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
+							var newNode = NodeGenerator.Generate(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
 
 							stackTop.AddFirstChild(newNode);
 							Stack.Push(newNode);
@@ -440,7 +439,7 @@ namespace Land.Core.Parsing.LL
 				}
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
-				var anyNode = new Node(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
+				var anyNode = NodeGenerator.Generate(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
 
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));

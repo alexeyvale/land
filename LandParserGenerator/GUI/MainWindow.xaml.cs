@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
+using System.Reflection;
 
 using Microsoft.Win32;
 
@@ -26,7 +27,8 @@ namespace Land.GUI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private string LAST_GRAMMARS_FILE = "./last_grammars.land.ide";
+		private string RECENT_GRAMMARS_FILE = "./recent_grammars.land.ide";
+		private string RECENT_PREPROCS_FILE = "./recent_preprocs.land.ide";
 
 		private Brush LightRed = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 
@@ -34,6 +36,7 @@ namespace Land.GUI
 		private SegmentsBackgroundRenderer File_SegmentColorizer { get; set; }
 
 		private Land.Core.Parsing.BaseParser Parser { get; set; }
+		private BasePreprocessor Preprocessor { get; set; }
 
 		public MainWindow()
 		{
@@ -50,14 +53,26 @@ namespace Land.GUI
 			File_Editor.TextArea.TextView.BackgroundRenderers.Add(File_SegmentColorizer = new SegmentsBackgroundRenderer(File_Editor.TextArea));
 
 
-			if (File.Exists(LAST_GRAMMARS_FILE))
+			if (File.Exists(RECENT_GRAMMARS_FILE))
 			{
-				var files = File.ReadAllLines(LAST_GRAMMARS_FILE);
+				var files = File.ReadAllLines(RECENT_GRAMMARS_FILE);
 				foreach(var filepath in files)
 				{
 					if(!String.IsNullOrEmpty(filepath))
 					{
-						Grammar_RecentFiles.Items.Add(filepath);
+						Grammar_RecentGrammars.Items.Add(filepath);
+					}
+				}
+			}
+
+			if (File.Exists(RECENT_PREPROCS_FILE))
+			{
+				var files = File.ReadAllLines(RECENT_PREPROCS_FILE);
+				foreach (var filepath in files)
+				{
+					if (!String.IsNullOrEmpty(filepath))
+					{
+						Grammar_RecentPreprocs.Items.Add(filepath);
 					}
 				}
 			}
@@ -77,10 +92,19 @@ namespace Land.GUI
 		{
 			var listContent = new List<string>();
 
-			foreach (var item in Grammar_RecentFiles.Items)
+			/// Запоминаем список последних открытых грамматик
+			foreach (var item in Grammar_RecentGrammars.Items)
 				listContent.Add(item.ToString());
 
-			File.WriteAllLines(LAST_GRAMMARS_FILE, listContent.Take(10));
+			File.WriteAllLines(RECENT_GRAMMARS_FILE, listContent.Take(10));
+
+			listContent.Clear();
+
+			/// Запоминаем список последних использованных препроцессоров
+			foreach (var item in Grammar_RecentPreprocs.Items)
+				listContent.Add(item.ToString());
+
+			File.WriteAllLines(RECENT_PREPROCS_FILE, listContent.Take(10));
 		}
 
 		private void MoveCaretToSource(SegmentLocation loc, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
@@ -105,7 +129,15 @@ namespace Land.GUI
 
 		#region Генерация парсера
 
+		/// <summary>
+		/// Текущая открытая грамматика
+		/// </summary>
 		private string CurrentGrammarFilename { get; set; } = null;
+
+		/// <summary>
+		///  Последние подтверждённые настройки генерации библиотеки для текущей грамматики
+		/// </summary>
+		private LibrarySettingsWindow LastLibrarySettings { get; set; }
 
 		private bool MayProceedClosingGrammar()
 		{
@@ -134,50 +166,40 @@ namespace Land.GUI
 
 		private void Grammar_BuildButton_Click(object sender, RoutedEventArgs e)
 		{
-			Parser = null;
-			var messages = new List<Message>();
-
-			Parser = BuilderBase.BuildParser(GrammarType.LL, Grammar_Editor.Text, messages);
-
-			Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m=>m.Type == MessageType.Trace).Select(m=>m.Text));
-			Grammar_ErrorsList.ItemsSource = messages.Where(m=>m.Type == MessageType.Error || m.Type == MessageType.Warning);
-
-			if (Parser == null || messages.Count(m=>m.Type == MessageType.Error) > 0)
-			{
-				Grammar_StatusBarLabel.Content = "Обнаружены ошибки в грамматике языка";
-				Grammar_StatusBar.Background = LightRed;
-			}
-			else
-			{
-				Grammar_StatusBarLabel.Content = "Парсер успешно сгенерирован";
-				Grammar_StatusBar.Background = Brushes.LightGreen;
-			}
-		}
-
-		private void Grammar_LibraryButton_Click(object sender, RoutedEventArgs e)
-		{
 			var librarySettings = new LibrarySettingsWindow();
 
-			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(CurrentGrammarFilename) 
+			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(CurrentGrammarFilename)
 				? Path.GetFileNameWithoutExtension(CurrentGrammarFilename)
 				: null;
 			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(CurrentGrammarFilename);
 
 			if (librarySettings.ShowDialog() == true)
 			{
+				/// Запоминаем одобренные настройки генерации парсера,
+				/// их будем использовать для быстрой перегенерации
+				LastLibrarySettings = librarySettings;
+
+				Grammar_RebuildButton_Click(null, null);
+			}
+		}
+
+		private void Grammar_RebuildButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (LastLibrarySettings != null)
+			{
 				var messages = new List<Message>();
 				var success = BuilderBase.GenerateLibrary(
-					GrammarType.LL, 
-					Grammar_Editor.Text, 
-					librarySettings.Input_Namespace.Text, 
-					librarySettings.Input_OutputDirectory.Text,
-					librarySettings.Input_IsSignedAssembly.IsChecked == true 
-						? String.IsNullOrWhiteSpace(librarySettings.Input_KeysFile.Text)
-							? Path.Combine(librarySettings.Input_OutputDirectory.Text, $"{librarySettings.Input_Namespace.Text}.snk")
-							: librarySettings.Input_KeysFile.Text
+					GrammarType.LL,
+					Grammar_Editor.Text,
+					LastLibrarySettings.Input_Namespace.Text,
+					LastLibrarySettings.Input_OutputDirectory.Text,
+					LastLibrarySettings.Input_IsSignedAssembly.IsChecked == true
+						? String.IsNullOrWhiteSpace(LastLibrarySettings.Input_KeysFile.Text)
+							? Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.snk")
+							: LastLibrarySettings.Input_KeysFile.Text
 						: null,
 					messages
-				);			
+				);
 
 				Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m => m.Type == MessageType.Trace).Select(m => m.Text));
 				Grammar_ErrorsList.ItemsSource = messages.Where(m => m.Type == MessageType.Error || m.Type == MessageType.Warning);
@@ -189,17 +211,46 @@ namespace Land.GUI
 				}
 				else
 				{
-					Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована";
-					Grammar_StatusBar.Background = Brushes.LightGreen;
+					Parser = (Core.Parsing.BaseParser)LoadAssembly(Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.dll"))
+						.GetType($"{LastLibrarySettings.Input_Namespace.Text}.ParserProvider")?.GetMethod("GetParser").Invoke(null, null);
+
+					if (Parser != null)
+					{
+						Parser.SetPreprocessor(Preprocessor);
+
+						Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована, парсер загружен";
+						Grammar_StatusBar.Background = Brushes.LightGreen;
+					}
+					else
+					{
+						Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована, не удалось загрузить парсер";
+						Grammar_StatusBar.Background = LightRed;
+					}
 				}
 			}
+		}
+
+		private Assembly LoadAssembly(string path)
+		{
+			/// Копируем сборку во временный файл и загружаем её оттуда,
+			/// чтобы не блокировать доступ к исходной dll
+			var tmpName = Path.GetTempFileName();
+			File.Copy(path, tmpName, true);
+
+			return Assembly.LoadFile(tmpName);
 		}
 
 		private void Grammar_LoadGrammarButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (MayProceedClosingGrammar())
 			{
-				var openFileDialog = new OpenFileDialog();
+				var openFileDialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					DefaultExt = "land",
+					Filter = "Файлы грамматики (*.land)|*.land|Все файлы (*.*)|*.*"
+				};
+
 				if (openFileDialog.ShowDialog() == true)
 				{
 					OpenGrammar(openFileDialog.FileName);
@@ -207,27 +258,45 @@ namespace Land.GUI
 			}
 		}
 
-		private void SetAsCurrentGrammar(string filename)
+		private void Grammar_LoadPreprocButton_Click(object sender, RoutedEventArgs e)
 		{
-			Grammar_RecentFiles.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
+			var openFileDialog = new OpenFileDialog()
+			{
+				AddExtension = true,
+				DefaultExt = "dll",
+				Filter = "Библиотека препроцессора (*.dll)|*.dll|Все файлы (*.*)|*.*",
+			};
 
-			if (Grammar_RecentFiles.Items.Contains(filename))
-				Grammar_RecentFiles.Items.Remove(filename);
+			if (openFileDialog.ShowDialog() == true)
+			{
+				OpenPreproc(openFileDialog.FileName);
+			}
+		}
 
-			Grammar_RecentFiles.Items.Insert(0, filename);
-			Grammar_RecentFiles.SelectedIndex = 0;
+		private void SetAsCurrentElement(ComboBox target, string filename)
+		{
+			target.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
 
-			Grammar_RecentFiles.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
+			if (target.Items.Contains(filename))
+				target.Items.Remove(filename);
+
+			target.Items.Insert(0, filename);
+			target.SelectedIndex = 0;
+
+			target.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
 		}
 
 		private void OpenGrammar(string filename)
 		{
+			LastLibrarySettings = null;
+
 			if(!File.Exists(filename))
 			{
 				MessageBox.Show("Указанный файл не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
 
-				Grammar_RecentFiles.Items.Remove(filename);
-				Grammar_RecentFiles.SelectedIndex = -1;
+				Grammar_RecentGrammars.Items.Remove(filename);
+				Grammar_RecentGrammars.SelectedIndex = -1;
+				Grammar_RecentPreprocs.SelectedIndex = -1;
 
 				CurrentGrammarFilename = null;
 				Grammar_Editor.Text = String.Empty;
@@ -245,7 +314,28 @@ namespace Land.GUI
 			}
 
 			Grammar_SaveButton.IsEnabled = false;
-			SetAsCurrentGrammar(filename);
+			SetAsCurrentElement(Grammar_RecentGrammars, filename);
+		}
+
+		private void OpenPreproc(string filename)
+		{
+			if (!File.Exists(filename))
+			{
+				MessageBox.Show("Указанный файл не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+				Grammar_RecentPreprocs.Items.Remove(filename);
+				Grammar_RecentPreprocs.SelectedIndex = -1;
+
+				return;
+			}
+
+			Preprocessor = (BasePreprocessor)LoadAssembly(filename)
+				.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
+				?.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+			Grammar_DisablePreprocButton_Checked(null, null);
+
+			SetAsCurrentElement(Grammar_RecentPreprocs, filename);
 		}
 
 		private Encoding GetEncoding(string filename)
@@ -281,7 +371,7 @@ namespace Land.GUI
 					File.WriteAllText(saveFileDialog.FileName, Grammar_Editor.Text);
 					Grammar_SaveButton.IsEnabled = false;
 					CurrentGrammarFilename = saveFileDialog.FileName;
-					SetAsCurrentGrammar(saveFileDialog.FileName);
+					SetAsCurrentElement(Grammar_RecentGrammars, saveFileDialog.FileName);
 				}
 			}
 		}
@@ -290,7 +380,7 @@ namespace Land.GUI
 		{
 			if (MayProceedClosingGrammar())
 			{
-				Grammar_RecentFiles.SelectedIndex = -1;
+				Grammar_RecentGrammars.SelectedIndex = -1;
 				CurrentGrammarFilename = null;
 				Grammar_Editor.Text = String.Empty;
 			}
@@ -334,19 +424,35 @@ namespace Land.GUI
 			if (e.AddedItems.Count > 0)
 			{
 				/// Нужно предложить сохранение, и откатить смену выбора файла, если пользователь передумал
-				if (!MayProceedClosingGrammar())
+				if (sender == Grammar_RecentGrammars && !MayProceedClosingGrammar())
 				{
-					Grammar_RecentFiles.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
-					ComboBox combo = (ComboBox)sender;
+					var combo = (ComboBox)sender;
+					combo.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
+					
 					/// Если до этого был выбран какой-то файл
 					if (e.RemovedItems.Count > 0)
 						combo.SelectedItem = e.RemovedItems[0];
 					else
 						combo.SelectedIndex = -1;
-					Grammar_RecentFiles.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
+					combo.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
 					return;
 				}
-				OpenGrammar(e.AddedItems[0].ToString());
+
+				if(sender == Grammar_RecentGrammars)
+					OpenGrammar(e.AddedItems[0].ToString());
+				else
+					OpenPreproc(e.AddedItems[0].ToString());
+			}
+		}
+
+		private void Grammar_DisablePreprocButton_Checked(object sender, RoutedEventArgs e)
+		{
+			if (Parser != null)
+			{
+				if (Grammar_DisablePreprocButton.IsChecked == true)
+					Parser.SetPreprocessor(null);
+				else
+					Parser.SetPreprocessor(Preprocessor);
 			}
 		}
 
@@ -359,23 +465,6 @@ namespace Land.GUI
 
 		private Node File_Parse(string fileName, string text, bool enableTracing = false)
 		{
-			BasePreprocessor preproc = null;
-			
-			/// Если известно имя файла, по расширению можем выбрать препроцессор
-			if ((File_PreprocessToggle.IsChecked ?? false) && !String.IsNullOrEmpty(fileName))
-			{
-				switch (Path.GetExtension(fileName))
-				{
-					case ".cs":
-						preproc = new SharpPreprocessor.SharpPreprocessor();
-						break;
-					case ".pas":
-						preproc = new PascalPreprocessor.PascalPreprocessor();
-						break;
-				}
-			}
-
-			Parser?.SetPreprocessor(preproc);
 			return Parser?.Parse(text, enableTracing);
 		}
 
@@ -1014,6 +1103,6 @@ namespace Land.GUI
 			}
 		}
 
-		#endregion
+		#endregion		
 	}
 }

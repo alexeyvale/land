@@ -93,6 +93,8 @@
     <Compile Include="Parsing\Preprocessing\BasePreprocessor.cs" />
     <Compile Include="Parsing\Statistics.cs" />
     <Compile Include="Parsing\BaseTable.cs" />
+    <Compile Include="Parsing\Tree\BaseNodeGenerator.cs" />
+    <Compile Include="Parsing\Tree\Visitors\BaseNodeRetypingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />

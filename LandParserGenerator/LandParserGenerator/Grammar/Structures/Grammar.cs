@@ -1388,7 +1388,7 @@ namespace Land.Core
 
 		public string GetConstructionLog(Alternative alt)
 		{
-			return $"{Environment.NewLine}new Alternative() {{ Elements = new List<Entry>() {{ {String.Join($", ", alt.Elements.Select(entry => GetConstructionLog(entry)))}}}}}";
+			return $"{Environment.NewLine}new Alternative() {{ Alias = {(!String.IsNullOrEmpty(alt.Alias) ? $"\"{alt.Alias}\"" : "null")}, Elements = new List<Entry>() {{ {String.Join($", ", alt.Elements.Select(entry => GetConstructionLog(entry)))}}}}}";
 		}
 
 		public string GetConstructionLog(Entry entry)

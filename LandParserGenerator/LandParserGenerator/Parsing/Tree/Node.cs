@@ -59,6 +59,19 @@ namespace Land.Core.Parsing.Tree
 			Options = opts ?? new LocalOptions();
 		}
 
+		public Node(Node node)
+		{
+			Symbol = node.Symbol;
+			Options = node.Options;
+			Parent = node.Parent;
+			Alias = node.Alias;
+			Children = node.Children;
+			Value = node.Value;
+
+			_anchor = node._anchor;
+			AnchorReady = node.AnchorReady;
+		}
+
 		protected void GetAnchorFromChildren()
 		{
 			if (Children.Count > 0)

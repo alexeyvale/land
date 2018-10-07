@@ -16,7 +16,7 @@ namespace Land.Core.Parsing.LR
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
-		public Parser(Grammar g, ILexer lexer): base(g, lexer)
+		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLR1(g);
 		}
@@ -50,7 +50,7 @@ namespace Land.Core.Parsing.LR
 				{
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
-						token = SkipAny(new Node(Grammar.ANY_TOKEN_NAME));
+						token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME));
 
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
 						if (token.Name == Grammar.ERROR_TOKEN_NAME)
@@ -64,7 +64,7 @@ namespace Land.Core.Parsing.LR
 					/// Если нужно произвести перенос
 					if (action is ShiftAction)
 					{
-						var tokenNode = new Node(token.Name);
+						var tokenNode = NodeGenerator.Generate(token.Name);
 						tokenNode.SetAnchor(token.Location.Start, token.Location.End);
 
 						var shift = (ShiftAction)action;
@@ -84,7 +84,7 @@ namespace Land.Core.Parsing.LR
 					/// Если нужно произвести свёртку
 					else if (action is ReduceAction reduce)
 					{
-						var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
+						var parentNode = NodeGenerator.Generate(reduce.ReductionAlternative.NonterminalSymbolName);
 
 						/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
 						for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
@@ -184,7 +184,7 @@ namespace Land.Core.Parsing.LR
 			while (rawActions.Count == 1 && rawActions[0] is ReduceAction)
 			{
 				var reduce = (ReduceAction)rawActions[0];
-				var parentNode = new Node(reduce.ReductionAlternative.NonterminalSymbolName);
+				var parentNode = NodeGenerator.Generate(reduce.ReductionAlternative.NonterminalSymbolName);
 
 				/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
 				for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
@@ -269,7 +269,7 @@ namespace Land.Core.Parsing.LR
 				/// Пытаемся пропустить Any в этом месте,
 				/// Any захватывает участок с начала последнего 
 				/// снятого со стека символа до места восстановления
-				var anyNode = new Node(Grammar.ANY_TOKEN_NAME);
+				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
 					anyNode.SetAnchor(startLocation, startLocation);
 
