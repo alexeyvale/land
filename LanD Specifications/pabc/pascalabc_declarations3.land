@@ -15,7 +15,7 @@ square_bracketed = %left '[' %right ']'
 round_bracketed = %left '(' %right ')'
 
 file			=	(Any|'interface'|'implementation'|declaration)* ('end' '.' )?
-declaration		=	const|type|var|routine_part ';'|attribute|block '.'?
+declaration		=	const|type|var|routine ';'|attribute|block '.'?
 const			=	'const' (const_atom ';'|attribute|Any)+!
 type			=	'type' (type_atom ';'|attribute|Any)+!
 var				=	'var' (var_atom ';'|attribute|Any)+!
@@ -25,9 +25,9 @@ type_atom		=	name '=' Any (class => class_type |)
 
 class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (class_members? 'end')?!
 class_members	=	class_member (';' class_member)*
-class_member	=	(ACCESS_MODIFIER|attribute)* ('class'|'static')? (routine_part|field|property|block) | Any
+class_member	=	(ACCESS_MODIFIER|attribute)* ('class'|'static')? (routine|field|property|block) | Any
 
-routine_part	=	routine_header (':=' (Any|block))?|ROUTINE_MODIFIER Any (':=' (Any|block))?
+routine			=	routine_header (':=' (Any|block))?|ROUTINE_MODIFIER Any (':=' (Any|block))?
 routine_header	=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
 
 field			=	%ghost var_atom

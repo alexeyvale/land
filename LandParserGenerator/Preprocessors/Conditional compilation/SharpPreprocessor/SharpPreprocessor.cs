@@ -9,25 +9,21 @@ using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
 
-using pascalabc_preprocessor;
+using sharp_preprocessor;
 
-namespace PascalPreprocessor
+namespace SharpPreprocessing.ConditionalCompilation
 {
-	public class ExcludedSegmentLocation: SegmentLocation
-	{
-		public bool EndsOnEol { get; set; }
-	}
-
-	public class PascalPreprocessor: BasePreprocessor
+	public class SharpPreprocessor: BasePreprocessor
     {		
 		private BaseParser Parser { get; set; }
 		public override List<Message> Log { get { return Parser?.Log; } }
 
-		public List<ExcludedSegmentLocation> Excluded { get; set; } = new List<ExcludedSegmentLocation>();
+		public List<SegmentLocation> Excluded { get; set; } = new List<SegmentLocation>();
 
-		public PascalPreprocessor()
+		public SharpPreprocessor()
 		{
 			Parser = ParserProvider.GetParser();
+			Properties = new SharpPreprocessorProperties();
 		}
 
 		public override string Preprocess(string text, out bool success)
@@ -42,14 +38,20 @@ namespace PascalPreprocessor
 
 			if (success)
 			{
-				var visitor = new DirectivesVisitor(text);
+				var visitor = new DirectivesVisitor(text, 
+                    ((SharpPreprocessorProperties)Properties).PredefinedSymbols);
 				root.Accept(visitor);
 
 				for (var i = visitor.SegmentsToExclude.Count - 1; i >= 0; --i)
 				{
+					var length = Math.Max(
+							text.IndexOf('\n', visitor.SegmentsToExclude[i].End.Offset), 
+							visitor.SegmentsToExclude[i].End.Offset
+						) - visitor.SegmentsToExclude[i].Start.Offset + 1;
+
 					text = text.Remove(
 						visitor.SegmentsToExclude[i].Start.Offset,
-						visitor.SegmentsToExclude[i].Length.Value
+						length
 					);
 				}
 
@@ -80,12 +82,8 @@ namespace PascalPreprocessor
 				var includedCharsCount = 0;
 				/// Сколько исключенных из компиляции строк было учтено на данный момент 
 				var includedLinesCount = 0;
-				/// Сколько исключенных из компиляции строк было учтено на данный момент для текущей строки
-				var includedColumnsCount = 0;
 				/// Сколько исключенных из компиляции участков было учтено на данный момент 
 				var includedSegmentsCount = 0;
-				/// Номер последней строки, в которую включили удалённый сегмент
-				var currentLineIndex = -1;
 
 				foreach (var loc in locations)
 				{
@@ -98,31 +96,12 @@ namespace PascalPreprocessor
 						&& Excluded[includedSegmentsCount].Start.Offset <= start)
 					{
 						includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
-						includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line +
-							(Excluded[includedSegmentsCount].EndsOnEol ? 1 : 0);
-
-						if (Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
-							&& Excluded[includedSegmentsCount].Start.Line == currentLineIndex)
-						{
-							includedColumnsCount += Excluded[includedSegmentsCount].Length.Value;
-						}
-						else
-						{
-							currentLineIndex = Excluded[includedSegmentsCount].End.Line;
-							includedColumnsCount = Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
-								? Excluded[includedSegmentsCount].Length.Value
-								: Excluded[includedSegmentsCount].End.Column + 1;
-						}
-
+						includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line + 1;
 						start += Excluded[includedSegmentsCount].Length.Value;
 						includedSegmentsCount += 1;
 					}
 
-					loc.Shift(
-						includedLinesCount,
-						loc.Line + includedLinesCount == currentLineIndex ? includedColumnsCount : 0,
-						includedCharsCount
-					);
+					loc.Shift(includedLinesCount, 0, includedCharsCount);
 				}
 			}
 		}

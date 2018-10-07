@@ -7,7 +7,7 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 
-namespace SharpPreprocessor
+namespace SharpPreprocessing.ConditionalCompilation
 {
 	/// <summary>
 	/// Визитор собирает координаты по всем узлам и сбрасывает предвычисленные

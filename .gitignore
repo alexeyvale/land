@@ -27,3 +27,9 @@ LandParserGenerator/Preprocessors/PascalPreprocessor/bin/
 LandParserGenerator/Preprocessors/PascalPreprocessor/obj/
 LandParserGenerator/Preprocessors/SharpPreprocessor/obj/
 LandParserGenerator/Preprocessors/SharpPreprocessor/bin/
+LandParserGenerator/Preprocessors/Conditional compilation/PascalPreprocessor/bin/
+LandParserGenerator/Preprocessors/Conditional compilation/PascalPreprocessor/obj/
+LandParserGenerator/Preprocessors/Conditional compilation/SharpPreprocessor/bin/
+LandParserGenerator/Preprocessors/Conditional compilation/SharpPreprocessor/obj/
+LandParserGenerator/Preprocessors/Tree postprocessing/PascalPreprocessor/obj/
+LandParserGenerator/Preprocessors/Tree postprocessing/PascalPreprocessor/bin/

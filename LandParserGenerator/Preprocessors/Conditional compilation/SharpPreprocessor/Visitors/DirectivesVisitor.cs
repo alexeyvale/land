@@ -9,7 +9,7 @@ using Land.Core.Parsing.Tree;
 
 using sharp_preprocessor;
 
-namespace SharpPreprocessor
+namespace SharpPreprocessing.ConditionalCompilation
 {
 
 	internal class DirectivesVisitor : BaseTreeVisitor

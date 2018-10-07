@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3AC961FA-CE34-4C61-8E32-4175D348A03B}</ProjectGuid>
+    <ProjectGuid>{5BB7C445-36C4-4686-B17A-A163385848A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpPreprocessor</RootNamespace>
-    <AssemblyName>SharpPreprocessor</AssemblyName>
+    <RootNamespace>PascalPreprocessor</RootNamespace>
+    <AssemblyName>PascalPreprocessor</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -30,19 +30,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="sharp_preprocessor">
-      <HintPath>..\..\..\LanD Specifications\sharp\sharp_preprocessor.dll</HintPath>
+    <Reference Include="pascalabc_declarations3">
+      <HintPath>..\..\..\..\LanD Specifications\pabc\pascalabc_declarations3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,25 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Visitors\GatherAnchorsVisitor.cs" />
-    <Compile Include="Visitors\PostprocessVisitor.cs" />
-    <Compile Include="Visitors\DirectivesVisitor.cs" />
-    <Compile Include="SharpPreprocessorProperties.cs" />
-    <Compile Include="SharpPreprocessor.cs" />
+    <Compile Include="PascalPreprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Control.Helpers\Control.Helpers.csproj">
-      <Project>{e45c5fce-03bf-44e8-b9b2-ba3c98350856}</Project>
-      <Name>Control.Helpers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\LandParserGenerator\LandParserGenerator.csproj">
+    <ProjectReference Include="..\..\..\LandParserGenerator\LandParserGenerator.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>LandParserGenerator</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="keys.snk" />
+    <ProjectReference Include="..\..\Conditional compilation\PascalPreprocessor\PascalPreprocessor.csproj">
+      <Project>{9d1f2e8f-dcf1-44bf-a515-1e7d97fec1db}</Project>
+      <Name>PascalPreprocessor</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

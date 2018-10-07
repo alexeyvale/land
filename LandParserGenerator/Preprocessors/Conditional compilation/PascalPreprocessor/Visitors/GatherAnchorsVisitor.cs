@@ -7,7 +7,7 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 
-namespace PascalPreprocessor
+namespace PascalPreprocessing.ConditionalCompilation
 {
 	/// <summary>
 	/// Визитор собирает координаты по всем узлам и сбрасывает предвычисленные

@@ -7,7 +7,7 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 
-namespace PascalPreprocessor
+namespace PascalPreprocessing.ConditionalCompilation
 {
 
 	internal class DirectivesVisitor : BaseTreeVisitor
