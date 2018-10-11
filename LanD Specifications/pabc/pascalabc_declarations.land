@@ -4,9 +4,10 @@ COMMENT_ML	: '{' .*? '}'
 STRING_SKIP	: '\'\'' | '\\\\'
 STRING		: '\'' (STRING_SKIP|.)*? '\''
 
-ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
-ROUTINE_MODIFIER	: 'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'|'external'|'forward'
 ACCESS_MODIFIER		: 'internal'|'private'|'protected'|'public'
+ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
+ONLY_HEADER_ROUTINE_MODIFIER	: 'external'|'forward'
+OTHER_ROUTINE_MODIFIER			: 'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'
 
 ID					: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 CLASS_MEMBER_USAGE	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
@@ -14,8 +15,13 @@ CLASS_MEMBER_USAGE	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u043
 square_bracketed = %left '[' %right ']'
 round_bracketed = %left '(' %right ')'
 
-file			=	(Any|'interface'|'implementation'|declaration)* ('end' '.' )?
-declaration		=	const|type|var|routine ';'|attribute|block '.'?
+file			=	(interface_declarations|usual_declaration)* ((block | 'end') '.' )?
+
+interface_declarations	=	'interface' in_interface_declaration* 'implementation'
+usual_declaration		=	const|type|var|usual_routine ';'|attribute|Any
+in_interface_declaration	=	const|type|var|interface_routine|attribute|Any
+in_class_declaration	=	const|type|var|attribute
+
 const			=	'const' (const_atom ';'|attribute|Any)+!
 type			=	'type' (type_atom ';'|attribute|Any)+!
 var				=	'var' (var_atom ';'|attribute|Any)+!
@@ -23,16 +29,23 @@ const_atom		=	name (':' Any)? '=' Any
 var_atom		=	names_list (':' Any class?)? (':=' Any)?
 type_atom		=	name '=' Any (class => class_type |)
 
-class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (class_members? 'end')?!
-class_members	=	class_member (';' class_member)*
-class_member	=	(ACCESS_MODIFIER|attribute)* ('class'|'static')? (routine|field|property|block) | Any
-
-routine			=	routine_header routine_init?|ROUTINE_MODIFIER Any routine_init?
-routine_header	=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
-routine_init	=	':=' (Any|block)
+class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (section? (ACCESS_MODIFIER section?)* 'end')?!
+section			=	class_member (';' class_member)*
+class_member	=	(attribute)* ('class'|'static')? (in_class_routine|field|property) | Any
 
 field			=	%ghost var_atom
 property		=	'property' name Any ':' (block|Any)+
+
+usual_routine			=	routine_header (routine_init|usual_routine_tail)
+usual_routine_tail		=	';' (usual_declaration* block 
+	| OTHER_ROUTINE_MODIFIER Any (routine_init | usual_routine_tail) 
+	| ONLY_HEADER_ROUTINE_MODIFIER Any)
+interface_routine		=	routine_header ((OTHER_ROUTINE_MODIFIER|ONLY_HEADER_ROUTINE_MODIFIER) Any)*
+in_class_routine		=	routine_header (routine_init|in_class_routine_tail)?
+in_class_routine_tail	=	';' ((in_class_declaration* block)? 
+	| (OTHER_ROUTINE_MODIFIER|ONLY_HEADER_ROUTINE_MODIFIER) Any (routine_init | in_class_routine_tail))
+routine_header			=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
+routine_init			=	':=' (Any|block)
 
 name_atom			=	'^'? ID
 name_tail_element	=	'::' name_atom | CLASS_MEMBER_USAGE
@@ -52,6 +65,7 @@ attribute	=	'[' Any ']'
 %parsing skip COMMENT
 
 %nodes leaf name
-%nodes ghost declaration class class_members class_member
+%nodes ghost usual_declaration in_interface_declaration in_class_declaration 
+%nodes ghost class class_member
 
-%mapping land routine_header block class_type field property
+%mapping land routine_header in_class_routine interface_routine usual_routine block class_type field property

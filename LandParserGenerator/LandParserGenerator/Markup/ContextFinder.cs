@@ -212,7 +212,7 @@ namespace Land.Core.Markup
 				for (int j = 1; j <= b.Count(); j++)
 				{
 					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
-					double cost = 1 - DispatchLevenstein(a.ElementAt(i - 1), b.ElementAt(j - 1));
+					double cost = 1 - DispatchLevenshtein(a.ElementAt(i - 1), b.ElementAt(j - 1));
 					distances[i, j] = Math.Min(Math.Min(
 						distances[i - 1, j] + DeletionCost,
 						distances[i, j - 1] + InsertionCost),
@@ -242,7 +242,7 @@ namespace Land.Core.Markup
 				return DeletionCost;
 		}
 
-		private static double DispatchLevenstein<T>(T a, T b)
+		private static double DispatchLevenshtein<T>(T a, T b)
 		{
 			if (a is IEnumerable<string>)
 				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
