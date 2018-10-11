@@ -10,8 +10,8 @@ namespace PascalPreprocessing.TreePostprocessing
 {
 	public class RoutineAggregationVisitor : BaseTreeVisitor
 	{
+		public List<Message> Log { get; set; } = new List<Message>();
 		private Dictionary<Node, List<Node>> Aggregated { get; set; } = new Dictionary<Node, List<Node>>();
-
 		private Node CurrentRoutine { get; set; } = null;
 
 		public override void Visit(Node node)
@@ -23,10 +23,18 @@ namespace PascalPreprocessing.TreePostprocessing
 					Aggregated[node] = new List<Node>();
 					break;
 				case "in_class_routine_tail":
-					Aggregated[CurrentRoutine].Add(node);
-					if (node.Children
-						.Any(c => c.Type == "block" || c.Type == "routine_init"))
+					if (CurrentRoutine != null)
+					{
+						Aggregated[CurrentRoutine].Add(node);
 						CurrentRoutine = null;
+					}
+					else
+					{
+						Log.Add(Message.Error(
+							"Обнаружено завершение неизвестной процедуры", 
+							node.Anchor.Start)
+						);
+					}
 					break;
 				case "file":
 					base.Visit(node);

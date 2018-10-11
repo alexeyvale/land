@@ -32,7 +32,12 @@ namespace PascalPreprocessing.TreePostprocessing
 	{
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			root.Accept(new RoutineAggregationVisitor());
+			var visitor = new RoutineAggregationVisitor();
+			root.Accept(visitor);
+
+			Log.AddRange(visitor.Log);
+			foreach (var rec in Log)
+				rec.Source = this.GetType().FullName;	
 		}
 
 		public override string Preprocess(string text, out bool success)
