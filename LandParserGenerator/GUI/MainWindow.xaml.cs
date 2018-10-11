@@ -43,6 +43,9 @@ namespace Land.GUI
 		{
 			InitializeComponent();
 
+			/// Очищаем директорию со временными файлами
+			if(Directory.Exists(TmpFilesFolder))
+				Directory.Delete(TmpFilesFolder, true);
 			Directory.CreateDirectory(TmpFilesFolder);
 
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
@@ -108,9 +111,6 @@ namespace Land.GUI
 				listContent.Add(item.ToString());
 
 			File.WriteAllLines(RECENT_PREPROCS_FILE, listContent.Take(10));
-
-			/// Очищаем директорию со временными файлами
-			Directory.Delete(TmpFilesFolder, true);
 		}
 
 		private void MoveCaretToSource(SegmentLocation loc, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
@@ -217,7 +217,7 @@ namespace Land.GUI
 				}
 				else
 				{
-					Parser = (Core.Parsing.BaseParser)LoadAssembly(Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.dll"))
+					Parser = (Core.Parsing.BaseParser)CopyAndLoadAssembly(Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.dll"))
 						.GetType($"{LastLibrarySettings.Input_Namespace.Text}.ParserProvider")?.GetMethod("GetParser").Invoke(null, null);
 
 					if (Parser != null)
@@ -236,7 +236,7 @@ namespace Land.GUI
 			}
 		}
 
-		private Assembly LoadAssembly(string path)
+		private Assembly CopyAndLoadAssembly(string path)
 		{
 			/// Копируем сборку во временный файл и загружаем её оттуда,
 			/// чтобы не блокировать доступ к исходной dll
@@ -244,7 +244,7 @@ namespace Land.GUI
 			File.Move(tmpName, tmpName = Path.Combine(TmpFilesFolder, Path.GetFileName(tmpName)));
 			File.Copy(path, tmpName, true);
 
-			return Assembly.LoadFile(tmpName);
+			return Assembly.LoadFrom(tmpName);
 		}
 
 		private void Grammar_LoadGrammarButton_Click(object sender, RoutedEventArgs e)
@@ -336,7 +336,7 @@ namespace Land.GUI
 				return;
 			}
 
-			Preprocessor = (BasePreprocessor)LoadAssembly(filename)
+			Preprocessor = (BasePreprocessor)Assembly.LoadFrom(filename)
 				.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
 				?.GetConstructor(Type.EmptyTypes).Invoke(null);
 
@@ -565,7 +565,9 @@ namespace Land.GUI
 			if (lb.SelectedIndex != -1)
 			{
 				var msg = (Land.Core.Message)lb.SelectedItem;
-				if (msg.Location != null)
+				if (msg.Location != null 
+					&& msg.Location.Line > 0 
+					&& msg.Location.Line <= File_Editor.Document.LineCount)
 				{
 					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					File_Editor.Focus();

@@ -153,7 +153,7 @@ namespace Land.Core.Parsing.Tree
 			Value = new List<string>(vals);
 		}
 
-		public void Accept(BaseTreeVisitor visitor)
+		public virtual void Accept(BaseTreeVisitor visitor)
 		{
 			visitor.Visit(this);
 		}

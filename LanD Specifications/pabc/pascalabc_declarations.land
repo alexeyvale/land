@@ -19,8 +19,8 @@ file			=	(interface_declarations|usual_declaration)* ((block | 'end') '.' )?
 
 interface_declarations	=	'interface' in_interface_declaration* 'implementation'
 usual_declaration		=	const|type|var|usual_routine ';'|attribute|Any
-in_interface_declaration	=	const|type|var|interface_routine|attribute|Any
-in_class_declaration	=	const|type|var|attribute
+in_interface_declaration	=	const|type|var|interface_routine ';'|attribute|Any
+in_class_declaration	=	const|type|var //Может ли здесь быть атрибут?
 
 const			=	'const' (const_atom ';'|attribute|Any)+!
 type			=	'type' (type_atom ';'|attribute|Any)+!
@@ -31,7 +31,7 @@ type_atom		=	name '=' Any (class => class_type |)
 
 class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (section? (ACCESS_MODIFIER section?)* 'end')?!
 section			=	class_member (';' class_member)*
-class_member	=	(attribute)* ('class'|'static')? (in_class_routine|field|property) | Any
+class_member	=	(attribute)* ('class'|'static')? (field|property|in_class_routine|in_class_routine_tail) | Any
 
 field			=	%ghost var_atom
 property		=	'property' name Any ':' (block|Any)+
@@ -41,9 +41,9 @@ usual_routine_tail		=	';' (usual_declaration* block
 	| OTHER_ROUTINE_MODIFIER Any (routine_init | usual_routine_tail) 
 	| ONLY_HEADER_ROUTINE_MODIFIER Any)
 interface_routine		=	routine_header ((OTHER_ROUTINE_MODIFIER|ONLY_HEADER_ROUTINE_MODIFIER) Any)*
-in_class_routine		=	routine_header (routine_init|in_class_routine_tail)?
-in_class_routine_tail	=	';' ((in_class_declaration* block)? 
-	| (OTHER_ROUTINE_MODIFIER|ONLY_HEADER_ROUTINE_MODIFIER) Any (routine_init | in_class_routine_tail))
+in_class_routine		=	routine_header (routine_init)?
+in_class_routine_tail	=	in_class_declaration* block 
+	| (OTHER_ROUTINE_MODIFIER|ONLY_HEADER_ROUTINE_MODIFIER) Any routine_init?
 routine_header			=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
 routine_init			=	':=' (Any|block)
 

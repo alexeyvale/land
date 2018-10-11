@@ -1071,6 +1071,7 @@ namespace Land.Core
 		#endregion
 
 		#region Построение FOLLOW
+
 		private bool FollowCacheConsistent { get; set; } = false;
 		private Dictionary<string, HashSet<string>> _follow;
 		private Dictionary<string, HashSet<string>> FollowCache

@@ -199,7 +199,14 @@ namespace Land.Core
 		/// <param name="path">Путь к файлу генерируемой библиотеки</param>
 		/// <param name="messages">Лог генерации парсера</param>
 		/// <returns>Признак успешности выполнения операции</returns>
-		public static bool GenerateLibrary(GrammarType type, string text, string @namespace, string path, string keyPath, List<Message> messages)
+		public static bool GenerateLibrary(
+			GrammarType type, 
+			string text, 
+			string @namespace, 
+			string path,
+			string keyPath, 
+			List<Message> messages
+		)
 		{
 			/// Строим объект грамматики и проверяем, корректно ли прошло построение
 			var builtGrammar = BuildGrammar(type, text, messages);
@@ -373,19 +380,19 @@ namespace " + @namespace + @"
 
 		private static string GetNodeGeneratorText(Grammar grammar, string @namespace)
 		{
-			var nodeCLassesSource = new StringBuilder();
+			var nodeClassesSource = new StringBuilder();
 
-			nodeCLassesSource.AppendLine("using System;");
-			nodeCLassesSource.AppendLine("using System.Collections.Generic;");
-			nodeCLassesSource.AppendLine("using System.Linq;");
-			nodeCLassesSource.AppendLine("using System.Reflection;");
+			nodeClassesSource.AppendLine("using System;");
+			nodeClassesSource.AppendLine("using System.Collections.Generic;");
+			nodeClassesSource.AppendLine("using System.Linq;");
+			nodeClassesSource.AppendLine("using System.Reflection;");
 
-			nodeCLassesSource.AppendLine("using Land.Core;");
-			nodeCLassesSource.AppendLine("using Land.Core.Parsing.Tree;");
+			nodeClassesSource.AppendLine("using Land.Core;");
+			nodeClassesSource.AppendLine("using Land.Core.Parsing.Tree;");
 
-			nodeCLassesSource.AppendLine($"namespace {@namespace} {{");
+			nodeClassesSource.AppendLine($"namespace {@namespace} {{");
 
-			nodeCLassesSource.AppendLine(@"
+			nodeClassesSource.AppendLine(@"
 	public class NodeGenerator : BaseNodeGenerator 
 	{
 		public NodeGenerator(Grammar grammar): base(grammar)
@@ -404,7 +411,7 @@ namespace " + @namespace + @"
 		}
 	}");
 
-			nodeCLassesSource.AppendLine(@"
+			nodeClassesSource.AppendLine(@"
 	public class NodeRetypingVisitor : BaseNodeRetypingVisitor
 	{
 		private Dictionary<string, ConstructorInfo> Cache { get; set; }
@@ -451,33 +458,75 @@ namespace " + @namespace + @"
 
 
 			foreach (var name in grammar.Rules.Keys.Where(key=>!key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
-				nodeCLassesSource.AppendLine(@"
+				nodeClassesSource.AppendLine(@"
 	public class " + name + @"_node : Node 
 	{
 		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
 		public " + name + @"_node(Node node): base(node) {}
+
+		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}");
 
 			foreach (var kvp in grammar.Aliases)
 				foreach (var alias in kvp.Value)
-					nodeCLassesSource.AppendLine(@"
+					nodeClassesSource.AppendLine(@"
 	public class " + alias + @"_node : " + kvp.Key + @"_node 
 	{
 		public " + alias + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
 		public " + alias + @"_node(Node node): base(node) {}
+
+		public override void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}");
 
 			foreach (var name in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
-				nodeCLassesSource.AppendLine(@"
+				nodeClassesSource.AppendLine(@"
 	public class " + name + @"_node : Node 
 	{
 		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
 		public " + name + @"_node(Node node): base(node) {}
+
+		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}");
 
-			nodeCLassesSource.AppendLine("}");
+			nodeClassesSource.AppendLine(@"
+	public class BaseTypedTreeVisitor: BaseTreeVisitor 
+	{");
+			foreach (var name in grammar.Rules.Keys.Where(key => !key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
+				nodeClassesSource.AppendLine(@"
+		public virtual void Visit(" + name + @"_node node)
+		{
+			foreach(var child in node.Children)
+				child.Accept(this);
+		}");
 
-			return nodeCLassesSource.ToString();
+			foreach (var kvp in grammar.Aliases)
+				foreach (var alias in kvp.Value)
+					nodeClassesSource.AppendLine(@"
+		public virtual void Visit(" + alias + @"_node node)
+		{
+			foreach(var child in node.Children)
+				child.Accept(this);
+		}");
+
+			foreach (var name in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+				nodeClassesSource.AppendLine(@"
+		public virtual void Visit(" + name + @"_node node) {}");
+
+
+			nodeClassesSource.AppendLine(@"
+	}");
+			nodeClassesSource.AppendLine("}");
+
+			return nodeClassesSource.ToString();
 		}
 	}
 }
