@@ -144,6 +144,14 @@ namespace Land.Core
 		public void AddAnchor(string smb, PointLocation loc)
 		{
 			_symbolAnchors[smb] = loc;
+
+			/// Если грамматика LL и якорь устанавливается для символа, сгенерированного
+			/// для некоторой сущности с квантификатором +, этот же якорь надо установить
+			/// для вспомогательного символа с квантификатором *, входящего в правило для данного
+			if (Type == GrammarType.LL 
+				&& AutoRuleQuantifier.ContainsKey(smb) 
+				&& AutoRuleQuantifier[smb].Quantifier == Quantifier.ONE_OR_MORE)
+				_symbolAnchors[Rules[smb].Alternatives[0][1]] = loc;
 		}
 
 		public PointLocation GetAnchor(string smb)
@@ -239,7 +247,7 @@ namespace Land.Core
 							AutoRuleQuantifier[newName] = new ElementQuantifierPair()
 							{
 								Element = elemName,
-								Quantifier = quantifier
+								Quantifier = Quantifier.ZERO_OR_MORE
 							};
 
 							var oldName = newName;
