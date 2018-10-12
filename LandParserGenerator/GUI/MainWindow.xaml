@@ -66,9 +66,10 @@
 										<Separator></Separator>
 										<Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click" Content="&#xf15b;" ToolTip="Новая" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click" Content="&#xf093;" ToolTip="Сгенерировать и загрузить парсер" Style="{StaticResource IconButtonStyle}"/>
+										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click" Content="&#xf04b;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<Button Name="Grammar_RebuildButton" Click="Grammar_RebuildButton_Click" Content="&#xf01e;" ToolTip="Перегенерировать парсер" Style="{StaticResource IconButtonStyle}"/>
+										<Button Name="Grammar_GetLibraryButton" Click="Grammar_GetLibraryButton_Click" Content="&#xf02d;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
+										<Separator></Separator>
 										<Separator></Separator>
 										<ComboBox MinWidth="90" MaxWidth="90" Margin="0, 0, 10, 0" Name="Grammar_RecentGrammars" ToolTip="Недавние грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
 										<Separator></Separator>

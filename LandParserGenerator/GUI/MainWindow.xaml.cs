@@ -30,8 +30,6 @@ namespace Land.GUI
 		private const string RECENT_GRAMMARS_FILE = "./recent_grammars.land.ide";
 		private const string RECENT_PREPROCS_FILE = "./recent_preprocs.land.ide";
 
-		private string TmpFilesFolder { get; set; } = Path.Combine(Path.GetTempPath(), "LanD");
-
 		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
 		private SegmentsBackgroundRenderer File_SegmentColorizer { get; set; }
@@ -42,11 +40,6 @@ namespace Land.GUI
 		public MainWindow()
 		{
 			InitializeComponent();
-
-			/// Очищаем директорию со временными файлами
-			if(Directory.Exists(TmpFilesFolder))
-				Directory.Delete(TmpFilesFolder, true);
-			Directory.CreateDirectory(TmpFilesFolder);
 
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
 				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
@@ -172,6 +165,33 @@ namespace Land.GUI
 
 		private void Grammar_BuildButton_Click(object sender, RoutedEventArgs e)
 		{
+			var messages = new List<Message>();
+
+			Parser = BuilderBase.BuildParser(
+				GrammarType.LL,
+				Grammar_Editor.Text,
+				messages
+			);
+
+			Grammar_LogList.Text = String.Join(Environment.NewLine, messages.Where(m => m.Type == MessageType.Trace).Select(m => m.Text));
+			Grammar_ErrorsList.ItemsSource = messages.Where(m => m.Type == MessageType.Error || m.Type == MessageType.Warning);
+
+			if (messages.Any(m=>m.Type == MessageType.Error))
+			{
+				Grammar_StatusBarLabel.Content = "Не удалось сгенерировать парсер";
+				Grammar_StatusBar.Background = LightRed;
+			}
+			else
+			{
+				Parser.SetPreprocessor(Preprocessor);
+
+				Grammar_StatusBarLabel.Content = "Парсер успешно сгенерирован";
+				Grammar_StatusBar.Background = Brushes.LightGreen;
+			}
+		}
+
+		private void Grammar_GetLibraryButton_Click(object sender, RoutedEventArgs e)
+		{
 			var librarySettings = new LibrarySettingsWindow();
 
 			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(CurrentGrammarFilename)
@@ -181,28 +201,16 @@ namespace Land.GUI
 
 			if (librarySettings.ShowDialog() == true)
 			{
-				/// Запоминаем одобренные настройки генерации парсера,
-				/// их будем использовать для быстрой перегенерации
-				LastLibrarySettings = librarySettings;
-
-				Grammar_RebuildButton_Click(null, null);
-			}
-		}
-
-		private void Grammar_RebuildButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (LastLibrarySettings != null)
-			{
 				var messages = new List<Message>();
 				var success = BuilderBase.GenerateLibrary(
 					GrammarType.LL,
 					Grammar_Editor.Text,
-					LastLibrarySettings.Input_Namespace.Text,
-					LastLibrarySettings.Input_OutputDirectory.Text,
-					LastLibrarySettings.Input_IsSignedAssembly.IsChecked == true
-						? String.IsNullOrWhiteSpace(LastLibrarySettings.Input_KeysFile.Text)
-							? Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.snk")
-							: LastLibrarySettings.Input_KeysFile.Text
+					librarySettings.Input_Namespace.Text,
+					librarySettings.Input_OutputDirectory.Text,
+					librarySettings.Input_IsSignedAssembly.IsChecked == true
+						? String.IsNullOrWhiteSpace(librarySettings.Input_KeysFile.Text)
+							? Path.Combine(librarySettings.Input_OutputDirectory.Text, $"{librarySettings.Input_Namespace.Text}.snk")
+							: librarySettings.Input_KeysFile.Text
 						: null,
 					messages
 				);
@@ -217,34 +225,10 @@ namespace Land.GUI
 				}
 				else
 				{
-					Parser = (Core.Parsing.BaseParser)CopyAndLoadAssembly(Path.Combine(LastLibrarySettings.Input_OutputDirectory.Text, $"{LastLibrarySettings.Input_Namespace.Text}.dll"))
-						.GetType($"{LastLibrarySettings.Input_Namespace.Text}.ParserProvider")?.GetMethod("GetParser").Invoke(null, null);
-
-					if (Parser != null)
-					{
-						Parser.SetPreprocessor(Preprocessor);
-
-						Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована, парсер загружен";
-						Grammar_StatusBar.Background = Brushes.LightGreen;
-					}
-					else
-					{
-						Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована, не удалось загрузить парсер";
-						Grammar_StatusBar.Background = LightRed;
-					}
+					Grammar_StatusBarLabel.Content = "Библиотека успешно сгенерирована";
+					Grammar_StatusBar.Background = Brushes.LightGreen;
 				}
 			}
-		}
-
-		private Assembly CopyAndLoadAssembly(string path)
-		{
-			/// Копируем сборку во временный файл и загружаем её оттуда,
-			/// чтобы не блокировать доступ к исходной dll
-			var tmpName = Path.GetTempFileName();
-			File.Move(tmpName, tmpName = Path.Combine(TmpFilesFolder, Path.GetFileName(tmpName)));
-			File.Copy(path, tmpName, true);
-
-			return Assembly.LoadFrom(tmpName);
 		}
 
 		private void Grammar_LoadGrammarButton_Click(object sender, RoutedEventArgs e)
