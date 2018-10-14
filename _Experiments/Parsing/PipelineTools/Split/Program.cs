@@ -57,8 +57,9 @@ namespace Split
 				SplittedFiles = new Dictionary<string, StreamWriter>();
 				SplittedFilesTargetDirectory = args[0];
 
-				if (!Directory.Exists(SplittedFilesTargetDirectory))
-					Directory.CreateDirectory(SplittedFilesTargetDirectory);
+				if (Directory.Exists(SplittedFilesTargetDirectory))
+					Directory.Delete(SplittedFilesTargetDirectory, true);
+				Directory.CreateDirectory(SplittedFilesTargetDirectory);
 
 				var sourceFileName = String.Empty;
 				var sourceFileIslands = new Dictionary<string, List<string>>();

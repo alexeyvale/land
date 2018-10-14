@@ -24,14 +24,14 @@ file_content	=	(Any|outer_entity)*
 outer_entity	=	
 	MODIFIER*
 	(
-	 	'enum' name Any '{' Any '}' ';'? 	=> enum						|
-		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> class_struct_interface
+	 	'enum' name Any '{' Any '}' ';'? 	=> enum	|
+		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> class_interface
 	)
 inner_entity	=	
 	attribute* MODIFIER*
 	(
-	 	'enum' name Any '{' Any '}' ';'? 	=> inner_enum					|
-		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> inner_class_struct_interface	|
+	 	'enum' name Any '{' Any '}' ';'? 	=> inner_enum	|
+		('class'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> inner_class_interface	|
 		('<' Any '>')? %priority(2) type name
 		(
 	  		arguments Any (init_expression? ';' | block)	=> method	|
@@ -65,6 +65,6 @@ block		=	'{' Any '}'
 %nodes ghost  names_list
 %nodes leaf name type
 
-%mapping land enum class_struct_interface method field property
+%mapping land enum class_interface inner_class_interface method field property
 %mapping priority(3) name
  

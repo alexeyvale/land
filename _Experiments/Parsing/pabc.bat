@@ -1,3 +1,5 @@
 @chcp 1251
-".\PascalAbcBaseline\bin\Debug\PascalAbcBaseline.exe" "C:\Users\Алексей\Desktop\Учёба"
+".\PipelineTools\Split\bin\Debug\Split.exe" ".\_Results\pabc"
+".\Baselines\PascalAbcBaseline\bin\Debug\PascalAbcBaseline.exe" ".\_Results\pabc"
+".\PipelineTools\RemoveMatches\bin\Debug\RemoveMatches.exe" ".\_Results\pabc"
 pause

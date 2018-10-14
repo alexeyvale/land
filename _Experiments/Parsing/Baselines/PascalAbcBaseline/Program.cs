@@ -18,14 +18,33 @@ namespace PascalABCBaseline
 				var parser = new PascalABCNewLanguageParser();
 				var package = new List<string>();
 
-				foreach (var path in args)
-					package.AddRange(Directory.GetFiles(path, "*.pas", SearchOption.AllDirectories));
+				if (args.Length > 1)
+				{
+					foreach (var path in args.Skip(1))
+						package.AddRange(Directory.GetFiles(path, "*.pas", SearchOption.AllDirectories));
+				}
+				else
+				{
+					var landResultsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\last_batch_parsing_report.txt";
+
+					if (File.Exists(landResultsFile))
+					{
+						package.AddRange(Directory.GetFiles(
+							File.ReadAllLines(landResultsFile)[1],
+							"*.pas", SearchOption.AllDirectories));
+					}
+					else
+					{
+						Console.WriteLine("Не указаны каталоги для парсинга");
+						return;
+					}
+				}
 
 				var proceduresCounter = 0;
 				var classesCounter = 0;
 
-				var procedureOutput = new StreamWriter("_pascalabcProcedureOutput.txt", false);
-				var classOutput = new StreamWriter("_pascalabcClassOutput.txt", false);
+				var procedureOutput = new StreamWriter(Path.Combine(args[0], "procedure_baseline.txt"), false);
+				var classOutput = new StreamWriter(Path.Combine(args[0], "class_baseline.txt"), false);
 
 				foreach (var filename in package)
 				{

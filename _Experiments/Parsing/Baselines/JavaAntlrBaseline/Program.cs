@@ -16,15 +16,22 @@ namespace JavaAntlrBaseline
 		public int ClassInterfaceCounter { get; private set; } = 0;
 		public int EnumCounter { get; private set; } = 0;
 
-		private StreamWriter MethodOutput { get; set; } = new StreamWriter("_javaMethodOutput.txt", false);
-		private StreamWriter ClassOutput { get; set; } = new StreamWriter("_javaClassOutput.txt", false);
-		private StreamWriter EnumOutput { get; set; } = new StreamWriter("_javaEnumOutput.txt", false);
+		private StreamWriter MethodOutput { get; set; }
+		private StreamWriter ClassOutput { get; set; }
+		private StreamWriter EnumOutput { get; set; }
 
 		private List<string> Methods { get; set; }
 		private List<string> ClassesInterfaces { get; set; }
 		private List<string> Enums { get; set; }
 
 		private string FileName { get; set; }
+
+		public JavaTreeVisitor(string outputDirectory)
+		{
+			MethodOutput = new StreamWriter(Path.Combine(outputDirectory, "method_baseline.txt"), false);
+			ClassOutput = new StreamWriter(Path.Combine(outputDirectory, "class_interface_baseline.txt"), false);
+			EnumOutput = new StreamWriter(Path.Combine(outputDirectory, "enum_baseline.txt"), false);
+		}
 
 		public void CloseOutputs()
 		{
@@ -48,18 +55,21 @@ namespace JavaAntlrBaseline
 
 			if(Methods.Count > 0)
 			{
+				MethodOutput.WriteLine("*");
 				MethodOutput.WriteLine(FileName);
 				Methods.ForEach(line => MethodOutput.WriteLine(line));
 			}
 
 			if (ClassesInterfaces.Count > 0)
 			{
+				ClassOutput.WriteLine("*");
 				ClassOutput.WriteLine(FileName);
 				ClassesInterfaces.ForEach(line => ClassOutput.WriteLine(line));
 			}
 
 			if (Enums.Count > 0)
 			{
+				EnumOutput.WriteLine("*");
 				EnumOutput.WriteLine(FileName);
 				Enums.ForEach(line => EnumOutput.WriteLine(line));
 			}
@@ -105,12 +115,31 @@ namespace JavaAntlrBaseline
 		static void Main(string[] args)
 		{
 			if (args.Length > 0)
-			{
-				var visitor = new JavaTreeVisitor();
+			{			
+				var visitor = new JavaTreeVisitor(args[0]);
 				var package = new List<string>();
 
-				foreach (var path in args)
-					package.AddRange(Directory.GetFiles(path, "*.java", SearchOption.AllDirectories));
+				if (args.Length > 1)
+				{
+					foreach (var path in args.Skip(1))
+						package.AddRange(Directory.GetFiles(path, "*.java", SearchOption.AllDirectories));
+				}
+				else
+				{
+					var landResultsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\last_batch_parsing_report.txt";
+
+					if (File.Exists(landResultsFile))
+					{
+						package.AddRange(Directory.GetFiles(
+							File.ReadAllLines(landResultsFile)[1],
+							"*.java", SearchOption.AllDirectories));
+					}
+					else
+					{
+						Console.WriteLine("Не указаны каталоги для парсинга");
+						return;
+					}
+				}
 
 				foreach (var filename in package)
 				{
@@ -129,8 +158,6 @@ namespace JavaAntlrBaseline
 				Console.WriteLine($"methods: {visitor.MethodCounter}");
 				Console.WriteLine($"classes: {visitor.ClassInterfaceCounter}");
 				Console.WriteLine($"enums: {visitor.EnumCounter}");
-
-				Console.ReadLine();
 			}
 		}
 	}

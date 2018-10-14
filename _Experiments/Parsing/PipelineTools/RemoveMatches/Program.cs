@@ -47,7 +47,7 @@ namespace RemoveMatches
 							{
 								int landFileIndex = 0, baselineFileIndex = 0;
 
-								while (landFileIndex < landReport[landIndex].Item2.Count 
+								while (landFileIndex < landReport[landIndex].Item2.Count
 									&& baselineFileIndex < baselineReport[baselineIndex].Item2.Count)
 								{
 									switch (landReport[landIndex].Item2[landFileIndex]
@@ -66,20 +66,29 @@ namespace RemoveMatches
 									}
 								}
 
-								if (landReport[landIndex].Item2.Count == 0)
+								if (landReport[landIndex].Item2.Count == 0 && baselineReport[baselineIndex].Item2.Count == 0)
+								{
 									landReport.RemoveAt(landIndex);
-								else
-									landIndex++;
-
-								if(baselineReport[baselineIndex].Item2.Count == 0)
 									baselineReport.RemoveAt(baselineIndex);
+								}
 								else
+								{
+									landIndex++;
 									baselineIndex++;
+								}
 							}
 							else if (String.Compare(landReport[landIndex].Item1, baselineReport[baselineIndex].Item1) == 1)
+							{
+								landReport.Insert(landIndex, new Tuple<string, List<string>>(baselineReport[baselineIndex].Item1, new List<string>()));
 								baselineIndex++;
-							else
 								landIndex++;
+							}
+							else
+							{
+								baselineReport.Insert(baselineIndex, new Tuple<string, List<string>>(landReport[landIndex].Item1, new List<string>()));
+								baselineIndex++;
+								landIndex++;
+							}
 						}
 
 						using (var fs = new StreamWriter(pair.ElementAt(0), false))
