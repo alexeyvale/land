@@ -395,18 +395,36 @@ namespace " + @namespace + @"
 			nodeClassesSource.AppendLine(@"
 	public class NodeGenerator : BaseNodeGenerator 
 	{
+		public const string BASE_RULE_TYPE = ""RuleNode"";
+		public const string BASE_TOKEN_TYPE = ""TokenNode"";
+
 		public NodeGenerator(Grammar grammar): base(grammar)
 		{
-			foreach (var smb in grammar.Rules.Keys.Where(key => !key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
+			Cache[BASE_RULE_TYPE] = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + BASE_RULE_TYPE)
+				.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) ;
+			Cache[BASE_TOKEN_TYPE] = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + BASE_TOKEN_TYPE)
+				.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) ;
+
+			foreach (var smb in grammar.Rules.Keys)
 			{
-				var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
-				Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_NODE_TYPE];
+				if(smb.StartsWith(Grammar.AUTO_RULE_PREFIX))
+					Cache[smb] = Cache[BASE_RULE_TYPE];
+				else
+				{
+					var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
+					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_RULE_TYPE];
+				}
 			}
 
-			foreach (var smb in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
+			foreach (var smb in grammar.Tokens.Keys)
 			{
-				var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
-				Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_NODE_TYPE];
+				if(smb.StartsWith(Grammar.AUTO_TOKEN_PREFIX))
+					Cache[smb] = Cache[BASE_TOKEN_TYPE];
+				else
+				{
+					var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
+					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_TOKEN_TYPE];
+				}
 			}
 		}
 	}");
@@ -454,17 +472,39 @@ namespace " + @namespace + @"
 			foreach (var child in node.Children)
 				child.Accept(this);
 		}
+	}
+
+	public class RuleNode: Node
+	{
+		public RuleNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public RuleNode(Node node): base(node) {}
+
+		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
+	}
+
+	public class TokenNode: Node
+	{
+		public TokenNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public TokenNode(Node node): base(node) {}
+
+		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}");
 
 
 			foreach (var name in grammar.Rules.Keys.Where(key=>!key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
 				nodeClassesSource.AppendLine(@"
-	public class " + name + @"_node : Node 
+	public class " + name + @"_node : RuleNode 
 	{
 		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
 		public " + name + @"_node(Node node): base(node) {}
 
-		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		public override void Accept(BaseTypedTreeVisitor visitor)
 		{
 			visitor.Visit(this);
 		}
@@ -486,12 +526,12 @@ namespace " + @namespace + @"
 
 			foreach (var name in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
 				nodeClassesSource.AppendLine(@"
-	public class " + name + @"_node : Node 
+	public class " + name + @"_node : TokenNode 
 	{
 		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
 		public " + name + @"_node(Node node): base(node) {}
 
-		public virtual void Accept(BaseTypedTreeVisitor visitor)
+		public override void Accept(BaseTypedTreeVisitor visitor)
 		{
 			visitor.Visit(this);
 		}
@@ -499,12 +539,19 @@ namespace " + @namespace + @"
 
 			nodeClassesSource.AppendLine(@"
 	public class BaseTypedTreeVisitor: BaseTreeVisitor 
-	{");
+	{
+		public virtual void Visit(RuleNode node)
+		{
+			foreach (var child in node.Children)
+				child.Accept(this);
+		}
+
+		public virtual void Visit(TokenNode node) {}");
 			foreach (var name in grammar.Rules.Keys.Where(key => !key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
 				nodeClassesSource.AppendLine(@"
 		public virtual void Visit(" + name + @"_node node)
 		{
-			foreach(var child in node.Children)
+			foreach (var child in node.Children)
 				child.Accept(this);
 		}");
 
@@ -513,7 +560,7 @@ namespace " + @namespace + @"
 					nodeClassesSource.AppendLine(@"
 		public virtual void Visit(" + alias + @"_node node)
 		{
-			foreach(var child in node.Children)
+			foreach (var child in node.Children)
 				child.Accept(this);
 		}");
 
