@@ -27,8 +27,14 @@ namespace Land.GUI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private const string RECENT_GRAMMARS_FILE = "./recent_grammars.land.ide";
-		private const string RECENT_PREPROCS_FILE = "./recent_preprocs.land.ide";
+		private readonly string APP_DATA_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD IDE";
+		private readonly string DOCUMENTS_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace";
+
+		private string RECENT_GRAMMARS_FILE = "recent_grammars.txt";
+		private string RECENT_PREPROCS_FILE = "recent_preprocs.txt";
+		private string RECENT_DIRECTORIES_FILE = "recent_directories.txt";
+
+		private string LAND_EXPLORER_SETTINGS = "land_explorer_settings.xml";
 
 		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
@@ -41,6 +47,20 @@ namespace Land.GUI
 		{
 			InitializeComponent();
 
+			/// Обеспечиваем существование каталогов для сохранения данных приложения
+			if (!Directory.Exists(APP_DATA_DIRECTORY))
+				Directory.CreateDirectory(APP_DATA_DIRECTORY);
+
+			if (!Directory.Exists(DOCUMENTS_DIRECTORY))
+				Directory.CreateDirectory(DOCUMENTS_DIRECTORY);
+
+			/// Корректируем пути к конфигурационным файлам
+			RECENT_GRAMMARS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_GRAMMARS_FILE);
+			RECENT_PREPROCS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_PREPROCS_FILE);
+			RECENT_DIRECTORIES_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_DIRECTORIES_FILE);
+			LAND_EXPLORER_SETTINGS = Path.Combine(APP_DATA_DIRECTORY, LAND_EXPLORER_SETTINGS);
+
+			/// Подгружаем определение для подсветки синтаксиса, создаём подсветчики и выделители
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
 				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
 				ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
@@ -51,34 +71,31 @@ namespace Land.GUI
 			File_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineBackgroundRenderer(File_Editor.TextArea));
 			File_Editor.TextArea.TextView.BackgroundRenderers.Add(File_SegmentColorizer = new SegmentsBackgroundRenderer(File_Editor.TextArea));
 
-
-			if (File.Exists(RECENT_GRAMMARS_FILE))
+			/// Загружаем списки последних открытых файлов и каталогов
+			var contentToLoad = new
 			{
-				var files = File.ReadAllLines(RECENT_GRAMMARS_FILE);
-				foreach(var filepath in files)
+				Controls = new ComboBox[] { Grammar_RecentGrammars, Grammar_RecentPreprocs, Batch_RecentDirectories },
+				FileNames = new string[] { RECENT_GRAMMARS_FILE, RECENT_PREPROCS_FILE, RECENT_DIRECTORIES_FILE }
+			};
+
+			for(var i=0; i<contentToLoad.Controls.Length; ++i)
+			{
+				if (File.Exists(contentToLoad.FileNames[i]))
 				{
-					if(!String.IsNullOrEmpty(filepath))
+					var paths = File.ReadAllLines(contentToLoad.FileNames[i]);
+					foreach (var path in paths)
 					{
-						Grammar_RecentGrammars.Items.Add(filepath);
+						if (!String.IsNullOrEmpty(path))
+							contentToLoad.Controls[i].Items.Add(path);
 					}
 				}
 			}
 
-			if (File.Exists(RECENT_PREPROCS_FILE))
-			{
-				var files = File.ReadAllLines(RECENT_PREPROCS_FILE);
-				foreach (var filepath in files)
-				{
-					if (!String.IsNullOrEmpty(filepath))
-					{
-						Grammar_RecentPreprocs.Items.Add(filepath);
-					}
-				}
-			}
-
-			EditorAdapter = new EditorAdapter(this, "./land_explorer_settings.xml");
+			/// Загружаем настройки панели разметки
+			EditorAdapter = new EditorAdapter(this, LAND_EXPLORER_SETTINGS);
 			LandExplorer.Initialize(EditorAdapter);
 
+			/// Инициализирующие действия для массового парсинга
 			InitPackageParsing();
 		}
 
@@ -89,21 +106,21 @@ namespace Land.GUI
 
 		private void Window_Closed(object sender, EventArgs e)
 		{
-			var listContent = new List<string>();
+			var contentToSave = new
+			{
+				Controls = new ComboBox[] { Grammar_RecentGrammars, Grammar_RecentPreprocs, Batch_RecentDirectories },
+				FileNames = new string[] { RECENT_GRAMMARS_FILE, RECENT_PREPROCS_FILE, RECENT_DIRECTORIES_FILE }
+			};
 
-			/// Запоминаем список последних открытых грамматик
-			foreach (var item in Grammar_RecentGrammars.Items)
-				listContent.Add(item.ToString());
+			for(var i=0; i<contentToSave.Controls.Length; ++i)
+			{
+				var listContent = new List<string>();
 
-			File.WriteAllLines(RECENT_GRAMMARS_FILE, listContent.Take(10));
+				foreach (var item in contentToSave.Controls[i].Items)
+					listContent.Add(item.ToString());
 
-			listContent.Clear();
-
-			/// Запоминаем список последних использованных препроцессоров
-			foreach (var item in Grammar_RecentPreprocs.Items)
-				listContent.Add(item.ToString());
-
-			File.WriteAllLines(RECENT_PREPROCS_FILE, listContent.Take(10));
+				File.WriteAllLines(contentToSave.FileNames[i], listContent.Take(10));
+			}
 		}
 
 		private void MoveCaretToSource(SegmentLocation loc, ICSharpCode.AvalonEdit.TextEditor editor, bool selectText = true, int? tabToSelect = null)
@@ -131,7 +148,12 @@ namespace Land.GUI
 		/// <summary>
 		/// Текущая открытая грамматика
 		/// </summary>
-		private string CurrentGrammarFilename { get; set; } = null;
+		private string OpenedGrammarFilename { get; set; } = null;
+
+		/// <summary>
+		/// Грамматика, по которой сгенерирован текущий парсер
+		/// </summary>
+		private string BuiltGrammarFilename { get; set; } = null;
 
 		/// <summary>
 		///  Последние подтверждённые настройки генерации библиотеки для текущей грамматики
@@ -141,8 +163,8 @@ namespace Land.GUI
 		private bool MayProceedClosingGrammar()
 		{
 			/// Предлагаем сохранить грамматику, если она новая или если в открытой грамматике произошли изменения или исходный файл был удалён
-			if (String.IsNullOrEmpty(CurrentGrammarFilename) && !String.IsNullOrEmpty(Grammar_Editor.Text) ||
-				!String.IsNullOrEmpty(CurrentGrammarFilename) && (!File.Exists(CurrentGrammarFilename) || File.ReadAllText(CurrentGrammarFilename) != Grammar_Editor.Text))
+			if (String.IsNullOrEmpty(OpenedGrammarFilename) && !String.IsNullOrEmpty(Grammar_Editor.Text) ||
+				!String.IsNullOrEmpty(OpenedGrammarFilename) && (!File.Exists(OpenedGrammarFilename) || File.ReadAllText(OpenedGrammarFilename) != Grammar_Editor.Text))
 			{
 				switch (MessageBox.Show(
 					"В грамматике имеются несохранённые изменения. Сохранить текущую версию?",
@@ -165,6 +187,8 @@ namespace Land.GUI
 
 		private void Grammar_BuildButton_Click(object sender, RoutedEventArgs e)
 		{
+			BuiltGrammarFilename = OpenedGrammarFilename;
+
 			var messages = new List<Message>();
 
 			Parser = BuilderBase.BuildParser(
@@ -194,10 +218,10 @@ namespace Land.GUI
 		{
 			var librarySettings = new LibrarySettingsWindow();
 
-			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(CurrentGrammarFilename)
-				? Path.GetFileNameWithoutExtension(CurrentGrammarFilename)
+			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(OpenedGrammarFilename)
+				? Path.GetFileNameWithoutExtension(OpenedGrammarFilename)
 				: null;
-			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(CurrentGrammarFilename);
+			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(OpenedGrammarFilename);
 
 			if (librarySettings.ShowDialog() == true)
 			{
@@ -264,9 +288,10 @@ namespace Land.GUI
 			}
 		}
 
-		private void SetAsCurrentElement(ComboBox target, string filename)
+		private void RecentItems_SetAsCurrentElement(ComboBox target, string filename, SelectionChangedEventHandler handler = null)
 		{
-			target.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
+			if (handler != null)
+				target.SelectionChanged -= handler;
 
 			if (target.Items.Contains(filename))
 				target.Items.Remove(filename);
@@ -274,7 +299,8 @@ namespace Land.GUI
 			target.Items.Insert(0, filename);
 			target.SelectedIndex = 0;
 
-			target.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
+			if (handler != null)
+				target.SelectionChanged += handler;
 		}
 
 		private void OpenGrammar(string filename)
@@ -289,14 +315,14 @@ namespace Land.GUI
 				Grammar_RecentGrammars.SelectedIndex = -1;
 				Grammar_RecentPreprocs.SelectedIndex = -1;
 
-				CurrentGrammarFilename = null;
+				OpenedGrammarFilename = null;
 				Grammar_Editor.Text = String.Empty;
 				Grammar_SaveButton.IsEnabled = true;
 
 				return;
 			}
 
-			CurrentGrammarFilename = filename;
+			OpenedGrammarFilename = filename;
 
 			using (var stream = new StreamReader(filename, GetEncoding(filename)))
 			{
@@ -305,7 +331,7 @@ namespace Land.GUI
 			}
 
 			Grammar_SaveButton.IsEnabled = false;
-			SetAsCurrentElement(Grammar_RecentGrammars, filename);
+			RecentItems_SetAsCurrentElement(Grammar_RecentGrammars, filename, RecentItems_SelectionChanged);
 		}
 
 		private void OpenPreproc(string filename)
@@ -326,7 +352,7 @@ namespace Land.GUI
 
 			Grammar_DisablePreprocButton_Checked(null, null);
 
-			SetAsCurrentElement(Grammar_RecentPreprocs, filename);
+			RecentItems_SetAsCurrentElement(Grammar_RecentPreprocs, filename, RecentItems_SelectionChanged);
 		}
 
 		private Encoding GetEncoding(string filename)
@@ -349,9 +375,9 @@ namespace Land.GUI
 
 		private void Grammar_SaveButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (!String.IsNullOrEmpty(CurrentGrammarFilename))
+			if (!String.IsNullOrEmpty(OpenedGrammarFilename))
 			{
-				File.WriteAllText(CurrentGrammarFilename, Grammar_Editor.Text);
+				File.WriteAllText(OpenedGrammarFilename, Grammar_Editor.Text);
 				Grammar_SaveButton.IsEnabled = false;
 			}
 			else
@@ -361,8 +387,8 @@ namespace Land.GUI
 				{
 					File.WriteAllText(saveFileDialog.FileName, Grammar_Editor.Text);
 					Grammar_SaveButton.IsEnabled = false;
-					CurrentGrammarFilename = saveFileDialog.FileName;
-					SetAsCurrentElement(Grammar_RecentGrammars, saveFileDialog.FileName);
+					OpenedGrammarFilename = saveFileDialog.FileName;
+					RecentItems_SetAsCurrentElement(Grammar_RecentGrammars, saveFileDialog.FileName);
 				}
 			}
 		}
@@ -372,7 +398,7 @@ namespace Land.GUI
 			if (MayProceedClosingGrammar())
 			{
 				Grammar_RecentGrammars.SelectedIndex = -1;
-				CurrentGrammarFilename = null;
+				OpenedGrammarFilename = null;
 				Grammar_Editor.Text = String.Empty;
 			}
 		}
@@ -409,7 +435,7 @@ namespace Land.GUI
 			}
 		}
 
-		private void Grammar_RecentFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		private void RecentItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			/// Если что-то новое было выделено
 			if (e.AddedItems.Count > 0)
@@ -418,21 +444,23 @@ namespace Land.GUI
 				if (sender == Grammar_RecentGrammars && !MayProceedClosingGrammar())
 				{
 					var combo = (ComboBox)sender;
-					combo.SelectionChanged -= Grammar_RecentFiles_SelectionChanged;
+					combo.SelectionChanged -= RecentItems_SelectionChanged;
 					
 					/// Если до этого был выбран какой-то файл
 					if (e.RemovedItems.Count > 0)
 						combo.SelectedItem = e.RemovedItems[0];
 					else
 						combo.SelectedIndex = -1;
-					combo.SelectionChanged += Grammar_RecentFiles_SelectionChanged;
+					combo.SelectionChanged += RecentItems_SelectionChanged;
 					return;
 				}
 
-				if(sender == Grammar_RecentGrammars)
+				if (sender == Grammar_RecentGrammars)
 					OpenGrammar(e.AddedItems[0].ToString());
-				else
+				else if (sender == Grammar_RecentPreprocs)
 					OpenPreproc(e.AddedItems[0].ToString());
+				else if (sender == Batch_RecentDirectories)
+					SetBatchDirectory(e.AddedItems[0].ToString());
 			}
 		}
 
@@ -614,6 +642,12 @@ namespace Land.GUI
 
 		#region Парсинг набора файлов
 
+		public class FileLandPair
+		{
+			public string File { get; set; }
+			public List<CountLandNodesVisitor.TypeValuePair> Land { get; set; }
+		}
+
 		private System.ComponentModel.BackgroundWorker PackageParsingWorker;
 		private Dispatcher FrontendUpdateDispatcher { get; set; }
 
@@ -636,10 +670,26 @@ namespace Land.GUI
 
 			/// При выборе каталога запоминаем имя и отображаем его в строке статуса
 			if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				SetBatchDirectory(folderDialog.SelectedPath);
+		}
+
+		private void SetBatchDirectory(string path)
+		{
+			if (!Directory.Exists(path))
 			{
-				PackageSource = folderDialog.SelectedPath;
-				Batch_PathLabel.Content = $"Выбран каталог {PackageSource}";
+				MessageBox.Show("Указанный каталог не найден", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+
+				Batch_RecentDirectories.Items.Remove(path);
+				Batch_RecentDirectories.SelectedIndex = -1;
+				Batch_RecentDirectories.SelectedIndex = -1;
+
+				return;
 			}
+
+			PackageSource = path;
+			Batch_PathLabel.Content = $"Выбран каталог {path}";
+
+			RecentItems_SetAsCurrentElement(Batch_RecentDirectories, path, RecentItems_SelectionChanged);
 		}
 
 		void Worker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -647,7 +697,7 @@ namespace Land.GUI
 			OnPackageFileParsingError = AddRecordToPackageParsingLog;
 			OnPackageFileParsed = UpdatePackageParsingStatus;
 
-			var files = (List<string>) e.Argument;
+			var argument = (BatchWorkerArgument)e.Argument;
 			var errorCounter = 0;
 			var counter = 0;
 			var timeSpent = new TimeSpan();
@@ -656,23 +706,24 @@ namespace Land.GUI
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
 			var timePerFile = new Dictionary<string, TimeSpan>();
 			var landCounts = new Dictionary<string, int>();
-			var landValues = new Dictionary<string, Dictionary<string, List<string>>>();
+			var landLists = new List<FileLandPair>();
 
-			for (; counter < files.Count; ++counter)
+			for (; counter < argument.Files.Count; ++counter)
 			{
 				try
 				{
 					Node root = null;
 					FrontendUpdateDispatcher.Invoke((Action)(() => 
 					{
-						root = File_Parse(files[counter], File.ReadAllText(files[counter], GetEncoding(files[counter])));
+						root = File_Parse(argument.Files[counter], 
+							File.ReadAllText(argument.Files[counter], GetEncoding(argument.Files[counter])));
 					}));
 
 					timeSpent += Parser.Statistics.TimeSpent;
 
 					if (Parser.Log.Any(l=>l.Type == MessageType.Error))
 					{
-						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
+						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, argument.Files[counter]);
 						foreach (var error in Parser.Log.Where(l=>l.Type != MessageType.Trace))
 							FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
 
@@ -680,28 +731,30 @@ namespace Land.GUI
 					}
 					else
 					{
-						timePerFile[files[counter]] = Parser.Statistics.TimeSpent;
+						timePerFile[argument.Files[counter]] = Parser.Statistics.TimeSpent;
 
 						var visitor = new CountLandNodesVisitor("name");
 						root.Accept(visitor);
 
+						landLists.Add(new FileLandPair()
+						{
+							File = argument.Files[counter],
+							Land = visitor.Land
+						});
+
 						foreach (var pair in visitor.Counts)
 						{
 							if (!landCounts.ContainsKey(pair.Key))
-							{
 								landCounts[pair.Key] = 0;
-								landValues[pair.Key] = new Dictionary<string, List<string>>();
-							}
 
 							landCounts[pair.Key] += pair.Value;
-							landValues[pair.Key][files[counter]] = new List<string>(visitor.Values[pair.Key]);
 						}
 
 					}
 				}
 				catch (Exception ex)
 				{
-					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, files[counter]);
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, argument.Files[counter]);
 					foreach (var error in Parser.Log.Where(l => l.Type != MessageType.Trace))
 						FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{error}");
 					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{ex.ToString()}");
@@ -709,8 +762,8 @@ namespace Land.GUI
 					++errorCounter;
 				}
 
-				(sender as System.ComponentModel.BackgroundWorker).ReportProgress((counter + 1) * 100 / files.Count);
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, files.Count, counter + 1, errorCounter, timeSpent);
+				(sender as System.ComponentModel.BackgroundWorker).ReportProgress((counter + 1) * 100 / argument.Files.Count);
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsed, argument.Files.Count, counter + 1, errorCounter, timeSpent);
 
 				if(PackageParsingWorker.CancellationPending)
 				{
@@ -731,17 +784,22 @@ namespace Land.GUI
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
 
 			foreach (var pair in landCounts)
-			{
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
 
-				using (var fs = new StreamWriter($"{pair.Key}.txt", false))
-				{
-					foreach(var fileData in landValues[pair.Key].Where(p=>p.Value.Count > 0))
-					{
-						fs.WriteLine(fileData.Key);
+			using (var fs = new StreamWriter(Path.Combine(DOCUMENTS_DIRECTORY, "last_batch_parsing_report.txt")))
+			{
+				fs.WriteLine(BuiltGrammarFilename);
+				fs.WriteLine(argument.DirectoryPath);
 
-						foreach(var line in fileData.Value.SelectMany(str => str.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)))
-							fs.WriteLine(line);
+				foreach(var file in landLists)
+				{
+					fs.WriteLine("*");
+					fs.WriteLine(file.File);
+
+					foreach(var landEntity in file.Land)
+					{
+						fs.WriteLine(landEntity.Type);
+						fs.WriteLine(landEntity.Value);
 					}
 				}
 			}
@@ -795,9 +853,15 @@ namespace Land.GUI
 			}
 		}
 
+		public struct BatchWorkerArgument
+		{
+			public string DirectoryPath { get; set; }
+			public List<string> Files { get; set; }
+		}
+
 		private void Batch_StartOrStopPackageParsingButton_Click(object sender, RoutedEventArgs e)
 		{
-			if(!PackageParsingWorker.IsBusy)
+			if (!PackageParsingWorker.IsBusy)
 			{
 				/// Если в настоящий момент парсинг не осуществляется и парсер сгенерирован
 				if (Parser != null)
@@ -807,7 +871,7 @@ namespace Land.GUI
 					var package = new List<string>();
 					/// Возможна ошибка при доступе к определённым директориям
 					try
-					{			
+					{
 						foreach (var pattern in patterns)
 						{
 							package.AddRange(Directory.GetFiles(PackageSource, pattern, SearchOption.AllDirectories));
@@ -820,7 +884,11 @@ namespace Land.GUI
 					}
 					/// Запускаем в отдельном потоке массовый парсинг
 					Batch_StatusBar.Background = Brushes.WhiteSmoke;
-					PackageParsingWorker.RunWorkerAsync(package);
+					PackageParsingWorker.RunWorkerAsync(new BatchWorkerArgument()
+					{
+						DirectoryPath = PackageSource,
+						Files = package
+					});
 					Batch_ParsingProgress.Foreground = Brushes.MediumSeaGreen;
 				}
 			}
@@ -830,6 +898,7 @@ namespace Land.GUI
 				Batch_ParsingProgress.Foreground = Brushes.IndianRed;
 			}
 		}
+
 		#endregion
 
 		#region Отладка перепривязки
@@ -1096,6 +1165,6 @@ namespace Land.GUI
 			}
 		}
 
-		#endregion		
+		#endregion
 	}
 }

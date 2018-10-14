@@ -7,7 +7,7 @@ using System.Linq;
 using PascalABCCompiler.PascalABCNewParser;
 using PascalABCCompiler.SyntaxTree;
 
-namespace PascalABCProvidedBaseline
+namespace PascalABCBaseline
 {
 	class Program
 	{

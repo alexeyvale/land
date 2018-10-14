@@ -71,13 +71,13 @@
 										<Button Name="Grammar_GetLibraryButton" Click="Grammar_GetLibraryButton_Click" Content="&#xf02d;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
 										<Separator></Separator>
-										<ComboBox MinWidth="90" MaxWidth="90" Margin="0, 0, 10, 0" Name="Grammar_RecentGrammars" ToolTip="Недавние грамматики" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+										<ComboBox MinWidth="90" MaxWidth="90" Margin="0, 0, 10, 0" Name="Grammar_RecentGrammars" ToolTip="Недавние грамматики" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
 										<Separator></Separator>
 										<Separator></Separator>
 										<Label Padding="10,7,10,0">ПРЕПРОЦЕССОР</Label>
 										<Button Name="Grammar_LoadPreprocButton" Click="Grammar_LoadPreprocButton_Click" ToolTip="Выбрать препроцессор" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<ComboBox MinWidth="90" MaxWidth="90" Name="Grammar_RecentPreprocs" ToolTip="Недавние препроцессоры" SelectionChanged="Grammar_RecentFiles_SelectionChanged"></ComboBox>
+										<ComboBox MinWidth="90" MaxWidth="90" Name="Grammar_RecentPreprocs" ToolTip="Недавние препроцессоры" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
 										<Separator></Separator>
 										<ToggleButton Name="Grammar_DisablePreprocButton" ToolTip="Отключить препроцессор" Content="&#xf057;" Checked="Grammar_DisablePreprocButton_Checked" Unchecked="Grammar_DisablePreprocButton_Checked" Style="{StaticResource IconToggleButtonStyle}"/>
 									</ToolBar>
@@ -197,6 +197,9 @@
                                     <TextBox Width="60" BorderBrush="Black" Name="Batch_TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
                                     <Separator></Separator>
                                     <Button Name="Batch_StartOrStopPackageParsingButton" Content="Запуск/Остановка" Click="Batch_StartOrStopPackageParsingButton_Click"/>
+									<Separator></Separator>
+									<Separator></Separator>
+									<ComboBox MinWidth="90" MaxWidth="90" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
                                 </ToolBar>
                                 <ListBox FontSize="14pt" Grid.Row="1" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick" ></ListBox>
                                 <StatusBar Name="Batch_StatusBar" Grid.Row="2">

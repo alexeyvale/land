@@ -1,35 +1,10 @@
-LandParserGenerator/LandParserGenerator/bin/
-LandParserGenerator/LandParserGenerator/obj/
-LandParserGenerator/packages/
 *.lst
 *.back
 *.suo
 *.user
-LandParserGenerator/.vs/
-LandParserGenerator/GUI/bin/
-LandParserGenerator/GUI/obj/
-LandParserGenerator/Control/obj/
-LandParserGenerator/Control/bin/
-LandParserGenerator/VisualStudioExtension/bin/
-LandParserGenerator/VisualStudioExtension/obj/
-LandParserGenerator/SharpPreprocessor/obj/
-LandParserGenerator/SharpPreprocessor/bin/
-Baselines/RoslynProvidedBaseline/bin/
-Baselines/RoslynProvidedBaseline/obj/
-Baselines/RoslynProvidedBaseline/.vs/
-Baselines/RoslynProvidedBaseline/packages/
-Baselines/PascalABCProvidedBaseline/.vs/
-Baselines/PascalABCProvidedBaseline/bin/
-Baselines/PascalABCProvidedBaseline/obj/
-LandParserGenerator/Control.Helpers/bin/
-LandParserGenerator/Control.Helpers/obj/
-LandParserGenerator/Preprocessors/PascalPreprocessor/bin/
-LandParserGenerator/Preprocessors/PascalPreprocessor/obj/
-LandParserGenerator/Preprocessors/SharpPreprocessor/obj/
-LandParserGenerator/Preprocessors/SharpPreprocessor/bin/
-LandParserGenerator/Preprocessors/Conditional compilation/PascalPreprocessor/bin/
-LandParserGenerator/Preprocessors/Conditional compilation/PascalPreprocessor/obj/
-LandParserGenerator/Preprocessors/Conditional compilation/SharpPreprocessor/bin/
-LandParserGenerator/Preprocessors/Conditional compilation/SharpPreprocessor/obj/
-LandParserGenerator/Preprocessors/Tree postprocessing/PascalPreprocessor/obj/
-LandParserGenerator/Preprocessors/Tree postprocessing/PascalPreprocessor/bin/
+**/.vs/
+**/bin/
+**/obj/
+**/packages/
+
+_Experiments/Parsing/_Results/

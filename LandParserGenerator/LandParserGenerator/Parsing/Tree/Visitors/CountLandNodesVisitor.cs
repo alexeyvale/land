@@ -10,8 +10,14 @@ namespace Land.Core.Parsing.Tree
 {
 	public class CountLandNodesVisitor: BaseTreeVisitor
 	{
+		public class TypeValuePair
+		{
+			public string Type { get; set; }
+			public string Value { get; set; }
+		}
+
 		public Dictionary<string, int> Counts { get; set; } = new Dictionary<string, int>();
-		public Dictionary<string, List<string>> Values { get; set; } = new Dictionary<string, List<string>>();
+		public List<TypeValuePair> Land { get; set; } = new List<TypeValuePair>();
 
 		public HashSet<string> ChildrenWithValues { get; set; }
 
@@ -27,11 +33,16 @@ namespace Land.Core.Parsing.Tree
 				if (!Counts.ContainsKey(node.Type))
 				{
 					Counts[node.Type] = 0;
-					Values[node.Type] = new List<string>();
 				}
 
 				Counts[node.Type] += 1;
-				Values[node.Type].Add(String.Join(" ", node.Children.Where(c=> ChildrenWithValues.Contains(c.Type)).Select(c=>String.Join("", c.Value))));
+				Land.Add(new TypeValuePair()
+				{
+					Type = node.Type,
+					Value = String.Join(" ", node.Children
+						.Where(c => ChildrenWithValues.Contains(c.Type))
+						.Select(c => String.Join("", c.Value)))
+				});
 			}
 
 			base.Visit(node);

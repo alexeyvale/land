@@ -9,8 +9,8 @@
     <ProjectGuid>{D9B545B9-949A-4363-AF43-F4EA223122A9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RoslynProvidedBaseline</RootNamespace>
-    <AssemblyName>RoslynProvidedBaseline</AssemblyName>
+    <RootNamespace>SharpRoslynBaseline</RootNamespace>
+    <AssemblyName>SharpRoslynBaseline</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

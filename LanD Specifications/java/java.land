@@ -1,0 +1,70 @@
+DIRECTIVE	: '#' ~[\n\r]*
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' (~["]|'""')* '"')+
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+NEW_LINE	: '\n'
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+MODIFIER	: 'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+ID			: [_$a-zA-Z][_0-9a-zA-Z]*
+ 
+ 
+curve_bracketed	= %left '{' %right '}'
+round_bracketed	= %left '(' %right ')'
+square_bracketed = %left '[' %right ']'
+
+ 
+file_content	=	(Any|outer_entity)*
+outer_entity	=	
+	MODIFIER*
+	(
+	 	'enum' name Any '{' Any '}' ';'? 	=> enum						|
+		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> class_struct_interface
+	)
+inner_entity	=	
+	attribute* MODIFIER*
+	(
+	 	'enum' name Any '{' Any '}' ';'? 	=> inner_enum					|
+		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> inner_class_struct_interface	|
+		('<' Any '>')? %priority(2) type name
+		(
+	  		arguments Any (init_expression? ';' | block)	=> method	|
+	  		init_value? (',' name init_value?)* ';'			=> field	|
+	  		(block (init_value ';')? | init_expression ';')	=> property
+	  	)
+	)
+
+init_expression		=	'=>' (Any | %ghost type)+
+init_value			=	'=' (Any | %ghost type)+
+
+name_atom	=	(ID | MODIFIER) ('<' types_list '>')?
+name		=	name_atom (('.'|'::') name_atom)*
+names_list	=	name (',' name)*
+
+type_atom	=	('unsigned'? ID) ('<' types_list '>')? '?'? '*'*
+type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
+types_list	=	(attribute|'in'|'out')* type? (',' (attribute|'in'|'out')* type?)*
+
+arguments	=	'(' Any ')'
+attribute	=	'@' Any NEW_LINE
+block		=	'{' Any '}'
+
+%%
+
+%parsing recovery
+%parsing fragment STRING_INT_CODE
+%parsing start file_content
+%parsing skip COMMENT STRING DIRECTIVE NEW_LINE
+
+%nodes ghost  names_list
+%nodes leaf name type
+
+%mapping land enum class_struct_interface method field property
+%mapping priority(3) name
+ 

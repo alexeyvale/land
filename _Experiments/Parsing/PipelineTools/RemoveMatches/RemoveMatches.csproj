@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F72E45A6-2073-42D2-B8C4-1A40559F5617}</ProjectGuid>
+    <ProjectGuid>{469A4B83-03F6-47D3-9A48-7715C86B4425}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PascalABCProvidedBaseline</RootNamespace>
-    <AssemblyName>PascalABCProvidedBaseline</AssemblyName>
+    <RootNamespace>RemoveMatches</RootNamespace>
+    <AssemblyName>RemoveMatches</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,18 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Errors">
-      <HintPath>components\Errors.dll</HintPath>
-    </Reference>
-    <Reference Include="ParserTools">
-      <HintPath>components\ParserTools.dll</HintPath>
-    </Reference>
-    <Reference Include="PascalABCParser">
-      <HintPath>components\PascalABCParser.dll</HintPath>
-    </Reference>
-    <Reference Include="SyntaxTree">
-      <HintPath>components\SyntaxTree.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

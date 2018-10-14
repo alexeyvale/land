@@ -18,8 +18,27 @@ namespace RoslynParserTest
 			{
 				var package = new List<string>();
 
-				foreach (var path in args)
-					package.AddRange(Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories));
+				if (args.Length > 1)
+				{
+					foreach (var path in args.Skip(1))
+						package.AddRange(Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories));
+				}
+				else
+				{
+					var landResultsFile = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\last_batch_parsing_report.txt";
+
+					if (File.Exists(landResultsFile))
+					{
+						package.AddRange(Directory.GetFiles(
+							File.ReadAllLines(landResultsFile)[1],
+							"*.cs", SearchOption.AllDirectories));
+					}
+					else
+					{
+						Console.WriteLine("Не указаны каталоги для парсинга");
+						return;
+					}
+				}
 
 				var classesCounter = 0;
 				var enumsCounter = 0;
@@ -27,10 +46,10 @@ namespace RoslynParserTest
 				var methodsCounter = 0;
 				var fieldsCounter = 0;
 
-				var enumOutput = new StreamWriter("_roslynCSharpEnumOutput.txt", false);
-				var propertyOutput = new StreamWriter("_roslynCSharpPropertyOutput.txt", false);
-				var fieldOutput = new StreamWriter("_roslynCSharpFieldOutput.txt", false);
-				var methodOutput = new StreamWriter("_roslynCSharpMethodOutput.txt", false);
+				var enumOutput = new StreamWriter(Path.Combine(args[0], "enum_baseline.txt"), false);
+				var propertyOutput = new StreamWriter(Path.Combine(args[0], "property_baseline.txt"), false);
+				var fieldOutput = new StreamWriter(Path.Combine(args[0], "field_baseline.txt"), false);
+				var methodOutput = new StreamWriter(Path.Combine(args[0], "method_baseline.txt"), false);
 
 				foreach (var filename in package)
 				{
@@ -39,6 +58,7 @@ namespace RoslynParserTest
 					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().ToList();
 					if (enums.Count > 0)
 					{
+						enumOutput.WriteLine("*");
 						enumOutput.WriteLine(filename);
 
 						foreach (var node in enums)
@@ -48,6 +68,7 @@ namespace RoslynParserTest
 					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
 					if (fields.Count > 0)
 					{
+						fieldOutput.WriteLine("*");
 						fieldOutput.WriteLine(filename);
 
 						foreach (var node in fields)
@@ -58,6 +79,7 @@ namespace RoslynParserTest
 					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
 					if (properties.Count > 0)
 					{
+						propertyOutput.WriteLine("*");
 						propertyOutput.WriteLine(filename);
 
 						foreach (var node in properties)
@@ -67,6 +89,7 @@ namespace RoslynParserTest
 					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
 					if (methods.Count > 0)
 					{
+						methodOutput.WriteLine("*");
 						methodOutput.WriteLine(filename);
 
 						foreach (var node in methods)
@@ -92,8 +115,6 @@ namespace RoslynParserTest
 				Console.WriteLine($"fields: {fieldsCounter}");
 				Console.WriteLine($"properties: {propertiesCounter}");
 				Console.WriteLine($"methods: {methodsCounter}");
-
-				Console.ReadLine();
 			}
 		}
 	}
