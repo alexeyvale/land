@@ -30,6 +30,7 @@ namespace JavaAntlrBaseline
 		private string FileName { get; set; }
 
 		private bool InField { get; set; } = false;
+		private bool InConstant { get; set; } = false;
 
 		public JavaTreeVisitor(string outputDirectory)
 		{
@@ -137,6 +138,26 @@ namespace JavaAntlrBaseline
 			return true;
 		}
 
+		public override bool VisitConstDeclaration([NotNull] JavaParser.ConstDeclarationContext context)
+		{
+			InConstant = true;
+			base.VisitConstDeclaration(context);
+			InConstant = false;
+
+			return true;
+		}
+
+		public override bool VisitConstantDeclarator([NotNull] JavaParser.ConstantDeclaratorContext context)
+		{
+			if (InConstant)
+			{
+				++FieldCounter;
+				Fields.Add(context.IDENTIFIER().GetText());
+			}
+
+			return true;
+
+		}
 		public override bool VisitMethodDeclaration([NotNull] JavaParser.MethodDeclarationContext context)
 		{
 			++MethodCounter;

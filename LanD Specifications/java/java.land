@@ -10,8 +10,8 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 NEW_LINE	: '\n'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
-ID			: [_$a-zA-Z][_0-9a-zA-Z]*
+MODIFIER	: 'transient'|'strictfp'|'native'|'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
  
  
 curve_bracketed	= %left '{' %right '}'
@@ -30,27 +30,28 @@ outer_entity	=
 inner_entity	=	
 	annotation* MODIFIER*
 	(
-	 	'enum' name Any '{' Any '}' ';'? 	=> inner_enum	|
+	 	'enum' name Any '{' Any '}' ';'? 								=> inner_enum	|
 		('class'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> inner_class_interface	|
 		('<' Any '>')? %priority(2) type name
 		(
-	  		arguments Any (';' | block)				=> method	|
-	  		init_value? (',' name init_value?)* ';'	=> field
+	  		arguments Any (';' | block)									=> method	|
+	  		('['']')* init_value? (',' name ('['']')* init_value?)* ';'	=> field
 	  	)
 	)
 init_value	=	'=' Any
 
-// AnyInclude('@interface') - пропускаем определения аннотаций
-// Также нас не интересуют local class-ы, которые могут быть внутри блока
-// блоки инициализации пропускаются за счёт пары {} и механизмов восстановления
+// 1) AnyInclude('@interface') - пропускаем определения аннотаций
+// 2) нас не интересуют local class-ы, которые могут быть внутри блока
+// 3) блоки инициализации пропускаются за счёт пары {} и механизмов восстановления,
+// 4) анонимные классы в инициализаторах пропускаются - блок включается в Any за счёт механизма пропуска пар 
 
 name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
-type_atom	=	('unsigned'? ID) type_parameter? '?'? '*'*
-type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
-type_parameter	=	'<' (Any|type_parameter)* '>'
+type_atom	=	('unsigned'? ID) type_parameter? '*'*
+type		=	type_atom ((('.'|'::') type_atom) | '['']')*!
+type_parameter	=	'<' (AnyAvoid(';')|type_parameter)* '>'
 
 arguments	=	'(' Any ')'
 annotation	=	'@' name Any
