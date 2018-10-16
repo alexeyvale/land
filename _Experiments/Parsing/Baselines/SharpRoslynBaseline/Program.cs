@@ -46,6 +46,7 @@ namespace RoslynParserTest
 				var methodsCounter = 0;
 				var fieldsCounter = 0;
 
+				var classOutput = new StreamWriter(Path.Combine(args[0], "class_struct_interface_baseline.txt"), false);
 				var enumOutput = new StreamWriter(Path.Combine(args[0], "enum_baseline.txt"), false);
 				var propertyOutput = new StreamWriter(Path.Combine(args[0], "property_baseline.txt"), false);
 				var fieldOutput = new StreamWriter(Path.Combine(args[0], "field_baseline.txt"), false);
@@ -96,10 +97,25 @@ namespace RoslynParserTest
 							methodOutput.WriteLine(node.Identifier);
 					}
 
+					var classes = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
+					var structs = tree.GetRoot().DescendantNodes().OfType<StructDeclarationSyntax>();
+					var interfaces = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
+
+					if(classes.Count() > 0 || structs.Count() > 0 || interfaces.Count() > 0)
+					{
+						classOutput.WriteLine("*");
+						classOutput.WriteLine(filename);
+
+						foreach (var node in classes)
+							classOutput.WriteLine(node.Identifier);
+						foreach (var node in structs)
+							classOutput.WriteLine(node.Identifier);
+						foreach (var node in interfaces)
+							classOutput.WriteLine(node.Identifier);
+					}
+
 					enumsCounter += enums.Count();
-					classesCounter += tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Count()
-						+ tree.GetRoot().DescendantNodes().OfType<StructDeclarationSyntax>().Count()
-						+ tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>().Count();
+					classesCounter += classes.Count() + structs.Count() + interfaces.Count();
 					fieldsCounter += fields.Sum(node => node.Declaration.Variables.Count);
 					propertiesCounter += properties.Count();
 					methodsCounter += methods.Count();

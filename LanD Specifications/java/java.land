@@ -38,7 +38,7 @@ inner_entity	=
 	  		('['']')* init_value? (',' name ('['']')* init_value?)* ';'	=> field
 	  	)
 	)
-init_value	=	'=' Any
+init_value	=	'=' (Any | %ghost type)+
 
 // 1) AnyInclude('@interface') - пропускаем определения аннотаций
 // 2) нас не интересуют local class-ы, которые могут быть внутри блока

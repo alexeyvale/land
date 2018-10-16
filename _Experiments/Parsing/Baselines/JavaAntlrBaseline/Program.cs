@@ -16,6 +16,7 @@ namespace JavaAntlrBaseline
 		public int ClassInterfaceCounter { get; private set; } = 0;
 		public int EnumCounter { get; private set; } = 0;
 		public int FieldCounter { get; private set; } = 0;
+		public int FieldDeclarationCounter { get; private set; } = 0;
 
 		private StreamWriter MethodOutput { get; set; }
 		private StreamWriter ClassOutput { get; set; }
@@ -121,6 +122,7 @@ namespace JavaAntlrBaseline
 		public override bool VisitFieldDeclaration([NotNull] JavaParser.FieldDeclarationContext context)
 		{
 			InField = true;
+			FieldDeclarationCounter++;
 			base.VisitChildren(context);
 			InField = false;
 
@@ -141,6 +143,7 @@ namespace JavaAntlrBaseline
 		public override bool VisitConstDeclaration([NotNull] JavaParser.ConstDeclarationContext context)
 		{
 			InConstant = true;
+			FieldDeclarationCounter++;
 			base.VisitConstDeclaration(context);
 			InConstant = false;
 
@@ -239,6 +242,7 @@ namespace JavaAntlrBaseline
 				Console.WriteLine($"classes: {visitor.ClassInterfaceCounter}");
 				Console.WriteLine($"enums: {visitor.EnumCounter}");
 				Console.WriteLine($"fields: {visitor.FieldCounter}");
+				Console.WriteLine($"field declarations: {visitor.FieldDeclarationCounter}");
 			}
 		}
 	}

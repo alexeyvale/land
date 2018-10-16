@@ -12,7 +12,7 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
-ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]* | '$'ID'$'
+ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
  
  
 curve_bracketed	= %left '{' %right '}'
@@ -40,14 +40,14 @@ entity =
 init_expression		=	'=>' (Any | %ghost type)+
 init_value			=	'=' (Any | %ghost type)+
 
-name_atom	=	(ID | MODIFIER) ('<' types_list '>')?
+name_atom	=	(ID | MODIFIER) type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	('unsigned'? ID | tuple) ('<' types_list '>')? '?'? '*'*
+type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
 type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
-types_list	=	(attribute|'in'|'out')* type? (',' (attribute|'in'|'out')* type?)*
+type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
 
 arguments	=	'(' Any ')'
 attribute	=	'[' Any ']'

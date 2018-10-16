@@ -232,6 +232,35 @@ namespace Land.Core.Parsing.LL
 			}
 		}
 
+		private HashSet<string> GetStopTokens(LocalOptions options, Stack<Node> stack)
+		{
+			/// Если с Any не связана последовательность стоп-символов
+			if (!options.AnyOptions.ContainsKey(AnyOption.Except))
+			{
+				/// Создаём последовательность символов, идущих в стеке после Any
+				var alt = new Alternative();
+				foreach (var elem in stack)
+					alt.Add(elem.Symbol);
+
+				/// Определяем множество токенов, которые могут идти после Any
+				var tokensAfterText = GrammarObject.First(alt);
+				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
+				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
+
+				/// Если указаны токены, которые нужно однозначно включать в Any
+				if (options.AnyOptions.ContainsKey(AnyOption.Include))
+				{
+					tokensAfterText.ExceptWith(options.AnyOptions[AnyOption.Include]);
+				}
+
+				return tokensAfterText;
+			}
+			else
+			{
+				return options.AnyOptions[AnyOption.Except];
+			}
+		}
+
 		/// <summary>
 		/// Пропуск токенов в позиции, задаваемой символом Any
 		/// </summary>
@@ -242,37 +271,12 @@ namespace Land.Core.Parsing.LL
 		{
 			var nestingCopy = new Stack<PairSymbol>(Nesting.Reverse());
 			var tokenIndex = LexingStream.CurrentIndex;
-
-			IToken token = LexingStream.CurrentToken;
-			HashSet<string> tokensAfterText;
-
-			/// Если с Any не связана последовательность стоп-символов
-			if (!anyNode.Options.AnyOptions.ContainsKey(AnyOption.Except))
-			{
-				/// Создаём последовательность символов, идущих в стеке после Any
-				var alt = new Alternative();
-				foreach (var elem in Stack)
-					alt.Add(elem.Symbol);
-
-				/// Определяем множество токенов, которые могут идти после Any
-				tokensAfterText = GrammarObject.First(alt);
-				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
-				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
-
-				/// Если указаны токены, которые нужно однозначно включать в Any
-				if (anyNode.Options.AnyOptions.ContainsKey(AnyOption.Include))
-				{
-					tokensAfterText.ExceptWith(anyNode.Options.AnyOptions[AnyOption.Include]);
-				}
-			}
-			else
-			{
-				tokensAfterText = anyNode.Options.AnyOptions[AnyOption.Except];
-			}		
+			var token = LexingStream.CurrentToken;
+			var stopTokens = GetStopTokens(anyNode.Options, Stack);	
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
-			if (!tokensAfterText.Contains(token.Name))
+			if (!stopTokens.Contains(token.Name))
 			{
 				/// Проверка на случай, если допропускаем текст в процессе восстановления
 				if (anyNode.Anchor == null)
@@ -282,7 +286,7 @@ namespace Land.Core.Parsing.LL
 				var endLocation = token.Location.End;
 				var anyLevel = Nesting.Count;
 
-				while (!tokensAfterText.Contains(token.Name)
+				while (!stopTokens.Contains(token.Name)
 					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 					&& token.Name != Grammar.EOF_TOKEN_NAME
 					&& token.Name != Grammar.ERROR_TOKEN_NAME)
@@ -314,11 +318,11 @@ namespace Land.Core.Parsing.LL
 					return token;
 
 				/// Если дошли до конца входной строки, и это было не по плану
-				if (token.Name == Grammar.EOF_TOKEN_NAME && !tokensAfterText.Contains(token.Name)
+				if (token.Name == Grammar.EOF_TOKEN_NAME && !stopTokens.Contains(token.Name)
 					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
 				{
 					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", tokensAfterText.Select(t => GrammarObject.Userify(t))) }",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t))) }",
 						token.Location.Start
 					);
 
@@ -375,8 +379,10 @@ namespace Land.Core.Parsing.LL
 			));
 
 			/// То, что мы хотели разобрать, и не смогли
-			var currentNode = Stack.Peek();
-			Stack.Pop();
+			var currentNode = Stack.Pop();
+			var currentStopTokens = currentNode.Symbol == Grammar.ANY_TOKEN_NAME
+				? GetStopTokens(currentNode.Options, Stack)
+				: (HashSet<string>)null;
 
 			/// Если произошла ошибка при пропуске Any и конфигурация ветки
 			/// может заставить нас повторно перейти на неё же при восстановлении,
@@ -406,7 +412,10 @@ namespace Land.Core.Parsing.LL
 			/// для которого допустима альтернатива из одного Any
 			while (currentNode != null
 				&& (!GrammarObject.Rules.ContainsKey(currentNode.Symbol)
-				|| !GrammarObject.Rules[currentNode.Symbol].Alternatives.Any(a => a.Count == 1 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)))
+				|| !GrammarObject.Rules[currentNode.Symbol].Alternatives
+					.Any(a => a.Count == 1 
+						&& a[0].Symbol == Grammar.ANY_TOKEN_NAME 
+						&& (currentStopTokens == null || !GetStopTokens(a[0].Options, Stack).SetEquals(currentStopTokens)))))
 			{
 				if (currentNode.Parent != null)
 				{
