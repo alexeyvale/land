@@ -15,22 +15,28 @@ namespace JavaAntlrBaseline
 		public int MethodCounter { get; private set; } = 0;
 		public int ClassInterfaceCounter { get; private set; } = 0;
 		public int EnumCounter { get; private set; } = 0;
+		public int FieldCounter { get; private set; } = 0;
 
 		private StreamWriter MethodOutput { get; set; }
 		private StreamWriter ClassOutput { get; set; }
 		private StreamWriter EnumOutput { get; set; }
+		private StreamWriter FieldOutput { get; set; }
 
 		private List<string> Methods { get; set; }
 		private List<string> ClassesInterfaces { get; set; }
 		private List<string> Enums { get; set; }
+		private List<string> Fields { get; set; }
 
 		private string FileName { get; set; }
+
+		private bool InField { get; set; } = false;
 
 		public JavaTreeVisitor(string outputDirectory)
 		{
 			MethodOutput = new StreamWriter(Path.Combine(outputDirectory, "method_baseline.txt"), false);
 			ClassOutput = new StreamWriter(Path.Combine(outputDirectory, "class_interface_baseline.txt"), false);
 			EnumOutput = new StreamWriter(Path.Combine(outputDirectory, "enum_baseline.txt"), false);
+			FieldOutput = new StreamWriter(Path.Combine(outputDirectory, "field_baseline.txt"), false);
 		}
 
 		public void CloseOutputs()
@@ -38,6 +44,7 @@ namespace JavaAntlrBaseline
 			MethodOutput.Close();
 			ClassOutput.Close();
 			EnumOutput.Close();
+			FieldOutput.Close();
 		}
 
 		public void SetFile(string filename)
@@ -50,6 +57,8 @@ namespace JavaAntlrBaseline
 			Methods = new List<string>();
 			ClassesInterfaces = new List<string>();
 			Enums = new List<string>();
+			Fields = new List<string>();
+			InField = false;
 
 			base.VisitCompilationUnit(context);
 
@@ -72,6 +81,13 @@ namespace JavaAntlrBaseline
 				EnumOutput.WriteLine("*");
 				EnumOutput.WriteLine(FileName);
 				Enums.ForEach(line => EnumOutput.WriteLine(line));
+			}
+
+			if (Fields.Count > 0)
+			{
+				FieldOutput.WriteLine("*");
+				FieldOutput.WriteLine(FileName);
+				Fields.ForEach(line => FieldOutput.WriteLine(line));
 			}
 
 			return true;
@@ -101,11 +117,54 @@ namespace JavaAntlrBaseline
 			return true;
 		}
 
+		public override bool VisitFieldDeclaration([NotNull] JavaParser.FieldDeclarationContext context)
+		{
+			InField = true;
+			base.VisitChildren(context);
+			InField = false;
+
+			return true;
+		}
+
+		public override bool VisitVariableDeclaratorId([NotNull] JavaParser.VariableDeclaratorIdContext context)
+		{
+			if(InField)
+			{
+				++FieldCounter;
+				Fields.Add(context.IDENTIFIER().GetText());
+			}
+
+			return true;
+		}
+
 		public override bool VisitMethodDeclaration([NotNull] JavaParser.MethodDeclarationContext context)
 		{
 			++MethodCounter;
 			Methods.Add(context.IDENTIFIER().GetText());
 
+			return true;
+		}
+
+		public override bool VisitInterfaceMethodDeclaration([NotNull] JavaParser.InterfaceMethodDeclarationContext context)
+		{
+			++MethodCounter;
+			Methods.Add(context.IDENTIFIER().GetText());
+
+			return true;
+		}
+
+		public override bool VisitAnnotationTypeDeclaration([NotNull] JavaParser.AnnotationTypeDeclarationContext context)
+		{
+			return true;
+		}
+
+		public override bool VisitBlock([NotNull] JavaParser.BlockContext context)
+		{
+			return true;
+		}
+
+		public override bool VisitVariableInitializer([NotNull] JavaParser.VariableInitializerContext context)
+		{
 			return true;
 		}
 	}
@@ -158,6 +217,7 @@ namespace JavaAntlrBaseline
 				Console.WriteLine($"methods: {visitor.MethodCounter}");
 				Console.WriteLine($"classes: {visitor.ClassInterfaceCounter}");
 				Console.WriteLine($"enums: {visitor.EnumCounter}");
+				Console.WriteLine($"fields: {visitor.FieldCounter}");
 			}
 		}
 	}

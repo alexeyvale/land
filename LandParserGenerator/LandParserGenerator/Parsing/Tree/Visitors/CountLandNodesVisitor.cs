@@ -39,9 +39,8 @@ namespace Land.Core.Parsing.Tree
 				Land.Add(new TypeValuePair()
 				{
 					Type = node.Type,
-					Value = String.Join(" ", node.Children
-						.Where(c => ChildrenWithValues.Contains(c.Type))
-						.Select(c => String.Join("", c.Value)))
+					Value = String.Join(" ", node.Children.Where(c => ChildrenWithValues.Contains(c.Type))
+						.Select(c => String.Join("", c.Value.Select(e=>System.Text.RegularExpressions.Regex.Replace(e, "[\n\r\t\f]+", " ")))))
 				});
 			}
 

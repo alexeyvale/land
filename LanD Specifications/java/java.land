@@ -4,14 +4,13 @@ COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
 
-STRING		: STRING_STD|STRING_VERB
+STRING		: STRING_STD
 STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
-STRING_VERB	: '@'('"' (~["]|'""')* '"')+
 STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 NEW_LINE	: '\n'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+MODIFIER	: 'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
 ID			: [_$a-zA-Z][_0-9a-zA-Z]*
  
  
@@ -20,39 +19,41 @@ round_bracketed	= %left '(' %right ')'
 square_bracketed = %left '[' %right ']'
 
  
-file_content	=	(Any|outer_entity)*
+file_content	=	(AnyInclude('@interface')|outer_entity)*
+
 outer_entity	=	
-	MODIFIER*
+	annotation* MODIFIER*
 	(
 	 	'enum' name Any '{' Any '}' ';'? 	=> enum	|
-		('class'|'struct'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> class_interface
+		('class'|'interface') name Any '{' (inner_entity|AnyInclude('@interface'))* '}' ';'?	=> class_interface
 	)
 inner_entity	=	
-	attribute* MODIFIER*
+	annotation* MODIFIER*
 	(
 	 	'enum' name Any '{' Any '}' ';'? 	=> inner_enum	|
 		('class'|'interface') name Any '{' (inner_entity|Any)* '}' ';'?	=> inner_class_interface	|
 		('<' Any '>')? %priority(2) type name
 		(
-	  		arguments Any (init_expression? ';' | block)	=> method	|
-	  		init_value? (',' name init_value?)* ';'			=> field	|
-	  		(block (init_value ';')? | init_expression ';')	=> property
+	  		arguments Any (';' | block)				=> method	|
+	  		init_value? (',' name init_value?)* ';'	=> field
 	  	)
 	)
+init_value	=	'=' Any
 
-init_expression		=	'=>' (Any | %ghost type)+
-init_value			=	'=' (Any | %ghost type)+
+// AnyInclude('@interface') - пропускаем определения аннотаций
+// Также нас не интересуют local class-ы, которые могут быть внутри блока
+// блоки инициализации пропускаются за счёт пары {} и механизмов восстановления
 
-name_atom	=	(ID | MODIFIER) ('<' types_list '>')?
+name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
-type_atom	=	('unsigned'? ID) ('<' types_list '>')? '?'? '*'*
+type_atom	=	('unsigned'? ID) type_parameter? '?'? '*'*
 type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
-types_list	=	(attribute|'in'|'out')* type? (',' (attribute|'in'|'out')* type?)*
+type_parameter	=	'<' (Any|type_parameter)* '>'
 
 arguments	=	'(' Any ')'
-attribute	=	'@' Any NEW_LINE
+annotation	=	'@' name Any
 block		=	'{' Any '}'
 
 %%
@@ -65,6 +66,6 @@ block		=	'{' Any '}'
 %nodes ghost  names_list
 %nodes leaf name type
 
-%mapping land enum class_interface inner_class_interface method field property
+%mapping land enum inner_enum class_interface inner_class_interface method field
 %mapping priority(3) name
  
