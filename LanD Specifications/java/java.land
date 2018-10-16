@@ -10,7 +10,7 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 NEW_LINE	: '\n'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'transient'|'strictfp'|'native'|'extern'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
 ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
  
  

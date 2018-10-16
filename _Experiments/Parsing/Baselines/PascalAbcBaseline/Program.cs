@@ -44,7 +44,7 @@ namespace PascalABCBaseline
 				var classesCounter = 0;
 
 				var procedureOutput = new StreamWriter(Path.Combine(args[0], "procedure_baseline.txt"), false);
-				var classOutput = new StreamWriter(Path.Combine(args[0], "class_baseline.txt"), false);
+				var classOutput = new StreamWriter(Path.Combine(args[0], "class_type_baseline.txt"), false);
 
 				foreach (var filename in package)
 				{
@@ -55,6 +55,7 @@ namespace PascalABCBaseline
 						var procedures = tree.DescendantNodes().OfType<procedure_definition>().ToList();
 						if (procedures.Count > 0)
 						{
+							procedureOutput.WriteLine("*");
 							procedureOutput.WriteLine(filename);
 
 							foreach (var node in procedures)
@@ -66,6 +67,7 @@ namespace PascalABCBaseline
 						var classes = tree.DescendantNodes().OfType<class_definition>().ToList();
 						if (classes.Count > 0)
 						{
+							classOutput.WriteLine("*");
 							classOutput.WriteLine(filename);
 
 							foreach (var node in classes)
@@ -94,8 +96,6 @@ namespace PascalABCBaseline
 
 				Console.WriteLine($"procedures: {proceduresCounter}");
 				Console.WriteLine($"classes: {classesCounter}");
-
-				Console.ReadLine();
 			}
 		}
 	}
