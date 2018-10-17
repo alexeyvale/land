@@ -75,9 +75,13 @@ namespace SharpPreprocessing.ConditionalCompilation
 
 		private void FinCurrentSegment(PointLocation end)
 		{
-			var delta = Text.IndexOf('\n', end.Offset) - end.Offset;
+			var endOffset = Math.Max(Text.IndexOf('\n', end.Offset), end.Offset);
 
-			CurrentSegment.End = new PointLocation(end.Line, end.Column + delta - 1, end.Offset + delta);
+			CurrentSegment.End = new PointLocation(
+				end.Line, 
+				end.Column + endOffset - end.Offset, 
+				endOffset
+			);
 		}
 
 		public override void Visit(Node node)
