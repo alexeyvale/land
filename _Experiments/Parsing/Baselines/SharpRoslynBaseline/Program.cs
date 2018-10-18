@@ -125,6 +125,7 @@ namespace RoslynParserTest
 				propertyOutput.Close();
 				methodOutput.Close();
 				fieldOutput.Close();
+				classOutput.Close();
 
 				Console.WriteLine($"enums: {enumsCounter}");
 				Console.WriteLine($"classes: {classesCounter}");

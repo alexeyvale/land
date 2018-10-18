@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
 STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+MODIFIER	: 'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
  
  
@@ -29,7 +29,10 @@ entity =
 		(
 		 	'enum' name Any '{' Any '}' ';'? 								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
-			%priority(2) type name
+			// 'delegate' (Any|block) ';'										=> delegate |
+			// 'event' ... // если разрешить Any после name в строке ниже,
+			// чтобы подбирались буферы в unsafe-структурах, как методы будут подбираться индексаторы
+			%priority(2) type name Any
 			(
 		  		arguments Any (init_expression? ';' | block)	=> method	|
 		  		init_value? (',' name init_value?)* ';'			=> field	|
@@ -40,12 +43,12 @@ entity =
 init_expression		=	'=>' (Any | %ghost type)+
 init_value			=	'=' (Any | %ghost type)+
 
-name_atom	=	(ID | MODIFIER) type_parameters?
+name_atom	=	ID type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
+type_atom	=	('ref'? 'unsigned'? ID | tuple) type_parameters? '?'? '*'*
 type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
 type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
 
