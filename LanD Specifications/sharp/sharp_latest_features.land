@@ -55,14 +55,19 @@ block		=	'{' Any '}'
 
 %%
 
-%parsing recovery
-%parsing fragment STRING_INT_CODE
-%parsing start namespace_content
-%parsing skip COMMENT STRING DIRECTIVE
+%parsing {
+	recovery
+	fragment STRING_INT_CODE
+	start namespace_content
+	skip COMMENT STRING DIRECTIVE
+}
 
-%nodes ghost  names_list
-%nodes leaf name type
+%nodes {
+	ghost names_list
+	leaf name type
+}
 
-%mapping land namespace enum class_struct_interface method field property
-%mapping priority(3) name
- 
+%mapping {
+	land namespace enum class_struct_interface method field property
+	priority(3) name
+}

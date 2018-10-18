@@ -184,4 +184,11 @@ namespace Land.Core
 		public string Name { get; set; }
 		public List<dynamic> Arguments { get; set; }
 	}
+
+	public class OptionDeclaration
+	{
+		public string Name { get; set; }
+		public List<dynamic> Arguments { get; set; }
+		public List<string> Symbols { get; set; }
+	}
 }

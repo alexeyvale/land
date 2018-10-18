@@ -12,6 +12,7 @@
 
 %x in_terminal_declaration
 %x in_options
+%x in_option
 %x before_option_args
 %x before_body_element_args
 
@@ -27,7 +28,7 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 %%
 
-<0, in_options> {
+<0, in_options, in_option> {
 	{LINE_COMMENT} |
 	{MULTILINE_COMMENT} {}
 }
@@ -122,14 +123,14 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 <before_option_args> {
 	"(" {
 		yy_pop_state();
-		return (int)Tokens.OPT_LPAR;
+		return (int)Tokens.OPT_LROUND_BRACKET;
 	}
 }
 
 <before_body_element_args> {
 	"(" {
 		yy_pop_state();
-		return (int)Tokens.ELEM_LPAR;
+		return (int)Tokens.ELEM_LROUND_BRACKET;
 	}
 }
 
@@ -144,10 +145,10 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.ID;
 }
 	
-<0, in_options> {
-	"(" return (int)Tokens.LPAR;
+<0, in_option> {
+	"(" return (int)Tokens.LROUND_BRACKET;
 	
-	")" return (int)Tokens.RPAR;
+	")" return (int)Tokens.RROUND_BRACKET;
 	
 	{RNUM} {
 		yylval.doubleVal = double.Parse(yytext, CultureInfo.InvariantCulture);
@@ -162,10 +163,32 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	}
 	
 	{ID} {
+		BEGIN(in_option);	
+		yylval.strVal = yytext;
+		return (int)Tokens.OPTION_NAME;
+	}
+	
+	"{" return (int)Tokens.LCURVE_BRACKET;
+	
+	"}" return (int)Tokens.RCURVE_BRACKET;
+}
+
+<in_option> {	
+	{ID} {
 		yylval.strVal = yytext;
 		return (int)Tokens.ID;
 	}
+	
+	"\n" BEGIN(in_options);
+	
+	"}" {
+		BEGIN(in_options);
+		return (int)Tokens.RCURVE_BRACKET;
+	}
+	
+	"%"{ID} yyerror("Встречено имя категории '{0}', ожидалось продолжение опции", yytext);
 }
+
 
 %{
   yylloc = new SegmentLocation()
@@ -180,7 +203,7 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 public override void yyerror(string format, params object[] args)
 { 
 	Log.Add(Message.Error(
-		String.Format(format, args.Select(a=>a.ToString())),
+		String.Format(format, args.Select(a=>a.ToString()).ToArray()),
 		new PointLocation(yyline, yycol, yypos),
 		"GPPG"
 	));

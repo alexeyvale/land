@@ -26,11 +26,11 @@
 	public Alternative altVal;
 	public ArgumentGroup argGroupVal;
 	public dynamic dynamicVal;
-	
-	public Tuple<string, double> strDoublePair;
+	public OptionDeclaration optDeclVal;
 	
 	public List<dynamic> dynamicList;
 	public List<Tuple<string, List<dynamic>>> optionParamsList;
+	public List<OptionDeclaration> optionsList;
 	public List<string> strList;	
 	public List<Alternative> altList;
 	
@@ -45,7 +45,8 @@
 
 %left OR
 
-%token COLON OPT_LPAR ELEM_LPAR LPAR RPAR COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT
+%token OPT_LROUND_BRACKET ELEM_LROUND_BRACKET LROUND_BRACKET RROUND_BRACKET LCURVE_BRACKET RCURVE_BRACKET
+%token COLON COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -61,16 +62,18 @@
 %type <argGroupVal> argument_group
 %type <dynamicVal> argument
 %type <altVal> alternative
+%type <optDeclVal> option
 
 %type <dynamicList> opt_args args context_opt_args entry_args
 %type <optionParamsList> context_options
+%type <optionsList> option_or_block options
 
 %type <strSet> pair_border_group_content pair_border
 
 %%
 
 lp_description 
-	: structure PROC options 
+	: structure PROC options_section 
 		{ 
 			ConstructedGrammar.PostProcessing();
 			Log.AddRange(ConstructedGrammar.CheckValidity()); 
@@ -120,7 +123,7 @@ pair_border
 			ConstructedGrammar.AddAnchor(generated, @1.Start);
 			$$ = new HashSet<string>() { generated };
 		}
-	| LPAR pair_border_group_content RPAR { $$ = $2; }
+	| LROUND_BRACKET pair_border_group_content RROUND_BRACKET { $$ = $2; }
 	;
 	
 pair_border_group_content
@@ -269,7 +272,7 @@ entry
 	;
 	
 entry_args
-	: ELEM_LPAR args RPAR { $$ = $2; }
+	: ELEM_LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
 	
@@ -283,7 +286,7 @@ context_options
 	;
 	
 context_opt_args
-	: OPT_LPAR args RPAR { $$ = $2; }
+	: OPT_LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
 	
@@ -312,7 +315,7 @@ entry_core
 	;
 	
 group
-	: LPAR body RPAR
+	: LROUND_BRACKET body RROUND_BRACKET
 		{ 
 			$$ = ConstructedGrammar.GenerateNonterminal($2);
 			ConstructedGrammar.AddAnchor($$, @$.Start);
@@ -321,13 +324,13 @@ group
 
 /***************************** OPTIONS ******************************/
 
-options
+options_section
 	:
-	| options option
+	| category_block options_section
 	;
 	
-option
-	: CATEGORY_NAME ID opt_args identifiers
+category_block
+	: CATEGORY_NAME option_or_block
 		{
 			OptionCategory optCategory;
 			if(!Enum.TryParse($1.ToUpper(), out optCategory))
@@ -338,51 +341,76 @@ option
 					"LanD"
 				));
 			}
-
-			bool goodOption = true;
-			switch (optCategory)
-			{
-				case OptionCategory.PARSING:
-					ParsingOption parsingOpt;
-					goodOption = Enum.TryParse($2.ToUpper(), out parsingOpt);
-					if(goodOption) 
-						SafeGrammarAction(() => { 
-					 		ConstructedGrammar.SetOption(parsingOpt, $4.ToArray());
-					 	}, @1.Start);
-					break;
-				case OptionCategory.NODES:
-					NodeOption nodeOpt;
-					goodOption = Enum.TryParse($2.ToUpper(), out nodeOpt);
-					if(goodOption)
-						SafeGrammarAction(() => { 					
-							ConstructedGrammar.SetOption(nodeOpt, $4.ToArray());
-						}, @1.Start);
-					break;
-				case OptionCategory.MAPPING:
-					MappingOption mappingOpt;
-					goodOption = Enum.TryParse($2.ToUpper(), out mappingOpt);
-					if(goodOption)
-						SafeGrammarAction(() => { 			
-							ConstructedGrammar.SetOption(mappingOpt, $4.ToArray(), $3.ToArray());
-						}, @1.Start);
-					break;
-				default:
-					break;
-			}
 			
-			if(!goodOption)
+			foreach(var option in $2)
 			{
-				Log.Add(Message.Error(
-					"Опция '" + $2 + "' не определена для категории '" + $1 + "'",
-					@2.Start,
-					"LanD"
-				));
+				bool goodOption = true;
+				switch (optCategory)
+				{
+					case OptionCategory.PARSING:
+						ParsingOption parsingOpt;
+						goodOption = Enum.TryParse(option.Name.ToUpper(), out parsingOpt);
+						if(goodOption) 
+							SafeGrammarAction(() => { 
+						 		ConstructedGrammar.SetOption(parsingOpt, option.Symbols.ToArray());
+						 	}, @1.Start);
+						break;
+					case OptionCategory.NODES:
+						NodeOption nodeOpt;
+						goodOption = Enum.TryParse(option.Name.ToUpper(), out nodeOpt);
+						if(goodOption)
+							SafeGrammarAction(() => { 					
+								ConstructedGrammar.SetOption(nodeOpt, option.Symbols.ToArray());
+							}, @1.Start);
+						break;
+					case OptionCategory.MAPPING:
+						MappingOption mappingOpt;
+						goodOption = Enum.TryParse(option.Name.ToUpper(), out mappingOpt);
+						if(goodOption)
+							SafeGrammarAction(() => { 			
+								ConstructedGrammar.SetOption(mappingOpt, option.Symbols.ToArray(), option.Arguments.ToArray());
+							}, @1.Start);
+						break;
+					default:
+						break;
+				}
+				
+				if(!goodOption)
+				{
+					Log.Add(Message.Error(
+						"Опция '" + option.Name + "' не определена для категории '" + $1 + "'",
+						@2.Start,
+						"LanD"
+					));
+				}
 			}
+		}
+	;
+
+option_or_block
+	: option { $$ = new List<OptionDeclaration>(){ $1 }; }
+	| LCURVE_BRACKET options RCURVE_BRACKET { $$ = $2; }
+	;
+	
+options
+	: { $$ = new List<OptionDeclaration>(); }
+	| options option { $$ = $1; $1.Add($2);  }
+	;
+	
+option
+	: OPTION_NAME opt_args identifiers
+		{
+			$$ = new OptionDeclaration()
+			{
+				Name = $1,
+				Arguments = $2,
+				Symbols = $3
+			};
 		}
 	;
 	
 opt_args
-	: LPAR args RPAR { $$ = $2; }
+	: LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
 	
@@ -409,7 +437,7 @@ argument
 	;
 
 argument_group
-	: ID ELEM_LPAR args RPAR 
+	: ID ELEM_LROUND_BRACKET args RROUND_BRACKET 
 		{ 
 			$$ = new ArgumentGroup()
 			{
