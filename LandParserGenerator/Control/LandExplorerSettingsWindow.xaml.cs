@@ -167,7 +167,7 @@ namespace Land.Control
 			if (File.Exists(item.PreprocessorPath))
 			{
 				/// Получаем тип препроцессора из библиотеки
-				var propertiesObjectType = Assembly.LoadFile(item.PreprocessorPath)
+				var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
 					.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
 				/// Получаем типы свойств препроцессора
 				var propertyTypes = propertiesObjectType?.GetProperties()

@@ -929,7 +929,7 @@ namespace Land.Control
                 }
                 else
                 {
-					var preprocessor = (BasePreprocessor)Assembly.LoadFile(item.PreprocessorPath)
+					var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
                         .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
                         ?.GetConstructor(Type.EmptyTypes).Invoke(null);
 
@@ -939,7 +939,7 @@ namespace Land.Control
 							&& item.PreprocessorProperties.Count > 0)
 						{
 							/// Получаем тип препроцессора из библиотеки
-							var propertiesObjectType = Assembly.LoadFile(item.PreprocessorPath)
+							var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
 								.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
 
 							/// Для каждой настройки препроцессора
