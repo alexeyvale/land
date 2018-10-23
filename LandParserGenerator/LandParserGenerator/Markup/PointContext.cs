@@ -243,4 +243,16 @@ namespace Land.Core.Markup
 				context.SiblingsContext = GetSiblingsContext(node);
 		}
 	}
+
+	public struct Socket
+	{
+		public string Type { get; set; }
+		public double Priority { get; set; }
+
+		public Socket(HeaderContextElement context)
+		{
+			Type = context.Type;
+			Priority = context.Priority;
+		}
+	}
 }

@@ -180,11 +180,33 @@ namespace Land.Core.Markup
 			if (a.Count() == 0 && b.Count() == 0)
 				return 1;
 
+			var denominator = 0.0;
+
+			if (a is IEnumerable<HeaderContextElement>)
+			{
+				var aSockets = (a as IEnumerable<HeaderContextElement>).Select(e => new Socket(e))
+					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
+				var bSockets = (b as IEnumerable<HeaderContextElement>).Select(e => new Socket(e))
+					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
+
+				denominator += aSockets.Sum(kvp => kvp.Key.Priority * kvp.Value);
+
+				foreach (var kvp in aSockets)
+					if (bSockets.ContainsKey(kvp.Key))
+						bSockets[kvp.Key] -= kvp.Value;
+
+				denominator += bSockets.Where(kvp => kvp.Value > 0).Sum(kvp => kvp.Key.Priority * kvp.Value);
+			}
+			else
+			{
+				denominator = Math.Max(a.Count(), b.Count());
+			}
+
 			/// Сразу отбрасываем общие префиксы и суффиксы
 			var commonPrefixLength = 0;
 			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count()
 				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
-				++commonPrefixLength;
+				++commonPrefixLength;			
 			a = a.Skip(commonPrefixLength).ToList();
 			b = b.Skip(commonPrefixLength).ToList();
 
@@ -204,9 +226,9 @@ namespace Land.Core.Markup
 
 			/// Заполняем первую строку и первый столбец
 			for (int i = 1; i <= a.Count(); ++i)
-				distances[i, 0] = distances[i - 1, 0] + DeletionCost;
+				distances[i, 0] = distances[i - 1, 0] + PriorityCoefficient(a.ElementAt(i - 1));
 			for (int j = 1; j <= b.Count(); ++j)
-				distances[0, j] = distances[0, j - 1] + InsertionCost;
+				distances[0, j] = distances[0, j - 1] + PriorityCoefficient(b.ElementAt(j - 1));
 
 			for (int i = 1; i <= a.Count(); i++)
 				for (int j = 1; j <= b.Count(); j++)
@@ -214,34 +236,23 @@ namespace Land.Core.Markup
 					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
 					double cost = 1 - DispatchLevenshtein(a.ElementAt(i - 1), b.ElementAt(j - 1));
 					distances[i, j] = Math.Min(Math.Min(
-						distances[i - 1, j] + DeletionCost,
-						distances[i, j - 1] + InsertionCost),
-						distances[i - 1, j - 1] + cost);
+						distances[i - 1, j] + PriorityCoefficient(a.ElementAt(i - 1)),
+						distances[i, j - 1] + PriorityCoefficient(b.ElementAt(j - 1))),
+						distances[i - 1, j - 1] + PriorityCoefficient(a.ElementAt(i - 1)) * cost);
 				}
 
-			return 1 - distances[a.Count(), b.Count()] /
-				Math.Max(a.Count() + commonSuffixLength + commonPrefixLength, b.Count() + commonSuffixLength + commonPrefixLength);
-		}
-
-		private static double Denominator<T>(IEnumerable<T> a, IEnumerable<T> b)
-		{
-			if (a is IEnumerable<HeaderContextElement>)
-				return Math.Max(
-					((IEnumerable<HeaderContextElement>)a).Sum(elem => elem.Priority), 
-					((IEnumerable<HeaderContextElement>)b).Sum(elem => elem.Priority)
-				);
-			else
-				return Math.Max(a.Count(), b.Count());
+			return 1 - distances[a.Count(), b.Count()] / denominator;
 		}
 
 		private static double PriorityCoefficient<T>(T elem)
 		{
-			if (elem is HeaderContextElement)
-				return (elem as HeaderContextElement).Priority * DeletionCost;
-			else
-				return DeletionCost;
+			return elem is HeaderContextElement 
+				? (elem as HeaderContextElement).Priority 
+				: 1;
 		}
 
+		/// Похожесть новой последовательности на старую 
+		/// при переходе от последовательности a к последовательности b
 		private static double DispatchLevenshtein<T>(T a, T b)
 		{
 			if (a is IEnumerable<string>)

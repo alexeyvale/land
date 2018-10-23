@@ -980,7 +980,8 @@ namespace Land.GUI
 				{
 					/// значит, в какой-то новый узел мы отобразили старый
 					MappingDebug_SimilaritiesList.SelectedItem = similarities.FirstOrDefault(e=>e.Value == similarities.Max(el=>el.Value));
-					MoveCaretToSource(((KeyValuePair<Node, double>)MappingDebug_SimilaritiesList.SelectedItem).Key.Anchor, MappingDebug_NewTextEditor);
+					if(MappingDebug_SimilaritiesList.SelectedItem != null)
+						MoveCaretToSource(((KeyValuePair<Node, double>)MappingDebug_SimilaritiesList.SelectedItem).Key.Anchor, MappingDebug_NewTextEditor);
 				}
 			}
 		}
