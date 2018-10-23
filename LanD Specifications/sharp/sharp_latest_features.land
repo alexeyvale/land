@@ -72,5 +72,5 @@ block		=	'{' Any '}'
 
 %mapping {
 	land namespace enum class_struct_interface method field property
-	priority(3) name
+	priority(5) name
 }

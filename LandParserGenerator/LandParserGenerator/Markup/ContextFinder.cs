@@ -270,7 +270,7 @@ namespace Land.Core.Markup
 
 				if (aContext.Type == bContext.Type && aContext.Priority == bContext.Priority)
 				{
-					return Levenshtein(aContext.Value, bContext.Value);
+					return Levenshtein(String.Join("", aContext.Value), String.Join("", bContext.Value));
 				}
 				else
 					return 0;
