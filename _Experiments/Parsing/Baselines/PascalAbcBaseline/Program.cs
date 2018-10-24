@@ -43,7 +43,7 @@ namespace PascalABCBaseline
 				var proceduresCounter = 0;
 				var classesCounter = 0;
 
-				var procedureOutput = new StreamWriter(Path.Combine(args[0], "procedure_baseline.txt"), false);
+				var procedureOutput = new StreamWriter(Path.Combine(args[0], "routine_baseline.txt"), false);
 				var classOutput = new StreamWriter(Path.Combine(args[0], "class_type_baseline.txt"), false);
 
 				foreach (var filename in package)
