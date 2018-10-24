@@ -70,14 +70,14 @@ namespace PascalABCBaseline
 
 					if (tree != null)
 					{
-						var procedures = tree.DescendantNodes().OfType<procedure_definition>().ToList();
+						var procedures = tree.DescendantNodes().OfType<procedure_header>().ToList();
 						if (procedures.Count > 0)
 						{
 							procedureOutput.WriteLine("*");
 							procedureOutput.WriteLine(filename);
 
 							foreach (var node in procedures)
-								procedureOutput.WriteLine(node.proc_header.name);
+								procedureOutput.WriteLine(node.name);
 						}
 
 						proceduresCounter += procedures.Count();
