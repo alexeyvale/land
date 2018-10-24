@@ -11,9 +11,11 @@ DECLARATION_CODE : '%{' (STRING|COMMENT|.)*? '%}'
 ID : [_a-zA-Z][_0-9a-zA-Z]*
 DECLARATION_NAME : '%'ID
 
-grammar 		=	declaration* '%%' rule* grammar_ending
+curve_bracketed	= %left '{' %right '}'
+
+grammar 		=	declaration* '%%' (rule | Any)* grammar_ending
 grammar_ending	=	('%%' Any)?
-declaration		=	symbol_declaration | other_declaration
+declaration		=	symbol_declaration | other_declaration | Any
 symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
 other_declaration = DECLARATION_NAME Any
 rule			=	ID ':' alternative ('|' alternative)* ';'
@@ -22,9 +24,12 @@ block			=	'{' (Any|block)+ '}'
 
 %%
 
-%parsing ignoreundefined
-%parsing start grammar
-%parsing skip COMMENT STRING DECLARATION_CODE
+%parsing {
+	ignoreundefined
+	start grammar
+	skip COMMENT STRING DECLARATION_CODE
+	recovery
+}
 
 %nodes ghost declaration
 
