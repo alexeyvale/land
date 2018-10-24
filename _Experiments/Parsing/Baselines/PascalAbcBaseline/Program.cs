@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +11,24 @@ namespace PascalABCBaseline
 {
 	class Program
 	{
+		private static Encoding GetEncoding(string filename)
+		{
+			using (FileStream fs = File.OpenRead(filename))
+			{
+				Ude.CharsetDetector cdet = new Ude.CharsetDetector();
+				cdet.Feed(fs);
+				cdet.DataEnd();
+				if (cdet.Charset != null)
+				{
+					return Encoding.GetEncoding(cdet.Charset);
+				}
+				else
+				{
+					return Encoding.Default;
+				}
+			}
+		}
+
 		static void Main(string[] args)
 		{
 			if (args.Length > 0)
@@ -48,7 +66,7 @@ namespace PascalABCBaseline
 
 				foreach (var filename in package)
 				{
-					var tree = parser.BuildTree(filename, File.ReadAllText(filename), PascalABCCompiler.Parsers.ParseMode.Normal);
+					var tree = parser.BuildTree(filename, File.ReadAllText(filename, GetEncoding(filename)), PascalABCCompiler.Parsers.ParseMode.Normal);
 
 					if (tree != null)
 					{
