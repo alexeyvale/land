@@ -13,10 +13,9 @@ CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
 ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
  
- 
-curve_bracketed	= %left '{' %right '}'
-round_bracketed	= %left '(' %right ')'
-square_bracketed = %left '[' %right ']'
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
 
  
 file_content	=	(AnyInclude('@interface')|outer_entity)*
@@ -59,14 +58,20 @@ block		=	'{' Any '}'
 
 %%
 
-%parsing recovery
-%parsing fragment STRING_INT_CODE
-%parsing start file_content
-%parsing skip COMMENT STRING DIRECTIVE NEW_LINE
+%parsing {
+	recovery
+	fragment STRING_INT_CODE
+	start file_content
+	skip COMMENT STRING DIRECTIVE NEW_LINE
+}
 
-%nodes ghost  names_list
-%nodes leaf name type
+%nodes {
+	ghost  names_list
+	leaf name type
+}
 
-%mapping land enum inner_enum class_interface inner_class_interface method field
-%mapping priority(3) name
+%mapping {
+	land enum inner_enum class_interface inner_class_interface method field
+	priority(3) name
+}
  

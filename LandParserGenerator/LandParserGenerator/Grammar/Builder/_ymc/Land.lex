@@ -10,7 +10,8 @@
 
 %option stack
 
-%x in_terminal_declaration
+%x before_terminal_declaration_body
+%x in_terminal_declaration_body
 %x in_options
 %x in_option
 %x before_option_args
@@ -73,8 +74,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 // Для пар
 
-"%left" return (int)Tokens.LEFT;
-
 "%right" return (int)Tokens.RIGHT;
 
 // Символы, означающие нечто внутри правила
@@ -91,11 +90,27 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 }
 
 ":" {
-	BEGIN(in_terminal_declaration);
+	BEGIN(before_terminal_declaration_body);
 	return (int)Tokens.COLON;
 }
 
-<in_terminal_declaration> {
+<before_terminal_declaration_body> {
+	// Для пар
+	"%left" {
+		BEGIN(0);
+		return (int)Tokens.LEFT;
+	}
+	
+	// Для терминалов, начинающихся с начала строки
+	"%linestart" return (int)Tokens.LINESTART;
+	
+	[^ \r\n\t\f] {
+		yyless(0);
+		BEGIN(in_terminal_declaration_body);
+	}
+}
+
+<in_terminal_declaration_body> {
 	.+ {
 		BEGIN(0);
 		

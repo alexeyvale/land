@@ -337,11 +337,11 @@ namespace Land.Core
 			return newName;
 		}
 
-		public void DeclareTerminal(string name,  string pattern)
+		public void DeclareTerminal(string name,  string pattern, bool lineStart = false)
 		{
-			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", \"{pattern.Replace("\"", "\\\"")}\");");
+			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", \"{pattern.Replace("\"", "\\\"")}\", {lineStart.ToString().ToLower()});");
 
-			var terminal = new TerminalSymbol(name, pattern);
+			var terminal = new TerminalSymbol(name, pattern, lineStart);
 			DeclareTerminal(terminal);
 		}
 

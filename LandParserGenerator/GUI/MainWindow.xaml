@@ -66,7 +66,7 @@
 										<Separator></Separator>
 										<Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click" Content="&#xf15b;" ToolTip="Новая" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
-										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click" Content="&#xf04b;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
+										<Button Name="Grammar_BuildButton" Click="Grammar_BuildButton_Click" Content="&#xf04b;" ToolTip="Сгенерировать парсер" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
 										<Button Name="Grammar_GetLibraryButton" Click="Grammar_GetLibraryButton_Click" Content="&#xf02d;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>

@@ -14,10 +14,9 @@ CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
  
- 
-curve_bracketed	= %left '{' %right '}'
-round_bracketed	= %left '(' %right ')'
-square_bracketed = %left '[' %right ']'
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
 
  
 namespace_content	=	opening_directive*! (namespace|entity)*

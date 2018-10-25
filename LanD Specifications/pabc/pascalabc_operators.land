@@ -5,8 +5,7 @@ STRING_SKIP	: '\'\'' | '\\\\'
 STRING	: '\'' (STRING_SKIP|.)*? '\''
 ID		: '&'?[_a-zA-Z][_0-9a-zA-Z]*
 
-
-round_bracketed = %left '(' %right ')'
+ROUND_BRACKETED : %left '(' %right ')'
 
 
 file	=	header? Any (

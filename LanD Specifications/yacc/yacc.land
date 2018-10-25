@@ -8,19 +8,18 @@ STRING_ESC	: '@'('"' ~["]* '"')+
 LITERAL		: '\'' ('\\\''|'\\\\'|.)*? '\''
 DECLARATION_CODE : '%{' (STRING|COMMENT|.)*? '%}'
 
+RULE_HEADER : %linestart ID
 ID : [_a-zA-Z][_0-9a-zA-Z]*
 DECLARATION_NAME : '%'ID
-
-curve_bracketed	= %left '{' %right '}'
 
 grammar 		=	declaration* '%%' (rule | Any)* grammar_ending
 grammar_ending	=	('%%' Any)?
 declaration		=	symbol_declaration | other_declaration | Any
 symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
 other_declaration = DECLARATION_NAME Any
-rule			=	ID ':' alternative ('|' alternative)* ';'
+rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'
 alternative		=	(ID | block | LITERAL | '%prec')*
-block			=	'{' (Any|block)+ '}'
+block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 
 %%
 

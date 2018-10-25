@@ -46,7 +46,7 @@
 %left OR
 
 %token OPT_LROUND_BRACKET ELEM_LROUND_BRACKET LROUND_BRACKET RROUND_BRACKET LCURVE_BRACKET RCURVE_BRACKET
-%token COLON COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT
+%token COLON COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT LINESTART
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
@@ -58,7 +58,7 @@
 %type <entryVal> entry
 %type <strList> identifiers
 %type <altList> body
-%type <boolVal> prec_nonempty
+%type <boolVal> prec_nonempty opt_linestart
 %type <argGroupVal> argument_group
 %type <dynamicVal> argument
 %type <altVal> alternative
@@ -94,19 +94,23 @@ element
 	;
 	
 terminal
-	: ENTITY_NAME COLON REGEX 
+	: ENTITY_NAME COLON opt_linestart REGEX 
 		{ 
 			SafeGrammarAction(() => { 
-				ConstructedGrammar.DeclareTerminal($1, $3);
+				ConstructedGrammar.DeclareTerminal($1, $4, $3);
 				ConstructedGrammar.AddAnchor($1, @1.Start);
 			}, @1.Start);
 		}
 	;
 	
+opt_linestart
+	: LINESTART { $$ = true; }
+	| { $$ = false; }
+	;
+	
 /******** ID = %left ID1 %right (ID2 | ID3) ***************/
-
 pair
-	: ENTITY_NAME EQUALS LEFT pair_border RIGHT pair_border 
+	: ENTITY_NAME COLON LEFT pair_border RIGHT pair_border 
 		{
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclarePair($1, $4, $6);

@@ -39,7 +39,7 @@ namespace Land.Core
 			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
 			{
 				var fragment = grammar.Options.GetSymbols(ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
-				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern} ;");
+				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern}{(grammar.Tokens[token].LineStart ? $" {{this.InputStream.LA(-1 - Text.Length) == 10 || this.InputStream.LA(-1 - Text.Length) == -1}}?" : "")} ;");
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 

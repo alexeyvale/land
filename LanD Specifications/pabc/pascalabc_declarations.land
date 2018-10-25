@@ -11,8 +11,8 @@ ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
 ID					: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 CLASS_MEMBER_USAGE	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 
-square_bracketed = %left '[' %right ']'
-round_bracketed = %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
+ROUND_BRACKETED : %left '(' %right ')'
 
 file	=	(interface_declarations|declaration)* 'end'? '.'?
 
