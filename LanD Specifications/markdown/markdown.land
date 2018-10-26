@@ -1,0 +1,16 @@
+
+HEADER_ANY : %linestart '#'+ .*?
+HEADER_H1 : %linestart ~[\n]*? '\n' '='+ [ \r\t]*? '\n'
+HEADER_H2 : %linestart ~[\n]*? '\n' '-'+ [ \r\t]*? '\n'
+
+CODE_BORDER : %linestart '~~~'
+CODE : %left CODE_BORDER %right CODE_BORDER
+
+file	=	(HEADER_ANY|HEADER_H1|HEADER_H2|Any)*
+
+%%
+
+%parsing start file
+%parsing ignoreundefined
+
+%mapping land HEADER_ANY HEADER_H1 HEADER_H2

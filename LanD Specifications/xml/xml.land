@@ -11,6 +11,9 @@ attribute		=	attribute_name '=' attribute_value
 attribute_name	=	ID (':' ID)*
 attribute_value	= 	'"' Any '"' | '\'' Any '\''
 
+// По поводу некорректно сгенерированного файла документации:
+// https://github.com/dotnet/corefx/issues/29600
+
 %%
 
 %parsing skip COMMENT
