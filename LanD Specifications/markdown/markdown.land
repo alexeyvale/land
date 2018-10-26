@@ -1,5 +1,5 @@
 
-HEADER_ANY : %linestart '#'+ .*?
+HEADER_ANY : %linestart '#'+ ~[\n]*? '\n'
 HEADER_H1 : %linestart ~[\n]*? '\n' '='+ [ \r\t]*? '\n'
 HEADER_H2 : %linestart ~[\n]*? '\n' '-'+ [ \r\t]*? '\n'
 
