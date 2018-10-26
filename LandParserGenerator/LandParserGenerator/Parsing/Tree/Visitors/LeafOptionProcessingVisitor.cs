@@ -19,20 +19,11 @@ namespace Land.Core.Parsing.Tree
 
 		public override void Visit(Node node)
 		{
-			Visit(node, false);
-		}
-
-		private void Visit(Node node, bool computeValue)
-		{
 			/// Если текущий узел должен быть листовым
 			if (node.Options.NodeOption == NodeOption.LEAF || node.Options.NodeOption == null && (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol)
-				|| !String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LEAF, node.Alias)) || computeValue)
+				|| !String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LEAF, node.Alias)))
 			{
-				foreach (var child in node.Children)
-				{
-					Visit(child, true);
-					node.Value.AddRange(child.Value);
-				}
+				node.Value = node.GetValue();
 
 				/// Перед тем, как удалить дочерние узлы, вычисляем соответствие нового листа тексту
 				var tmp = node.Anchor;

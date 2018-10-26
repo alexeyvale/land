@@ -30,7 +30,11 @@ namespace Land.Core.Parsing.Tree
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
 
-					for(var j=smbToRemove.Children.Count -1; j >=0; --j)
+					if (smbToRemove.Options.Priority.HasValue)
+						smbToRemove.Children.ForEach(c =>
+							c.Options.Priority = smbToRemove.Options.Priority);
+
+					for (var j=smbToRemove.Children.Count -1; j >=0; --j)
 					{
 						smbToRemove.Children[j].Parent = node;
 						node.Children.Insert(i, smbToRemove.Children[j]);
@@ -54,6 +58,10 @@ namespace Land.Core.Parsing.Tree
 					{
 						var smbToRemove = node.Children[i];
 						node.Children.RemoveAt(i);
+
+						if (smbToRemove.Options.Priority.HasValue)
+							smbToRemove.Children.ForEach(c =>
+								c.Options.Priority = smbToRemove.Options.Priority);
 
 						for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
 						{

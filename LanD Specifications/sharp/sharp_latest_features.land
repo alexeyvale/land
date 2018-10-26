@@ -31,7 +31,7 @@ entity =
 			// 'delegate' (Any|block) ';'										=> delegate |
 			// 'event' ... // если разрешить Any после name в строке ниже,
 			// чтобы подбирались буферы в unsafe-структурах, как методы будут подбираться индексаторы
-			%priority(2) type name Any
+			%priority(2) type name
 			(
 		  		arguments Any (init_expression? ';' | block)	=> method	|
 		  		init_value? (',' name init_value?)* ';'			=> field	|

@@ -32,6 +32,12 @@ namespace Land.Core.Parsing.Tree
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
 
+					/// Если у символа, вместо которого подставляем потомков,
+					/// есть явно указанный приоритет, проставляем его же для всех потомков
+					if (smbToRemove.Options.Priority.HasValue)
+						smbToRemove.Children.ForEach(c => 
+							c.Options.Priority = smbToRemove.Options.Priority);
+
 					for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
 					{
 						smbToRemove.Children[j].Parent = node;
