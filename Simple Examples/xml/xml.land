@@ -1,0 +1,17 @@
+COMMENT	: '<!--' .*? '-->'
+ID	: [_a-zA-Z][-._a-zA-Z0-9]*
+
+file		=	(xml_prolog|doctype_decl|tag)+
+
+xml_prolog		=	'<?' 'xml' attribute* '?>'
+doctype_decl	=	'<!' 'DOCTYPE' Any '>'
+tag				=	'<' ID attribute* ('>' (tag|cdata_section|Any)* '</' ID '>' | '/>')
+cdata_section	=	'<![CDATA[' Any ']]>'
+attribute		=	attribute_name '=' attribute_value
+attribute_name	=	ID (':' ID)*
+attribute_value	= 	'"' Any '"' | '\'' Any '\''
+
+%%
+
+%parsing skip COMMENT
+%parsing start file
