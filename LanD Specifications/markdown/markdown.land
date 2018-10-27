@@ -1,7 +1,9 @@
+LINE_END : '\r'?'\n' | '\r' | '\f'
+REST_OF_LINE : ~[\n\r\f]*? LINE_END
 
-HEADER_ANY : %linestart '#'+ ~[\n]*? '\n'
-HEADER_H1 : %linestart ~[\n]*? '\n' '='+ [ \r\t]*? '\n'
-HEADER_H2 : %linestart ~[\n]*? '\n' '-'+ [ \r\t]*? '\n'
+HEADER_ANY : %linestart '#'+ REST_OF_LINE
+HEADER_H1 : %linestart REST_OF_LINE '='+ [ \t]*? LINE_END
+HEADER_H2 : %linestart REST_OF_LINE '-'+ [ \t]*? LINE_END
 
 CODE_BORDER : %linestart '~~~'
 CODE : %left CODE_BORDER %right CODE_BORDER
@@ -10,6 +12,7 @@ file	=	(HEADER_ANY|HEADER_H1|HEADER_H2|Any)*
 
 %%
 
+%parsing fragment LINE_END REST_OF_LINE
 %parsing start file
 %parsing ignoreundefined
 
