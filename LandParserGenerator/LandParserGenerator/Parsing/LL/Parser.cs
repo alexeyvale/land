@@ -178,38 +178,58 @@ namespace Land.Core.Parsing.LL
 			if (LexingStream.CurrentToken != null)
 			{
 				var token = LexingStream.CurrentToken;
+
+				/// Предполагается, что токен может быть началом ровно одной пары, или концом ровно одной пары,
+				/// или одновременно началом и концом ровно одной пары
 				var closed = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
 
+				/// Если текущий токен закрывает некоторую конструкцию
 				if (closed.Value != null)
 				{
-					if (Nesting.Count == 0)
+					/// и при этом не открывает её же
+					if (!closed.Value.Left.Contains(token.Name))
 					{
-						Log.Add(Message.Error(
-							$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
-							token.Location.Start
-						));
+						/// проверяем, есть ли на стеке то, что можно этой конструкцией закрыть
+						if (Nesting.Count == 0)
+						{
+							Log.Add(Message.Error(
+								$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
+								token.Location.Start
+							));
 
-						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-					}
-					else if(Nesting.Peek() != closed.Value)
-					{
-						Log.Add(Message.Error(
-							$"Неожиданная закрывающая конструкция {GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", Nesting.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", Nesting.Peek().Left.Select(e=> GrammarObject.Userify(e)))}",
-							token.Location.Start
-						));
+							return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+						}
+						else if (Nesting.Peek() != closed.Value)
+						{
+							Log.Add(Message.Error(
+								$"Неожиданная закрывающая конструкция {GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", Nesting.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", Nesting.Peek().Left.Select(e => GrammarObject.Userify(e)))}",
+								token.Location.Start
+							));
 
-						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+							return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+						}
+						else
+						{
+							Nesting.Pop();
+						}
 					}
+					/// иначе, если текущий токен одновременно открывающий и закрывающий
 					else
 					{
-						Nesting.Pop();
+						/// и есть что закрыть, закрываем
+						if (Nesting.Count > 0 && Nesting.Peek() == closed.Value)
+							Nesting.Pop();
+						else
+							Nesting.Push(closed.Value);
 					}
 				}
+				else
+				{
+					var opened = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
 
-				var opened = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
-
-				if (opened.Value != null)
-					Nesting.Push(opened.Value);
+					if (opened.Value != null)
+						Nesting.Push(opened.Value);
+				}
 			}
 
 			return LexingStream.NextToken();
