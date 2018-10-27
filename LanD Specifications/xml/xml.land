@@ -19,5 +19,11 @@ cdata_section	=	'<![CDATA[' Any ']]>'
 
 %%
 
-%parsing skip COMMENT
-%parsing start file
+%parsing {
+	skip COMMENT
+	start file
+}
+
+%nodes {
+	list direct_doctype_decls
+}
