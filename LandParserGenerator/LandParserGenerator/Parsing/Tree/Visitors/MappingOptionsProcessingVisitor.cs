@@ -12,12 +12,15 @@ namespace Land.Core.Parsing.Tree
 	{
 		public const double DEFAULT_BASE_PRIORITY = 1;
 
+		private Grammar GrammarObject { get; set; }
+
 		private HashSet<string> Land { get; set; }
 		private double BasePriority { get; set; }
 		private Dictionary<string, double> GlobalPriorities { get; set; }
 
 		public MappingOptionsProcessingVisitor(Grammar g)
 		{
+			GrammarObject = g;
 			Land = g.Options.GetSymbols(MappingOption.LAND);
 
 			var temp = g.Options.GetParams(MappingOption.BASEPRIORITY, OptionsManager.GLOBAL_PARAMETERS_SYMBOL);
@@ -31,6 +34,10 @@ namespace Land.Core.Parsing.Tree
 		{
 			if (Land.Contains(node.Symbol) || Land.Contains(node.Alias))
 				node.Options.Set(MappingOption.LAND);
+
+			if (GrammarObject.Options.IsSet(MappingOption.EXACTMATCH, node.Symbol)
+				|| GrammarObject.Options.IsSet(MappingOption.EXACTMATCH, node.Alias))
+				node.Options.ExactMatch = true;
 
 			if (!node.Options.Priority.HasValue)
 			{

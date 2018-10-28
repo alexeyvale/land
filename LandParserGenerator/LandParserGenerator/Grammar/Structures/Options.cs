@@ -24,7 +24,7 @@ namespace Land.Core
 	/// <summary>
 	/// Опции, касающиеся отображения старого дерева в новое (изменённое) дерево
 	/// </summary>
-	public enum MappingOption { PRIORITY, LAND, BASEPRIORITY }
+	public enum MappingOption { PRIORITY, LAND, BASEPRIORITY, EXACTMATCH }
 
 
 	public class OptionsManager
@@ -136,8 +136,10 @@ namespace Land.Core
 	public class LocalOptions
 	{
 		public NodeOption? NodeOption { get; set; } = null;
+
 		public double? Priority { get; set; } = null;
 		public bool IsLand { get; set; } = false;
+		public bool ExactMatch { get; set; } = false;
 
 		public Dictionary<AnyOption, HashSet<string>> AnyOptions { get; set; } 
 			= new Dictionary<AnyOption, HashSet<string>>();
@@ -156,6 +158,9 @@ namespace Land.Core
 					break;
 				case MappingOption.PRIORITY:
 					Priority = (double)@params[0];
+					break;
+				case MappingOption.EXACTMATCH:
+					ExactMatch = true;
 					break;
 				default:
 					break;

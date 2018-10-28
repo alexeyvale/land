@@ -16,17 +16,34 @@ namespace Land.Core.Markup
 		public double Priority { get; set; }
 
 		[DataMember]
+		public bool ExactMatch { get; set; }
+
+		[DataMember]
 		public string Type { get; set; }
 
 		[DataMember]
 		public List<string> Value { get; set; }
+
+		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
+		public bool EqualsIgnoreValue(object obj)
+		{
+			if (obj is HeaderContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Priority == elem.Priority
+					&& Type == elem.Type
+					&& ExactMatch == elem.ExactMatch;
+			}
+
+			return false;
+		}
 
 		public override bool Equals(object obj)
 		{
 			if(obj is HeaderContextElement elem)
 			{
 				return ReferenceEquals(this, elem) || Priority == elem.Priority 
-					&& Type == elem.Type 
+					&& Type == elem.Type
+					&& ExactMatch == elem.ExactMatch
 					&& Value.SequenceEqual(elem.Value);
 			}
 
@@ -54,7 +71,8 @@ namespace Land.Core.Markup
 			{
 				Type = node.Type,
 				Value = node.Value,
-				Priority = node.Options.Priority.Value
+				Priority = node.Options.Priority.Value,
+				ExactMatch = node.Options.ExactMatch
 			};
 		}
 	}

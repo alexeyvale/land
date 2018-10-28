@@ -268,9 +268,11 @@ namespace Land.Core.Markup
 				var aContext = a as HeaderContextElement;
 				var bContext = b as HeaderContextElement;
 
-				if (aContext.Type == bContext.Type && aContext.Priority == bContext.Priority)
+				if (aContext.EqualsIgnoreValue(bContext))
 				{
-					return Levenshtein(String.Join("", aContext.Value), String.Join("", bContext.Value));
+					return aContext.ExactMatch 
+						? String.Join("", aContext.Value) == String.Join("", bContext.Value) ? 1 : 0
+						: Levenshtein(String.Join("", aContext.Value), String.Join("", bContext.Value));
 				}
 				else
 					return 0;
