@@ -1,29 +1,24 @@
-COMMENT	: '<!--' .*? '-->'
-ID	: [_a-zA-Z][-._a-zA-Z0-9]*
+COMMENT			: '<!--' .*? '-->'
+DOCTYPE_DECL	: '<!' (DOCTYPE_DECL|STRING|.)*? '>'
+CDATA			: '<![CDATA[' .*? ']]>'
+PROCESS_INSTR	: %left ('<?'|'<?xml')	%right '?>'
 
-file		=	(xml_prolog|doctype_decl|tag)+
+ID		: [_a-zA-Z][-._a-zA-Z0-9]*
+STRING	: '"' ~[<"]*? '"' | '\'' ~[<']*? '\''
 
-xml_prolog		=	'<?xml' attribute* '?>'
-doctype_decl	=	'<!DOCTYPE' (Any|direct_doctype_decls)* '>'
-tag				=	'<' ID attribute* ('>' (tag|cdata_section|Any)* '</' ID '>' | '/>')
-attribute		=	attribute_name '=' attribute_value
-attribute_name	=	ID (':' ID)*
-attribute_value	= 	'"' Any '"' | '\'' Any '\''
-
-// вода
-direct_doctype_decls	=	'[' (Any|direct_doctype_decls) ']'
-cdata_section	=	'<![CDATA[' Any ']]>'
-
-// По поводу некорректно сгенерированного файла документации System.Collections.Immutable:
-// https://github.com/dotnet/corefx/issues/29600
+file		=	xml_prolog? (tag|Any)*
+xml_prolog	=	'<?xml' attribute* '?>'
+tag			=	'<' name attribute* ('>' (tag|Any)* '</' name '>' | '/>')
+attribute	=	name '=' STRING
+name		=	ID (':' ID)*
 
 %%
 
 %parsing {
-	skip COMMENT
+	skip COMMENT DOCTYPE_DECL CDATA STRING
 	start file
 }
 
 %nodes {
-	list direct_doctype_decls
+	leaf name
 }
