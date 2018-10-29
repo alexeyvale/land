@@ -1,0 +1,57 @@
+DIRECTIVE	: '#' ~[\n\r]*
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' (~["]|'""')* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
+ 
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
+
+ 
+namespace_content	=	opening_directive*! (namespace|entity)*
+opening_directive	=	('using'|'extern') Any ';'
+namespace			=	'namespace' header_element '{' namespace_content '}'
+
+entity	=	attribute | (header_element|Any)*! 
+	(
+		('class'|'struct'|'interface') header_element Any '{' entity* '}' | 
+		(header_element|Any|tuple_or_arguments)* (block|init_expression ';'|init_value ';'|';')+!
+	)
+
+init_expression		=	'=>' (Any | %ghost header_element)+
+init_value			=	'=' (Any | %ghost header_element)+
+
+tuple_or_arguments	=	'(' Any ')'
+header_atom	=	'ref'? 'unsigned'? ID type_parameters? '?'? '*'*
+header_element		=	header_atom ((('.'|'::') header_atom) | ('[' Any ']'))*!
+type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
+
+attribute	=	'[' Any ']'
+block		=	'{' Any '}'
+
+%%
+
+%parsing {
+	recovery
+	fragment STRING_INT_CODE
+	start namespace_content
+	skip COMMENT STRING DIRECTIVE
+}
+
+%nodes {
+	leaf header_element
+}
+
+%mapping {
+	land entity
+}
