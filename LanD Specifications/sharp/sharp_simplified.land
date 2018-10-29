@@ -25,11 +25,8 @@ namespace			=	'namespace' header_element '{' namespace_content '}'
 entity	=	attribute | (header_element|Any)*! 
 	(
 		('class'|'struct'|'interface') header_element Any '{' entity* '}' | 
-		(header_element|Any|tuple_or_arguments)* (block|init_expression ';'|init_value ';'|';')+!
+		(header_element|Any|tuple_or_arguments)* (block|';')+!
 	)
-
-init_expression		=	'=>' (Any | %ghost header_element)+
-init_value			=	'=' (Any | %ghost header_element)+
 
 tuple_or_arguments	=	'(' Any ')'
 header_atom	=	'ref'? 'unsigned'? ID type_parameters? '?'? '*'*
