@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tree postprocessing", "Tree
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPreprocessor", "Preprocessors\Tree postprocessing\PascalPreprocessor\PascalPreprocessor.csproj", "{5BB7C445-36C4-4686-B17A-A163385848A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpPreprocessor", "Preprocessors\Tree postprocessing\SharpPreprocessor\SharpPreprocessor.csproj", "{CF232C51-2875-4A92-89A4-A8AEA894E160}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{86500D9B-BDA6-4A54-B821-159F513B20EA} = {373EC8C3-5355-4019-B833-E46A111B2E41}
 		{2BBDC627-AFB5-44D0-BB15-F48D5FA699EF} = {373EC8C3-5355-4019-B833-E46A111B2E41}
 		{5BB7C445-36C4-4686-B17A-A163385848A5} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
+		{CF232C51-2875-4A92-89A4-A8AEA894E160} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD7950FE-7FC3-4DA2-9B6B-4B3E76CBD3C2}
