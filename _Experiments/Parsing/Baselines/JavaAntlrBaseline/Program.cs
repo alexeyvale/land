@@ -66,28 +66,28 @@ namespace JavaAntlrBaseline
 
 			if(Methods.Count > 0)
 			{
-				MethodOutput.WriteLine("*");
+				MethodOutput.WriteLine("***");
 				MethodOutput.WriteLine(FileName);
 				Methods.ForEach(line => MethodOutput.WriteLine(line));
 			}
 
 			if (ClassesInterfaces.Count > 0)
 			{
-				ClassOutput.WriteLine("*");
+				ClassOutput.WriteLine("***");
 				ClassOutput.WriteLine(FileName);
 				ClassesInterfaces.ForEach(line => ClassOutput.WriteLine(line));
 			}
 
 			if (Enums.Count > 0)
 			{
-				EnumOutput.WriteLine("*");
+				EnumOutput.WriteLine("***");
 				EnumOutput.WriteLine(FileName);
 				Enums.ForEach(line => EnumOutput.WriteLine(line));
 			}
 
 			if (Fields.Count > 0)
 			{
-				FieldOutput.WriteLine("*");
+				FieldOutput.WriteLine("***");
 				FieldOutput.WriteLine(FileName);
 				Fields.ForEach(line => FieldOutput.WriteLine(line));
 			}

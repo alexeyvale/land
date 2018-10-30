@@ -22,13 +22,13 @@ namespace RemoveMatches
 						/// Отчёты для некоторого типа сущностей, разбитые на куски,
 						/// соответствующие отдельным проанализированным файлам
 						var landReport = File.ReadAllText(pair.ElementAt(0))
-							.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries)
+							.Split(new string[] { "***" }, StringSplitOptions.RemoveEmptyEntries)
 							.Select(r => r.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
 							.Select(splitted => new Tuple<string, List<string>>(splitted.First(), splitted.Skip(1).OrderBy(e => e).ToList()))
 							.OrderBy(e => e.Item1)
 							.ToList();
 						var baselineReport = File.ReadAllText(pair.ElementAt(1))
-							.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries)
+							.Split(new string[] { "***" }, StringSplitOptions.RemoveEmptyEntries)
 							.Select(r => r.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
 							.Select(splitted => new Tuple<string, List<string>>(splitted.First(), splitted.Skip(1).OrderBy(e => e).ToList()))
 							.OrderBy(e => e.Item1)

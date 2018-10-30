@@ -797,13 +797,13 @@ namespace Land.GUI
 
 				foreach(var file in landLists)
 				{
-					fs.WriteLine("*");
+					fs.WriteLine("***");
 					fs.WriteLine(file.File);
 
 					foreach(var landEntity in file.Land)
 					{
 						fs.WriteLine(landEntity.Type);
-						fs.WriteLine(landEntity.Value);
+						fs.WriteLine(String.IsNullOrEmpty(landEntity.Value) ? "MISSING_NAME" : landEntity.Value);
 					}
 				}
 			}

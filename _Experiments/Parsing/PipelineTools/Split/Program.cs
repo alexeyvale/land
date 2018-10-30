@@ -69,7 +69,7 @@ namespace Split
 					var line = landReportContent[i].Trim();
 
 					/// Если начинается информация про следующий файл
-					if (line == "*")
+					if (line == "***")
 					{
 						if (!String.IsNullOrEmpty(sourceFileName))
 							FlushBuffer(sourceFileName, sourceFileIslands);
@@ -127,7 +127,7 @@ namespace Split
 				if(!SplittedFiles.ContainsKey(kvp.Key))
 					SplittedFiles[kvp.Key] = new StreamWriter(Path.Combine(SplittedFilesTargetDirectory, $"{kvp.Key}_land.txt"), false);
 
-				SplittedFiles[kvp.Key].WriteLine('*');
+				SplittedFiles[kvp.Key].WriteLine("***");
 				SplittedFiles[kvp.Key].WriteLine(fileName);
 
 				foreach (var val in kvp.Value)

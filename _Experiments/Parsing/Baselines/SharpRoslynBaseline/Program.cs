@@ -59,7 +59,7 @@ namespace RoslynParserTest
 					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().ToList();
 					if (enums.Count > 0)
 					{
-						enumOutput.WriteLine("*");
+						enumOutput.WriteLine("***");
 						enumOutput.WriteLine(filename);
 
 						foreach (var node in enums)
@@ -69,7 +69,7 @@ namespace RoslynParserTest
 					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
 					if (fields.Count > 0)
 					{
-						fieldOutput.WriteLine("*");
+						fieldOutput.WriteLine("***");
 						fieldOutput.WriteLine(filename);
 
 						foreach (var node in fields)
@@ -80,7 +80,7 @@ namespace RoslynParserTest
 					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
 					if (properties.Count > 0)
 					{
-						propertyOutput.WriteLine("*");
+						propertyOutput.WriteLine("***");
 						propertyOutput.WriteLine(filename);
 
 						foreach (var node in properties)
@@ -90,7 +90,7 @@ namespace RoslynParserTest
 					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
 					if (methods.Count > 0)
 					{
-						methodOutput.WriteLine("*");
+						methodOutput.WriteLine("***");
 						methodOutput.WriteLine(filename);
 
 						foreach (var node in methods)
@@ -103,7 +103,7 @@ namespace RoslynParserTest
 
 					if(classes.Count() > 0 || structs.Count() > 0 || interfaces.Count() > 0)
 					{
-						classOutput.WriteLine("*");
+						classOutput.WriteLine("***");
 						classOutput.WriteLine(filename);
 
 						foreach (var node in classes)
