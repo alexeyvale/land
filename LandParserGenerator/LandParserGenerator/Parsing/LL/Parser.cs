@@ -252,15 +252,15 @@ namespace Land.Core.Parsing.LL
 			}
 		}
 
-		private HashSet<string> GetStopTokens(LocalOptions options, Stack<Node> stack)
+		private HashSet<string> GetStopTokens(LocalOptions options, IEnumerable<string> followSequence)
 		{
 			/// Если с Any не связана последовательность стоп-символов
 			if (!options.AnyOptions.ContainsKey(AnyOption.Except))
 			{
 				/// Создаём последовательность символов, идущих в стеке после Any
 				var alt = new Alternative();
-				foreach (var elem in stack)
-					alt.Add(elem.Symbol);
+				foreach (var elem in followSequence)
+					alt.Add(elem);
 
 				/// Определяем множество токенов, которые могут идти после Any
 				var tokensAfterText = GrammarObject.First(alt);
@@ -292,7 +292,7 @@ namespace Land.Core.Parsing.LL
 			var nestingCopy = new Stack<PairSymbol>(Nesting.Reverse());
 			var tokenIndex = LexingStream.CurrentIndex;
 			var token = LexingStream.CurrentToken;
-			var stopTokens = GetStopTokens(anyNode.Options, Stack);	
+			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n=>n.Symbol));	
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
@@ -401,41 +401,14 @@ namespace Land.Core.Parsing.LL
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Pop();
 			var currentStopTokens = currentNode.Symbol == Grammar.ANY_TOKEN_NAME
-				? GetStopTokens(currentNode.Options, Stack)
+				? GetStopTokens(currentNode.Options, Stack.Select(n=>n.Symbol))
 				: (HashSet<string>)null;
 
-			/// Если произошла ошибка при пропуске Any и конфигурация ветки
-			/// может заставить нас повторно перейти на неё же при восстановлении,
-			/// переходим сразу к родителю родителя этого Any
-			if(currentNode.Symbol == Grammar.ANY_TOKEN_NAME 
-				&& currentNode.Parent.Children.Count == 1)
-			{
-				/// Сместились к узлу, потомком которого было Any, 
-				/// в нём точно не восстановимся, нужно подниматься дальше
-				currentNode = currentNode.Parent;
-
-				if (currentNode.Parent != null)
-				{
-					var childIndex = currentNode.Parent.Children.IndexOf(currentNode);
-
-					/// Снимаем со стека всех неразобранных потомков родителя этого узла,
-					/// для текущего узла они являются правыми братьями
-					for (var i = 0; i < currentNode.Parent.Children.Count - childIndex - 1; ++i)
-						Stack.Pop();
-				}
-
-				/// Поднимаемся к родителю
-				currentNode = currentNode.Parent;
-			}
-
 			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
-			/// для которого допустима альтернатива из одного Any
-			while (currentNode != null
-				&& (!GrammarObject.Rules.ContainsKey(currentNode.Symbol)
-				|| !GrammarObject.Rules[currentNode.Symbol].Alternatives
-					.Any(a => a.Count == 1 
-						&& a[0].Symbol == Grammar.ANY_TOKEN_NAME 
-						&& (currentStopTokens == null || !GetStopTokens(a[0].Options, Stack).SetEquals(currentStopTokens)))))
+			/// для которого допустима альтернатива, начинающаяся с Any
+			while (currentNode != null && (!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || !GrammarObject.Rules[currentNode.Symbol].Alternatives
+				.Any(a => a.Elements.FirstOrDefault()?.Symbol == Grammar.ANY_TOKEN_NAME && (currentStopTokens == null 
+					|| !GetStopTokens(a[0].Options, a.Elements.Select(e=>e.Symbol).Concat(Stack.Select(s=>s.Symbol))).SetEquals(currentStopTokens)))))
 			{
 				if (currentNode.Parent != null)
 				{
@@ -469,6 +442,18 @@ namespace Land.Core.Parsing.LL
 
 				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
 				var anyNode = NodeGenerator.Generate(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
+				var newChildren = new LinkedList<Node>();
+
+				for (var i = alternativeToApply.Count - 1; i > 0; --i)
+				{
+					var newNode = 
+						NodeGenerator.Generate(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
+
+					newChildren.AddFirst(newNode);
+					Stack.Push(newNode);
+				}
+
+				newChildren.AddFirst(anyNode);
 
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
@@ -491,7 +476,9 @@ namespace Land.Core.Parsing.LL
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					currentNode.ResetChildren();
-					currentNode.AddFirstChild(anyNode);
+
+					foreach(var child in newChildren)
+						currentNode.AddLastChild(child);
 
 					if (!String.IsNullOrEmpty(alternativeToApply.Alias))
 						currentNode.Alias = alternativeToApply.Alias;
@@ -504,6 +491,11 @@ namespace Land.Core.Parsing.LL
 					Statistics.RecoveryTimes += 1;
 
 					return token;
+				}
+				else
+				{
+					for (var i = 0; i < alternativeToApply.Count - 1; ++i)
+						Stack.Pop();
 				}
 			}
 

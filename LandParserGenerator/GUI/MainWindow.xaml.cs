@@ -707,6 +707,7 @@ namespace Land.GUI
 			var timePerFile = new Dictionary<string, TimeSpan>();
 			var landCounts = new Dictionary<string, int>();
 			var landLists = new List<FileLandPair>();
+			var recoveryCount = 0;
 
 			for (; counter < argument.Files.Count; ++counter)
 			{
@@ -732,6 +733,7 @@ namespace Land.GUI
 					else
 					{
 						timePerFile[argument.Files[counter]] = Parser.Statistics.TimeSpent;
+						recoveryCount += Parser.Statistics.RecoveryTimes;
 
 						var visitor = new CountLandNodesVisitor("name");
 						root.Accept(visitor);
@@ -781,6 +783,8 @@ namespace Land.GUI
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{Message.Warning(file.Value.ToString(@"hh\:mm\:ss\:ff"), null)}");
 			}
 
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"Всего восстановлений: {recoveryCount}");
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
 
 			foreach (var pair in landCounts)

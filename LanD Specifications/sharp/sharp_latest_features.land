@@ -11,33 +11,31 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
 STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
+GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
 CURVE_BRACKETED : %left '{' %right '}'
 ROUND_BRACKETED : %left '(' %right ')'
-SQUARE_BRACKETED : %left '[' %right ']'
+SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
 
  
-namespace_content	=	opening_directive*! (namespace|entity)*
+namespace_content	=	opening_directive*! (namespace|entity|general_attribute)*
 opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity =
-		(MODIFIER|'extern')*
+		entity_attribute* (MODIFIER|'extern')*
 		(
-		 	'enum' name Any '{' Any '}' ';'? 								=> enum	|
+		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
-			// 'delegate' (Any|block) ';'										=> delegate |
-			// 'event' ... // если разрешить Any после name в строке ниже,
-			// чтобы подбирались буферы в unsafe-структурах, как методы будут подбираться индексаторы
 			%priority(2) type name
 			(
 		  		arguments Any (init_expression? ';' | block)	=> method	|
-		  		init_value? (',' name init_value?)* ';'			=> field	|
+		  		('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'			=> field	|
 		  		(block (init_value ';')? | init_expression ';')	=> property
 		  	)
-		) | AnyInclude('operator')
+		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
 
 init_expression		=	'=>' (Any | %ghost type)+
 init_value			=	'=' (Any | %ghost type)+
@@ -47,13 +45,14 @@ name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	('ref'? 'unsigned'? ID | tuple) type_parameters? '?'? '*'*
+type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
 type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
 type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
 
-arguments	=	'(' Any ')'
-attribute	=	'[' Any ']'
-block		=	'{' Any '}'
+entity_attribute	=	'[' Any ']'
+general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
+arguments			=	'(' Any ')'
+block				=	'{' Any '}'
 
 %%
 
