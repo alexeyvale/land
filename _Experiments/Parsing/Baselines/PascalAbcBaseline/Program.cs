@@ -60,9 +60,11 @@ namespace PascalABCBaseline
 
 				var proceduresCounter = 0;
 				var classesCounter = 0;
+				var propertiesCounter = 0;
 
 				var procedureOutput = new StreamWriter(Path.Combine(args[0], "routine_baseline.txt"), false);
 				var classOutput = new StreamWriter(Path.Combine(args[0], "class_type_baseline.txt"), false);
+				var propertyOutput = new StreamWriter(Path.Combine(args[0], "property_baseline.txt"), false);
 
 				foreach (var filename in package)
 				{
@@ -70,34 +72,73 @@ namespace PascalABCBaseline
 
 					if (tree != null)
 					{
-						var procedures = tree.DescendantNodes().OfType<procedure_header>().ToList();
-						if (procedures.Count > 0)
+						/// Отсекаем автосгенерированные геттеры и сеттеры,
+						/// а также заголовки процедур, используемые как типы
+						var procedures = tree.DescendantNodes()
+							.OfType<procedure_header>()
+							.Where(p => !(p.Parent is type_declaration) 
+								&& !(p.Parent?.Parent is variable_definitions) 
+								&& (p.name == null || !(p.name.ToString()?.StartsWith("#") ?? false)))
+							.ToList();
+						var operators = tree.DescendantNodes()
+							.OfType<operator_name_ident>()
+							.ToList();
+
+						if (procedures.Count > 0 || operators.Count > 0)
 						{
-							procedureOutput.WriteLine("*");
+							proceduresCounter += procedures.Count + operators.Count;
+
+							procedureOutput.WriteLine("***");
 							procedureOutput.WriteLine(filename);
 
 							foreach (var node in procedures)
-								procedureOutput.WriteLine(node.name);
+							{
+								if (node.name?.class_name != null)
+									procedureOutput.WriteLine($"{node.name.class_name}.{node.name.meth_name}");
+								else
+									if(node.name != null)
+										procedureOutput.WriteLine(node.name);
+									else
+										procedureOutput.WriteLine("MISSING_NAME");
+							}
+
+							foreach (var node in operators)
+							{
+								procedureOutput.WriteLine("operator" + node.operator_type);
+							}
 						}
 
-						proceduresCounter += procedures.Count();
+						var classes = tree.DescendantNodes()
+							.OfType<class_definition>()
+							.Where(node => node.Parent is type_declaration)
+							.ToList();
 
-						var classes = tree.DescendantNodes().OfType<class_definition>().ToList();
 						if (classes.Count > 0)
 						{
-							classOutput.WriteLine("*");
+							classOutput.WriteLine("***");
 							classOutput.WriteLine(filename);
 
 							foreach (var node in classes)
 							{
-								if (node.Parent is type_declaration)
-								{
-									classOutput.WriteLine(((type_declaration)node.Parent).type_name);
-								}
+								classOutput.WriteLine(((type_declaration)node.Parent).type_name);
 							}
 						}
 
 						classesCounter += classes.Count();
+
+						var properties = tree.DescendantNodes().OfType<simple_property>().ToList();
+						if (properties.Count > 0)
+						{
+							propertyOutput.WriteLine("***");
+							propertyOutput.WriteLine(filename);
+
+							foreach (var node in properties)
+							{
+								propertyOutput.WriteLine(node.property_name);
+							}
+						}
+
+						propertiesCounter += properties.Count();
 					}
 					else
 					{
@@ -111,8 +152,10 @@ namespace PascalABCBaseline
 
 				procedureOutput.Close();
 				classOutput.Close();
+				propertyOutput.Close();
 
-				Console.WriteLine($"procedures: {proceduresCounter}");
+				Console.WriteLine($"routines: {proceduresCounter}");
+				Console.WriteLine($"properties: {propertiesCounter}");
 				Console.WriteLine($"classes: {classesCounter}");
 			}
 		}
