@@ -19,11 +19,6 @@ namespace RemoveMatches
 				{
 					if (pair.Count() == 2)
 					{
-						var test1 = File.ReadAllText(pair.ElementAt(0))
-							.Split(new char[] { '*' }, StringSplitOptions.RemoveEmptyEntries);
-
-						var test2 = test1.Select(r => r.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)).ToList();
-
 						/// Отчёты для некоторого типа сущностей, разбитые на куски,
 						/// соответствующие отдельным проанализированным файлам
 						var landReport = File.ReadAllText(pair.ElementAt(0))
