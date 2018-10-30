@@ -63,7 +63,7 @@ namespace RoslynParserTest
 						enumOutput.WriteLine(filename);
 
 						foreach (var node in enums)
-							enumOutput.WriteLine(node.Identifier);
+							enumOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 					}
 
 					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
@@ -74,7 +74,7 @@ namespace RoslynParserTest
 
 						foreach (var node in fields)
 							foreach (var variable in node.Declaration.Variables)
-								fieldOutput.WriteLine(variable.Identifier);
+								fieldOutput.WriteLine(variable.Identifier.IsMissing ? "MISSING_NAME" : variable.Identifier.ToString());
 					}
 
 					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
@@ -84,7 +84,7 @@ namespace RoslynParserTest
 						propertyOutput.WriteLine(filename);
 
 						foreach (var node in properties)
-							propertyOutput.WriteLine(node.Identifier);
+							propertyOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 					}
 
 					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
@@ -94,7 +94,7 @@ namespace RoslynParserTest
 						methodOutput.WriteLine(filename);
 
 						foreach (var node in methods)
-							methodOutput.WriteLine(node.Identifier);
+							methodOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 					}
 
 					var classes = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
@@ -107,11 +107,11 @@ namespace RoslynParserTest
 						classOutput.WriteLine(filename);
 
 						foreach (var node in classes)
-							classOutput.WriteLine(node.Identifier);
+							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 						foreach (var node in structs)
-							classOutput.WriteLine(node.Identifier);
+							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 						foreach (var node in interfaces)
-							classOutput.WriteLine(node.Identifier);
+							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
 					}
 
 					enumsCounter += enums.Count();
