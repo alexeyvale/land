@@ -45,7 +45,7 @@ namespace Land.Core.Parsing.Tree
 					? GlobalPriorities[node.Alias]
 					: GlobalPriorities.ContainsKey(node.Symbol)
 						? GlobalPriorities[node.Symbol]
-						: BasePriority;
+						: node.Symbol == Grammar.ANY_TOKEN_NAME ? 0 : BasePriority;
 			}
 
 			base.Visit(node);

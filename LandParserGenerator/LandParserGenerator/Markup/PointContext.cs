@@ -200,7 +200,7 @@ namespace Land.Core.Markup
 			else
 			{
 				return node.Children
-					.Where(c => c.Children.Count == 0 && c.Symbol != Grammar.ANY_TOKEN_NAME)
+					.Where(c => c.Children.Count == 0 && c.Options.Priority > 0)
 					.Select(c => (HeaderContextElement)c).ToList();
 			}
 		}
