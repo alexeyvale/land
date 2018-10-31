@@ -16,26 +16,30 @@ namespace Land.Core.Parsing.Tree
 			public string Value { get; set; }
 		}
 
-		public Dictionary<string, int> Counts { get; set; } = new Dictionary<string, int>();
+		public Dictionary<string, int> Counts
+		{
+			get
+			{
+				return Land.Where(e => !WithValueOnly || !String.IsNullOrEmpty(e.Value))
+					.GroupBy(e => e.Type).ToDictionary(e => e.Key, e => e.Count());
+			}
+		}
+
 		public List<TypeValuePair> Land { get; set; } = new List<TypeValuePair>();
 
 		public HashSet<string> ChildrenWithValues { get; set; }
+		public bool WithValueOnly { get; set; }
 
-		public CountLandNodesVisitor(params string[] childrenWithValues)
+		public CountLandNodesVisitor(bool withValueOnly, params string[] childrenWithValues)
 		{
 			ChildrenWithValues = new HashSet<string>(childrenWithValues);
+			WithValueOnly = withValueOnly;
 		}
 
 		public override void Visit(Node node)
 		{
 			if(node.Options.IsLand)
 			{
-				if (!Counts.ContainsKey(node.Type))
-				{
-					Counts[node.Type] = 0;
-				}
-
-				Counts[node.Type] += 1;
 				Land.Add(new TypeValuePair()
 				{
 					Type = node.Type,

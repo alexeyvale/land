@@ -9,7 +9,8 @@ OTHER_MODIFIER		: 'external'|'forward'|'override'|'abstract'|'overload'|'reintro
 ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
 
 ID					: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
-CLASS_MEMBER_USAGE	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+OPERATOR_ACCESS		: '.operator'
+CLASS_MEMBER_ACCESS	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 
 SQUARE_BRACKETED : %left '[' %right ']'
 ROUND_BRACKETED : %left '(' %right ')'
@@ -22,7 +23,7 @@ declaration		=	const|type|var|attribute* routine ';'|routine_element ';'|block|A
 const			=	'const' (const_atom ';'|Any)+!
 type			=	'type' (type_atom ';'|Any)+!
 var				=	'var' (var_atom ';'|Any)+!
-const_atom		=	name (':' Any)? '=' Any
+const_atom		=	name (':' Any class?)? '=' Any
 var_atom		=	names_list (':' Any class?)? (':=' Any)?
 type_atom		=	attribute* name '=' Any (class => class_type |)
 
@@ -42,8 +43,8 @@ routine_header		=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
 routine_init		=	':=' (Any|block)
 
 name_atom			=	'^'? ID
-name_tail_element	=	'::' name_atom | CLASS_MEMBER_USAGE
-name		=	(('array'|'sequence'|'set') Any 'of')* name_atom (name_tail_element | '<' Any '>' | '[' Any ']')*
+name_tail_element	=	'::' name_atom | CLASS_MEMBER_ACCESS
+name		=	(('array'|'sequence'|'set') Any 'of')* name_atom (name_tail_element | '<' Any '>' | '[' Any ']')* (OPERATOR_ACCESS Any)? | 'operator' Any
 names_list	=	name (',' name)*
 
 block		=	('begin'|'case'|'try'|'match') (block|Any)+ 'end'
@@ -53,7 +54,6 @@ attribute	=	'[' Any ']'
 
 %parsing {
 	recovery
-	ignoreundefined
 	start file
 	ignorecase
 	skip COMMENT
@@ -61,8 +61,8 @@ attribute	=	'[' Any ']'
 
 %nodes {
 	leaf name
-	ghost declaration class
+	ghost declaration class names_list routine_header
 	list section
 }
 
-%mapping land block class_type field property routine_header
+%mapping land class_type field property routine method

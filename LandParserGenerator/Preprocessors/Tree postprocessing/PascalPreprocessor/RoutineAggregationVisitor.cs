@@ -49,7 +49,7 @@ namespace PascalPreprocessing.TreePostprocessing
 								break;					
 						}
 
-						base.Visit(node.Children[i]);
+						node.Children[i].Accept(this);
 					}
 
 					/// Отложенное выполнение всех перестановок,
@@ -82,7 +82,7 @@ namespace PascalPreprocessing.TreePostprocessing
 								break;
 						}
 
-						base.Visit(node.Children[i]);
+						node.Children[i].Accept(this);
 					}
 
 					break;
@@ -113,9 +113,18 @@ namespace PascalPreprocessing.TreePostprocessing
 								break;
 						}
 
-						base.Visit(node.Children[i]);
+						node.Children[i].Accept(this);
 					}
 
+					break;
+				case "method":
+				case "routine":
+					if (node.Children.Where(c => c.Type == "name")
+						.Any(c => c.Value.Any(v => v == "operator" || v == ".operator")))
+					{
+						node.Symbol = "operator";
+						node.Alias = null;
+					}
 					break;
 				default:
 					base.Visit(node);

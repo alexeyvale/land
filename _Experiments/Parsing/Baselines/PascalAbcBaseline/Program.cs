@@ -76,17 +76,14 @@ namespace PascalABCBaseline
 						/// а также заголовки процедур, используемые как типы
 						var procedures = tree.DescendantNodes()
 							.OfType<procedure_header>()
-							.Where(p => !(p.Parent is type_declaration) 
-								&& !(p.Parent?.Parent is variable_definitions) 
-								&& (p.name == null || !(p.name.ToString()?.StartsWith("#") ?? false)))
-							.ToList();
-						var operators = tree.DescendantNodes()
-							.OfType<operator_name_ident>()
+							.Where(p => p.name != null && !String.IsNullOrEmpty(p.name.ToString()) 
+								&& !p.name.ToString().StartsWith("#") && !p.name.ToString().StartsWith("operator") 
+								&& p.name.ToString() != "implicit" && p.name.ToString() != "explicit")
 							.ToList();
 
-						if (procedures.Count > 0 || operators.Count > 0)
+						if (procedures.Count > 0)
 						{
-							proceduresCounter += procedures.Count + operators.Count;
+							proceduresCounter += procedures.Count;
 
 							procedureOutput.WriteLine("***");
 							procedureOutput.WriteLine(filename);
@@ -100,11 +97,6 @@ namespace PascalABCBaseline
 										procedureOutput.WriteLine(node.name);
 									else
 										procedureOutput.WriteLine("MISSING_NAME");
-							}
-
-							foreach (var node in operators)
-							{
-								procedureOutput.WriteLine("operator" + node.operator_type);
 							}
 						}
 

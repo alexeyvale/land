@@ -56,67 +56,74 @@ namespace RoslynParserTest
 				{
 					var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(filename), new CSharpParseOptions());
 
-					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().ToList();
+					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>()
+						.Where(e=>!e.Identifier.IsMissing).ToList();
 					if (enums.Count > 0)
 					{
 						enumOutput.WriteLine("***");
 						enumOutput.WriteLine(filename);
 
 						foreach (var node in enums)
-							enumOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							enumOutput.WriteLine(node.Identifier);
 					}
 
-					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>()
+						.SelectMany(f=>f.Declaration.Variables)
+						.Where(e => !e.Identifier.IsMissing).ToList();
 					if (fields.Count > 0)
 					{
 						fieldOutput.WriteLine("***");
 						fieldOutput.WriteLine(filename);
 
 						foreach (var node in fields)
-							foreach (var variable in node.Declaration.Variables)
-								fieldOutput.WriteLine(variable.Identifier.IsMissing ? "MISSING_NAME" : variable.Identifier.ToString());
+							fieldOutput.WriteLine(node.Identifier);
 					}
 
-					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>().ToList();
+					var properties = tree.GetRoot().DescendantNodes().OfType<PropertyDeclarationSyntax>()
+						.Where(e => !e.Identifier.IsMissing).ToList();
 					if (properties.Count > 0)
 					{
 						propertyOutput.WriteLine("***");
 						propertyOutput.WriteLine(filename);
 
 						foreach (var node in properties)
-							propertyOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							propertyOutput.WriteLine(node.Identifier);
 					}
 
-					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>().ToList();
+					var methods = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
+						.Where(e => !e.Identifier.IsMissing).ToList();
 					if (methods.Count > 0)
 					{
 						methodOutput.WriteLine("***");
 						methodOutput.WriteLine(filename);
 
 						foreach (var node in methods)
-							methodOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							methodOutput.WriteLine(node.Identifier);
 					}
 
-					var classes = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>();
-					var structs = tree.GetRoot().DescendantNodes().OfType<StructDeclarationSyntax>();
-					var interfaces = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>();
+					var classes = tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>()
+						.Where(e => !e.Identifier.IsMissing).ToList();
+					var structs = tree.GetRoot().DescendantNodes().OfType<StructDeclarationSyntax>()
+						.Where(e => !e.Identifier.IsMissing).ToList();
+					var interfaces = tree.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()
+						.Where(e => !e.Identifier.IsMissing).ToList();
 
-					if(classes.Count() > 0 || structs.Count() > 0 || interfaces.Count() > 0)
+					if (classes.Count > 0 || structs.Count > 0 || interfaces.Count > 0)
 					{
 						classOutput.WriteLine("***");
 						classOutput.WriteLine(filename);
 
 						foreach (var node in classes)
-							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							classOutput.WriteLine(node.Identifier);
 						foreach (var node in structs)
-							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							classOutput.WriteLine(node.Identifier);
 						foreach (var node in interfaces)
-							classOutput.WriteLine(node.Identifier.IsMissing ? "MISSING_NAME" : node.Identifier.ToString());
+							classOutput.WriteLine(node.Identifier);
 					}
 
 					enumsCounter += enums.Count();
 					classesCounter += classes.Count() + structs.Count() + interfaces.Count();
-					fieldsCounter += fields.Sum(node => node.Declaration.Variables.Count);
+					fieldsCounter += fields.Count();
 					propertiesCounter += properties.Count();
 					methodsCounter += methods.Count();
 				}

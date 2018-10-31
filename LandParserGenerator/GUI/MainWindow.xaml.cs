@@ -735,7 +735,7 @@ namespace Land.GUI
 						timePerFile[argument.Files[counter]] = Parser.Statistics.TimeSpent;
 						recoveryCount += Parser.Statistics.RecoveryTimes;
 
-						var visitor = new CountLandNodesVisitor("name");
+						var visitor = new CountLandNodesVisitor(true, "name");
 						root.Accept(visitor);
 
 						landLists.Add(new FileLandPair()
@@ -803,7 +803,7 @@ namespace Land.GUI
 					foreach(var landEntity in file.Land)
 					{
 						fs.WriteLine(landEntity.Type);
-						fs.WriteLine(String.IsNullOrEmpty(landEntity.Value) ? "MISSING_NAME" : landEntity.Value);
+						fs.WriteLine(landEntity.Value);
 					}
 				}
 			}
