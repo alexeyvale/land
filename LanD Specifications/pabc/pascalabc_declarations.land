@@ -27,7 +27,7 @@ const_atom		=	name (':' Any class?)? '=' Any
 var_atom		=	names_list (':' Any class?)? (':=' Any)?
 type_atom		=	attribute* name '=' Any (class => class_type |)
 
-class			=	('record'|'class'|'typeclass'|'instance'|'interface') Any (OTHER_MODIFIER Any ';')?! (section? (ACCESS_MODIFIER section?)* 'end')?!
+class			=	('record'|'class'|'interface') Any (OTHER_MODIFIER Any ';')?! (section? (ACCESS_MODIFIER section?)* 'end')?!
 section			=	(class_member | routine_element | block | Any) (';' section)? | (const | type | var) section?
 
 class_member	=	attribute* ('class'|'static')? 
