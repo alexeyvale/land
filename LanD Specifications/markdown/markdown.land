@@ -2,18 +2,26 @@ LINE_END : '\r'?'\n' | '\r' | '\f'
 REST_OF_LINE : ~[\n\r\f]*? LINE_END
 
 HEADER_ANY : %linestart '#'+ REST_OF_LINE
-HEADER_H1 : %linestart REST_OF_LINE '='+ [ \t]*? LINE_END
-HEADER_H2 : %linestart REST_OF_LINE '-'+ [ \t]*? LINE_END
+HEADER_H1_BORDER :  %linestart '='+ [ \t]*? LINE_END
+HEADER_H2_BORDER :  %linestart '-'+ [ \t]*? LINE_END
 
-CODE_BORDER : %linestart '~~~'
+CODE_BORDER : %linestart '~~~' REST_OF_LINE
 CODE : %left CODE_BORDER %right CODE_BORDER
 
-file	=	(HEADER_ANY|HEADER_H1|HEADER_H2|Any)*
+LINE : %linestart REST_OF_LINE
+
+file			=	(element|Any)*
+element			=	HEADER_ANY	=> header_any	|
+					LINE 
+					(
+						HEADER_H1_BORDER => header_h1 | 
+						HEADER_H2_BORDER => header_h2 | 
+						=> text
+					)
 
 %%
 
 %parsing fragment LINE_END REST_OF_LINE
 %parsing start file
-%parsing ignoreundefined
 
-%mapping land HEADER_ANY HEADER_H1 HEADER_H2
+%nodes leaf element

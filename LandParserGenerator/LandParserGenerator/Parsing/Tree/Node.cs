@@ -72,6 +72,19 @@ namespace Land.Core.Parsing.Tree
 			AnchorReady = node.AnchorReady;
 		}
 
+		public void CopyFromNode(Node node)
+		{
+			this.Symbol = node.Symbol;
+			this.Options = node.Options;
+			this.Parent = node.Parent;
+			this.Alias = node.Alias;
+			this.Children = node.Children;
+			this.Value = node.Value;
+
+			this._anchor = node._anchor;
+			this.AnchorReady = node.AnchorReady;
+		}
+
 		protected void GetAnchorFromChildren()
 		{
 			if (Children.Count > 0)
