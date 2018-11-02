@@ -1,3 +1,4 @@
+EOL			: '\r'?'\n' | '\r' | '\f'
 COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
@@ -11,12 +12,14 @@ ID			: [_a-zA-Z][_0-9a-zA-Z]*
 
 file	=	(if|elif|else|endif|define|undef|Any)+
 
-if		=	'#if' condition
-elif	=	'#elif' condition
-else	=	'#else'
-endif	=	'#endif'
-define	=	'#define' ID
-undef	=	'#undef' ID
+if		=	'#if' condition eol
+elif	=	'#elif' condition eol
+else	=	'#else' eol
+endif	=	'#endif' eol
+define	=	'#define' ID eol
+undef	=	'#undef' ID eol
+
+eol		=	EOL|EOF
 
 condition	=	ands or_right
 or_right	=	| '||' ands or_right
@@ -27,9 +30,11 @@ atom		=	ID | '(' condition ')'
 
 %%
 
-%parsing recovery
-%parsing fragment STRING_INT_CODE
-%parsing ignoreundefined
-%parsing start file
-%parsing skip COMMENT STRING CHAR
+%parsing {
+	skip COMMENT STRING CHAR EOL
+	fragment STRING_INT_CODE
+	recovery
+	ignoreundefined
+	start file
+}
  

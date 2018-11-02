@@ -142,14 +142,14 @@ namespace SharpPreprocessing.ConditionalCompilation
 				case define_node define_nd:
 					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 					{
-						for (var i = 1; i < node.Children.Count; ++i)
+						for (var i = 1; i < node.Children.Count - 1; ++i)
 							SymbolsDefined.Add(node.Children[i].Value[0]);
 					}
 					break;
 				case undef_node undef_nd:
 					if (Levels.Count == 0 || Levels.Peek().IncludeCurrentSegment)
 					{
-						for (var i = 1; i < node.Children.Count; ++i)
+						for (var i = 1; i < node.Children.Count - 1; ++i)
 							SymbolsDefined.Remove(node.Children[i].Value[0]);
 					}
 					break;
