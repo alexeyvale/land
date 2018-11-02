@@ -207,7 +207,8 @@ namespace Land.GUI
 			}
 			else
 			{
-				Parser.SetPreprocessor(Preprocessor);
+				if(Grammar_DisablePreprocButton.IsChecked != true)
+					Parser.SetPreprocessor(Preprocessor);
 
 				Grammar_StatusBarLabel.Content = "Парсер успешно сгенерирован";
 				Grammar_StatusBar.Background = Brushes.LightGreen;
