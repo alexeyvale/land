@@ -170,7 +170,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 				case ands_node nd:
 					return VisitCondition(node.Children[0]) && VisitCondition(node.Children[1]);
 				case and_right_node nd:
-					return node.Children.Count > 0 ? VisitCondition(node.Children[1]) || VisitCondition(node.Children[2]) : true;
+					return node.Children.Count > 0 ? VisitCondition(node.Children[1]) && VisitCondition(node.Children[2]) : true;
 				case atom_or_neg_node nd:
 					return node.Children.Count > 1 ? !VisitCondition(node.Children[1]) : VisitCondition(node.Children[0]);
 				case atom_node nd:

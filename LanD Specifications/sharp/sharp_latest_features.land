@@ -7,12 +7,12 @@ COMMENT_ML	: '/*' .*? '*/'
 STRING		: STRING_STD|STRING_VERB|STRING_INT
 STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
 STRING_VERB	: '@'('"' (~["]|'""')* '"')+
-STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
-STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|'{{'|STRING_INT_CODE|.)*? '"')+
+STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'
-ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]* | '$'ID'$'
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'
+ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
 CURVE_BRACKETED : %left '{' %right '}'
@@ -25,22 +25,22 @@ opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity =
-		entity_attribute* (MODIFIER|'extern')*
+		entity_attribute* (MODIFIER|'extern'|'async')*
 		(
 		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
 			%priority(2) type name
 			(
-		  		arguments Any (init_expression? ';' | block)	=> method	|
-		  		('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'			=> field	|
-		  		(block (init_value ';')? | init_expression ';')	=> property
+		  		arguments Any (init_expression? ';' | block)							=> method	|
+		  		('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'	=> field	|
+		  		(block (init_value ';')? | init_expression ';')							=> property
 		  	)
 		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
 
 init_expression		=	'=>' (Any | %ghost type)+
 init_value			=	'=' (Any | %ghost type)+
 
-name_atom	=	ID type_parameters?
+name_atom	=	('async'|ID) type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
