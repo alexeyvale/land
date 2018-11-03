@@ -27,6 +27,14 @@ namespace Land.Control
     {
 		public enum LandExplorerCommand { AddPoint, Relink }
 
+		public class PendingCommandInfo
+		{
+			public TreeViewItem Target { get; set; }
+			public LandExplorerCommand? Command { get; set; }
+			public string DocumentName { get; set; }
+			public string DocumentText { get; set; }
+		}
+
 		public class ControlState
 		{
 			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
@@ -36,9 +44,7 @@ namespace Land.Control
 			public TreeViewItem EditedItem { get; set; }
 			public string EditedItemOldHeader { get; set; }
 
-			public TreeViewItem PendingCommandTarget { get; set; }
-			public LandExplorerCommand? PendingCommand { get; set; }
-			public string PendingCommandDocument { get; set; }
+			public PendingCommandInfo PendingCommand { get; set; }		
 
 			public bool HighlightConcerns { get; set; }
 		}
@@ -71,7 +77,7 @@ namespace Land.Control
 		/// <summary>
 		/// Деревья для файлов, к которым осуществлена привязка
 		/// </summary>
-		public Dictionary<string, Node> AstRoots = new Dictionary<string, Node>();
+		public Dictionary<string, Tuple<Node, string>> ParsedFiles = new Dictionary<string, Tuple<Node, string>>();
 
 		/// <summary>
 		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
@@ -121,10 +127,11 @@ namespace Land.Control
 				? Parsers[extension] : null;
 		}
 
-		public List<NodeSimilarityPair> GetMappingCandidates(ConcernPoint point, Node root)
+		public List<NodeSimilarityPair> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
-			return root != null 
-				? MarkupManager.Find(point, point.Context.FileName, root) 
+			return root != null
+				? MarkupManager.Find(point, 
+					new MarkupTargetInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
 				: new List<NodeSimilarityPair>();
 		}
 
@@ -137,21 +144,25 @@ namespace Land.Control
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
-			var documentName = Editor.GetActiveDocumentName();
-			var root = LogFunction(() => GetRoot(documentName), true, false);
+			var fileName = Editor.GetActiveDocumentName();
+			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
-			if (root != null)
+			if (rootTextPair != null)
 			{
 				var offset = Editor.GetActiveDocumentOffset();
 
-				if (!String.IsNullOrEmpty(documentName))
+				if (!String.IsNullOrEmpty(fileName))
 				{
-					State.PendingCommandTarget = State.SelectedItem;
-					State.PendingCommandDocument = documentName;
-					State.PendingCommand = LandExplorerCommand.AddPoint;
+					State.PendingCommand = new PendingCommandInfo()
+					{
+						Target = State.SelectedItem,
+						DocumentName = fileName,
+						Command = LandExplorerCommand.AddPoint,
+						DocumentText = rootTextPair.Item2
+					};
 
 					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(root, offset.Value);
+						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
 				}
 			}
 		}
@@ -159,10 +170,15 @@ namespace Land.Control
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
 			var fileName = Editor.GetActiveDocumentName();
-			var root = LogFunction(() => GetRoot(fileName), true, false);
+			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
-			if (root != null)
-				MarkupManager.AddLand(fileName, root);
+			if (rootTextPair != null)
+				MarkupManager.AddLand(new MarkupTargetInfo()
+				{			
+					FileName = fileName,
+					FileText = rootTextPair.Item2,
+					TargetNode = rootTextPair.Item1
+				});
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -217,21 +233,25 @@ namespace Land.Control
 
 		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
 		{
-			var documentName = Editor.GetActiveDocumentName();
-			var root = LogFunction(() => GetRoot(documentName), true, false);
+			var fileName = Editor.GetActiveDocumentName();
+			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
-			if (root != null)
+			if (rootTextPair != null)
 			{
 				var offset = Editor.GetActiveDocumentOffset();
 
-				if (!String.IsNullOrEmpty(documentName))
+				if (!String.IsNullOrEmpty(fileName))
 				{
-					State.PendingCommandTarget = State.SelectedItem;
-					State.PendingCommandDocument = documentName;
-					State.PendingCommand = LandExplorerCommand.Relink;
+					State.PendingCommand = new PendingCommandInfo()
+					{
+						Target = State.SelectedItem,
+						DocumentName = fileName,
+						Command = LandExplorerCommand.Relink,
+						DocumentText = rootTextPair.Item2
+					};
 
 					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(root, offset.Value);
+						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
 				}
 			}
 		}
@@ -276,7 +296,10 @@ namespace Land.Control
 				{
 					concernsAndColors[concern] = Editor.SetSegments(GetSegments(concern, true));
 
-					var label = GetMarkupTreeItemLabel(MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, "ConcernIcon");
+					var label = GetMarkupTreeItemLabel(
+						MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, 
+						"ConcernIcon"
+					);
 					if (label != null)
 						label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
 				}
@@ -327,7 +350,7 @@ namespace Land.Control
 			LogAction(() =>
 			{
 				var referenced = MarkupManager.GetReferencedFiles();
-				var forest = new Dictionary<string, Node>();
+				var forest = new Dictionary<string, Tuple<Node, string>>();
 
 				foreach (var documentName in referenced)
 					forest[documentName] = TryParse(documentName, out bool success);
@@ -340,29 +363,34 @@ namespace Land.Control
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
-				if (State.PendingCommand == LandExplorerCommand.Relink)
+				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
 				{
 					MarkupManager.RelinkConcernPoint(
 						(ConcernPoint)State.SelectedItem.DataContext,
-						State.PendingCommandDocument,
-						(Node)ConcernPointCandidatesList.SelectedItem
+						new MarkupTargetInfo()
+						{
+							FileName = State.PendingCommand.DocumentName,
+							FileText = State.PendingCommand.DocumentText,
+							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
+						}
 					);
 				}
 				else
 				{
 					MarkupManager.AddConcernPoint(
-						State.PendingCommandDocument,
-						(Node)ConcernPointCandidatesList.SelectedItem,
+						new MarkupTargetInfo()
+						{
+							FileName = State.PendingCommand.DocumentName,
+							FileText = State.PendingCommand.DocumentText,
+							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
+						},
 						null,
-						State.PendingCommandTarget != null 
-							? (Concern)State.PendingCommandTarget.DataContext : null
+						State.PendingCommand.Target != null 
+							? (Concern)State.PendingCommand.Target.DataContext : null
 					);
 
-					if (State.PendingCommandTarget != null)
-					{
-						State.PendingCommandTarget.IsExpanded = true;
-						State.PendingCommandTarget = null;
-					}
+					if (State.PendingCommand.Target != null)
+						State.PendingCommand.Target.IsExpanded = true;
 				}
 
 				ConcernPointCandidatesList.ItemsSource = null;
@@ -376,7 +404,7 @@ namespace Land.Control
 				var node = (Node)ConcernPointCandidatesList.SelectedItem;
 
 				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommandDocument, 
+					State.PendingCommand.DocumentName, 
 					node.Anchor.Start
 				);
 			}
@@ -396,17 +424,21 @@ namespace Land.Control
 				/// При клике по точке переходим к ней
 				if (item.DataContext is ConcernPoint concernPoint)
 				{
-					if(!AstRoots.ContainsKey(concernPoint.Context.FileName) 
-						|| AstRoots[concernPoint.Context.FileName] == null)
+					if(!ParsedFiles.ContainsKey(concernPoint.Context.FileName) 
+						|| ParsedFiles[concernPoint.Context.FileName] == null)
 					{
-						AstRoots[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
+						ParsedFiles[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
 
-						if (AstRoots[concernPoint.Context.FileName] != null)
+						if (ParsedFiles[concernPoint.Context.FileName] != null)
 						{
 							MarkupManager.Remap(
-								concernPoint, 
-								concernPoint.Context.FileName, 
-								AstRoots[concernPoint.Context.FileName]
+								concernPoint,
+								new MarkupTargetInfo()
+								{
+									FileName = concernPoint.Context.FileName,
+									FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
+									TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
+								}
 							);
 						}
 					}
@@ -820,23 +852,23 @@ namespace Land.Control
 
 		private void DocumentChangedHandler(string fileName)
 		{
-			if (AstRoots.ContainsKey(fileName))
+			if (ParsedFiles.ContainsKey(fileName))
 			{
-				AstRoots.Remove(fileName);
+				ParsedFiles.Remove(fileName);
 				MarkupManager.InvalidatePoints(fileName);
 			}
 		}
 
-		private Node GetRoot(string documentName)
+		private Tuple<Node, string> GetRoot(string documentName)
 		{
 			return !String.IsNullOrEmpty(documentName)
-				? AstRoots.ContainsKey(documentName) && AstRoots[documentName] != null
-					? AstRoots[documentName]
+				? ParsedFiles.ContainsKey(documentName) && ParsedFiles[documentName] != null
+					? ParsedFiles[documentName]
 					: TryParse(documentName, out bool success)
 				: null;
 		}
 
-		private Node TryParse(string fileName, out bool success, string text = null)
+		private Tuple<Node, string> TryParse(string fileName, out bool success, string text = null)
 		{
 			if (!String.IsNullOrEmpty(fileName))
 			{
@@ -848,17 +880,12 @@ namespace Land.Control
 						text = GetText(fileName);
 
 					var root = Parsers[extension].Parse(text);
-					success = Parsers[extension].Log.All(l => l.Type != MessageType.Error && l.Type != MessageType.Warning);
-
-					if (success)
-					{
-						AstRoots[fileName] = root;
-					}
+					success = Parsers[extension].Log.All(l => l.Type != MessageType.Error);
 
 					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
 					Log.AddRange(Parsers[extension].Log);
 
-					return root;
+					return success ? new Tuple<Node, string>(root, text) : null;
 				}
 				else
 				{
@@ -1003,7 +1030,19 @@ namespace Land.Control
 						if (element is ConcernPoint cp)
 						{
 							if (cp.Location == null)
-								MarkupManager.Remap(cp, cp.Context.FileName, GetRoot(cp.Context.FileName));
+							{
+								var rootTextPair = GetRoot(cp.Context.FileName);
+
+								if (rootTextPair != null)
+								{
+									MarkupManager.Remap(cp, new MarkupTargetInfo()
+									{
+										FileName = cp.Context.FileName,
+										FileText = rootTextPair.Item2,
+										TargetNode = rootTextPair.Item1
+									});
+								}
+							}
 
 							if (cp.Location != null)
 							{

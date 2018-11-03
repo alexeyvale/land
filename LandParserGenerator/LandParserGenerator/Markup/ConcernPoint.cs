@@ -16,42 +16,49 @@ namespace Land.Core.Markup
 
 		public SegmentLocation Location { get; set; }
 
-		public ConcernPoint(string fileName, Node node, Concern parent = null)
+		public ConcernPoint(MarkupTargetInfo targetInfo, Concern parent = null)
 		{
-			Context = PointContext.Create(fileName, node);
+			Context = PointContext.Create(targetInfo);
 
-			Location = node.Anchor;
+			Location = targetInfo.TargetNode.Anchor;
 			Parent = parent;
-			Name = String.IsNullOrEmpty(node.Alias) ? node.Symbol : node.Alias;
+			Name = targetInfo.TargetNode.Type;
 
-			if (node.Value.Count > 0)
-				Name += ": " + String.Join(" ", node.Value);
+			if (targetInfo.TargetNode.Value.Count > 0)
+				Name += ": " + String.Join(" ", targetInfo.TargetNode.Value);
 			else
 			{
-				if (node.Children.Count > 0)
+				if (targetInfo.TargetNode.Children.Count > 0)
 				{
-					Name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+					Name += ": " + String.Join(" ", targetInfo.TargetNode.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
 		}
 
-		public ConcernPoint(string name, string fileName, Node node, Concern parent = null)
+		public ConcernPoint(string name, MarkupTargetInfo targetInfo, Concern parent = null)
 		{
 			Name = name;
-			Context = PointContext.Create(fileName, node);
+			Context = PointContext.Create(targetInfo);
 			Parent = parent;
 		}
 
-		public void Relink(string fileName, Node node)
+		public void Relink(MarkupTargetInfo targetInfo)
 		{
-			Location = node.Anchor;
-			Context = PointContext.Create(fileName, node);
+			Location = targetInfo.TargetNode.Anchor;
+			Context = PointContext.Create(targetInfo);
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);
 		}
+	}
+
+	public class MarkupTargetInfo
+	{
+		public string FileName { get; set; }
+		public string FileText { get; set; }
+		public Node TargetNode { get; set; }
 	}
 }

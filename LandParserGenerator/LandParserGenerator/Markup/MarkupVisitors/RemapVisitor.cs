@@ -10,20 +10,23 @@ namespace Land.Core.Markup
 	{
 		private const double MIN_SIMILARITY = 0.4;
 
-		private string FileName { get; set; }
-		private Node TreeRoot { get; set; }
+		private MarkupTargetInfo TargetInfo { get; set; }
 
-		public RemapVisitor(string fileName, Node root)
+		public RemapVisitor(string fileName, Tuple<Node, string> parsed)
 		{
-			FileName = fileName;
-			TreeRoot = root;
+			TargetInfo = new MarkupTargetInfo()
+			{
+				FileName = fileName,
+				FileText = parsed.Item2,
+				TargetNode = parsed.Item1
+			};
 		}
 
 		public override void Visit(ConcernPoint point)
 		{
-			if(point.Context.FileName == FileName)
+			if(point.Context.FileName == TargetInfo.FileText)
 			{
-				var candidate = ContextFinder.Find(point.Context, FileName, TreeRoot).FirstOrDefault();
+				var candidate = ContextFinder.Find(point.Context, TargetInfo).FirstOrDefault();
 
 				if (candidate != null && candidate.Similarity > MIN_SIMILARITY)
 				{

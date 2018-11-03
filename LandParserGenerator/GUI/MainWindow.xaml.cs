@@ -975,7 +975,7 @@ namespace Land.GUI
 			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
-				var similarities = LandExplorer.GetMappingCandidates(point, NewTreeRoot).ToDictionary(e=>e.Node, e=>e.Similarity);
+				var similarities = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot).ToDictionary(e=>e.Node, e=>e.Similarity);
 				MappingDebug_SimilaritiesList.ItemsSource = similarities;
 
 				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);

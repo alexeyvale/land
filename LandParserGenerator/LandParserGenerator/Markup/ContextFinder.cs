@@ -12,7 +12,7 @@ namespace Land.Core.Markup
 	{
 		private const double HeaderContextWeight = 1;
 		private const double AncestorsContextWeight = 0.5;
-		private const double InnerContextWeight = 0.7;
+		private const double InnerContextWeight = 0.6;
 		private const double SiblingsContextWeight = 0.4;
 
 		public Node Node { get; set; }
@@ -25,10 +25,9 @@ namespace Land.Core.Markup
 
 		public double Similarity => 
 			((HeaderSimilarity ?? 1) * HeaderContextWeight 
-			+ (AncestorSimilarity ?? 1) * AncestorsContextWeight)
-			//+ (InnerSimilarity ?? 1) * InnerContextWeight
-			//+ (SiblingsSimilarity ?? 1) * SiblingsContextWeight)
-			/ (HeaderContextWeight + AncestorsContextWeight /*+ InnerContextWeight + SiblingsContextWeight*/);
+			+ (AncestorSimilarity ?? 1) * AncestorsContextWeight
+			+ (InnerSimilarity ?? 1) * InnerContextWeight)
+			/ (HeaderContextWeight + AncestorsContextWeight + InnerContextWeight);
 	}
 
 	public static class ContextFinder
@@ -44,24 +43,29 @@ namespace Land.Core.Markup
 		/// <param name="context"></param>
 		/// <param name="tree"></param>
 		/// <returns>Список кандидатов, отсортированных по степени похожести</returns>
-		public static List<NodeSimilarityPair> Find(PointContext context, string fileName, Node tree, bool fullComparison = false)
+		public static List<NodeSimilarityPair> Find(
+			PointContext context,
+			MarkupTargetInfo targetInfo,
+			bool fullComparison = false
+		)
 		{
 			var candidates = new List<NodeSimilarityPair>();
 			var groupVisitor = new GroupNodesByTypeVisitor(context.NodeType);
 
-			tree.Accept(groupVisitor);
+			targetInfo.TargetNode.Accept(groupVisitor);
 
 			if (groupVisitor.Grouped.ContainsKey(context.NodeType))
 			{
-				candidates = groupVisitor.Grouped[context.NodeType].Select(node => new NodeSimilarityPair()
-				{
-					Node = node,
-					Context = new PointContext()
+				candidates = groupVisitor.Grouped[context.NodeType].Select(node =>
+					new NodeSimilarityPair()
 					{
-						FileName = fileName,
-						NodeType = node.Type
-					}
-				}).ToList();
+						Node = node,
+						Context = new PointContext()
+						{
+							FileName = targetInfo.FileName,
+							NodeType = node.Type
+						}
+					}).ToList();
 
 				foreach (var candidate in candidates)
 				{
@@ -77,7 +81,9 @@ namespace Land.Core.Markup
 
 				foreach (var candidate in candidates)
 				{
-					PointContext.ComplementContexts(candidate.Context, candidate.Node);
+					targetInfo.TargetNode = candidate.Node;
+					candidate.Context.InnerContext = PointContext.GetInnerContext(targetInfo);
+					candidate.InnerSimilarity = Levenshtein(context.InnerContext, candidate.Context.InnerContext);
 				}
 			}
 
@@ -153,7 +159,7 @@ namespace Land.Core.Markup
 				var similarities = new Dictionary<InnerContextElement, double>();
 
 				foreach (var candidateChild in candidateInnerContext[child.Type])
-					similarities[candidateChild] = Similarity(child.HeaderContext, candidateChild.HeaderContext);
+					similarities[candidateChild] = FuzzyHashing.CompareHashes(child.Hash, candidateChild.Hash);
 
 				var bestCandidate = similarities.OrderByDescending(s => s.Value).FirstOrDefault();
 
@@ -182,11 +188,11 @@ namespace Land.Core.Markup
 
 			var denominator = 0.0;
 
-			if (a is IEnumerable<HeaderContextElement>)
+			if (a is IEnumerable<TypedPrioritizedContextElement>)
 			{
-				var aSockets = (a as IEnumerable<HeaderContextElement>).Select(e => new Socket(e))
+				var aSockets = (a as IEnumerable<TypedPrioritizedContextElement>).Select(e => new Socket(e))
 					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
-				var bSockets = (b as IEnumerable<HeaderContextElement>).Select(e => new Socket(e))
+				var bSockets = (b as IEnumerable<TypedPrioritizedContextElement>).Select(e => new Socket(e))
 					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
 
 				denominator += aSockets.Sum(kvp => kvp.Key.Priority * kvp.Value);
@@ -264,32 +270,36 @@ namespace Land.Core.Markup
 			else if (a is string)
 				return Levenshtein((IEnumerable<char>)a, (IEnumerable<char>)b);
 			else if (a is HeaderContextElement)
-			{
-				var aContext = a as HeaderContextElement;
-				var bContext = b as HeaderContextElement;
-
-				if (aContext.EqualsIgnoreValue(bContext))
-				{
-					return aContext.ExactMatch 
-						? String.Join("", aContext.Value) == String.Join("", bContext.Value) ? 1 : 0
-						: Levenshtein(String.Join("", aContext.Value), String.Join("", bContext.Value));
-				}
-				else
-					return 0;
-			}
+				return EvalSimilarity(a as HeaderContextElement, b as HeaderContextElement);
+			else if(a is InnerContextElement)
+				return EvalSimilarity(a as InnerContextElement, b as InnerContextElement);
 			else if (a is AncestorsContextElement)
-			{
-				var aContext = a as AncestorsContextElement;
-				var bContext = b as AncestorsContextElement;
+				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
+			else
+				return a.Equals(b) ? 1 : 1 - SubstitutionCost;
+		}
 
-				if (aContext.Type == bContext.Type)
-				{
-					return Levenshtein(aContext.HeaderContext, bContext.HeaderContext);
-				}
-				else
-					return 0;
+		private static double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
+		{
+			if (a.EqualsIgnoreValue(b))
+			{
+				return a.ExactMatch
+					? String.Join("", a.Value) == String.Join("", b.Value) ? 1 : 0
+					: Levenshtein(String.Join("", a.Value), String.Join("", b.Value));
 			}
-			else return a.Equals(b) ? 1 : 1 - SubstitutionCost;
+			else
+				return 0;
+		}
+
+		private static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
+		{
+			return FuzzyHashing.CompareHashes(a.Hash, b.Hash) / 100.0;
+			//return Levenshtein(Encoding.ASCII.GetString(a.Hash), Encoding.ASCII.GetString(b.Hash));
+		}
+
+		private static double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
+		{
+			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
 		}
 	}
 }

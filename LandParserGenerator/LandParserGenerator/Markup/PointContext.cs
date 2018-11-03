@@ -10,16 +10,20 @@ using Land.Core.Parsing.Tree;
 namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
-	public class HeaderContextElement
+	public abstract class TypedPrioritizedContextElement
 	{
 		[DataMember]
 		public double Priority { get; set; }
 
 		[DataMember]
-		public bool ExactMatch { get; set; }
-
-		[DataMember]
 		public string Type { get; set; }
+	}
+
+	[DataContract(IsReference = true)]
+	public class HeaderContextElement: TypedPrioritizedContextElement
+	{
+		[DataMember]
+		public bool ExactMatch { get; set; }
 
 		[DataMember]
 		public List<string> Value { get; set; }
@@ -78,24 +82,19 @@ namespace Land.Core.Markup
 	}
 
 	[DataContract(IsReference = true)]
-	public class InnerContextElement
+	public class InnerContextElement: TypedPrioritizedContextElement
 	{
 		[DataMember]
-		public double Priority { get; set; }
+		public byte[] Hash { get; set; }
 
-		[DataMember]
-		public string Type { get; set; }
-
-		public List<HeaderContextElement> HeaderContext { get; set; }
-
-		public static explicit operator InnerContextElement(Node node)
+		public InnerContextElement(Node node, string fileText)
 		{
-			return new InnerContextElement()
-			{
-				Type = node.Type,
-				HeaderContext = PointContext.GetHeaderContext(node),
-				Priority = node.Options.Priority.Value
-			};
+			Type = node.Type;
+			Priority = node.Options.Priority.Value;
+
+			Hash = FuzzyHashing.GetFuzzyHash(
+				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value)
+			);
 		}
 	}
 
@@ -219,11 +218,11 @@ namespace Land.Core.Markup
 			return context;
 		}
 
-		public static List<InnerContextElement> GetInnerContext(Node node)
+		public static List<InnerContextElement> GetInnerContext(MarkupTargetInfo info)
 		{
-			return node.Children
+			return info.TargetNode.Children
 					.Where(c => c.Children.Count > 0)
-					.Select(c => (InnerContextElement)c).ToList();
+					.Select(c => new InnerContextElement(c, info.FileText)).ToList();
 		}
 
 		public static List<SiblingsContextElement> GetSiblingsContext(Node node)
@@ -233,32 +232,17 @@ namespace Land.Core.Markup
 				: new List<SiblingsContextElement>();
 		}
 
-		public static PointContext Create(string fileName, Node node)
+		public static PointContext Create(MarkupTargetInfo info)
 		{
 			return new PointContext()
 			{
-				FileName = fileName,
-				NodeType = node.Type,
-				HeaderContext = GetHeaderContext(node),
-				AncestorsContext = GetAncestorsContext(node),
-				InnerContext = GetInnerContext(node),
-				SiblingsContext = GetSiblingsContext(node)
+				FileName = info.FileName,
+				NodeType = info.TargetNode.Type,
+				HeaderContext = GetHeaderContext(info.TargetNode),
+				AncestorsContext = GetAncestorsContext(info.TargetNode),
+				InnerContext = GetInnerContext(info),
+				SiblingsContext = GetSiblingsContext(info.TargetNode)
 			};
-		}
-
-		public static void ComplementContexts(PointContext context, Node node)
-		{
-			if (context.HeaderContext == null)
-				context.HeaderContext = GetHeaderContext(node);
-
-			if (context.AncestorsContext == null)
-				context.AncestorsContext = GetAncestorsContext(node);
-
-			if (context.InnerContext == null)
-				context.InnerContext = GetInnerContext(node);
-
-			if (context.SiblingsContext == null)
-				context.SiblingsContext = GetSiblingsContext(node);
 		}
 	}
 
@@ -267,7 +251,7 @@ namespace Land.Core.Markup
 		public string Type { get; set; }
 		public double Priority { get; set; }
 
-		public Socket(HeaderContextElement context)
+		public Socket(TypedPrioritizedContextElement context)
 		{
 			Type = context.Type;
 			Priority = context.Priority;

@@ -64,9 +64,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(string fileName, Node node, string name = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(MarkupTargetInfo sourceInfo, string name = null, Concern parent = null)
 		{
-			var point = new ConcernPoint(fileName, node, parent);
+			var point = new ConcernPoint(sourceInfo, parent);
 			AddElement(point);
 			return point;
 		}
@@ -74,10 +74,11 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(string fileName, Node root)
+		public void AddLand(MarkupTargetInfo sourceInfo)
 		{
 			var visitor = new LandExplorerVisitor();
-			root.Accept(visitor);
+			/// При добавлении всей суши к разметке, в качестве целевого узла передаётся корень дерева
+			sourceInfo.TargetNode.Accept(visitor);
 
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
@@ -94,7 +95,10 @@ namespace Land.Core.Markup
 					var subconcern = AddConcern(subgroup.Key, concern);
 
 					foreach (var point in subgroup)
-						AddElement(new ConcernPoint(fileName, point, subconcern));
+					{
+						sourceInfo.TargetNode = point;
+						AddElement(new ConcernPoint(sourceInfo, subconcern));
+					}
 				}
 
 				/// Остальные добавляются напрямую к функциональности, соответствующей символу
@@ -102,7 +106,10 @@ namespace Land.Core.Markup
 					.SelectMany(s => s).ToList();
 
 				foreach (var point in points)
-					AddElement(new ConcernPoint(fileName, point, concern));
+				{
+					sourceInfo.TargetNode = point;
+					AddElement(new ConcernPoint(sourceInfo, concern));
+				}
 			}
 		}
 
@@ -132,9 +139,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, string fileName, Node node)
+		public void RelinkConcernPoint(ConcernPoint point, MarkupTargetInfo targetInfo)
 		{
-			point.Relink(fileName, node);
+			point.Relink(targetInfo);
 		}
 
 		/// <summary>
@@ -190,9 +197,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<NodeSimilarityPair> Find(ConcernPoint point, string fileName, Node root)
+		public List<NodeSimilarityPair> Find(ConcernPoint point, MarkupTargetInfo targetInfo)
 		{
-			return ContextFinder.Find(point.Context, fileName, root);
+			return ContextFinder.Find(point.Context, targetInfo);
 		}
 
 		/// <summary>
@@ -211,9 +218,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public void Remap(ConcernPoint point, string fileName, Node root)
+		public void Remap(ConcernPoint point, MarkupTargetInfo targetInfo)
 		{
-			var candidate = Find(point, fileName, root).FirstOrDefault();
+			var candidate = Find(point, targetInfo).FirstOrDefault();
 
 			if(candidate != null)
 			{
@@ -229,7 +236,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Перепривязка разметки
 		/// </summary>
-		public void Remap(Dictionary<string, Node> roots)
+		public void Remap(Dictionary<string, Tuple<Node, string>> parsed)
 		{
 			var groupVisitor = new GroupPointsVisitor();
 
@@ -238,9 +245,9 @@ namespace Land.Core.Markup
 
 			foreach (var group in groupVisitor.Points)
 			{
-				if (roots.ContainsKey(group.Key) && roots[group.Key] != null)
+				if (parsed.ContainsKey(group.Key) && parsed[group.Key] != null)
 				{
-					var visitor = new RemapVisitor(group.Key, roots[group.Key]);
+					var visitor = new RemapVisitor(group.Key, parsed[group.Key]);
 
 					foreach (var elem in Markup)
 						elem.Accept(visitor);
