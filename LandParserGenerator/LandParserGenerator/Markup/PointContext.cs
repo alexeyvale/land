@@ -96,6 +96,17 @@ namespace Land.Core.Markup
 				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value)
 			);
 		}
+
+		public bool EqualsIgnoreValue(object obj)
+		{
+			if (obj is InnerContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Priority == elem.Priority
+					&& Type == elem.Type;
+			}
+
+			return false;
+		}
 	}
 
 	[DataContract(IsReference = true)]
