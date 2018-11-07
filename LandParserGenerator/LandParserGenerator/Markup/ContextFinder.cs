@@ -293,8 +293,12 @@ namespace Land.Core.Markup
 
 		private static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
 		{
-			return FuzzyHashing.CompareHashes(a.Hash, b.Hash) / 100.0;
-			//return Levenshtein(Encoding.ASCII.GetString(a.Hash), Encoding.ASCII.GetString(b.Hash));
+			if (a.EqualsIgnoreValue(b))
+			{
+				return FuzzyHashing.CompareHashes(a.Hash, b.Hash);
+			}
+			else
+				return 0;
 		}
 
 		private static double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
