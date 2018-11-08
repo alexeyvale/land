@@ -84,17 +84,36 @@ namespace Land.Core.Markup
 	[DataContract(IsReference = true)]
 	public class InnerContextElement: TypedPrioritizedContextElement
 	{
+		public const int MAX_TEXT_LENGTH = 200;
+
 		[DataMember]
 		public byte[] Hash { get; set; }
+
+		[DataMember]
+		public int TextLength { get; set; }
+
+		[DataMember]
+		public string Text { get; set; }
 
 		public InnerContextElement(Node node, string fileText)
 		{
 			Type = node.Type;
 			Priority = node.Options.Priority.Value;
 
-			Hash = FuzzyHashing.GetFuzzyHash(
-				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value)
+			/// Удаляем из текста все пробельные символы
+			var text = System.Text.RegularExpressions.Regex.Replace(
+				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value), "[\n\r\f ]", ""
 			);
+
+			TextLength = text.Length;
+
+			/// Хэш от строки можем посчитать, только если длина строки
+			/// больше заданной константы
+			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+				Hash = FuzzyHashing.GetFuzzyHash(text);
+
+			if (text.Length <= MAX_TEXT_LENGTH)
+				Text = text;
 		}
 
 		public bool EqualsIgnoreValue(object obj)
