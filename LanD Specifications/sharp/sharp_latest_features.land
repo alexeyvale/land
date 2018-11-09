@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'partial'|'unsafe'|'readonly'|'abstract'|'volatile'
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -25,7 +25,7 @@ opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity =
-		entity_attribute* (MODIFIER|'extern'|'async')*
+		entity_attribute* (MODIFIER|'extern'|'async'|'partial')*
 		(
 		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
@@ -40,7 +40,7 @@ entity =
 init_expression		=	'=>' (Any | %ghost type)+
 init_value			=	'=' (Any | %ghost type)+
 
-name_atom	=	('async'|ID) type_parameters?
+name_atom	=	('async'|'partial'|ID) type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 

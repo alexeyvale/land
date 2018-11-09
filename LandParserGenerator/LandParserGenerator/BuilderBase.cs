@@ -43,7 +43,7 @@ namespace Land.Core
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 
-			grammarOutput.WriteLine(@"WS: [ \n\r\t] -> skip ;");
+			grammarOutput.WriteLine(@"WS: [ \n\r\t\u00A0] -> skip ;");
 
 			if (grammar.Options.IsSet(ParsingOption.IGNOREUNDEFINED))
 				grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
