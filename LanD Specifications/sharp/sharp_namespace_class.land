@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'public'|'private'|'protected'|'internal'|'static'|'new'|'sealed'|'partial'|'unsafe'|'abstract'|'readonly'
+MODIFIER	: 'ref'|'public'|'private'|'protected'|'internal'|'static'|'new'|'sealed'|'partial'|'unsafe'|'abstract'|'readonly'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
