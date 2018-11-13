@@ -28,7 +28,7 @@ namespace Land.Core.Parsing.LR
 			/// Готовим лексер
 			LexingStream = new TokenStream(Lexer, text);
 			/// Читаем первую лексему из входного потока
-			var token = LexingStream.NextToken();
+			var token = LexingStream.GetNextToken();
 			/// Создаём стек
 			Stack = new ParsingStack(LexingStream);
 			Stack.Push(0);
@@ -39,7 +39,7 @@ namespace Land.Core.Parsing.LR
 
 				if(enableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
+						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Location.Start
 					));
 
@@ -79,7 +79,7 @@ namespace Land.Core.Parsing.LR
 							));
 						}
 
-						token = LexingStream.NextToken();
+						token = LexingStream.GetNextToken();
 					}
 					/// Если нужно произвести свёртку
 					else if (action is ReduceAction reduce)
@@ -120,7 +120,7 @@ namespace Land.Core.Parsing.LR
 				{
 					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
-						$"Неожиданный символ {GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+						$"Неожиданный символ {this.GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						token.Location.Start
 					);
 
@@ -142,7 +142,7 @@ namespace Land.Core.Parsing.LR
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
 					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
-						token = LexingStream.NextToken();
+						token = LexingStream.GetNextToken();
 					}
 					else
 					{
@@ -221,7 +221,7 @@ namespace Land.Core.Parsing.LR
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				endLocation = token.Location.End;
-				token = LexingStream.NextToken();
+				token = LexingStream.GetNextToken();
 			}
 
 			if(endLocation != null)

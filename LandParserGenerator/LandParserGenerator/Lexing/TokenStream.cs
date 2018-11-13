@@ -8,7 +8,7 @@ namespace Land.Core.Lexing
 {
 	public class TokenStream
 	{
-		private ILexer Lexer { get; set; }
+		protected ILexer Lexer { get; set; }
 
 		private List<IToken> Tokens { get; set; } = new List<IToken>();
 
@@ -22,7 +22,7 @@ namespace Land.Core.Lexing
 		/// Переход к следующему токену потока
 		/// </summary>
 		/// <returns></returns>
-		public IToken NextToken()
+		public virtual IToken GetNextToken()
 		{
 			/// Если токен с нужным индексом ещё не считан
 			/// и последний считанный токен - не признак конца файла

@@ -15,12 +15,8 @@ namespace Land.Core.Parsing.LL
 
 		private TableLL1 Table { get; set; }
 		private Stack<Node> Stack { get; set; }
-		private TokenStream LexingStream { get; set; }
+		private PairAwareTokenStream LexingStream { get; set; }
 
-		/// <summary>
-		/// Стек открытых на момент прочтения последнего токена пар
-		/// </summary>
-		private Stack<PairSymbol> Nesting { get; set; }
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
 		/// на котором начался разбор нетерминала
@@ -47,12 +43,11 @@ namespace Land.Core.Parsing.LL
 		protected override Node ParsingAlgorithm(string text, bool enableTracing)
 		{
 			/// Контроль вложенностей пар
-			Nesting = new Stack<PairSymbol>();
 			NestingLevel = new Dictionary<Node, int>();
 			PositionsWhereRecoveryStarted = new HashSet<int>();
 
 			/// Готовим лексер и стеки
-			LexingStream = new TokenStream(Lexer, text);
+			LexingStream = new PairAwareTokenStream(GrammarObject, Lexer, text, Log);
 			Stack = new Stack<Node>();
 			/// Кладём на стек стартовый символ
 			var root = NodeGenerator.Generate(GrammarObject.StartSymbol);
@@ -60,7 +55,7 @@ namespace Land.Core.Parsing.LL
 			Stack.Push(root);
 
 			/// Читаем первую лексему из входного потока
-			var token = GetNextToken();
+			var token = LexingStream.GetNextToken();
 
 			/// Пока не прошли полностью правило для стартового символа
 			while (Stack.Count > 0)
@@ -73,7 +68,7 @@ namespace Land.Core.Parsing.LL
 				if (enableTracing)
 				{
 					Log.Add(Message.Trace(
-						$"Текущий токен: {GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
+						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
 						LexingStream.CurrentToken.Location.Start
 					));
 				}
@@ -95,7 +90,7 @@ namespace Land.Core.Parsing.LL
 						node.SetAnchor(token.Location.Start, token.Location.End);
 						node.SetValue(token.Text);
 
-						token = GetNextToken();
+						token = LexingStream.GetNextToken();
 					}
 
 					continue;
@@ -125,7 +120,7 @@ namespace Land.Core.Parsing.LL
 						if (!String.IsNullOrEmpty(alternativeToApply.Alias))
 							stackTop.Alias = alternativeToApply.Alias;
 
-						NestingLevel[stackTop] = Nesting.Count;
+						NestingLevel[stackTop] = LexingStream.GetPairsCount();
 
 						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
 						{
@@ -145,8 +140,8 @@ namespace Land.Core.Parsing.LL
 				{
 					Log.Add(Message.Warning(
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
-							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
-							$"Неожиданный символ {GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
+							$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
+							$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
 						LexingStream.CurrentToken.Location.Start
 					));
 
@@ -159,7 +154,7 @@ namespace Land.Core.Parsing.LL
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
 					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
-						token = GetNextToken();
+						token = LexingStream.GetNextToken();
 					}
 					else
 					{
@@ -171,85 +166,6 @@ namespace Land.Core.Parsing.LL
 			TreePostProcessing(root);
 
 			return root;
-		}
-
-		private IToken GetNextToken()
-		{
-			if (LexingStream.CurrentToken != null)
-			{
-				var token = LexingStream.CurrentToken;
-
-				/// Предполагается, что токен может быть началом ровно одной пары, или концом ровно одной пары,
-				/// или одновременно началом и концом ровно одной пары
-				var closed = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Right.Contains(token.Name));
-
-				/// Если текущий токен закрывает некоторую конструкцию
-				if (closed.Value != null)
-				{
-					/// и при этом не открывает её же
-					if (!closed.Value.Left.Contains(token.Name))
-					{
-						/// проверяем, есть ли на стеке то, что можно этой конструкцией закрыть
-						if (Nesting.Count == 0)
-						{
-							Log.Add(Message.Error(
-								$"Отсутствует открывающая конструкция для парной закрывающей {GetTokenInfoForMessage(token)}",
-								token.Location.Start
-							));
-
-							return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-						}
-						else if (Nesting.Peek() != closed.Value)
-						{
-							Log.Add(Message.Error(
-								$"Неожиданная закрывающая конструкция {GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", Nesting.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", Nesting.Peek().Left.Select(e => GrammarObject.Userify(e)))}",
-								token.Location.Start
-							));
-
-							return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-						}
-						else
-						{
-							Nesting.Pop();
-						}
-					}
-					/// иначе, если текущий токен одновременно открывающий и закрывающий
-					else
-					{
-						/// и есть что закрыть, закрываем
-						if (Nesting.Count > 0 && Nesting.Peek() == closed.Value)
-							Nesting.Pop();
-						else
-							Nesting.Push(closed.Value);
-					}
-				}
-				else
-				{
-					var opened = GrammarObject.Pairs.FirstOrDefault(p => p.Value.Left.Contains(token.Name));
-
-					if (opened.Value != null)
-						Nesting.Push(opened.Value);
-				}
-			}
-
-			return LexingStream.NextToken();
-		}
-
-		private IToken GetNextToken(int level, out List<IToken> skipped)
-		{
-			skipped = new List<IToken>();
-
-			while(true)
-			{
-				var next = GetNextToken();
-
-				if (Nesting.Count == level 
-					|| next.Name == Grammar.EOF_TOKEN_NAME 
-					|| next.Name == Grammar.ERROR_TOKEN_NAME)
-					return next;
-				else
-					skipped.Add(next);
-			}
 		}
 
 		private HashSet<string> GetStopTokens(LocalOptions options, IEnumerable<string> followSequence)
@@ -289,10 +205,11 @@ namespace Land.Core.Parsing.LL
 		/// </returns>
 		private IToken SkipAny(Node anyNode, bool enableRecovery)
 		{
-			var nestingCopy = new Stack<PairSymbol>(Nesting.Reverse());
+			var nestingCopy = LexingStream.GetPairsState();
 			var tokenIndex = LexingStream.CurrentIndex;
 			var token = LexingStream.CurrentToken;
-			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n=>n.Symbol));	
+			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n=>n.Symbol));
+			var ignorePairs = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs);
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
@@ -304,9 +221,10 @@ namespace Land.Core.Parsing.LL
 
 				/// Смещение для участка, подобранного как текст
 				var endLocation = token.Location.End;
-				var anyLevel = Nesting.Count;
+				var anyLevel = LexingStream.GetPairsCount();
 
 				while (!stopTokens.Contains(token.Name)
+					&& (ignorePairs || LexingStream.CurrentTokenDirection != Direction.Up)
 					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 					&& token.Name != Grammar.EOF_TOKEN_NAME
 					&& token.Name != Grammar.ERROR_TOKEN_NAME)
@@ -314,13 +232,13 @@ namespace Land.Core.Parsing.LL
 					anyNode.Value.Add(token.Text);
 					endLocation = token.Location.End;
 
-					if (anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs))
+					if (ignorePairs)
 					{
-						token = GetNextToken();
+						token = LexingStream.GetNextToken();
 					}
 					else
 					{
-						token = GetNextToken(anyLevel, out List<IToken> skippedBuffer);
+						token = LexingStream.GetNextToken(anyLevel, out List<IToken> skippedBuffer);
 
 						/// Если при пропуске до токена на том же уровне
 						/// пропустили токены с более глубокой вложенностью
@@ -337,9 +255,7 @@ namespace Land.Core.Parsing.LL
 				if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					return token;
 
-				/// Если дошли до конца входной строки, и это было не по плану
-				if (token.Name == Grammar.EOF_TOKEN_NAME && !stopTokens.Contains(token.Name)
-					|| anyNode.Options.Contains(AnyOption.Avoid, token.Name))
+				if (!stopTokens.Contains(token.Name))
 				{
 					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t))) }",
@@ -351,8 +267,7 @@ namespace Land.Core.Parsing.LL
 						message.Type = MessageType.Warning;
 						Log.Add(message);
 
-						Nesting = nestingCopy;
-						LexingStream.MoveTo(tokenIndex);
+						LexingStream.MoveTo(tokenIndex, nestingCopy);
 						anyNode.Reset();
 						///	Возвращаем узел обратно на стек
 						Stack.Push(anyNode);
@@ -386,7 +301,7 @@ namespace Land.Core.Parsing.LL
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(
-					$"Возобновление разбора невозможно: восстановление в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -394,7 +309,7 @@ namespace Land.Core.Parsing.LL
 			}
 
 			Log.Add(Message.Warning(
-				$"Процесс восстановления запущен в позиции токена {GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
 
@@ -426,13 +341,13 @@ namespace Land.Core.Parsing.LL
 			{
 				List<IToken> skippedBuffer;
 
-				if (Nesting.Count != NestingLevel[currentNode])
+				if (LexingStream.GetPairsCount() != NestingLevel[currentNode])
 				{
 					/// Запоминаем токен, на котором произошла ошибка
 					var errorToken = LexingStream.CurrentToken;
 					/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
 					/// на котором раскрывали нетерминал
-					GetNextToken(NestingLevel[currentNode], out skippedBuffer);
+					LexingStream.GetNextToken(NestingLevel[currentNode], out skippedBuffer);
 					skippedBuffer.Insert(0, errorToken);
 				}
 				else
@@ -484,7 +399,7 @@ namespace Land.Core.Parsing.LL
 						currentNode.Alias = alternativeToApply.Alias;
 
 					Log.Add(Message.Warning(
-						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {GetTokenInfoForMessage(token)}",
+						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {this.GetTokenInfoForMessage(token)}",
 						token.Location.Start
 					));
 

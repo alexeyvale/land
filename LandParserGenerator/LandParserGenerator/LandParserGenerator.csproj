@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="AntlrTokenAdapter.cs" />
     <Compile Include="BuilderBase.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Grammar\Structures\PairSymbol.cs" />
     <Compile Include="Grammar\Structures\Common\Location.cs" />
     <Compile Include="Grammar\Structures\Common\Message.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Lexing\StubToken.cs" />
     <Compile Include="Lexing\IToken.cs" />
     <Compile Include="Lexing\ILexer.cs" />
+    <Compile Include="Lexing\PairAwareTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsVisitor.cs" />
