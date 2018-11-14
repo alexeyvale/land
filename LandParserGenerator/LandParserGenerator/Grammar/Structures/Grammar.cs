@@ -12,7 +12,7 @@ namespace Land.Core
 
 	public enum GrammarType { LL, LR }
 
-	public enum AnyOption { Include, Except, Avoid, IgnorePairs }
+	public enum AnyOption { Include, Except, Avoid, IgnorePairs, IgnoreTriggers }
 
 	[Serializable]
 	public class Grammar
@@ -408,6 +408,40 @@ namespace Land.Core
 				throw new IncorrectGrammarException(
 					$"Символы '{String.Join("', '", errorSymbols)}' не определены как нетерминальные или псевдонимы"
 				);
+		}
+
+		public void SetOption(RecoveryOption option, params string[] symbols)
+		{
+			ConstructionLog.Add($"grammar.SetOption(RecoveryOption.{option}, new string[]{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }});");
+
+			Options.Set(option, symbols);
+
+			var errorSymbols = CheckIfTerminals(symbols);
+			if (errorSymbols.Count > 0)
+				throw new IncorrectGrammarException(
+					$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
+				);
+		}
+
+		public void SetOption(RecoveryOption option, string[] symbols, params dynamic[] @params)
+		{
+			ConstructionLog.Add($"grammar.SetOption(RecoveryOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param.ToString()))}}} );");
+
+			if (symbols == null || symbols.Length == 0)
+			{
+				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
+				Options.Set(option, symbols, @params);
+			}
+			else
+			{
+				Options.Set(option, symbols, @params);
+
+				var errorSymbols = CheckIfTerminals(symbols);
+				if (errorSymbols.Count > 0)
+					throw new IncorrectGrammarException(
+						$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
+					);
+			}
 		}
 
 		public void SetOption(ParsingOption option, params string[] symbols)

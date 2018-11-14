@@ -145,7 +145,7 @@ namespace Land.Core.Parsing.LL
 						LexingStream.CurrentToken.Location.Start
 					));
 
-					token = ErrorRecovery();
+					token = RecoverOnAny();
 				}
 				/// Если непонятно, что делать с текущим токеном, и он конкретный
 				/// (не Any), заменяем его на Any
@@ -155,6 +155,10 @@ namespace Land.Core.Parsing.LL
 					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.GetNextToken();
+					}
+					else if (IsTrigger(token))
+					{
+						token = RecoverOnTrigger();
 					}
 					else
 					{
@@ -166,6 +170,18 @@ namespace Land.Core.Parsing.LL
 			TreePostProcessing(root);
 
 			return root;
+		}
+
+		private bool IsTrigger(IToken token)
+		{
+			var test1 = GrammarObject.Options.IsSet(RecoveryOption.TRIGGER, token.Name);
+			var test2 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Count == 0;
+			var test4 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name);
+			var test3 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Contains(token.Text);
+
+			return GrammarObject.Options.IsSet(RecoveryOption.TRIGGER, token.Name)
+				&& (GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Count == 0
+				|| GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Contains(token.Text));
 		}
 
 		private HashSet<string> GetStopTokens(LocalOptions options, IEnumerable<string> followSequence)
@@ -210,6 +226,7 @@ namespace Land.Core.Parsing.LL
 			var token = LexingStream.CurrentToken;
 			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n=>n.Symbol));
 			var ignorePairs = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs);
+			var ignoreTriggers = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnoreTriggers);
 
 			/// Если Any непустой (текущий токен - это не токен,
 			/// который может идти после Any)
@@ -225,6 +242,7 @@ namespace Land.Core.Parsing.LL
 
 				while (!stopTokens.Contains(token.Name)
 					&& (ignorePairs || LexingStream.CurrentTokenDirection != Direction.Up)
+					&& (ignoreTriggers || !IsTrigger(token))
 					&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 					&& token.Name != Grammar.EOF_TOKEN_NAME
 					&& token.Name != Grammar.ERROR_TOKEN_NAME)
@@ -267,12 +285,18 @@ namespace Land.Core.Parsing.LL
 						message.Type = MessageType.Warning;
 						Log.Add(message);
 
-						LexingStream.MoveTo(tokenIndex, nestingCopy);
-						anyNode.Reset();
-						///	Возвращаем узел обратно на стек
-						Stack.Push(anyNode);
+						/// Если ошибку спровоцировал триггерный токен
+						if (!ignoreTriggers && IsTrigger(token))
+							return RecoverOnTrigger();
+						else
+						{
+							LexingStream.MoveTo(tokenIndex, nestingCopy);
+							anyNode.Reset();
+							///	Возвращаем узел обратно на стек
+							Stack.Push(anyNode);
 
-						return ErrorRecovery();
+							return RecoverOnAny();
+						}
 					}
 					else
 					{
@@ -286,9 +310,9 @@ namespace Land.Core.Parsing.LL
 			return token;
 		}
 
-		private IToken ErrorRecovery()
+		private IToken RecoverOnAny()
 		{
-			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			if (!GrammarObject.Options.IsSet(RecoveryOption.ANYBASED))
 			{
 				Log.Add(Message.Error(
 					$"Возобновление разбора в случае ошибки отключено",
@@ -420,6 +444,45 @@ namespace Land.Core.Parsing.LL
 			));
 
 			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+		}
+
+		private IToken RecoverOnTrigger()
+		{
+			if (!IsTrigger(LexingStream.CurrentToken))
+			{
+				Log.Add(Message.Error(
+					$"Восстановление разбора запущено на символе, не являющемся триггером",
+					LexingStream.CurrentToken.Location.Start
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
+
+			Log.Add(Message.Warning(
+				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				LexingStream.CurrentToken.Location.Start
+			));
+
+			while (Stack.Count > 0 && !GrammarObject.First(Stack.Peek().Symbol).
+				Contains(LexingStream.CurrentToken.Name))
+			{
+				var node = Stack.Pop();
+				node.IsMissing = true;
+			}
+
+			if (Stack.Count > 0)
+			{
+				return LexingStream.CurrentToken;
+			}
+			else
+			{
+				Log.Add(Message.Error(
+					$"Не удалось продолжить разбор",
+					null
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
 		}
 	}
 }

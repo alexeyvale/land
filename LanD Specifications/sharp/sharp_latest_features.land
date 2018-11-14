@@ -58,10 +58,15 @@ block				=	'{' Any '}'
 %%
 
 %parsing {
-	recovery
 	fragment STRING_INT_CODE
 	start namespace_content
 	skip COMMENT STRING DIRECTIVE
+}
+
+%recovery {
+	anybased
+	trigger('public','private','protected','internal') MODIFIER
+	trigger 'extern'
 }
 
 %nodes {

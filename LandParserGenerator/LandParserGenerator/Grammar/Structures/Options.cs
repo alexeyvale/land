@@ -9,7 +9,7 @@ namespace Land.Core
 	/// <summary>
 	/// Возможные категории опций
 	/// </summary>
-	public enum OptionCategory { PARSING, NODES, MAPPING }
+	public enum OptionCategory { PARSING, NODES, MAPPING, RECOVERY }
 
 	/// <summary>
 	/// Опции, касающиеся построения дерева
@@ -19,7 +19,12 @@ namespace Land.Core
 	/// <summary>
 	/// Опции, касающиеся процесса разбора
 	/// </summary>
-	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, IGNOREUNDEFINED, RECOVERY }
+	public enum ParsingOption { START, SKIP, IGNORECASE, FRAGMENT, IGNOREUNDEFINED }
+
+	/// <summary>
+	/// Опции, касающиеся восстановления от ошибок
+	/// </summary>
+	public enum RecoveryOption { ANYBASED, TRIGGER, INSERT }
 
 	/// <summary>
 	/// Опции, касающиеся отображения старого дерева в новое (изменённое) дерево
@@ -37,6 +42,8 @@ namespace Land.Core
 			new Dictionary<MappingOption, Dictionary<string, List<dynamic>>>();
 		private Dictionary<ParsingOption, Dictionary<string, List<dynamic>>> ParsingOptions { get; set; } = 
 			new Dictionary<ParsingOption, Dictionary<string, List<dynamic>>>();
+		private Dictionary<RecoveryOption, Dictionary<string, List<dynamic>>> RecoveryOptions { get; set; } =
+			new Dictionary<RecoveryOption, Dictionary<string, List<dynamic>>>();
 
 		public void Set(NodeOption opt, params string[] symbols)
 		{
@@ -82,6 +89,28 @@ namespace Land.Core
 			}
 		}
 
+		public void Set(RecoveryOption opt, params string[] symbols)
+		{
+			if (!RecoveryOptions.ContainsKey(opt))
+				RecoveryOptions[opt] = new Dictionary<string, List<dynamic>>();
+			foreach (var smb in symbols)
+			{
+				if (!RecoveryOptions[opt].ContainsKey(smb))
+					RecoveryOptions[opt].Add(smb, null);
+			}
+		}
+
+		public void Set(RecoveryOption opt, string[] symbols, params dynamic[] @params)
+		{
+			if (!RecoveryOptions.ContainsKey(opt))
+				RecoveryOptions[opt] = new Dictionary<string, List<dynamic>>();
+			foreach (var smb in symbols)
+			{
+				if (!RecoveryOptions[opt].ContainsKey(smb))
+					RecoveryOptions[opt].Add(smb, @params.ToList());
+			}
+		}
+
 		public bool IsSet(NodeOption opt, string symbol = null)
 		{
 			return NodeOptions.ContainsKey(opt) && (symbol == null || NodeOptions[opt].ContainsKey(symbol));
@@ -95,6 +124,11 @@ namespace Land.Core
 		public bool IsSet(MappingOption opt, string symbol = null)
 		{
 			return MappingOptions.ContainsKey(opt) && (symbol == null || MappingOptions[opt].ContainsKey(symbol));
+		}
+
+		public bool IsSet(RecoveryOption opt, string symbol = null)
+		{
+			return RecoveryOptions.ContainsKey(opt) && (symbol == null || RecoveryOptions[opt].ContainsKey(symbol));
 		}
 
 		public HashSet<string> GetSymbols(NodeOption opt)
@@ -112,9 +146,19 @@ namespace Land.Core
 			return IsSet(opt) ? new HashSet<string>(MappingOptions[opt].Keys) : new HashSet<string>();
 		}
 
+		public HashSet<string> GetSymbols(RecoveryOption opt)
+		{
+			return IsSet(opt) ? new HashSet<string>(RecoveryOptions[opt].Keys) : new HashSet<string>();
+		}
+
 		public List<dynamic> GetParams(MappingOption opt, string symbol)
 		{
 			return IsSet(opt, symbol) ? MappingOptions[opt][symbol] : new List<dynamic>();
+		}
+
+		public List<dynamic> GetParams(RecoveryOption opt, string symbol)
+		{
+			return IsSet(opt, symbol) ? RecoveryOptions[opt][symbol] : new List<dynamic>();
 		}
 
 		public void Clear(NodeOption opt)
@@ -130,6 +174,11 @@ namespace Land.Core
 		public void Clear(MappingOption opt)
 		{
 			MappingOptions.Remove(opt);
+		}
+
+		public void Clear(RecoveryOption opt)
+		{
+			RecoveryOptions.Remove(opt);
 		}
 	}
 

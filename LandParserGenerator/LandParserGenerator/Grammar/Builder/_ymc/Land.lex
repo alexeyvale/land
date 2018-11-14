@@ -84,11 +84,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 
 // Элементы правила
 
-{STRING} {
-	yylval.strVal = yytext;
-	return (int)Tokens.STRING;
-}
-
 ":" {
 	BEGIN(before_terminal_declaration_body);
 	return (int)Tokens.COLON;
@@ -165,6 +160,13 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	
 	")" return (int)Tokens.RROUND_BRACKET;
 	
+	"," return (int)Tokens.COMMA;
+	
+	{STRING} {
+		yylval.strVal = yytext;
+		return (int)Tokens.STRING;
+	}
+
 	{RNUM} {
 		yylval.doubleVal = double.Parse(yytext, CultureInfo.InvariantCulture);
 		return (int)Tokens.RNUM;

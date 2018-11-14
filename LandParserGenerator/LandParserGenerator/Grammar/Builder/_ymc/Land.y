@@ -59,12 +59,12 @@
 %type <strList> identifiers
 %type <altList> body
 %type <boolVal> prec_nonempty opt_linestart
-%type <argGroupVal> argument_group
-%type <dynamicVal> argument
+%type <argGroupVal> entry_arg_group
+%type <dynamicVal> opt_argument entry_argument
 %type <altVal> alternative
 %type <optDeclVal> option
 
-%type <dynamicList> opt_args args context_opt_args entry_args
+%type <dynamicList> opt_args opt_args_list context_opt_args entry_args entry_args_list
 %type <optionParamsList> context_options
 %type <optionsList> option_or_block options
 
@@ -276,8 +276,41 @@ entry
 	;
 	
 entry_args
-	: ELEM_LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
+	: ELEM_LROUND_BRACKET entry_args_list RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
+	;
+	
+entry_args_list
+	: entry_args_list COMMA entry_argument 
+		{ 
+			$$ = $1; 
+			$$.Add($3); 
+		}
+	| entry_argument { $$ = new List<dynamic>(){ $1 }; }
+	;
+	
+	
+entry_argument
+	: RNUM { $$ = $1; }
+	| STRING 
+		{
+			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
+			ConstructedGrammar.AddAnchor(generated, @1.Start);		
+			$$ = generated;
+		}
+	| ID { $$ = $1; }
+	| entry_arg_group { $$ = $1; }
+	;
+
+entry_arg_group
+	: ID ELEM_LROUND_BRACKET entry_args_list RROUND_BRACKET 
+		{ 
+			$$ = new ArgumentGroup()
+			{
+				Name = $1,
+				Arguments = $3
+			};
+		}
 	;
 	
 context_options
@@ -290,7 +323,7 @@ context_options
 	;
 	
 context_opt_args
-	: OPT_LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
+	: OPT_LROUND_BRACKET opt_args_list RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
 	
@@ -375,6 +408,14 @@ category_block
 								ConstructedGrammar.SetOption(mappingOpt, option.Symbols.ToArray(), option.Arguments.ToArray());
 							}, @1.Start);
 						break;
+					case OptionCategory.RECOVERY:
+						RecoveryOption recoveryOpt;
+						goodOption = Enum.TryParse(option.Name.ToUpper(), out recoveryOpt);
+						if(goodOption)
+							SafeGrammarAction(() => { 			
+								ConstructedGrammar.SetOption(recoveryOpt, option.Symbols.ToArray(), option.Arguments.ToArray());
+							}, @1.Start);
+						break;
 					default:
 						break;
 				}
@@ -414,45 +455,44 @@ option
 	;
 	
 opt_args
-	: LROUND_BRACKET args RROUND_BRACKET { $$ = $2; }
+	: LROUND_BRACKET opt_args_list RROUND_BRACKET { $$ = $2; }
 	| { $$ = new List<dynamic>(); }
 	;
 	
-args
-	: args COMMA argument 
+opt_args_list
+	: opt_args_list COMMA opt_argument 
 		{ 
 			$$ = $1; 
 			$$.Add($3); 
 		}
-	| argument { $$ = new List<dynamic>(){ $1 }; }
+	| opt_argument { $$ = new List<dynamic>(){ $1 }; }
 	;
 	
 	
-argument
+opt_argument
 	: RNUM { $$ = $1; }
-	| STRING 
-		{
-			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
-			ConstructedGrammar.AddAnchor(generated, @1.Start);		
-			$$ = generated;
-		}
+	| STRING { $$ = $1.Trim('\''); }
 	| ID { $$ = $1; }
-	| argument_group { $$ = $1; }
-	;
-
-argument_group
-	: ID ELEM_LROUND_BRACKET args RROUND_BRACKET 
-		{ 
-			$$ = new ArgumentGroup()
-			{
-				Name = $1,
-				Arguments = $3
-			};
-		}
 	;
 
 identifiers
 	: identifiers ID { $$ = $1; $$.Add($2); }
+	| identifiers STRING 
+		{ 
+			$$ = $1; 
+			
+			var token = ConstructedGrammar.Tokens.FirstOrDefault(t=>t.Value.Pattern == $2);
+			if(!String.IsNullOrEmpty(token.Key))
+				$$.Add(token.Key);
+			else
+			{
+				Log.Add(Message.Error(
+						"Литерал " + $2 + " используется в опции, но не является элементом правил грамматики",
+						@2.Start,
+						"LanD"
+					));
+			}			
+		}
 	| { $$ = new List<string>(); }
 	;
 	

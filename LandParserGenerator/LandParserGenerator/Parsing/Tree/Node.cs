@@ -9,6 +9,16 @@ namespace Land.Core.Parsing.Tree
 	public class Node
 	{
 		/// <summary>
+		/// Признак того, что элемент, соответствующий узлу дерева, не найден
+		/// </summary>
+		public bool IsMissing { get; set; }
+
+		/// <summary>
+		/// Признак того, что соответствующая узлу конструкция не разобрана полностью
+		/// </summary>
+		public bool IsIncomplete { get; set; }
+
+		/// <summary>
 		/// Родительский узел
 		/// </summary
 		public Node Parent { get; set; }

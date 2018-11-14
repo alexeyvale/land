@@ -33,8 +33,11 @@ atom		=	ID | '(' condition ')'
 %parsing {
 	skip COMMENT STRING CHAR EOL
 	fragment STRING_INT_CODE
-	recovery
 	ignoreundefined
 	start file
+}
+
+%recovery {
+	anybased
 }
  
