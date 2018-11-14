@@ -174,11 +174,6 @@ namespace Land.Core.Parsing.LL
 
 		private bool IsTrigger(IToken token)
 		{
-			var test1 = GrammarObject.Options.IsSet(RecoveryOption.TRIGGER, token.Name);
-			var test2 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Count == 0;
-			var test4 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name);
-			var test3 = GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Contains(token.Text);
-
 			return GrammarObject.Options.IsSet(RecoveryOption.TRIGGER, token.Name)
 				&& (GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Count == 0
 				|| GrammarObject.Options.GetParams(RecoveryOption.TRIGGER, token.Name).Contains(token.Text));
