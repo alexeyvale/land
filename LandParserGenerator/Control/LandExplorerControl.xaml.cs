@@ -206,7 +206,7 @@ namespace Land.Control
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Serialize(saveFileDialog.FileName);
+				MarkupManager.Serialize(saveFileDialog.FileName, !SettingsObject.SaveAbsolutePath);
 			}
 		}
 

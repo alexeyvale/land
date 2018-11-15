@@ -52,6 +52,9 @@ namespace Land.Control
 	public class LandExplorerSettings
 	{
 		[DataMember]
+		public bool SaveAbsolutePath { get; set; }
+
+		[DataMember]
 		public bool HighlightSelectedElement { get; set; }
 
 		[DataMember]
@@ -62,6 +65,7 @@ namespace Land.Control
 			return new LandExplorerSettings()
 			{
 				HighlightSelectedElement = HighlightSelectedElement,
+				SaveAbsolutePath = SaveAbsolutePath,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};
 		}

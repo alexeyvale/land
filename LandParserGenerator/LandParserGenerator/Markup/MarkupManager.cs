@@ -162,8 +162,23 @@ namespace Land.Core.Markup
 				Markup.Add(elem);
 		}
 
-		public void Serialize(string fileName)
+		public void Serialize(string fileName, bool useRelativePaths)
 		{
+			if (useRelativePaths)
+			{
+				/// Превращаем указанные в точках привязки абсолютные пути в пути относительно файла разметки
+				var directoryUri = new Uri(Path.GetDirectoryName(fileName) + "/");
+				DoWithMarkup((MarkupElement elem) =>
+				{
+					if (elem is ConcernPoint p)
+					{
+						p.Context.FileName = Uri.UnescapeDataString(
+							directoryUri.MakeRelativeUri(new Uri(p.Context.FileName)).ToString()
+						);
+					}
+				});
+			}
+
 			using (FileStream fs = new FileStream(fileName, FileMode.Create))
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
@@ -175,13 +190,27 @@ namespace Land.Core.Markup
 					serializer.WriteObject(gZipStream, Markup);
 				}
 			}
+
+			if (useRelativePaths)
+			{
+				/// Трансформируем пути обратно в абсолютные
+				DoWithMarkup((MarkupElement elem) =>
+				{
+					if (elem is ConcernPoint p)
+					{
+						p.Context.FileName = Path.GetFullPath(
+							Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileName)
+						);
+					}
+				});
+			}
 		}
 
-		public void Deserialize(string filename)
+		public void Deserialize(string fileName)
 		{
 			Clear();
 
-			using (FileStream fs = new FileStream(filename, FileMode.Open))
+			using (FileStream fs = new FileStream(fileName, FileMode.Open))
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
 				{
@@ -192,6 +221,16 @@ namespace Land.Core.Markup
 					this.Markup = (ObservableCollection<MarkupElement>)serializer.ReadObject(gZipStream);
 				}
 			}
+
+			DoWithMarkup((MarkupElement elem) =>
+			{
+				if (elem is ConcernPoint p && !Path.IsPathRooted(p.Context.FileName))
+				{
+					p.Context.FileName = Path.GetFullPath(
+						Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileName)
+					);
+				}
+			});
 		}
 
 		/// <summary>
