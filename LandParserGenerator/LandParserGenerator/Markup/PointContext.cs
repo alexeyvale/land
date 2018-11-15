@@ -191,28 +191,34 @@ namespace Land.Core.Markup
 	[DataContract(IsReference = true)]
 	public class PointContext
 	{
+		[DataMember]
 		public string FileName { get; set; }
 
+		[DataMember]
 		public string NodeType { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		/// <summary>
 		/// Контекст потомков узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<InnerContextElement> InnerContext { get; set; }
 
 		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<AncestorsContextElement> AncestorsContext { get; set; }
 
 		/// <summary>
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<SiblingsContextElement> SiblingsContext { get; set; }
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)

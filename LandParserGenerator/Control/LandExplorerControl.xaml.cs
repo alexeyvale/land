@@ -424,25 +424,27 @@ namespace Land.Control
 				/// При клике по точке переходим к ней
 				if (item.DataContext is ConcernPoint concernPoint)
 				{
-					if(!ParsedFiles.ContainsKey(concernPoint.Context.FileName) 
+					/// Если связанный с точкой файл не разбирали, или он изменился с прошлого разбора
+					if (!ParsedFiles.ContainsKey(concernPoint.Context.FileName)
 						|| ParsedFiles[concernPoint.Context.FileName] == null)
 					{
 						ParsedFiles[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
-
-						if (ParsedFiles[concernPoint.Context.FileName] != null)
-						{
-							MarkupManager.Remap(
-								concernPoint,
-								new MarkupTargetInfo()
-								{
-									FileName = concernPoint.Context.FileName,
-									FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
-									TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
-								}
-							);
-						}
 					}
 
+					/// Если файл разобран и у точки отсутствует связанное с ней положение в тексте 
+					if (ParsedFiles[concernPoint.Context.FileName] != null && concernPoint.Location == null)
+					{
+						MarkupManager.Remap(
+							concernPoint,
+							new MarkupTargetInfo()
+							{
+								FileName = concernPoint.Context.FileName,
+								FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
+								TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
+							}
+						);
+					}
+			
 					if (concernPoint.Location != null)
 					{
 						Editor.SetActiveDocumentAndOffset(
