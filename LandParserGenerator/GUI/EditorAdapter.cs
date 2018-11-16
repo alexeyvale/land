@@ -201,6 +201,11 @@ namespace Land.GUI
 			throw new NotImplementedException();
 		}
 
+		public void RegisterOnDocumentsSetChanged(Action<HashSet<string>> callback)
+		{
+			EditorWindow.DocumentsSetChangedCallback = callback;
+		}
+
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
 			EditorWindow.DocumentChangedCallback = callback;

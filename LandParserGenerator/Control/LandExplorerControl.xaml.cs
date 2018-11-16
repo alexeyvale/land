@@ -85,6 +85,11 @@ namespace Land.Control
 		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
 
 		/// <summary>
+		/// Множество файлов, в которых будем искать точку привязки при полном поиске
+		/// </summary>
+		private HashSet<string> SearchArea = new HashSet<string>();
+
+		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
@@ -104,6 +109,7 @@ namespace Land.Control
 
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
+			Editor.RegisterOnDocumentsSetChanged(DocumentsSetChangedHandler);
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 
@@ -859,6 +865,11 @@ namespace Land.Control
 				ParsedFiles.Remove(fileName);
 				MarkupManager.InvalidatePoints(fileName);
 			}
+		}
+
+		private void DocumentsSetChangedHandler(HashSet<string> documents)
+		{
+
 		}
 
 		private Tuple<Node, string> GetRoot(string documentName)
