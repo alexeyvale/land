@@ -967,65 +967,68 @@ namespace Land.Control
                 foreach (var key in item.Extensions)
 					parsers[key] = parser;
 
-                if (!File.Exists(item.PreprocessorPath))
-                {
-                    Log.Add(Message.Error(
-                        $"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
-                        null
-                    ));
-                }
-                else
-                {
-					var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
-                        .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-                        ?.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-					if(preprocessor != null)
+				if (!String.IsNullOrEmpty(item.PreprocessorPath))
+				{
+					if (!File.Exists(item.PreprocessorPath))
 					{
-						if(item.PreprocessorProperties != null 
-							&& item.PreprocessorProperties.Count > 0)
-						{
-							/// Получаем тип препроцессора из библиотеки
-							var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
-								.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
-
-							/// Для каждой настройки препроцессора
-							foreach(var property in item.PreprocessorProperties)
-							{
-								/// проверяем, есть ли такое свойство у объекта
-								var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
-								
-								if(propertyInfo != null)
-								{
-									var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
-										.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-										.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-									try
-									{
-										propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
-									}
-									catch
-									{
-										Log.Add(Message.Error(
-											$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
-											null
-										));
-									}
-								}
-							}
-						}
-
-						parser.SetPreprocessor(preprocessor);
+						Log.Add(Message.Error(
+							$"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
+							null
+						));
 					}
 					else
 					{
-						Log.Add(Message.Error(
-							$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
-							null
-						));
-					}               
-                }
+						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
+							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
+							?.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+						if (preprocessor != null)
+						{
+							if (item.PreprocessorProperties != null
+								&& item.PreprocessorProperties.Count > 0)
+							{
+								/// Получаем тип препроцессора из библиотеки
+								var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
+									.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
+
+								/// Для каждой настройки препроцессора
+								foreach (var property in item.PreprocessorProperties)
+								{
+									/// проверяем, есть ли такое свойство у объекта
+									var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
+
+									if (propertyInfo != null)
+									{
+										var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
+											.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
+											.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+										try
+										{
+											propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
+										}
+										catch
+										{
+											Log.Add(Message.Error(
+												$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
+												null
+											));
+										}
+									}
+								}
+							}
+
+							parser.SetPreprocessor(preprocessor);
+						}
+						else
+						{
+							Log.Add(Message.Error(
+								$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
+								null
+							));
+						}
+					}
+				}
             }
 
 			return parsers;
