@@ -80,7 +80,7 @@ namespace Land.VisualStudioExtension
 			throw new NotImplementedException();
 		}
 
-		public void RegisterOnDocumentsSetChanged(Action<HashSet<string>> callback)
+		public void RegisterOnWorkingSetChanged(Action<HashSet<string>> callback)
 		{
 			throw new NotImplementedException();
 		}

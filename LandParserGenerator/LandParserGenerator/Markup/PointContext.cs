@@ -254,7 +254,7 @@ namespace Land.Core.Markup
 			return context;
 		}
 
-		public static List<InnerContextElement> GetInnerContext(MarkupTargetInfo info)
+		public static List<InnerContextElement> GetInnerContext(TargetFileInfo info)
 		{
 			return info.TargetNode.Children
 					.Where(c => c.Children.Count > 0)
@@ -268,7 +268,7 @@ namespace Land.Core.Markup
 				: new List<SiblingsContextElement>();
 		}
 
-		public static PointContext Create(MarkupTargetInfo info)
+		public static PointContext Create(TargetFileInfo info)
 		{
 			return new PointContext()
 			{

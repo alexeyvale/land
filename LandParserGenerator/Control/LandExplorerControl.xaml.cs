@@ -87,7 +87,7 @@ namespace Land.Control
 		/// <summary>
 		/// Множество файлов, в которых будем искать точку привязки при полном поиске
 		/// </summary>
-		private HashSet<string> SearchArea = new HashSet<string>();
+		private HashSet<string> WorkingSetOfFiles = new HashSet<string>();
 
 		/// <summary>
 		/// Лог панели разметки
@@ -109,7 +109,7 @@ namespace Land.Control
 
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
-			Editor.RegisterOnDocumentsSetChanged(DocumentsSetChangedHandler);
+			Editor.RegisterOnWorkingSetChanged(WorkingSetChangedHandler);
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 
@@ -137,7 +137,7 @@ namespace Land.Control
 		{
 			return root != null
 				? MarkupManager.Find(point, 
-					new MarkupTargetInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
+					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
 				: new List<NodeSimilarityPair>();
 		}
 
@@ -179,7 +179,7 @@ namespace Land.Control
 			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
 			if (rootTextPair != null)
-				MarkupManager.AddLand(new MarkupTargetInfo()
+				MarkupManager.AddLand(new TargetFileInfo()
 				{			
 					FileName = fileName,
 					FileText = rootTextPair.Item2,
@@ -355,13 +355,21 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				var referenced = MarkupManager.GetReferencedFiles();
-				var forest = new Dictionary<string, Tuple<Node, string>>();
+				var forest = (sender == ApplyLocalMapping ? MarkupManager.GetReferencedFiles() : WorkingSetOfFiles).Select(f =>
+				{
+					var parsed = TryParse(f, out bool success);
 
-				foreach (var documentName in referenced)
-					forest[documentName] = TryParse(documentName, out bool success);
+					return success
+						? new TargetFileInfo()
+						{
+							FileName = f,
+							FileText = parsed.Item2,
+							TargetNode = parsed.Item1
+						}
+						: null;
+				}).Where(r => r != null).ToList();
 
-				MarkupManager.Remap(forest);
+				MarkupManager.Remap(forest, sender == ApplyLocalMapping);		
 			}, true, false);
 		}
 
@@ -373,7 +381,7 @@ namespace Land.Control
 				{
 					MarkupManager.RelinkConcernPoint(
 						(ConcernPoint)State.SelectedItem.DataContext,
-						new MarkupTargetInfo()
+						new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
 							FileText = State.PendingCommand.DocumentText,
@@ -384,7 +392,7 @@ namespace Land.Control
 				else
 				{
 					MarkupManager.AddConcernPoint(
-						new MarkupTargetInfo()
+						new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
 							FileText = State.PendingCommand.DocumentText,
@@ -418,7 +426,6 @@ namespace Land.Control
 
 		#endregion
 
-
 		#region MarkupTreeView manipulations
 
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -442,7 +449,7 @@ namespace Land.Control
 					{
 						MarkupManager.Remap(
 							concernPoint,
-							new MarkupTargetInfo()
+							new TargetFileInfo()
 							{
 								FileName = concernPoint.Context.FileName,
 								FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
@@ -867,9 +874,9 @@ namespace Land.Control
 			}
 		}
 
-		private void DocumentsSetChangedHandler(HashSet<string> documents)
+		private void WorkingSetChangedHandler(HashSet<string> fileNames)
 		{
-
+			WorkingSetOfFiles = fileNames;
 		}
 
 		private Tuple<Node, string> GetRoot(string documentName)
@@ -1048,7 +1055,7 @@ namespace Land.Control
 
 								if (rootTextPair != null)
 								{
-									MarkupManager.Remap(cp, new MarkupTargetInfo()
+									MarkupManager.Remap(cp, new TargetFileInfo()
 									{
 										FileName = cp.Context.FileName,
 										FileText = rootTextPair.Item2,

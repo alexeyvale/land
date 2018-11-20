@@ -64,7 +64,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(MarkupTargetInfo sourceInfo, string name = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, Concern parent = null)
 		{
 			var point = new ConcernPoint(sourceInfo, parent);
 			AddElement(point);
@@ -74,7 +74,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(MarkupTargetInfo sourceInfo)
+		public void AddLand(TargetFileInfo sourceInfo)
 		{
 			var visitor = new LandExplorerVisitor();
 			/// При добавлении всей суши к разметке, в качестве целевого узла передаётся корень дерева
@@ -139,7 +139,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, MarkupTargetInfo targetInfo)
+		public void RelinkConcernPoint(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			point.Relink(targetInfo);
 		}
@@ -236,32 +236,88 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<NodeSimilarityPair> Find(ConcernPoint point, MarkupTargetInfo targetInfo)
+		public List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			return ContextFinder.Find(point.Context, targetInfo);
+			return ContextFinder.Find(point, targetInfo);
 		}
 
 		/// <summary>
 		/// Получение списка файлов, в которых есть точки привязки
 		/// </summary>
-		public List<string> GetReferencedFiles()
+		public HashSet<string> GetReferencedFiles()
 		{
-			var groupVisitor = new GroupPointsVisitor();
+			return new HashSet<string>(
+				GroupPointsByFileVisitor.GetGroups(Markup).Select(p => p.Key)
+			);
+		}
 
-			foreach (var elem in this.Markup)
-				elem.Accept(groupVisitor);
+		#region Перепривязка
 
-			return groupVisitor.Points.Select(p => p.Key).Distinct().ToList();
+		private const double MIN_SIMILARITY = 0.4;
+
+		public void Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		{
+			if (useLocalRemap)
+				LocalRemap(targetFiles);
+			else
+				GlobalRemap(targetFiles);
+		}
+
+		private void LocalRemap(List<TargetFileInfo> targetFiles)
+		{
+			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
+
+			foreach(var fileGroup in groupedByFile)
+			{
+				var file = targetFiles.Where(f => f.FileName == fileGroup.Key).FirstOrDefault();
+
+				if(file != null)
+				{
+					var groupedByType = fileGroup.Value.GroupBy(p => p.Context.NodeType).ToDictionary(g => g.Key, g => g.ToList());
+					var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedByType.Keys);
+
+					var result = ContextFinder.Find(groupedByType, groupedFiles, file);
+
+					foreach (var kvp in result)
+						ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
+				}
+				else
+				{
+					foreach (var point in fileGroup.Value)
+						point.Location = null;
+				}
+			}
+		}
+
+		private void GlobalRemap(List<TargetFileInfo> targetFiles)
+		{
+			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
+			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<NodeSimilarityPair>());
+
+			foreach (var file in targetFiles)
+			{
+				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedPoints.Keys);
+				var currentRes = ContextFinder.Find(groupedPoints, groupedFiles, file);
+
+				foreach (var kvp in currentRes)
+					accumulator[kvp.Key].AddRange(kvp.Value);
+			}
+
+			foreach(var kvp in accumulator)
+				ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
 		}
 
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public void Remap(ConcernPoint point, MarkupTargetInfo targetInfo)
+		public void Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			var candidate = Find(point, targetInfo).FirstOrDefault();
+			ApplyCandidate(point, ContextFinder.Find(point, targetInfo).FirstOrDefault());		
+		}
 
-			if(candidate != null)
+		private void ApplyCandidate(ConcernPoint point, NodeSimilarityPair candidate)
+		{
+			if (candidate != null && candidate.Similarity > MIN_SIMILARITY)
 			{
 				point.Context = candidate.Context;
 				point.Location = candidate.Node.Anchor;
@@ -272,27 +328,7 @@ namespace Land.Core.Markup
 			}
 		}
 
-		/// <summary>
-		/// Перепривязка разметки
-		/// </summary>
-		public void Remap(Dictionary<string, Tuple<Node, string>> parsed)
-		{
-			var groupVisitor = new GroupPointsVisitor();
-
-			foreach (var elem in this.Markup)
-				elem.Accept(groupVisitor);
-
-			foreach (var group in groupVisitor.Points)
-			{
-				if (parsed.ContainsKey(group.Key) && parsed[group.Key] != null)
-				{
-					var visitor = new RemapVisitor(group.Key, parsed[group.Key]);
-
-					foreach (var elem in Markup)
-						elem.Accept(visitor);
-				}
-			}
-		}
+		#endregion
 
 		/// <summary>
 		/// Обобщённое добавление элемента разметки

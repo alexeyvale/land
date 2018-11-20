@@ -13,24 +13,26 @@ namespace Land.Core.Markup
 	{
 		public Dictionary<string, List<Node>> Grouped { get; set; } = new Dictionary<string, List<Node>>();
 
-		public string TargetType { get; set; }
-
-		public GroupNodesByTypeVisitor(string targetType = null)
+		public GroupNodesByTypeVisitor(IEnumerable<string> targetTypes)
 		{
-			TargetType = targetType;
+			Grouped = targetTypes.ToDictionary(e => e, e => new List<Node>());
 		}
 
 		public override void Visit(Node node)
 		{
-			if (String.IsNullOrEmpty(TargetType) || node.Type == TargetType)
-			{
-				if (!Grouped.ContainsKey(node.Type))
-					Grouped[node.Type] = new List<Node>();
-
+			if (Grouped.ContainsKey(node.Type))
 				Grouped[node.Type].Add(node);
-			}
 
 			base.Visit(node);
+		}
+
+		public static Dictionary<string, List<Node>> GetGroups(Node root, IEnumerable<string> targetTypes)
+		{
+			var visitor = new GroupNodesByTypeVisitor(targetTypes);
+
+			root.Accept(visitor);
+
+			return visitor.Grouped;
 		}
 	}
 }

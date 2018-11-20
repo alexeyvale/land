@@ -38,56 +38,72 @@ namespace Land.Core.Markup
 		private const double SubstitutionCost = 0.8;
 
 		/// <summary>
-		/// Поиск узла дерева, соответствующего заданному контексту
+		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="tree"></param>
-		/// <returns>Список кандидатов, отсортированных по степени похожести</returns>
-		public static List<NodeSimilarityPair> Find(
-			PointContext context,
-			MarkupTargetInfo targetInfo,
-			bool fullComparison = false
+		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
+		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
+		/// <returns></returns>
+		public static Dictionary<ConcernPoint, List<NodeSimilarityPair>> Find(
+			Dictionary<string, List<ConcernPoint>> points, 
+			Dictionary<string, List<Node>> candidateNodes, 
+			TargetFileInfo candidateFileInfo
 		)
 		{
-			var candidates = new List<NodeSimilarityPair>();
-			var groupVisitor = new GroupNodesByTypeVisitor(context.NodeType);
+			var result = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
 
-			targetInfo.TargetNode.Accept(groupVisitor);
-
-			if (groupVisitor.Grouped.ContainsKey(context.NodeType))
+			foreach (var typePointsPair in points)
 			{
-				candidates = groupVisitor.Grouped[context.NodeType].Select(node =>
-					new NodeSimilarityPair()
+				foreach (var point in typePointsPair.Value)
+				{
+					var candidates = candidateNodes.ContainsKey(typePointsPair.Key)
+						? candidateNodes[typePointsPair.Key].Select(node =>
+							new NodeSimilarityPair()
+							{
+								Node = node,
+								Context = new PointContext()
+								{
+									FileName = candidateFileInfo.FileName,
+									NodeType = node.Type
+								}
+							}).ToList()
+						: new List<NodeSimilarityPair>();
+
+					foreach (var candidate in candidates)
 					{
-						Node = node,
-						Context = new PointContext()
-						{
-							FileName = targetInfo.FileName,
-							NodeType = node.Type
-						}
-					}).ToList();
+						candidate.Context.HeaderContext = PointContext.GetHeaderContext(candidate.Node);
+						candidate.HeaderSimilarity = Levenshtein(point.Context.HeaderContext, candidate.Context.HeaderContext);
+					}
 
-				foreach (var candidate in candidates)
-				{
-					candidate.Context.HeaderContext = PointContext.GetHeaderContext(candidate.Node);
-					candidate.HeaderSimilarity = Levenshtein(context.HeaderContext, candidate.Context.HeaderContext);
-				}
+					foreach (var candidate in candidates)
+					{
+						candidate.Context.AncestorsContext = PointContext.GetAncestorsContext(candidate.Node);
+						candidate.AncestorSimilarity = Levenshtein(point.Context.AncestorsContext, candidate.Context.AncestorsContext);
+					}
 
-				foreach (var candidate in candidates)
-				{
-					candidate.Context.AncestorsContext = PointContext.GetAncestorsContext(candidate.Node);
-					candidate.AncestorSimilarity = Levenshtein(context.AncestorsContext, candidate.Context.AncestorsContext);
-				}
+					foreach (var candidate in candidates)
+					{
+						candidate.Context.InnerContext = PointContext.GetInnerContext(
+							new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
+						);
+						candidate.InnerSimilarity = Levenshtein(point.Context.InnerContext, candidate.Context.InnerContext);
+					}
 
-				foreach (var candidate in candidates)
-				{
-					targetInfo.TargetNode = candidate.Node;
-					candidate.Context.InnerContext = PointContext.GetInnerContext(targetInfo);
-					candidate.InnerSimilarity = Levenshtein(context.InnerContext, candidate.Context.InnerContext);
+					result[point] = candidates;
 				}
 			}
 
-			return candidates.OrderByDescending(p=>p.Similarity).ToList();
+			return result;
+		}
+
+		public static List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		{
+			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
+			targetInfo.TargetNode.Accept(visitor);
+
+			return Find(
+				new Dictionary<string, List<ConcernPoint>> { { point.Context.NodeType, new List<ConcernPoint> { point } } },
+				visitor.Grouped, targetInfo
+			)[point];
 		}
 
 		private static double Similarity(List<AncestorsContextElement> originContext, List<AncestorsContextElement> candidateContext)

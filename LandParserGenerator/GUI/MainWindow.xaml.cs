@@ -1011,7 +1011,7 @@ namespace Land.GUI
 
 		//public delegate void DocumentChangedHandler(string documentName);
 		public Action<string> DocumentChangedCallback;
-		public Action<HashSet<string>> DocumentsSetChangedCallback;
+		public Action<HashSet<string>> WorkingSetChangedCallback;
 
 		public class DocumentTab
 		{
@@ -1075,7 +1075,7 @@ namespace Land.GUI
 				document.Editor.Text = stream.ReadToEnd();
 				stream.Close();
 
-				DocumentsSetChangedCallback?.Invoke(
+				WorkingSetChangedCallback?.Invoke(
 					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
 				);
 
@@ -1150,7 +1150,7 @@ namespace Land.GUI
 				DocumentTabs.Items.Remove(activeTab);
 				Documents.Remove(activeTab);
 
-				DocumentsSetChangedCallback?.Invoke(
+				WorkingSetChangedCallback?.Invoke(
 					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
 				);
 			}

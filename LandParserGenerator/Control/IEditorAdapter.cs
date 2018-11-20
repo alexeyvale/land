@@ -99,7 +99,7 @@ namespace Land.Control
 
 		void RegisterOnDocumentChanged(Action<string> callback);
 
-		void RegisterOnDocumentsSetChanged(Action<HashSet<string>> callback);
+		void RegisterOnWorkingSetChanged(Action<HashSet<string>> callback);
 
 		#endregion
 	}
