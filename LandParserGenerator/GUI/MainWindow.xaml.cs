@@ -975,7 +975,8 @@ namespace Land.GUI
 			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
-				var candidates = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot);
+				var candidates = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
+					.OrderByDescending(c=>c.Similarity).ToList();
 
 				MappingDebug_SimilaritiesList.ItemsSource = candidates;
 
@@ -985,7 +986,7 @@ namespace Land.GUI
 				if (MappingDebug_SimilaritiesList.ItemsSource != null)
 				{
 					/// значит, в какой-то новый узел мы отобразили старый
-					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault(e=>e.Similarity == candidates.Max(el=>el.Similarity));
+					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
 						MoveCaretToSource(((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
 				}
