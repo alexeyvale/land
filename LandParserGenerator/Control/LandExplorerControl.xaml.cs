@@ -85,6 +85,11 @@ namespace Land.Control
 		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
 
 		/// <summary>
+		/// Множество файлов, в которых будем искать точку привязки при полном поиске
+		/// </summary>
+		private HashSet<string> WorkingSetOfFiles = new HashSet<string>();
+
+		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
@@ -104,6 +109,7 @@ namespace Land.Control
 
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
+			Editor.RegisterOnWorkingSetChanged(WorkingSetChangedHandler);
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 
@@ -131,7 +137,7 @@ namespace Land.Control
 		{
 			return root != null
 				? MarkupManager.Find(point, 
-					new MarkupTargetInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
+					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
 				: new List<NodeSimilarityPair>();
 		}
 
@@ -173,7 +179,7 @@ namespace Land.Control
 			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
 			if (rootTextPair != null)
-				MarkupManager.AddLand(new MarkupTargetInfo()
+				MarkupManager.AddLand(new TargetFileInfo()
 				{			
 					FileName = fileName,
 					FileText = rootTextPair.Item2,
@@ -206,7 +212,7 @@ namespace Land.Control
 
 			if (saveFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Serialize(saveFileDialog.FileName);
+				MarkupManager.Serialize(saveFileDialog.FileName, !SettingsObject.SaveAbsolutePath);
 			}
 		}
 
@@ -349,13 +355,21 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				var referenced = MarkupManager.GetReferencedFiles();
-				var forest = new Dictionary<string, Tuple<Node, string>>();
+				var forest = (sender == ApplyLocalMapping ? MarkupManager.GetReferencedFiles() : WorkingSetOfFiles).Select(f =>
+				{
+					var parsed = TryParse(f, out bool success);
 
-				foreach (var documentName in referenced)
-					forest[documentName] = TryParse(documentName, out bool success);
+					return success
+						? new TargetFileInfo()
+						{
+							FileName = f,
+							FileText = parsed.Item2,
+							TargetNode = parsed.Item1
+						}
+						: null;
+				}).Where(r => r != null).ToList();
 
-				MarkupManager.Remap(forest);
+				MarkupManager.Remap(forest, sender == ApplyLocalMapping);		
 			}, true, false);
 		}
 
@@ -367,7 +381,7 @@ namespace Land.Control
 				{
 					MarkupManager.RelinkConcernPoint(
 						(ConcernPoint)State.SelectedItem.DataContext,
-						new MarkupTargetInfo()
+						new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
 							FileText = State.PendingCommand.DocumentText,
@@ -378,7 +392,7 @@ namespace Land.Control
 				else
 				{
 					MarkupManager.AddConcernPoint(
-						new MarkupTargetInfo()
+						new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
 							FileText = State.PendingCommand.DocumentText,
@@ -412,7 +426,6 @@ namespace Land.Control
 
 		#endregion
 
-
 		#region MarkupTreeView manipulations
 
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -424,25 +437,27 @@ namespace Land.Control
 				/// При клике по точке переходим к ней
 				if (item.DataContext is ConcernPoint concernPoint)
 				{
-					if(!ParsedFiles.ContainsKey(concernPoint.Context.FileName) 
+					/// Если связанный с точкой файл не разбирали, или он изменился с прошлого разбора
+					if (!ParsedFiles.ContainsKey(concernPoint.Context.FileName)
 						|| ParsedFiles[concernPoint.Context.FileName] == null)
 					{
 						ParsedFiles[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
-
-						if (ParsedFiles[concernPoint.Context.FileName] != null)
-						{
-							MarkupManager.Remap(
-								concernPoint,
-								new MarkupTargetInfo()
-								{
-									FileName = concernPoint.Context.FileName,
-									FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
-									TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
-								}
-							);
-						}
 					}
 
+					/// Если файл разобран и у точки отсутствует связанное с ней положение в тексте 
+					if (ParsedFiles[concernPoint.Context.FileName] != null && concernPoint.Location == null)
+					{
+						MarkupManager.Remap(
+							concernPoint,
+							new TargetFileInfo()
+							{
+								FileName = concernPoint.Context.FileName,
+								FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
+								TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
+							}
+						);
+					}
+			
 					if (concernPoint.Location != null)
 					{
 						Editor.SetActiveDocumentAndOffset(
@@ -859,6 +874,11 @@ namespace Land.Control
 			}
 		}
 
+		private void WorkingSetChangedHandler(HashSet<string> fileNames)
+		{
+			WorkingSetOfFiles = fileNames;
+		}
+
 		private Tuple<Node, string> GetRoot(string documentName)
 		{
 			return !String.IsNullOrEmpty(documentName)
@@ -947,65 +967,68 @@ namespace Land.Control
                 foreach (var key in item.Extensions)
 					parsers[key] = parser;
 
-                if (!File.Exists(item.PreprocessorPath))
-                {
-                    Log.Add(Message.Error(
-                        $"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
-                        null
-                    ));
-                }
-                else
-                {
-					var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
-                        .GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-                        ?.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-					if(preprocessor != null)
+				if (!String.IsNullOrEmpty(item.PreprocessorPath))
+				{
+					if (!File.Exists(item.PreprocessorPath))
 					{
-						if(item.PreprocessorProperties != null 
-							&& item.PreprocessorProperties.Count > 0)
-						{
-							/// Получаем тип препроцессора из библиотеки
-							var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
-								.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
-
-							/// Для каждой настройки препроцессора
-							foreach(var property in item.PreprocessorProperties)
-							{
-								/// проверяем, есть ли такое свойство у объекта
-								var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
-								
-								if(propertyInfo != null)
-								{
-									var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
-										.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-										.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-									try
-									{
-										propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
-									}
-									catch
-									{
-										Log.Add(Message.Error(
-											$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
-											null
-										));
-									}
-								}
-							}
-						}
-
-						parser.SetPreprocessor(preprocessor);
+						Log.Add(Message.Error(
+							$"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
+							null
+						));
 					}
 					else
 					{
-						Log.Add(Message.Error(
-							$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
-							null
-						));
-					}               
-                }
+						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
+							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
+							?.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+						if (preprocessor != null)
+						{
+							if (item.PreprocessorProperties != null
+								&& item.PreprocessorProperties.Count > 0)
+							{
+								/// Получаем тип препроцессора из библиотеки
+								var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
+									.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
+
+								/// Для каждой настройки препроцессора
+								foreach (var property in item.PreprocessorProperties)
+								{
+									/// проверяем, есть ли такое свойство у объекта
+									var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
+
+									if (propertyInfo != null)
+									{
+										var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
+											.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
+											.GetConstructor(Type.EmptyTypes).Invoke(null);
+
+										try
+										{
+											propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
+										}
+										catch
+										{
+											Log.Add(Message.Error(
+												$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
+												null
+											));
+										}
+									}
+								}
+							}
+
+							parser.SetPreprocessor(preprocessor);
+						}
+						else
+						{
+							Log.Add(Message.Error(
+								$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
+								null
+							));
+						}
+					}
+				}
             }
 
 			return parsers;
@@ -1035,7 +1058,7 @@ namespace Land.Control
 
 								if (rootTextPair != null)
 								{
-									MarkupManager.Remap(cp, new MarkupTargetInfo()
+									MarkupManager.Remap(cp, new TargetFileInfo()
 									{
 										FileName = cp.Context.FileName,
 										FileText = rootTextPair.Item2,

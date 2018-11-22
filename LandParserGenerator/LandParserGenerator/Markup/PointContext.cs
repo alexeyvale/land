@@ -191,28 +191,34 @@ namespace Land.Core.Markup
 	[DataContract(IsReference = true)]
 	public class PointContext
 	{
+		[DataMember]
 		public string FileName { get; set; }
 
+		[DataMember]
 		public string NodeType { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		/// <summary>
 		/// Контекст потомков узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<InnerContextElement> InnerContext { get; set; }
 
 		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<AncestorsContextElement> AncestorsContext { get; set; }
 
 		/// <summary>
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
 		/// </summary>
+		[DataMember]
 		public List<SiblingsContextElement> SiblingsContext { get; set; }
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)
@@ -248,7 +254,7 @@ namespace Land.Core.Markup
 			return context;
 		}
 
-		public static List<InnerContextElement> GetInnerContext(MarkupTargetInfo info)
+		public static List<InnerContextElement> GetInnerContext(TargetFileInfo info)
 		{
 			return info.TargetNode.Children
 					.Where(c => c.Children.Count > 0)
@@ -262,7 +268,7 @@ namespace Land.Core.Markup
 				: new List<SiblingsContextElement>();
 		}
 
-		public static PointContext Create(MarkupTargetInfo info)
+		public static PointContext Create(TargetFileInfo info)
 		{
 			return new PointContext()
 			{

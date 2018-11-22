@@ -79,5 +79,10 @@ namespace Land.VisualStudioExtension
 		{
 			throw new NotImplementedException();
 		}
+
+		public void RegisterOnWorkingSetChanged(Action<HashSet<string>> callback)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

@@ -71,7 +71,7 @@
 						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-                <Button Content="&#xf0c1;" ToolTip="Перепривязать" 
+                <Button Content="&#xf0c1;" ToolTip="Сменить привязку" 
 						Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf2ed;" ToolTip="Удалить" 
 						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
@@ -83,8 +83,9 @@
 				
                 <Separator Margin="7"></Separator>
 				
-                <Button Content="&#xf337;" ToolTip="Перепривязать" Click="ApplyMapping_Click"></Button>
-                <Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
+                <Button Content="&#xf337;" ToolTip="Обновить привязки локально" Click="ApplyMapping_Click" Name="ApplyLocalMapping"></Button>
+				<Button Content="&#xf0b2;" ToolTip="Обновить привязки глобально" Click="ApplyMapping_Click" Name="ApplyGlobalMapping"></Button>
+				<Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
             </ToolBar>
             <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
                 MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"

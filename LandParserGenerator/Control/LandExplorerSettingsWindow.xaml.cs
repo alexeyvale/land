@@ -39,7 +39,7 @@ namespace Land.Control
 				SyncPreprocessorAndProperties(item, out string message);
 
 			SettingsObject.Parsers = new ObservableCollection<ParserSettingsItem>(SettingsObject.Parsers
-				.GroupBy(gr => new { GrammmarPath = gr.GrammarPath.Trim(), PreprocessorPath = gr.PreprocessorPath.Trim() }).Select(g => new ParserSettingsItem()
+				.GroupBy(gr => new { GrammmarPath = gr.GrammarPath.Trim(), PreprocessorPath = gr.PreprocessorPath?.Trim() }).Select(g => new ParserSettingsItem()
 				{
 					GrammarPath = g.Key.GrammmarPath,
 					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),

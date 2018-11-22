@@ -16,7 +16,7 @@ namespace Land.Core.Markup
 
 		public SegmentLocation Location { get; set; }
 
-		public ConcernPoint(MarkupTargetInfo targetInfo, Concern parent = null)
+		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{
 			Context = PointContext.Create(targetInfo);
 
@@ -36,14 +36,14 @@ namespace Land.Core.Markup
 			}
 		}
 
-		public ConcernPoint(string name, MarkupTargetInfo targetInfo, Concern parent = null)
+		public ConcernPoint(string name, TargetFileInfo targetInfo, Concern parent = null)
 		{
 			Name = name;
 			Context = PointContext.Create(targetInfo);
 			Parent = parent;
 		}
 
-		public void Relink(MarkupTargetInfo targetInfo)
+		public void Relink(TargetFileInfo targetInfo)
 		{
 			Location = targetInfo.TargetNode.Anchor;
 			Context = PointContext.Create(targetInfo);
@@ -55,7 +55,7 @@ namespace Land.Core.Markup
 		}
 	}
 
-	public class MarkupTargetInfo
+	public class TargetFileInfo
 	{
 		public string FileName { get; set; }
 		public string FileText { get; set; }

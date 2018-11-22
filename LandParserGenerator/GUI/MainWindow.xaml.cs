@@ -975,8 +975,10 @@ namespace Land.GUI
 			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
-				var similarities = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot).ToDictionary(e=>e.Node, e=>e.Similarity);
-				MappingDebug_SimilaritiesList.ItemsSource = similarities;
+				var candidates = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
+					.OrderByDescending(c=>c.Similarity).ToList();
+
+				MappingDebug_SimilaritiesList.ItemsSource = candidates;
 
 				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);
 
@@ -984,9 +986,9 @@ namespace Land.GUI
 				if (MappingDebug_SimilaritiesList.ItemsSource != null)
 				{
 					/// значит, в какой-то новый узел мы отобразили старый
-					MappingDebug_SimilaritiesList.SelectedItem = similarities.FirstOrDefault(e=>e.Value == similarities.Max(el=>el.Value));
+					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((KeyValuePair<Node, double>)MappingDebug_SimilaritiesList.SelectedItem).Key.Anchor, MappingDebug_NewTextEditor);
+						MoveCaretToSource(((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
 				}
 			}
 		}
@@ -995,7 +997,7 @@ namespace Land.GUI
 		{
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
-				var node = ((KeyValuePair<Node,double>)MappingDebug_SimilaritiesList.SelectedItem).Key;
+				var node = ((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node;
 				MoveCaretToSource(node.Anchor, MappingDebug_NewTextEditor);
 			}
 		}
@@ -1011,6 +1013,7 @@ namespace Land.GUI
 
 		//public delegate void DocumentChangedHandler(string documentName);
 		public Action<string> DocumentChangedCallback;
+		public Action<HashSet<string>> WorkingSetChangedCallback;
 
 		public class DocumentTab
 		{
@@ -1073,6 +1076,10 @@ namespace Land.GUI
 
 				document.Editor.Text = stream.ReadToEnd();
 				stream.Close();
+
+				WorkingSetChangedCallback?.Invoke(
+					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
+				);
 
 				return document;
 			}
@@ -1144,6 +1151,10 @@ namespace Land.GUI
 
 				DocumentTabs.Items.Remove(activeTab);
 				Documents.Remove(activeTab);
+
+				WorkingSetChangedCallback?.Invoke(
+					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
+				);
 			}
 		}
 

@@ -36,7 +36,7 @@ namespace Land.Core.Parsing.Tree
 				node.Options.Set(MappingOption.LAND);
 
 			if (GrammarObject.Options.IsSet(MappingOption.EXACTMATCH, node.Symbol)
-				|| GrammarObject.Options.IsSet(MappingOption.EXACTMATCH, node.Alias))
+				|| !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(MappingOption.EXACTMATCH, node.Alias))
 				node.Options.ExactMatch = true;
 
 			if (!node.Options.Priority.HasValue)
