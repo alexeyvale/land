@@ -9,6 +9,11 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
+	public interface IEqualsIgnoreValue
+	{
+		bool EqualsIgnoreValue(object obj);
+	}
+
 	[DataContract(IsReference = true)]
 	public abstract class TypedPrioritizedContextElement
 	{
@@ -20,7 +25,7 @@ namespace Land.Core.Markup
 	}
 
 	[DataContract(IsReference = true)]
-	public class HeaderContextElement: TypedPrioritizedContextElement
+	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
 		[DataMember]
 		public bool ExactMatch { get; set; }
@@ -82,7 +87,7 @@ namespace Land.Core.Markup
 	}
 
 	[DataContract(IsReference = true)]
-	public class InnerContextElement: TypedPrioritizedContextElement
+	public class InnerContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
 		public const int MAX_TEXT_LENGTH = 200;
 
@@ -102,7 +107,7 @@ namespace Land.Core.Markup
 
 			/// Удаляем из текста все пробельные символы
 			var text = System.Text.RegularExpressions.Regex.Replace(
-				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value), "[\n\r\f ]", ""
+				fileText.Substring(node.Anchor.Start.Offset, node.Anchor.Length.Value), "[\n\r\f\t ]", ""
 			);
 
 			TextLength = text.Length;
@@ -282,15 +287,13 @@ namespace Land.Core.Markup
 		}
 	}
 
-	public struct Socket
+	public class EqualsIgnoreValueComparer : 
+		IEqualityComparer<IEqualsIgnoreValue>
 	{
-		public string Type { get; set; }
-		public double Priority { get; set; }
+		public bool Equals(IEqualsIgnoreValue e1, 
+			IEqualsIgnoreValue e2) => e1.EqualsIgnoreValue(e2);
 
-		public Socket(TypedPrioritizedContextElement context)
-		{
-			Type = context.Type;
-			Priority = context.Priority;
-		}
+		public int GetHashCode(IEqualsIgnoreValue e) 
+			=> e.GetHashCode();
 	}
 }
