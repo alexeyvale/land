@@ -77,17 +77,17 @@ namespace Land.Control
 		/// <summary>
 		/// Деревья для файлов, к которым осуществлена привязка
 		/// </summary>
-		public Dictionary<string, Tuple<Node, string>> ParsedFiles = new Dictionary<string, Tuple<Node, string>>();
+		public Dictionary<string, Tuple<Node, string>> ParsedFiles { get; set; } = new Dictionary<string, Tuple<Node, string>>();
 
 		/// <summary>
 		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
 		/// </summary>
-		public Dictionary<string, BaseParser> Parsers = new Dictionary<string, BaseParser>();
+		public Dictionary<string, BaseParser> Parsers { get; set; } = new Dictionary<string, BaseParser>();
 
 		/// <summary>
 		/// Множество файлов, в которых будем искать точку привязки при полном поиске
 		/// </summary>
-		private HashSet<string> WorkingSetOfFiles = new HashSet<string>();
+		private HashSet<string> WorkingSetOfFiles { get; set; }
 
 		/// <summary>
 		/// Лог панели разметки
@@ -355,7 +355,14 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				var forest = (sender == ApplyLocalMapping ? MarkupManager.GetReferencedFiles() : WorkingSetOfFiles).Select(f =>
+				/// В случае, если запросили перепривязку в пределах
+				/// рабочего множества файлов, а это множество не установлено,
+				/// проводим перепривязку в пределах файлов, на которые
+				/// ссылаются имеющиеся точки
+				var forest = (sender == ApplyLocalMapping
+					? MarkupManager.GetReferencedFiles()
+					: WorkingSetOfFiles ?? MarkupManager.GetReferencedFiles()
+				).Select(f =>
 				{
 					var parsed = TryParse(f, out bool success);
 
