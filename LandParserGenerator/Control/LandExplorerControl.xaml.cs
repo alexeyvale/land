@@ -435,6 +435,31 @@ namespace Land.Control
 
 		#region MarkupTreeView manipulations
 
+		private int MAX_TEXT_SIZE = 30;
+		private int MIN_TEXT_SIZE = 9;
+
+		private void MarkupTreeView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			var snd = sender as TreeView;
+
+			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Control)
+			{
+				e.Handled = true;
+				var oldSize = snd.FontSize;
+				if (e.Delta > 0)
+				{
+					if (snd.FontSize < MAX_TEXT_SIZE)
+					{
+						++snd.FontSize;
+					}
+				}
+				else if (snd.FontSize > MIN_TEXT_SIZE)
+				{
+					--snd.FontSize;
+				}
+			}
+		}
+
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);

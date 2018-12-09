@@ -91,6 +91,7 @@
                 MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
                 PreviewMouseLeftButtonDown="MarkupTreeView_PreviewMouseLeftButtonDown"
                 PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
+				PreviewMouseWheel="MarkupTreeView_PreviewMouseWheel"
                 DragOver="MarkupTreeView_DragOver"
                 Drop="MarkupTreeView_Drop"
                 MouseMove="MarkupTreeView_MouseMove">
