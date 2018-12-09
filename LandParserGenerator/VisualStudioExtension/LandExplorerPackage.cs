@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using EnvDTE80;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -16,38 +18,26 @@ using Task = System.Threading.Tasks.Task;
 namespace Land.VisualStudioExtension
 {
 	/// <summary>
-	/// This is the class that implements the package exposed by this assembly.
+	///  Наследуем пакет от AsyncPackage, так как загрузка 
+	///  при большом количестве парсеров может быть медленной
 	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// The minimum requirement for a class to be considered a valid package for Visual Studio
-	/// is to implement the IVsPackage interface and register itself with the shell.
-	/// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-	/// to do it: it derives from the Package class that provides the implementation of the
-	/// IVsPackage interface and uses the registration attributes defined in the framework to
-	/// register itself and its components with the shell. These attributes tell the pkgdef creation
-	/// utility what data to put into .pkgdef file.
-	/// </para>
-	/// <para>
-	/// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
-	/// </para>
-	/// </remarks>
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
+	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	[ProvideToolWindow(typeof(LandExplorer))]
 	[Guid(LandExplorerPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-	public sealed class LandExplorerPackage : AsyncPackage
+	public sealed class LandExplorerPackage : AsyncPackage, IVsShellPropertyEvents
 	{
-		/// <summary>
-		/// LandExplorerPackage GUID string.
-		/// </summary>
 		public const string PackageGuidString = "92dd57dc-aa42-446e-b5bc-9cd875a9e9ec";
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="LandExplorerPackage"/> class.
+		/// Development Tools Environment object для взаимодействия со средой
 		/// </summary>
+		public static DTE2 DteService { get; private set; }
+
+		public uint ShellPropertyEventsCookie { get; set; }
+
 		public LandExplorerPackage()
 		{
 			// Inside this method you can place any initialization code that does not require
@@ -71,6 +61,63 @@ namespace Land.VisualStudioExtension
 			// Do any initialization that requires the UI thread after switching to the UI thread.
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 			await LandExplorerCommand.InitializeAsync(this);
+
+			InitializeDTE();
+		}
+
+		#endregion
+
+		#region IVsShellPropertyEvents
+
+		int IVsShellPropertyEvents.OnShellPropertyChange(int propid, object var)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (propid == (int)__VSSPROPID.VSSPROPID_Zombie)
+			{
+				var isZombie = (bool)var;
+				if (!isZombie)
+				{
+					var shellService = this.GetService(typeof(SVsShell)) as IVsShell;
+					Assumes.Present(shellService);
+
+					/// В случае, если среда проинициализирована, 
+					/// отвязываемся от события и вызываем инициализацию сервиса DTE
+					var hr = shellService.UnadviseShellPropertyChanges(this.ShellPropertyEventsCookie);
+					ErrorHandler.ThrowOnFailure(hr);
+
+					this.ShellPropertyEventsCookie = 0;
+					this.InitializeDTE();
+				}
+			}
+			return VSConstants.S_OK;
+		}
+
+		#endregion
+
+		#region Methods
+
+		private void InitializeDTE()
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			DteService = this.GetService(typeof(SDTE)) as DTE2;
+
+			/// Если оболочка ещё не проинициализирована полностью
+			if (DteService == null)
+			{
+				var shellService = this.GetService(typeof(SVsShell)) as IVsShell;
+
+				/// Убеждаемся, что сервис получен, иначе - исключение
+				Assumes.Present(shellService);
+
+				/// Устанавливаем обработчик для события полной инициализации среды
+				var hr = shellService.AdviseShellPropertyChanges(this, out uint cookie);
+				this.ShellPropertyEventsCookie = cookie;
+
+				/// Если вернулся не 0, а код ошибки, выбрасываем исключение
+				ErrorHandler.ThrowOnFailure(hr);
+			}
 		}
 
 		#endregion
