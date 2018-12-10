@@ -291,12 +291,17 @@ namespace Land.Core.Markup
 
 		private void GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
+			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
 			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<NodeSimilarityPair>());
 
 			foreach (var file in targetFiles)
 			{
+				/// Группируем узлы AST файла, к которому попытаемся перепривязаться,
+				/// по типам точек, к которым требуется перепривязка
 				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedPoints.Keys);
+
+				/// Похожести, посчитанные для сущностей из текущего файла
 				var currentRes = ContextFinder.Find(groupedPoints, groupedFiles, file);
 
 				foreach (var kvp in currentRes)

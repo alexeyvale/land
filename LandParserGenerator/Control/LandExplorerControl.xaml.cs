@@ -85,11 +85,6 @@ namespace Land.Control
 		public Dictionary<string, BaseParser> Parsers { get; set; } = new Dictionary<string, BaseParser>();
 
 		/// <summary>
-		/// Множество файлов, в которых будем искать точку привязки при полном поиске
-		/// </summary>
-		private HashSet<string> WorkingSetOfFiles { get; set; }
-
-		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
@@ -109,7 +104,6 @@ namespace Land.Control
 
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
-			Editor.RegisterOnWorkingSetChanged(WorkingSetChangedHandler);
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 
@@ -361,7 +355,7 @@ namespace Land.Control
 				/// ссылаются имеющиеся точки
 				var forest = (sender == ApplyLocalMapping
 					? MarkupManager.GetReferencedFiles()
-					: WorkingSetOfFiles ?? MarkupManager.GetReferencedFiles()
+					: GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles()
 				).Select(f =>
 				{
 					var parsed = TryParse(f, out bool success);
@@ -897,6 +891,24 @@ namespace Land.Control
 
 		#region Helpers
 
+		private HashSet<string> GetFileSet(HashSet<string> paths)
+		{
+			if (paths == null)
+				return null;
+
+			var res = new HashSet<string>();
+
+			foreach(var path in paths)
+			{
+				if (File.Exists(path))
+					res.Add(path);
+				else if (Directory.Exists(path))
+					res.UnionWith(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
+			}
+
+			return res;
+		}
+
 		private void DocumentChangedHandler(string fileName)
 		{
 			if (ParsedFiles.ContainsKey(fileName))
@@ -904,11 +916,6 @@ namespace Land.Control
 				ParsedFiles.Remove(fileName);
 				MarkupManager.InvalidatePoints(fileName);
 			}
-		}
-
-		private void WorkingSetChangedHandler(HashSet<string> fileNames)
-		{
-			WorkingSetOfFiles = fileNames;
 		}
 
 		private Tuple<Node, string> GetRoot(string documentName)

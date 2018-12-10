@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Media;
 using System.Linq;
+using System.IO;
 
 using EnvDTE;
 using Microsoft.VisualStudio;
@@ -98,12 +99,9 @@ namespace Land.VisualStudioExtension
 
 		public void ResetSegments()
 		{
-			//foreach (var document in EditorWindow.Documents)
-			//{
-			//	document.Value.SegmentsColorizer.ResetSegments();
-			//}
-
 			ColorManager.Reset();
+
+			OnSetSegments(new List<DocumentSegment>());
 		}
 
 		public void SetActiveDocumentAndOffset(string documentName, PointLocation location)
@@ -187,9 +185,18 @@ namespace Land.VisualStudioExtension
 			return;
 		}
 
-		public void RegisterOnWorkingSetChanged(Action<HashSet<string>> callback)
+		public HashSet<string> GetWorkingSet()
 		{
-			return;
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			var res = new HashSet<string>();
+
+			foreach(Project proj in DteService.Solution.Projects)
+			{
+				res.Add(Path.GetDirectoryName(proj.FileName));
+			}
+
+			return res;
 		}
 	}
 }
