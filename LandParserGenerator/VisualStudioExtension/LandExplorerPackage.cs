@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using Task = System.Threading.Tasks.Task;
+using Land.VisualStudioExtension.Listeners;
 
 namespace Land.VisualStudioExtension
 {
@@ -27,16 +28,9 @@ namespace Land.VisualStudioExtension
 	[ProvideToolWindow(typeof(LandExplorer))]
 	[Guid(LandExplorerPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-	public sealed class LandExplorerPackage : AsyncPackage, IVsShellPropertyEvents
+	public sealed class LandExplorerPackage : AsyncPackage
 	{
 		public const string PackageGuidString = "92dd57dc-aa42-446e-b5bc-9cd875a9e9ec";
-
-		/// <summary>
-		/// Development Tools Environment object для взаимодействия со средой
-		/// </summary>
-		public static DTE2 DteService { get; private set; }
-
-		public uint ShellPropertyEventsCookie { get; set; }
 
 		public LandExplorerPackage()
 		{
@@ -62,63 +56,22 @@ namespace Land.VisualStudioExtension
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 			await LandExplorerCommand.InitializeAsync(this);
 
-			InitializeDTE();
+			ServiceEventAggregator.InitializeInstance(
+				await GetServiceAsync(typeof(SVsSolution)) as IVsSolution,
+				await GetServiceAsync(typeof(SVsShell)) as IVsShell,
+				() => GetService(typeof(SDTE)) as DTE2
+			);
 		}
 
-		#endregion
-
-		#region IVsShellPropertyEvents
-
-		int IVsShellPropertyEvents.OnShellPropertyChange(int propid, object var)
+		protected override void Dispose(bool disposing)
 		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-
-			if (propid == (int)__VSSPROPID.VSSPROPID_Zombie)
-			{
-				var isZombie = (bool)var;
-				if (!isZombie)
-				{
-					var shellService = this.GetService(typeof(SVsShell)) as IVsShell;
-					Assumes.Present(shellService);
-
-					/// В случае, если среда проинициализирована, 
-					/// отвязываемся от события и вызываем инициализацию сервиса DTE
-					var hr = shellService.UnadviseShellPropertyChanges(this.ShellPropertyEventsCookie);
-					ErrorHandler.ThrowOnFailure(hr);
-
-					this.ShellPropertyEventsCookie = 0;
-					this.InitializeDTE();
-				}
-			}
-			return VSConstants.S_OK;
+			base.Dispose(disposing);
+			ServiceEventAggregator.DisposeInstance();
 		}
 
 		#endregion
 
 		#region Methods
-
-		private void InitializeDTE()
-		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-
-			DteService = this.GetService(typeof(SDTE)) as DTE2;
-
-			/// Если оболочка ещё не проинициализирована полностью
-			if (DteService == null)
-			{
-				var shellService = this.GetService(typeof(SVsShell)) as IVsShell;
-
-				/// Убеждаемся, что сервис получен, иначе - исключение
-				Assumes.Present(shellService);
-
-				/// Устанавливаем обработчик для события полной инициализации среды
-				var hr = shellService.AdviseShellPropertyChanges(this, out uint cookie);
-				this.ShellPropertyEventsCookie = cookie;
-
-				/// Если вернулся не 0, а код ошибки, выбрасываем исключение
-				ErrorHandler.ThrowOnFailure(hr);
-			}
-		}
 
 		#endregion
 	}

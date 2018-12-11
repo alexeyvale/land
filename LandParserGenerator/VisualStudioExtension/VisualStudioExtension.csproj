@@ -62,6 +62,10 @@
     <Compile Include="LandExplorer.cs" />
     <Compile Include="LandExplorerCommand.cs" />
     <Compile Include="LandExplorerPackage.cs" />
+    <Compile Include="ServiceEventAggregator.cs" />
+    <Compile Include="Listeners\ShellPropertyEventsListener.cs" />
+    <Compile Include="Listeners\SolutionEventsListener.cs" />
+    <Compile Include="Listeners\TextViewCreationListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

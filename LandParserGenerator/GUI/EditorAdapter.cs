@@ -196,11 +196,6 @@ namespace Land.GUI
 			}
 		}
 
-		public void RegisterOnDocumentSaved(Action<string> callback)
-		{
-			throw new NotImplementedException();
-		}
-
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
 			EditorWindow.DocumentChangedCallback = callback;
@@ -211,6 +206,16 @@ namespace Land.GUI
 			return new HashSet<string>(
 				EditorWindow.Documents.Select(d => d.Value.DocumentName)
 			);
+		}
+
+		public void RegisterOnDocumentSaved(Action<string> callback)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RegisterOnWorkingDirectoryChanged(Action<string> callback)
+		{
+			throw new NotImplementedException();
 		}
 
 		#endregion

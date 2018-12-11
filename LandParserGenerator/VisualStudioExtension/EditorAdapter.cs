@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -19,16 +20,7 @@ namespace Land.VisualStudioExtension
 {
 	public class EditorAdapter : IEditorAdapter
 	{
-		private DTE _dteService;
-		private DTE DteService
-		{
-			get
-			{
-				ThreadHelper.ThrowIfNotOnUIThread();
-
-				return _dteService ?? (_dteService = (DTE)LandExplorerPackage.DteService);
-			}
-		}
+		private DTE2 DteService => ServiceEventAggregator.Instance.DteService;
 
 		public delegate void SetSegmentstHandler(List<DocumentSegment> e);
 		public static event SetSegmentstHandler OnSetSegments;
@@ -182,21 +174,58 @@ namespace Land.VisualStudioExtension
 
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
-			return;
+			ServiceEventAggregator.Instance.RegisterOnDocumentChanged(callback);
+		}
+
+		public void RegisterOnWorkingDirectoryChanged(Action<string> callback)
+		{
+			ServiceEventAggregator.Instance.RegisterOnSolutionOpened(callback);
 		}
 
 		public HashSet<string> GetWorkingSet()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			var res = new HashSet<string>();
+			return new HashSet<string>(GetAllProjects(DteService.Solution)
+				.Select(p =>
+				{
+					ThreadHelper.ThrowIfNotOnUIThread();
+					return Path.GetDirectoryName(p.FileName);
+				}));
+		}
 
-			foreach(Project proj in DteService.Solution.Projects)
+		#region Methods
+
+		public IEnumerable<Project> GetAllProjects(Solution sln)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			return sln.Projects
+				.Cast<Project>()
+				.SelectMany(GetProjects);
+		}
+
+		private IEnumerable<Project> GetProjects(Project project)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			/// Если имеем дело с каталогом, посещаем его и получаем вложенные проекты
+			if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
 			{
-				res.Add(Path.GetDirectoryName(proj.FileName));
+				return project.ProjectItems
+					.Cast<ProjectItem>()
+					.Select(x =>
+					{
+						ThreadHelper.ThrowIfNotOnUIThread();
+						return x.SubProject;
+					})
+					.Where(x => x != null)
+					.SelectMany(GetProjects);
 			}
 
-			return res;
+			return new[] { project };
 		}
+
+		#endregion
 	}
 }
