@@ -34,8 +34,6 @@ namespace Land.GUI
 		private string RECENT_PREPROCS_FILE = "recent_preprocs.txt";
 		private string RECENT_DIRECTORIES_FILE = "recent_directories.txt";
 
-		private string LAND_EXPLORER_SETTINGS = "land_explorer_settings.xml";
-
 		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
 		private SegmentsBackgroundRenderer File_SegmentColorizer { get; set; }
@@ -58,7 +56,6 @@ namespace Land.GUI
 			RECENT_GRAMMARS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_GRAMMARS_FILE);
 			RECENT_PREPROCS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_PREPROCS_FILE);
 			RECENT_DIRECTORIES_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_DIRECTORIES_FILE);
-			LAND_EXPLORER_SETTINGS = Path.Combine(APP_DATA_DIRECTORY, LAND_EXPLORER_SETTINGS);
 
 			/// Подгружаем определение для подсветки синтаксиса, создаём подсветчики и выделители
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
@@ -92,7 +89,7 @@ namespace Land.GUI
 			}
 
 			/// Загружаем настройки панели разметки
-			EditorAdapter = new EditorAdapter(this, LAND_EXPLORER_SETTINGS);
+			EditorAdapter = new EditorAdapter(this, LandExplorerControl.SETTINGS_DEFAULT_PATH);
 			LandExplorer.Initialize(EditorAdapter);
 
 			/// Инициализирующие действия для массового парсинга

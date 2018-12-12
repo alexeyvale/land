@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Linq;
 using System.IO;
+using System.Runtime.Serialization;
 
 using EnvDTE;
 using EnvDTE80;
@@ -24,6 +25,13 @@ namespace Land.VisualStudioExtension
 
 		public delegate void SetSegmentstHandler(List<DocumentSegment> e);
 		public static event SetSegmentstHandler OnSetSegments;
+
+		public EditorAdapter()
+		{
+			ServiceEventAggregator.Instance.RegisterOnSolutionOpened(
+				(string path) => WorkingDirectory = path
+			);
+		}
 
 		public string GetActiveDocumentName()
 		{
@@ -157,15 +165,52 @@ namespace Land.VisualStudioExtension
 			return color;
 		}
 
-		public void SaveSettings(LandExplorerSettings settings)
+		#region Settings
+
+		private string WorkingDirectory { get; set; }
+
+		public void SaveSettings(LandExplorerSettings settings, string defaultPath)
 		{
-			return;
+			DataContractSerializer serializer = new DataContractSerializer(
+				typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) }
+			);
+
+			var settingsPath = Directory.Exists(WorkingDirectory) 
+				? Path.Combine(WorkingDirectory, LandExplorerControl.SETTINGS_FILE_NAME) 
+				: defaultPath;
+
+			using (FileStream fs = new FileStream(settingsPath, FileMode.Create))
+			{
+				serializer.WriteObject(fs, settings);
+			}
 		}
 
-		public LandExplorerSettings LoadSettings()
+		public LandExplorerSettings LoadSettings(string defaultPath)
 		{
-			return null;
+			var settingsPath = Directory.Exists(WorkingDirectory)
+				? Path.Combine(WorkingDirectory, LandExplorerControl.SETTINGS_FILE_NAME)
+				: defaultPath;
+
+			if (File.Exists(settingsPath))
+			{
+				DataContractSerializer serializer = new DataContractSerializer(
+					typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) }
+				);
+
+				using (FileStream fs = new FileStream(settingsPath, FileMode.Open))
+				{
+					return (LandExplorerSettings)serializer.ReadObject(fs);
+				}
+			}
+			else
+			{
+				return null;
+			}
 		}
+
+		public event Action ShouldLoadSettings;
+
+		#endregion
 
 		public void RegisterOnDocumentSaved(Action<string> callback)
 		{
@@ -175,11 +220,6 @@ namespace Land.VisualStudioExtension
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
 			ServiceEventAggregator.Instance.RegisterOnDocumentChanged(callback);
-		}
-
-		public void RegisterOnWorkingDirectoryChanged(Action<string> callback)
-		{
-			ServiceEventAggregator.Instance.RegisterOnSolutionOpened(callback);
 		}
 
 		public HashSet<string> GetWorkingSet()

@@ -49,6 +49,13 @@ namespace Land.Control
 			public bool HighlightConcerns { get; set; }
 		}
 
+		private static readonly string APP_DATA_DIRECTORY = 
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control";
+		public static readonly string SETTINGS_FILE_NAME = "LandExplorerSettings.xml";
+
+		public static string SETTINGS_DEFAULT_PATH => 
+			Path.Combine(APP_DATA_DIRECTORY, SETTINGS_FILE_NAME);
+
 		/// <summary>
 		/// Настройки панели
 		/// </summary>
@@ -89,6 +96,11 @@ namespace Land.Control
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
 
+		static LandExplorerControl()
+		{
+			if (!Directory.Exists(APP_DATA_DIRECTORY))
+				Directory.CreateDirectory(APP_DATA_DIRECTORY);
+		}
 
 		public LandExplorerControl()
         {
@@ -100,13 +112,24 @@ namespace Land.Control
 
 		public void Initialize(IEditorAdapter adapter)
 		{
-			SettingsObject = adapter.LoadSettings() ?? new LandExplorerSettings();
-
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
+			Editor.ShouldLoadSettings += LoadSettings;
 
+			/// Загружаем настройки панели разметки
+			LoadSettings();
+
+			/// В TreeView будем показывать текущее дерево разметки
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
+		}
 
+		private void LoadSettings()
+		{
+			/// Загружаем настройки панели способом, определённым в адаптере
+			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH) 
+				?? new LandExplorerSettings();
+
+			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			Parsers = LogFunction(() => BuildParsers(), true, true);
 		}
 
@@ -339,7 +362,9 @@ namespace Land.Control
 			if (SettingsWindow.ShowDialog() ?? false)
 			{
 				SettingsObject = SettingsWindow.SettingsObject;
-				Editor.SaveSettings(SettingsObject);
+				Editor.SaveSettings(
+					SettingsObject, SETTINGS_DEFAULT_PATH
+				);
 
 				Parsers = LogFunction(() => BuildParsers(), true, true);
 			}

@@ -86,9 +86,11 @@ namespace Land.Control
 
 		#region Settings
 
-		void SaveSettings(LandExplorerSettings settings);
+		void SaveSettings(LandExplorerSettings settings, string defaultPath);
 
-		LandExplorerSettings LoadSettings();
+		LandExplorerSettings LoadSettings(string defaultPath);
+
+		event Action ShouldLoadSettings;
 
 		#endregion
 
@@ -98,8 +100,6 @@ namespace Land.Control
 		void RegisterOnDocumentSaved(Action<string> callback);
 
 		void RegisterOnDocumentChanged(Action<string> callback);
-
-		void RegisterOnWorkingDirectoryChanged(Action<string> callback);
 
 		HashSet<string> GetWorkingSet();
 

@@ -169,7 +169,7 @@ namespace Land.GUI
 			ColorsManager.Reset();
 		}
 
-		public void SaveSettings(LandExplorerSettings settings)
+		public void SaveSettings(LandExplorerSettings settings, string defaultPath)
 		{
 			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) });
 
@@ -179,7 +179,7 @@ namespace Land.GUI
 			}
 		}
 
-		public LandExplorerSettings LoadSettings()
+		public LandExplorerSettings LoadSettings(string defaultPath)
 		{
 			if (File.Exists(SettingsPath))
 			{
@@ -196,6 +196,8 @@ namespace Land.GUI
 			}
 		}
 
+		public event Action ShouldLoadSettings;
+
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
 			EditorWindow.DocumentChangedCallback = callback;
@@ -209,11 +211,6 @@ namespace Land.GUI
 		}
 
 		public void RegisterOnDocumentSaved(Action<string> callback)
-		{
-			throw new NotImplementedException();
-		}
-
-		public void RegisterOnWorkingDirectoryChanged(Action<string> callback)
 		{
 			throw new NotImplementedException();
 		}

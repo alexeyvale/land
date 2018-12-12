@@ -31,7 +31,10 @@ namespace Land.VisualStudioExtension
 
 		private Func<DTE2> DteServiceCallback { get; set; }
 
-		public static void InitializeInstance(IVsSolution solutionService, IVsShell shellService, Func<DTE2> dteServiceCallback)
+		public static void InitializeInstance(
+			IVsSolution solutionService, 
+			IVsShell shellService, 
+			Func<DTE2> dteServiceCallback)
 		{
 			Instance = new ServiceEventAggregator();
 
@@ -63,7 +66,7 @@ namespace Land.VisualStudioExtension
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			if(Instance.SolutionService != null
+			if(Instance?.SolutionService != null
 				&& Instance.SolutionEventsCookie != 0)
 			{
 				Instance.SolutionService
