@@ -454,6 +454,12 @@ namespace Land.Control
 			}
 		}
 
+		/// Убираем горизонтальную прокрутку при выборе элемента
+		private void MarkupTreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+		{
+			e.Handled = true;
+		}
+
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);

@@ -131,6 +131,7 @@
 						<EventSetter Event="KeyDown" Handler="MarkupTreeViewItem_KeyDown"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight"/>
+						<EventSetter Event="RequestBringIntoView" Handler="MarkupTreeViewItem_RequestBringIntoView"/>
 					</Style>
 				</TreeView.ItemContainerStyle>
 			</TreeView>
