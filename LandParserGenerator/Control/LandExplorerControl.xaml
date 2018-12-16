@@ -12,6 +12,7 @@
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
         <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
         <local:ConcernPointIsEnabledConverter x:Key="ConcernPointIsEnabledConverter" />
+		<local:IconVisibilityConverter x:Key="IconVisibilityConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
@@ -31,6 +32,7 @@
             <RowDefinition Height="75*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
             <RowDefinition Height="25*"></RowDefinition>
+			<RowDefinition Height="25"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
@@ -98,11 +100,24 @@
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
                         <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=., Converter={StaticResource ConcernPointIsEnabledConverter}}">
-                            <Grid>
-                                <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
-                                <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
-                            </Grid>
-                            <Grid>
+							<Grid>
+								<!--<Grid.Resources>
+									<Style TargetType="Label">
+										<MultiBinding Converter="{StaticResource IconVisibilityConverter}" ConverterParameter=" ">
+											<Binding Path="." />
+											<Binding Path="Location" />
+										</MultiBinding>
+									</Style>	
+								</Grid.Resources>-->
+								
+								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray" 
+									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='ConcernIcon'}"/>
+								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray" 
+									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='PointIcon'}"/>
+								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="IndianRed" 
+									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='MissingIcon'}"/>
+							</Grid>
+							<Grid>
                                 <TextBlock Text="{Binding Path=Name}" />
                                 <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
                             </Grid>
@@ -126,7 +141,6 @@
 						<EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
 						<EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
 						<EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
-						<EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
 						<EventSetter Event="MouseDoubleClick" Handler="MarkupTreeViewItem_MouseDoubleClick"/>
 						<EventSetter Event="KeyDown" Handler="MarkupTreeViewItem_KeyDown"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop"/>
@@ -137,12 +151,26 @@
 			</TreeView>
         </Grid>
         <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-        <ListBox
-            Grid.Row="2"
-            FontSize="12pt"
-            Name="ConcernPointCandidatesList"
-            SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
-            MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
-        </ListBox>
+		<TabControl Grid.Row="2">
+			<TabItem Header="Кандидаты">
+				<ListBox       
+					FontSize="12pt"
+					Name="ConcernPointCandidatesList"
+					SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
+					MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
+				</ListBox>
+			</TabItem>
+			<TabItem Header="Потерянные точки">
+				<ListBox       
+					FontSize="12pt"
+					Name="MissingPointsList"
+					SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
+					MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
+				</ListBox>
+			</TabItem>
+		</TabControl>
+		<StatusBar Name="ControlStatusBar" Grid.Row="3">
+			<Label Name="ControlStatusLabel"></Label>
+		</StatusBar>
     </Grid>
 </UserControl>

@@ -395,7 +395,7 @@ namespace Land.Control
 						: null;
 				}).Where(r => r != null).ToList();
 
-				MarkupManager.Remap(forest, sender == ApplyLocalMapping);		
+				MarkupManager.Remap(forest, sender == ApplyLocalMapping);
 			}, true, false);
 		}
 
@@ -498,7 +498,7 @@ namespace Land.Control
 					if (!ParsedFiles.ContainsKey(concernPoint.Context.FileName)
 						|| ParsedFiles[concernPoint.Context.FileName] == null)
 					{
-						ParsedFiles[concernPoint.Context.FileName] = GetRoot(concernPoint.Context.FileName);
+						GetRoot(concernPoint.Context.FileName);
 					}
 
 					/// Если файл разобран и у точки отсутствует связанное с ней положение в тексте 
@@ -650,28 +650,14 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_GotFocus(object sender, RoutedEventArgs e)
 		{
-			var item = (TreeViewItem)sender;
-
-			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null && !State.HighlightConcerns)
-				label.Foreground = Brushes.WhiteSmoke;
-			label = GetMarkupTreeItemLabel(item, "PointIcon");
-			if (label != null)
-				label.Foreground = Brushes.WhiteSmoke;
+			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, true);
 
 			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_LostFocus(object sender, RoutedEventArgs e)
 		{
-			var item = (TreeViewItem)sender;
-
-			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null && !State.HighlightConcerns)
-				label.Foreground = Brushes.DimGray;
-			label = GetMarkupTreeItemLabel(item, "PointIcon");
-			if (label != null)
-				label.Foreground = Brushes.DimGray;
+			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, false);
 
 			e.Handled = true;
 		}
@@ -695,24 +681,35 @@ namespace Land.Control
 		{
 			State.SelectedItem = null;
 
-			var item = (TreeViewItem)sender;
-
-			var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-			if (label != null && !State.HighlightConcerns)
-				label.Foreground = Brushes.DimGray;
+			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, false);
 
 			e.Handled = true;
 		}
 
-		private void MarkupTreeViewItem_Loaded(object sender, RoutedEventArgs e)
+		private void MarkupTreeViewItem_SwitchIconColor(TreeViewItem item, bool isFocused)
 		{
-			var item = (TreeViewItem)sender;
+			switch(item.DataContext)
+			{
+				case Concern concern:
+					var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
+					if (label != null && !State.HighlightConcerns)
+						label.Foreground = isFocused ? Brushes.WhiteSmoke : Brushes.DimGray;
 
-			var label = GetMarkupTreeItemLabel(item, item.DataContext is Concern ? "PointIcon" : "ConcernIcon");
-			if (label != null)
-				label.Visibility = Visibility.Hidden;
+					break;
+				case ConcernPoint point:
+					label = GetMarkupTreeItemLabel(item, point.Location == null ? "MissingIcon" : "PointIcon");
 
-			e.Handled = true;
+					if (label != null)
+					{
+						label.Foreground = isFocused
+							? Brushes.WhiteSmoke
+							: point.Location == null
+								? Brushes.IndianRed
+								: Brushes.DimGray;
+					}
+
+					break;
+			}
 		}
 
 		#endregion
@@ -954,7 +951,7 @@ namespace Land.Control
 			return !String.IsNullOrEmpty(documentName)
 				? ParsedFiles.ContainsKey(documentName) && ParsedFiles[documentName] != null
 					? ParsedFiles[documentName]
-					: TryParse(documentName, out bool success)
+					: ParsedFiles[documentName] = TryParse(documentName, out bool success)
 				: null;
 		}
 

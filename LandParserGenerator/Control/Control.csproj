@@ -56,6 +56,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IconVisibilityConverter.cs" />
     <Compile Include="ConcernPointIsEnabledConverter.cs" />
     <Compile Include="LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
