@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Tree;
@@ -9,12 +9,26 @@ using Land.Core.Parsing.Tree;
 namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
-	public class ConcernPoint: MarkupElement
+	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
 		[DataMember]
 		public PointContext Context { get; set; }
 
-		public SegmentLocation Location { get; set; }
+		private SegmentLocation _location;
+		public SegmentLocation Location
+		{
+			get => _location;
+
+			set
+			{
+				_location = value;
+
+				if(PropertyChanged != null)
+					PropertyChanged(this, new PropertyChangedEventArgs("Location"));
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{

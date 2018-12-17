@@ -4,19 +4,21 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 using Land.Core.Markup;
 
 namespace Land.Control
 {
-	public class IconVisibilityConverter : IValueConverter
+	public class IconVisibilityConverter : IMultiValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			var markupElement = (MarkupElement)value;
+			var label = (Label)values[0];
+			var markupElement = (MarkupElement)values[1];
 
-			switch (parameter)
+			switch (label.Name)
 			{
 				case "MissingIcon":
 					return markupElement is ConcernPoint point1 
@@ -38,9 +40,9 @@ namespace Land.Control
 			return Visibility.Hidden;
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
 		{
-			return DependencyProperty.UnsetValue;
+			return new object[] { };
 		}
 	}
 }

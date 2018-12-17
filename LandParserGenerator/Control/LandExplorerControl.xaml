@@ -10,8 +10,7 @@
              Loaded="LandExplorer_Loaded">
     <UserControl.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
-        <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
-        <local:ConcernPointIsEnabledConverter x:Key="ConcernPointIsEnabledConverter" />
+		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 		<local:IconVisibilityConverter x:Key="IconVisibilityConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
@@ -99,23 +98,25 @@
                 MouseMove="MarkupTreeView_MouseMove">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=., Converter={StaticResource ConcernPointIsEnabledConverter}}">
+                        <StackPanel Orientation="Horizontal">
 							<Grid>
-								<!--<Grid.Resources>
+								<Grid.Resources>
 									<Style TargetType="Label">
-										<MultiBinding Converter="{StaticResource IconVisibilityConverter}" ConverterParameter=" ">
-											<Binding Path="." />
-											<Binding Path="Location" />
-										</MultiBinding>
+										<Setter Property="Visibility">
+											<Setter.Value>
+												<MultiBinding Converter="{StaticResource IconVisibilityConverter}">
+													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+													<Binding Path="." />
+													<Binding Path="Location" />
+												</MultiBinding>
+											</Setter.Value>
+										</Setter>
 									</Style>	
-								</Grid.Resources>-->
+								</Grid.Resources>
 								
-								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray" 
-									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='ConcernIcon'}"/>
-								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray" 
-									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='PointIcon'}"/>
-								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="IndianRed" 
-									   Visibility="{Binding Path=., Converter={StaticResource IconVisibilityConverter}, ConverterParameter='MissingIcon'}"/>
+								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
+								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
+								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="IndianRed"/>
 							</Grid>
 							<Grid>
                                 <TextBlock Text="{Binding Path=Name}" />
