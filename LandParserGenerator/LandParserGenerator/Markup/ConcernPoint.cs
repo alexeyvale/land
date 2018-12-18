@@ -47,6 +47,11 @@ namespace Land.Core.Markup
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
+		public void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			PropertyChanged?.Invoke(sender, e);
+		}
+
 		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{
 			Context = PointContext.Create(targetInfo);
@@ -65,6 +70,8 @@ namespace Land.Core.Markup
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
+
+			base.PropertyChanged += ParentPropertyChanged;
 		}
 
 		public ConcernPoint(string name, TargetFileInfo targetInfo, Concern parent = null)
@@ -72,6 +79,8 @@ namespace Land.Core.Markup
 			Name = name;
 			Context = PointContext.Create(targetInfo);
 			Parent = parent;
+
+			base.PropertyChanged += ParentPropertyChanged;
 		}
 
 		public ConcernPoint(string name, string comment, TargetFileInfo targetInfo, Concern parent = null)
