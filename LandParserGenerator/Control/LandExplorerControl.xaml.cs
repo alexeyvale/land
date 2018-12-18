@@ -444,8 +444,16 @@ namespace Land.Control
 				ConcernPointCandidatesList.ItemsSource = null;
 				ConfigureMarkupElementTab(false);
 
-				SetStatus("Готово", ControlStatus.Success);
+				SetStatus("Привязка завершена", ControlStatus.Success);
 			}
+		}
+
+		private void ConcernPointCancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			ConcernPointCandidatesList.ItemsSource = null;
+			ConfigureMarkupElementTab(false);
+
+			SetStatus("Привязка отменена", ControlStatus.Ready);
 		}
 
 		#endregion
@@ -851,7 +859,7 @@ namespace Land.Control
 					ControlStatusBar.Background = Brushes.LightGoldenrodYellow;
 					break;
 				case ControlStatus.Ready:
-					ControlStatusBar.Background = Brushes.Blue;
+					ControlStatusBar.Background = Brushes.LightBlue;
 					break;
 				case ControlStatus.Success:
 					ControlStatusBar.Background = Brushes.LightGreen;
@@ -1170,5 +1178,23 @@ namespace Land.Control
 		}
 
 		#endregion
+
+		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var textBox = (TextBox)sender;
+
+			if (textBox.IsReadOnly)
+			{
+				textBox.IsReadOnly = false;
+				textBox.Select(0, 0);
+			}
+		}
+
+		private void MarkupElementText_LostFocus(object sender, RoutedEventArgs e)
+		{
+			var textBox = (TextBox)sender;
+
+			textBox.IsReadOnly = true;
+		}
 	}
 }

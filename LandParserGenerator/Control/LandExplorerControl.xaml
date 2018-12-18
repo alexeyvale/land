@@ -28,9 +28,9 @@
 	</UserControl.CommandBindings>
 	<Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="75*"></RowDefinition>
+            <RowDefinition Height="70*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="25*"></RowDefinition>
+            <RowDefinition Height="30*"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -177,27 +177,51 @@
 								<Label Content="Комментарий"/>
 								<TextBox TextWrapping="Wrap" 
 										 AcceptsReturn="True"
+										 Height="70"
 										 Name="ConcernPointCommentText"/>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="20">
 								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click">Сохранить</Button>
-								<Button Name="ConcernPointCancelButton" Click="ConcernPointSaveButton_Click">Отменить</Button>
+								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
 						</StackPanel>
-						<StackPanel Orientation="Vertical" Name="MarkupElementPanel">
-							<StackPanel Orientation="Vertical">
-								<Label Content="Имя"/>
-								<TextBox Name="MarkupElementNameText"
-										 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}"></TextBox>
-							</StackPanel>
-							<StackPanel Orientation="Vertical">
-								<Label Content="Комментарий"/>
-								<TextBox TextWrapping="Wrap" 
-										 AcceptsReturn="True"
-										 Name="MarkupElementCommentText"
-										 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}"></TextBox>
-							</StackPanel>
-						</StackPanel>
+						<Grid Name="MarkupElementPanel">
+							<Grid.Resources>
+								<Style TargetType="TextBox">
+									<Style.Triggers>
+										<Trigger Property="IsReadOnly" Value="true">
+											<Setter Property="Background" Value="WhiteSmoke"/>
+										</Trigger>
+										<Trigger Property="IsReadOnly" Value="false">
+											<Setter Property="Background" Value="White"/>
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</Grid.Resources>
+							<Grid.RowDefinitions>
+								<RowDefinition Height="27"></RowDefinition>
+								<RowDefinition Height="20"></RowDefinition>
+								<RowDefinition Height="27"></RowDefinition>
+								<RowDefinition Height="*"></RowDefinition>
+							</Grid.RowDefinitions>
+							<Label Content="Имя" Grid.Row="0"/>
+							<TextBox Name="MarkupElementNameText" Grid.Row="1"
+									 Margin="5 0 5 0"
+									 IsReadOnly="True"
+									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									 LostFocus="MarkupElementText_LostFocus"
+									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}"></TextBox>
+							<Label Content="Комментарий" Grid.Row="2"/>
+							<TextBox TextWrapping="Wrap" 
+									AcceptsReturn="True"
+									Name="MarkupElementCommentText"
+									MinHeight="100"
+									Grid.Row="3"
+									Margin="5 0 5 10"
+									IsReadOnly="True"
+									MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}"></TextBox>
+						</Grid>
 					</Grid>
 				</ScrollViewer>
 			</TabItem>
