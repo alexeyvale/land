@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Tree;
@@ -9,16 +9,38 @@ using Land.Core.Parsing.Tree;
 namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
-	public abstract class MarkupElement
+	public abstract class MarkupElement: INotifyPropertyChanged
 	{
-		[DataMember]
-		public string Name { get; set; }
+		private string _name;
+		private string _comment;
 
 		[DataMember]
-		public string Comment { get; set; }
+		public string Name {
+			get => _name;
+			set
+			{
+				_name = value;
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+			}
+		}
+
+		[DataMember]
+		public string Comment
+		{
+			get => _comment;
+			set
+			{
+				_comment = value;
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Comment"));
+			}
+		}
 
 		[DataMember]
 		public Concern Parent { get; set; }
+
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		public abstract void Accept(BaseMarkupVisitor visitor);
 	}

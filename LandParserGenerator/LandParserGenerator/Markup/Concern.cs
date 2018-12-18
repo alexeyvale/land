@@ -22,6 +22,12 @@ namespace Land.Core.Markup
 			Elements = new ObservableCollection<MarkupElement>();
 		}
 
+		public Concern(string name, string comment, Concern parent = null)
+			: this(name, parent)
+		{
+			Comment = comment;
+		}
+
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);

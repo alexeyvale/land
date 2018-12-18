@@ -37,12 +37,7 @@ namespace Land.Control
 
 		public class ControlState
 		{
-			public HashSet<MarkupElement> ExpandedItems { get; set; } = new HashSet<MarkupElement>();
 			public TreeViewItem SelectedItem { get; set; }
-			public HashSet<TreeViewItem> InactiveItems { get; set; }
-
-			public TreeViewItem EditedItem { get; set; }
-			public string EditedItemOldHeader { get; set; }
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -186,6 +181,12 @@ namespace Land.Control
 
 					ConcernPointCandidatesList.ItemsSource =
 						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
+					ConfigureMarkupElementTab(true);
+
+					SetStatus(
+						 $"{(State.PendingCommand.Command == LandExplorerCommand.AddPoint ? "Добавление" : "Перепривязка")} точки",
+						 ControlStatus.Pending
+					);
 				}
 			}
 		}
@@ -210,7 +211,7 @@ namespace Land.Control
 				&& MarkupTreeView.SelectedItem is Concern
 					? (Concern)MarkupTreeView.SelectedItem : null;
 
-			MarkupManager.AddConcern("Новая функциональность", parent);
+			MarkupManager.AddConcern("Новая функциональность", null, parent);
 
 			if (parent != null)
 			{
@@ -277,18 +278,6 @@ namespace Land.Control
 						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
 				}
 			}
-		}
-
-		private void Command_Rename_Executed(object sender, RoutedEventArgs e)
-		{
-			TreeViewItem item = e.OriginalSource as TreeViewItem;
-
-			var textbox = GetMarkupTreeItemTextBox(item);
-			textbox.Visibility = Visibility.Visible;
-			textbox.Focus();
-
-			State.EditedItemOldHeader = textbox.Text;
-			State.EditedItem = item;
 		}
 
 		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
@@ -403,10 +392,25 @@ namespace Land.Control
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
 			{
+				var node = (Node)ConcernPointCandidatesList.SelectedItem;
+
+				Editor.SetActiveDocumentAndOffset(
+					State.PendingCommand.DocumentName,
+					node.Anchor.Start
+				);
+			}
+		}
+
+		private void ConcernPointSaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (ConcernPointCandidatesList.SelectedItem != null)
+			{
 				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
 				{
+					var point = (ConcernPoint)State.SelectedItem.DataContext;
+
 					MarkupManager.RelinkConcernPoint(
-						(ConcernPoint)State.SelectedItem.DataContext,
+						point,
 						new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
@@ -414,6 +418,9 @@ namespace Land.Control
 							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
 						}
 					);
+
+					point.Name = ConcernPointNameText.Text;
+					point.Comment = ConcernPointCommentText.Text;
 				}
 				else
 				{
@@ -424,8 +431,9 @@ namespace Land.Control
 							FileText = State.PendingCommand.DocumentText,
 							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
 						},
-						null,
-						State.PendingCommand.Target != null 
+						ConcernPointNameText.Text,
+						ConcernPointCommentText.Text,
+						State.PendingCommand.Target != null
 							? (Concern)State.PendingCommand.Target.DataContext : null
 					);
 
@@ -434,19 +442,9 @@ namespace Land.Control
 				}
 
 				ConcernPointCandidatesList.ItemsSource = null;
-			}
-		}
+				ConfigureMarkupElementTab(false);
 
-		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if (ConcernPointCandidatesList.SelectedItem != null)
-			{
-				var node = (Node)ConcernPointCandidatesList.SelectedItem;
-
-				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommand.DocumentName, 
-					node.Anchor.Start
-				);
+				SetStatus("Готово", ControlStatus.Success);
 			}
 		}
 
@@ -489,7 +487,7 @@ namespace Land.Control
 		{
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
-			if (item != null && State.EditedItem != item && e.ChangedButton == MouseButton.Left)
+			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
 				/// При клике по точке переходим к ней
 				if (item.DataContext is ConcernPoint concernPoint)
@@ -513,37 +511,7 @@ namespace Land.Control
 
 			if (item != null)
 			{
-				switch (e.Key)
-				{
-					case Key.Enter:
-						if (State.EditedItem == item)
-						{
-							var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
-							textbox.Visibility = Visibility.Hidden;
-							State.EditedItem = null;
-						}
-						else
-						{
-							if (item.DataContext is ConcernPoint concernPoint)
-							{
-								Editor.SetActiveDocumentAndOffset(
-									concernPoint.Context.FileName,
-									concernPoint.Location.Start
-								);
-							}
-						}
-						break;
-					case Key.Escape:
-						if (State.EditedItem == item)
-						{
-							var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
-							textbox.Text = State.EditedItemOldHeader;
-							textbox.Visibility = Visibility.Hidden;						
 
-							State.EditedItem = null;				
-						}
-						break;
-				}
 			}
 		}
 
@@ -603,8 +571,6 @@ namespace Land.Control
 
 			if (item.DataContext is Concern)
 			{
-				State.ExpandedItems.Add((MarkupElement)item.DataContext);
-
 				var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
 				if (label != null)
 					label.Content = "\xf07c";
@@ -619,8 +585,6 @@ namespace Land.Control
 
 			if (item.DataContext is Concern)
 			{
-				State.ExpandedItems.Remove((MarkupElement)item.DataContext);
-
 				var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
 				if (label != null)
 					label.Content = "\xf07b";
@@ -642,14 +606,6 @@ namespace Land.Control
 		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
 			State.SelectedItem = (TreeViewItem)sender;
-
-			if (State.EditedItem != null 
-				&& State.EditedItem != (TreeViewItem)sender)
-			{
-				var textbox = GetMarkupTreeItemTextBox(State.EditedItem);
-				textbox.Visibility = Visibility.Hidden;
-				State.EditedItem = null;
-			}
 
 			e.Handled = true;
 		}
@@ -867,6 +823,43 @@ namespace Land.Control
 		#endregion
 
 		#region Helpers
+
+		private void ConfigureMarkupElementTab(bool mappingMode)
+		{
+			if(mappingMode)
+			{
+				ConcernPointPanel.Visibility = Visibility.Visible;
+				MarkupElementPanel.Visibility = Visibility.Collapsed;
+			}
+			else
+			{
+				ConcernPointPanel.Visibility = Visibility.Collapsed;
+				MarkupElementPanel.Visibility = Visibility.Visible;
+			}
+		}
+
+		private enum ControlStatus { Ready, Pending, Success, Error }
+
+		private void SetStatus(string text, ControlStatus status)
+		{
+			switch(status)
+			{
+				case ControlStatus.Error:
+					ControlStatusBar.Background = Brushes.IndianRed;
+					break;
+				case ControlStatus.Pending:
+					ControlStatusBar.Background = Brushes.LightGoldenrodYellow;
+					break;
+				case ControlStatus.Ready:
+					ControlStatusBar.Background = Brushes.Blue;
+					break;
+				case ControlStatus.Success:
+					ControlStatusBar.Background = Brushes.LightGreen;
+					break;
+			}
+
+			ControlStatusLabel.Content = text;
+		}
 
 		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
@@ -1140,19 +1133,6 @@ namespace Land.Control
 			}
 			catch
 			{
-			}
-
-			return null;
-		}
-
-		private TextBox GetMarkupTreeItemTextBox(TreeViewItem item)
-		{
-			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
-			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
-
-			if (dataTemplate != null && templateParent != null)
-			{
-				return dataTemplate.FindName("ConcernNameEditor", templateParent) as TextBox;
 			}
 
 			return null;

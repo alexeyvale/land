@@ -54,9 +54,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление функциональности
 		/// </summary>
-		public Concern AddConcern(string name, Concern parent = null)
+		public Concern AddConcern(string name, string comment = null, Concern parent = null)
 		{
-			var concern = new Concern(name, parent);
+			var concern = new Concern(name, comment, parent);
 			AddElement(concern);
 			return concern;
 		}
@@ -64,9 +64,14 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, string comment = null, Concern parent = null)
 		{
 			var point = new ConcernPoint(sourceInfo, parent);
+
+			if (!String.IsNullOrEmpty(name))
+				point.Name = name;
+			point.Comment = comment;
+
 			AddElement(point);
 			return point;
 		}
@@ -92,7 +97,7 @@ namespace Land.Core.Markup
 				foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
 				{
 					/// создаём подфункциональность
-					var subconcern = AddConcern(subgroup.Key, concern);
+					var subconcern = AddConcern(subgroup.Key, null, concern);
 
 					foreach (var point in subgroup)
 					{

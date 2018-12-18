@@ -36,18 +36,16 @@ namespace Land.Core.Markup
 		public SegmentLocation Location
 		{
 			get => _location;
-
 			set
 			{
 				_location = value;
 				HasIrrelevantLocation = false;
 
-				if(PropertyChanged != null)
-					PropertyChanged(this, new PropertyChangedEventArgs("Location"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
 			}
 		}
 
-		public event PropertyChangedEventHandler PropertyChanged;
+		public new event PropertyChangedEventHandler PropertyChanged;
 
 		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{
@@ -74,6 +72,12 @@ namespace Land.Core.Markup
 			Name = name;
 			Context = PointContext.Create(targetInfo);
 			Parent = parent;
+		}
+
+		public ConcernPoint(string name, string comment, TargetFileInfo targetInfo, Concern parent = null)
+			: this(name, targetInfo, parent)
+		{
+			Comment = comment;
 		}
 
 		public void Relink(TargetFileInfo targetInfo)
