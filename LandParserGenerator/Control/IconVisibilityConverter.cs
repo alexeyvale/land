@@ -22,13 +22,13 @@ namespace Land.Control
 			{
 				case "MissingIcon":
 					return markupElement is ConcernPoint point1 
-						? point1.Location == null 
+						? point1.HasMissingLocation
 							? Visibility.Visible : Visibility.Hidden 
 						: Visibility.Hidden;
 
 				case "PointIcon":
 					return markupElement is ConcernPoint point2
-						? point2.Location == null
+						? point2.HasMissingLocation
 							? Visibility.Hidden : Visibility.Visible
 						: Visibility.Hidden;
 

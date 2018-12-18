@@ -35,7 +35,7 @@ namespace Land.Core.Markup
 				if(elem is ConcernPoint concernPoint 
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.Location = null;
+					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
 		}

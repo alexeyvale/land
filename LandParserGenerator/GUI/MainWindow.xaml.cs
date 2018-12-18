@@ -917,7 +917,7 @@ namespace Land.GUI
 		{
 			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint point)
 			{
-				if (point.Location != null)
+				if (!point.HasInvalidLocation)
 				{
 					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 

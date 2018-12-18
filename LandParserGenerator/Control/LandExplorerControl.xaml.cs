@@ -494,28 +494,7 @@ namespace Land.Control
 				/// При клике по точке переходим к ней
 				if (item.DataContext is ConcernPoint concernPoint)
 				{
-					/// Если связанный с точкой файл не разбирали, или он изменился с прошлого разбора
-					if (!ParsedFiles.ContainsKey(concernPoint.Context.FileName)
-						|| ParsedFiles[concernPoint.Context.FileName] == null)
-					{
-						GetRoot(concernPoint.Context.FileName);
-					}
-
-					/// Если файл разобран и у точки отсутствует связанное с ней положение в тексте 
-					if (ParsedFiles[concernPoint.Context.FileName] != null && concernPoint.Location == null)
-					{
-						MarkupManager.Remap(
-							concernPoint,
-							new TargetFileInfo()
-							{
-								FileName = concernPoint.Context.FileName,
-								FileText = ParsedFiles[concernPoint.Context.FileName].Item2,
-								TargetNode = ParsedFiles[concernPoint.Context.FileName].Item1
-							}
-						);
-					}
-			
-					if (concernPoint.Location != null)
+					if(EnsureLocationValid(concernPoint))
 					{
 						Editor.SetActiveDocumentAndOffset(
 							concernPoint.Context.FileName,
@@ -577,6 +556,8 @@ namespace Land.Control
 				if (State.SelectedItem != null)
 				{
 					State.SelectedItem.IsSelected = false;
+
+					MarkupTreeView.Focus();
 				}
 			}
 		}
@@ -681,8 +662,6 @@ namespace Land.Control
 		{
 			State.SelectedItem = null;
 
-			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, false);
-
 			e.Handled = true;
 		}
 
@@ -697,13 +676,13 @@ namespace Land.Control
 
 					break;
 				case ConcernPoint point:
-					label = GetMarkupTreeItemLabel(item, point.Location == null ? "MissingIcon" : "PointIcon");
+					label = GetMarkupTreeItemLabel(item, point.HasMissingLocation ? "MissingIcon" : "PointIcon");
 
 					if (label != null)
 					{
 						label.Foreground = isFocused
 							? Brushes.WhiteSmoke
-							: point.Location == null
+							: point.HasMissingLocation
 								? Brushes.IndianRed
 								: Brushes.DimGray;
 					}
@@ -949,8 +928,11 @@ namespace Land.Control
 		private Tuple<Node, string> GetRoot(string documentName)
 		{
 			return !String.IsNullOrEmpty(documentName)
+				/// Если связанный с точкой файл разбирали и он не изменился с прошлого разбора,
 				? ParsedFiles.ContainsKey(documentName) && ParsedFiles[documentName] != null
+					/// возвращаем сохранённый ранее результат
 					? ParsedFiles[documentName]
+					/// иначе пытаемся переразобрать файл
 					: ParsedFiles[documentName] = TryParse(documentName, out bool success)
 				: null;
 		}
@@ -1119,22 +1101,7 @@ namespace Land.Control
 					{
 						if (element is ConcernPoint cp)
 						{
-							if (cp.Location == null)
-							{
-								var rootTextPair = GetRoot(cp.Context.FileName);
-
-								if (rootTextPair != null)
-								{
-									MarkupManager.Remap(cp, new TargetFileInfo()
-									{
-										FileName = cp.Context.FileName,
-										FileText = rootTextPair.Item2,
-										TargetNode = rootTextPair.Item1
-									});
-								}
-							}
-
-							if (cp.Location != null)
+							if (EnsureLocationValid(cp))
 							{
 								segments.Add(new DocumentSegment()
 								{
@@ -1154,7 +1121,7 @@ namespace Land.Control
 			{
 				var concernPoint = (ConcernPoint)elem;
 
-				if (concernPoint.Location != null)
+				if (EnsureLocationValid(concernPoint))
 				{
 					segments.Add(new DocumentSegment()
 					{
@@ -1167,6 +1134,26 @@ namespace Land.Control
 			}
 
 			return segments;
+		}
+
+		private bool EnsureLocationValid(ConcernPoint cp)
+		{
+			if (cp.HasInvalidLocation)
+			{
+				var rootTextPair = GetRoot(cp.Context.FileName);
+
+				if (rootTextPair != null)
+				{
+					MarkupManager.Remap(cp, new TargetFileInfo()
+					{
+						FileName = cp.Context.FileName,
+						FileText = rootTextPair.Item2,
+						TargetNode = rootTextPair.Item1
+					});
+				}
+			}
+
+			return !cp.HasInvalidLocation;
 		}
 
 		private Label GetMarkupTreeItemLabel(TreeViewItem item, string labelName)

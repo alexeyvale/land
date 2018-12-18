@@ -14,6 +14,24 @@ namespace Land.Core.Markup
 		[DataMember]
 		public PointContext Context { get; set; }
 
+		/// <summary>
+		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
+		/// </summary>
+		public bool HasIrrelevantLocation { get; set; }
+
+		/// <summary>
+		/// Признак того, что координаты потеряны
+		/// </summary>
+		public bool HasMissingLocation => _location == null;
+
+		/// <summary>
+		/// Признак того, что координаты невозможно использовать для перехода
+		/// </summary>
+		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
+
+		/// <summary>
+		/// Координаты участка в тексте, которому соответствует точка 
+		/// </summary>
 		private SegmentLocation _location;
 		public SegmentLocation Location
 		{
@@ -22,6 +40,7 @@ namespace Land.Core.Markup
 			set
 			{
 				_location = value;
+				HasIrrelevantLocation = false;
 
 				if(PropertyChanged != null)
 					PropertyChanged(this, new PropertyChangedEventArgs("Location"));
