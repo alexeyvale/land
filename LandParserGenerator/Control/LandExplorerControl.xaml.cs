@@ -180,13 +180,12 @@ namespace Land.Control
 					};
 
 					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
+						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
+							.Select(c=>new ConcernPointCandidateViewModel(c));
+
 					ConfigureMarkupElementTab(true);
 
-					SetStatus(
-						 $"{(State.PendingCommand.Command == LandExplorerCommand.AddPoint ? "Добавление" : "Перепривязка")} точки",
-						 ControlStatus.Pending
-					);
+					SetStatus("Добавление точки", ControlStatus.Pending);
 				}
 			}
 		}
@@ -275,7 +274,12 @@ namespace Land.Control
 					};
 
 					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value);
+						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
+							.Select(c => new ConcernPointCandidateViewModel(c));
+
+					ConfigureMarkupElementTab(true);
+
+					SetStatus("Перепривязка точки", ControlStatus.Pending);
 				}
 			}
 		}
@@ -386,74 +390,6 @@ namespace Land.Control
 
 				MarkupManager.Remap(forest, sender == ApplyLocalMapping);
 			}, true, false);
-		}
-
-		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			if (ConcernPointCandidatesList.SelectedItem != null)
-			{
-				var node = (Node)ConcernPointCandidatesList.SelectedItem;
-
-				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommand.DocumentName,
-					node.Anchor.Start
-				);
-			}
-		}
-
-		private void ConcernPointSaveButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (ConcernPointCandidatesList.SelectedItem != null)
-			{
-				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
-				{
-					var point = (ConcernPoint)State.SelectedItem.DataContext;
-
-					MarkupManager.RelinkConcernPoint(
-						point,
-						new TargetFileInfo()
-						{
-							FileName = State.PendingCommand.DocumentName,
-							FileText = State.PendingCommand.DocumentText,
-							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
-						}
-					);
-
-					point.Name = ConcernPointNameText.Text;
-					point.Comment = ConcernPointCommentText.Text;
-				}
-				else
-				{
-					MarkupManager.AddConcernPoint(
-						new TargetFileInfo()
-						{
-							FileName = State.PendingCommand.DocumentName,
-							FileText = State.PendingCommand.DocumentText,
-							TargetNode = (Node)ConcernPointCandidatesList.SelectedItem
-						},
-						ConcernPointNameText.Text,
-						ConcernPointCommentText.Text,
-						State.PendingCommand.Target != null
-							? (Concern)State.PendingCommand.Target.DataContext : null
-					);
-
-					if (State.PendingCommand.Target != null)
-						State.PendingCommand.Target.IsExpanded = true;
-				}
-
-				ConcernPointCandidatesList.ItemsSource = null;
-				ConfigureMarkupElementTab(false);
-
-				SetStatus("Привязка завершена", ControlStatus.Success);
-			}
-		}
-
-		private void ConcernPointCancelButton_Click(object sender, RoutedEventArgs e)
-		{
-			ConcernPointCandidatesList.ItemsSource = null;
-			ConfigureMarkupElementTab(false);
-
-			SetStatus("Привязка отменена", ControlStatus.Ready);
 		}
 
 		#endregion
@@ -830,6 +766,114 @@ namespace Land.Control
 
 		#endregion
 
+		#region TabControl manipulations
+
+		private class ConcernPointCandidateViewModel
+		{
+			public Node Node { get; set; }
+			public string ViewHeader { get; set; }
+
+			public ConcernPointCandidateViewModel(Node node)
+			{
+				Node = node;
+				ViewHeader = String.Join(" ",
+					PointContext.GetHeaderContext(node).Select(c => String.Join("", c.Value)));
+			}
+
+			public override string ToString()
+			{
+				return ViewHeader;
+			}
+		}
+
+		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if (ConcernPointCandidatesList.SelectedItem != null)
+			{
+				var node = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node;
+
+				Editor.SetActiveDocumentAndOffset(
+					State.PendingCommand.DocumentName,
+					node.Anchor.Start
+				);
+			}
+		}
+
+		private void ConcernPointSaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (ConcernPointCandidatesList.SelectedItem != null)
+			{
+				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
+				{
+					var point = (ConcernPoint)State.SelectedItem.DataContext;
+
+					MarkupManager.RelinkConcernPoint(
+						point,
+						new TargetFileInfo()
+						{
+							FileName = State.PendingCommand.DocumentName,
+							FileText = State.PendingCommand.DocumentText,
+							TargetNode = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node
+						}
+					);
+
+					point.Name = ConcernPointNameText.Text;
+					point.Comment = ConcernPointCommentText.Text;
+				}
+				else
+				{
+					MarkupManager.AddConcernPoint(
+						new TargetFileInfo()
+						{
+							FileName = State.PendingCommand.DocumentName,
+							FileText = State.PendingCommand.DocumentText,
+							TargetNode = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node
+						},
+						ConcernPointNameText.Text,
+						ConcernPointCommentText.Text,
+						State.PendingCommand.Target != null
+							? (Concern)State.PendingCommand.Target.DataContext : null
+					);
+
+					if (State.PendingCommand.Target != null)
+						State.PendingCommand.Target.IsExpanded = true;
+				}
+
+				ConcernPointCandidatesList.ItemsSource = null;
+				ConfigureMarkupElementTab(false);
+
+				SetStatus("Привязка завершена", ControlStatus.Success);
+			}
+		}
+
+		private void ConcernPointCancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			ConcernPointCandidatesList.ItemsSource = null;
+			ConfigureMarkupElementTab(false);
+
+			SetStatus("Привязка отменена", ControlStatus.Ready);
+		}
+
+		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var textBox = (TextBox)sender;
+
+			if (textBox.IsReadOnly)
+			{
+				textBox.IsReadOnly = false;
+				textBox.Select(0, 0);
+			}
+		}
+
+		private void MarkupElementText_LostFocus(object sender, RoutedEventArgs e)
+		{
+			var textBox = (TextBox)sender;
+
+			textBox.IsReadOnly = true;
+		}
+
+		#endregion
+
 		#region Helpers
 
 		private void ConfigureMarkupElementTab(bool mappingMode)
@@ -1178,23 +1222,5 @@ namespace Land.Control
 		}
 
 		#endregion
-
-		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			if (textBox.IsReadOnly)
-			{
-				textBox.IsReadOnly = false;
-				textBox.Select(0, 0);
-			}
-		}
-
-		private void MarkupElementText_LostFocus(object sender, RoutedEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			textBox.IsReadOnly = true;
-		}
 	}
 }

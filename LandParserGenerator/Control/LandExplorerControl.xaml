@@ -163,6 +163,11 @@
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<StackPanel Orientation="Vertical" Name="ConcernPointPanel" Visibility="Collapsed">
+							<StackPanel.Resources>
+								<Style TargetType="Button">
+									<Setter Property="Padding" Value="3 3 3 3"></Setter>
+								</Style>
+							</StackPanel.Resources>
 							<ListBox       
 								FontSize="12pt"
 								Height="100"
@@ -171,7 +176,9 @@
 							</ListBox>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Имя"/>
-								<TextBox Name="ConcernPointNameText"/>
+								<TextBox Name="ConcernPointNameText"
+										 Height="20"
+										 Text="{Binding ElementName=ConcernPointCandidatesList, Path=SelectedItem.ViewHeader, Mode=OneWay}"/>
 							</StackPanel>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Комментарий"/>
@@ -180,7 +187,7 @@
 										 Height="70"
 										 Name="ConcernPointCommentText"/>
 							</StackPanel>
-							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="20">
+							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="25">
 								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click">Сохранить</Button>
 								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
