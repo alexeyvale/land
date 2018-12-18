@@ -455,7 +455,28 @@ namespace Land.Control
 
 			if (item != null)
 			{
+				switch (e.Key)
+				{
+					case Key.Enter:
+						if (item.DataContext is ConcernPoint concernPoint)
+						{
+							Editor.SetActiveDocumentAndOffset(
+								concernPoint.Context.FileName,
+								concernPoint.Location.Start
+							);
+						}
+						else
+							item.IsExpanded = true;
 
+						e.Handled = true;
+						break;
+					case Key.Escape:
+						if (item.DataContext is Concern)
+							item.IsExpanded = false;
+
+						e.Handled = true;
+						break;
+				}
 			}
 		}
 
