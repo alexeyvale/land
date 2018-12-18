@@ -631,15 +631,11 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_GotFocus(object sender, RoutedEventArgs e)
 		{
-			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, true);
-
 			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_LostFocus(object sender, RoutedEventArgs e)
 		{
-			MarkupTreeViewItem_SwitchIconColor((TreeViewItem)sender, false);
-
 			e.Handled = true;
 		}
 
@@ -663,32 +659,6 @@ namespace Land.Control
 			State.SelectedItem = null;
 
 			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_SwitchIconColor(TreeViewItem item, bool isFocused)
-		{
-			switch(item.DataContext)
-			{
-				case Concern concern:
-					var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-					if (label != null && !State.HighlightConcerns)
-						label.Foreground = isFocused ? Brushes.WhiteSmoke : Brushes.DimGray;
-
-					break;
-				case ConcernPoint point:
-					label = GetMarkupTreeItemLabel(item, point.HasMissingLocation ? "MissingIcon" : "PointIcon");
-
-					if (label != null)
-					{
-						label.Foreground = isFocused
-							? Brushes.WhiteSmoke
-							: point.HasMissingLocation
-								? Brushes.IndianRed
-								: Brushes.DimGray;
-					}
-
-					break;
-			}
 		}
 
 		#endregion

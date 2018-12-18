@@ -12,6 +12,7 @@
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 		<local:IconVisibilityConverter x:Key="IconVisibilityConverter" />
+		<local:IconColorConverter x:Key="IconColorConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
@@ -111,12 +112,20 @@
 												</MultiBinding>
 											</Setter.Value>
 										</Setter>
+										<Setter Property="Foreground">
+											<Setter.Value>
+												<MultiBinding Converter="{StaticResource IconColorConverter}">
+													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
+												</MultiBinding>
+											</Setter.Value>
+										</Setter>
 									</Style>	
 								</Grid.Resources>
 								
-								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
-								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
-								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="IndianRed"/>
+								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}"/>
+								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
 							</Grid>
 							<Grid>
                                 <TextBlock Text="{Binding Path=Name}" />
