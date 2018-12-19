@@ -232,7 +232,8 @@
 			<TabItem Header="Потерянные точки" Name="MissingPointsTab">
 				<ListBox       
 					FontSize="12pt"
-					Name="MissingPointsList">
+					Name="MissingPointsList"
+					PreviewMouseLeftButtonDown="MissingPointsList_PreviewMouseLeftButtonDown">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
 							<StackPanel Orientation="Horizontal">

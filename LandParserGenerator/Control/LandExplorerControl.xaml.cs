@@ -462,10 +462,13 @@ namespace Land.Control
 					case Key.Enter:
 						if (item.DataContext is ConcernPoint concernPoint)
 						{
-							Editor.SetActiveDocumentAndOffset(
-								concernPoint.Context.FileName,
-								concernPoint.Location.Start
-							);
+							if (EnsureLocationValid(concernPoint))
+							{
+								Editor.SetActiveDocumentAndOffset(
+									concernPoint.Context.FileName,
+									concernPoint.Location.Start
+								);
+							}
 						}
 						else
 							item.IsExpanded = true;
@@ -854,8 +857,7 @@ namespace Land.Control
 						},
 						ConcernPointNameText.Text,
 						ConcernPointCommentText.Text,
-						State.PendingCommand.Target != null
-							? (Concern)State.PendingCommand.Target.DataContext : null
+						State.PendingCommand.Target?.DataContext as Concern
 					);
 
 					if (State.PendingCommand.Target != null)
@@ -893,6 +895,15 @@ namespace Land.Control
 			var textBox = (TextBox)sender;
 
 			textBox.IsReadOnly = true;
+		}
+
+		private void MissingPointsList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (MissingPointsList.SelectedItem != null)
+			{
+				MissingPointsList.SelectedItem = null;
+				MissingPointsList.Focus();
+			}
 		}
 
 		private void RefreshMissingPointsList()

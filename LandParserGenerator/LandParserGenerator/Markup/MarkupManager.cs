@@ -348,7 +348,9 @@ namespace Land.Core.Markup
 		/// </summary>
 		public void Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			ApplyCandidate(point, ContextFinder.Find(point, targetInfo).FirstOrDefault());		
+			ApplyCandidate(point, ContextFinder.Find(point, targetInfo).FirstOrDefault());
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		private void ApplyCandidate(ConcernPoint point, NodeSimilarityPair candidate)
