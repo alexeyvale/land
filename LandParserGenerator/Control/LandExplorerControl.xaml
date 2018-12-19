@@ -19,8 +19,8 @@
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
-		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
         <CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
@@ -28,9 +28,9 @@
 	</UserControl.CommandBindings>
 	<Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="70*"></RowDefinition>
+            <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="30*"></RowDefinition>
+            <RowDefinition Height="40*" MaxHeight="280"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -74,12 +74,12 @@
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
                 <Button Content="&#xf0c1;" ToolTip="Сменить привязку" 
 						Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf2ed;" ToolTip="Удалить" 
+				<Button Content="&#xf2ed;" ToolTip="Удалить"
 						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 
-				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить все функциональности" 
+				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить функциональности" Name="ToolBar_HighlightButton"
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
 				
                 <Separator Margin="7"></Separator>
@@ -98,7 +98,7 @@
                 MouseMove="MarkupTreeView_MouseMove">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                        <StackPanel Orientation="Horizontal">
+						<StackPanel Orientation="Horizontal">
 							<Grid>
 								<Grid.Resources>
 									<Style TargetType="Label">
@@ -158,42 +158,42 @@
 			</TreeView>
         </Grid>
         <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-		<TabControl Grid.Row="2">
+		<TabControl Grid.Row="2" Name="Tabs">
 			<TabItem Header="Текущая точка" Name="MarkupElementTab">
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<StackPanel Orientation="Vertical" Name="ConcernPointPanel" Visibility="Collapsed">
 							<StackPanel.Resources>
 								<Style TargetType="Button">
-									<Setter Property="Padding" Value="3 3 3 3"></Setter>
+									<Setter Property="Width" Value="80"></Setter>
 								</Style>
 							</StackPanel.Resources>
 							<ListBox       
 								FontSize="12pt"
-								Height="100"
+								Height="80"
 								Name="ConcernPointCandidatesList"
 								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
 							</ListBox>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Имя"/>
 								<TextBox Name="ConcernPointNameText"
-										 Height="20"
 										 Text="{Binding ElementName=ConcernPointCandidatesList, Path=SelectedItem.ViewHeader, Mode=OneWay}"/>
 							</StackPanel>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Комментарий"/>
 								<TextBox TextWrapping="Wrap" 
 										 AcceptsReturn="True"
-										 Height="70"
+										 Height="60"
+										 ScrollViewer.VerticalScrollBarVisibility="Auto"
 										 Name="ConcernPointCommentText"/>
 							</StackPanel>
 							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="25">
-								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click">Сохранить</Button>
+								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
 								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
 						</StackPanel>
-						<Grid Name="MarkupElementPanel">
-							<Grid.Resources>
+						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">
+							<StackPanel.Resources>
 								<Style TargetType="TextBox">
 									<Style.Triggers>
 										<Trigger Property="IsReadOnly" Value="true">
@@ -204,38 +204,66 @@
 										</Trigger>
 									</Style.Triggers>
 								</Style>
-							</Grid.Resources>
-							<Grid.RowDefinitions>
-								<RowDefinition Height="27"></RowDefinition>
-								<RowDefinition Height="20"></RowDefinition>
-								<RowDefinition Height="27"></RowDefinition>
-								<RowDefinition Height="*"></RowDefinition>
-							</Grid.RowDefinitions>
-							<Label Content="Имя" Grid.Row="0"/>
-							<TextBox Name="MarkupElementNameText" Grid.Row="1"
+							</StackPanel.Resources>
+			
+							<Label Content="Имя"/>
+							<TextBox Name="MarkupElementNameText"
 									 Margin="5 0 5 0"
 									 IsReadOnly="True"
 									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
 									 LostFocus="MarkupElementText_LostFocus"
 									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}"></TextBox>
-							<Label Content="Комментарий" Grid.Row="2"/>
+
+							<Label Content="Комментарий"/>
 							<TextBox TextWrapping="Wrap" 
 									AcceptsReturn="True"
 									Name="MarkupElementCommentText"
-									MinHeight="100"
-									Grid.Row="3"
+									Height="150"
+									ScrollViewer.VerticalScrollBarVisibility="Auto"
 									Margin="5 0 5 10"
 									IsReadOnly="True"
 									MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									LostFocus="MarkupElementText_LostFocus"
 									Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}"></TextBox>
-						</Grid>
+						</StackPanel>
 					</Grid>
 				</ScrollViewer>
 			</TabItem>
-			<TabItem Header="Потерянные точки">
+			<TabItem Header="Потерянные точки" Name="MissingPointsTab">
 				<ListBox       
 					FontSize="12pt"
 					Name="MissingPointsList">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<StackPanel Orientation="Horizontal">
+								<Grid>
+									<Grid.Resources>
+										<Style TargetType="Label">
+											<Setter Property="Foreground">
+												<Setter.Value>
+													<MultiBinding Converter="{StaticResource IconColorConverter}">
+														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}" Path="IsFocused" />
+													</MultiBinding>
+												</Setter.Value>
+											</Setter>
+										</Style>
+									</Grid.Resources>
+									
+									<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+								</Grid>
+								<Grid>
+									<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+								</Grid>
+								<StackPanel.ContextMenu>
+									<ContextMenu>
+										<MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									</ContextMenu>
+								</StackPanel.ContextMenu>
+							</StackPanel>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
 				</ListBox>
 			</TabItem>
 		</TabControl>

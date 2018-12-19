@@ -100,6 +100,8 @@ namespace Land.Control
 		public LandExplorerControl()
         {
 			InitializeComponent();
+
+			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
 
 		private void LandExplorer_Loaded(object sender, RoutedEventArgs e)
@@ -893,12 +895,23 @@ namespace Land.Control
 			textBox.IsReadOnly = true;
 		}
 
+		private void RefreshMissingPointsList()
+		{
+			MissingPointsList.ItemsSource = MarkupManager.GetConcernPoints()
+				.Where(p => p.HasMissingLocation).ToList();
+
+			if (MissingPointsList.Items.Count > 0)
+				Tabs.SelectedItem = MissingPointsTab;
+		}
+
 		#endregion
 
 		#region Helpers
 
 		private void ConfigureMarkupElementTab(bool mappingMode)
 		{
+			Tabs.SelectedItem = MarkupElementTab;
+
 			if(mappingMode)
 			{
 				ConcernPointPanel.Visibility = Visibility.Visible;

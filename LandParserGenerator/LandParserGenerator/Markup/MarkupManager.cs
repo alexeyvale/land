@@ -12,6 +12,8 @@ namespace Land.Core.Markup
 {
 	public class MarkupManager
 	{
+		public event Action OnMarkupChanged;
+
 		/// <summary>
 		/// Коллекция точек привязки
 		/// </summary>
@@ -23,6 +25,8 @@ namespace Land.Core.Markup
 		public void Clear()
 		{
 			Markup.Clear();
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -49,6 +53,8 @@ namespace Land.Core.Markup
 				elem.Parent.Elements.Remove(elem);
 			else
 				Markup.Remove(elem);
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -58,6 +64,8 @@ namespace Land.Core.Markup
 		{
 			var concern = new Concern(name, comment, parent);
 			AddElement(concern);
+
+			OnMarkupChanged?.Invoke();
 			return concern;
 		}
 
@@ -73,6 +81,8 @@ namespace Land.Core.Markup
 			point.Comment = comment;
 
 			AddElement(point);
+
+			OnMarkupChanged?.Invoke();
 			return point;
 		}
 
@@ -116,6 +126,8 @@ namespace Land.Core.Markup
 					AddElement(new ConcernPoint(sourceInfo, concern));
 				}
 			}
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -147,6 +159,16 @@ namespace Land.Core.Markup
 		public void RelinkConcernPoint(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			point.Relink(targetInfo);
+
+			OnMarkupChanged?.Invoke();
+		}
+
+		/// <summary>
+		/// Получение списка точек привязки для текущего дерева разметки
+		/// </summary>
+		public List<ConcernPoint> GetConcernPoints()
+		{
+			return GetPointsVisitor.GetPoints(Markup);
 		}
 
 		/// <summary>
@@ -165,6 +187,8 @@ namespace Land.Core.Markup
 				newParent.Elements.Add(elem);
 			else
 				Markup.Add(elem);
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		public void Serialize(string fileName, bool useRelativePaths)
@@ -266,6 +290,8 @@ namespace Land.Core.Markup
 				LocalRemap(targetFiles);
 			else
 				GlobalRemap(targetFiles);
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		private void LocalRemap(List<TargetFileInfo> targetFiles)

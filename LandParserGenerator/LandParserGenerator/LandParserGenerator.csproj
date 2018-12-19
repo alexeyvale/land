@@ -84,6 +84,7 @@
     <Compile Include="Lexing\PairAwareTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
+    <Compile Include="Markup\MarkupVisitors\GetPointsVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByTypeVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByFileVisitor.cs" />
     <Compile Include="Markup\PointContext.cs" />
