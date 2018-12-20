@@ -27,6 +27,7 @@
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
 	<Grid>
+	<Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
