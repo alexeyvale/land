@@ -12,40 +12,10 @@ using Land.Control;
 
 namespace Land.GUI
 {
-	public class ColorsManager
-	{
-		private Color[] ColorsList { get; set; } = new Color[] {
-			Color.FromArgb(60, 100, 200, 100),
-			Color.FromArgb(60, Colors.Cyan.R, Colors.Cyan.G, Colors.Cyan.B),
-			Color.FromArgb(60, Colors.HotPink.R, Colors.HotPink.G, Colors.HotPink.B),
-			Color.FromArgb(60, Colors.Coral.R, Colors.Coral.G, Colors.Coral.B),
-			Color.FromArgb(60, Colors.Gold.R, Colors.Gold.G, Colors.Gold.B),
-			Color.FromArgb(60, Colors.LightSkyBlue.R, Colors.LightSkyBlue.G, Colors.LightSkyBlue.B),
-			Color.FromArgb(60, Colors.Thistle.R, Colors.Thistle.G, Colors.Thistle.B)
-		};
-
-		private Random Generator { get; set; } = new Random();
-
-		private int ColorsUsed { get; set; } = 0;
-
-		public Color GetColor()
-		{
-			return ColorsUsed < ColorsList.Length 
-				? ColorsList[ColorsUsed++]
-				: Color.FromArgb(45, (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206), (byte)Generator.Next(100, 206));
-		}
-
-		public void Reset()
-		{
-			ColorsUsed = 0;
-		}
-	}
-
 	public class EditorAdapter : IEditorAdapter
 	{
 		private MainWindow EditorWindow { get; set; }
 		private string SettingsPath { get; set; }
-		private ColorsManager ColorsManager { get; set; } = new ColorsManager();
 		private Action<string> DocumentSavingCallback { get; set; }
 
 		public EditorAdapter(MainWindow window, string settingsPath)
@@ -139,10 +109,8 @@ namespace Land.GUI
 			}
 		}
 
-		public Color SetSegments(List<DocumentSegment> segments)
+		public void SetSegments(List<DocumentSegment> segments, Color color)
 		{
-			var color = ColorsManager.GetColor();
-
 			foreach(var group in segments.GroupBy(s=>s.FileName))
 			{
 				var documentTab = EditorWindow.Documents
@@ -151,12 +119,12 @@ namespace Land.GUI
 
 				if(documentTab != null)
 				{
-					documentTab.SegmentsColorizer.SetSegments(group.ToList(), color);
+					documentTab.SegmentsColorizer.SetSegments(
+						group.ToList(), 
+						color
+					);
 				}
 			}
-
-			color.A = (byte)255;
-			return color;
 		}
 
 		public void ResetSegments()
@@ -165,8 +133,6 @@ namespace Land.GUI
 			{
 				document.Value.SegmentsColorizer.ResetSegments();
 			}
-
-			ColorsManager.Reset();
 		}
 
 		public void SaveSettings(LandExplorerSettings settings, string defaultPath)

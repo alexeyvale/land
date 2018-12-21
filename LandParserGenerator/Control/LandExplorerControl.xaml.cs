@@ -51,6 +51,8 @@ namespace Land.Control
 		public static string SETTINGS_DEFAULT_PATH => 
 			Path.Combine(APP_DATA_DIRECTORY, SETTINGS_FILE_NAME);
 
+		public static readonly Color HighlightingColor = Color.FromArgb(60, 100, 200, 100);
+
 		/// <summary>
 		/// Настройки панели
 		/// </summary>
@@ -290,38 +292,8 @@ namespace Land.Control
 		{
 			State.HighlightConcerns = !State.HighlightConcerns;
 
-			Editor.ResetSegments();
-
-			if (!State.HighlightConcerns)
-			{
-				/// Обеспечиваем стандартное отображение Concern-ов в панели
-				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-				{
-					var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
-					if (!markupTreeItem.IsSelected)
-					{
-						var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
-						if (label != null)
-							label.Foreground = Brushes.DimGray;
-					}
-				}
-			}
-			else
-			{
-				var concernsAndColors = new Dictionary<Concern, Color>();
-
-				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-				{
-					concernsAndColors[concern] = Editor.SetSegments(GetSegments(concern, true));
-
-					var label = GetMarkupTreeItemLabel(
-						MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, 
-						"ConcernIcon"
-					);
-					if (label != null)
-						label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
-				}
-			}
+			if(!State.HighlightConcerns)
+				Editor.ResetSegments();		
 		}
 
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -522,14 +494,17 @@ namespace Land.Control
 		{
 			var item = (TreeViewItem)sender;
 
-			if (SettingsObject.HighlightSelectedElement && !State.HighlightConcerns)
+			if (State.HighlightConcerns)
 			{
 				Editor.ResetSegments();
 
-				Editor.SetSegments(GetSegments(
-					(MarkupElement)item.DataContext,
-					item.DataContext is Concern
-				));
+				Editor.SetSegments(
+					GetSegments(
+						(MarkupElement)item.DataContext,
+						item.DataContext is Concern
+					), 
+					HighlightingColor
+				);
 			}
 		}
 

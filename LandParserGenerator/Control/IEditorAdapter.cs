@@ -65,7 +65,7 @@ namespace Land.Control
 		/// <summary>
 		/// Выделить участки текста в файле
 		/// </summary>
-		Color SetSegments(List<DocumentSegment> segments);
+		void SetSegments(List<DocumentSegment> segments, Color color);
 
 		/// <summary>
 		/// Сбросить выделение

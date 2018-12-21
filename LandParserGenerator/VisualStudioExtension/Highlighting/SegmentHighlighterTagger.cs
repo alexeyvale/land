@@ -27,10 +27,7 @@ namespace VisualStudioExtension.Highlighting
 	{
 		public SegmentFormatDefinition()
 		{
-			if (!ColorManager.CurrentColor.HasValue)
-				ColorManager.NextColor();
-
-			this.Fill = new SolidColorBrush(ColorManager.CurrentColor.Value);
+			this.Fill = new SolidColorBrush(LandExplorerControl.HighlightingColor);
 			this.Border = new Pen(Brushes.Gray, 1.0);
 			this.DisplayName = "Highlight Concern Segment";
 			this.ZOrder = 5;

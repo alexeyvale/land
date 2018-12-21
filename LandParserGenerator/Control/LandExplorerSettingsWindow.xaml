@@ -20,24 +20,18 @@
         </Style>
     </Window.Resources>
     <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="20"></RowDefinition>
+		<Grid.RowDefinitions>
 			<RowDefinition Height="20"></RowDefinition>
-            <RowDefinition Height="100*"></RowDefinition>
-            <RowDefinition Height="30"></RowDefinition>
-        </Grid.RowDefinitions>
-
-		<CheckBox Name="HighlightCheckBox" 
-				  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.HighlightSelectedElement, Mode=TwoWay}" 
-				  Grid.Row="0">Подсвечивать выбранную функциональность
-		</CheckBox>
+			<RowDefinition Height="100*"></RowDefinition>
+			<RowDefinition Height="30"></RowDefinition>
+		</Grid.RowDefinitions>
 
 		<CheckBox Name="SaveAbsolutePathCheckBox" 
 				  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}" 
-				  Grid.Row="1">Сохранять в разметке абсолютные пути к файлам
+				  Grid.Row="0">Сохранять в разметке абсолютные пути к файлам
 		</CheckBox>
 
-		<DockPanel Grid.Row="2" Margin="0,10,0,0">
+		<DockPanel Grid.Row="1" Margin="0,10,0,0">
 			<Label DockPanel.Dock="Top">Синтаксический анализ</Label>
 			<StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
 				<Button Width="25" Height="25" Margin="0, 5, 10, 0" Content="&#xf067;" Style="{StaticResource IconButton}" Click="GrammarsGrid_Add_Click"></Button>
@@ -80,7 +74,7 @@
             </DataGrid>
         </DockPanel>
 
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Row="3">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Grid.Row="2">
             <Button HorizontalAlignment="Left" Margin="0, 0, 20, 0" Width="80" Click="DialogResult_Ok_Click">Сохранить</Button>
             <Button HorizontalAlignment="Right" Width="80" Click="DialogResult_Cancel_Click">Отмена</Button>
         </StackPanel>
