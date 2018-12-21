@@ -16,6 +16,19 @@ namespace Land.Control
 		public int StartOffset { get; set; }
 		public int EndOffset { get; set; }
 		public bool CaptureWholeLine { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			return obj is DocumentSegment val
+				&& val.FileName == FileName
+				&& val.StartOffset == StartOffset
+				&& val.EndOffset == EndOffset;
+		}
+
+		public override int GetHashCode()
+		{
+			return StartOffset ^ EndOffset ^ FileName.Length;
+		}
 	}
 
 	public interface IEditorAdapter
@@ -63,14 +76,19 @@ namespace Land.Control
 		#region Text highlighting
 
 		/// <summary>
+		/// Доступна ли подсветка разными цветами разных функциональностей
+		/// </summary>
+		bool IsMultiColorEnabled { get; }
+
+		/// <summary>
 		/// Выделить участки текста в файле
 		/// </summary>
-		Color SetSegments(List<DocumentSegment> segments);
+		void SetSegments(IEnumerable<DocumentSegment> segments, Color color);
 
 		/// <summary>
 		/// Сбросить выделение
 		/// </summary>
-		void ResetSegments();
+		void ResetSegments(IEnumerable<DocumentSegment> segments = null);
 
 		#endregion
 

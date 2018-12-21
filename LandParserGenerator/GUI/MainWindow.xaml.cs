@@ -622,12 +622,14 @@ namespace Land.GUI
 				{
 					var waterVisitor = new GetWaterSegmentsVisitor();
 					waterVisitor.Visit(TreeRoot);
-					File_SegmentColorizer.SetSegments(waterVisitor.AnySegments.Select(s => new DocumentSegment()
-					{
-						StartOffset = s.Item1,
-						EndOffset = s.Item2,
-						CaptureWholeLine = false
-					}).ToList(), Color.FromArgb(60, 150, 150, 200));
+					File_SegmentColorizer.SetSegments(new HashSet<DocumentSegment>(
+						waterVisitor.AnySegments.Select(s => new DocumentSegment()
+						{
+							StartOffset = s.Item1,
+							EndOffset = s.Item2,
+							CaptureWholeLine = false
+						})
+					), Color.FromArgb(60, 150, 150, 200));
 				}
 			}
 			else

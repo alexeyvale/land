@@ -56,7 +56,9 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorManager.cs" />
     <Compile Include="IconColorConverter.cs" />
+    <Compile Include="BoolToVisibilityConverter.cs" />
     <Compile Include="IconVisibilityConverter.cs" />
     <Compile Include="LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />

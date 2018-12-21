@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using System.Linq;
 
 using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Document;
@@ -14,24 +15,41 @@ namespace Land.GUI
 {
 	public class SegmentsBackgroundRenderer : IBackgroundRenderer
 	{
-		private TextArea textEditor { get; set; }
-		private List<Tuple<List<DocumentSegment>, Color>> SegmentGroups { get; set; } = new List<Tuple<List<DocumentSegment>, Color>>();
+		private TextArea TextEditor { get; set; }
+		private List<Tuple<HashSet<DocumentSegment>, Color>> SegmentGroups { get; set; } = new List<Tuple<HashSet<DocumentSegment>, Color>>();
 		
 		public SegmentsBackgroundRenderer(TextArea editor)
 		{
-			textEditor = editor;
+			TextEditor = editor;
 		}
 
-		public void SetSegments(List<DocumentSegment> segments, Color color)
+		public void SetSegments(IEnumerable<DocumentSegment> segments, Color color)
 		{
-			SegmentGroups.Add(new Tuple<List<DocumentSegment>, Color>(segments, color));
-			textEditor.TextView.Redraw();
+			SegmentGroups.Add(new Tuple<HashSet<DocumentSegment>, Color>(
+				new HashSet<DocumentSegment>(segments), color)
+			);
+
+			TextEditor.TextView.Redraw();
 		}
 
-		public void ResetSegments()
+		public void ResetSegments(IEnumerable<DocumentSegment> segments = null)
 		{
-			SegmentGroups = new List<Tuple<List<DocumentSegment>, Color>>();
-			textEditor.TextView.Redraw();
+			if (segments?.Count() > 0)
+			{
+				for (var i = 0; i < SegmentGroups.Count; ++i)
+				{
+					SegmentGroups[i].Item1.ExceptWith(segments);
+
+					if (SegmentGroups[i].Item1.Count == 0)
+						SegmentGroups.RemoveAt(i--);
+				}
+			}
+			else
+			{
+				SegmentGroups.Clear();
+			}
+
+			TextEditor.TextView.Redraw();
 		}
 
 		public KnownLayer Layer

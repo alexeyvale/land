@@ -97,10 +97,8 @@ namespace Land.VisualStudioExtension
 			Console.WriteLine(message.ToString());
 		}
 
-		public void ResetSegments()
+		public void ResetSegments(IEnumerable<DocumentSegment> segments = null)
 		{
-			ColorManager.Reset();
-
 			OnSetSegments(new List<DocumentSegment>());
 		}
 
@@ -142,11 +140,9 @@ namespace Land.VisualStudioExtension
 				location.Line - 1, location.Column - 1);
 		}
 
-		public Color SetSegments(List<DocumentSegment> segments)
+		public void SetSegments(IEnumerable<DocumentSegment> segments, Color color)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
-
-			var color = ColorManager.NextColor();
 
 			foreach (var group in segments.GroupBy(s => s.FileName))
 			{
@@ -160,10 +156,9 @@ namespace Land.VisualStudioExtension
 						}
 					}
 			}
-
-			color.A = (byte)255;
-			return color;
 		}
+
+		public bool IsMultiColorEnabled => false;
 
 		#region Settings
 

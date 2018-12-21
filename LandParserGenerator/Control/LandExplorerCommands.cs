@@ -53,13 +53,5 @@ namespace Land.Control
 				"Delete",
 				typeof(LandExplorerCommands)
 			);
-
-
-		public static RoutedUICommand Highlight { get; } = new RoutedUICommand
-			(
-				"Выделить функциональности",
-				"Highlight",
-				typeof(LandExplorerCommands)
-			);
 	}
 }

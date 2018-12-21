@@ -13,6 +13,7 @@
 		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 		<local:IconVisibilityConverter x:Key="IconVisibilityConverter" />
 		<local:IconColorConverter x:Key="IconColorConverter" />
+		<local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
@@ -24,9 +25,11 @@
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
         <CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
-	<Grid>
+	
+	<UserControl.InputBindings>
+		<KeyBinding Command="{Binding LandExplorerCommands.Delete}" Key="Delete"/>
+	</UserControl.InputBindings>
 	<Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="60*"></RowDefinition>
@@ -80,8 +83,10 @@
 				
                 <Separator Margin="7"></Separator>
 
-				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить функциональности" Name="ToolBar_HighlightButton"
-							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
+				<ToggleButton Content="&#xf1fc;"
+							  ToolTip="Выделить функциональности" 
+							  Checked="ToolBar_HighlightButton_Checked"
+							  Name="ToolBar_HighlightButton"></ToggleButton>
 				
                 <Separator Margin="7"></Separator>
 				
@@ -100,6 +105,11 @@
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
 						<StackPanel Orientation="Horizontal">
+							<Label Content=" "
+								   Name="ItemColorLabel"
+								   VerticalAlignment="Center"
+								   Visibility="{Binding IsChecked, ElementName=ItemCheckBox, Converter={StaticResource BoolToVisibilityConverter}}" >
+							</Label>
 							<Grid>
 								<Grid.Resources>
 									<Style TargetType="Label">
@@ -127,6 +137,12 @@
 								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}"/>
 								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
 							</Grid>
+							<CheckBox VerticalAlignment="Center" 
+									  Visibility="{Binding IsChecked, ElementName=ToolBar_HighlightButton, Converter={StaticResource BoolToVisibilityConverter}}" 
+									  Name="ItemCheckBox"
+									  Checked="ItemCheckBox_CheckedChanged"
+									  Unchecked="ItemCheckBox_CheckedChanged">
+							</CheckBox>
 							<Grid>
 								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
 							</Grid>

@@ -17,6 +17,7 @@ using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Markup;
 using Land.Control.Helpers;
+using System.Windows.Controls.Primitives;
 
 namespace Land.Control
 {
@@ -112,6 +113,11 @@ namespace Land.Control
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
 			Editor.ShouldLoadSettings += LoadSettings;
+
+			/// Скрываем кнопку множественной подсветки функциональностей, 
+			/// если такая подсветка не поддерживается редактором
+			if (!Editor.IsMultiColorEnabled)
+				ToolBar_HighlightButton.Visibility = Visibility.Collapsed;
 
 			/// Загружаем настройки панели разметки
 			LoadSettings();
@@ -288,40 +294,40 @@ namespace Land.Control
 
 		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
 		{
-			State.HighlightConcerns = !State.HighlightConcerns;
+			//State.HighlightConcerns = !State.HighlightConcerns;
 
-			Editor.ResetSegments();
+			//Editor.ResetSegments();
 
-			if (!State.HighlightConcerns)
-			{
-				/// Обеспечиваем стандартное отображение Concern-ов в панели
-				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-				{
-					var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
-					if (!markupTreeItem.IsSelected)
-					{
-						var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
-						if (label != null)
-							label.Foreground = Brushes.DimGray;
-					}
-				}
-			}
-			else
-			{
-				var concernsAndColors = new Dictionary<Concern, Color>();
+			//if (!State.HighlightConcerns)
+			//{
+			//	/// Обеспечиваем стандартное отображение Concern-ов в панели
+			//	foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
+			//	{
+			//		var markupTreeItem = MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem;
+			//		if (!markupTreeItem.IsSelected)
+			//		{
+			//			var label = GetMarkupTreeItemLabel(markupTreeItem, "ConcernIcon");
+			//			if (label != null)
+			//				label.Foreground = Brushes.DimGray;
+			//		}
+			//	}
+			//}
+			//else
+			//{
+			//	var concernsAndColors = new Dictionary<Concern, Color>();
 
-				foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
-				{
-					concernsAndColors[concern] = Editor.SetSegments(GetSegments(concern, true));
+			//	foreach (var concern in MarkupManager.Markup.OfType<Concern>().Where(c => c.Parent == null))
+			//	{
+			//		concernsAndColors[concern] = Editor.SetSegments(GetSegments(concern, true));
 
-					var label = GetMarkupTreeItemLabel(
-						MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, 
-						"ConcernIcon"
-					);
-					if (label != null)
-						label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
-				}
-			}
+			//		var label = GetMarkupTreeItemLabel(
+			//			MarkupTreeView.ItemContainerGenerator.ContainerFromItem(concern) as TreeViewItem, 
+			//			"ConcernIcon"
+			//		);
+			//		if (label != null)
+			//			label.Foreground = new SolidColorBrush(concernsAndColors[concern]);
+			//	}
+			//}
 		}
 
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -397,6 +403,40 @@ namespace Land.Control
 		#endregion
 
 		#region MarkupTreeView manipulations
+
+		private void ToolBar_HighlightButton_Checked(object sender, RoutedEventArgs e)
+		{
+			ColorManager.Instance.SwitchMode(
+				(sender as ToggleButton).IsChecked ?? false 
+					? ColorManager.Mode.MultiColor : ColorManager.Mode.OneColor
+			);
+		}
+
+		private void ItemCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+		{
+			var item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var snd = (CheckBox)sender;
+
+			var segments = GetPointsVisitor.GetPoints(new List<MarkupElement> { (MarkupElement)item.DataContext })
+				.Select(cp=> new DocumentSegment()
+				{
+					FileName = cp.Context.FileName,
+					StartOffset = cp.Location.Start.Offset,
+					EndOffset = cp.Location.End.Offset,
+					CaptureWholeLine = false
+				}).ToList();
+
+			if(snd.IsChecked ?? false)
+			{
+				var color = ColorManager.Instance.GetColor();
+				SetColorLabel(item, color);
+				Editor.SetSegments(segments, color);
+			}
+			else
+			{
+				Editor.ResetSegments(segments);
+			}
+		}
 
 		private int MAX_TEXT_SIZE = 30;
 		private int MIN_TEXT_SIZE = 9;
@@ -525,11 +565,12 @@ namespace Land.Control
 			if (SettingsObject.HighlightSelectedElement && !State.HighlightConcerns)
 			{
 				Editor.ResetSegments();
+				ColorManager.Instance.Reset();
 
 				Editor.SetSegments(GetSegments(
 					(MarkupElement)item.DataContext,
 					item.DataContext is Concern
-				));
+				), ColorManager.Instance.GetColor());
 			}
 		}
 
@@ -1143,9 +1184,9 @@ namespace Land.Control
 			return parsers;
 		}
 
-		private List<DocumentSegment> GetSegments(MarkupElement elem, bool captureWholeLine)
+		private HashSet<DocumentSegment> GetSegments(MarkupElement elem, bool captureWholeLine)
 		{
-			var segments = new List<DocumentSegment>();
+			var segments = new HashSet<DocumentSegment>();
 
 			if (elem is Concern concern)
 			{
@@ -1226,6 +1267,28 @@ namespace Land.Control
 				if (dataTemplate != null && templateParent != null)
 				{
 					return dataTemplate.FindName(labelName, templateParent) as Label;
+				}
+			}
+			catch
+			{
+			}
+
+			return null;
+		}
+
+		private Label SetColorLabel(TreeViewItem item, Color color)
+		{
+			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
+			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
+
+			try
+			{
+				if (dataTemplate != null && templateParent != null)
+				{
+					if (dataTemplate.FindName("ItemColorLabel", templateParent) is Label label)
+					{
+						label.Foreground = label.Background = new SolidColorBrush(color);
+					}
 				}
 			}
 			catch
