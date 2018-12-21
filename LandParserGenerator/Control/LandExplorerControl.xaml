@@ -22,11 +22,10 @@
 		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
-	<Grid>
 	<Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="60*"></RowDefinition>
