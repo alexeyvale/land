@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Land.Control"
         mc:Ignorable="d"
-        Title="Настройки" Height="400" Width="1000" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Icon="Resources/AppIcon.ico"
+        Title="Настройки" Height="600" Width="1000" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Icon="Resources/AppIcon.ico"
         Loaded="Window_Loaded"
 		Name="SettingsWindowObject">
     <Window.Resources>
@@ -21,16 +22,34 @@
     </Window.Resources>
     <Grid Margin="10">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="20"></RowDefinition>
+			<RowDefinition Height="170"></RowDefinition>
 			<RowDefinition Height="100*"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
 		</Grid.RowDefinitions>
 
 		<StackPanel Grid.Row="0" Name="AutoPropertiesStack">
-			<CheckBox Name="SaveAbsolutePathCheckBox" 
-				  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}">
-				Сохранять в разметке абсолютные пути к файлам
+			<StackPanel.Resources>
+				<Style TargetType="xctk:DoubleUpDown">
+					<Setter Property="Increment" Value=".01"></Setter>
+					<Setter Property="Width" Value="100"></Setter>
+					<Setter Property="HorizontalAlignment" Value="Left"></Setter>
+					<Setter Property="Maximum" Value="1"></Setter>
+					<Setter Property="Minimum" Value="0"></Setter>
+					<Setter Property="FormatString" Value="F2"></Setter>
+				</Style>
+			</StackPanel.Resources>
+			
+			<CheckBox Name="SaveAbsolutePathBool" 
+					  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}"
+					  Margin="0, 5, 0, 10"
+					  Content="Сохранять в разметке абсолютные пути к файлам">
 			</CheckBox>
+			<Label Content="Похожесть, начиная с которой разрешается автоматическая перепривязка"></Label>
+			<xctk:DoubleUpDown Name="AcceptanceThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.AcceptanceThreshold, Mode=TwoWay}"/>
+			<Label Content="Отступ от лучшего варианта, начиная с которого разрешается автоматическая перепривязка"></Label>
+			<xctk:DoubleUpDown Name="DistanceToClosestThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.DistanceToClosestThreshold, Mode=TwoWay}"/>
+			<Label Content="Похожесть, значения ниже которой игнорируются при перепривязке"></Label>
+			<xctk:DoubleUpDown Name="GarbageThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.GarbageThreshold, Mode=TwoWay}"/>
 		</StackPanel>
 		
 		<DockPanel Grid.Row="1" Margin="0,10,0,0">
