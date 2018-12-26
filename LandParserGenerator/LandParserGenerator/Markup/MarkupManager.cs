@@ -291,7 +291,7 @@ namespace Land.Core.Markup
 		/// Дельта похожести между лучшим кандидатом и следующим, при которой можно автоматически
 		/// перепривязаться к лучшему кандидату
 		/// </summary>
-		public double DistanceToClosestThreshold { get; set; } = 0.5;
+		public double DistanceToClosestThreshold { get; set; } = 0.05;
 
 		/// <summary>
 		/// Размер топа кандидатов, ранжированных по похожести, возвращаемого при неоднозначности
