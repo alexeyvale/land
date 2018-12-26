@@ -37,7 +37,8 @@ namespace Land.Control
 
 		public class ControlState
 		{
-			public TreeViewItem SelectedItem { get; set; }
+			public TreeViewItem SelectedItem_MarkupTreeView { get; set; }
+			public TreeViewItem SelectedItem_MissingTreeView { get; set; }
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -128,6 +129,23 @@ namespace Land.Control
 			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH) 
 				?? new LandExplorerSettings();
 
+			/// Если в настройках отсутствуют пороги, помещаем туда дефолтные значения
+			/// из менеджера разметки, иначе настраиваем менеджер в соответствии с настройками
+			if (!SettingsObject.GarbageThreshold.HasValue)
+				SettingsObject.GarbageThreshold = MarkupManager.GarbageThreshold;
+			else
+				MarkupManager.GarbageThreshold = SettingsObject.GarbageThreshold.Value;
+
+			if (!SettingsObject.DistanceToClosestThreshold.HasValue)
+				SettingsObject.DistanceToClosestThreshold = MarkupManager.DistanceToClosestThreshold;
+			else
+				MarkupManager.DistanceToClosestThreshold = SettingsObject.DistanceToClosestThreshold.Value;
+
+			if (!SettingsObject.AcceptanceThreshold.HasValue)
+				SettingsObject.AcceptanceThreshold = MarkupManager.AcceptanceThreshold;
+			else
+				MarkupManager.AcceptanceThreshold = SettingsObject.AcceptanceThreshold.Value;
+
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			Parsers = LogFunction(() => BuildParsers(), true, true);
 		}
@@ -177,7 +195,7 @@ namespace Land.Control
 				{
 					State.PendingCommand = new PendingCommandInfo()
 					{
-						Target = State.SelectedItem,
+						Target = State.SelectedItem_MarkupTreeView,
 						DocumentName = fileName,
 						Command = LandExplorerCommand.AddPoint,
 						DocumentText = rootTextPair.Item2
@@ -218,7 +236,7 @@ namespace Land.Control
 
 			if (parent != null)
 			{
-				State.SelectedItem.IsExpanded = true;
+				State.SelectedItem_MarkupTreeView.IsExpanded = true;
 			}
 		}
 
@@ -271,7 +289,7 @@ namespace Land.Control
 				{
 					State.PendingCommand = new PendingCommandInfo()
 					{
-						Target = State.SelectedItem,
+						Target = State.SelectedItem_MarkupTreeView,
 						DocumentName = fileName,
 						Command = LandExplorerCommand.Relink,
 						DocumentText = rootTextPair.Item2
@@ -362,7 +380,9 @@ namespace Land.Control
 						: null;
 				}).Where(r => r != null).ToList();
 
-				MarkupManager.Remap(forest, sender == ApplyLocalMapping);
+				ProcessAmbiguities(
+					MarkupManager.Remap(forest, sender == ApplyLocalMapping)
+				);
 			}, true, false);
 		}
 
@@ -396,7 +416,7 @@ namespace Land.Control
 		}
 
 		/// Убираем горизонтальную прокрутку при выборе элемента
-		private void MarkupTreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
 		{
 			e.Handled = true;
 		}
@@ -463,9 +483,9 @@ namespace Land.Control
 
 			if (item == null)
 			{
-				if (State.SelectedItem != null)
+				if (State.SelectedItem_MarkupTreeView != null)
 				{
-					State.SelectedItem.IsSelected = false;
+					State.SelectedItem_MarkupTreeView.IsSelected = false;
 
 					MarkupTreeView.Focus();
 				}
@@ -483,9 +503,9 @@ namespace Land.Control
 			}
 			else
 			{
-				if (State.SelectedItem != null)
+				if (State.SelectedItem_MarkupTreeView != null)
 				{
-					State.SelectedItem.IsSelected = false;
+					State.SelectedItem_MarkupTreeView.IsSelected = false;
 				}
 			}
 		}
@@ -550,14 +570,14 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
 		{
-			State.SelectedItem = (TreeViewItem)sender;
+			State.SelectedItem_MarkupTreeView = (TreeViewItem)sender;
 
 			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
 		{
-			State.SelectedItem = null;
+			State.SelectedItem_MarkupTreeView = null;
 
 			e.Handled = true;
 		}
@@ -769,24 +789,6 @@ namespace Land.Control
 
 		#region TabControl manipulations
 
-		private class ConcernPointCandidateViewModel
-		{
-			public Node Node { get; set; }
-			public string ViewHeader { get; set; }
-
-			public ConcernPointCandidateViewModel(Node node)
-			{
-				Node = node;
-				ViewHeader = String.Join(" ",
-					PointContext.GetHeaderContext(node).Select(c => String.Join("", c.Value)));
-			}
-
-			public override string ToString()
-			{
-				return ViewHeader;
-			}
-		}
-
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			if (ConcernPointCandidatesList.SelectedItem != null)
@@ -806,7 +808,7 @@ namespace Land.Control
 			{
 				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
 				{
-					var point = (ConcernPoint)State.SelectedItem.DataContext;
+					var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
 
 					MarkupManager.RelinkConcernPoint(
 						point,
@@ -872,22 +874,57 @@ namespace Land.Control
 			textBox.IsReadOnly = true;
 		}
 
-		private void MissingPointsList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private void MissingTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (MissingPointsList.SelectedItem != null)
+			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+
+			if (item == null)
 			{
-				MissingPointsList.SelectedItem = null;
-				MissingPointsList.Focus();
+				if (State.SelectedItem_MissingTreeView != null)
+				{
+					State.SelectedItem_MissingTreeView.IsSelected = false;
+
+					MissingTreeView.Focus();
+				}
 			}
 		}
 
 		private void RefreshMissingPointsList()
 		{
-			MissingPointsList.ItemsSource = MarkupManager.GetConcernPoints()
-				.Where(p => p.HasMissingLocation).ToList();
+			MissingTreeView.ItemsSource = MarkupManager.GetConcernPoints()
+				.Where(p => p.HasMissingLocation)
+				.Select(p=>new PointCandidatesPair() { Point = p })
+				.ToList();
 
-			if (MissingPointsList.Items.Count > 0)
+			if (MissingTreeView.Items.Count > 0)
+			{
 				Tabs.SelectedItem = MissingPointsTab;
+				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
+			}
+		}
+
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<NodeSimilarityPair>> ambiguities)
+		{
+			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
+			foreach(PointCandidatesPair pair in MissingTreeView.ItemsSource)
+			{
+				if (ambiguities.ContainsKey(pair.Point))
+					ambiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
+			}
+		}
+
+		private void MissingTreeViewItem_Selected(object sender, RoutedEventArgs e)
+		{
+			State.SelectedItem_MissingTreeView = (TreeViewItem)sender;
+
+			e.Handled = true;
+		}
+
+		private void MissingTreeViewItem_Unselected(object sender, RoutedEventArgs e)
+		{
+			State.SelectedItem_MissingTreeView = null;
+
+			e.Handled = true;
 		}
 
 		#endregion
@@ -910,6 +947,8 @@ namespace Land.Control
 			}
 		}
 
+		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
+
 		private enum ControlStatus { Ready, Pending, Success, Error }
 
 		private void SetStatus(string text, ControlStatus status)
@@ -917,7 +956,7 @@ namespace Land.Control
 			switch(status)
 			{
 				case ControlStatus.Error:
-					ControlStatusBar.Background = Brushes.IndianRed;
+					ControlStatusBar.Background = LightRed;
 					break;
 				case ControlStatus.Pending:
 					ControlStatusBar.Background = Brushes.LightGoldenrodYellow;
@@ -1179,12 +1218,14 @@ namespace Land.Control
 
 				if (rootTextPair != null)
 				{
-					MarkupManager.Remap(cp, new TargetFileInfo()
-					{
-						FileName = cp.Context.FileName,
-						FileText = rootTextPair.Item2,
-						TargetNode = rootTextPair.Item1
-					});
+					ProcessAmbiguities(
+						MarkupManager.Remap(cp, new TargetFileInfo()
+						{
+							FileName = cp.Context.FileName,
+							FileText = rootTextPair.Item2,
+							TargetNode = rootTextPair.Item1
+						})
+					);
 				}
 			}
 

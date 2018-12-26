@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 
 using Land.Core;
-using Land.Core.Parsing.Preprocessing;
+using Land.Control.Helpers;
 
 namespace Land.Control
 {
@@ -49,10 +49,31 @@ namespace Land.Control
 	}
 
 	[DataContract]
-	public class LandExplorerSettings
+	public class LandExplorerSettings: IExtensibleDataObject
 	{
+		[PropertyToSet]
+		[DisplayedName("Сохранять в разметке абсолютные пути к файлам")]
+		//[Converter(typeof(PredefinedSymbolsConverter))]
 		[DataMember]
 		public bool SaveAbsolutePath { get; set; }
+
+		[PropertyToSet]
+		[DisplayedName("Похожесть, начиная с которой разрешается автоматическая перепривязка")]
+		[Converter(typeof(DoubleConverter))]
+		[DataMember]
+		public double? AcceptanceThreshold { get; set; }
+
+		[PropertyToSet]
+		[DisplayedName("Отступ от лучшего варианта, начиная с которого разрешается автоматическая перепривязка")]
+		[Converter(typeof(DoubleConverter))]
+		[DataMember]
+		public double? DistanceToClosestThreshold { get; set; }
+
+		[PropertyToSet]
+		[DisplayedName("Похожесть, значения ниже которой игнорируются при перепривязке")]
+		[Converter(typeof(DoubleConverter))]
+		[DataMember]
+		public double? GarbageThreshold { get; set; }
 
 		[DataMember]
 		public ObservableCollection<ParserSettingsItem> Parsers { get; set; } = new ObservableCollection<ParserSettingsItem>();
@@ -64,6 +85,14 @@ namespace Land.Control
 				SaveAbsolutePath = SaveAbsolutePath,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};
+		}
+
+		private ExtensionDataObject _extensionData;
+
+		public virtual ExtensionDataObject ExtensionData
+		{
+			get { return _extensionData; }
+			set { _extensionData = value; }
 		}
 	}
 }

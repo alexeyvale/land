@@ -11,8 +11,11 @@
     <UserControl.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
-		<local:IconVisibilityConverter x:Key="IconVisibilityConverter" />
-		<local:IconColorConverter x:Key="IconColorConverter" />
+		<local:MarkupTreeIconVisibilityConverter x:Key="MarkupTreeIconVisibilityConverter" />
+		<local:MarkupTreeIconColorConverter x:Key="MarkupTreeIconColorConverter" />
+		<local:MissingListIconVisibilityConverter x:Key="MissingListIconVisibilityConverter" />
+		<local:MissingListIconColorConverter x:Key="MissingListIconColorConverter" />
+		<local:MissingListItemConverter x:Key="MissingListItemConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
@@ -104,7 +107,7 @@
 									<Style TargetType="Label">
 										<Setter Property="Visibility">
 											<Setter.Value>
-												<MultiBinding Converter="{StaticResource IconVisibilityConverter}">
+												<MultiBinding Converter="{StaticResource MarkupTreeIconVisibilityConverter}">
 													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
 													<Binding Path="." />
 													<Binding Path="Location" />
@@ -113,7 +116,7 @@
 										</Setter>
 										<Setter Property="Foreground">
 											<Setter.Value>
-												<MultiBinding Converter="{StaticResource IconColorConverter}">
+												<MultiBinding Converter="{StaticResource MarkupTreeIconColorConverter}">
 													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
 													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
 												</MultiBinding>
@@ -152,7 +155,7 @@
 						<EventSetter Event="KeyDown" Handler="MarkupTreeViewItem_KeyDown"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight"/>
-						<EventSetter Event="RequestBringIntoView" Handler="MarkupTreeViewItem_RequestBringIntoView"/>
+						<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
 					</Style>
 				</TreeView.ItemContainerStyle>
 			</TreeView>
@@ -230,31 +233,48 @@
 				</ScrollViewer>
 			</TabItem>
 			<TabItem Header="Потерянные точки" Name="MissingPointsTab">
-				<ListBox       
-					FontSize="12pt"
-					Name="MissingPointsList"
-					PreviewMouseLeftButtonDown="MissingPointsList_PreviewMouseLeftButtonDown">
-					<ListBox.ItemTemplate>
-						<DataTemplate>
+				<TreeView Grid.Row="1" Name="MissingTreeView" FontSize="12pt" AllowDrop="True"
+						  PreviewMouseLeftButtonDown="MissingTreeView_PreviewMouseLeftButtonDown">
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate ItemsSource="{Binding Candidates}">
 							<StackPanel Orientation="Horizontal">
 								<Grid>
 									<Grid.Resources>
 										<Style TargetType="Label">
+											<Setter Property="Visibility">
+												<Setter.Value>
+													<MultiBinding Converter="{StaticResource MissingListIconVisibilityConverter}">
+														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+														<Binding Path="." />
+													</MultiBinding>
+												</Setter.Value>
+											</Setter>
 											<Setter Property="Foreground">
 												<Setter.Value>
-													<MultiBinding Converter="{StaticResource IconColorConverter}">
+													<MultiBinding Converter="{StaticResource MissingListIconColorConverter}">
 														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
-														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListBoxItem}}" Path="IsFocused" />
+														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
 													</MultiBinding>
 												</Setter.Value>
 											</Setter>
 										</Style>
 									</Grid.Resources>
-									
+
 									<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+									<Label Name="AmbiguousIcon"  Content="&#xf059;" FontFamily="{StaticResource FontAwesomeSolid}"/>
 								</Grid>
 								<Grid>
-									<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+									<Grid.Resources>
+										<Style TargetType="TextBlock">
+											<Setter Property="Text">
+												<Setter.Value>
+													<Binding Converter="{StaticResource MissingListItemConverter}" Path="."></Binding>
+												</Setter.Value>
+											</Setter>
+										</Style>
+									</Grid.Resources>
+									
+									<TextBlock />
 								</Grid>
 								<StackPanel.ContextMenu>
 									<ContextMenu>
@@ -263,9 +283,16 @@
 									</ContextMenu>
 								</StackPanel.ContextMenu>
 							</StackPanel>
-						</DataTemplate>
-					</ListBox.ItemTemplate>
-				</ListBox>
+						</HierarchicalDataTemplate>
+					</TreeView.ItemTemplate>
+					<TreeView.ItemContainerStyle>
+						<Style TargetType="{x:Type TreeViewItem}">
+							<EventSetter Event="Selected" Handler="MissingTreeViewItem_Selected" />
+							<EventSetter Event="Unselected" Handler="MissingTreeViewItem_Unselected" />
+							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
+						</Style>
+					</TreeView.ItemContainerStyle>
+				</TreeView>
 			</TabItem>
 		</TabControl>
 		<StatusBar Name="ControlStatusBar" Grid.Row="3">

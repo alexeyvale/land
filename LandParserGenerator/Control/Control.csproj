@@ -56,10 +56,15 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IconColorConverter.cs" />
-    <Compile Include="IconVisibilityConverter.cs" />
+    <Compile Include="Converters\MissingListItemConverter.cs" />
+    <Compile Include="Converters\MissingListIconColorConverter.cs" />
+    <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
+    <Compile Include="Converters\MissingListIconVisibilityConverter.cs" />
+    <Compile Include="Converters\MarkupTreeIconVisibilityConverter.cs" />
     <Compile Include="LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
+    <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
+    <Compile Include="Models\PointCandidatesPair.cs" />
     <Compile Include="PreprocessorPropertiesWindow.xaml.cs">
       <DependentUpon>PreprocessorPropertiesWindow.xaml</DependentUpon>
     </Compile>

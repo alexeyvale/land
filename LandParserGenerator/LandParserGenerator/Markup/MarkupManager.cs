@@ -282,21 +282,42 @@ namespace Land.Core.Markup
 
 		#region Перепривязка
 
-		private const double MIN_SIMILARITY = 0.4;
+		/// <summary>
+		/// Значение похожести, ниже которого нельзя выполнять автоматическую перепривязку
+		/// </summary>
+		public double AcceptanceThreshold { get; set; } = 0.8;
 
-		public void Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		/// <summary>
+		/// Дельта похожести между лучшим кандидатом и следующим, при которой можно автоматически
+		/// перепривязаться к лучшему кандидату
+		/// </summary>
+		public double DistanceToClosestThreshold { get; set; } = 0.5;
+
+		/// <summary>
+		/// Размер топа кандидатов, ранжированных по похожести, возвращаемого при неоднозначности
+		/// </summary>
+		public int AmbiguityTopCount { get; set; } = 10;
+
+		/// <summary>
+		/// Похожесть, ниже которой не рассматриваем элемент как кандидата
+		/// </summary>
+		public double GarbageThreshold { get; set; } = 0.4;
+
+		public Dictionary<ConcernPoint, List<NodeSimilarityPair>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
-			if (useLocalRemap)
-				LocalRemap(targetFiles);
-			else
-				GlobalRemap(targetFiles);
+			var ambiguous = useLocalRemap
+				? LocalRemap(targetFiles)
+				: GlobalRemap(targetFiles);
 
 			OnMarkupChanged?.Invoke();
+
+			return ambiguous;
 		}
 
-		private void LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<NodeSimilarityPair>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
+			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -310,7 +331,14 @@ namespace Land.Core.Markup
 					var result = ContextFinder.Find(groupedByType, groupedFiles, file);
 
 					foreach (var kvp in result)
-						ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
+					{
+						var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+							.TakeWhile(c=>c.Similarity >= GarbageThreshold)
+							.Take(AmbiguityTopCount).ToList();
+
+						if (!ApplyCandidate(kvp.Key, candidates))
+							ambiguous[kvp.Key] = candidates;
+					}
 				}
 				else
 				{
@@ -318,10 +346,14 @@ namespace Land.Core.Markup
 						point.Location = null;
 				}
 			}
+
+			return ambiguous;
 		}
 
-		private void GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<NodeSimilarityPair>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
+			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
 			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<NodeSimilarityPair>());
@@ -339,30 +371,55 @@ namespace Land.Core.Markup
 					accumulator[kvp.Key].AddRange(kvp.Value);
 			}
 
-			foreach(var kvp in accumulator)
-				ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
+			foreach (var kvp in accumulator)
+			{
+				var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+					.TakeWhile(c => c.Similarity >= GarbageThreshold)
+					.Take(AmbiguityTopCount).ToList();
+
+				if (!ApplyCandidate(kvp.Key, candidates))
+					ambiguous[kvp.Key] = candidates;
+			}
+
+			return ambiguous;
 		}
 
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public void Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<NodeSimilarityPair>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			ApplyCandidate(point, ContextFinder.Find(point, targetInfo).FirstOrDefault());
+			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var candidates = ContextFinder.Find(point, targetInfo).OrderByDescending(c=>c.Similarity)
+				.TakeWhile(c => c.Similarity >= GarbageThreshold)
+				.Take(AmbiguityTopCount).ToList();
+
+			if (!ApplyCandidate(point, candidates))
+				ambiguous[point] = candidates;
 
 			OnMarkupChanged?.Invoke();
+
+			return ambiguous;
 		}
 
-		private void ApplyCandidate(ConcernPoint point, NodeSimilarityPair candidate)
+		private bool ApplyCandidate(ConcernPoint point, IEnumerable<NodeSimilarityPair> candidates)
 		{
-			if (candidate != null && candidate.Similarity > MIN_SIMILARITY)
+			var first = candidates.FirstOrDefault();
+			var second = candidates.Skip(1).FirstOrDefault();
+
+			if (first != null && first.Similarity > AcceptanceThreshold
+				&& (second == null || (first.Similarity - second.Similarity) > DistanceToClosestThreshold))
 			{
-				point.Context = candidate.Context;
-				point.Location = candidate.Node.Anchor;
+				point.Context = first.Context;
+				point.Location = first.Node.Anchor;
+
+				return true;
 			}
 			else
 			{
 				point.Location = null;
+
+				return false;
 			}
 		}
 
