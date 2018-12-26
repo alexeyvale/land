@@ -129,22 +129,7 @@ namespace Land.Control
 			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH) 
 				?? new LandExplorerSettings();
 
-			/// Если в настройках отсутствуют пороги, помещаем туда дефолтные значения
-			/// из менеджера разметки, иначе настраиваем менеджер в соответствии с настройками
-			if (!SettingsObject.GarbageThreshold.HasValue)
-				SettingsObject.GarbageThreshold = MarkupManager.GarbageThreshold;
-			else
-				MarkupManager.GarbageThreshold = SettingsObject.GarbageThreshold.Value;
-
-			if (!SettingsObject.DistanceToClosestThreshold.HasValue)
-				SettingsObject.DistanceToClosestThreshold = MarkupManager.DistanceToClosestThreshold;
-			else
-				MarkupManager.DistanceToClosestThreshold = SettingsObject.DistanceToClosestThreshold.Value;
-
-			if (!SettingsObject.AcceptanceThreshold.HasValue)
-				SettingsObject.AcceptanceThreshold = MarkupManager.AcceptanceThreshold;
-			else
-				MarkupManager.AcceptanceThreshold = SettingsObject.AcceptanceThreshold.Value;
+			SyncMarkupManagerSettings();
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			Parsers = LogFunction(() => BuildParsers(), true, true);
@@ -351,6 +336,7 @@ namespace Land.Control
 					SettingsObject, SETTINGS_DEFAULT_PATH
 				);
 
+				SyncMarkupManagerSettings();
 				Parsers = LogFunction(() => BuildParsers(), true, true);
 			}
 		}
@@ -1061,6 +1047,26 @@ namespace Land.Control
 
 			action();
 			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
+		}
+
+		private void SyncMarkupManagerSettings()
+		{
+			/// Если в настройках отсутствуют пороги, помещаем туда дефолтные значения
+			/// из менеджера разметки, иначе настраиваем менеджер в соответствии с настройками
+			if (!SettingsObject.GarbageThreshold.HasValue)
+				SettingsObject.GarbageThreshold = MarkupManager.GarbageThreshold;
+			else
+				MarkupManager.GarbageThreshold = SettingsObject.GarbageThreshold.Value;
+
+			if (!SettingsObject.DistanceToClosestThreshold.HasValue)
+				SettingsObject.DistanceToClosestThreshold = MarkupManager.DistanceToClosestThreshold;
+			else
+				MarkupManager.DistanceToClosestThreshold = SettingsObject.DistanceToClosestThreshold.Value;
+
+			if (!SettingsObject.AcceptanceThreshold.HasValue)
+				SettingsObject.AcceptanceThreshold = MarkupManager.AcceptanceThreshold;
+			else
+				MarkupManager.AcceptanceThreshold = SettingsObject.AcceptanceThreshold.Value;
 		}
 
 		private Dictionary<string, BaseParser> BuildParsers()

@@ -407,8 +407,8 @@ namespace Land.Core.Markup
 			var first = candidates.FirstOrDefault();
 			var second = candidates.Skip(1).FirstOrDefault();
 
-			if (first != null && first.Similarity > AcceptanceThreshold
-				&& (second == null || (first.Similarity - second.Similarity) > DistanceToClosestThreshold))
+			if (first != null && first.Similarity >= AcceptanceThreshold
+				&& (second == null || first.Similarity - second.Similarity >= DistanceToClosestThreshold))
 			{
 				point.Context = first.Context;
 				point.Location = first.Node.Anchor;
