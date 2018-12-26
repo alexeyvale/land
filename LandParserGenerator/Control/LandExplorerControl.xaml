@@ -6,8 +6,7 @@
              xmlns:local="clr-namespace:Land.Control"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="300"
-			 x:Name="LandExplorer"
-             Loaded="LandExplorer_Loaded">
+			 x:Name="LandExplorer">
     <UserControl.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
@@ -25,9 +24,13 @@
 		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Delete_Markup" Executed="Command_MarkupTree_Delete_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Relink_Markup" Executed="Command_MarkupTree_Relink_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+
+		<CommandBinding Command="local:LandExplorerCommands.Delete_Missing" Executed="Command_MissingTree_Delete_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Accept_Missing" Executed="Command_MissingTree_Accept_Executed" CanExecute="Command_MissingTree_HasSelectedCandidate_CanExecute"/>
 	</UserControl.CommandBindings>
 	<Grid Background="White">
         <Grid.RowDefinitions>
@@ -76,9 +79,9 @@
 				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
                 <Button Content="&#xf0c1;" ToolTip="Сменить привязку" 
-						Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+						Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf2ed;" ToolTip="Удалить"
-						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+						Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 
@@ -136,8 +139,8 @@
                                 <ContextMenu>
                                     <MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
-									<MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
-									<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
 								</ContextMenu>
                             </StackPanel.ContextMenu>
                         </StackPanel>
@@ -278,8 +281,10 @@
 								</Grid>
 								<StackPanel.ContextMenu>
 									<ContextMenu>
-										<MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
-										<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<MenuItem Command="local:LandExplorerCommands.Relink_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<MenuItem Command="local:LandExplorerCommands.Delete_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<Separator></Separator>
+										<MenuItem Command="local:LandExplorerCommands.Accept_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									</ContextMenu>
 								</StackPanel.ContextMenu>
 							</StackPanel>
@@ -290,6 +295,7 @@
 							<EventSetter Event="Selected" Handler="MissingTreeViewItem_Selected" />
 							<EventSetter Event="Unselected" Handler="MissingTreeViewItem_Unselected" />
 							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
+							<EventSetter Event="MouseDoubleClick" Handler="MissingTreeViewItem_MouseDoubleClick"/>
 						</Style>
 					</TreeView.ItemContainerStyle>
 				</TreeView>

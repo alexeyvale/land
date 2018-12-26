@@ -107,8 +107,7 @@ namespace Land.Control
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
 
-		private void LandExplorer_Loaded(object sender, RoutedEventArgs e)
-		{ }
+		#region Public
 
 		public void Initialize(IEditorAdapter adapter)
 		{
@@ -121,18 +120,6 @@ namespace Land.Control
 
 			/// В TreeView будем показывать текущее дерево разметки
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
-		}
-
-		private void LoadSettings()
-		{
-			/// Загружаем настройки панели способом, определённым в адаптере
-			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH) 
-				?? new LandExplorerSettings();
-
-			SyncMarkupManagerSettings();
-
-			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
-			Parsers = LogFunction(() => BuildParsers(), true, true);
 		}
 
 		public ObservableCollection<MarkupElement> GetMarkup()
@@ -160,778 +147,9 @@ namespace Land.Control
 				: new List<NodeSimilarityPair>();
 		}
 
-		#region Commands
-
-		private void Command_Delete_Executed(object sender, RoutedEventArgs e)
-		{
-			MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
-		}
-
-		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
-		{
-			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
-
-			if (rootTextPair != null)
-			{
-				var offset = Editor.GetActiveDocumentOffset();
-
-				if (!String.IsNullOrEmpty(fileName))
-				{
-					State.PendingCommand = new PendingCommandInfo()
-					{
-						Target = State.SelectedItem_MarkupTreeView,
-						DocumentName = fileName,
-						Command = LandExplorerCommand.AddPoint,
-						DocumentText = rootTextPair.Item2
-					};
-
-					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
-							.Select(c=>new ConcernPointCandidateViewModel(c));
-
-					ConfigureMarkupElementTab(true);
-
-					SetStatus("Добавление точки", ControlStatus.Pending);
-				}
-			}
-		}
-
-		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
-		{
-			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
-
-			if (rootTextPair != null)
-				MarkupManager.AddLand(new TargetFileInfo()
-				{			
-					FileName = fileName,
-					FileText = rootTextPair.Item2,
-					TargetNode = rootTextPair.Item1
-				});
-		}
-
-		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
-		{
-			var parent = MarkupTreeView.SelectedItem != null 
-				&& MarkupTreeView.SelectedItem is Concern
-					? (Concern)MarkupTreeView.SelectedItem : null;
-
-			MarkupManager.AddConcern("Новая функциональность", null, parent);
-
-			if (parent != null)
-			{
-				State.SelectedItem_MarkupTreeView.IsExpanded = true;
-			}
-		}
-
-		private void Command_Save_Executed(object sender, RoutedEventArgs e)
-		{
-			var saveFileDialog = new SaveFileDialog()
-			{
-				AddExtension = true,
-				DefaultExt = "landmark",
-				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
-			};
-
-			if (saveFileDialog.ShowDialog() == true)
-			{
-				MarkupManager.Serialize(saveFileDialog.FileName, !SettingsObject.SaveAbsolutePath);
-			}
-		}
-
-		private void Command_Open_Executed(object sender, RoutedEventArgs e)
-		{
-			var openFileDialog = new OpenFileDialog()
-			{
-				AddExtension = true,
-				DefaultExt = "landmark",
-				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
-			};
-
-			if (openFileDialog.ShowDialog() == true)
-			{
-				MarkupManager.Deserialize(openFileDialog.FileName);
-				MarkupTreeView.ItemsSource = MarkupManager.Markup;
-			}
-		}
-
-		private void Command_New_Executed(object sender, RoutedEventArgs e)
-		{
-			MarkupManager.Clear();
-		}
-
-		private void Command_Relink_Executed(object sender, RoutedEventArgs e)
-		{
-			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
-
-			if (rootTextPair != null)
-			{
-				var offset = Editor.GetActiveDocumentOffset();
-
-				if (!String.IsNullOrEmpty(fileName))
-				{
-					State.PendingCommand = new PendingCommandInfo()
-					{
-						Target = State.SelectedItem_MarkupTreeView,
-						DocumentName = fileName,
-						Command = LandExplorerCommand.Relink,
-						DocumentText = rootTextPair.Item2
-					};
-
-					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
-							.Select(c => new ConcernPointCandidateViewModel(c));
-
-					ConfigureMarkupElementTab(true);
-
-					SetStatus("Перепривязка точки", ControlStatus.Pending);
-				}
-			}
-		}
-
-		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
-		{
-			State.HighlightConcerns = !State.HighlightConcerns;
-
-			if(!State.HighlightConcerns)
-				Editor.ResetSegments();		
-		}
-
-		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = true;
-		}
-
-		private void Command_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = MarkupTreeView != null 
-				&& MarkupTreeView.SelectedItem != null;
-		}
-
-		private void Command_HasSelectedConcernPoint_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = MarkupTreeView != null  
-				&& MarkupTreeView.SelectedItem != null 
-				&& MarkupTreeView.SelectedItem is ConcernPoint;
-		}
-
-		private void Command_ConcernPointIsNotSelected_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = e.CanExecute = MarkupTreeView != null
-				&& (MarkupTreeView.SelectedItem == null
-				|| MarkupTreeView.SelectedItem is Concern);
-		}
-
-		private void Settings_Click(object sender, RoutedEventArgs e)
-		{
-			SettingsWindow = new LandExplorerSettingsWindow(SettingsObject.Clone());
-			SettingsWindow.Owner = Window.GetWindow(this);
-
-			if (SettingsWindow.ShowDialog() ?? false)
-			{
-				SettingsObject = SettingsWindow.SettingsObject;
-				Editor.SaveSettings(
-					SettingsObject, SETTINGS_DEFAULT_PATH
-				);
-
-				SyncMarkupManagerSettings();
-				Parsers = LogFunction(() => BuildParsers(), true, true);
-			}
-		}
-
-		private void ApplyMapping_Click(object sender, RoutedEventArgs e)
-		{
-			LogAction(() =>
-			{
-				/// В случае, если запросили перепривязку в пределах
-				/// рабочего множества файлов, а это множество не установлено,
-				/// проводим перепривязку в пределах файлов, на которые
-				/// ссылаются имеющиеся точки
-				var forest = (sender == ApplyLocalMapping
-					? MarkupManager.GetReferencedFiles()
-					: GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles()
-				).Select(f =>
-				{
-					var parsed = TryParse(f, out bool success);
-
-					return success
-						? new TargetFileInfo()
-						{
-							FileName = f,
-							FileText = parsed.Item2,
-							TargetNode = parsed.Item1
-						}
-						: null;
-				}).Where(r => r != null).ToList();
-
-				ProcessAmbiguities(
-					MarkupManager.Remap(forest, sender == ApplyLocalMapping)
-				);
-			}, true, false);
-		}
-
 		#endregion
 
-		#region MarkupTreeView manipulations
-
-		private int MAX_TEXT_SIZE = 30;
-		private int MIN_TEXT_SIZE = 9;
-
-		private void MarkupTreeView_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-		{
-			var snd = sender as TreeView;
-
-			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Control)
-			{
-				e.Handled = true;
-				var oldSize = snd.FontSize;
-				if (e.Delta > 0)
-				{
-					if (snd.FontSize < MAX_TEXT_SIZE)
-					{
-						++snd.FontSize;
-					}
-				}
-				else if (snd.FontSize > MIN_TEXT_SIZE)
-				{
-					--snd.FontSize;
-				}
-			}
-		}
-
-		/// Убираем горизонтальную прокрутку при выборе элемента
-		private void TreeViewItem_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-		{
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
-			if (item != null && e.ChangedButton == MouseButton.Left)
-			{
-				/// При клике по точке переходим к ней
-				if (item.DataContext is ConcernPoint concernPoint)
-				{
-					if(EnsureLocationValid(concernPoint))
-					{
-						Editor.SetActiveDocumentAndOffset(
-							concernPoint.Context.FileName,
-							concernPoint.Location.Start
-						);
-					}
-
-					e.Handled = true;
-				}
-			}
-		}
-
-		private void MarkupTreeViewItem_KeyDown(object sender, KeyEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
-			if (item != null)
-			{
-				switch (e.Key)
-				{
-					case Key.Enter:
-						if (item.DataContext is ConcernPoint concernPoint)
-						{
-							if (EnsureLocationValid(concernPoint))
-							{
-								Editor.SetActiveDocumentAndOffset(
-									concernPoint.Context.FileName,
-									concernPoint.Location.Start
-								);
-							}
-						}
-						else
-							item.IsExpanded = true;
-
-						e.Handled = true;
-						break;
-					case Key.Escape:
-						if (item.DataContext is Concern)
-							item.IsExpanded = false;
-
-						e.Handled = true;
-						break;
-				}
-			}
-		}
-
-		private void MarkupTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
-			if (item == null)
-			{
-				if (State.SelectedItem_MarkupTreeView != null)
-				{
-					State.SelectedItem_MarkupTreeView.IsSelected = false;
-
-					MarkupTreeView.Focus();
-				}
-			}
-		}
-
-		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
-			if (item != null)
-			{
-				item.IsSelected = true;
-				e.Handled = true;
-			}
-			else
-			{
-				if (State.SelectedItem_MarkupTreeView != null)
-				{
-					State.SelectedItem_MarkupTreeView.IsSelected = false;
-				}
-			}
-		}
-
-		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight(object sender, MouseButtonEventArgs e)
-		{
-			var item = (TreeViewItem)sender;
-
-			if (State.HighlightConcerns)
-			{
-				Editor.ResetSegments();
-
-				Editor.SetSegments(
-					GetSegments(
-						(MarkupElement)item.DataContext,
-						item.DataContext is Concern
-					), 
-					HighlightingColor
-				);
-			}
-		}
-
-		#region displaying element
-
-		private void MarkupTreeViewItem_Expanded(object sender, RoutedEventArgs e)
-		{
-			var item = (TreeViewItem)sender;
-
-			if (item.DataContext is Concern)
-			{
-				var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-				if (label != null)
-					label.Content = "\xf07c";
-			}
-
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_Collapsed(object sender, RoutedEventArgs e)
-		{
-			var item = (TreeViewItem)sender;
-
-			if (item.DataContext is Concern)
-			{
-				var label = GetMarkupTreeItemLabel(item, "ConcernIcon");
-				if (label != null)
-					label.Content = "\xf07b";
-			}
-
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_GotFocus(object sender, RoutedEventArgs e)
-		{
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_LostFocus(object sender, RoutedEventArgs e)
-		{
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_Selected(object sender, RoutedEventArgs e)
-		{
-			State.SelectedItem_MarkupTreeView = (TreeViewItem)sender;
-
-			e.Handled = true;
-		}
-
-		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
-		{
-			State.SelectedItem_MarkupTreeView = null;
-
-			e.Handled = true;
-		}
-
-		#endregion
-
-		#region drag and drop
-
-		/// Точка, в которой была нажата левая кнопка мыши
-		private Point LastMouseDown { get; set; }
-
-		/// Перетаскиваемый и целевой элементы
-		private MarkupElement DraggedItem { get; set; }
-
-		private const int DRAG_START_TOLERANCE = 20;
-		private const int SCROLL_START_TOLERANCE = 20;
-		private const int SCROLL_BASE_OFFSET = 6;
-
-		/// Элементы, развёрнутые автоматически в ходе перетаскивания
-		private List<TreeViewItem> ExpandedWhileDrag = new List<TreeViewItem>();
-
-		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop(object sender, MouseButtonEventArgs e)
-		{
-			if (e.ChangedButton == MouseButton.Left)
-			{
-				TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
-
-				DraggedItem = treeItem != null ? (MarkupElement)treeItem.DataContext : null;
-				LastMouseDown = e.GetPosition(MarkupTreeView);
-			}
-		}
-
-		private void MarkupTreeView_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			if (e.ChangedButton == MouseButton.Left)
-			{
-				DraggedItem = null;
-			}
-		}
-
-		private void MarkupTreeView_MouseMove(object sender, MouseEventArgs e)
-		{
-			if (e.LeftButton == MouseButtonState.Pressed && DraggedItem != null)
-			{
-				Point currentPosition = e.GetPosition(MarkupTreeView);
-
-				/// Если сдвинули элемент достаточно далеко
-				if (Math.Abs(currentPosition.Y - LastMouseDown.Y) > DRAG_START_TOLERANCE)
-				{
-					/// Инициируем перемещение
-					ExpandedWhileDrag.Clear();
-
-					DragDrop.DoDragDrop(MarkupTreeView, DraggedItem, DragDropEffects.Move);
-				}
-			}
-		}
-
-		private void MarkupTreeView_DragOver(object sender, DragEventArgs e)
-		{
-			Point currentPosition = e.GetPosition(MarkupTreeView);
-
-			/// Прокручиваем дерево, если слишком приблизились к краю
-			ScrollViewer sv = FindVisualChild<ScrollViewer>(MarkupTreeView);
-
-			double verticalPos = currentPosition.Y;
-
-			if (verticalPos < SCROLL_START_TOLERANCE)
-			{
-				sv.ScrollToVerticalOffset(sv.VerticalOffset - SCROLL_BASE_OFFSET);
-			}
-			else if (verticalPos > MarkupTreeView.ActualHeight - SCROLL_START_TOLERANCE)
-			{
-				sv.ScrollToVerticalOffset(sv.VerticalOffset + SCROLL_BASE_OFFSET);
-			}
-
-			/// Ищем элемент дерева, над которым происходит перетаскивание,
-			/// чтобы выделить его и развернуть
-			TreeViewItem treeItem = GetNearestContainer(e.OriginalSource as UIElement);
-
-			if (treeItem != null)
-			{
-				treeItem.IsSelected = true;
-
-				if (!treeItem.IsExpanded && treeItem.DataContext is Concern)
-				{
-					treeItem.IsExpanded = true;
-					ExpandedWhileDrag.Add(treeItem);
-				}
-
-				var item = (MarkupElement)treeItem.DataContext;
-
-				/// Запрещаем перенос элемента во вложенный элемент
-				var canMove = true;
-				while (item != null)
-				{
-					if (item == DraggedItem)
-					{
-						canMove = false;
-						break;
-					}
-					item = item.Parent;
-				}
-
-				e.Effects = canMove ? DragDropEffects.Move : DragDropEffects.None;
-			}
-
-			e.Handled = true;
-		}
-
-		private void MarkupTreeView_Drop(object sender, DragEventArgs e)
-		{
-			e.Effects = DragDropEffects.None;
-			e.Handled = true;
-
-			/// Если закончили перетаскивание над элементом treeview, нужно осуществить перемещение
-			TreeViewItem target = GetNearestContainer(e.OriginalSource as UIElement);
-
-			if (DraggedItem != null)
-			{
-				var targetItem = target != null ? (MarkupElement)target.DataContext : null;
-
-				DropItem(DraggedItem, targetItem);
-				DraggedItem = null;
-			}
-
-			if (target != null)
-			{
-				var dataElement = (MarkupElement)target.DataContext;
-
-				while (dataElement != null)
-				{
-					ExpandedWhileDrag.RemoveAll(elem => elem.DataContext == dataElement);
-					dataElement = dataElement.Parent;
-				}
-			}
-
-			foreach (var item in ExpandedWhileDrag)
-				item.IsExpanded = false;
-		}
-
-		public void DropItem(MarkupElement source, MarkupElement target)
-		{
-			/// Если перетащили элемент на функциональность, добавляем его внутрь функциональности
-			if (target is Concern)
-			{
-				MarkupManager.MoveTo((Concern)target, source);
-			}
-			else
-			{
-				if (target != null)
-				{
-					if (target.Parent != source.Parent)
-					{
-						MarkupManager.MoveTo(target.Parent, source);
-					}
-				}
-				else
-				{
-					MarkupManager.MoveTo(null, source);
-				}
-			}
-		}
-
-		private TreeViewItem GetNearestContainer(UIElement element)
-		{
-			// Поднимаемся по визуальному дереву до TreeViewItem-а
-			TreeViewItem container = element as TreeViewItem;
-			while ((container == null) && (element != null))
-			{
-				element = VisualTreeHelper.GetParent(element) as UIElement;
-				container = element as TreeViewItem;
-			}
-			return container;
-		}
-
-		/// <summary>
-		/// Search for an element of a certain type in the visual tree.
-		/// </summary>
-		/// <typeparam name="T">The type of element to find.</typeparam>
-		/// <param name="visual">The parent element.</param>
-		/// <returns></returns>
-		private T FindVisualChild<T>(Visual visual) where T : Visual
-		{
-			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
-			{
-				Visual child = (Visual)VisualTreeHelper.GetChild(visual, i);
-				if (child != null)
-				{
-					T correctlyTyped = child as T;
-					if (correctlyTyped != null)
-					{
-						return correctlyTyped;
-					}
-
-					T descendent = FindVisualChild<T>(child);
-					if (descendent != null)
-					{
-						return descendent;
-					}
-				}
-			}
-
-			return null;
-		}
-
-		#endregion
-
-		#endregion
-
-		#region TabControl manipulations
-
-		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			if (ConcernPointCandidatesList.SelectedItem != null)
-			{
-				var node = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node;
-
-				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommand.DocumentName,
-					node.Anchor.Start
-				);
-			}
-		}
-
-		private void ConcernPointSaveButton_Click(object sender, RoutedEventArgs e)
-		{
-			if (ConcernPointCandidatesList.SelectedItem != null)
-			{
-				if (State.PendingCommand.Command == LandExplorerCommand.Relink)
-				{
-					var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
-
-					MarkupManager.RelinkConcernPoint(
-						point,
-						new TargetFileInfo()
-						{
-							FileName = State.PendingCommand.DocumentName,
-							FileText = State.PendingCommand.DocumentText,
-							TargetNode = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node
-						}
-					);
-
-					point.Name = ConcernPointNameText.Text;
-					point.Comment = ConcernPointCommentText.Text;
-				}
-				else
-				{
-					MarkupManager.AddConcernPoint(
-						new TargetFileInfo()
-						{
-							FileName = State.PendingCommand.DocumentName,
-							FileText = State.PendingCommand.DocumentText,
-							TargetNode = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node
-						},
-						ConcernPointNameText.Text,
-						ConcernPointCommentText.Text,
-						State.PendingCommand.Target?.DataContext as Concern
-					);
-
-					if (State.PendingCommand.Target != null)
-						State.PendingCommand.Target.IsExpanded = true;
-				}
-
-				ConcernPointCandidatesList.ItemsSource = null;
-				ConfigureMarkupElementTab(false);
-
-				SetStatus("Привязка завершена", ControlStatus.Success);
-			}
-		}
-
-		private void ConcernPointCancelButton_Click(object sender, RoutedEventArgs e)
-		{
-			ConcernPointCandidatesList.ItemsSource = null;
-			ConfigureMarkupElementTab(false);
-
-			SetStatus("Привязка отменена", ControlStatus.Ready);
-		}
-
-		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			if (textBox.IsReadOnly)
-			{
-				textBox.IsReadOnly = false;
-				textBox.Select(0, 0);
-			}
-		}
-
-		private void MarkupElementText_LostFocus(object sender, RoutedEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			textBox.IsReadOnly = true;
-		}
-
-		private void MissingTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
-
-			if (item == null)
-			{
-				if (State.SelectedItem_MissingTreeView != null)
-				{
-					State.SelectedItem_MissingTreeView.IsSelected = false;
-
-					MissingTreeView.Focus();
-				}
-			}
-		}
-
-		private void RefreshMissingPointsList()
-		{
-			MissingTreeView.ItemsSource = MarkupManager.GetConcernPoints()
-				.Where(p => p.HasMissingLocation)
-				.Select(p=>new PointCandidatesPair() { Point = p })
-				.ToList();
-
-			if (MissingTreeView.Items.Count > 0)
-			{
-				Tabs.SelectedItem = MissingPointsTab;
-				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
-			}
-		}
-
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<NodeSimilarityPair>> ambiguities)
-		{
-			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
-			foreach(PointCandidatesPair pair in MissingTreeView.ItemsSource)
-			{
-				if (ambiguities.ContainsKey(pair.Point))
-					ambiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
-			}
-		}
-
-		private void MissingTreeViewItem_Selected(object sender, RoutedEventArgs e)
-		{
-			State.SelectedItem_MissingTreeView = (TreeViewItem)sender;
-
-			e.Handled = true;
-		}
-
-		private void MissingTreeViewItem_Unselected(object sender, RoutedEventArgs e)
-		{
-			State.SelectedItem_MissingTreeView = null;
-
-			e.Handled = true;
-		}
-
-		#endregion
-
-		#region Helpers
-
-		private void ConfigureMarkupElementTab(bool mappingMode)
-		{
-			Tabs.SelectedItem = MarkupElementTab;
-
-			if(mappingMode)
-			{
-				ConcernPointPanel.Visibility = Visibility.Visible;
-				MarkupElementPanel.Visibility = Visibility.Collapsed;
-			}
-			else
-			{
-				ConcernPointPanel.Visibility = Visibility.Collapsed;
-				MarkupElementPanel.Visibility = Visibility.Visible;
-			}
-		}
+		#region Status
 
 		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 
@@ -958,95 +176,74 @@ namespace Land.Control
 			ControlStatusLabel.Content = text;
 		}
 
-		private HashSet<string> GetFileSet(HashSet<string> paths)
+		#endregion
+
+		#region Controls search
+
+		private Label GetMarkupTreeItemLabel(TreeViewItem item, string labelName)
 		{
-			if (paths == null)
-				return null;
+			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
+			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
 
-			var res = new HashSet<string>();
-
-			foreach(var path in paths)
+			try
 			{
-				if (File.Exists(path))
-					res.Add(path);
-				else if (Directory.Exists(path))
-					res.UnionWith(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
-			}
-
-			return res;
-		}
-
-		private void DocumentChangedHandler(string fileName)
-		{
-			if (ParsedFiles.ContainsKey(fileName))
-			{
-				ParsedFiles.Remove(fileName);
-				MarkupManager.InvalidatePoints(fileName);
-			}
-		}
-
-		private Tuple<Node, string> GetRoot(string documentName)
-		{
-			return !String.IsNullOrEmpty(documentName)
-				/// Если связанный с точкой файл разбирали и он не изменился с прошлого разбора,
-				? ParsedFiles.ContainsKey(documentName) && ParsedFiles[documentName] != null
-					/// возвращаем сохранённый ранее результат
-					? ParsedFiles[documentName]
-					/// иначе пытаемся переразобрать файл
-					: ParsedFiles[documentName] = TryParse(documentName, out bool success)
-				: null;
-		}
-
-		private Tuple<Node, string> TryParse(string fileName, out bool success, string text = null)
-		{
-			if (!String.IsNullOrEmpty(fileName))
-			{
-				var extension = Path.GetExtension(fileName);
-
-				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
+				if (dataTemplate != null && templateParent != null)
 				{
-					if (String.IsNullOrEmpty(text))
-						text = GetText(fileName);
-
-					var root = Parsers[extension].Parse(text);
-					success = Parsers[extension].Log.All(l => l.Type != MessageType.Error);
-
-					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
-					Log.AddRange(Parsers[extension].Log);
-
-					return success ? new Tuple<Node, string>(root, text) : null;
-				}
-				else
-				{
-					Log.Add(Message.Error($"Отсутствует парсер для файлов с расширением '{extension}'", null));
+					return dataTemplate.FindName(labelName, templateParent) as Label;
 				}
 			}
+			catch
+			{
+			}
 
-			success = false;
 			return null;
 		}
 
-		private T LogFunction<T>(Func<T> func, bool resetPrevious, bool skipTrace)
+		private static TreeViewItem VisualUpwardSearch(DependencyObject source)
 		{
-			if(resetPrevious)
-			{
-				Log.Clear();
-			}
+			while (source != null && !(source is TreeViewItem))
+				source = VisualTreeHelper.GetParent(source);
 
-			var result = func();
-			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
-			return result;
+			return source as TreeViewItem;
 		}
 
-		private void LogAction(Action action, bool resetPrevious, bool skipTrace)
+		private static T GetFrameworkElementByName<T>(FrameworkElement referenceElement) where T : FrameworkElement
 		{
-			if (resetPrevious)
+			FrameworkElement child = null;
+
+			//travel the visualtree by VisualTreeHelper to get the template
+			for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(referenceElement); i++)
 			{
-				Log.Clear();
+				child = VisualTreeHelper.GetChild(referenceElement, i) as FrameworkElement;
+
+				if (child != null && child.GetType() == typeof(T)) { break; }
+				else if (child != null)
+				{
+					child = GetFrameworkElementByName<T>(child);
+					if (child != null && child.GetType() == typeof(T))
+					{
+						break;
+					}
+				}
 			}
 
-			action();
-			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
+			return child as T;
+		}
+
+		#endregion
+
+		#region Settings
+
+		private void LoadSettings()
+		{
+			/// Загружаем настройки панели способом, определённым в адаптере
+			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH)
+				?? new LandExplorerSettings();
+
+			SyncMarkupManagerSettings();
+
+			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
+			Parsers = LogFunction(() => BuildParsers(), true, true);
 		}
 
 		private void SyncMarkupManagerSettings()
@@ -1069,98 +266,58 @@ namespace Land.Control
 				MarkupManager.AcceptanceThreshold = SettingsObject.AcceptanceThreshold.Value;
 		}
 
-		private Dictionary<string, BaseParser> BuildParsers()
+		#endregion
+
+		#region Other helpers
+
+		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
-			var parsers = new Dictionary<string, BaseParser>();
+			if (paths == null)
+				return null;
 
-			/// Генерируем парсер и связываем его с каждым из расширений, 
-			/// указанных для грамматики
-			foreach (var item in SettingsObject.Parsers)
+			var res = new HashSet<string>();
+
+			foreach (var path in paths)
 			{
-				if(!File.Exists(item.GrammarPath))
-				{
-					Log.Add(Message.Error(
-						$"Файл {item.GrammarPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
-						null
-					));
+				if (File.Exists(path))
+					res.Add(path);
+				else if (Directory.Exists(path))
+					res.UnionWith(Directory.GetFiles(path, "*.*", SearchOption.AllDirectories));
+			}
 
-					continue;
-				}
+			return res;
+		}
 
-				var parser = BuilderBase.BuildParser(
-					GrammarType.LL,
-					File.ReadAllText(item.GrammarPath),
-					Log
-				);
+		private void DocumentChangedHandler(string fileName)
+		{
+			if (ParsedFiles.ContainsKey(fileName))
+			{
+				ParsedFiles.Remove(fileName);
+				MarkupManager.InvalidatePoints(fileName);
+			}
+		}
 
-                foreach (var key in item.Extensions)
-					parsers[key] = parser;
+		private T LogFunction<T>(Func<T> func, bool resetPrevious, bool skipTrace)
+		{
+			if (resetPrevious)
+			{
+				Log.Clear();
+			}
 
-				if (!String.IsNullOrEmpty(item.PreprocessorPath))
-				{
-					if (!File.Exists(item.PreprocessorPath))
-					{
-						Log.Add(Message.Error(
-							$"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
-							null
-						));
-					}
-					else
-					{
-						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
-							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-							?.GetConstructor(Type.EmptyTypes).Invoke(null);
+			var result = func();
+			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
+			return result;
+		}
 
-						if (preprocessor != null)
-						{
-							if (item.PreprocessorProperties != null
-								&& item.PreprocessorProperties.Count > 0)
-							{
-								/// Получаем тип препроцессора из библиотеки
-								var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
-									.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
+		private void LogAction(Action action, bool resetPrevious, bool skipTrace)
+		{
+			if (resetPrevious)
+			{
+				Log.Clear();
+			}
 
-								/// Для каждой настройки препроцессора
-								foreach (var property in item.PreprocessorProperties)
-								{
-									/// проверяем, есть ли такое свойство у объекта
-									var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
-
-									if (propertyInfo != null)
-									{
-										var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
-											.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-											.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-										try
-										{
-											propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
-										}
-										catch
-										{
-											Log.Add(Message.Error(
-												$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
-												null
-											));
-										}
-									}
-								}
-							}
-
-							parser.SetPreprocessor(preprocessor);
-						}
-						else
-						{
-							Log.Add(Message.Error(
-								$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
-								null
-							));
-						}
-					}
-				}
-            }
-
-			return parsers;
+			action();
+			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
 		}
 
 		private List<DocumentSegment> GetSegments(MarkupElement elem, bool captureWholeLine)
@@ -1236,56 +393,6 @@ namespace Land.Control
 			}
 
 			return !cp.HasInvalidLocation;
-		}
-
-		private Label GetMarkupTreeItemLabel(TreeViewItem item, string labelName)
-		{
-			ContentPresenter templateParent = GetFrameworkElementByName<ContentPresenter>(item);
-			HierarchicalDataTemplate dataTemplate = MarkupTreeView.ItemTemplate as HierarchicalDataTemplate;
-
-			try
-			{
-				if (dataTemplate != null && templateParent != null)
-				{
-					return dataTemplate.FindName(labelName, templateParent) as Label;
-				}
-			}
-			catch
-			{
-			}
-
-			return null;
-		}
-
-		private static TreeViewItem VisualUpwardSearch(DependencyObject source)
-		{
-			while (source != null && !(source is TreeViewItem))
-				source = VisualTreeHelper.GetParent(source);
-
-			return source as TreeViewItem;
-		}
-
-		private static T GetFrameworkElementByName<T>(FrameworkElement referenceElement) where T : FrameworkElement
-		{
-			FrameworkElement child = null;
-
-			//travel the visualtree by VisualTreeHelper to get the template
-			for (Int32 i = 0; i < VisualTreeHelper.GetChildrenCount(referenceElement); i++)
-			{
-				child = VisualTreeHelper.GetChild(referenceElement, i) as FrameworkElement;
-
-				if (child != null && child.GetType() == typeof(T)) { break; }
-				else if (child != null)
-				{
-					child = GetFrameworkElementByName<T>(child);
-					if (child != null && child.GetType() == typeof(T))
-					{
-						break;
-					}
-				}
-			}
-
-			return child as T;
 		}
 
 		#endregion

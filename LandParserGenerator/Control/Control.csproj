@@ -59,12 +59,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlPartial\Parsing.cs" />
+    <Compile Include="ControlPartial\MissingPointsTab.cs" />
+    <Compile Include="ControlPartial\MarkupElementTab.cs" />
+    <Compile Include="ControlPartial\MarkupTree.cs" />
+    <Compile Include="ControlPartial\DragAndDrop.cs" />
+    <Compile Include="ControlPartial\Commands.cs" />
     <Compile Include="Converters\MissingListItemConverter.cs" />
     <Compile Include="Converters\MissingListIconColorConverter.cs" />
     <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
     <Compile Include="Converters\MissingListIconVisibilityConverter.cs" />
     <Compile Include="Converters\MarkupTreeIconVisibilityConverter.cs" />
-    <Compile Include="LandExplorerSettings.cs" />
+    <Compile Include="Models\LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
     <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
     <Compile Include="Models\PointCandidatesPair.cs" />
@@ -93,7 +99,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PreprocessorProperty.cs" />
+    <Compile Include="Models\PreprocessorProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
