@@ -95,6 +95,12 @@ namespace Land.Core.Markup
 			Context = PointContext.Create(targetInfo);
 		}
 
+		public void Relink(CandidateInfo candidate)
+		{
+			Location = candidate.Node.Anchor;
+			Context = candidate.Context;
+		}
+
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);

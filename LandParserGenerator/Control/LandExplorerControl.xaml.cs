@@ -139,12 +139,12 @@ namespace Land.Control
 				? Parsers[extension] : null;
 		}
 
-		public List<NodeSimilarityPair> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
+		public List<CandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
 				? MarkupManager.Find(point, 
 					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
-				: new List<NodeSimilarityPair>();
+				: new List<CandidateInfo>();
 		}
 
 		#endregion
@@ -179,6 +179,17 @@ namespace Land.Control
 		#endregion
 
 		#region Controls search
+
+		public TreeViewItem GetTreeViewItemParent(TreeViewItem item)
+		{
+			DependencyObject parent = VisualTreeHelper.GetParent(item);
+			while (!(parent is TreeViewItem || parent is TreeView))
+			{
+				parent = VisualTreeHelper.GetParent(parent);
+			}
+
+			return parent as TreeViewItem;
+		}
 
 		private Label GetMarkupTreeItemLabel(TreeViewItem item, string labelName)
 		{

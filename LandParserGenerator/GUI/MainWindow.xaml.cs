@@ -985,7 +985,7 @@ namespace Land.GUI
 					/// значит, в какой-то новый узел мы отобразили старый
 					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
+						MoveCaretToSource(((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
 				}
 			}
 		}
@@ -994,7 +994,7 @@ namespace Land.GUI
 		{
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
-				var node = ((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node;
+				var node = ((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
 				MoveCaretToSource(node.Anchor, MappingDebug_NewTextEditor);
 			}
 		}

@@ -51,7 +51,7 @@ namespace Land.Control
 			}
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<NodeSimilarityPair>> ambiguities)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities)
 		{
 			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
 			foreach (PointCandidatesPair pair in MissingTreeView.ItemsSource)
@@ -81,7 +81,7 @@ namespace Land.Control
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
-				if (item.DataContext is NodeSimilarityPair pair)
+				if (item.DataContext is CandidateInfo pair)
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,

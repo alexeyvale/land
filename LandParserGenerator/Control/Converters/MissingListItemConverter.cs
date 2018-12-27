@@ -17,7 +17,7 @@ namespace Land.Control
 		{
 			return value is PointCandidatesPair pair1
 				? pair1.Point?.Name
-				: value is NodeSimilarityPair pair2
+				: value is CandidateInfo pair2
 					? $"{new ConcernPointCandidateViewModel(pair2.Node).ViewHeader}\t{pair2.ToString()}"
 					: null;
 		}

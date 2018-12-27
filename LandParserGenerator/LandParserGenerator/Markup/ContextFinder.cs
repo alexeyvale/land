@@ -8,7 +8,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	public class NodeSimilarityPair
+	public class CandidateInfo
 	{
 		private const double HeaderContextWeight = 1;
 		private const double AncestorsContextWeight = 0.5;
@@ -43,13 +43,13 @@ namespace Land.Core.Markup
 		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
 		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
 		/// <returns></returns>
-		public static Dictionary<ConcernPoint, List<NodeSimilarityPair>> Find(
+		public static Dictionary<ConcernPoint, List<CandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
 			TargetFileInfo candidateFileInfo
 		)
 		{
-			var result = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var result = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			foreach (var typePointsPair in points)
 			{
@@ -57,7 +57,7 @@ namespace Land.Core.Markup
 				{
 					var candidates = candidateNodes.ContainsKey(typePointsPair.Key)
 						? candidateNodes[typePointsPair.Key].Select(node =>
-							new NodeSimilarityPair()
+							new CandidateInfo()
 							{
 								Node = node,
 								Context = new PointContext()
@@ -66,7 +66,7 @@ namespace Land.Core.Markup
 									NodeType = node.Type
 								}
 							}).ToList()
-						: new List<NodeSimilarityPair>();
+						: new List<CandidateInfo>();
 
 					foreach (var candidate in candidates)
 					{
@@ -95,7 +95,7 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		public static List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public static List<CandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
 			targetInfo.TargetNode.Accept(visitor);

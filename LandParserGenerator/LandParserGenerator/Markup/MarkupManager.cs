@@ -161,6 +161,14 @@ namespace Land.Core.Markup
 			point.Relink(targetInfo);
 
 			OnMarkupChanged?.Invoke();
+		/// <summary>
+		/// Смена узла, к которому привязана точка
+		/// </summary>
+		public void RelinkConcernPoint(ConcernPoint point, CandidateInfo candidate)
+		{
+			point.Relink(candidate);
+
+			OnMarkupChanged?.Invoke(false);
 		}
 
 		/// <summary>
@@ -265,7 +273,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<CandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -303,7 +311,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<NodeSimilarityPair>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles)
@@ -314,10 +322,10 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<NodeSimilarityPair>> LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<CandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
-			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -350,13 +358,13 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<NodeSimilarityPair>> GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<CandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
-			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<NodeSimilarityPair>());
+			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<CandidateInfo>());
 
 			foreach (var file in targetFiles)
 			{
@@ -387,9 +395,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<NodeSimilarityPair>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 			var candidates = ContextFinder.Find(point, targetInfo).OrderByDescending(c=>c.Similarity)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
@@ -402,7 +410,7 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private bool ApplyCandidate(ConcernPoint point, IEnumerable<NodeSimilarityPair> candidates)
+		private bool ApplyCandidate(ConcernPoint point, IEnumerable<CandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
 			var second = candidates.Skip(1).FirstOrDefault();

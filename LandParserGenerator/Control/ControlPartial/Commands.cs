@@ -44,7 +44,15 @@ namespace Land.Control
 
 		private void Command_MissingTree_Accept_Executed(object sender, RoutedEventArgs e)
 		{
-			
+			var parent = GetTreeViewItemParent(State.SelectedItem_MissingTreeView);
+
+			if (parent != null)
+			{
+				MarkupManager.RelinkConcernPoint(
+					(parent.DataContext as PointCandidatesPair).Point,
+					State.SelectedItem_MissingTreeView.DataContext as CandidateInfo
+				);
+			}
 		}
 
 		private void Command_Relink_Executed(TreeViewItem target)
@@ -214,7 +222,7 @@ namespace Land.Control
 		{
 			e.CanExecute = MissingTreeView != null
 				&& MissingTreeView.SelectedItem != null
-				&& MissingTreeView.SelectedItem is NodeSimilarityPair;
+				&& MissingTreeView.SelectedItem is CandidateInfo;
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
