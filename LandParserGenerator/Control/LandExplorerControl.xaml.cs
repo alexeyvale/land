@@ -40,6 +40,8 @@ namespace Land.Control
 			public TreeViewItem SelectedItem_MarkupTreeView { get; set; }
 			public TreeViewItem SelectedItem_MissingTreeView { get; set; }
 
+			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; }
+
 			public PendingCommandInfo PendingCommand { get; set; }		
 
 			public bool HighlightConcerns { get; set; }
@@ -398,7 +400,8 @@ namespace Land.Control
 							FileName = cp.Context.FileName,
 							FileText = rootTextPair.Item2,
 							TargetNode = rootTextPair.Item1
-						})
+						}),
+						false
 					);
 				}
 			}

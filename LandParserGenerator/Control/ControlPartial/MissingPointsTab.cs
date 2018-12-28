@@ -51,8 +51,16 @@ namespace Land.Control
 			}
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
 		{
+			if (globalRemap)
+				State.RecentAmbiguities = ambiguities;
+			else
+			{
+				foreach (var kvp in ambiguities)
+					State.RecentAmbiguities[kvp.Key] = kvp.Value;
+			}
+
 			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
 			foreach (PointCandidatesPair pair in MissingTreeView.ItemsSource)
 			{
