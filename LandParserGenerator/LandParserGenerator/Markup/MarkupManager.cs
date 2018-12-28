@@ -161,6 +161,8 @@ namespace Land.Core.Markup
 			point.Relink(targetInfo);
 
 			OnMarkupChanged?.Invoke();
+		}
+
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
@@ -168,7 +170,7 @@ namespace Land.Core.Markup
 		{
 			point.Relink(candidate);
 
-			OnMarkupChanged?.Invoke(false);
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
