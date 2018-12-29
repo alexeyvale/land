@@ -1383,9 +1383,6 @@ namespace Land.Core
 						case MappingOption.LAND:
 							result += $"%mapping {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
 							break;
-						case MappingOption.BASEPRIORITY:
-							result += $"%mapping {option.ToString().ToLower()}({(double)Options.GetParams(option, OptionsManager.GLOBAL_PARAMETERS_SYMBOL).Single()}){Environment.NewLine}";
-							break;
 						case MappingOption.PRIORITY:
 							foreach(var smb in Options.GetSymbols(option))
 								result += $"%mapping {option.ToString().ToLower()}({(double)Options.GetParams(option, smb).Single()}) {smb}{Environment.NewLine}";

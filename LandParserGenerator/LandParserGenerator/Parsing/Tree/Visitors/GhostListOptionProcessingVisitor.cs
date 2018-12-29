@@ -32,7 +32,7 @@ namespace Land.Core.Parsing.Tree
 
 					if (smbToRemove.Options.Priority.HasValue)
 						smbToRemove.Children.ForEach(c =>
-							c.Options.Priority = smbToRemove.Options.Priority);
+							c.Options.Priority = (c.Options.Priority ?? LocalOptions.BASE_PRIORITY) * smbToRemove.Options.Priority);
 
 					for (var j=smbToRemove.Children.Count -1; j >=0; --j)
 					{
@@ -61,7 +61,7 @@ namespace Land.Core.Parsing.Tree
 
 						if (smbToRemove.Options.Priority.HasValue)
 							smbToRemove.Children.ForEach(c =>
-								c.Options.Priority = smbToRemove.Options.Priority);
+								c.Options.Priority = (c.Options.Priority ?? LocalOptions.BASE_PRIORITY) * smbToRemove.Options.Priority);
 
 						for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
 						{
