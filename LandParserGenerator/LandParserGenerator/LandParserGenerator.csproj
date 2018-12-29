@@ -94,6 +94,7 @@
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
+    <Compile Include="Markup\RelationsExtension.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />

@@ -78,5 +78,17 @@ namespace Land.Core
 			Start.Shift(lnDelta, colDelta, offsetDelta);
 			End.Shift(lnDelta, colDelta, offsetDelta);
 		}
+
+		public bool Includes(SegmentLocation other)
+		{
+			return Start.Offset <= other.Start.Offset
+				&& End.Offset >= other.End.Offset;
+		}
+
+		public bool Overlaps(SegmentLocation other)
+		{
+			return Start.Offset <= other.Start.Offset && End.Offset >= other.Start.Offset
+				|| End.Offset >= other.End.Offset && Start.Offset <= other.End.Offset;
+		}
 	}
 }

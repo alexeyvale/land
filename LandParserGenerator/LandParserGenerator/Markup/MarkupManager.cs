@@ -353,7 +353,7 @@ namespace Land.Core.Markup
 				else
 				{
 					foreach (var point in fileGroup.Value)
-						point.Location = null;
+						point.AstNode = null;
 				}
 			}
 
@@ -421,13 +421,13 @@ namespace Land.Core.Markup
 				&& (second == null || first.Similarity - second.Similarity >= DistanceToClosestThreshold))
 			{
 				point.Context = first.Context;
-				point.Location = first.Node.Anchor;
+				point.AstNode = first.Node;
 
 				return true;
 			}
 			else
 			{
-				point.Location = null;
+				point.AstNode = null;
 
 				return false;
 			}

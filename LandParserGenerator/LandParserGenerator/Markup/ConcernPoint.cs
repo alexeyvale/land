@@ -22,7 +22,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Признак того, что координаты потеряны
 		/// </summary>
-		public bool HasMissingLocation => _location == null;
+		public bool HasMissingLocation => Location == null;
 
 		/// <summary>
 		/// Признак того, что координаты невозможно использовать для перехода
@@ -30,20 +30,25 @@ namespace Land.Core.Markup
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
 		/// <summary>
-		/// Координаты участка в тексте, которому соответствует точка 
+		/// Узел AST, которому соответствует точка
 		/// </summary>
-		private SegmentLocation _location;
-		public SegmentLocation Location
+		private Node _node;
+		public Node AstNode
 		{
-			get => _location;
+			get => _node;
 			set
 			{
-				_location = value;
+				_node = value;
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
 			}
 		}
+
+		/// <summary>
+		/// Координаты участка в тексте, которому соответствует точка 
+		/// </summary>
+		public SegmentLocation Location => _node?.Anchor;
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
@@ -56,7 +61,7 @@ namespace Land.Core.Markup
 		{
 			Context = PointContext.Create(targetInfo);
 
-			Location = targetInfo.TargetNode.Anchor;
+			AstNode = targetInfo.TargetNode;
 			Parent = parent;
 			Name = targetInfo.TargetNode.Type;
 
@@ -91,13 +96,13 @@ namespace Land.Core.Markup
 
 		public void Relink(TargetFileInfo targetInfo)
 		{
-			Location = targetInfo.TargetNode.Anchor;
+			AstNode = targetInfo.TargetNode;
 			Context = PointContext.Create(targetInfo);
 		}
 
 		public void Relink(CandidateInfo candidate)
 		{
-			Location = candidate.Node.Anchor;
+			AstNode = candidate.Node;
 			Context = candidate.Context;
 		}
 
