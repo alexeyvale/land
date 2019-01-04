@@ -16,9 +16,10 @@ namespace Land.Control
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
 			var label = (Label)values[0];
-			var isFocused = (bool)values[1];
+			var IsFocused = (bool)values[1];
+			var IsSelectionActive = (bool)values[2];
 
-			return isFocused
+			return IsFocused && IsSelectionActive
 				? Brushes.WhiteSmoke
 				: label.Name == "MissingIcon"
 					? Brushes.IndianRed

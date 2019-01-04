@@ -113,7 +113,6 @@
 												<MultiBinding Converter="{StaticResource MarkupTreeIconVisibilityConverter}">
 													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
 													<Binding Path="." />
-													<Binding Path="Location" />
 												</MultiBinding>
 											</Setter.Value>
 										</Setter>
@@ -122,6 +121,7 @@
 												<MultiBinding Converter="{StaticResource MarkupTreeIconColorConverter}">
 													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
 													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
+													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsSelectionActive" />
 												</MultiBinding>
 											</Setter.Value>
 										</Setter>
@@ -257,6 +257,7 @@
 													<MultiBinding Converter="{StaticResource MissingListIconColorConverter}">
 														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
 														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
+														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsSelectionActive" />
 													</MultiBinding>
 												</Setter.Value>
 											</Setter>
