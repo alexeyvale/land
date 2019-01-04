@@ -29,6 +29,7 @@ namespace Land.GUI
 	{
 		private readonly string APP_DATA_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD IDE";
 		private readonly string DOCUMENTS_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace";
+		private readonly string DOCUMENTS_DLL_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\dll";
 
 		private string RECENT_GRAMMARS_FILE = "recent_grammars.txt";
 		private string RECENT_PREPROCS_FILE = "recent_preprocs.txt";
@@ -51,6 +52,9 @@ namespace Land.GUI
 
 			if (!Directory.Exists(DOCUMENTS_DIRECTORY))
 				Directory.CreateDirectory(DOCUMENTS_DIRECTORY);
+
+			if (!Directory.Exists(DOCUMENTS_DLL_DIRECTORY))
+				Directory.CreateDirectory(DOCUMENTS_DLL_DIRECTORY);
 
 			/// Корректируем пути к конфигурационным файлам
 			RECENT_GRAMMARS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_GRAMMARS_FILE);
@@ -219,7 +223,7 @@ namespace Land.GUI
 			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(OpenedGrammarFilename)
 				? Path.GetFileNameWithoutExtension(OpenedGrammarFilename)
 				: null;
-			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(OpenedGrammarFilename);
+			librarySettings.Input_OutputDirectory.Text = DOCUMENTS_DLL_DIRECTORY;
 
 			if (librarySettings.ShowDialog() == true)
 			{
