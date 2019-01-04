@@ -450,7 +450,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Совершение заданного действия со всеми элементами разметки
 		/// </summary>
-		private void DoWithMarkup(Action<MarkupElement> action)
+		public void DoWithMarkup(Action<MarkupElement> action)
 		{
 			foreach (var elem in Markup)
 				DoWithMarkupSubtree(action, elem);

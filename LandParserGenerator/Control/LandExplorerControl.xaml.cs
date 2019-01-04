@@ -40,7 +40,8 @@ namespace Land.Control
 			public TreeViewItem SelectedItem_MarkupTreeView { get; set; }
 			public TreeViewItem SelectedItem_MissingTreeView { get; set; }
 
-			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; }
+			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; } =
+				new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
