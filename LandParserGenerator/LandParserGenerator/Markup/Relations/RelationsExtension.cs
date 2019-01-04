@@ -36,15 +36,15 @@ namespace Land.Core.Markup
 
 		public static bool Spatial_Includes(this Concern a, ConcernPoint b)
 		{
-			return GetPointsVisitor.GetPoints(new List<Concern> { a })
+			return GetLinearSequenceVisitor.GetPoints(new List<Concern> { a })
 				.Any(p => p.Spatial_Includes(b));
 		}
 
 		public static bool Spatial_Includes(this Concern a, Concern b)
 		{
-			var aPoints = GetPointsVisitor.GetPoints(new List<Concern> { a });
+			var aPoints = GetLinearSequenceVisitor.GetPoints(new List<Concern> { a });
 
-			return GetPointsVisitor.GetPoints(new List<Concern> { b })
+			return GetLinearSequenceVisitor.GetPoints(new List<Concern> { b })
 				.All(bPoint => aPoints.Any(aPoint => aPoint.Spatial_Includes(bPoint)));
 		}
 
@@ -55,9 +55,9 @@ namespace Land.Core.Markup
 
 		public static bool Spatial_Intersects(this Concern a, Concern b)
 		{
-			var aPoints = GetPointsVisitor.GetPoints(new List<Concern> { a });
+			var aPoints = GetLinearSequenceVisitor.GetPoints(new List<Concern> { a });
 
-			return GetPointsVisitor.GetPoints(new List<Concern> { b })
+			return GetLinearSequenceVisitor.GetPoints(new List<Concern> { b })
 				.All(bPoint => aPoints.Any(aPoint => aPoint.Spatial_Intersects(bPoint)));
 		}
 
@@ -77,23 +77,34 @@ namespace Land.Core.Markup
 
 		public static bool Set_Includes(this Concern a, ConcernPoint b)
 		{
-			return GetPointsVisitor.GetPoints(new List<Concern> { a }).Contains(b);
+			return GetLinearSequenceVisitor.GetPoints(new List<Concern> { a })
+				.Any(p=>p.AstNode == b.AstNode);
 		}
 
 		public static bool Set_Includes(this Concern a, Concern b)
 		{
-			var aPoints = GetPointsVisitor.GetPoints(new List<Concern> { a });
+			var aNodes = new HashSet<Node>(
+				GetLinearSequenceVisitor.GetPoints(new List<Concern> { a }).Select(p => p.AstNode)
+			);
 
-			return (new HashSet<ConcernPoint>(GetPointsVisitor.GetPoints(new List<Concern> { b })))
-				.All(p => aPoints.Contains(p));
+			var bNodes = new HashSet<Node>(
+				GetLinearSequenceVisitor.GetPoints(new List<Concern> { b }).Select(p => p.AstNode)
+			);
+
+			return bNodes.SetEquals(aNodes);
 		}
 
 		public static bool Set_Intersects(this Concern a, Concern b)
 		{
-			var aPoints = GetPointsVisitor.GetPoints(new List<Concern> { a });
+			var aNodes = new HashSet<Node>(
+				GetLinearSequenceVisitor.GetPoints(new List<Concern> { a }).Select(p => p.AstNode)
+			);
 
-			return (new HashSet<ConcernPoint>(GetPointsVisitor.GetPoints(new List<Concern> { b })))
-				.Any(p => aPoints.Contains(p));
+			var bNodes = new HashSet<Node>(
+				GetLinearSequenceVisitor.GetPoints(new List<Concern> { b }).Select(p => p.AstNode)
+			);
+
+			return aNodes.Intersect(bNodes).Count() > 0;
 		}
 
 		#endregion

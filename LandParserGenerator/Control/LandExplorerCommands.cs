@@ -28,7 +28,7 @@ namespace Land.Control
 
 		public static RoutedUICommand AddLand { get; } = new RoutedUICommand
 			(
-				"Добавить все острова",
+				"Разметить всю сушу",
 				"AddLand",
 				typeof(LandExplorerCommands)
 			);
@@ -40,23 +40,65 @@ namespace Land.Control
 				typeof(LandExplorerCommands)
 			);
 
+		public static RoutedUICommand Highlight { get; } = new RoutedUICommand
+			(
+				"Выделить функциональности",
+				"Highlight",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand OpenConcernGraph { get; } = new RoutedUICommand
+			(
+				"Открыть граф зависимостей",
+				"OpenConcernGraph",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand DeleteWithSource { get; } = new RoutedUICommand
+			(
+				"Удалить вместе с исходным кодом",
+				"DeleteWithSource",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand TurnOff { get; } = new RoutedUICommand
+			(
+				"Отключить",
+				"TurnOff",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand TurnOn { get; } = new RoutedUICommand
+			(
+				"Включить",
+				"TurnOn",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand Delete_Markup { get; } = new RoutedUICommand
+			(
+				"Удалить",
+				"Delete",
+				typeof(LandExplorerCommands)
+			);
+
 		public static RoutedUICommand Relink_Markup { get; } = new RoutedUICommand
 			(
-				"Перепривязать",
+				"Сменить привязку",
 				"Relink",
 				typeof(LandExplorerCommands)
 			);
 
 		public static RoutedUICommand Delete_Missing { get; } = new RoutedUICommand
 			(
-				"Удалить элемент разметки",
+				"Удалить",
 				"Delete",
 				typeof(LandExplorerCommands)
 			);
 
 		public static RoutedUICommand Relink_Missing { get; } = new RoutedUICommand
 			(
-				"Перепривязать",
+				"Сменить привязку",
 				"Relink",
 				typeof(LandExplorerCommands)
 			);
@@ -65,21 +107,6 @@ namespace Land.Control
 			(
 				"Подтвердить",
 				"Accept",
-				typeof(LandExplorerCommands)
-			);
-
-		public static RoutedUICommand Delete_Markup { get; } = new RoutedUICommand
-			(
-				"Удалить элемент разметки",
-				"Delete",
-				typeof(LandExplorerCommands)
-			);
-
-
-		public static RoutedUICommand Highlight { get; } = new RoutedUICommand
-			(
-				"Выделить функциональности",
-				"Highlight",
 				typeof(LandExplorerCommands)
 			);
 	}

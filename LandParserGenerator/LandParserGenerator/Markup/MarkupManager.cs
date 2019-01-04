@@ -178,7 +178,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public List<ConcernPoint> GetConcernPoints()
 		{
-			return GetPointsVisitor.GetPoints(Markup);
+			return GetLinearSequenceVisitor.GetPoints(Markup);
 		}
 
 		/// <summary>

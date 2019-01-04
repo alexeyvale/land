@@ -39,6 +39,18 @@
     <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GraphSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\components\GraphSharp\GraphSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="GraphSharp.Controls, Version=1.0.4868.15710, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\components\GraphSharp\GraphSharp.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph, Version=3.2.40122.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\components\GraphSharp\QuickGraph.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
@@ -59,6 +71,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcernGraph.xaml.cs">
+      <DependentUpon>ConcernGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ControlPartial\Parsing.cs" />
     <Compile Include="ControlPartial\MissingPointsTab.cs" />
     <Compile Include="ControlPartial\MarkupElementTab.cs" />
@@ -80,6 +95,10 @@
     <Compile Include="LandExplorerSettingsWindow.xaml.cs">
       <DependentUpon>LandExplorerSettingsWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="ConcernGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LandExplorerControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

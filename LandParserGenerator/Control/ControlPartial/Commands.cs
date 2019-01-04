@@ -37,6 +37,24 @@ namespace Land.Control
 			MarkupManager.RemoveElement(((PointCandidatesPair)MissingTreeView.SelectedItem).Point);
 		}
 
+		private void Command_MarkupTree_DeleteWithSource_Executed(object sender, RoutedEventArgs e)
+		{
+			var points = GetLinearSequenceVisitor.GetPoints(
+				new List<MarkupElement> { (MarkupElement)MarkupTreeView.SelectedItem }
+			);
+
+		}
+
+		private void Command_MarkupTree_TurnOn_Executed(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
+		private void Command_MarkupTree_TurnOff_Executed(object sender, RoutedEventArgs e)
+		{
+			
+		}
+
 		private void Command_MissingTree_Relink_Executed(object sender, RoutedEventArgs e)
 		{
 			Command_Relink_Executed(State.SelectedItem_MissingTreeView);
@@ -185,6 +203,11 @@ namespace Land.Control
 
 			if(!State.HighlightConcerns)
 				Editor.ResetSegments();		
+		}
+
+		private void Command_OpenConcernGraph_Executed(object sender, RoutedEventArgs e)
+		{
+			
 		}
 
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)

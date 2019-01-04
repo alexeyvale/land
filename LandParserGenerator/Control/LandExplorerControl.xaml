@@ -24,9 +24,13 @@
 		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.DeleteWithSource" Executed="Command_MarkupTree_DeleteWithSource_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.TurnOn" Executed="Command_MarkupTree_TurnOn_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.TurnOff" Executed="Command_MarkupTree_TurnOff_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Delete_Markup" Executed="Command_MarkupTree_Delete_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink_Markup" Executed="Command_MarkupTree_Relink_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.OpenConcernGraph" Executed="Command_OpenConcernGraph_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
 		<CommandBinding Command="local:LandExplorerCommands.Delete_Missing" Executed="Command_MissingTree_Delete_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
@@ -71,22 +75,24 @@
 						Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
-				
-				<Button Content="&#xf067;" ToolTip="Добавить точку привязки" 
+
+				<Button Content="&#xf067;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf0fe;" ToolTip="Добавить функциональность" 
+				<Button Content="&#xf0fe;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" 
 						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
+				<Button Content="&#xf0ac;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-                <Button Content="&#xf0c1;" ToolTip="Сменить привязку" 
+				<Button Content="&#xf0c1;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf2ed;" ToolTip="Удалить"
+				<Button Content="&#xf2ed;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 
-				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить функциональности" Name="ToolBar_HighlightButton"
+				<ToggleButton Content="&#xf1fc;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" Name="ToolBar_HighlightButton"
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
+				<Button Content="&#xf0e8;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.OpenConcernGraph" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 				
