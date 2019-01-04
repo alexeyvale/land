@@ -15,7 +15,7 @@ namespace Land.Control
 		public List<string> Extensions { get; set; } = new List<string>();
 
 		[DataMember]
-		public string GrammarPath { get; set; }
+		public string ParserPath { get; set; }
 
 		[DataMember]
 		public string PreprocessorPath { get; set; }
@@ -40,7 +40,7 @@ namespace Land.Control
 			return new ParserSettingsItem()
 			{
 				Extensions = Extensions,
-				GrammarPath = GrammarPath,
+				ParserPath = ParserPath,
                 PreprocessorPath = PreprocessorPath,
                 PreprocessorProperties = new List<PreprocessorProperty>(PreprocessorProperties)
 			};

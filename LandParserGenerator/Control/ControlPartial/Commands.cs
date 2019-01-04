@@ -251,7 +251,7 @@ namespace Land.Control
 				);
 
 				SyncMarkupManagerSettings();
-				Parsers = LogFunction(() => BuildParsers(), true, true);
+				Parsers = LogFunction(() => LoadParsers(), true, true);
 			}
 		}
 

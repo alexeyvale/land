@@ -257,7 +257,7 @@ namespace Land.Control
 			SyncMarkupManagerSettings();
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
-			Parsers = LogFunction(() => BuildParsers(), true, true);
+			Parsers = LogFunction(() => LoadParsers(), true, true);
 		}
 
 		private void SyncMarkupManagerSettings()
