@@ -121,7 +121,7 @@ namespace Land.Core.Parsing.LR
 					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
 						$"Неожиданный символ {this.GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						token.Location.Start
+						errorToken.Location.Start
 					);
 
 					token = ErrorRecovery();
