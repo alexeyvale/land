@@ -193,7 +193,7 @@ namespace Land.GUI
 			var messages = new List<Message>();
 
 			Parser = BuilderBase.BuildParser(
-				GrammarType.LL,
+				ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,
 				Grammar_Editor.Text,
 				messages
 			);
