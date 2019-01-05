@@ -1,0 +1,64 @@
+DIRECTIVE	: '#' ~[\n\r]*
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
+
+ANY_TRIGGER_TOKEN	: '@interface'
+ 
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
+
+ 
+file_content	=	outer_entity*
+
+outer_entity	=	(annotation|MODIFIER)* (enum | class_interface) | Any (block | ';')+
+enum			=	'enum' name Any '{' Any '}' ';'?
+class_interface	=	('class'|'interface') name Any '{' inner_entity* '}' ';'?
+
+inner_entity	=	(annotation|MODIFIER)* (enum | class_interface | method | field) | Any (block | ';')+
+method			=	type_parameter? %priority(2) type name arguments Any (';' | block)	
+field			=	type_parameter? %priority(2) type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
+
+init_value	=	'=' (Any | %ghost type)+
+
+name_atom	=	(ID | MODIFIER) type_parameter?
+name		=	name_atom (('.'|'::') name_atom)*
+names_list	=	name (',' name)*
+
+type_atom	=	('unsigned'? ID) type_parameter? '*'*
+type		=	type_atom ((('.'|'::') type_atom) | '['']')*!
+type_parameter	=	'<' (AnyAvoid(';')|type_parameter)* '>'
+
+arguments	=	'(' (Any|arguments)+ ')'
+annotation	=	'@' name Any
+block		=	'{' (Any|block)+ '}'
+
+%%
+
+%parsing {
+	recovery
+	fragment STRING_INT_CODE
+	start file_content
+	skip COMMENT STRING DIRECTIVE
+}
+
+%nodes {
+	ghost  names_list
+	leaf name type
+}
+
+%mapping {
+	land enum class_interface method field
+	priority(3) name
+}
+ 

@@ -260,6 +260,16 @@ namespace Land.Core.Parsing.LR
 
 		private IToken ErrorRecovery()
 		{
+			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			{
+				Log.Add(Message.Error(
+					$"Возобновление разбора в случае ошибки отключено",
+					LexingStream.CurrentToken.Location.Start
+				));
+
+				return null;
+			}
+
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
 
