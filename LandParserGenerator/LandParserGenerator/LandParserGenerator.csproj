@@ -84,6 +84,7 @@
     <Compile Include="Lexing\PairAwareTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
+    <Compile Include="Markup\MarkupVisitors\GetPointsVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByTypeVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByFileVisitor.cs" />
     <Compile Include="Markup\PointContext.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
+    <Compile Include="Markup\RelationsExtension.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />
@@ -129,6 +131,14 @@
     <None Include="Grammar\Builder\_ymc\Land.lex" />
     <None Include="Grammar\Builder\_ymc\Land.y" />
     <None Include="keys.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\antlr-4.7-complete.jar">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\sn.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

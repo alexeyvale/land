@@ -39,9 +39,9 @@ namespace Land.Control
 				SyncPreprocessorAndProperties(item, out string message);
 
 			SettingsObject.Parsers = new ObservableCollection<ParserSettingsItem>(SettingsObject.Parsers
-				.GroupBy(gr => new { GrammmarPath = gr.GrammarPath.Trim(), PreprocessorPath = gr.PreprocessorPath?.Trim() }).Select(g => new ParserSettingsItem()
+				.GroupBy(gr => new { GrammmarPath = gr.ParserPath.Trim(), PreprocessorPath = gr.PreprocessorPath?.Trim() }).Select(g => new ParserSettingsItem()
 				{
-					GrammarPath = g.Key.GrammmarPath,
+					ParserPath = g.Key.GrammmarPath,
 					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),
                     PreprocessorPath = g.Key.PreprocessorPath,
                     PreprocessorProperties = g.Select(el=>el.PreprocessorProperties).FirstOrDefault()
@@ -80,14 +80,14 @@ namespace Land.Control
 					var openFileDialog = new OpenFileDialog()
 					{
 						AddExtension = true,
-						Filter = "Файлы LAND (*.land)|*.land|Все файлы (*.*)|*.*",
-						Title = "Выберите файл грамматики"
+						Filter = "Динамическая библиотека (*.dll)|*.dll",
+						Title = "Выберите библиотеку парсера"
 					};
 
 					if (openFileDialog.ShowDialog() == true)
 					{
 						var item = (ParserSettingsItem)((DataGridRow)vis).Item;
-						item.GrammarPath = openFileDialog.FileName;
+						item.ParserPath = openFileDialog.FileName;
 
 						GrammarsGrid.Items.Refresh();
 					}

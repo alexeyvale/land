@@ -1,4 +1,5 @@
 ﻿using Land.Control;
+using Land.VisualStudioExtension.Listeners;
 
 namespace Land.VisualStudioExtension
 {
@@ -28,8 +29,9 @@ namespace Land.VisualStudioExtension
 			this.Caption = "LandExplorer";
 
 			var control = new LandExplorerControl();
-			control.Initialize(new EditorAdapter());
+			var adapter = new EditorAdapter();
 
+			control.Initialize(adapter);
 			this.Content = control;
 		}
 	}

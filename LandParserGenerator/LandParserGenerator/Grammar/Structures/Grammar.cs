@@ -323,7 +323,7 @@ namespace Land.Core
 		//Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
 		public string GenerateTerminal(string pattern)
 		{
-			ConstructionLog.Add($"grammar.GenerateTerminal(\"{pattern.Replace("\"", "\\\"")}\");");
+			ConstructionLog.Add($"grammar.GenerateTerminal(@\"{pattern.Replace("\"", "\"\"")}\");");
 
 			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
 			foreach (var token in Tokens.Values)
@@ -339,7 +339,7 @@ namespace Land.Core
 
 		public void DeclareTerminal(string name,  string pattern, bool lineStart = false)
 		{
-			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", \"{pattern.Replace("\"", "\\\"")}\", {lineStart.ToString().ToLower()});");
+			ConstructionLog.Add($"grammar.DeclareTerminal(\"{name}\", @\"{pattern.Replace("\"", "\"\"")}\", {lineStart.ToString().ToLower()});");
 
 			var terminal = new TerminalSymbol(name, pattern, lineStart);
 			DeclareTerminal(terminal);
@@ -1416,9 +1416,6 @@ namespace Land.Core
 					{
 						case MappingOption.LAND:
 							result += $"%mapping {option.ToString().ToLower()} {String.Join(" ", Options.GetSymbols(option))}{Environment.NewLine}";
-							break;
-						case MappingOption.BASEPRIORITY:
-							result += $"%mapping {option.ToString().ToLower()}({(double)Options.GetParams(option, OptionsManager.GLOBAL_PARAMETERS_SYMBOL).Single()}){Environment.NewLine}";
 							break;
 						case MappingOption.PRIORITY:
 							foreach(var smb in Options.GetSymbols(option))

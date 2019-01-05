@@ -65,7 +65,7 @@ namespace Land.Control
 		/// <summary>
 		/// Выделить участки текста в файле
 		/// </summary>
-		Color SetSegments(List<DocumentSegment> segments);
+		void SetSegments(List<DocumentSegment> segments, Color color);
 
 		/// <summary>
 		/// Сбросить выделение
@@ -86,9 +86,11 @@ namespace Land.Control
 
 		#region Settings
 
-		void SaveSettings(LandExplorerSettings settings);
+		void SaveSettings(LandExplorerSettings settings, string defaultPath);
 
-		LandExplorerSettings LoadSettings();
+		LandExplorerSettings LoadSettings(string defaultPath);
+
+		event Action ShouldLoadSettings;
 
 		#endregion
 
@@ -99,7 +101,7 @@ namespace Land.Control
 
 		void RegisterOnDocumentChanged(Action<string> callback);
 
-		void RegisterOnWorkingSetChanged(Action<HashSet<string>> callback);
+		HashSet<string> GetWorkingSet();
 
 		#endregion
 	}

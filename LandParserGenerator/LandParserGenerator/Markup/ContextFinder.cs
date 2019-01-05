@@ -8,7 +8,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	public class NodeSimilarityPair
+	public class CandidateInfo
 	{
 		private const double HeaderContextWeight = 1;
 		private const double AncestorsContextWeight = 0.5;
@@ -37,24 +37,19 @@ namespace Land.Core.Markup
 
 	public static class ContextFinder
 	{
-		/// Веса операций для Левенштейна
-		private const double InsertionCost = 1;
-		private const double DeletionCost = 1;
-		private const double SubstitutionCost = 0.8;
-
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
 		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
 		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
 		/// <returns></returns>
-		public static Dictionary<ConcernPoint, List<NodeSimilarityPair>> Find(
+		public static Dictionary<ConcernPoint, List<CandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
 			TargetFileInfo candidateFileInfo
 		)
 		{
-			var result = new Dictionary<ConcernPoint, List<NodeSimilarityPair>>();
+			var result = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			foreach (var typePointsPair in points)
 			{
@@ -62,7 +57,7 @@ namespace Land.Core.Markup
 				{
 					var candidates = candidateNodes.ContainsKey(typePointsPair.Key)
 						? candidateNodes[typePointsPair.Key].Select(node =>
-							new NodeSimilarityPair()
+							new CandidateInfo()
 							{
 								Node = node,
 								Context = new PointContext()
@@ -71,7 +66,7 @@ namespace Land.Core.Markup
 									NodeType = node.Type
 								}
 							}).ToList()
-						: new List<NodeSimilarityPair>();
+						: new List<CandidateInfo>();
 
 					foreach (var candidate in candidates)
 					{
@@ -100,7 +95,7 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		public static List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public static List<CandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
 			targetInfo.TargetNode.Accept(visitor);
@@ -211,18 +206,26 @@ namespace Land.Core.Markup
 
 			if (a is IEnumerable<TypedPrioritizedContextElement>)
 			{
-				var aSockets = (a as IEnumerable<TypedPrioritizedContextElement>).Select(e => new Socket(e))
-					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
-				var bSockets = (b as IEnumerable<TypedPrioritizedContextElement>).Select(e => new Socket(e))
-					.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
+				var comparer = new EqualsIgnoreValueComparer();
 
-				denominator += aSockets.Sum(kvp => kvp.Key.Priority * kvp.Value);
+				var aSockets = (a as IEnumerable<IEqualsIgnoreValue>)
+					.GroupBy(e => e, comparer).ToDictionary(g => g.Key, g => g.Count());
+				var bSockets = (b as IEnumerable<IEqualsIgnoreValue>)
+					.GroupBy(e => e, comparer).ToDictionary(g => g.Key, g => g.Count());
+
+				denominator += aSockets.Sum(kvp 
+					=> ((TypedPrioritizedContextElement)kvp.Key).Priority * kvp.Value);
 
 				foreach (var kvp in aSockets)
-					if (bSockets.ContainsKey(kvp.Key))
-						bSockets[kvp.Key] -= kvp.Value;
+				{
+					var sameKey = bSockets.Keys.FirstOrDefault(e => e.EqualsIgnoreValue(kvp.Key));
 
-				denominator += bSockets.Where(kvp => kvp.Value > 0).Sum(kvp => kvp.Key.Priority * kvp.Value);
+					if (sameKey != null)
+						bSockets[sameKey] -= kvp.Value;
+				}
+
+				denominator += bSockets.Where(kvp => kvp.Value > 0)
+					.Sum(kvp => ((TypedPrioritizedContextElement)kvp.Key).Priority * kvp.Value);
 			}
 			else
 			{
@@ -271,11 +274,17 @@ namespace Land.Core.Markup
 			return 1 - distances[a.Count(), b.Count()] / denominator;
 		}
 
-		private static double PriorityCoefficient<T>(T elem)
+		private static double PriorityCoefficient(object elem)
 		{
-			return elem is HeaderContextElement 
-				? (elem as HeaderContextElement).Priority 
-				: 1;
+			switch(elem)
+			{
+				case HeaderContextElement headerContext:
+					return headerContext.Priority;
+				case InnerContextElement innerContext:
+					return innerContext.Priority;
+				default:
+					return 1;
+			}
 		}
 
 		/// Похожесть новой последовательности на старую 
@@ -297,7 +306,7 @@ namespace Land.Core.Markup
 			else if (a is AncestorsContextElement)
 				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
 			else
-				return a.Equals(b) ? 1 : 1 - SubstitutionCost;
+				return a.Equals(b) ? 1 : 0;
 		}
 
 		private static double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)

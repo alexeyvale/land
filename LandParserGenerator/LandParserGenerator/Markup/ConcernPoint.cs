@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 using Land.Core.Parsing.Tree;
@@ -9,18 +9,59 @@ using Land.Core.Parsing.Tree;
 namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
-	public class ConcernPoint: MarkupElement
+	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
 		[DataMember]
 		public PointContext Context { get; set; }
 
-		public SegmentLocation Location { get; set; }
+		/// <summary>
+		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
+		/// </summary>
+		public bool HasIrrelevantLocation { get; set; }
+
+		/// <summary>
+		/// Признак того, что координаты потеряны
+		/// </summary>
+		public bool HasMissingLocation => Location == null;
+
+		/// <summary>
+		/// Признак того, что координаты невозможно использовать для перехода
+		/// </summary>
+		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
+
+		/// <summary>
+		/// Узел AST, которому соответствует точка
+		/// </summary>
+		private Node _node;
+		public Node AstNode
+		{
+			get => _node;
+			set
+			{
+				_node = value;
+				HasIrrelevantLocation = false;
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+			}
+		}
+
+		/// <summary>
+		/// Координаты участка в тексте, которому соответствует точка 
+		/// </summary>
+		public SegmentLocation Location => _node?.Anchor;
+
+		public new event PropertyChangedEventHandler PropertyChanged;
+
+		public void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			PropertyChanged?.Invoke(sender, e);
+		}
 
 		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{
 			Context = PointContext.Create(targetInfo);
 
-			Location = targetInfo.TargetNode.Anchor;
+			AstNode = targetInfo.TargetNode;
 			Parent = parent;
 			Name = targetInfo.TargetNode.Type;
 
@@ -34,6 +75,8 @@ namespace Land.Core.Markup
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
+
+			base.PropertyChanged += ParentPropertyChanged;
 		}
 
 		public ConcernPoint(string name, TargetFileInfo targetInfo, Concern parent = null)
@@ -41,12 +84,26 @@ namespace Land.Core.Markup
 			Name = name;
 			Context = PointContext.Create(targetInfo);
 			Parent = parent;
+
+			base.PropertyChanged += ParentPropertyChanged;
+		}
+
+		public ConcernPoint(string name, string comment, TargetFileInfo targetInfo, Concern parent = null)
+			: this(name, targetInfo, parent)
+		{
+			Comment = comment;
 		}
 
 		public void Relink(TargetFileInfo targetInfo)
 		{
-			Location = targetInfo.TargetNode.Anchor;
+			AstNode = targetInfo.TargetNode;
 			Context = PointContext.Create(targetInfo);
+		}
+
+		public void Relink(CandidateInfo candidate)
+		{
+			AstNode = candidate.Node;
+			Context = candidate.Context;
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)

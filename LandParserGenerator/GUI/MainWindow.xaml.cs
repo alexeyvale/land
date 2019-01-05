@@ -29,12 +29,11 @@ namespace Land.GUI
 	{
 		private readonly string APP_DATA_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD IDE";
 		private readonly string DOCUMENTS_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace";
+		private readonly string DOCUMENTS_DLL_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\dll";
 
 		private string RECENT_GRAMMARS_FILE = "recent_grammars.txt";
 		private string RECENT_PREPROCS_FILE = "recent_preprocs.txt";
 		private string RECENT_DIRECTORIES_FILE = "recent_directories.txt";
-
-		private string LAND_EXPLORER_SETTINGS = "land_explorer_settings.xml";
 
 		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
 		private SelectedTextColorizer Grammar_SelectedTextColorizer { get; set; }
@@ -54,11 +53,13 @@ namespace Land.GUI
 			if (!Directory.Exists(DOCUMENTS_DIRECTORY))
 				Directory.CreateDirectory(DOCUMENTS_DIRECTORY);
 
+			if (!Directory.Exists(DOCUMENTS_DLL_DIRECTORY))
+				Directory.CreateDirectory(DOCUMENTS_DLL_DIRECTORY);
+
 			/// Корректируем пути к конфигурационным файлам
 			RECENT_GRAMMARS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_GRAMMARS_FILE);
 			RECENT_PREPROCS_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_PREPROCS_FILE);
 			RECENT_DIRECTORIES_FILE = Path.Combine(APP_DATA_DIRECTORY, RECENT_DIRECTORIES_FILE);
-			LAND_EXPLORER_SETTINGS = Path.Combine(APP_DATA_DIRECTORY, LAND_EXPLORER_SETTINGS);
 
 			/// Подгружаем определение для подсветки синтаксиса, создаём подсветчики и выделители
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
@@ -92,7 +93,7 @@ namespace Land.GUI
 			}
 
 			/// Загружаем настройки панели разметки
-			EditorAdapter = new EditorAdapter(this, LAND_EXPLORER_SETTINGS);
+			EditorAdapter = new EditorAdapter(this, LandExplorerControl.SETTINGS_DEFAULT_PATH);
 			LandExplorer.Initialize(EditorAdapter);
 
 			/// Инициализирующие действия для массового парсинга
@@ -192,7 +193,7 @@ namespace Land.GUI
 			var messages = new List<Message>();
 
 			Parser = BuilderBase.BuildParser(
-				GrammarType.LL,
+				ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,
 				Grammar_Editor.Text,
 				messages
 			);
@@ -222,7 +223,7 @@ namespace Land.GUI
 			librarySettings.Input_Namespace.Text = !String.IsNullOrEmpty(OpenedGrammarFilename)
 				? Path.GetFileNameWithoutExtension(OpenedGrammarFilename)
 				: null;
-			librarySettings.Input_OutputDirectory.Text = Path.GetDirectoryName(OpenedGrammarFilename);
+			librarySettings.Input_OutputDirectory.Text = DOCUMENTS_DLL_DIRECTORY;
 
 			if (librarySettings.ShowDialog() == true)
 			{
@@ -920,7 +921,7 @@ namespace Land.GUI
 		{
 			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint point)
 			{
-				if (point.Location != null)
+				if (!point.HasInvalidLocation)
 				{
 					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 
@@ -988,7 +989,7 @@ namespace Land.GUI
 					/// значит, в какой-то новый узел мы отобразили старый
 					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
+						MoveCaretToSource(((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
 				}
 			}
 		}
@@ -997,7 +998,7 @@ namespace Land.GUI
 		{
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
-				var node = ((NodeSimilarityPair)MappingDebug_SimilaritiesList.SelectedItem).Node;
+				var node = ((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
 				MoveCaretToSource(node.Anchor, MappingDebug_NewTextEditor);
 			}
 		}
@@ -1013,7 +1014,6 @@ namespace Land.GUI
 
 		//public delegate void DocumentChangedHandler(string documentName);
 		public Action<string> DocumentChangedCallback;
-		public Action<HashSet<string>> WorkingSetChangedCallback;
 
 		public class DocumentTab
 		{
@@ -1076,10 +1076,6 @@ namespace Land.GUI
 
 				document.Editor.Text = stream.ReadToEnd();
 				stream.Close();
-
-				WorkingSetChangedCallback?.Invoke(
-					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
-				);
 
 				return document;
 			}
@@ -1151,10 +1147,6 @@ namespace Land.GUI
 
 				DocumentTabs.Items.Remove(activeTab);
 				Documents.Remove(activeTab);
-
-				WorkingSetChangedCallback?.Invoke(
-					new HashSet<string>(Documents.Select(d => d.Value.DocumentName))
-				);
 			}
 		}
 

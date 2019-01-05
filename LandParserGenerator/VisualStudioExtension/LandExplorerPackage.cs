@@ -6,48 +6,32 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using EnvDTE80;
+using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using Task = System.Threading.Tasks.Task;
+using Land.VisualStudioExtension.Listeners;
 
 namespace Land.VisualStudioExtension
 {
 	/// <summary>
-	/// This is the class that implements the package exposed by this assembly.
+	///  Наследуем пакет от AsyncPackage, так как загрузка 
+	///  при большом количестве парсеров может быть медленной
 	/// </summary>
-	/// <remarks>
-	/// <para>
-	/// The minimum requirement for a class to be considered a valid package for Visual Studio
-	/// is to implement the IVsPackage interface and register itself with the shell.
-	/// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-	/// to do it: it derives from the Package class that provides the implementation of the
-	/// IVsPackage interface and uses the registration attributes defined in the framework to
-	/// register itself and its components with the shell. These attributes tell the pkgdef creation
-	/// utility what data to put into .pkgdef file.
-	/// </para>
-	/// <para>
-	/// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
-	/// </para>
-	/// </remarks>
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
+	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	[ProvideToolWindow(typeof(LandExplorer))]
 	[Guid(LandExplorerPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
 	public sealed class LandExplorerPackage : AsyncPackage
 	{
-		/// <summary>
-		/// LandExplorerPackage GUID string.
-		/// </summary>
 		public const string PackageGuidString = "92dd57dc-aa42-446e-b5bc-9cd875a9e9ec";
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="LandExplorerPackage"/> class.
-		/// </summary>
 		public LandExplorerPackage()
 		{
 			// Inside this method you can place any initialization code that does not require
@@ -71,7 +55,23 @@ namespace Land.VisualStudioExtension
 			// Do any initialization that requires the UI thread after switching to the UI thread.
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 			await LandExplorerCommand.InitializeAsync(this);
+
+			ServiceEventAggregator.InitializeInstance(
+				await GetServiceAsync(typeof(SVsSolution)) as IVsSolution,
+				await GetServiceAsync(typeof(SVsShell)) as IVsShell,
+				() => GetService(typeof(SDTE)) as DTE2
+			);
 		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+			ServiceEventAggregator.DisposeInstance();
+		}
+
+		#endregion
+
+		#region Methods
 
 		#endregion
 	}

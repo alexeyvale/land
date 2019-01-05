@@ -9,11 +9,11 @@ namespace Land.GUI
 {
 	public class CurrentLineBackgroundRenderer : IBackgroundRenderer
 	{
-		private TextArea textEditor { get; set; }
+		private TextArea TextEditor { get; set; }
 
 		public CurrentLineBackgroundRenderer(TextArea editor)
 		{
-			textEditor = editor;
+			TextEditor = editor;
 		}
 
 		public KnownLayer Layer
@@ -27,7 +27,7 @@ namespace Land.GUI
 		public void Draw(TextView textView, DrawingContext drawingContext)
 		{
 			textView.EnsureVisualLines();
-			var line = textEditor.Document.GetLineByOffset(textEditor.Caret.Offset);
+			var line = TextEditor.Document.GetLineByOffset(TextEditor.Caret.Offset);
 			var segment = new TextSegment { StartOffset = line.Offset, EndOffset = line.EndOffset };
 
 			foreach (System.Windows.Rect r in BackgroundGeometryBuilder.GetRectsForSegment(textView, segment))

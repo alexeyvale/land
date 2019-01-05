@@ -12,6 +12,8 @@ namespace Land.Core.Markup
 {
 	public class MarkupManager
 	{
+		public event Action OnMarkupChanged;
+
 		/// <summary>
 		/// Коллекция точек привязки
 		/// </summary>
@@ -23,6 +25,8 @@ namespace Land.Core.Markup
 		public void Clear()
 		{
 			Markup.Clear();
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -35,7 +39,7 @@ namespace Land.Core.Markup
 				if(elem is ConcernPoint concernPoint 
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.Location = null;
+					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
 		}
@@ -49,25 +53,36 @@ namespace Land.Core.Markup
 				elem.Parent.Elements.Remove(elem);
 			else
 				Markup.Remove(elem);
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
 		/// Добавление функциональности
 		/// </summary>
-		public Concern AddConcern(string name, Concern parent = null)
+		public Concern AddConcern(string name, string comment = null, Concern parent = null)
 		{
-			var concern = new Concern(name, parent);
+			var concern = new Concern(name, comment, parent);
 			AddElement(concern);
+
+			OnMarkupChanged?.Invoke();
 			return concern;
 		}
 
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, string comment = null, Concern parent = null)
 		{
 			var point = new ConcernPoint(sourceInfo, parent);
+
+			if (!String.IsNullOrEmpty(name))
+				point.Name = name;
+			point.Comment = comment;
+
 			AddElement(point);
+
+			OnMarkupChanged?.Invoke();
 			return point;
 		}
 
@@ -92,7 +107,7 @@ namespace Land.Core.Markup
 				foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
 				{
 					/// создаём подфункциональность
-					var subconcern = AddConcern(subgroup.Key, concern);
+					var subconcern = AddConcern(subgroup.Key, null, concern);
 
 					foreach (var point in subgroup)
 					{
@@ -111,6 +126,8 @@ namespace Land.Core.Markup
 					AddElement(new ConcernPoint(sourceInfo, concern));
 				}
 			}
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		/// <summary>
@@ -142,6 +159,26 @@ namespace Land.Core.Markup
 		public void RelinkConcernPoint(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			point.Relink(targetInfo);
+
+			OnMarkupChanged?.Invoke();
+		}
+
+		/// <summary>
+		/// Смена узла, к которому привязана точка
+		/// </summary>
+		public void RelinkConcernPoint(ConcernPoint point, CandidateInfo candidate)
+		{
+			point.Relink(candidate);
+
+			OnMarkupChanged?.Invoke();
+		}
+
+		/// <summary>
+		/// Получение списка точек привязки для текущего дерева разметки
+		/// </summary>
+		public List<ConcernPoint> GetConcernPoints()
+		{
+			return GetPointsVisitor.GetPoints(Markup);
 		}
 
 		/// <summary>
@@ -160,6 +197,8 @@ namespace Land.Core.Markup
 				newParent.Elements.Add(elem);
 			else
 				Markup.Add(elem);
+
+			OnMarkupChanged?.Invoke();
 		}
 
 		public void Serialize(string fileName, bool useRelativePaths)
@@ -236,7 +275,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<NodeSimilarityPair> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<CandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -253,19 +292,42 @@ namespace Land.Core.Markup
 
 		#region Перепривязка
 
-		private const double MIN_SIMILARITY = 0.4;
+		/// <summary>
+		/// Значение похожести, ниже которого нельзя выполнять автоматическую перепривязку
+		/// </summary>
+		public double AcceptanceThreshold { get; set; } = 0.8;
 
-		public void Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		/// <summary>
+		/// Дельта похожести между лучшим кандидатом и следующим, при которой можно автоматически
+		/// перепривязаться к лучшему кандидату
+		/// </summary>
+		public double DistanceToClosestThreshold { get; set; } = 0.05;
+
+		/// <summary>
+		/// Размер топа кандидатов, ранжированных по похожести, возвращаемого при неоднозначности
+		/// </summary>
+		public int AmbiguityTopCount { get; set; } = 10;
+
+		/// <summary>
+		/// Похожесть, ниже которой не рассматриваем элемент как кандидата
+		/// </summary>
+		public double GarbageThreshold { get; set; } = 0.4;
+
+		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
-			if (useLocalRemap)
-				LocalRemap(targetFiles);
-			else
-				GlobalRemap(targetFiles);
+			var ambiguous = useLocalRemap
+				? LocalRemap(targetFiles)
+				: GlobalRemap(targetFiles);
+
+			OnMarkupChanged?.Invoke();
+
+			return ambiguous;
 		}
 
-		private void LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<CandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -279,52 +341,95 @@ namespace Land.Core.Markup
 					var result = ContextFinder.Find(groupedByType, groupedFiles, file);
 
 					foreach (var kvp in result)
-						ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
+					{
+						var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+							.TakeWhile(c=>c.Similarity >= GarbageThreshold)
+							.Take(AmbiguityTopCount).ToList();
+
+						if (!ApplyCandidate(kvp.Key, candidates))
+							ambiguous[kvp.Key] = candidates;
+					}
 				}
 				else
 				{
 					foreach (var point in fileGroup.Value)
-						point.Location = null;
+						point.AstNode = null;
 				}
 			}
+
+			return ambiguous;
 		}
 
-		private void GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<CandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+
+			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
-			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<NodeSimilarityPair>());
+			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<CandidateInfo>());
 
 			foreach (var file in targetFiles)
 			{
+				/// Группируем узлы AST файла, к которому попытаемся перепривязаться,
+				/// по типам точек, к которым требуется перепривязка
 				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedPoints.Keys);
+
+				/// Похожести, посчитанные для сущностей из текущего файла
 				var currentRes = ContextFinder.Find(groupedPoints, groupedFiles, file);
 
 				foreach (var kvp in currentRes)
 					accumulator[kvp.Key].AddRange(kvp.Value);
 			}
 
-			foreach(var kvp in accumulator)
-				ApplyCandidate(kvp.Key, kvp.Value.OrderByDescending(c => c.Similarity).FirstOrDefault());
+			foreach (var kvp in accumulator)
+			{
+				var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+					.TakeWhile(c => c.Similarity >= GarbageThreshold)
+					.Take(AmbiguityTopCount).ToList();
+
+				if (!ApplyCandidate(kvp.Key, candidates))
+					ambiguous[kvp.Key] = candidates;
+			}
+
+			return ambiguous;
 		}
 
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public void Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			ApplyCandidate(point, ContextFinder.Find(point, targetInfo).FirstOrDefault());		
+			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var candidates = ContextFinder.Find(point, targetInfo).OrderByDescending(c=>c.Similarity)
+				.TakeWhile(c => c.Similarity >= GarbageThreshold)
+				.Take(AmbiguityTopCount).ToList();
+
+			if (!ApplyCandidate(point, candidates))
+				ambiguous[point] = candidates;
+
+			OnMarkupChanged?.Invoke();
+
+			return ambiguous;
 		}
 
-		private void ApplyCandidate(ConcernPoint point, NodeSimilarityPair candidate)
+		private bool ApplyCandidate(ConcernPoint point, IEnumerable<CandidateInfo> candidates)
 		{
-			if (candidate != null && candidate.Similarity > MIN_SIMILARITY)
+			var first = candidates.FirstOrDefault();
+			var second = candidates.Skip(1).FirstOrDefault();
+
+			if (first != null && first.Similarity >= AcceptanceThreshold
+				&& (second == null || first.Similarity - second.Similarity >= DistanceToClosestThreshold))
 			{
-				point.Context = candidate.Context;
-				point.Location = candidate.Node.Anchor;
+				point.Context = first.Context;
+				point.AstNode = first.Node;
+
+				return true;
 			}
 			else
 			{
-				point.Location = null;
+				point.AstNode = null;
+
+				return false;
 			}
 		}
 
@@ -345,7 +450,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Совершение заданного действия со всеми элементами разметки
 		/// </summary>
-		private void DoWithMarkup(Action<MarkupElement> action)
+		public void DoWithMarkup(Action<MarkupElement> action)
 		{
 			foreach (var elem in Markup)
 				DoWithMarkupSubtree(action, elem);

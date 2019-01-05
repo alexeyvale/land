@@ -121,7 +121,7 @@ namespace Land.Core.Parsing.LR
 					var errorToken = LexingStream.CurrentToken;
 					var message = Message.Error(
 						$"Неожиданный символ {this.GetTokenInfoForMessage(errorToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						token.Location.Start
+						errorToken.Location.Start
 					);
 
 					token = ErrorRecovery();
@@ -208,12 +208,9 @@ namespace Land.Core.Parsing.LR
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 
-			PointLocation startLocation = anyNode.Anchor != null
-				? anyNode.Anchor.Start 
-				: token.Location.Start;
-			PointLocation endLocation = anyNode.Anchor != null
-				? anyNode.Anchor.End
-				: null;
+			var startLocation = anyNode.Anchor?.Start 
+				?? token.Location.Start;
+			var endLocation = anyNode.Anchor?.End;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
@@ -244,12 +241,22 @@ namespace Land.Core.Parsing.LR
 
 		private IToken ErrorRecovery()
 		{
+			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			{
+				Log.Add(Message.Error(
+					$"Возобновление разбора в случае ошибки отключено",
+					LexingStream.CurrentToken.Location.Start
+				));
+
+				return null;
+			}
+
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
-			/// в котором есть пункт A -> * Any
-			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count == 1
+			/// в котором есть пункт A -> * Any ...
+			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count > 0
 				&& m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null)
 			{
 				if (Stack.CountSymbols > 0 && Stack.PeekSymbol().Anchor != null)

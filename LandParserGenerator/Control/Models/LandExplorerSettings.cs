@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 
 using Land.Core;
-using Land.Core.Parsing.Preprocessing;
 
 namespace Land.Control
 {
@@ -16,7 +15,7 @@ namespace Land.Control
 		public List<string> Extensions { get; set; } = new List<string>();
 
 		[DataMember]
-		public string GrammarPath { get; set; }
+		public string ParserPath { get; set; }
 
 		[DataMember]
 		public string PreprocessorPath { get; set; }
@@ -41,7 +40,7 @@ namespace Land.Control
 			return new ParserSettingsItem()
 			{
 				Extensions = Extensions,
-				GrammarPath = GrammarPath,
+				ParserPath = ParserPath,
                 PreprocessorPath = PreprocessorPath,
                 PreprocessorProperties = new List<PreprocessorProperty>(PreprocessorProperties)
 			};
@@ -49,13 +48,19 @@ namespace Land.Control
 	}
 
 	[DataContract]
-	public class LandExplorerSettings
+	public class LandExplorerSettings: IExtensibleDataObject
 	{
 		[DataMember]
 		public bool SaveAbsolutePath { get; set; }
 
 		[DataMember]
-		public bool HighlightSelectedElement { get; set; }
+		public double? AcceptanceThreshold { get; set; }
+
+		[DataMember]
+		public double? DistanceToClosestThreshold { get; set; }
+
+		[DataMember]
+		public double? GarbageThreshold { get; set; }
 
 		[DataMember]
 		public ObservableCollection<ParserSettingsItem> Parsers { get; set; } = new ObservableCollection<ParserSettingsItem>();
@@ -64,10 +69,20 @@ namespace Land.Control
 		{
 			return new LandExplorerSettings()
 			{
-				HighlightSelectedElement = HighlightSelectedElement,
 				SaveAbsolutePath = SaveAbsolutePath,
+				AcceptanceThreshold = AcceptanceThreshold,
+				GarbageThreshold = GarbageThreshold,
+				DistanceToClosestThreshold = DistanceToClosestThreshold,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};
+		}
+
+		private ExtensionDataObject _extensionData;
+
+		public virtual ExtensionDataObject ExtensionData
+		{
+			get { return _extensionData; }
+			set { _extensionData = value; }
 		}
 	}
 }

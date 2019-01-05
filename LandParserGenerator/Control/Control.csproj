@@ -54,11 +54,26 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.Toolkit, Version=3.7.18313.20590, Culture=neutral, PublicKeyToken=ba83ff368b7563c6, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xceed.Wpf.Toolkit.3.7.18313.20590\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConcernPointIsEnabledConverter.cs" />
-    <Compile Include="LandExplorerSettings.cs" />
+    <Compile Include="ControlPartial\Parsing.cs" />
+    <Compile Include="ControlPartial\MissingPointsTab.cs" />
+    <Compile Include="ControlPartial\MarkupElementTab.cs" />
+    <Compile Include="ControlPartial\MarkupTree.cs" />
+    <Compile Include="ControlPartial\DragAndDrop.cs" />
+    <Compile Include="ControlPartial\Commands.cs" />
+    <Compile Include="Converters\MissingListItemConverter.cs" />
+    <Compile Include="Converters\MissingListIconColorConverter.cs" />
+    <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
+    <Compile Include="Converters\MissingListIconVisibilityConverter.cs" />
+    <Compile Include="Converters\MarkupTreeIconVisibilityConverter.cs" />
+    <Compile Include="Models\LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
+    <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
+    <Compile Include="Models\PointCandidatesPair.cs" />
     <Compile Include="PreprocessorPropertiesWindow.xaml.cs">
       <DependentUpon>PreprocessorPropertiesWindow.xaml</DependentUpon>
     </Compile>
@@ -84,7 +99,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PreprocessorProperty.cs" />
+    <Compile Include="Models\PreprocessorProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -103,6 +118,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="keys.snk" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -10,21 +10,15 @@ namespace Land.Core.Parsing.Tree
 {
 	public class MappingOptionsProcessingVisitor : BaseTreeVisitor
 	{
-		public const double DEFAULT_BASE_PRIORITY = 1;
-
 		private Grammar GrammarObject { get; set; }
 
 		private HashSet<string> Land { get; set; }
-		private double BasePriority { get; set; }
 		private Dictionary<string, double> GlobalPriorities { get; set; }
 
 		public MappingOptionsProcessingVisitor(Grammar g)
 		{
 			GrammarObject = g;
 			Land = g.Options.GetSymbols(MappingOption.LAND);
-
-			var temp = g.Options.GetParams(MappingOption.BASEPRIORITY, OptionsManager.GLOBAL_PARAMETERS_SYMBOL);
-			BasePriority = temp.Count > 0 ? (double)temp[0] : DEFAULT_BASE_PRIORITY;
 
 			GlobalPriorities = g.Options.GetSymbols(MappingOption.PRIORITY)
 				.ToDictionary(e => e, e => (double)g.Options.GetParams(MappingOption.PRIORITY, e).First());
@@ -45,7 +39,7 @@ namespace Land.Core.Parsing.Tree
 					? GlobalPriorities[node.Alias]
 					: GlobalPriorities.ContainsKey(node.Symbol)
 						? GlobalPriorities[node.Symbol]
-						: node.Symbol == Grammar.ANY_TOKEN_NAME ? 0 : BasePriority;
+						: node.Symbol == Grammar.ANY_TOKEN_NAME ? 0 : LocalOptions.BASE_PRIORITY;
 			}
 
 			base.Visit(node);

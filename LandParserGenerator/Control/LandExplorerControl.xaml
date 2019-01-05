@@ -6,31 +6,38 @@
              xmlns:local="clr-namespace:Land.Control"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="300"
-			 x:Name="LandExplorer"
-             Loaded="LandExplorer_Loaded">
+			 x:Name="LandExplorer">
     <UserControl.Resources>
         <FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
-        <FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
-        <local:ConcernPointIsEnabledConverter x:Key="ConcernPointIsEnabledConverter" />
+		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
+		<local:MarkupTreeIconVisibilityConverter x:Key="MarkupTreeIconVisibilityConverter" />
+		<local:MarkupTreeIconColorConverter x:Key="MarkupTreeIconColorConverter" />
+		<local:MissingListIconVisibilityConverter x:Key="MissingListIconVisibilityConverter" />
+		<local:MissingListIconColorConverter x:Key="MissingListIconColorConverter" />
+		<local:MissingListItemConverter x:Key="MissingListItemConverter" />
     </UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
-		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_ConcernPointIsNotSelected_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.Delete" Executed="Command_Delete_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.Relink" Executed="Command_Relink_Executed" CanExecute="Command_HasSelectedConcernPoint_CanExecute"/>
-        <CommandBinding Command="local:LandExplorerCommands.Rename" Executed="Command_Rename_Executed" CanExecute="Command_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Delete_Markup" Executed="Command_MarkupTree_Delete_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Relink_Markup" Executed="Command_MarkupTree_Relink_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+
+		<CommandBinding Command="local:LandExplorerCommands.Delete_Missing" Executed="Command_MissingTree_Delete_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Accept_Missing" Executed="Command_MissingTree_Accept_Executed" CanExecute="Command_MissingTree_HasSelectedCandidate_CanExecute"/>
 	</UserControl.CommandBindings>
-	<Grid>
+	<Grid Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="75*"></RowDefinition>
+            <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="25*"></RowDefinition>
+            <RowDefinition Height="40*" MaxHeight="280"></RowDefinition>
+			<RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
@@ -72,13 +79,13 @@
 				<Button Content="&#xf0e8;" ToolTip="Добавить все" 
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
                 <Button Content="&#xf0c1;" ToolTip="Сменить привязку" 
-						Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf2ed;" ToolTip="Удалить" 
-						Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+						Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf2ed;" ToolTip="Удалить"
+						Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 
-				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить все функциональности" 
+				<ToggleButton Content="&#xf1fc;" ToolTip="Выделить функциональности" Name="ToolBar_HighlightButton"
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
 				
                 <Separator Margin="7"></Separator>
@@ -91,27 +98,49 @@
                 MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
                 PreviewMouseLeftButtonDown="MarkupTreeView_PreviewMouseLeftButtonDown"
                 PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
+				PreviewMouseWheel="MarkupTreeView_PreviewMouseWheel"
                 DragOver="MarkupTreeView_DragOver"
                 Drop="MarkupTreeView_Drop"
                 MouseMove="MarkupTreeView_MouseMove">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Elements}">
-                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding Path=., Converter={StaticResource ConcernPointIsEnabledConverter}}">
-                            <Grid>
-                                <Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}" Foreground="DimGray"/>
-                                <Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}" Foreground="DimGray"/>
-                            </Grid>
-                            <Grid>
-                                <TextBlock Text="{Binding Path=Name}" />
-                                <TextBox Name="ConcernNameEditor" Visibility="Hidden" Text="{Binding Name, Mode=TwoWay}"/>
-                            </Grid>
+						<StackPanel Orientation="Horizontal">
+							<Grid>
+								<Grid.Resources>
+									<Style TargetType="Label">
+										<Setter Property="Visibility">
+											<Setter.Value>
+												<MultiBinding Converter="{StaticResource MarkupTreeIconVisibilityConverter}">
+													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+													<Binding Path="." />
+												</MultiBinding>
+											</Setter.Value>
+										</Setter>
+										<Setter Property="Foreground">
+											<Setter.Value>
+												<MultiBinding Converter="{StaticResource MarkupTreeIconColorConverter}">
+													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
+													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsSelectionActive" />
+												</MultiBinding>
+											</Setter.Value>
+										</Setter>
+									</Style>	
+								</Grid.Resources>
+								
+								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}"/>
+								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+							</Grid>
+							<Grid>
+								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+							</Grid>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
-                                    <MenuItem Command="local:LandExplorerCommands.Relink" CommandTarget="{Binding ElementName=LandExplorer}"/>
-									<MenuItem Command="local:LandExplorerCommands.Rename" CommandTarget="{Binding ElementName=LandExplorer}"/>
-									<MenuItem Command="local:LandExplorerCommands.Delete" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
 								</ContextMenu>
                             </StackPanel.ContextMenu>
                         </StackPanel>
@@ -125,22 +154,156 @@
 						<EventSetter Event="LostFocus" Handler="MarkupTreeViewItem_LostFocus" />
 						<EventSetter Event="Selected" Handler="MarkupTreeViewItem_Selected" />
 						<EventSetter Event="Unselected" Handler="MarkupTreeViewItem_Unselected" />
-						<EventSetter Event="Loaded" Handler="MarkupTreeViewItem_Loaded"/>
 						<EventSetter Event="MouseDoubleClick" Handler="MarkupTreeViewItem_MouseDoubleClick"/>
 						<EventSetter Event="KeyDown" Handler="MarkupTreeViewItem_KeyDown"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_DragDrop"/>
 						<EventSetter Event="PreviewMouseLeftButtonDown" Handler="MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight"/>
+						<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
 					</Style>
 				</TreeView.ItemContainerStyle>
 			</TreeView>
         </Grid>
         <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-        <ListBox
-            Grid.Row="2"
-            FontSize="12pt"
-            Name="ConcernPointCandidatesList"
-            SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
-            MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
-        </ListBox>
+		<TabControl Grid.Row="2" Name="Tabs">
+			<TabItem Header="Текущая точка" Name="MarkupElementTab">
+				<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<Grid>
+						<StackPanel Orientation="Vertical" Name="ConcernPointPanel" Visibility="Collapsed">
+							<StackPanel.Resources>
+								<Style TargetType="Button">
+									<Setter Property="Width" Value="80"></Setter>
+								</Style>
+							</StackPanel.Resources>
+							<ListBox       
+								FontSize="12pt"
+								Height="80"
+								Name="ConcernPointCandidatesList"
+								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
+							</ListBox>
+							<StackPanel Orientation="Vertical">
+								<Label Content="Имя"/>
+								<TextBox Name="ConcernPointNameText"
+										 Text="{Binding ElementName=ConcernPointCandidatesList, Path=SelectedItem.ViewHeader, Mode=OneWay}"/>
+							</StackPanel>
+							<StackPanel Orientation="Vertical">
+								<Label Content="Комментарий"/>
+								<TextBox TextWrapping="Wrap" 
+										 AcceptsReturn="True"
+										 Height="60"
+										 ScrollViewer.VerticalScrollBarVisibility="Auto"
+										 Name="ConcernPointCommentText"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="25">
+								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
+								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
+							</StackPanel>
+						</StackPanel>
+						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">
+							<StackPanel.Resources>
+								<Style TargetType="TextBox">
+									<Style.Triggers>
+										<Trigger Property="IsReadOnly" Value="true">
+											<Setter Property="Background" Value="WhiteSmoke"/>
+										</Trigger>
+										<Trigger Property="IsReadOnly" Value="false">
+											<Setter Property="Background" Value="White"/>
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</StackPanel.Resources>
+			
+							<Label Content="Имя"/>
+							<TextBox Name="MarkupElementNameText"
+									 Margin="5 0 5 0"
+									 IsReadOnly="True"
+									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									 LostFocus="MarkupElementText_LostFocus"
+									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}"></TextBox>
+
+							<Label Content="Комментарий"/>
+							<TextBox TextWrapping="Wrap" 
+									AcceptsReturn="True"
+									Name="MarkupElementCommentText"
+									Height="150"
+									ScrollViewer.VerticalScrollBarVisibility="Auto"
+									Margin="5 0 5 10"
+									IsReadOnly="True"
+									MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									LostFocus="MarkupElementText_LostFocus"
+									Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}"></TextBox>
+						</StackPanel>
+					</Grid>
+				</ScrollViewer>
+			</TabItem>
+			<TabItem Header="Потерянные точки" Name="MissingPointsTab">
+				<TreeView Grid.Row="1" Name="MissingTreeView" FontSize="12pt" AllowDrop="True"
+						  PreviewMouseLeftButtonDown="MissingTreeView_PreviewMouseLeftButtonDown">
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate ItemsSource="{Binding Candidates}">
+							<StackPanel Orientation="Horizontal">
+								<Grid>
+									<Grid.Resources>
+										<Style TargetType="Label">
+											<Setter Property="Visibility">
+												<Setter.Value>
+													<MultiBinding Converter="{StaticResource MissingListIconVisibilityConverter}">
+														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+														<Binding Path="." />
+													</MultiBinding>
+												</Setter.Value>
+											</Setter>
+											<Setter Property="Foreground">
+												<Setter.Value>
+													<MultiBinding Converter="{StaticResource MissingListIconColorConverter}">
+														<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
+														<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsSelectionActive" />
+													</MultiBinding>
+												</Setter.Value>
+											</Setter>
+										</Style>
+									</Grid.Resources>
+
+									<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+									<Label Name="AmbiguousIcon"  Content="&#xf059;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+								</Grid>
+								<Grid>
+									<Grid.Resources>
+										<Style TargetType="TextBlock">
+											<Setter Property="Text">
+												<Setter.Value>
+													<Binding Converter="{StaticResource MissingListItemConverter}" Path="."></Binding>
+												</Setter.Value>
+											</Setter>
+										</Style>
+									</Grid.Resources>
+									
+									<TextBlock />
+								</Grid>
+								<StackPanel.ContextMenu>
+									<ContextMenu>
+										<MenuItem Command="local:LandExplorerCommands.Relink_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<MenuItem Command="local:LandExplorerCommands.Delete_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
+										<Separator></Separator>
+										<MenuItem Command="local:LandExplorerCommands.Accept_Missing" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									</ContextMenu>
+								</StackPanel.ContextMenu>
+							</StackPanel>
+						</HierarchicalDataTemplate>
+					</TreeView.ItemTemplate>
+					<TreeView.ItemContainerStyle>
+						<Style TargetType="{x:Type TreeViewItem}">
+							<EventSetter Event="Selected" Handler="MissingTreeViewItem_Selected" />
+							<EventSetter Event="Unselected" Handler="MissingTreeViewItem_Unselected" />
+							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
+							<EventSetter Event="MouseDoubleClick" Handler="MissingTreeViewItem_MouseDoubleClick"/>
+						</Style>
+					</TreeView.ItemContainerStyle>
+				</TreeView>
+			</TabItem>
+		</TabControl>
+		<StatusBar Name="ControlStatusBar" Grid.Row="3">
+			<Label Name="ControlStatusLabel"></Label>
+		</StatusBar>
     </Grid>
 </UserControl>
