@@ -14,7 +14,7 @@ namespace Land.Core.Parsing.LR
 		private TableLR1 Table { get; set; }
 
 		private ParsingStack Stack { get; set; }
-		private PairAwareTokenStream LexingStream { get; set; }
+		private TokenStream LexingStream { get; set; }
 
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
@@ -26,7 +26,7 @@ namespace Land.Core.Parsing.LR
 			Node root = null;	
 
 			/// Готовим лексер
-			LexingStream = new PairAwareTokenStream(GrammarObject, Lexer, text, Log);
+			LexingStream = new TokenStream(Lexer, text);
 			/// Читаем первую лексему из входного потока
 			var token = LexingStream.GetNextToken();
 			/// Создаём стек
@@ -177,8 +177,6 @@ namespace Land.Core.Parsing.LR
 
 		private IToken SkipAny(Node anyNode)
 		{
-			var nestingCopy = LexingStream.GetPairsState();
-			var tokenIndex = LexingStream.CurrentIndex;
 			var token = LexingStream.CurrentToken;
 			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
 
@@ -214,34 +212,17 @@ namespace Land.Core.Parsing.LR
 				?? token.Location.Start;
 			var endLocation = anyNode.Anchor?.End;
 
-			/// Запоминаем текущий уровень вложенности
-			var anyLevel = LexingStream.GetPairsCount();
-
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
 			while (Table[Stack.PeekState(), token.Name].Count == 0
-				&& LexingStream.CurrentTokenDirection != Direction.Up
-				&& token.Name != Grammar.EOF_TOKEN_NAME
-				&& token.Name != Grammar.ERROR_TOKEN_NAME)
+				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				endLocation = token.Location.End;
-
-				token = LexingStream.GetNextToken(anyLevel, out List<IToken> skippedBuffer);
-
-				/// Если при пропуске до токена на том же уровне
-				/// пропустили токены с более глубокой вложенностью
-				if (skippedBuffer.Count > 0)
-				{
-					anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
-					endLocation = skippedBuffer.Last().Location.End;
-				}
+				token = LexingStream.GetNextToken();
 			}
 
 			if(endLocation != null)
 				anyNode.SetAnchor(startLocation, endLocation);
-
-			if (token.Name == Grammar.ERROR_TOKEN_NAME)
-				return token;
 
 			/// Если дошли до конца входной строки, и это было не по плану
 			if (token.Name == Grammar.EOF_TOKEN_NAME

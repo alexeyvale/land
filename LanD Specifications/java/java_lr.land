@@ -21,15 +21,16 @@ SQUARE_BRACKETED : %left '[' %right ']'
  
 file_content	=	outer_entity*
 
-outer_entity	=	(annotation|MODIFIER)* (enum | class_interface) | Any (block | ';')+
-enum			=	'enum' name Any '{' Any '}' ';'?
-class_interface	=	('class'|'interface') name Any '{' inner_entity* '}' ';'?
+outer_entity	=	enum | class_interface | Any (block | ';')+
+enum			=	common_beginning 'enum' name Any block ';'?
+class_interface	=	common_beginning ('class'|'interface') name Any '{' inner_entity* '}' ';'?
 
-inner_entity	=	(annotation|MODIFIER)* (enum | class_interface | method | field) | Any (block | ';')+
-method			=	type_parameter? %priority(2) type name arguments Any (';' | block)	
-field			=	type_parameter? %priority(2) type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
+inner_entity	=	enum | class_interface | method | field | Any (block | ';')+
+method			=	common_beginning type_parameter? type name arguments Any (';' | block)	
+field			=	common_beginning type_parameter? type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
 
-init_value	=	'=' (Any | %ghost type)+
+common_beginning	=	(annotation|MODIFIER)*
+init_value			=	'=' (Any | %ghost type | round_bracketed_water | block)+
 
 name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
@@ -43,6 +44,8 @@ arguments	=	'(' (Any|arguments)+ ')'
 annotation	=	'@' name Any
 block		=	'{' (Any|block)+ '}'
 
+round_bracketed_water	=	'(' (Any|round_bracketed_water)+ ')'
+
 %%
 
 %parsing {
@@ -53,7 +56,7 @@ block		=	'{' (Any|block)+ '}'
 }
 
 %nodes {
-	ghost  names_list
+	ghost names_list common_beginning
 	leaf name type
 }
 
