@@ -65,6 +65,7 @@ namespace Land.Core.Parsing.LR
 					if (action is ShiftAction)
 					{
 						var tokenNode = NodeGenerator.Generate(token.Name);
+						tokenNode.SetValue(token.Text);
 						tokenNode.SetAnchor(token.Location.Start, token.Location.End);
 
 						var shift = (ShiftAction)action;
@@ -284,12 +285,15 @@ namespace Land.Core.Parsing.LR
 
 				/// Если Any успешно пропустили и возобновили разбор,
 				/// возвращаем токен, с которого разбор продолжается
-				return token.Name != Grammar.ERROR_TOKEN_NAME ? token : null;
+
+				if (token.Name != Grammar.ERROR_TOKEN_NAME)
+				{
+					Statistics.RecoveryTimes += 1;
+					return token;
+				}
 			}
-			else
-			{
-				return null;
-			}
+
+			return null;
 		}
 	}
 }
