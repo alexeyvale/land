@@ -218,7 +218,9 @@ namespace Land.Core.Parsing.LR
 			while (Table[Stack.PeekState(), token.Name].Count == 0
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
+				anyNode.Value.Add(token.Text);
 				endLocation = token.Location.End;
+
 				token = LexingStream.GetNextToken();
 			}
 
@@ -254,19 +256,25 @@ namespace Land.Core.Parsing.LR
 
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
+			IEnumerable<string> value = new List<string>();
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
 			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count > 0
 				&& m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null)
 			{
-				if (Stack.CountSymbols > 0 && Stack.PeekSymbol().Anchor != null)
+				if (Stack.CountSymbols > 0)
 				{
-					startLocation = Stack.PeekSymbol().Anchor.Start;
-					if(endLocation == null)
+					if (Stack.PeekSymbol().Anchor != null)
 					{
-						endLocation = Stack.PeekSymbol().Anchor.End;
+						startLocation = Stack.PeekSymbol().Anchor.Start;
+						if (endLocation == null)
+						{
+							endLocation = Stack.PeekSymbol().Anchor.End;
+						}
 					}
+
+					value = Stack.PeekSymbol().GetValue().Concat(value);
 				}
 
 				Stack.Pop();
@@ -280,6 +288,7 @@ namespace Land.Core.Parsing.LR
 				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
 					anyNode.SetAnchor(startLocation, startLocation);
+				anyNode.Value = value.ToList();
 
 				var token = SkipAny(anyNode);
 
