@@ -30,7 +30,7 @@ namespace Land.Core.Parsing.LR
 			/// Читаем первую лексему из входного потока
 			var token = LexingStream.GetNextToken();
 			/// Создаём стек
-			Stack = new ParsingStack(LexingStream);
+			Stack = new ParsingStack();
 			Stack.Push(0);
 
 			while (true)
