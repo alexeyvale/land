@@ -336,20 +336,12 @@ namespace Land.Core.Parsing.LR
 				return null;
 			}
 
-			PointLocation startLocation = null;
-			PointLocation endLocation = null;
-			IEnumerable<string> value = new List<string>();
-
 			var symbols = new HashSet<string>();
-			/// Запоминаем левые части пунктов вида A -> alpha * 
-			foreach (var smb in Table.Items[Stack.PeekState()].Where(i => i.Position > 0))
-				symbols.Add(smb.Alternative.NonterminalSymbolName);
 
-			var oldCount = 0;
-			while(oldCount < symbols.Count())
+			foreach (var item in Table.Items[Stack.PeekState()].Where(i => i.Position > 0))
 			{
-				oldCount = symbols.Count();
-				symbols.UnionWith(symbols.SelectMany(s=> GrammarObject.Rules.Where(r=>r.Value.Alternatives.Any(a=>a.Elements.Any(e=>e.Symbol == s)))).Select(r=>r.Key).ToList());
+				symbols.Add(item.Alternative.NonterminalSymbolName);
+				symbols.UnionWith(GrammarObject.Defines(item.Alternative.NonterminalSymbolName));
 			}
 
 			/// Исключаем из множества контрольных символов символы, из которых не выводимы строки,
@@ -358,20 +350,27 @@ namespace Land.Core.Parsing.LR
 				symbols.Where(s => !GrammarObject.First(s).Contains(Grammar.ANY_TOKEN_NAME)).ToList()
 			);
 
+			PointLocation startLocation = null;
+			PointLocation endLocation = null;
+			IEnumerable<string> value = new List<string>();
+
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
 			do
 			{
-				if (Stack.PeekSymbol().Anchor != null)
+				if (Stack.CountSymbols > 0)
 				{
-					startLocation = Stack.PeekSymbol().Anchor.Start;
-					if (endLocation == null)
+					if (Stack.PeekSymbol().Anchor != null)
 					{
-						endLocation = Stack.PeekSymbol().Anchor.End;
+						startLocation = Stack.PeekSymbol().Anchor.Start;
+						if (endLocation == null)
+						{
+							endLocation = Stack.PeekSymbol().Anchor.End;
+						}
 					}
-				}
 
-				value = Stack.PeekSymbol().GetValue().Concat(value);
+					value = Stack.PeekSymbol().GetValue().Concat(value);
+				}
 
 				Stack.Pop();
 			}
