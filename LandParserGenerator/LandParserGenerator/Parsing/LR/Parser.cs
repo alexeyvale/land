@@ -210,13 +210,15 @@ namespace Land.Core.Parsing.LR
 			Stack.Push(anyNode, shift.TargetItemIndex);
 			stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
+			var stopTokens = Table.GetLookaheads(Stack.PeekState());
+
 			var startLocation = anyNode.Anchor?.Start 
 				?? token.Location.Start;
 			var endLocation = anyNode.Anchor?.End;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
-			while (Table[Stack.PeekState(), token.Name].Count == 0
+			while (!stopTokens.Contains(token.Name)
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				anyNode.Value.Add(token.Text);
@@ -233,7 +235,7 @@ namespace Land.Core.Parsing.LR
 				&& Table[Stack.PeekState(), token.Name].Count == 0)
 			{
 				var message = Message.Trace(
-					$"Ошибка при пропуске токенов: неожиданный конец файла",
+					$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
 					token.Location.Start
 				);
 
