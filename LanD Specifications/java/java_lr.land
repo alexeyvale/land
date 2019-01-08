@@ -28,7 +28,7 @@ enum			=	common_beginning 'enum' name Any block ';'?
 class_interface	=	common_beginning ('class'|'interface') name Any '{' inner_entity* '}' ';'?
 method			=	common_beginning type_parameter? type name arguments Any (';' | block)	
 field			=	common_beginning type_parameter? type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
-water_entity	=	water ';'?
+water_entity	=	(Any | round_bracketed_water) (block | ';')+
 
 common_beginning	=	(annotation|MODIFIER)*
 init_value			=	'=' (water | %ghost type)+

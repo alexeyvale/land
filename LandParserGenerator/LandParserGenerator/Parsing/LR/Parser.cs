@@ -333,28 +333,45 @@ namespace Land.Core.Parsing.LR
 			PointLocation endLocation = null;
 			IEnumerable<string> value = new List<string>();
 
+			var symbols = new HashSet<string>();
+			/// Запоминаем левые части пунктов вида A -> alpha * 
+			foreach (var smb in Table.Items[Stack.PeekState()].Where(i => i.Position > 0))
+				symbols.Add(smb.Alternative.NonterminalSymbolName);
+
+			var oldCount = 0;
+			while(oldCount < symbols.Count())
+			{
+				oldCount = symbols.Count();
+				symbols.UnionWith(symbols.SelectMany(s=> GrammarObject.Rules.Where(r=>r.Value.Alternatives.Any(a=>a.Elements.Any(e=>e.Symbol == s)))).Select(r=>r.Key).ToList());
+			}
+
+			/// Исключаем из множества контрольных символов символы, из которых не выводимы строки,
+			/// начинающиеся с Any
+			symbols.ExceptWith(
+				symbols.Where(s => !GrammarObject.First(s).Contains(Grammar.ANY_TOKEN_NAME)).ToList()
+			);
+
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
 			do
 			{
-				if (Stack.CountSymbols > 0)
+				if (Stack.PeekSymbol().Anchor != null)
 				{
-					if (Stack.PeekSymbol().Anchor != null)
+					startLocation = Stack.PeekSymbol().Anchor.Start;
+					if (endLocation == null)
 					{
-						startLocation = Stack.PeekSymbol().Anchor.Start;
-						if (endLocation == null)
-						{
-							endLocation = Stack.PeekSymbol().Anchor.End;
-						}
+						endLocation = Stack.PeekSymbol().Anchor.End;
 					}
-
-					value = Stack.PeekSymbol().GetValue().Concat(value);
 				}
+
+				value = Stack.PeekSymbol().GetValue().Concat(value);
 
 				Stack.Pop();
 			}
-			while (Stack.CountStates > 0 && Table.Items[Stack.PeekState()].FirstOrDefault(m => m.Alternative.Count > 0
-				 && m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 0) == null);
+			/// Снимаем состояния, пока не встретим небазисный пункт с альтернативой, начинающейся с Any;
+			/// в этом же множестве будет и базисный пункт с указателем перед нетерминалом, на котором возможно восстановление
+			while (Stack.CountStates > 0 && !Table.Items[Stack.PeekState()].Any(m => m.Alternative.Count > 0
+				&& m.Position < m.Alternative.Count && symbols.Contains(m.Alternative[m.Position])));
 
 			if (Stack.CountStates > 0)
 			{
