@@ -280,12 +280,14 @@ namespace Land.Core.Parsing.LR
 				.Where(m => m.Alternative.Count > 0 && m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 1)
 				.ToList();
 
-			var stopTokens = markers.SelectMany(m => {
-				var set = GrammarObject.First(m.Alternative.Subsequence(1));
-				if (set.Contains(null))
-					set.Add(m.Lookahead);
-				return set;
-			}).ToList();
+			var stopTokens = new HashSet<string>(
+				markers.SelectMany(m => {
+					var set = GrammarObject.First(m.Alternative.Subsequence(1));
+					if (set.Remove(null))
+						set.Add(m.Lookahead);
+					return set;
+				})
+			);
 
 			var token = LexingStream.CurrentToken;
 
@@ -311,6 +313,11 @@ namespace Land.Core.Parsing.LR
 			if (token.Name == Grammar.EOF_TOKEN_NAME
 				&& Table[Stack.PeekState(), token.Name].Count == 0)
 			{
+				Log.Add(Message.Error(
+					$"Ошибка при восстановлении: неожиданный конец файла, ожидался один из токенов {String.Join(", ", stopTokens.Select(t=>GrammarObject.Userify(t)))}",
+					token.Location.Start
+				));
+
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
