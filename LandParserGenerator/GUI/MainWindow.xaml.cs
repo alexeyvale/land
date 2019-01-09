@@ -229,7 +229,7 @@ namespace Land.GUI
 			{
 				var messages = new List<Message>();
 				var success = BuilderBase.GenerateLibrary(
-					GrammarType.LL,
+					ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,
 					Grammar_Editor.Text,
 					librarySettings.Input_Namespace.Text,
 					librarySettings.Input_OutputDirectory.Text,
