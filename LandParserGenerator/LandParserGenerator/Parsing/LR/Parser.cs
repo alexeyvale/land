@@ -210,7 +210,7 @@ namespace Land.Core.Parsing.LR
 			Stack.Push(anyNode, shift.TargetItemIndex);
 			stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
-			var stopTokens = Table.GetLookaheads(Stack.PeekState());
+			var stopTokens = Table.GetExpectedTokens(Stack.PeekState());
 
 			var startLocation = anyNode.Anchor?.Start 
 				?? token.Location.Start;

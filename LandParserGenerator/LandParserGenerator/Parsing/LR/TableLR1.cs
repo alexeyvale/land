@@ -226,9 +226,11 @@ namespace Land.Core.Parsing.LR
 			return String.Join($"{Environment.NewLine}{padding}", strings);
 		}
 
-		public HashSet<string> GetLookaheads(int state)
+		public HashSet<string> GetExpectedTokens(int state)
 		{
-			return new HashSet<string>(Items[state].Select(i => i.Lookahead));
+			return new HashSet<string>(
+				Lookaheads.Keys.Where(l => this[state, l].Count > 0)
+			);
 		}
 	}
 }
