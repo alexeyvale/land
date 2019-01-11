@@ -204,13 +204,22 @@ namespace Land.Core.Parsing.LR
 				rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
 			}
 
+			/// Берём опции из нужного вхождения Any
+			var marker = Table.Items[Stack.PeekState()].First(i => i.Next == Grammar.ANY_TOKEN_NAME);
+			anyNode.Options = marker.Alternative[marker.Position].Options;
+
 			/// Производим перенос
 			var shift = (ShiftAction)rawActions.Where(a => a is ShiftAction).Single();
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 			stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
-			var stopTokens = Table.GetExpectedTokens(Stack.PeekState());
+			var stopTokens = anyNode.Options.AnyOptions.ContainsKey(AnyOption.Except)
+				? anyNode.Options.AnyOptions[AnyOption.Except]
+				: Table.GetExpectedTokens(Stack.PeekState()).Except(
+					anyNode.Options.AnyOptions.ContainsKey(AnyOption.Include) 
+						? anyNode.Options.AnyOptions[AnyOption.Include] : new HashSet<string>()
+				);
 
 			var startLocation = anyNode.Anchor?.Start 
 				?? token.Location.Start;
@@ -219,6 +228,7 @@ namespace Land.Core.Parsing.LR
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
 			while (!stopTokens.Contains(token.Name)
+				&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				anyNode.Value.Add(token.Text);
@@ -231,11 +241,10 @@ namespace Land.Core.Parsing.LR
 				anyNode.SetAnchor(startLocation, endLocation);
 
 			/// Если дошли до конца входной строки, и это было не по плану
-			if (token.Name == Grammar.EOF_TOKEN_NAME
-				&& Table[Stack.PeekState(), token.Name].Count == 0)
+			if (!stopTokens.Contains(token.Name))
 			{
 				var message = Message.Trace(
-					$"Ошибка при пропуске токенов: неожиданный конец файла, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
+					$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
 					token.Location.Start
 				);
 
@@ -271,28 +280,23 @@ namespace Land.Core.Parsing.LR
 
 		private IToken SkipAnyInRecovery(Node anyNode)
 		{
+			/// Берём опции из нужного вхождения Any
+			var marker = Table.Items[Stack.PeekState()].First(i => i.Next == Grammar.ANY_TOKEN_NAME);
+			anyNode.Options = marker.Alternative[marker.Position].Options;
 			/// Производим перенос Any
 			var shift = (ShiftAction)Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME]
 				.Where(a => a is ShiftAction).Single();
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 
-			/// Выбираем пункты с альтернативами, продвижение по которым нас интересует
-			var markers = Table.Items[Stack.PeekState()]
-				.Where(m => m.Alternative.Count > 0 && m.Alternative[0] == Grammar.ANY_TOKEN_NAME && m.Position == 1)
-				.ToList();
-
-			var stopTokens = new HashSet<string>(
-				markers.SelectMany(m => {
-					var set = GrammarObject.First(m.Alternative.Subsequence(1));
-					if (set.Remove(null))
-						set.Add(m.Lookahead);
-					return set;
-				})
-			);
+			var stopTokens = anyNode.Options.AnyOptions.ContainsKey(AnyOption.Except)
+				? anyNode.Options.AnyOptions[AnyOption.Except]
+				: Table.GetExpectedTokens(Stack.PeekState()).Except(
+					anyNode.Options.AnyOptions.ContainsKey(AnyOption.Include)
+						? anyNode.Options.AnyOptions[AnyOption.Include] : new HashSet<string>()
+				);
 
 			var token = LexingStream.CurrentToken;
-
 			var startLocation = anyNode.Anchor?.Start
 				?? token.Location.Start;
 			var endLocation = anyNode.Anchor?.End;
@@ -300,6 +304,7 @@ namespace Land.Core.Parsing.LR
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
 			while (!stopTokens.Contains(token.Name)
+				&& !anyNode.Options.Contains(AnyOption.Avoid, token.Name)
 				&& token.Name != Grammar.EOF_TOKEN_NAME)
 			{
 				anyNode.Value.Add(token.Text);
@@ -311,12 +316,10 @@ namespace Land.Core.Parsing.LR
 			if (endLocation != null)
 				anyNode.SetAnchor(startLocation, endLocation);
 
-			/// Если дошли до конца входной строки, и это было не по плану
-			if (token.Name == Grammar.EOF_TOKEN_NAME
-				&& Table[Stack.PeekState(), token.Name].Count == 0)
-			{
+			if (!stopTokens.Contains(token.Name))
+				{
 				Log.Add(Message.Error(
-					$"Ошибка при восстановлении: неожиданный конец файла, ожидался один из токенов {String.Join(", ", stopTokens.Select(t=>GrammarObject.Userify(t)))}",
+					$"Ошибка при восстановлении: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из токенов {String.Join(", ", stopTokens.Select(t=>GrammarObject.Userify(t)))}",
 					token.Location.Start
 				));
 
@@ -337,20 +340,6 @@ namespace Land.Core.Parsing.LR
 
 				return null;
 			}
-
-			var symbols = new HashSet<string>();
-
-			foreach (var item in Table.Items[Stack.PeekState()].Where(i => i.Position > 0))
-			{
-				symbols.Add(item.Alternative.NonterminalSymbolName);
-				symbols.UnionWith(GrammarObject.Defines(item.Alternative.NonterminalSymbolName));
-			}
-
-			/// Исключаем из множества контрольных символов символы, из которых не выводимы строки,
-			/// начинающиеся с Any
-			symbols.ExceptWith(
-				symbols.Where(s => !GrammarObject.First(s).Contains(Grammar.ANY_TOKEN_NAME)).ToList()
-			);
 
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
@@ -378,8 +367,8 @@ namespace Land.Core.Parsing.LR
 			}
 			/// Снимаем состояния, пока не встретим небазисный пункт с альтернативой, начинающейся с Any;
 			/// в этом же множестве будет и базисный пункт с указателем перед нетерминалом, на котором возможно восстановление
-			while (Stack.CountStates > 0 && !Table.Items[Stack.PeekState()].Any(m => m.Alternative.Count > 0
-				&& m.Position < m.Alternative.Count && symbols.Contains(m.Alternative[m.Position])));
+			while (Stack.CountStates > 0 && !Table.Items[Stack.PeekState()].Any(m => m.Position == 0
+				&& m.Next == Grammar.ANY_TOKEN_NAME));
 
 			if (Stack.CountStates > 0)
 			{

@@ -180,6 +180,21 @@ namespace Land.Core.Parsing.LR
 						}
 					}
 
+			/// Проверяем состояния на наличие нескольких пунктов перед Any
+			for(var i=0; i<Items.Count; ++i)
+			{
+				if(Items[i].GroupBy(m=>new { m.Alternative, m.Position })
+					.Where(g=>g.First().Next == Grammar.ANY_TOKEN_NAME).Count() > 1)
+				{
+					errors.Add(Message.Error(
+						$"Any-конфликт: согласно состоянию{Environment.NewLine}" + $"\t\t{ToString(i, null, "\t\t")}{Environment.NewLine}" 
+							+ $"\tпрефикс, оканчивающийся на Any может быть разобран несколькими способами",
+						null,
+						"LanD"
+					));
+				}
+			}
+
 			return errors;
 		}
 

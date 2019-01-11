@@ -111,7 +111,6 @@ namespace Land.Core
 			FirstCacheConsistent = false;
 			FollowCacheConsistent = false;
 			SentenceTokensCacheConsistent = false;
-			DefinesCacheConsistent = false;
 		}
 
 		#region Описание символов
@@ -1265,72 +1264,6 @@ namespace Land.Core
 				return new HashSet<string>(SentenceTokensCache[gramSymbol.Name]);
 			else
 				return new HashSet<string>() { gramSymbol.Name };
-		}
-
-		#endregion
-
-		#region Построение Defines
-
-		private bool DefinesCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<string>> _defines;
-		private Dictionary<string, HashSet<string>> DefinesCache
-		{
-			get
-			{
-				if (_defines == null || !DefinesCacheConsistent)
-				{
-					DefinesCacheConsistent = true;
-					try
-					{
-						BuildDefines();
-					}
-					catch
-					{
-						DefinesCacheConsistent = false;
-						throw;
-					}
-				}
-
-				return _defines;
-			}
-
-			set { _defines = value; }
-		}
-
-		private void BuildDefines()
-		{
-			/// Первоначально для каждого нетерминала находим те, в правилах которых он участвует непосредственно
-			DefinesCache = Rules.Keys.ToDictionary(k => k, k => new HashSet<string>(
-				Rules.Values.Where(r=>r.Alternatives.Any(a=>a.Elements.Any(e=>e.Symbol == k))).Select(r=>r.Name)
-			));
-
-			var changed = true;
-
-			while (changed)
-			{
-				changed = false;
-
-				foreach(var kvp in DefinesCache)
-				{
-					var oldCount = kvp.Value.Count;
-
-					/// Для каждого нетерминала добавляем те нетерминалы, в правилах для которых участвуют
-					/// уже известные нам нетерминалы, определяемые через данный
-					kvp.Value.UnionWith(
-						DefinesCache.Where(e=>kvp.Value.Contains(e.Key)).SelectMany(e=>e.Value).ToList()
-					);
-
-					if(!changed)
-						changed = kvp.Value.Count != oldCount;
-				}
-			}
-		}
-
-		/// Получение множества нетерминалов, которые определяются через заданный нетерминал
-		public HashSet<string> Defines(string smb)
-		{
-			return DefinesCache.ContainsKey(smb) 
-				? DefinesCache[smb] : new HashSet<string>();
 		}
 
 		#endregion
