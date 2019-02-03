@@ -15,17 +15,6 @@ namespace Land.Core.Parsing.LR
 		private Stack<int> StatesStack { get; set; } = new Stack<int>();
 		private Stack<Node> SymbolsStack { get; set; } = new Stack<Node>();
 
-		/// <summary>
-		/// Поток токенов, используемый при разборе
-		/// </summary>
-		private TokenStream TokenStream { get; set; }
-
-		public ParsingStack(TokenStream stream)
-		{
-			TokenStream = stream;
-		}
-
-
 		public void Push(Node smb)
 		{
 			Push(smb, null);

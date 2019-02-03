@@ -68,7 +68,7 @@
                     AutoGenerateColumns="False">
                 <DataGrid.Columns>
 					<DataGridTextColumn Header="Расширение" Binding="{Binding Path=ExtensionsString}" Width="10*" />
-                    <DataGridTextColumn Header="Файл грамматики" Binding="{Binding Path=GrammarPath}" Width="45*" />
+                    <DataGridTextColumn Header="Библиотека парсера" Binding="{Binding Path=ParserPath}" Width="45*" />
 					<DataGridTemplateColumn CanUserResize="False">
 						<DataGridTemplateColumn.CellTemplate>
 							<DataTemplate>

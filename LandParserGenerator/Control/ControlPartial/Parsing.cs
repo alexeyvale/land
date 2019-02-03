@@ -21,7 +21,10 @@ using Land.Control.Helpers;
 namespace Land.Control
 {
 	public partial class LandExplorerControl : UserControl
-	{	
+	{
+		private const string PARSER_PROVIDER_CLASS = "ParserProvider";
+		private const string GET_PARSER_METHOD = "GetParser";
+
 		private Tuple<Node, string> GetRoot(string documentName)
 		{
 			return !String.IsNullOrEmpty(documentName)
@@ -34,7 +37,7 @@ namespace Land.Control
 				: null;
 		}
 
-		private Dictionary<string, BaseParser> BuildParsers()
+		private Dictionary<string, BaseParser> LoadParsers()
 		{
 			var parsers = new Dictionary<string, BaseParser>();
 
@@ -42,21 +45,29 @@ namespace Land.Control
 			/// указанных для грамматики
 			foreach (var item in SettingsObject.Parsers)
 			{
-				if(!File.Exists(item.GrammarPath))
+				if(!File.Exists(item.ParserPath))
 				{
 					Log.Add(Message.Error(
-						$"Файл {item.GrammarPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
+						$"Файл {item.ParserPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
 						null
 					));
 
 					continue;
 				}
 
-				var parser = BuilderBase.BuildParser(
-					GrammarType.LL,
-					File.ReadAllText(item.GrammarPath),
-					Log
-				);
+				var parser = (BaseParser)Assembly.LoadFrom(item.ParserPath)
+							.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
+							?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
+
+				if(parser == null)
+				{
+					Log.Add(Message.Error(
+						$"Не удалось загрузить парсер для расширения {item.ExtensionsString}",
+						null
+					));
+
+					continue;
+				}
 
                 foreach (var key in item.Extensions)
 					parsers[key] = parser;

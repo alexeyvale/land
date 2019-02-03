@@ -180,6 +180,21 @@ namespace Land.Core.Parsing.LR
 						}
 					}
 
+			/// Проверяем состояния на наличие нескольких пунктов перед Any
+			for(var i=0; i<Items.Count; ++i)
+			{
+				if(Items[i].GroupBy(m=>new { m.Alternative, m.Position })
+					.Where(g=>g.First().Next == Grammar.ANY_TOKEN_NAME).Count() > 1)
+				{
+					errors.Add(Message.Error(
+						$"Any-конфликт: согласно состоянию{Environment.NewLine}" + $"\t\t{ToString(i, null, "\t\t")}{Environment.NewLine}" 
+							+ $"\tпрефикс, оканчивающийся на Any может быть разобран несколькими способами",
+						null,
+						"LanD"
+					));
+				}
+			}
+
 			return errors;
 		}
 
@@ -226,9 +241,11 @@ namespace Land.Core.Parsing.LR
 			return String.Join($"{Environment.NewLine}{padding}", strings);
 		}
 
-		public HashSet<string> GetLookaheads(int state)
+		public HashSet<string> GetExpectedTokens(int state)
 		{
-			return new HashSet<string>(Items[state].Select(i => i.Lookahead));
+			return new HashSet<string>(
+				Lookaheads.Keys.Where(l => this[state, l].Count > 0)
+			);
 		}
 	}
 }

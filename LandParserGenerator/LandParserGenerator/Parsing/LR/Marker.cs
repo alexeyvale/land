@@ -21,23 +21,14 @@ namespace Land.Core.Parsing.LR
 		}
 
 		/// <summary>
+		/// Предшествующий пункту элемент альтернативы
+		/// </summary>
+		public string Prev => Position > 0 ? Alternative[Position - 1] : String.Empty;
+
+		/// <summary>
 		/// Следующий после пункта элемент альтернативы
 		/// </summary>
-		public string Next
-		{
-			get
-			{
-				if (Position < Alternative.Count)
-				{
-					return Alternative[Position];
-				}
-				else
-				{
-					/// Случай, когда пункт стоит в конце альтернативы
-					return String.Empty;
-				}
-			}
-		}
+		public string Next => Position < Alternative.Count ? Alternative[Position] : String.Empty;
 
 		/// <summary>
 		/// Сдвиг пункта к следующему символу в альтернативе

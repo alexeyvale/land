@@ -17,10 +17,15 @@ namespace Land.Core
 {
 	public static class BuilderBase
 	{
+		private static readonly string TempDir = Path.GetTempPath();
+
+		private static string TempName(string fname) => Path.Combine(TempDir, fname);
+
+
 		public static Type BuildLexer(Grammar grammar, string lexerName, List<Message> errors = null)
 		{
 			/// Генерируем по грамматике файл для ANTLR
-			var grammarOutput = new StreamWriter($"{lexerName}.g4");
+			var grammarOutput = new StreamWriter($"{TempName(lexerName)}.g4");
 
 			grammarOutput.WriteLine($"lexer grammar {lexerName};");
 			grammarOutput.WriteLine();	
@@ -58,7 +63,7 @@ namespace Land.Core
 			ProcessStartInfo startInfo = new ProcessStartInfo()
 			{
 				FileName = "cmd.exe",
-				Arguments = $"/C java -jar \"../../../components/Antlr/antlr-4.7-complete.jar\" -Dlanguage=CSharp {lexerName}.g4",
+				Arguments = $"/C java -jar \"Resources/antlr-4.7-complete.jar\" -Dlanguage=CSharp \"{TempName(lexerName)}.g4\"",
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
@@ -111,7 +116,7 @@ namespace Land.Core
 			compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
 			compilerParams.ReferencedAssemblies.Add("System.dll");
 
-			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{lexerName}.cs");
+			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{TempName(lexerName)}.cs");
 			return compilationResult.CompiledAssembly.GetType(lexerName);
 		}
 
@@ -158,7 +163,7 @@ namespace Land.Core
 
 				messages.AddRange(table.CheckValidity());
 
-				table.ExportToCsv("current_table.csv");
+				table.ExportToCsv(TempName("current_table.csv"));
 
 				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", messages);
 
@@ -196,7 +201,7 @@ namespace Land.Core
 		/// <param name="type">Тип парсера (LL или LR)</param>
 		/// <param name="text">Грамматика разбираемого формата файлов</param>
 		/// <param name="namespace">Пространство имён для сгенерированного парсера</param>
-		/// <param name="path">Путь к файлу генерируемой библиотеки</param>
+		/// <param name="path">Путь к каталогу, в котором необходимо сгенерировать библиотеку</param>
 		/// <param name="messages">Лог генерации парсера</param>
 		/// <returns>Признак успешности выполнения операции</returns>
 		public static bool GenerateLibrary(
@@ -208,6 +213,8 @@ namespace Land.Core
 			List<Message> messages
 		)
 		{
+			const string ANTLR_LIBRARY = "Antlr4.Runtime.Standard.dll";
+
 			/// Строим объект грамматики и проверяем, корректно ли прошло построение
 			var builtGrammar = BuildGrammar(type, text, messages);
 
@@ -232,10 +239,10 @@ namespace Land.Core
 
 				if (messages.Count(m => m.Type == MessageType.Error) == 0)
 				{
-					var lexerFileName = $"{@namespace.Replace('.', '_')}_Lexer.cs";
-					var parserFileName = $"{@namespace.Replace('.', '_')}_Parser.cs";
-					var grammarFileName = $"{@namespace.Replace('.', '_')}_Grammar.cs";
-					var nodeGeneratorFileName = $"{@namespace.Replace('.', '_')}_NodeGenerator.cs";
+					var lexerFileName = TempName($"{@namespace.Replace('.', '_')}_Lexer.cs");
+					var parserFileName = TempName($"{@namespace.Replace('.', '_')}_Parser.cs");
+					var grammarFileName = TempName($"{@namespace.Replace('.', '_')}_Grammar.cs");
+					var nodeGeneratorFileName = TempName($"{@namespace.Replace('.', '_')}_NodeGenerator.cs");
 
 					BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
 					File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
@@ -249,7 +256,7 @@ namespace Land.Core
 						ProcessStartInfo startInfo = new ProcessStartInfo()
 						{
 							FileName = "cmd.exe",
-							Arguments = $"/C chcp 1251 | \"../../../components/Microsoft SDK/sn.exe\" -k \"{keyPath}\"",
+							Arguments = $"/C chcp 1251 | \"Resources/sn.exe\" -k \"{keyPath}\"",
 							CreateNoWindow = true,
 							RedirectStandardOutput = true,
 							UseShellExecute = false
@@ -266,7 +273,7 @@ namespace Land.Core
 
 					compilerParams.GenerateInMemory = false;
 					compilerParams.OutputAssembly = Path.Combine(path, $"{@namespace}.dll");
-					compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
+					compilerParams.ReferencedAssemblies.Add(ANTLR_LIBRARY);
 					compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
 					compilerParams.ReferencedAssemblies.Add("System.dll");
 					compilerParams.ReferencedAssemblies.Add("System.Core.dll");
@@ -279,6 +286,8 @@ namespace Land.Core
 
 					if (compilationResult.Errors.Count == 0)
 					{
+						File.Copy(ANTLR_LIBRARY, Path.Combine(path, ANTLR_LIBRARY), true);
+
 						return true;
 					}
 					else

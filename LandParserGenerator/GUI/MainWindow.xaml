@@ -70,6 +70,9 @@
 										<Separator></Separator>
 										<Button Name="Grammar_GetLibraryButton" Click="Grammar_GetLibraryButton_Click" Content="&#xf02d;" ToolTip="Сгенерировать библиотеку" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
+										<RadioButton GroupName="Grammar_ParsingTypeRadioButton" Name="ParsingLL" Content="LL" IsChecked="True" Margin="2,0,0,0"/>
+										<RadioButton GroupName="Grammar_ParsingTypeRadioButton" Name="ParsingLR" Content="LR" Margin="0,0,2,0"/>
+										<Separator></Separator>
 										<Separator></Separator>
 										<ComboBox MinWidth="90" MaxWidth="90" Margin="0, 0, 10, 0" Name="Grammar_RecentGrammars" ToolTip="Недавние грамматики" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
 										<Separator></Separator>

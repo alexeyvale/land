@@ -188,6 +188,19 @@ namespace Land.Control
 			if (openFileDialog.ShowDialog() == true)
 			{
 				MarkupManager.Deserialize(openFileDialog.FileName);
+
+				var stubNode = new Node("");
+				stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+
+				MarkupManager.DoWithMarkup(elem =>
+				{
+					if(elem is ConcernPoint p)
+					{
+						p.AstNode = stubNode;
+						p.HasIrrelevantLocation = true;
+					}
+				});
+
 				MarkupTreeView.ItemsSource = MarkupManager.Markup;
 			}
 		}
@@ -261,7 +274,7 @@ namespace Land.Control
 				);
 
 				SyncMarkupManagerSettings();
-				Parsers = LogFunction(() => BuildParsers(), true, true);
+				Parsers = LogFunction(() => LoadParsers(), true, true);
 			}
 		}
 

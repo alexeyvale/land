@@ -40,7 +40,8 @@ namespace Land.Control
 			public TreeViewItem SelectedItem_MarkupTreeView { get; set; }
 			public TreeViewItem SelectedItem_MissingTreeView { get; set; }
 
-			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; }
+			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; } =
+				new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -256,7 +257,7 @@ namespace Land.Control
 			SyncMarkupManagerSettings();
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
-			Parsers = LogFunction(() => BuildParsers(), true, true);
+			Parsers = LogFunction(() => LoadParsers(), true, true);
 		}
 
 		private void SyncMarkupManagerSettings()
