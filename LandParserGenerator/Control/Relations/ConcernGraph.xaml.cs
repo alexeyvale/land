@@ -39,6 +39,7 @@ namespace Land.Control
 
 			RelationsManager = relationsManager;
 
+			/// Заполняем дерево, в котором можно будет выбрать нужные нам отношения
 			RelationsTree = ((RelationGroup[])Enum.GetValues(typeof(RelationGroup))).Select(g => new RelationsTreeNode()
 			{
 				Text = g.GetAttribute<DescriptionAttribute>().Description,
@@ -53,6 +54,12 @@ namespace Land.Control
 			}).ToList();
 
 			RelationsTreeView.ItemsSource = RelationsTree;
+
+			/// Конфигурируем отображение графа
+			var layoutParams = new GraphSharp.Algorithms.Layout.Simple.FDP.KKLayoutParameters();
+			ConcernGraphLayout.LayoutAlgorithmType = "CompoundFDP";
+			layoutParams.AdjustForGravity = true;
+			ConcernGraphLayout.LayoutParameters = layoutParams;
 		}
 
 		private void RelationCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
