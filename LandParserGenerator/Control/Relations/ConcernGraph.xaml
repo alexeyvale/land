@@ -10,8 +10,8 @@
         mc:Ignorable="d"
         Title="Граф функциональностей" Height="450" Width="800">
 	<Window.Resources>
-		<FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
-		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
+		<FontFamily x:Key="FontAwesomeRegular">../Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
+		<FontFamily x:Key="FontAwesomeSolid">../Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 		<local:MarkupTreeIconVisibilityConverter x:Key="MarkupTreeIconVisibilityConverter" />
 		<local:RelationCheckBoxVisibilityConverter x:Key="RelationCheckBoxVisibilityConverter" />
 	</Window.Resources>
