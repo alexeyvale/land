@@ -91,7 +91,7 @@ namespace Land.Core.Markup
 				GetLinearSequenceVisitor.GetPoints(new List<Concern> { b }).Select(p => p.AstNode)
 			);
 
-			return bNodes.SetEquals(aNodes);
+			return bNodes.IsSubsetOf(aNodes);
 		}
 
 		public static bool Set_Intersects(this Concern a, Concern b)

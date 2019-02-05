@@ -86,7 +86,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConcernGraph.xaml.cs">
+    <Compile Include="Relations\ConcernGraph.xaml.cs">
       <DependentUpon>ConcernGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControlPartial\Parsing.cs" />
@@ -95,6 +95,7 @@
     <Compile Include="ControlPartial\MarkupTree.cs" />
     <Compile Include="ControlPartial\DragAndDrop.cs" />
     <Compile Include="ControlPartial\Commands.cs" />
+    <Compile Include="Relations\RelationCheckBoxVisibilityConverter.cs" />
     <Compile Include="Converters\MissingListItemConverter.cs" />
     <Compile Include="Converters\MissingListIconColorConverter.cs" />
     <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="LandExplorerSettingsWindow.xaml.cs">
       <DependentUpon>LandExplorerSettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="ConcernGraph.xaml">
+    <Page Include="Relations\ConcernGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -220,7 +220,10 @@ namespace Land.Control
 
 		private void Command_OpenConcernGraph_Executed(object sender, RoutedEventArgs e)
 		{
-			
+			RelationsManager.BuildRelations(MarkupManager.Markup);
+
+			var graphWindow = new ConcernGraph(RelationsManager);
+			graphWindow.Show();
 		}
 
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)

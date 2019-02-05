@@ -13,6 +13,7 @@
 		<FontFamily x:Key="FontAwesomeRegular">Resources/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Resources/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
 		<local:MarkupTreeIconVisibilityConverter x:Key="MarkupTreeIconVisibilityConverter" />
+		<local:RelationCheckBoxVisibilityConverter x:Key="RelationCheckBoxVisibilityConverter" />
 	</Window.Resources>
 
 	<Grid Background="White">
@@ -76,20 +77,22 @@
 		<GridSplitter ResizeDirection="Columns" Margin="0,31,0,0" VerticalAlignment="Stretch" Width="3" Grid.Column="1" ResizeBehavior="PreviousAndNext" Background="WhiteSmoke"/>
 
 		<Grid Grid.Column="2" Margin="2,0,0,0">
-			<ListView Grid.Row="0" Name="InfoTags" 
+			<TreeView Grid.Row="0" Name="RelationsTreeView" 
 					  HorizontalAlignment="Stretch" 
-					  VerticalAlignment="Stretch" 
-					  SelectionMode="Multiple">
-				<ListView.ItemTemplate>
-					<DataTemplate>
-						<CheckBox x:Name="TagInLV" IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}">
-							<CheckBox.Content>
-								<TextBlock Text="{Binding Path=Content,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"/>
-							</CheckBox.Content>
-						</CheckBox>
-					</DataTemplate>
-				</ListView.ItemTemplate>
-				<ListView.Resources>
+					  VerticalAlignment="Stretch">
+				<TreeView.ItemTemplate>
+					<HierarchicalDataTemplate ItemsSource="{Binding Children}">
+						<StackPanel Orientation="Horizontal">
+							<CheckBox x:Name="RelationCheckBox"
+									  Checked="RelationCheckBox_CheckedChanged"
+									  Unchecked="RelationCheckBox_CheckedChanged"
+									  Tag="{Binding Path=Relation}"
+									  Visibility="{Binding Path=Relation, Mode=OneTime, Converter={StaticResource RelationCheckBoxVisibilityConverter}}"/>
+							<TextBlock Text="{Binding Path=Text, Mode=OneWay}" />
+						</StackPanel>
+					</HierarchicalDataTemplate>
+				</TreeView.ItemTemplate>
+				<TreeView.Resources>
 					<Style TargetType="{x:Type CheckBox}">
 						<Style.Triggers>
 							<Trigger Property="IsMouseOver"  Value="True">
@@ -97,8 +100,8 @@
 							</Trigger>
 						</Style.Triggers>
 					</Style>
-				</ListView.Resources>>
-			</ListView>
+				</TreeView.Resources>
+			</TreeView>
 		</Grid>
 		<StatusBar Name="GRStatus" Height="25" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Margin="3,0,3,0">
 			<ProgressBar Name="GRProgress" Value="0" Maximum="4" Height="22" HorizontalAlignment="Center" Width="{Binding ElementName=GRStatus, Path=ActualWidth}"/>

@@ -94,6 +94,7 @@
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
+    <Compile Include="Markup\Relations\EnumExtension.cs" />
     <Compile Include="Markup\Relations\RelationsManager.cs" />
     <Compile Include="Markup\Relations\RelationsExtension.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
