@@ -16,16 +16,41 @@ using Land.Core.Markup;
 
 namespace Land.Control
 {
-    /// <summary>
-    /// Логика взаимодействия для ConcernGraph.xaml
-    /// </summary>
-    public partial class ConcernGraph : Window
-    {
+	/// <summary>
+	/// Логика взаимодействия для ConcernGraph.xaml
+	/// </summary>
+	public partial class ConcernGraph : Window
+	{
 		public class RelationsTreeNode
 		{
 			public string Text { get; set; }
 			public RelationType? Relation { get; set; }
 			public List<RelationsTreeNode> Children { get; set; }
+		}
+
+		public class InfoProvidedEdge : IEdge<object>
+		{
+			public object Source { get; set; }
+
+			public object Target { get; set; }
+
+			private HashSet<RelationType> Relations { get; set; }
+
+			public string Info => String.Join($";{Environment.NewLine}", Relations
+				.Select(r => r.GetAttribute<DescriptionAttribute>().Description));
+
+			public InfoProvidedEdge(MarkupElement source, MarkupElement target, RelationType relation)
+			{
+				Source = source;
+				Target = target;
+
+				Relations = new HashSet<RelationType>{ relation };
+			}
+
+			public void AddRelation(RelationType relation)
+			{
+				Relations.Add(relation);
+			}
 		}
 
 		private Brush StdForeground = new SolidColorBrush(Color.FromArgb(70, 100, 100, 100));
@@ -102,8 +127,17 @@ namespace Land.Control
 
 							foreach (var to in kvp.Value)
 							{
-								Graph.AddVertex(to);
-								Graph.AddEdge(new Edge<object>(kvp.Key, to));
+								Graph.TryGetEdge(kvp.Key, to, out IEdge<object> edge);
+
+								if (edge != null)
+								{
+									((InfoProvidedEdge)edge).AddRelation(rel);
+								}
+								else
+								{
+									Graph.AddVertex(to);
+									Graph.AddEdge(new InfoProvidedEdge(kvp.Key, to, rel));
+								}
 							}
 						}
 					}

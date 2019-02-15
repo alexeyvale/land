@@ -50,6 +50,12 @@
 						</Setter>
 					</Style>
 
+					<Style TargetType="{x:Type graphsharp:EdgeControl}">
+						<Style.Setters>
+							<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Edge.Info}"/>
+						</Style.Setters>
+					</Style>
+
 					<DataTemplate x:Key="vertexTemplate" DataType="{x:Type core:MarkupElement}">
 						<Border x:Name="brd" BorderThickness="0.5" CornerRadius="4,4,4,4" Padding="3">
 							<StackPanel Orientation="Horizontal">
