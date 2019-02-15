@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.ComponentModel;
 
 using QuickGraph;
@@ -27,6 +27,15 @@ namespace Land.Control
 			public RelationType? Relation { get; set; }
 			public List<RelationsTreeNode> Children { get; set; }
 		}
+
+		private Brush StdForeground = new SolidColorBrush(Color.FromArgb(70, 100, 100, 100));
+		private Brush InForeground = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
+		private Brush OutForeground = new SolidColorBrush(Color.FromArgb(200, 0, 0, 255));
+		private Brush LinkForeground = new SolidColorBrush(Color.FromArgb(200, 10, 10, 10));
+		private const double StdWidth = 1.2;
+		private const double SelectedWidth = 2;
+
+		private MarkupElement SelectedVertex { get; set; }
 
 		private List<RelationsTreeNode> RelationsTree { get; set; }
 		private RelationsManager RelationsManager { get; set; }
@@ -84,18 +93,81 @@ namespace Land.Control
 				{
 					foreach(var kvp in RelationsManager[rel])
 					{
-						Graph.AddVertex(kvp.Key);
-
-						foreach(var to in kvp.Value)
+						if (kvp.Value.Count > 0)
 						{
-							Graph.AddVertex(to);
-							Graph.AddEdge(new Edge<object>(kvp.Key, to));
+							Graph.AddVertex(kvp.Key);
+
+							foreach (var to in kvp.Value)
+							{
+								Graph.AddVertex(to);
+								Graph.AddEdge(new Edge<object>(kvp.Key, to));
+							}
 						}
 					}
 				}
 			}
 
 			ConcernGraphLayout.Graph = Graph;
+
+			foreach (var vertex in Graph.Vertices)
+			{
+				var control = ConcernGraphLayout.GetVertexControl(vertex);
+				control.PreviewMouseLeftButtonDown += Vertex_PreviewMouseLeftButtonDown;
+			}
 		}
+
+		private void Vertex_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			var cur = (MarkupElement)((VertexControl)sender).Vertex;
+
+			/// Чтобы не было конфликтов с операциями масштабирования GraphSharp 
+			if (Keyboard.Modifiers != ModifierKeys.Alt)
+			{
+				UnselectVertex(SelectedVertex);
+				SelectedVertex = cur;
+				SelectVertex(SelectedVertex);
+			}
+		}
+
+		private void UnselectVertex(object vc)
+		{
+			ChangeGroup(vc, StdForeground, StdForeground, StdForeground, StdWidth, false);
+		}
+
+		private void SelectVertex(object vc)
+		{
+			ChangeGroup(vc, InForeground, OutForeground, LinkForeground, SelectedWidth, true);
+		}
+
+		private void ChangeGroup(object vertexContext, Brush inColor, Brush outColor, Brush linkColor, double thickness, bool select)
+		{
+			if (vertexContext != null)
+			{
+				ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
+
+				if (edges != null)
+				{
+					foreach (IEdge<object> edg in edges)
+					{
+						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
+						curEdge.Foreground = inColor;
+						curEdge.StrokeThickness = thickness;
+					}
+				}
+
+				ConcernGraphLayout.Graph.TryGetOutEdges(vertexContext, out edges);
+
+				if (edges != null)
+				{
+					foreach (IEdge<object> edg in edges)
+					{
+						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
+						curEdge.Foreground = outColor;
+						curEdge.StrokeThickness = thickness;
+					}
+				}
+			}
+		}
+
 	}
 }
