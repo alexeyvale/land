@@ -67,9 +67,9 @@ namespace Land.Control
 			var checkBox = (CheckBox)sender;
 
 			if (checkBox.IsChecked ?? false)
-				RelationsSelected.Remove((RelationType)checkBox.Tag);
-			else
 				RelationsSelected.Add((RelationType)checkBox.Tag);
+			else
+				RelationsSelected.Remove((RelationType)checkBox.Tag);
 
 			RebuildGraph();
 		}

@@ -8,69 +8,94 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
+	public class Relation<T>
+	{
+		public RelationType Type { get; set; }
+		public HashSet<Tuple<T, T>> Elements { get; set; }
+	}
+
+	public class RelatedPair<T>
+	{
+		public RelationType RelationType { get; set; }
+		public T Item0 { get; set; }
+		public T Item1 { get; set; }
+	}
+
 	public class RelationPropertiesAttribute : Attribute
 	{
 		public bool IsReflexive { get; private set; }
 		public bool IsSymmetric { get; private set; }
 		public bool IsTransitive { get; private set; }
+		public bool IsBasic { get; private set; }
 
-		public RelationPropertiesAttribute(bool isReflexive, bool isSymmetric, bool isTransitive)
+		public RelationPropertiesAttribute(bool isReflexive, bool isSymmetric, bool isTransitive, bool isBasic)
 		{
 			IsReflexive = isReflexive;
 			IsSymmetric = isSymmetric;
 			IsTransitive = isTransitive;
+			IsBasic = isBasic;
 		}
 	}
 
 	public enum RelationGroup
 	{
-		[Description("Пространственные")]
-		Spatial,
-		[Description("Теоретико-множественные")]
-		Set,
-		[Description("Семантические")]
-		Semantic
+		[Description("Выявляемые автоматически")]
+		Internal,
+		[Description("Задаваемые пользователем или внешним инструментом")]
+		External
 	}
 
 	public enum RelationType
 	{
-		[Description("Предшествует в пределах объемлющей сущности")]
-		[RelationProperties(isReflexive:false, isSymmetric: false, isTransitive: true)]
-		Spatial_Preceeds,
+		[Description("Предшествует")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
+		Internal_Preceeds,
 
-		[Description("Следует за в пределах объемлющей сущности")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true)]
-		Spatial_Follows,
+		[Description("Непосредственная часть функциональности")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		Internal_IsChildOf,
 
-		[Description("Содержатся в пределах одной непосредственно объемлющей сущности")]
-		[RelationProperties(isReflexive: true, isSymmetric: true, isTransitive: true)]
-		Spatial_IsSiblingOf,
-
-		[Description("Включает в себя")]
-		[RelationProperties(isReflexive: true, isSymmetric: false, isTransitive: true)]
-		Spatial_Includes,
-
-		[Description("Код пересекается с кодом")]
-		[RelationProperties(isReflexive: true, isSymmetric: true, isTransitive: false)]
-		Spatial_Intersects,
+		[Description("Вложена в область текста, соответствующую")]
+		[RelationProperties(isReflexive: true, isSymmetric: false, isTransitive: true, isBasic: true)]
+		Internal_IsPartOf,
 
 
-		[Description("Включает в себя")]
-		[RelationProperties(isReflexive: true, isSymmetric: false, isTransitive: true)]
-		Set_Includes,
+		[Description("Следует за")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_Follows,
 
-		[Description("Пересекается с")]
-		[RelationProperties(isReflexive: true, isSymmetric: true, isTransitive: false)]
-		Set_Intersects,
+		[Description("Часть функциональности или её подфункциональностей")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_IsDescendantOf,
 
+		[Description("Непосредственно объемлющая функциональность")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_IsParentOf,
+
+		[Description("Объемлющая функциональность")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_IsAncestorOf,
+
+
+		[Description("Должна предшествовать")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		External_MustPreceed,
+
+		[Description("Присутствует, только если есть")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		External_ExistsIfAll,
+
+		[Description("Присутствует, если есть хотя бы")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		External_ExistsIfAny,
 
 		[Description("Использует")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false)]
-		Semantic_Uses,
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
+		External_Uses,
 
 		[Description("Модифицирует")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false)]
-		Semantic_Modifies
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		External_Modifies,
 	}
 
 	public class RelationsManager
@@ -93,10 +118,10 @@ namespace Land.Core.Markup
 
 
 		/// Убираем из кеша информацию об определённых группах отношений
-		public void Clear(params RelationGroup[] groups)
+		public void Clear(RelationGroup group)
 		{
 			foreach (RelationType relType in ((RelationType[])Enum.GetValues(typeof(RelationType)))
-				.Where(e=>groups.Select(g=>g.ToString()).Contains(e.ToString().Split('_')[0])))
+				.Where(e=>group.ToString() == e.ToString().Split('_')[0]))
 			{
 				Cache[relType] = null;
 			}
@@ -120,116 +145,125 @@ namespace Land.Core.Markup
 
 		public void BuildRelations(IEnumerable<MarkupElement> markup)
 		{
-			BuildSpatialRelations(markup);
-			BuildSetRelations(markup);
-		}
-
-		private void BuildSpatialRelations(IEnumerable<MarkupElement> markup)
-		{
-			Clear(RelationGroup.Spatial);
+			Clear(RelationGroup.Internal);
 
 			var elements = GetLinearSequenceVisitor.GetElements(markup);
+			var concerns = elements.OfType<Concern>().ToList();
+			var points = elements.OfType<ConcernPoint>().ToList();
 
+			/// Создаём заготовки для каждого отношения и элемента
 			foreach (RelationType relType in ((RelationType[])Enum.GetValues(typeof(RelationType)))
-						.Where(t => t.ToString().StartsWith(RelationGroup.Spatial.ToString())))
+						.Where(t => t.ToString().StartsWith(RelationGroup.Internal.ToString())))
 			{
 				Cache[relType] = elements.ToDictionary(c => c, c => new HashSet<MarkupElement>());
 			}
 
-			for (var i = 0; i < elements.Count; ++i)
-				for (var j = i + 1; j < elements.Count; ++j)
+			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
+			foreach (var concern in concerns.Where(e => e is Concern))
+				Cache[RelationType.Internal_IsParentOf][concern] = new HashSet<MarkupElement>(concern.Elements);
+
+			FillAsClosure(RelationType.Internal_IsAncestorOf, RelationType.Internal_IsParentOf);
+			FillAsTransposition(RelationType.Internal_IsChildOf, RelationType.Internal_IsParentOf);
+			FillAsTransposition(RelationType.Internal_IsDescendantOf, RelationType.Internal_IsAncestorOf);
+
+			/// Строим отношения, связанные с пространственным взаимным расположением точек
+			for (var i = 0; i < points.Count; ++i)
+				for (var j = i + 1; j < points.Count; ++j)
 				{
-					/// Если имеем дело с двумя точками
-					if (elements[i] is ConcernPoint point1 && elements[j] is ConcernPoint point2)
+					var point1 = points[i];
+					var point2 = points[j];
+
+					if (GetAstLandParent(point1) == GetAstLandParent(point2)
+						&& point1.Location.End.Offset <= point2.Location.Start.Offset)
 					{
-						if (point1.Spatial_Preceeds(point2))
-						{
-							Cache[RelationType.Spatial_IsSiblingOf][point1].Add(point2);
-							Cache[RelationType.Spatial_IsSiblingOf][point2].Add(point1);
-							Cache[RelationType.Spatial_Preceeds][point1].Add(point2);
-							Cache[RelationType.Spatial_Follows][point2].Add(point1);
-						}
-						else if(point1.Spatial_IsSiblingOf(point2))
-						{
-							Cache[RelationType.Spatial_IsSiblingOf][point1].Add(point2);
-							Cache[RelationType.Spatial_IsSiblingOf][point2].Add(point1);
-
-							if(point1 != point2)
-							{
-								Cache[RelationType.Spatial_Preceeds][point2].Add(point1);
-								Cache[RelationType.Spatial_Follows][point1].Add(point2);
-							}
-						}
-
-						if(point1.Spatial_Intersects(point2))
-						{
-							Cache[RelationType.Spatial_Intersects][point1].Add(point2);
-							Cache[RelationType.Spatial_Intersects][point2].Add(point1);
-
-							if(point1.Spatial_Includes(point2))
-							{
-								Cache[RelationType.Spatial_Includes][point1].Add(point2);
-							}
-							else if(point2.Spatial_Includes(point1))
-							{
-								Cache[RelationType.Spatial_Includes][point2].Add(point1);
-							}
-						}
+						Cache[RelationType.Internal_Preceeds][point1].Add(point2);
 					}
 
-					if((elements[i] is Concern ^ elements[j] is Concern) 
-						&& (elements[i] is ConcernPoint ^ elements[j] is ConcernPoint))
+					if (point1.Location.Includes(point2.Location))
 					{
-						var concern = elements[i] as Concern ?? elements[j] as Concern;
-						var point = elements[i] as ConcernPoint ?? elements[j] as ConcernPoint;
+						Cache[RelationType.Internal_IsPartOf][point2].Add(point1);
 
-						//// TODO: Отношения между функциональностью и точкой, функциональностью и функциональностью 
+						foreach (Concern concern in Cache[RelationType.Internal_IsDescendantOf][point1])
+							Cache[RelationType.Internal_IsPartOf][point2].Add(concern);
+					}
+
+					if (point2.Location.Includes(point1.Location))
+					{
+						Cache[RelationType.Internal_IsPartOf][point1].Add(point2);
+
+						foreach (Concern concern in Cache[RelationType.Internal_IsDescendantOf][point2])
+							Cache[RelationType.Internal_IsPartOf][point1].Add(concern);
+					}
+				}
+
+			FillAsTransposition(RelationType.Internal_Follows, RelationType.Internal_Preceeds);
+
+			/// Строим отношения, связанные с пространственным взаимным расположением функциональностей
+			for (var i = 0; i < concerns.Count; ++i)
+				for (var j = i + 1; j < concerns.Count; ++j)
+				{
+					if(Cache[RelationType.Internal_IsAncestorOf][concerns[i]].OfType<ConcernPoint>()
+						.All(p => Cache[RelationType.Internal_IsPartOf][p].Contains(concerns[j])))
+					{
+						Cache[RelationType.Internal_IsPartOf][concerns[i]].Add(concerns[j]);
+					}
+
+					if (Cache[RelationType.Internal_IsAncestorOf][concerns[j]].OfType<ConcernPoint>()
+						.All(p => Cache[RelationType.Internal_IsPartOf][p].Contains(concerns[i])))
+					{
+						Cache[RelationType.Internal_IsPartOf][concerns[j]].Add(concerns[i]);
 					}
 				}
 		}
 
-		private void BuildSetRelations(IEnumerable<MarkupElement> markup)
+		private void FillAsTransposition(RelationType target, RelationType source)
 		{
-			/// Получаем словарь функциональностей со списком включённых в них точек
-			var concerns = GetLinearSequenceVisitor.GetConcerns(markup)
-				.ToDictionary(e=>e, e=>
-					{
-						var points = GetLinearSequenceVisitor.GetPoints(new List<Concern> { e });
-						return new Tuple<List<ConcernPoint>, HashSet<Node>>(points, new HashSet<Node>(points.Select(p => p.AstNode)));
-					})
-				.ToList();
-
-			/// Для каждого из теоретико-множественных отношений готовим списки связанных элементов
-			/// для каждой из функциональностей
-			foreach (RelationType relType in
-						((RelationType[])Enum.GetValues(typeof(RelationType))).Where(t => t.ToString().StartsWith(RelationGroup.Set.ToString())))
+			if (Cache.ContainsKey(source) && Cache.ContainsKey(target))
 			{
-				Cache[relType] = concerns.ToDictionary(c => (MarkupElement)c.Key, c => new HashSet<MarkupElement>());
+				foreach (var leftPart in Cache[source].Keys)
+					foreach (var rightPart in Cache[source][leftPart])
+						Cache[target][rightPart].Add(leftPart);
 			}
+		}
 
-			for (var i=0; i< concerns.Count; ++i)
-			{			
-				for (var j = i + 1; i < concerns.Count; ++i)
+		private void FillAsClosure(RelationType target, RelationType source)
+		{
+			if (Cache.ContainsKey(source) && Cache.ContainsKey(target))
+			{
+				foreach (var leftPart in Cache[source].Keys)
+					Cache[target][leftPart] = new HashSet<MarkupElement>(Cache[source][leftPart]);
+
+				var changed = true;
+
+				while (changed)
 				{
-					var intersectionCount = concerns[i].Value.Item2.Intersect(concerns[j].Value.Item2).Count();
+					changed = false;
 
-					/// Пересечение симметрично
-					if(intersectionCount > 0)
+					foreach (var leftPart in Cache[target].Keys)
 					{
-						Cache[RelationType.Set_Intersects][concerns[i].Key].Add(concerns[j].Key);
-						Cache[RelationType.Set_Intersects][concerns[j].Key].Add(concerns[i].Key);
-					}
+						var toAdd = new HashSet<MarkupElement>();
+						var oldCount = Cache[target][leftPart].Count;
 
-					if (intersectionCount == concerns[i].Value.Item2.Count)
-					{
-						Cache[RelationType.Set_Includes][concerns[i].Key].UnionWith(concerns[j].Value.Item1);
-						Cache[RelationType.Set_Includes][concerns[i].Key].Add(concerns[j].Key);
-					}
+						foreach (var rightPart in Cache[target][leftPart])
+							toAdd.UnionWith(Cache[target][rightPart]);
 
-					if (intersectionCount == concerns[j].Value.Item2.Count)
-						Cache[RelationType.Set_Includes][concerns[j].Key].UnionWith(concerns[i].Value.Item1);
+						Cache[target][leftPart].UnionWith(toAdd);
+
+						if (Cache[target][leftPart].Count > oldCount)
+							changed = true;
+					}
 				}
 			}
+		}
+
+		private Node GetAstLandParent(ConcernPoint p)
+		{
+			var currentNode = p.AstNode;
+
+			while (!(currentNode.Parent?.Options.IsLand ?? true))
+				currentNode = currentNode.Parent;
+
+			return currentNode.Parent;
 		}
 	}
 }

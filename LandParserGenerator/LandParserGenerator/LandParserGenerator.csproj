@@ -96,7 +96,6 @@
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
     <Compile Include="Markup\Relations\EnumExtension.cs" />
     <Compile Include="Markup\Relations\RelationsManager.cs" />
-    <Compile Include="Markup\Relations\RelationsExtension.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
     <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />
