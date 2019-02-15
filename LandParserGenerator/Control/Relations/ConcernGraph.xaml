@@ -63,7 +63,6 @@
 								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}"/>
 								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
 								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" TextTrimming="CharacterEllipsis" MaxWidth="220" 
-										   Margin="-25 0 0 0"
 										   ToolTip="{Binding Path=Name, Mode=OneWay}"/>
 							</StackPanel>
 						</Border>

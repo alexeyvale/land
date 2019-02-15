@@ -23,21 +23,21 @@ namespace Land.Control
 				case "MissingIcon":
 					return markupElement is ConcernPoint point1 
 						? point1.HasMissingLocation
-							? Visibility.Visible : Visibility.Hidden 
-						: Visibility.Hidden;
+							? Visibility.Visible : Visibility.Collapsed 
+						: Visibility.Collapsed;
 
 				case "PointIcon":
 					return markupElement is ConcernPoint point2
 						? point2.HasMissingLocation
-							? Visibility.Hidden : Visibility.Visible
-						: Visibility.Hidden;
+							? Visibility.Collapsed : Visibility.Visible
+						: Visibility.Collapsed;
 
 				case "ConcernIcon":
 					return markupElement is Concern
-						? Visibility.Visible : Visibility.Hidden;
+						? Visibility.Visible : Visibility.Collapsed;
 			}
 
-			return Visibility.Hidden;
+			return Visibility.Collapsed;
 		}
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
