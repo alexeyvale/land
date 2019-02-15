@@ -51,6 +51,11 @@ namespace Land.Control
 			{
 				Relations.Add(relation);
 			}
+
+			public override string ToString()
+			{
+				return String.Empty;
+			}
 		}
 
 		private Brush StdForeground = new SolidColorBrush(Color.FromArgb(70, 100, 100, 100));
@@ -113,7 +118,7 @@ namespace Land.Control
 
 		private void RebuildGraph()
 		{
-			Graph = new BidirectionalGraph<object, IEdge<object>>();
+			Graph = new BidirectionalGraph<object, IEdge<object>>(true);
 
 			foreach(var rel in RelationsSelected)
 			{

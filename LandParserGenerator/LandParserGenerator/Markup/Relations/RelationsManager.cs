@@ -49,53 +49,53 @@ namespace Land.Core.Markup
 	{
 		[Description("Предшествует")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
-		Internal_Preceeds,
+		Internal_Preceeds = 0,
 
 		[Description("Непосредственная часть функциональности")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		Internal_IsChildOf,
+		Internal_IsChildOf = 2,
 
 		[Description("Вложена в область текста, соответствующую")]
 		[RelationProperties(isReflexive: true, isSymmetric: false, isTransitive: true, isBasic: true)]
-		Internal_IsPartOf,
+		Internal_IsPartOf = 6,
 
 
 		[Description("Следует за")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_Follows,
+		Internal_Follows = 1,
 
 		[Description("Часть функциональности или её подфункциональностей")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsDescendantOf,
+		Internal_IsDescendantOf = 3,
 
 		[Description("Непосредственно объемлющая функциональность")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsParentOf,
+		Internal_IsParentOf = 4,
 
 		[Description("Объемлющая функциональность")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsAncestorOf,
+		Internal_IsAncestorOf = 5,
 
 
 		[Description("Должна предшествовать")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_MustPreceed,
+		External_MustPreceed = 7,
 
 		[Description("Присутствует, только если есть")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_ExistsIfAll,
+		External_ExistsIfAll = 8,
 
 		[Description("Присутствует, если есть хотя бы")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_ExistsIfAny,
+		External_ExistsIfAny = 9,
 
 		[Description("Использует")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
-		External_Uses,
+		External_Uses = 10,
 
 		[Description("Модифицирует")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_Modifies,
+		External_Modifies = 11,
 	}
 
 	public class RelationsManager
