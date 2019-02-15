@@ -65,9 +65,12 @@ namespace Land.Control
 			RelationsTreeView.ItemsSource = RelationsTree;
 
 			/// Конфигурируем отображение графа
-			var layoutParams = new GraphSharp.Algorithms.Layout.Simple.FDP.KKLayoutParameters();
-			ConcernGraphLayout.LayoutAlgorithmType = "CompoundFDP";
-			layoutParams.AdjustForGravity = true;
+			var layoutParams = new GraphSharp.Algorithms.Layout.Simple.FDP.KKLayoutParameters
+			{
+				AdjustForGravity = true
+			};
+
+			ConcernGraphLayout.LayoutAlgorithmType = "KK";
 			ConcernGraphLayout.LayoutParameters = layoutParams;
 		}
 
