@@ -52,18 +52,28 @@ namespace Land.Control
 				Relations.Add(relation);
 			}
 
+			public void RemoveRelation(RelationType relation)
+			{
+				Relations.Remove(relation);
+			}
+
+			public int Count => Relations.Count;
+
 			public override string ToString()
 			{
 				return String.Empty;
 			}
 		}
 
-		private Brush StdForeground = new SolidColorBrush(Color.FromArgb(70, 100, 100, 100));
-		private Brush InForeground = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
-		private Brush OutForeground = new SolidColorBrush(Color.FromArgb(200, 0, 0, 255));
-		private Brush LinkForeground = new SolidColorBrush(Color.FromArgb(200, 10, 10, 10));
-		private const double StdWidth = 1.2;
-		private const double SelectedWidth = 2;
+		public static readonly Brush EdgeStdForeground = new SolidColorBrush(Color.FromArgb(60, 170, 170, 170));
+		public static readonly Brush EdgeInForeground = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
+		public static readonly Brush EdgeOutForeground = new SolidColorBrush(Color.FromArgb(200, 0, 0, 255));
+
+		public static readonly Brush VertexHiddenForeground = new SolidColorBrush(Color.FromArgb(150, 10, 10, 10));
+		public static readonly Brush VertexStdForeground = new SolidColorBrush(Color.FromArgb(250, 0, 0, 0));
+
+		public const double EdgeStdWidth = 1.4;
+		public const double EdgeSelectedWidth = 2;
 
 		private MarkupElement SelectedVertex { get; set; }
 
@@ -173,18 +183,29 @@ namespace Land.Control
 
 		private void UnselectVertex(object vc)
 		{
-			ChangeGroup(vc, StdForeground, StdForeground, StdForeground, StdWidth, false);
+			ChangeGroup(vc, false);
 		}
 
 		private void SelectVertex(object vc)
 		{
-			ChangeGroup(vc, InForeground, OutForeground, LinkForeground, SelectedWidth, true);
+			ChangeGroup(vc, true);
 		}
 
-		private void ChangeGroup(object vertexContext, Brush inColor, Brush outColor, Brush linkColor, double thickness, bool select)
+		private void ChangeGroup(object vertexContext, bool select)
 		{
 			if (vertexContext != null)
 			{
+				if(!select)
+				{
+					foreach (var vertex in Graph.Vertices)
+					{
+						var control = ConcernGraphLayout.GetVertexControl(vertex);
+						control.Foreground = VertexStdForeground;
+					}
+				}
+
+				var groupVertices = new HashSet<object> { vertexContext };
+
 				ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
 
 				if (edges != null)
@@ -192,8 +213,10 @@ namespace Land.Control
 					foreach (IEdge<object> edg in edges)
 					{
 						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
-						curEdge.Foreground = inColor;
-						curEdge.StrokeThickness = thickness;
+						curEdge.Foreground = select ? EdgeInForeground : EdgeStdForeground;
+						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
+
+						groupVertices.Add(edg.Source);
 					}
 				}
 
@@ -204,12 +227,28 @@ namespace Land.Control
 					foreach (IEdge<object> edg in edges)
 					{
 						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
-						curEdge.Foreground = outColor;
-						curEdge.StrokeThickness = thickness;
+						curEdge.Foreground = select ? EdgeOutForeground : EdgeStdForeground;
+						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
+
+						groupVertices.Add(edg.Target);
+					}
+				}
+
+				if (select)
+				{
+					foreach (var vertex in Graph.Vertices.Except(groupVertices))
+					{
+						var control = ConcernGraphLayout.GetVertexControl(vertex);
+						control.Foreground = VertexHiddenForeground;
 					}
 				}
 			}
 		}
 
+		private void ConcernGraphZoom_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left && SelectedVertex != null)
+				UnselectVertex(SelectedVertex);
+		}
 	}
 }

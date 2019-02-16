@@ -24,10 +24,11 @@
 		</Grid.ColumnDefinitions>
 
 		<zoom:ZoomControl Name="ConcernGraphZoom" 
-							 Margin="0,0,2,0" 
-							 BorderThickness="1" 
-							 BorderBrush="Gray" 
-							 Grid.Column="0">
+						  PreviewMouseLeftButtonDown="ConcernGraphZoom_PreviewMouseLeftButtonDown"
+						  Margin="0,0,2,0" 
+						  BorderThickness="1" 
+						  BorderBrush="Gray" 
+						  Grid.Column="0">
 			<graphsharp:GraphLayout Name="ConcernGraphLayout" 
 									Height="{Binding ElementName=ConcernGraphZoom, Path=Height}" 
 									Width="{Binding ElementName=ConcernGraphZoom, Path=Width}" 
@@ -53,6 +54,8 @@
 					<Style TargetType="{x:Type graphsharp:EdgeControl}">
 						<Style.Setters>
 							<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Edge.Info}"/>
+							<Setter Property="Foreground" Value="{x:Static local:ConcernGraph.EdgeStdForeground}"/>
+							<Setter Property="StrokeThickness" Value="{x:Static local:ConcernGraph.EdgeStdWidth}"/>
 						</Style.Setters>
 					</Style>
 
@@ -76,6 +79,7 @@
 								</ControlTemplate>
 							</Setter.Value>
 						</Setter>
+						<Setter Property="Foreground" Value="{x:Static local:ConcernGraph.VertexStdForeground}"/>
 					</Style>
 				</graphsharp:GraphLayout.Resources>
 			</graphsharp:GraphLayout>
