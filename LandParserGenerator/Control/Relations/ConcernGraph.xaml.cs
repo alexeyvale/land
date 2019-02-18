@@ -26,6 +26,14 @@ namespace Land.Control
 			public string Text { get; set; }
 			public RelationType? Relation { get; set; }
 			public List<RelationsTreeNode> Children { get; set; }
+
+			public RelationsTreeNode() { }
+
+			public RelationsTreeNode(RelationType relation)
+			{
+				Text = relation.GetDescription();
+				Relation = relation;
+			}
 		}
 
 		public class InfoProvidedEdge : IEdge<object>
@@ -89,18 +97,36 @@ namespace Land.Control
 			RelationsManager = relationsManager;
 
 			/// Заполняем дерево, в котором можно будет выбрать нужные нам отношения
-			RelationsTree = ((RelationGroup[])Enum.GetValues(typeof(RelationGroup))).Select(g => new RelationsTreeNode()
+			RelationsTree = new List<RelationsTreeNode>
 			{
-				Text = g.GetAttribute<DescriptionAttribute>().Description,
-				Relation = null,
-				Children = ((RelationType[])Enum.GetValues(typeof(RelationType)))
-					.Where(r=>r.ToString().Split('_')[0] == g.ToString()).Select(r => new RelationsTreeNode()
+				new RelationsTreeNode()
+				{
+					Text = RelationGroup.Internal.GetDescription(),
+					Children = new List<RelationsTreeNode>()
 					{
-						Text = r.GetAttribute<DescriptionAttribute>().Description,
-						Relation = r,
-						Children = null
-					}).ToList()
-			}).ToList();
+						new RelationsTreeNode(RelationType.Internal_Preceeds),
+						new RelationsTreeNode(RelationType.Internal_Follows),
+						new RelationsTreeNode(RelationType.Internal_IsLogicalChildOf),
+						new RelationsTreeNode(RelationType.Internal_IsLogicalDescendantOf),
+						new RelationsTreeNode(RelationType.Internal_IsLogicalParentOf),
+						new RelationsTreeNode(RelationType.Internal_IsLogicalAncestorOf),
+						new RelationsTreeNode(RelationType.Internal_IsPhysicalDescendantOf),
+					}
+				},
+
+				new RelationsTreeNode()
+				{
+					Text = RelationGroup.External.GetDescription(),
+					Children = ((RelationType[])Enum.GetValues(typeof(RelationType)))
+						.Where(r=>r.ToString().Split('_')[0] == RelationGroup.External.ToString())
+						.Select(r => new RelationsTreeNode()
+						{
+							Text = r.GetAttribute<DescriptionAttribute>().Description,
+							Relation = r,
+							Children = null
+						}).ToList()
+				}
+			};
 
 			RelationsTreeView.ItemsSource = RelationsTree;
 

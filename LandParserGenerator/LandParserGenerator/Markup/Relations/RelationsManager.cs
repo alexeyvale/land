@@ -47,55 +47,93 @@ namespace Land.Core.Markup
 
 	public enum RelationType
 	{
-		[Description("Предшествует")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
-		Internal_Preceeds = 0,
+		#region Базисные автоопределяемые отношения
+
+		[Description("Непосредственно предшествует")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		Internal_DirectlyPreceeds,
 
 		[Description("Непосредственная часть функциональности")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		Internal_IsChildOf = 2,
+		Internal_IsLogicalChildOf,
 
 		[Description("Вложена в область текста, соответствующую")]
-		[RelationProperties(isReflexive: true, isSymmetric: false, isTransitive: true, isBasic: true)]
-		Internal_IsPartOf = 6,
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		Internal_IsPhysicalChildOf,
 
+		[Description("Помечает")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
+		Internal_Marks,
+
+		#endregion
+
+		#region Производные от Internal_DirectlyPreceeds
+
+		[Description("Предшествует")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_Preceeds,
+
+		[Description("Непосредственно следует за")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: false)]
+		Internal_DirectlyFollows,
 
 		[Description("Следует за")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_Follows = 1,
+		Internal_Follows,
+
+		#endregion
+
+		#region Производные от Internal_IsLogicalChildOf и Internal_IsPhysicalChildOf
 
 		[Description("Часть функциональности или её подфункциональностей")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsDescendantOf = 3,
+		Internal_IsLogicalDescendantOf,
 
 		[Description("Непосредственно объемлющая функциональность")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsParentOf = 4,
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: false)]
+		Internal_IsLogicalParentOf,
 
 		[Description("Объемлющая функциональность")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
-		Internal_IsAncestorOf = 5,
+		Internal_IsLogicalAncestorOf,
 
+		[Description("Часть функциональности или её подфункциональностей")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_IsPhysicalDescendantOf,
+
+		[Description("Непосредственно объемлющая функциональность")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: false)]
+		Internal_IsPhysicalParentOf,
+
+		[Description("Объемлющая функциональность")]
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: false)]
+		Internal_IsPhysicalAncestorOf,
+
+		#endregion
+
+		#region Отношения, определяемые внешним контекстом
 
 		[Description("Должна предшествовать")]
-		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_MustPreceed = 7,
+		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
+		External_MustPreceed,
 
 		[Description("Присутствует, только если есть")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_ExistsIfAll = 8,
+		External_ExistsIfAll,
 
 		[Description("Присутствует, если есть хотя бы")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_ExistsIfAny = 9,
+		External_ExistsIfAny,
 
 		[Description("Использует")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: true, isBasic: true)]
-		External_Uses = 10,
+		External_Uses,
 
 		[Description("Модифицирует")]
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
-		External_Modifies = 11,
+		External_Modifies,
+
+		#endregion
 	}
 
 	public class RelationsManager
@@ -160,11 +198,11 @@ namespace Land.Core.Markup
 
 			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
 			foreach (var concern in concerns.Where(e => e is Concern))
-				Cache[RelationType.Internal_IsParentOf][concern] = new HashSet<MarkupElement>(concern.Elements);
+				Cache[RelationType.Internal_IsLogicalParentOf][concern] = new HashSet<MarkupElement>(concern.Elements);
 
-			FillAsClosure(RelationType.Internal_IsAncestorOf, RelationType.Internal_IsParentOf);
-			FillAsTransposition(RelationType.Internal_IsChildOf, RelationType.Internal_IsParentOf);
-			FillAsTransposition(RelationType.Internal_IsDescendantOf, RelationType.Internal_IsAncestorOf);
+			FillAsClosure(RelationType.Internal_IsLogicalAncestorOf, RelationType.Internal_IsLogicalParentOf);
+			FillAsTransposition(RelationType.Internal_IsLogicalChildOf, RelationType.Internal_IsLogicalParentOf);
+			FillAsTransposition(RelationType.Internal_IsLogicalDescendantOf, RelationType.Internal_IsLogicalAncestorOf);
 
 			/// Строим отношения, связанные с пространственным взаимным расположением точек
 			for (var i = 0; i < points.Count; ++i)
@@ -181,18 +219,18 @@ namespace Land.Core.Markup
 
 					if (point1.Location.Includes(point2.Location))
 					{
-						Cache[RelationType.Internal_IsPartOf][point2].Add(point1);
+						Cache[RelationType.Internal_IsPhysicalDescendantOf][point2].Add(point1);
 
-						foreach (Concern concern in Cache[RelationType.Internal_IsDescendantOf][point1])
-							Cache[RelationType.Internal_IsPartOf][point2].Add(concern);
+						foreach (Concern concern in Cache[RelationType.Internal_IsLogicalDescendantOf][point1])
+							Cache[RelationType.Internal_IsPhysicalDescendantOf][point2].Add(concern);
 					}
 
 					if (point2.Location.Includes(point1.Location))
 					{
-						Cache[RelationType.Internal_IsPartOf][point1].Add(point2);
+						Cache[RelationType.Internal_IsPhysicalDescendantOf][point1].Add(point2);
 
-						foreach (Concern concern in Cache[RelationType.Internal_IsDescendantOf][point2])
-							Cache[RelationType.Internal_IsPartOf][point1].Add(concern);
+						foreach (Concern concern in Cache[RelationType.Internal_IsLogicalDescendantOf][point2])
+							Cache[RelationType.Internal_IsPhysicalDescendantOf][point1].Add(concern);
 					}
 				}
 
@@ -202,16 +240,16 @@ namespace Land.Core.Markup
 			for (var i = 0; i < concerns.Count; ++i)
 				for (var j = i + 1; j < concerns.Count; ++j)
 				{
-					if(Cache[RelationType.Internal_IsAncestorOf][concerns[i]].OfType<ConcernPoint>()
-						.All(p => Cache[RelationType.Internal_IsPartOf][p].Contains(concerns[j])))
+					if(Cache[RelationType.Internal_IsLogicalAncestorOf][concerns[i]].OfType<ConcernPoint>()
+						.All(p => Cache[RelationType.Internal_IsPhysicalDescendantOf][p].Contains(concerns[j])))
 					{
-						Cache[RelationType.Internal_IsPartOf][concerns[i]].Add(concerns[j]);
+						Cache[RelationType.Internal_IsPhysicalDescendantOf][concerns[i]].Add(concerns[j]);
 					}
 
-					if (Cache[RelationType.Internal_IsAncestorOf][concerns[j]].OfType<ConcernPoint>()
-						.All(p => Cache[RelationType.Internal_IsPartOf][p].Contains(concerns[i])))
+					if (Cache[RelationType.Internal_IsLogicalAncestorOf][concerns[j]].OfType<ConcernPoint>()
+						.All(p => Cache[RelationType.Internal_IsPhysicalDescendantOf][p].Contains(concerns[i])))
 					{
-						Cache[RelationType.Internal_IsPartOf][concerns[j]].Add(concerns[i]);
+						Cache[RelationType.Internal_IsPhysicalDescendantOf][concerns[j]].Add(concerns[i]);
 					}
 				}
 		}
