@@ -45,7 +45,7 @@ type_parameter_elem	=	('?' | name) (Any | name)+
 type_parameter_list	=	type_parameter_elem (',' type_parameter_elem)*
 
 arguments	=	'(' (Any|arguments)+ ')'
-annotation	=	'@' name water
+annotation	=	'@' name arguments?
 block		=	'{' (Any|block)+ '}'
 
 round_bracketed_water	=	'(' (Any|round_bracketed_water)+ ')'

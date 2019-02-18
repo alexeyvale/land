@@ -345,6 +345,10 @@ namespace Land.Core.Parsing.LR
 			PointLocation endLocation = null;
 			IEnumerable<string> value = new List<string>();
 
+			var previouslyMatchedSymbol = String.Empty;
+			var pathParts = new HashSet<Tuple<Alternative, int>>();
+			var candidates = new HashSet<Tuple<Alternative, int>>();
+
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
 			do
@@ -361,14 +365,71 @@ namespace Land.Core.Parsing.LR
 					}
 
 					value = Stack.PeekSymbol().GetValue().Concat(value);
+
+					/// Запоминаем снятый со стека символ - это то, что было успешно распознано
+					previouslyMatchedSymbol = Stack.PeekSymbol().Symbol;
 				}
 
 				Stack.Pop();
+
+				if (Stack.CountStates > 0)
+				{
+					/// Выбираем пункты, продукции которых потенциально могут участвовать
+					/// в выводе текущего префикса из стартового символа
+					pathParts = new HashSet<Tuple<Alternative, int>>(
+						Table.Items[Stack.PeekState()]
+							.Where
+							(i =>
+								/// Точка должна стоять перед символом, только что снятым со стека
+								i.Next == previouslyMatchedSymbol &&
+								/// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
+								/// с той же альтернативой, но точкой на один символ дальше
+								(pathParts.Count == 0 || pathParts.Any(p => p.Item1.Equals(i.Alternative) && p.Item2 == i.Position + 1))
+							)
+							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position))
+					);
+
+					var oldCount = 0;
+
+					while(oldCount != pathParts.Count)
+					{
+						oldCount = pathParts.Count;
+
+						/// Добавляем к списку пункты, порождающие уже добавленные пункты
+						pathParts.UnionWith(Table.Items[Stack.PeekState()]
+							.Where(i=>pathParts.Any(p=>p.Item2 == 0 && p.Item1.NonterminalSymbolName == i.Next))
+							.Select(i=>new Tuple<Alternative, int>(i.Alternative, i.Position))
+						);
+					}
+
+					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
+					/// для которых есть пункт с точкой в начале, стоящей перед Any;
+					/// таких в каждом состоянии может быть ровно один
+					candidates = new HashSet<Tuple<Alternative, int>>(
+						Table.Items[Stack.PeekState()]
+							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
+							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position))
+					);
+
+					oldCount = 0;
+
+					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
+					/// уже имеющиеся в списке кандидатов пункты
+					while (oldCount != candidates.Count)
+					{
+						oldCount = candidates.Count;
+
+						candidates.UnionWith(Table.Items[Stack.PeekState()]
+							.Where(i => candidates.Any(c => c.Item2 == 0 && c.Item1.NonterminalSymbolName == i.Next))
+							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position)));
+					}
+				}
 			}
-			/// Снимаем состояния, пока не встретим небазисный пункт с альтернативой, начинающейся с Any;
-			/// в этом же множестве будет и базисный пункт с указателем перед нетерминалом, на котором возможно восстановление
-			while (Stack.CountStates > 0 && !Table.Items[Stack.PeekState()].Any(m => m.Position == 0
-				&& m.Next == Grammar.ANY_TOKEN_NAME));
+			/// Работаем, пока среди кандидатов нет того, который есть в вероятном пути,
+			/// или такой есть, но это тот символ, который был снят со стека на текущей итерации,
+			/// и значит, эта сущность уже была разобрана
+			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
+				|| candidates.Intersect(pathParts).Where(t=>t.Item1[t.Item2].Symbol != previouslyMatchedSymbol).Count() == 0));
 
 			if (Stack.CountStates > 0)
 			{
