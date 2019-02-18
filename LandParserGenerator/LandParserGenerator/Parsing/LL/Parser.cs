@@ -316,14 +316,31 @@ namespace Land.Core.Parsing.LL
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Pop();
 			var currentStopTokens = currentNode.Symbol == Grammar.ANY_TOKEN_NAME
-				? GetStopTokens(currentNode.Options, Stack.Select(n=>n.Symbol))
+				? GetStopTokens(currentNode.Options, Stack.Select(n => n.Symbol))
 				: (HashSet<string>)null;
 
-			/// Поднимаемся по уже построенной части дерева, пока не встретим узел нетерминала,
-			/// для которого допустима альтернатива, начинающаяся с Any
-			while (currentNode != null && (!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || !GrammarObject.Rules[currentNode.Symbol].Alternatives
-				.Any(a => a.Elements.FirstOrDefault()?.Symbol == Grammar.ANY_TOKEN_NAME && (currentStopTokens == null 
-					|| !GetStopTokens(a[0].Options, a.Elements.Select(e=>e.Symbol).Concat(Stack.Select(s=>s.Symbol))).SetEquals(currentStopTokens)))))
+			/// Поднимаемся по уже построенной части дерева, пока не встретим пригодный для восстановления нетерминал
+			while
+				(
+					currentNode != null &&
+					(
+						/// Отсекаем узел, при попытке разбора которого возникла ошибка
+						!GrammarObject.Rules.ContainsKey(currentNode.Symbol) ||
+						currentNode.Children.Count == 0 ||
+						/// Не восстанавливаемся на символе, если для него и так пошли по Any-альтернативе
+						currentNode.Children[0].Symbol == Grammar.ANY_TOKEN_NAME ||
+						/// Для восстановления подходит символ, у которого есть начинающаяся с Any альтернатива,
+						/// и для которого, в случае, если ошибка произошла при пропуске Any,
+						/// множество стоп-символов не совпадает со множеством стоп-символов для Any, которое не смогли пропустить
+						!GrammarObject.Rules[currentNode.Symbol].Alternatives.Any(a =>
+							a.Elements.FirstOrDefault()?.Symbol == Grammar.ANY_TOKEN_NAME &&
+							(
+								currentStopTokens == null ||
+								!GetStopTokens(a[0].Options, a.Elements.Select(e => e.Symbol).Concat(Stack.Select(s => s.Symbol))).SetEquals(currentStopTokens)
+							)
+						)
+					)
+				)
 			{
 				if (currentNode.Parent != null)
 				{
