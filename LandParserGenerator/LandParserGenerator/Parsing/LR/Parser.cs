@@ -329,6 +329,24 @@ namespace Land.Core.Parsing.LR
 			return token;
 		}
 
+		public class PathFragment
+		{
+			public Alternative Alt { get; set; }
+			public int Pos { get; set; }
+			public int Idx { get; set; }
+
+			public override bool Equals(object obj)
+			{
+				return obj is PathFragment pf 
+					&& Alt.Equals(pf.Alt) && Pos == pf.Pos;
+			}
+
+			public override int GetHashCode()
+			{
+				return Alt.GetHashCode();
+			}
+		}
+
 		private IToken ErrorRecovery()
 		{
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
@@ -346,8 +364,8 @@ namespace Land.Core.Parsing.LR
 			IEnumerable<string> value = new List<string>();
 
 			var previouslyMatchedSymbol = String.Empty;
-			var pathParts = new HashSet<Tuple<Alternative, int>>();
-			var candidates = new HashSet<Tuple<Alternative, int>>();
+			var pathParts = new HashSet<PathFragment>();
+			var candidates = new HashSet<PathFragment>();
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
@@ -376,7 +394,7 @@ namespace Land.Core.Parsing.LR
 				{
 					/// Выбираем пункты, продукции которых потенциально могут участвовать
 					/// в выводе текущего префикса из стартового символа
-					pathParts = new HashSet<Tuple<Alternative, int>>(
+					pathParts = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()]
 							.Where
 							(i =>
@@ -384,9 +402,9 @@ namespace Land.Core.Parsing.LR
 								i.Next == previouslyMatchedSymbol &&
 								/// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
 								/// с той же альтернативой, но точкой на один символ дальше
-								(pathParts.Count == 0 || pathParts.Any(p => p.Item1.Equals(i.Alternative) && p.Item2 == i.Position + 1))
+								(pathParts.Count == 0 || pathParts.Any(p => p.Alt.Equals(i.Alternative) && p.Pos == i.Position + 1))
 							)
-							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 					);
 
 					var oldCount = 0;
@@ -397,21 +415,22 @@ namespace Land.Core.Parsing.LR
 
 						/// Добавляем к списку пункты, порождающие уже добавленные пункты
 						pathParts.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i=>pathParts.Any(p=>p.Item2 == 0 && p.Item1.NonterminalSymbolName == i.Next))
-							.Select(i=>new Tuple<Alternative, int>(i.Alternative, i.Position))
+							.Where(i=>pathParts.Any(p=>p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 						);
 					}
 
 					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
 					/// для которых есть пункт с точкой в начале, стоящей перед Any;
 					/// таких в каждом состоянии может быть ровно один
-					candidates = new HashSet<Tuple<Alternative, int>>(
+					candidates = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()]
 							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
-							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = 0 })
 					);
 
 					oldCount = 0;
+					var iterIdx = 1;
 
 					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
 					/// уже имеющиеся в списке кандидатов пункты
@@ -420,8 +439,10 @@ namespace Land.Core.Parsing.LR
 						oldCount = candidates.Count;
 
 						candidates.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i => candidates.Any(c => c.Item2 == 0 && c.Item1.NonterminalSymbolName == i.Next))
-							.Select(i => new Tuple<Alternative, int>(i.Alternative, i.Position)));
+							.Where(i => candidates.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = iterIdx}));
+
+						++iterIdx;
 					}
 				}
 			}
@@ -429,7 +450,9 @@ namespace Land.Core.Parsing.LR
 			/// или такой есть, но это тот символ, который был снят со стека на текущей итерации,
 			/// и значит, эта сущность уже была разобрана
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
-				|| candidates.Intersect(pathParts).Where(t=>t.Item1[t.Item2].Symbol != previouslyMatchedSymbol).Count() == 0));
+				|| candidates.Intersect(pathParts).Count() == 0 
+				|| candidates.GroupBy(c=>c.Idx).Any(g=>g.All(e=>e.Alt[e.Pos] == previouslyMatchedSymbol)))
+			);
 
 			if (Stack.CountStates > 0)
 			{
