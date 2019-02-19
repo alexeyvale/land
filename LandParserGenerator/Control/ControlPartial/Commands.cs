@@ -315,53 +315,44 @@ namespace Land.Control
 
 		#region Копирование-вставка
 
-		private void Command_MarkupTree_Copy_Executed(object sender, RoutedEventArgs e)
+		private void Command_Copy_Executed(object sender, RoutedEventArgs e)
 		{
-			State.BufferedDataContext = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
-			SetStatus("Элемент скопирован", ControlStatus.Pending);
+			if (MarkupTreeView.IsKeyboardFocusWithin && State.SelectedItem_MarkupTreeView != null)
+			{
+				State.BufferedDataContext = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+				SetStatus("Элемент скопирован", ControlStatus.Pending);
+			}
+			else if(RelationSource.IsKeyboardFocusWithin && RelationSource.Tag != null)
+			{
+				State.BufferedDataContext = (MarkupElement)RelationSource.Tag;
+				SetStatus("Элемент скопирован", ControlStatus.Pending);
+			}
+			else if(RelationTarget.IsKeyboardFocusWithin && RelationTarget.Tag != null)
+			{
+				State.BufferedDataContext = (MarkupElement)RelationTarget.Tag;
+				SetStatus("Элемент скопирован", ControlStatus.Pending);
+			}
 		}
 
-		private void Command_RelationSource_Paste_Executed(object sender, RoutedEventArgs e)
+		private void Command_Paste_Executed(object sender, RoutedEventArgs e)
 		{
-			RelationSource.Tag = State.BufferedDataContext;
-			State.BufferedDataContext = null;
+			if (State.BufferedDataContext != null)
+			{
+				if (RelationSource.IsKeyboardFocusWithin)
+				{
+					RelationSource.Tag = State.BufferedDataContext;
+					State.BufferedDataContext = null;
 
-			SetStatus("Элемент вставлен", ControlStatus.Ready);
-		}
+					SetStatus("Элемент вставлен", ControlStatus.Ready);
+				}
+				else if (RelationTarget.IsKeyboardFocusWithin)
+				{
+					RelationTarget.Tag = State.BufferedDataContext;
+					State.BufferedDataContext = null;
 
-		private void Command_RelationTarget_Paste_Executed(object sender, RoutedEventArgs e)
-		{
-			RelationTarget.Tag = State.BufferedDataContext;
-			State.BufferedDataContext = null;
-
-			SetStatus("Элемент вставлен", ControlStatus.Ready);
-		}
-
-		private void Command_RelationSource_Copy_Executed(object sender, RoutedEventArgs e)
-		{
-			State.BufferedDataContext = (MarkupElement)RelationSource.Tag;
-			SetStatus("Элемент скопирован", ControlStatus.Pending);
-		}
-
-		private void Command_RelationTarget_Copy_Executed(object sender, RoutedEventArgs e)
-		{
-			State.BufferedDataContext = (MarkupElement)RelationTarget.Tag;
-			SetStatus("Элемент скопирован", ControlStatus.Pending);
-		}
-
-		private void Command_RelationSource_HasData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = RelationSource.Tag != null;
-		}
-
-		private void Command_RelationTarget_HasData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = RelationTarget.Tag != null;
-		}
-
-		private void Command_HasBufferedData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
-			e.CanExecute = State.BufferedDataContext != null;
+					SetStatus("Элемент вставлен", ControlStatus.Ready);
+				}
+			}
 		}
 
 		#endregion

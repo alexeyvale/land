@@ -15,7 +15,7 @@
 		<local:MissingListIconVisibilityConverter x:Key="MissingListIconVisibilityConverter" />
 		<local:MissingListIconColorConverter x:Key="MissingListIconColorConverter" />
 		<local:MissingListItemConverter x:Key="MissingListItemConverter" />
-    </UserControl.Resources>
+	</UserControl.Resources>
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
@@ -36,11 +36,8 @@
 		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Accept_Missing" Executed="Command_MissingTree_Accept_Executed" CanExecute="Command_MissingTree_HasSelectedCandidate_CanExecute"/>
 
-		<CommandBinding Command="local:LandExplorerCommands.Copy_Markup" Executed="Command_MarkupTree_Copy_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Copy_RelationSource" Executed="Command_RelationSource_Copy_Executed" CanExecute="Command_RelationSource_HasData_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Paste_RelationSource" Executed="Command_RelationSource_Paste_Executed" CanExecute="Command_HasBufferedData_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Copy_RelationTarget" Executed="Command_RelationTarget_Copy_Executed" CanExecute="Command_RelationTarget_HasData_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Paste_RelationTarget" Executed="Command_RelationTarget_Paste_Executed" CanExecute="Command_HasBufferedData_CanExecute"/>
+		<CommandBinding Command="ApplicationCommands.Copy" Executed="Command_Copy_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="ApplicationCommands.Paste" Executed="Command_Paste_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 	</UserControl.CommandBindings>
 	<Grid Background="White">
 		<Grid.Resources>
@@ -53,7 +50,7 @@
 		<Grid.RowDefinitions>
             <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="40*" MaxHeight="305"></RowDefinition>
+            <RowDefinition Height="40*" MaxHeight="300"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -370,16 +367,11 @@
 									<ColumnDefinition Width="100*"></ColumnDefinition>
 									<ColumnDefinition Width="25"></ColumnDefinition>
 								</Grid.ColumnDefinitions>
-								<TextBox Name="RelationSource" 
-										 AllowDrop="True" 
+								<TextBox Name="RelationSource"  
 										 Grid.Column="0" 
 										 Margin="5 0 5 0" 
-										 Text="{Binding Path=Tag.Name}"
+										 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Tag.Name, Mode=OneWay}"
 										 IsReadOnly="True">
-									<TextBox.InputBindings>
-										<KeyBinding Command="ApplicationCommands.Copy" Gesture="Ctrl+C" />
-										<KeyBinding Command="ApplicationCommands.Paste" Gesture="Ctrl+V" />
-									</TextBox.InputBindings>
 								</TextBox>
 								<Button Click="RelationSource_Reset_Click" Content="&#xf00d;" Style="{StaticResource IconButton}" Grid.Column="1"/>
 							</Grid>
@@ -399,15 +391,11 @@
 									<ColumnDefinition Width="100*"></ColumnDefinition>
 									<ColumnDefinition Width="25"></ColumnDefinition>
 								</Grid.ColumnDefinitions>
-								<TextBox Name="RelationTarget" Grid.Column="0"
-									   AllowDrop="True"
-									   IsReadOnly="True"
-										 Text="{Binding Path=Tag.Name}"
-									   Margin="5 0 5 0">
-									<TextBox.InputBindings>
-										<KeyBinding Command="ApplicationCommands.Copy" Gesture="Ctrl+C" />
-										<KeyBinding Command="ApplicationCommands.Paste" Gesture="Ctrl+V" />
-									</TextBox.InputBindings>
+								<TextBox Name="RelationTarget" 
+										 Grid.Column="0" 
+										 IsReadOnly="True"
+										 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Tag.Name, Mode=OneWay}"
+										 Margin="5 0 5 0">
 								</TextBox>
 								<Button Click="RelationTarget_Reset_Click" Content="&#xf00d;" Style="{StaticResource IconButton}" Grid.Column="1"/>
 							</Grid>
