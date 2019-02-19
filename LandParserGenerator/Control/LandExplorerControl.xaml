@@ -35,12 +35,25 @@
 		<CommandBinding Command="local:LandExplorerCommands.Delete_Missing" Executed="Command_MissingTree_Delete_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Accept_Missing" Executed="Command_MissingTree_Accept_Executed" CanExecute="Command_MissingTree_HasSelectedCandidate_CanExecute"/>
+
+		<CommandBinding Command="local:LandExplorerCommands.Copy_Markup" Executed="Command_MarkupTree_Copy_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Copy_RelationSource" Executed="Command_RelationSource_Copy_Executed" CanExecute="Command_RelationSource_HasData_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Paste_RelationSource" Executed="Command_RelationSource_Paste_Executed" CanExecute="Command_HasBufferedData_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Copy_RelationTarget" Executed="Command_RelationTarget_Copy_Executed" CanExecute="Command_RelationTarget_HasData_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.Paste_RelationTarget" Executed="Command_RelationTarget_Paste_Executed" CanExecute="Command_HasBufferedData_CanExecute"/>
 	</UserControl.CommandBindings>
 	<Grid Background="White">
-        <Grid.RowDefinitions>
+		<Grid.Resources>
+			<Style TargetType="{x:Type TextBox}">
+				<Setter Property="FontSize" Value="12pt"/>
+				<Setter Property="Padding" Value="2 2 2 2"/>
+			</Style>
+		</Grid.Resources>
+
+		<Grid.RowDefinitions>
             <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="40*" MaxHeight="280"></RowDefinition>
+            <RowDefinition Height="40*" MaxHeight="305"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -179,6 +192,13 @@
 								<Style TargetType="Button">
 									<Setter Property="Width" Value="80"></Setter>
 								</Style>
+
+								<Style TargetType="{x:Type Button}" x:Key="IconButton">
+									<Setter Property="FontSize" Value="12pt"/>
+									<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+									<Setter Property="Background" Value="White"/>
+									<Setter Property="BorderBrush" Value="White"/>
+								</Style>
 							</StackPanel.Resources>
 							<ListBox       
 								FontSize="12pt"
@@ -188,8 +208,18 @@
 							</ListBox>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Имя"/>
-								<TextBox Name="ConcernPointNameText"
-										 Text="{Binding ElementName=ConcernPointCandidatesList, Path=SelectedItem.ViewHeader, Mode=OneWay}"/>
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="100*"></ColumnDefinition>
+										<ColumnDefinition Width="25"></ColumnDefinition>
+									</Grid.ColumnDefinitions>
+									<TextBox Name="ConcernPointNameText" Grid.Column="0"/>
+									<Button Click="ConcernPointNameText_Reset_Click" 
+											Content="&#xf060;" 
+											Style="{StaticResource IconButton}"
+											ToolTip="Заменить на стандартное имя кандидата"
+											Grid.Column="1"/>
+								</Grid>
 							</StackPanel>
 							<StackPanel Orientation="Vertical">
 								<Label Content="Комментарий"/>
@@ -206,7 +236,7 @@
 						</StackPanel>
 						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">
 							<StackPanel.Resources>
-								<Style TargetType="TextBox">
+								<Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 									<Style.Triggers>
 										<Trigger Property="IsReadOnly" Value="true">
 											<Setter Property="Background" Value="WhiteSmoke"/>
@@ -224,19 +254,21 @@
 									 IsReadOnly="True"
 									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
 									 LostFocus="MarkupElementText_LostFocus"
-									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}"></TextBox>
+									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}">
+							</TextBox>
 
 							<Label Content="Комментарий"/>
 							<TextBox TextWrapping="Wrap" 
-									AcceptsReturn="True"
-									Name="MarkupElementCommentText"
-									Height="150"
-									ScrollViewer.VerticalScrollBarVisibility="Auto"
-									Margin="5 0 5 10"
-									IsReadOnly="True"
-									MouseDoubleClick="MarkupElementText_MouseDoubleClick"
-									LostFocus="MarkupElementText_LostFocus"
-									Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}"></TextBox>
+									 AcceptsReturn="True"
+									 Name="MarkupElementCommentText"
+									 Height="150"
+									 ScrollViewer.VerticalScrollBarVisibility="Auto"
+									 Margin="5 0 5 10"
+									 IsReadOnly="True"
+									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+									 LostFocus="MarkupElementText_LostFocus"
+									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}">
+							</TextBox>
 						</StackPanel>
 					</Grid>
 				</ScrollViewer>
@@ -306,6 +338,97 @@
 						</Style>
 					</TreeView.ItemContainerStyle>
 				</TreeView>
+			</TabItem>
+			<TabItem Header="Отношение" Name="RelationTab">
+				<ScrollViewer VerticalScrollBarVisibility="Auto">
+					<Grid>
+						<Grid.Resources>
+							<Style TargetType="Button">
+								<Setter Property="Width" Value="80"></Setter>
+							</Style>
+
+							<Style TargetType="{x:Type Button}" x:Key="IconButton">
+								<Setter Property="FontSize" Value="12pt"/>
+								<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+								<Setter Property="Background" Value="White"/>
+								<Setter Property="BorderBrush" Value="White"/>
+							</Style>
+						</Grid.Resources>
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="55"></RowDefinition>
+							<RowDefinition Height="30"></RowDefinition>
+							<RowDefinition Height="55"></RowDefinition>
+							<RowDefinition Height="100*" MinHeight="100"></RowDefinition>
+							<RowDefinition Height="25"></RowDefinition>
+						</Grid.RowDefinitions>
+
+						<StackPanel Orientation="Vertical" Grid.Row="0">
+							<Label Content="Элемент 1"/>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="100*"></ColumnDefinition>
+									<ColumnDefinition Width="25"></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+								<TextBox Name="RelationSource" 
+										 AllowDrop="True" 
+										 Grid.Column="0" 
+										 Margin="5 0 5 0" 
+										 Text="{Binding Path=Tag.Name}"
+										 IsReadOnly="True">
+									<TextBox.InputBindings>
+										<KeyBinding Command="ApplicationCommands.Copy" Gesture="Ctrl+C" />
+										<KeyBinding Command="ApplicationCommands.Paste" Gesture="Ctrl+V" />
+									</TextBox.InputBindings>
+								</TextBox>
+								<Button Click="RelationSource_Reset_Click" Content="&#xf00d;" Style="{StaticResource IconButton}" Grid.Column="1"/>
+							</Grid>
+						</StackPanel>
+
+						<Button Content="&#xf063;&#xf062;" 
+								Grid.Row="1"
+								Style="{StaticResource IconButton}" 
+								Width="40" 
+								Margin="0 5 0 0"  
+								Click="RelationParticipants_Swap_Click"/>
+
+						<StackPanel Orientation="Vertical" Grid.Row="2">
+							<Label Content="Элемент 2"/>
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="100*"></ColumnDefinition>
+									<ColumnDefinition Width="25"></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+								<TextBox Name="RelationTarget" Grid.Column="0"
+									   AllowDrop="True"
+									   IsReadOnly="True"
+										 Text="{Binding Path=Tag.Name}"
+									   Margin="5 0 5 0">
+									<TextBox.InputBindings>
+										<KeyBinding Command="ApplicationCommands.Copy" Gesture="Ctrl+C" />
+										<KeyBinding Command="ApplicationCommands.Paste" Gesture="Ctrl+V" />
+									</TextBox.InputBindings>
+								</TextBox>
+								<Button Click="RelationTarget_Reset_Click" Content="&#xf00d;" Style="{StaticResource IconButton}" Grid.Column="1"/>
+							</Grid>
+						</StackPanel>
+
+						<Grid Grid.Row="3" Margin="0 5 0 5">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="30"></RowDefinition>
+								<RowDefinition Height="100*"></RowDefinition>
+							</Grid.RowDefinitions>
+							
+							<Label Content="Возможные отношения" Grid.Row="0"/>
+							<ListView Name="RelationCandidatesList" Grid.Row="1"></ListView>
+						</Grid>
+
+						<StackPanel Orientation="Horizontal" Grid.Row="4">
+							<Button Name="RelationSaveButton" Click="RelationSaveButton_Click" Margin="0, 0, 20, 0" Content="Сохранить"/>
+							<Button Name="RelationCancelButton" Click="RelationCancelButton_Click" Content="Отменить"/>
+						</StackPanel>
+					</Grid>
+				</ScrollViewer>
 			</TabItem>
 		</TabControl>
 		<StatusBar Name="ControlStatusBar" Grid.Row="3">

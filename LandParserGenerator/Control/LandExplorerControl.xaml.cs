@@ -40,6 +40,8 @@ namespace Land.Control
 			public TreeViewItem SelectedItem_MarkupTreeView { get; set; }
 			public TreeViewItem SelectedItem_MissingTreeView { get; set; }
 
+			public MarkupElement BufferedDataContext { get; set; }
+
 			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; } =
 				new Dictionary<ConcernPoint, List<CandidateInfo>>();
 
@@ -415,6 +417,6 @@ namespace Land.Control
 			return !cp.HasInvalidLocation;
 		}
 
-		#endregion
+		#endregion	
 	}
 }

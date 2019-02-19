@@ -86,16 +86,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Relations\ConcernGraph.xaml.cs">
+    <Compile Include="ControlPartial\Tabs\RelationTab.cs" />
+    <Compile Include="ConcernGraph.xaml.cs">
       <DependentUpon>ConcernGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControlPartial\Parsing.cs" />
-    <Compile Include="ControlPartial\MissingPointsTab.cs" />
-    <Compile Include="ControlPartial\MarkupElementTab.cs" />
+    <Compile Include="ControlPartial\Tabs\MissingPointsTab.cs" />
+    <Compile Include="ControlPartial\Tabs\MarkupElementTab.cs" />
     <Compile Include="ControlPartial\MarkupTree.cs" />
     <Compile Include="ControlPartial\DragAndDrop.cs" />
     <Compile Include="ControlPartial\Commands.cs" />
-    <Compile Include="Relations\RelationCheckBoxVisibilityConverter.cs" />
+    <Compile Include="Converters\RelationCheckBoxVisibilityConverter.cs" />
     <Compile Include="Converters\MissingListItemConverter.cs" />
     <Compile Include="Converters\MissingListIconColorConverter.cs" />
     <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Models\LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
     <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
+    <Compile Include="Models\RelationsTreeNode.cs" />
     <Compile Include="Models\PointCandidatesPair.cs" />
     <Compile Include="PreprocessorPropertiesWindow.xaml.cs">
       <DependentUpon>PreprocessorPropertiesWindow.xaml</DependentUpon>
@@ -111,7 +113,7 @@
     <Compile Include="LandExplorerSettingsWindow.xaml.cs">
       <DependentUpon>LandExplorerSettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Relations\ConcernGraph.xaml">
+    <Page Include="ConcernGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -175,6 +177,7 @@
   <ItemGroup>
     <Resource Include="Resources\AppIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

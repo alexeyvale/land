@@ -109,5 +109,60 @@ namespace Land.Control
 				"Accept",
 				typeof(LandExplorerCommands)
 			);
+
+		public static RoutedUICommand Copy_Markup { get; } = new RoutedUICommand
+			(
+				"Копировать",
+				"Copy",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.C, ModifierKeys.Control)
+				}
+			);
+
+		public static RoutedUICommand Copy_RelationSource { get; } = new RoutedUICommand
+			(
+				"Копировать",
+				"Copy",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.C, ModifierKeys.Control)
+				}
+			);
+
+		public static RoutedUICommand Paste_RelationSource { get; } = new RoutedUICommand
+			(
+				"Вставить",
+				"Paste",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.V, ModifierKeys.Control)
+				}
+			);
+
+		public static RoutedUICommand Copy_RelationTarget { get; } = new RoutedUICommand
+			(
+				"Копировать",
+				"Copy",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.C, ModifierKeys.Control)
+				}
+			);
+
+		public static RoutedUICommand Paste_RelationTarget { get; } = new RoutedUICommand
+			(
+				"Вставить",
+				"Paste",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.V, ModifierKeys.Control)
+				}
+			);
 	}
 }

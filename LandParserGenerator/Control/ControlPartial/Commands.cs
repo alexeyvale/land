@@ -96,7 +96,7 @@ namespace Land.Control
 						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
 							.Select(c => new ConcernPointCandidateViewModel(c));
 
-					ConfigureMarkupElementTab(true);
+					ConfigureMarkupElementTab(true, (ConcernPoint)target.DataContext);
 
 					SetStatus("Перепривязка точки", ControlStatus.Pending);
 				}
@@ -239,8 +239,8 @@ namespace Land.Control
 
 		private void Command_MarkupTree_HasSelectedConcernPoint_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MarkupTreeView != null  
-				&& MarkupTreeView.SelectedItem != null 
+			e.CanExecute = MarkupTreeView != null
+				&& MarkupTreeView.SelectedItem != null
 				&& MarkupTreeView.SelectedItem is ConcernPoint;
 		}
 
@@ -312,5 +312,58 @@ namespace Land.Control
 				);
 			}, true, false);
 		}
+
+		#region Копирование-вставка
+
+		private void Command_MarkupTree_Copy_Executed(object sender, RoutedEventArgs e)
+		{
+			State.BufferedDataContext = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+			SetStatus("Элемент скопирован", ControlStatus.Pending);
+		}
+
+		private void Command_RelationSource_Paste_Executed(object sender, RoutedEventArgs e)
+		{
+			RelationSource.Tag = State.BufferedDataContext;
+			State.BufferedDataContext = null;
+
+			SetStatus("Элемент вставлен", ControlStatus.Ready);
+		}
+
+		private void Command_RelationTarget_Paste_Executed(object sender, RoutedEventArgs e)
+		{
+			RelationTarget.Tag = State.BufferedDataContext;
+			State.BufferedDataContext = null;
+
+			SetStatus("Элемент вставлен", ControlStatus.Ready);
+		}
+
+		private void Command_RelationSource_Copy_Executed(object sender, RoutedEventArgs e)
+		{
+			State.BufferedDataContext = (MarkupElement)RelationSource.Tag;
+			SetStatus("Элемент скопирован", ControlStatus.Pending);
+		}
+
+		private void Command_RelationTarget_Copy_Executed(object sender, RoutedEventArgs e)
+		{
+			State.BufferedDataContext = (MarkupElement)RelationTarget.Tag;
+			SetStatus("Элемент скопирован", ControlStatus.Pending);
+		}
+
+		private void Command_RelationSource_HasData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = RelationSource.Tag != null;
+		}
+
+		private void Command_RelationTarget_HasData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = RelationTarget.Tag != null;
+		}
+
+		private void Command_HasBufferedData_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = State.BufferedDataContext != null;
+		}
+
+		#endregion
 	}
 }
