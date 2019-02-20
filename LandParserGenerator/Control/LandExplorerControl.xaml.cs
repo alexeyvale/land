@@ -417,6 +417,6 @@ namespace Land.Control
 			return !cp.HasInvalidLocation;
 		}
 
-		#endregion	
+		#endregion
 	}
 }

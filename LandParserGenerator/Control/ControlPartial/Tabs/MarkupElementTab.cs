@@ -41,6 +41,7 @@ namespace Land.Control
 			{
 				ConcernPointNameText.Text = 
 					((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).ViewHeader;
+				CustomConcernPointNameEntered = false;
 			}
 		}
 
@@ -128,12 +129,26 @@ namespace Land.Control
 
 				ConcernPointNameText.Text = pointToRemap?.Name;
 				ConcernPointCommentText.Text = pointToRemap?.Comment;
+				CustomConcernPointNameEntered = pointToRemap != null;
 			}
 			else
 			{
 				ConcernPointPanel.Visibility = Visibility.Collapsed;
 				MarkupElementPanel.Visibility = Visibility.Visible;
 			}
+		}
+
+		private bool CustomConcernPointNameEntered = false;
+
+		private void ConcernPointCandidatesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (!CustomConcernPointNameEntered && ConcernPointCandidatesList.SelectedItem != null)
+				ConcernPointNameText.Text = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).ViewHeader;
+		}
+
+		private void ConcernPointNameText_PreviewKeyDown(object sender, KeyboardEventArgs e)
+		{
+			CustomConcernPointNameEntered = true;
 		}
 	}
 }

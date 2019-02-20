@@ -201,6 +201,7 @@
 								FontSize="12pt"
 								Height="80"
 								Name="ConcernPointCandidatesList"
+								SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
 								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
 							</ListBox>
 							<StackPanel Orientation="Vertical">
@@ -210,7 +211,7 @@
 										<ColumnDefinition Width="100*"></ColumnDefinition>
 										<ColumnDefinition Width="25"></ColumnDefinition>
 									</Grid.ColumnDefinitions>
-									<TextBox Name="ConcernPointNameText" Grid.Column="0"/>
+									<TextBox Name="ConcernPointNameText" PreviewKeyDown="ConcernPointNameText_PreviewKeyDown" Grid.Column="0"/>
 									<Button Click="ConcernPointNameText_Reset_Click" 
 											Content="&#xf060;" 
 											Style="{StaticResource IconButton}"
