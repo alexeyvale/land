@@ -341,6 +341,7 @@ namespace Land.Control
 				if (RelationSource.IsKeyboardFocusWithin)
 				{
 					RelationSource.Tag = State.BufferedDataContext;
+					RefreshRelationCandidates();
 					State.BufferedDataContext = null;
 
 					SetStatus("Элемент вставлен", ControlStatus.Ready);
@@ -348,6 +349,7 @@ namespace Land.Control
 				else if (RelationTarget.IsKeyboardFocusWithin)
 				{
 					RelationTarget.Tag = State.BufferedDataContext;
+					RefreshRelationCandidates();
 					State.BufferedDataContext = null;
 
 					SetStatus("Элемент вставлен", ControlStatus.Ready);

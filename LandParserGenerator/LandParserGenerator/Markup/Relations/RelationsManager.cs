@@ -154,6 +154,7 @@ namespace Land.Core.Markup
 		public Dictionary<MarkupElement, HashSet<MarkupElement>> this[RelationType relType] 
 			=> !Cache.ContainsKey(relType)? null : Cache[relType];
 
+		public bool HasCache => Cache != null && Cache.Count != 0;
 
 		/// Убираем из кеша информацию об определённых группах отношений
 		public void Clear(RelationGroup group)
@@ -197,7 +198,7 @@ namespace Land.Core.Markup
 			}
 
 			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
-			foreach (var concern in concerns.Where(e => e is Concern))
+			foreach (var concern in concerns)
 				Cache[RelationType.Internal_IsLogicalParentOf][concern] = new HashSet<MarkupElement>(concern.Elements);
 
 			FillAsClosure(RelationType.Internal_IsLogicalAncestorOf, RelationType.Internal_IsLogicalParentOf);
@@ -230,6 +231,50 @@ namespace Land.Core.Markup
 
 			FillAsTransposition(RelationType.Internal_Follows, RelationType.Internal_Preceeds);
 			FillAsTransposition(RelationType.Internal_IsPhysicalAncestorOf, RelationType.Internal_IsPhysicalDescendantOf);
+		}
+
+		public HashSet<RelationType> GetPossibleExternalRelations(MarkupElement from, MarkupElement to)
+		{
+			var result = new HashSet<RelationType>();
+
+			if(from is ConcernPoint)
+			{
+				/// CP CP
+				if(to is ConcernPoint)
+				{
+					result.Add(RelationType.External_Uses);
+
+					if (Cache[RelationType.Internal_Preceeds][from].Contains(to))
+					{
+						result.Add(RelationType.External_MustPreceed);
+					}
+				}
+				/// CP C
+				else
+				{
+					if (Cache[RelationType.Internal_IsLogicalDescendantOf][from].Contains(to) ||
+						Cache[RelationType.Internal_IsLogicalAncestorOf][to].Any(desc => Cache[RelationType.Internal_IsPhysicalAncestorOf][desc].Contains(from)))
+					{
+						result.Add(RelationType.External_ExistsIfAll);
+						result.Add(RelationType.External_ExistsIfAny);
+					}
+				}
+			}
+			else
+			{
+				/// C CP
+				if (to is ConcernPoint)
+				{
+					result.Add(RelationType.External_Uses);
+				}
+				/// C C
+				else
+				{
+					result.Add(RelationType.External_Modifies);
+				}
+			}
+
+			return result;
 		}
 
 		private void FillAsTransposition(RelationType target, RelationType source)

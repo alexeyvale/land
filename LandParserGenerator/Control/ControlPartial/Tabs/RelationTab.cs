@@ -35,19 +35,20 @@ namespace Land.Control
 		private void RelationSource_Reset_Click(object sender, RoutedEventArgs e)
 		{
 			RelationSource.Tag = null;
-			RelationCandidatesList.ItemsSource = null;
+			RefreshRelationCandidates();
 		}
 
 		private void RelationTarget_Reset_Click(object sender, RoutedEventArgs e)
 		{
 			RelationTarget.Tag = null;
-			RelationCandidatesList.ItemsSource = null;
+			RefreshRelationCandidates();
 		}
 
 		private void RelationCancelButton_Click(object sender, RoutedEventArgs e)
 		{
 			RelationSource_Reset_Click(null, null);
 			RelationTarget_Reset_Click(null, null);
+			RefreshRelationCandidates();
 
 			SetStatus("Добавление отношения отменено", ControlStatus.Ready);
 		}
@@ -59,7 +60,17 @@ namespace Land.Control
 
 		private void RefreshRelationCandidates()
 		{
+			if (RelationTarget.Tag == null || RelationSource.Tag == null)
+				RelationCandidatesList.ItemsSource = null;
+			else
+			{
+				if (!RelationsManager.HasCache)
+					RelationsManager.BuildRelations(MarkupManager.Markup);
 
+				RelationCandidatesList.ItemsSource =
+					RelationsManager.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
+						.Select(r=>new RelationsTreeNode(r));
+			}
 		}
 	}
 }
