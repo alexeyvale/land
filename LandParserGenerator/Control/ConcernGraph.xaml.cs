@@ -96,6 +96,7 @@ namespace Land.Control
 						new RelationsTreeNode(RelationType.Internal_IsLogicalParentOf),
 						new RelationsTreeNode(RelationType.Internal_IsLogicalAncestorOf),
 						new RelationsTreeNode(RelationType.Internal_IsPhysicalDescendantOf),
+						new RelationsTreeNode(RelationType.Internal_IsPhysicalAncestorOf),
 					}
 				},
 
