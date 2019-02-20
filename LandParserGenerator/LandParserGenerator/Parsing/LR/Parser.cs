@@ -444,14 +444,18 @@ namespace Land.Core.Parsing.LR
 
 						++iterIdx;
 					}
+
+					/// Оставляем те участки пути, которые фигурируют и в вероятном пути разбора,
+					/// и в путях, которые можно использовать для восстановления
+					candidates.IntersectWith(pathParts);
 				}
 			}
-			/// Работаем, пока среди кандидатов нет того, который есть в вероятном пути,
-			/// или такой есть, но это тот символ, который был снят со стека на текущей итерации,
-			/// и значит, эта сущность уже была разобрана
+			/// Работаем, пока вероятный путь разбора не пересекается с путём до места восстановления
+			/// или пока в базисных продукциях этого пересечения точка стоит перед последним снятым со стека символом,
+			/// то есть, мы уже успешно разобрали то, что хотим разобрать по-новому
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
-				|| candidates.Intersect(pathParts).Count() == 0 
-				|| candidates.GroupBy(c=>c.Idx).Any(g=>g.All(e=>e.Alt[e.Pos] == previouslyMatchedSymbol)))
+				|| candidates.Count == 0
+				|| candidates.Where(c=>c.Pos > 0).All(c=>c.Alt[c.Pos] == previouslyMatchedSymbol))
 			);
 
 			if (Stack.CountStates > 0)
