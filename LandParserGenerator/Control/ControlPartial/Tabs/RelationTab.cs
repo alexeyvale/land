@@ -55,7 +55,14 @@ namespace Land.Control
 
 		private void RelationSaveButton_Click(object sender, RoutedEventArgs e)
 		{
-			SetStatus("Отношение добавлено", ControlStatus.Success);
+			if (RelationSource.Tag is MarkupElement source
+				&& RelationTarget.Tag is MarkupElement target
+				&& RelationCandidatesList.SelectedItem is RelationsTreeNode relation)
+			{
+				RelationsManager.AddRelation(relation.Relation.Value, source, target);
+
+				SetStatus("Отношение добавлено", ControlStatus.Success);
+			}
 		}
 
 		private void RefreshRelationCandidates()

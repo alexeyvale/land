@@ -145,9 +145,11 @@ namespace Land.Core.Markup
 		{
 			get
 			{
-				return !Cache.ContainsKey(relType) || Cache[relType].ContainsKey(elem)
+				return !Cache.ContainsKey(relType)
 					? null
-					: Cache[relType][elem];
+					: !Cache[relType].ContainsKey(elem)
+						? new HashSet<MarkupElement>()
+						: Cache[relType][elem];
 			}
 		}
 
@@ -162,12 +164,15 @@ namespace Land.Core.Markup
 			foreach (RelationType relType in ((RelationType[])Enum.GetValues(typeof(RelationType)))
 				.Where(e=>group.ToString() == e.ToString().Split('_')[0]))
 			{
-				Cache[relType] = null;
+				Cache[relType] = new Dictionary<MarkupElement, HashSet<MarkupElement>>();
 			}
 		}
 
 		public void AddRelation(RelationType type, MarkupElement from, MarkupElement to)
 		{
+			if (!Cache.ContainsKey(type))
+				Cache[type] = new Dictionary<MarkupElement, HashSet<MarkupElement>>();
+
 			if (!Cache[type].ContainsKey(from))
 				Cache[type][from] = new HashSet<MarkupElement>();
 
@@ -179,6 +184,11 @@ namespace Land.Core.Markup
 					Cache[type][to] = new HashSet<MarkupElement>();
 
 				Cache[type][to].Add(from);
+			}
+
+			if (type.GetAttribute<RelationPropertiesAttribute>().IsTransitive)
+			{
+				FillAsClosure(type, type);
 			}
 		}
 
@@ -279,21 +289,32 @@ namespace Land.Core.Markup
 
 		private void FillAsTransposition(RelationType target, RelationType source)
 		{
-			if (Cache.ContainsKey(source) && Cache.ContainsKey(target))
+			if (Cache.ContainsKey(source))
 			{
+				var result = Cache[source].SelectMany(kvp=>kvp.Value).Distinct()
+					.ToDictionary(v=>v, v => new HashSet<MarkupElement>());
+
 				foreach (var leftPart in Cache[source].Keys)
 					foreach (var rightPart in Cache[source][leftPart])
-						Cache[target][rightPart].Add(leftPart);
+						result[rightPart].Add(leftPart);
+
+				Cache[target] = result;
 			}
 		}
 
 		private void FillAsClosure(RelationType target, RelationType source)
 		{
-			if (Cache.ContainsKey(source) && Cache.ContainsKey(target))
+			if (Cache.ContainsKey(source))
 			{
-				foreach (var leftPart in Cache[source].Keys)
-					Cache[target][leftPart] = new HashSet<MarkupElement>(Cache[source][leftPart]);
+				/// Копируем исходное отношение в целевое
+				var sourceCopy = new Dictionary<MarkupElement, HashSet<MarkupElement>>();
 
+				foreach (var leftPart in Cache[source].Keys)
+					sourceCopy[leftPart] = new HashSet<MarkupElement>(Cache[source][leftPart]);
+
+				Cache[target] = sourceCopy;
+
+				/// Итеративно строим замыкание
 				var changed = true;
 
 				while (changed)
