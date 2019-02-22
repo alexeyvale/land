@@ -49,6 +49,8 @@
 								</MultiBinding>
 							</Setter.Value>
 						</Setter>
+						<Setter Property="Foreground" 
+								Value="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type graphsharp:VertexControl}}, Path=Foreground}"/>
 					</Style>
 
 					<Style TargetType="{x:Type graphsharp:EdgeControl}">

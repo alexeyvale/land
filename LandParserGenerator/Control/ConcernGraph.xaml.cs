@@ -58,11 +58,11 @@ namespace Land.Control
 			}
 		}
 
-		public static readonly Brush EdgeStdForeground = new SolidColorBrush(Color.FromArgb(60, 170, 170, 170));
+		public static readonly Brush EdgeStdForeground = new SolidColorBrush(Color.FromArgb(60, 150, 150, 150));
 		public static readonly Brush EdgeInForeground = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
 		public static readonly Brush EdgeOutForeground = new SolidColorBrush(Color.FromArgb(200, 0, 0, 255));
 
-		public static readonly Brush VertexHiddenForeground = new SolidColorBrush(Color.FromArgb(150, 10, 10, 10));
+		public static readonly Brush VertexHiddenForeground = new SolidColorBrush(Color.FromArgb(60, 150, 150, 150));
 		public static readonly Brush VertexStdForeground = new SolidColorBrush(Color.FromArgb(250, 0, 0, 0));
 
 		public const double EdgeStdWidth = 1.4;
