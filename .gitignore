@@ -8,3 +8,5 @@
 **/packages/
 
 _Experiments/Parsing/_Results/
+_Experiments/Probabilities/venv/
+_Experiments/Probabilities/.idea/workspace.xml
