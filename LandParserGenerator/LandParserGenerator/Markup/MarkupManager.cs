@@ -279,7 +279,7 @@ namespace Land.Core.Markup
 						typeof(RelatedPair<MarkupElement>)
 					});
 
-					serializer.WriteObject(gZipStream, Markup);
+					serializer.WriteObject(gZipStream, unit);
 				}
 			}
 
