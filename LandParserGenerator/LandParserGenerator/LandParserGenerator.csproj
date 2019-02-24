@@ -84,6 +84,9 @@
     <Compile Include="Lexing\PairAwareTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
+    <Compile Include="Markup\Relations\RelationType.cs" />
+    <Compile Include="Markup\Relations\RelationsCache.cs" />
+    <Compile Include="Markup\SerializationUnit.cs" />
     <Compile Include="Markup\MarkupVisitors\GetLinearSequenceVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByTypeVisitor.cs" />
     <Compile Include="Markup\MarkupVisitors\GroupPointsByFileVisitor.cs" />
@@ -94,7 +97,6 @@
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />
-    <Compile Include="Markup\Relations\EnumExtension.cs" />
     <Compile Include="Markup\Relations\RelationsManager.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />

@@ -71,15 +71,15 @@ namespace Land.Control
 		private MarkupElement SelectedVertex { get; set; }
 
 		private List<RelationsTreeNode> RelationsTree { get; set; }
-		private RelationsManager RelationsManager { get; set; }
+		private MarkupManager Markup { get; set; }
 		private BidirectionalGraph<object, IEdge<object>> Graph { get; set; }
 		private HashSet<RelationType> RelationsSelected { get; set; } = new HashSet<RelationType>();
 
-		public ConcernGraph(RelationsManager relationsManager)
+		public ConcernGraph(MarkupManager markup)
         {
             InitializeComponent();
 
-			RelationsManager = relationsManager;
+			Markup = markup;
 
 			/// Заполняем дерево, в котором можно будет выбрать нужные нам отношения
 			RelationsTree = new List<RelationsTreeNode>
@@ -89,14 +89,14 @@ namespace Land.Control
 					Text = RelationGroup.Internal.GetDescription(),
 					Children = new List<RelationsTreeNode>()
 					{
-						new RelationsTreeNode(RelationType.Internal_Preceeds),
-						new RelationsTreeNode(RelationType.Internal_Follows),
-						new RelationsTreeNode(RelationType.Internal_IsLogicalChildOf),
-						new RelationsTreeNode(RelationType.Internal_IsLogicalDescendantOf),
-						new RelationsTreeNode(RelationType.Internal_IsLogicalParentOf),
-						new RelationsTreeNode(RelationType.Internal_IsLogicalAncestorOf),
-						new RelationsTreeNode(RelationType.Internal_IsPhysicalDescendantOf),
-						new RelationsTreeNode(RelationType.Internal_IsPhysicalAncestorOf),
+						new RelationsTreeNode(RelationType.Preceeds),
+						new RelationsTreeNode(RelationType.Follows),
+						new RelationsTreeNode(RelationType.IsLogicalChildOf),
+						new RelationsTreeNode(RelationType.IsLogicalDescendantOf),
+						new RelationsTreeNode(RelationType.IsLogicalParentOf),
+						new RelationsTreeNode(RelationType.IsLogicalAncestorOf),
+						new RelationsTreeNode(RelationType.IsPhysicalDescendantOf),
+						new RelationsTreeNode(RelationType.IsPhysicalAncestorOf),
 					}
 				},
 
@@ -104,7 +104,7 @@ namespace Land.Control
 				{
 					Text = RelationGroup.External.GetDescription(),
 					Children = ((RelationType[])Enum.GetValues(typeof(RelationType)))
-						.Where(r=>r.ToString().Split('_')[0] == RelationGroup.External.ToString())
+						.Where(r=>r.GetGroup() == RelationGroup.External)
 						.Select(r => new RelationsTreeNode()
 						{
 							Text = r.GetAttribute<DescriptionAttribute>().Description,
@@ -144,29 +144,27 @@ namespace Land.Control
 
 			foreach(var rel in RelationsSelected)
 			{
-				if(RelationsManager[rel] != null)
+				var relations = new HashSet<RelatedPair<MarkupElement>>(
+					Markup.Relations.InternalRelations.GetRelatedPairs(rel)
+				);
+
+				relations.UnionWith(
+					Markup.Relations.ExternalRelations.GetRelatedPairs(rel)
+				);
+
+				foreach(var pair in relations)
 				{
-					foreach(var kvp in RelationsManager[rel])
+					Graph.AddVertex(pair.Item0);
+					Graph.TryGetEdge(pair.Item0, pair.Item1, out IEdge<object> edge);
+
+					if (edge != null)
 					{
-						if (kvp.Value.Count > 0)
-						{
-							Graph.AddVertex(kvp.Key);
-
-							foreach (var to in kvp.Value)
-							{
-								Graph.TryGetEdge(kvp.Key, to, out IEdge<object> edge);
-
-								if (edge != null)
-								{
-									((InfoProvidedEdge)edge).AddRelation(rel);
-								}
-								else
-								{
-									Graph.AddVertex(to);
-									Graph.AddEdge(new InfoProvidedEdge(kvp.Key, to, rel));
-								}
-							}
-						}
+						((InfoProvidedEdge)edge).AddRelation(pair.RelationType);
+					}
+					else
+					{
+						Graph.AddVertex(pair.Item1);
+						Graph.AddEdge(new InfoProvidedEdge(pair.Item0, pair.Item1, rel));
 					}
 				}
 			}

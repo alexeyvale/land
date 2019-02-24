@@ -59,7 +59,7 @@ namespace Land.Control
 				&& RelationTarget.Tag is MarkupElement target
 				&& RelationCandidatesList.SelectedItem is RelationsTreeNode relation)
 			{
-				RelationsManager.AddRelation(relation.Relation.Value, source, target);
+				MarkupManager.Relations.AddExternalRelation(relation.Relation.Value, source, target);
 
 				SetStatus("Отношение добавлено", ControlStatus.Success);
 			}
@@ -71,11 +71,8 @@ namespace Land.Control
 				RelationCandidatesList.ItemsSource = null;
 			else
 			{
-				if (!RelationsManager.HasCache)
-					RelationsManager.BuildRelations(MarkupManager.Markup);
-
 				RelationCandidatesList.ItemsSource =
-					RelationsManager.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
+					MarkupManager.Relations.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
 						.Select(r=>new RelationsTreeNode(r));
 			}
 		}

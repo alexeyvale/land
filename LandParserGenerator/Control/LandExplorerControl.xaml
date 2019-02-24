@@ -413,7 +413,10 @@
 							<ListView Name="RelationCandidatesList" Grid.Row="1">
 								<ListView.ItemTemplate>
 									<DataTemplate>
-										<TextBlock Text="{Binding Path=Text, Mode=OneWay}" />
+										<StackPanel Orientation="Horizontal">
+											<CheckBox Tag="{Binding Path=Relation}"/>
+											<TextBlock Text="{Binding Path=Text, Mode=OneWay}" />
+										</StackPanel>
 									</DataTemplate>
 								</ListView.ItemTemplate>
 							</ListView>

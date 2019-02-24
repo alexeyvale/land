@@ -12,12 +12,35 @@ namespace Land.Core.Markup
 {
 	public class MarkupManager
 	{
-		public event Action OnMarkupChanged;
+		public MarkupManager()
+		{
+			OnMarkupChanged += InvalidateRelations;
+		}
+
+		private RelationsManager _relations = new RelationsManager();
+		/// <summary>
+		/// Менеджер отношений между функциональностями
+		/// </summary>
+		public RelationsManager Relations
+		{
+			get
+			{
+				if (!_relations.RelevanceFlag)
+					_relations.BuildInternalRelations(Markup);
+
+				return _relations;
+			}
+		}
 
 		/// <summary>
 		/// Коллекция точек привязки
 		/// </summary>
 		public ObservableCollection<MarkupElement> Markup = new ObservableCollection<MarkupElement>();
+
+		/// <summary>
+		/// Событие изменения разметки
+		/// </summary>
+		public event Action OnMarkupChanged;
 
 		/// <summary>
 		/// Очистка разметки
@@ -27,6 +50,23 @@ namespace Land.Core.Markup
 			Markup.Clear();
 
 			OnMarkupChanged?.Invoke();
+		}
+
+		/// <summary>
+		/// Проверка того, что вся разметка синхронизирована с кодом
+		/// </summary>
+		/// <returns></returns>
+		public bool CheckValidity()
+		{
+			return GetLinearSequenceVisitor.GetPoints(Markup).Any(p => p.HasInvalidLocation);
+		}
+
+		/// <summary>
+		/// Помечаем отношения как нерелевантные относительно разметки
+		/// </summary>
+		public void InvalidateRelations()
+		{
+			_relations.RelevanceFlag = false;
 		}
 
 		/// <summary>
@@ -222,8 +262,21 @@ namespace Land.Core.Markup
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
 				{
-					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
-						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(HeaderContextElement), typeof(AncestorsContextElement)
+					var unit = new SerializationUnit()
+					{
+						Markup = Markup,
+						ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
+					};
+
+					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
+						typeof(Concern),
+						typeof(ConcernPoint),
+						typeof(PointContext),
+						typeof(HeaderContextElement),
+						typeof(AncestorsContextElement),
+						typeof(ObservableCollection<MarkupElement>),
+						typeof(List<RelatedPair<MarkupElement>>),
+						typeof(RelatedPair<MarkupElement>)
 					});
 
 					serializer.WriteObject(gZipStream, Markup);
@@ -253,11 +306,20 @@ namespace Land.Core.Markup
 			{
 				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
 				{
-					DataContractSerializer serializer = new DataContractSerializer(Markup.GetType(), new List<Type>() {
-						typeof(Concern), typeof(ConcernPoint), typeof(PointContext), typeof(HeaderContextElement), typeof(AncestorsContextElement)
+					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
+						typeof(Concern),
+						typeof(ConcernPoint),
+						typeof(PointContext),
+						typeof(HeaderContextElement),
+						typeof(AncestorsContextElement),
+						typeof(ObservableCollection<MarkupElement>),
+						typeof(List<RelatedPair<MarkupElement>>),
+						typeof(RelatedPair<MarkupElement>)
 					});
 
-					this.Markup = (ObservableCollection<MarkupElement>)serializer.ReadObject(gZipStream);
+					var unit = (SerializationUnit)serializer.ReadObject(gZipStream);
+
+					Markup = unit.Markup;
 				}
 			}
 

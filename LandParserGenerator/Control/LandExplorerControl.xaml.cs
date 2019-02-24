@@ -80,11 +80,6 @@ namespace Land.Control
 		private MarkupManager MarkupManager { get; set; } = new MarkupManager();
 
 		/// <summary>
-		/// Менеджер отношений между функциональностями
-		/// </summary>
-		private RelationsManager RelationsManager { get; set; } = new RelationsManager();
-
-		/// <summary>
 		/// Состояние контрола
 		/// </summary>
 		private ControlState State { get; set; } = new ControlState();
