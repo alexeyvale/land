@@ -90,13 +90,32 @@ namespace Land.Core.Markup
 		/// Инициализируем все отношения списком элементов,
 		/// для которых впоследствии зададим связанные с ними элементы
 		/// </summary>
-		public void Initialize(IEnumerable<MarkupElement> elements)
+		public void SetElements(IEnumerable<MarkupElement> elements)
 		{
 			Clear();
 
 			foreach(var key in Cache.Keys.ToList())
 				Cache[key] = elements.ToDictionary(c => c, c => new HashSet<MarkupElement>());
 
+			KnownElements.UnionWith(elements);
+		}
+
+		/// <summary>
+		/// Обновляем список элементов и удаляем отношения,
+		/// в которых участвуют отсутствующие в списке элементы
+		/// </summary>
+		public void RefreshElements(IEnumerable<MarkupElement> elements)
+		{
+			foreach(var rel in Cache.Keys)
+			{
+				foreach (var key in Cache[rel].Keys.Where(k => !elements.Contains(k)).ToList())
+					Cache[rel].Remove(key);
+
+				foreach (var key in Cache[rel].Keys)
+					Cache[rel][key].IntersectWith(elements);
+			}
+
+			KnownElements.Clear();
 			KnownElements.UnionWith(elements);
 		}
 

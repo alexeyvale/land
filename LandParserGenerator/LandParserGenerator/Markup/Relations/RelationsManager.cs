@@ -22,7 +22,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Признак соответствия кеша текущей разметке
 		/// </summary>
-		public bool RelevanceFlag { get; set; } = true;
+		public bool IsValid { get; set; } = false;
 
 		/// <summary>
 		/// Проверка того, что элементы состоят в указанном отношении
@@ -30,13 +30,14 @@ namespace Land.Core.Markup
 		public bool AreRelated(MarkupElement a, MarkupElement b, RelationType relation) => relation.GetGroup() == RelationGroup.Internal 
 			? InternalRelations.AreRelated(a, b, relation) : ExternalRelations.AreRelated(a, b, relation);
 
-		public void BuildInternalRelations(IEnumerable<MarkupElement> markup)
+		public List<RelationNotification> RefreshCache(IEnumerable<MarkupElement> markup)
 		{
 			var elements = GetLinearSequenceVisitor.GetElements(markup);
 			var concerns = elements.OfType<Concern>().ToList();
 			var points = elements.OfType<ConcernPoint>().ToList();
 
-			InternalRelations.Initialize(elements);
+			InternalRelations.SetElements(elements);
+			ExternalRelations.RefreshElements(elements);
 
 			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
 			foreach (var concern in concerns)
@@ -66,7 +67,9 @@ namespace Land.Core.Markup
 			InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
 			InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
 
-			RelevanceFlag = true;
+			IsValid = true;
+
+			return CheckConsistency();
 		}
 
 		public HashSet<RelationType> GetPossibleExternalRelations(MarkupElement from, MarkupElement to)
@@ -126,7 +129,7 @@ namespace Land.Core.Markup
 		{
 			var notifications = new List<RelationNotification>();
 			
-			if(RelevanceFlag)
+			if(IsValid)
 			{
 				var pairs = ExternalRelations.GetRelatedPairs();
 

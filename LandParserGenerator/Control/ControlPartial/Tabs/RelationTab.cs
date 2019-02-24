@@ -59,9 +59,13 @@ namespace Land.Control
 				&& RelationTarget.Tag is MarkupElement target
 				&& RelationCandidatesList.SelectedItem is RelationsTreeNode relation)
 			{
-				MarkupManager.Relations.AddExternalRelation(relation.Relation.Value, source, target);
+				var relationsManager = TryGetRelations();
 
-				SetStatus("Отношение добавлено", ControlStatus.Success);
+				if (relationsManager != null)
+				{
+					relationsManager.AddExternalRelation(relation.Relation.Value, source, target);
+					SetStatus("Отношение добавлено", ControlStatus.Success);
+				}
 			}
 		}
 
@@ -72,9 +76,38 @@ namespace Land.Control
 			else
 			{
 				RelationCandidatesList.ItemsSource =
-					MarkupManager.Relations.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
+					TryGetRelations()?.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
 						.Select(r=>new RelationsTreeNode(r));
 			}
+		}
+
+		private RelationsManager TryGetRelations()
+		{
+			if(!MarkupManager.IsValid)
+			{
+				SetStatus(
+					"Для доступа к информации об отношениях необходимо перепривязать точки, соответствующие изменившемуся тексту",
+					ControlStatus.Error
+				);
+			}
+			else
+			{
+				var manager = MarkupManager.TryGetRelations();
+
+				if (manager != null)
+				{
+					return manager;
+				}
+				else
+				{
+					SetStatus(
+						"Не удалось получить информацию об отношениях",
+						ControlStatus.Error
+					);
+				}
+			}
+
+			return null;
 		}
 	}
 }

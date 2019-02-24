@@ -116,8 +116,8 @@
 				</TreeView.Resources>
 			</TreeView>
 		</Grid>
-		<StatusBar Name="GRStatus" Height="25" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Margin="3,0,3,0">
-			<ProgressBar Name="GRProgress" Value="0" Maximum="4" Height="22" HorizontalAlignment="Center" Width="{Binding ElementName=GRStatus, Path=ActualWidth}"/>
+		<StatusBar Name="ConcernGraphStatusBar" Height="30" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Margin="3,0,3,0">
+			<Label Name="ConcernGraphStatus"></Label>
 		</StatusBar>
 	</Grid>
 </Window>

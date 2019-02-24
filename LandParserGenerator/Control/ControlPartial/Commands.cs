@@ -220,8 +220,18 @@ namespace Land.Control
 
 		private void Command_OpenConcernGraph_Executed(object sender, RoutedEventArgs e)
 		{
-			var graphWindow = new ConcernGraph(MarkupManager);
-			graphWindow.Show();
+			if (MarkupManager.IsValid)
+			{
+				var graphWindow = new ConcernGraph(MarkupManager);
+				graphWindow.Show();
+			}
+			else
+			{
+				SetStatus(
+					"Для работы с отношениями необходимо синхронизировать разметку с кодом", 
+					ControlStatus.Error
+				);
+			}
 		}
 
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)

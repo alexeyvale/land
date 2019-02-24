@@ -21,6 +21,35 @@ namespace Land.Control
 	/// </summary>
 	public partial class ConcernGraph : Window
 	{
+		#region Статус
+
+		private Brush LightRed { get; set; } = new SolidColorBrush(Color.FromRgb(255, 200, 200));
+
+		private enum ControlStatus { Ready, Pending, Success, Error }
+
+		private void SetStatus(string text, ControlStatus status)
+		{
+			switch (status)
+			{
+				case ControlStatus.Error:
+					ConcernGraphStatusBar.Background = LightRed;
+					break;
+				case ControlStatus.Pending:
+					ConcernGraphStatusBar.Background = Brushes.LightGoldenrodYellow;
+					break;
+				case ControlStatus.Ready:
+					ConcernGraphStatusBar.Background = Brushes.LightBlue;
+					break;
+				case ControlStatus.Success:
+					ConcernGraphStatusBar.Background = Brushes.LightGreen;
+					break;
+			}
+
+			ConcernGraphStatus.Content = text;
+		}
+
+		#endregion
+
 		public class InfoProvidedEdge : IEdge<object>
 		{
 			public object Source { get; set; }
@@ -71,7 +100,7 @@ namespace Land.Control
 		private MarkupElement SelectedVertex { get; set; }
 
 		private List<RelationsTreeNode> RelationsTree { get; set; }
-		private MarkupManager Markup { get; set; }
+		private MarkupManager MarkupManager { get; set; }
 		private BidirectionalGraph<object, IEdge<object>> Graph { get; set; }
 		private HashSet<RelationType> RelationsSelected { get; set; } = new HashSet<RelationType>();
 
@@ -79,7 +108,7 @@ namespace Land.Control
         {
             InitializeComponent();
 
-			Markup = markup;
+			MarkupManager = markup;
 
 			/// Заполняем дерево, в котором можно будет выбрать нужные нам отношения
 			RelationsTree = new List<RelationsTreeNode>
@@ -138,43 +167,79 @@ namespace Land.Control
 			RebuildGraph();
 		}
 
-		private void RebuildGraph()
+		private RelationsManager TryGetRelations()
 		{
-			Graph = new BidirectionalGraph<object, IEdge<object>>(true);
-
-			foreach(var rel in RelationsSelected)
+			if (!MarkupManager.IsValid)
 			{
-				var relations = new HashSet<RelatedPair<MarkupElement>>(
-					Markup.Relations.InternalRelations.GetRelatedPairs(rel)
+				SetStatus(
+					"Для доступа к информации об отношениях необходимо перепривязать точки, соответствующие изменившемуся тексту",
+					ControlStatus.Error
 				);
+			}
+			else
+			{
+				var manager = MarkupManager.TryGetRelations();
 
-				relations.UnionWith(
-					Markup.Relations.ExternalRelations.GetRelatedPairs(rel)
-				);
-
-				foreach(var pair in relations)
+				if (manager != null)
 				{
-					Graph.AddVertex(pair.Item0);
-					Graph.TryGetEdge(pair.Item0, pair.Item1, out IEdge<object> edge);
-
-					if (edge != null)
-					{
-						((InfoProvidedEdge)edge).AddRelation(pair.RelationType);
-					}
-					else
-					{
-						Graph.AddVertex(pair.Item1);
-						Graph.AddEdge(new InfoProvidedEdge(pair.Item0, pair.Item1, rel));
-					}
+					return manager;
+				}
+				else
+				{
+					SetStatus(
+						"Не удалось получить информацию об отношениях",
+						ControlStatus.Error
+					);
 				}
 			}
 
-			ConcernGraphLayout.Graph = Graph;
+			return null;
+		}
 
-			foreach (var vertex in Graph.Vertices)
+		private void RebuildGraph()
+		{
+			var relationsManager = TryGetRelations();
+
+			if (relationsManager != null)
 			{
-				var control = ConcernGraphLayout.GetVertexControl(vertex);
-				control.PreviewMouseLeftButtonDown += Vertex_PreviewMouseLeftButtonDown;
+				Graph = new BidirectionalGraph<object, IEdge<object>>(true);
+
+				foreach (var rel in RelationsSelected)
+				{
+					var relations = new HashSet<RelatedPair<MarkupElement>>(
+						relationsManager.InternalRelations.GetRelatedPairs(rel)
+					);
+
+					relations.UnionWith(
+						relationsManager.ExternalRelations.GetRelatedPairs(rel)
+					);
+
+					foreach (var pair in relations)
+					{
+						Graph.AddVertex(pair.Item0);
+						Graph.TryGetEdge(pair.Item0, pair.Item1, out IEdge<object> edge);
+
+						if (edge != null)
+						{
+							((InfoProvidedEdge)edge).AddRelation(pair.RelationType);
+						}
+						else
+						{
+							Graph.AddVertex(pair.Item1);
+							Graph.AddEdge(new InfoProvidedEdge(pair.Item0, pair.Item1, rel));
+						}
+					}
+				}
+
+				ConcernGraphLayout.Graph = Graph;
+
+				foreach (var vertex in Graph.Vertices)
+				{
+					var control = ConcernGraphLayout.GetVertexControl(vertex);
+					control.PreviewMouseLeftButtonDown += Vertex_PreviewMouseLeftButtonDown;
+				}
+
+				SetStatus(String.Empty, ControlStatus.Success);
 			}
 		}
 

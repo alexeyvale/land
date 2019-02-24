@@ -17,19 +17,19 @@ namespace Land.Core.Markup
 			OnMarkupChanged += InvalidateRelations;
 		}
 
-		private RelationsManager _relations = new RelationsManager();
-		/// <summary>
-		/// Менеджер отношений между функциональностями
-		/// </summary>
-		public RelationsManager Relations
-		{
-			get
-			{
-				if (!_relations.RelevanceFlag)
-					_relations.BuildInternalRelations(Markup);
+		private RelationsManager Relations { get; set; } = new RelationsManager();
 
-				return _relations;
+		public RelationsManager TryGetRelations()
+		{
+			if (IsValid)
+			{
+				if (!Relations.IsValid)
+					Relations.RefreshCache(Markup);
+
+				return Relations;
 			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -56,17 +56,14 @@ namespace Land.Core.Markup
 		/// Проверка того, что вся разметка синхронизирована с кодом
 		/// </summary>
 		/// <returns></returns>
-		public bool CheckValidity()
-		{
-			return GetLinearSequenceVisitor.GetPoints(Markup).Any(p => p.HasInvalidLocation);
-		}
+		public bool IsValid => !GetLinearSequenceVisitor.GetPoints(Markup).Any(p => p.HasInvalidLocation);
 
 		/// <summary>
 		/// Помечаем отношения как нерелевантные относительно разметки
 		/// </summary>
 		public void InvalidateRelations()
 		{
-			_relations.RelevanceFlag = false;
+			Relations.IsValid = false;
 		}
 
 		/// <summary>
@@ -319,7 +316,14 @@ namespace Land.Core.Markup
 
 					var unit = (SerializationUnit)serializer.ReadObject(gZipStream);
 
+					/// Фиксируем разметку
 					Markup = unit.Markup;
+					
+					/// Запоминаем отношения между функциональностями
+					Relations.RefreshCache(Markup);
+
+					foreach (var pair in unit.ExternalRelatons)
+						Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);
 				}
 			}
 
