@@ -40,7 +40,7 @@ namespace Land.Core.Markup
 			IsValid = false;
 		}
 
-		public List<RelationNotification> RefreshCache(IEnumerable<MarkupElement> markup)
+		public void RefreshCache(IEnumerable<MarkupElement> markup)
 		{
 			var elements = GetLinearSequenceVisitor.GetElements(markup);
 			var concerns = elements.OfType<Concern>().ToList();
@@ -77,9 +77,20 @@ namespace Land.Core.Markup
 			InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
 			InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
 
-			IsValid = true;
+			/// Строим отношение, связывающее точки, помечающие одну и ту же сущность
+			var grouped = points.GroupBy(p => p.AstNode);
 
-			return CheckConsistency();
+			foreach(var group in grouped)
+			{
+				foreach(var point1 in group)
+					foreach(var point2 in group)
+					{
+						if(point1 != point2)
+							InternalRelations.AddRelation(RelationType.MarksTheSameAs, point2, point1);
+					}
+			}
+
+			IsValid = true;
 		}
 
 		public HashSet<RelationType> GetPossibleExternalRelations(MarkupElement from, MarkupElement to)
@@ -124,15 +135,29 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		private bool MustPreceedConstraint(MarkupElement from, MarkupElement to) => 
-			InternalRelations.AreRelated(from, to, RelationType.IsLogicalDescendantOf);
+		private bool MustPreceedConstraint(MarkupElement point1, MarkupElement point2) => 
+			InternalRelations.AreRelated(point1, point2, RelationType.Preceeds);
 
-		private bool ExistsIfConstraint(MarkupElement from, MarkupElement to) =>
-			InternalRelations.AreRelated(from, to, RelationType.IsLogicalDescendantOf);
+		private bool ExistsIfConstraint(MarkupElement point, MarkupElement concern) =>
+			/// Точка либо является потомком функциональности, либо существует
+			/// такая точка-потомок функциональности, что она помечает то же,
+			/// что и точка, которую хотим включить в отношение
+			InternalRelations.AreRelated(point, concern, RelationType.IsLogicalDescendantOf)
+			|| InternalRelations.GetRelated(concern, RelationType.IsLogicalAncestorOf)
+				.OfType<ConcernPoint>().Any(p=> InternalRelations.GetRelated(p, RelationType.MarksTheSameAs).Contains(point)) ;
 
 		public void AddExternalRelation(RelationType type, MarkupElement from, MarkupElement to)
 		{
 			ExternalRelations.AddRelation(type, from, to);
+
+			switch(type)
+			{
+				case RelationType.ExistsIfAll:
+				case RelationType.ExistsIfAny:
+					foreach(var point in InternalRelations.GetRelated(from, RelationType.MarksTheSameAs))
+						ExternalRelations.AddRelation(type, point, to);
+					break;
+			}
 		}
 
 		public List<RelationNotification> CheckConsistency()

@@ -35,6 +35,11 @@ namespace Land.Core.Markup
 		[RelationProperties(isReflexive: false, isSymmetric: false, isTransitive: false, isBasic: true)]
 		IsPhysicalChildOf,
 
+		[Description("Соответствует той же Land-сущности, что и")]
+		[RelationGroup(RelationGroup.Internal)]
+		[RelationProperties(isReflexive: false, isSymmetric: true, isTransitive: true, isBasic: true)]
+		MarksTheSameAs,
+
 		#endregion
 
 		#region Производные от Internal_DirectlyPreceeds

@@ -337,7 +337,7 @@
 					</TreeView.ItemContainerStyle>
 				</TreeView>
 			</TabItem>
-			<TabItem Header="Отношение" Name="RelationTab">
+			<TabItem Header="Отношения" Name="RelationTab">
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<Grid.Resources>

@@ -19,17 +19,19 @@ namespace Land.Core.Markup
 
 		private RelationsManager Relations { get; set; } = new RelationsManager();
 
-		public RelationsManager TryGetRelations()
+		public List<RelationNotification> TryGetRelations(out RelationsManager relationsManager)
 		{
 			if (IsValid)
 			{
 				if (!Relations.IsValid)
 					Relations.RefreshCache(Markup);
 
-				return Relations;
+				relationsManager = Relations;
+				return Relations.CheckConsistency();
 			}
 
-			return null;
+			relationsManager = null;
+			return new List<RelationNotification>();
 		}
 
 		/// <summary>

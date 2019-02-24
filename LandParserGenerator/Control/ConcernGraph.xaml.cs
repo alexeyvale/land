@@ -172,13 +172,13 @@ namespace Land.Control
 			if (!MarkupManager.IsValid)
 			{
 				SetStatus(
-					"Для доступа к информации об отношениях необходимо перепривязать точки, соответствующие изменившемуся тексту",
+					"Для доступа к информации об отношениях необходимо запустить перепривязку точек, соответствующих изменившемуся тексту",
 					ControlStatus.Error
 				);
 			}
 			else
 			{
-				var manager = MarkupManager.TryGetRelations();
+				MarkupManager.TryGetRelations(out RelationsManager manager);
 
 				if (manager != null)
 				{
