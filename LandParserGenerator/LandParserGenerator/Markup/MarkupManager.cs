@@ -319,8 +319,8 @@ namespace Land.Core.Markup
 					/// Фиксируем разметку
 					Markup = unit.Markup;
 					
-					/// Запоминаем отношения между функциональностями
-					Relations.RefreshCache(Markup);
+					/// Запоминаем external-отношения между функциональностями
+					Relations.RefreshElements(Markup);
 
 					foreach (var pair in unit.ExternalRelatons)
 						Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);

@@ -113,6 +113,9 @@ namespace Land.Core.Markup
 
 				foreach (var key in Cache[rel].Keys)
 					Cache[rel][key].IntersectWith(elements);
+
+				foreach (var elem in elements.Where(e=>!Cache[rel].ContainsKey(e)))
+					Cache[rel][elem] = new HashSet<MarkupElement>();
 			}
 
 			KnownElements.Clear();

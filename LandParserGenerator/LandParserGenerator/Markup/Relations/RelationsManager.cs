@@ -30,6 +30,16 @@ namespace Land.Core.Markup
 		public bool AreRelated(MarkupElement a, MarkupElement b, RelationType relation) => relation.GetGroup() == RelationGroup.Internal 
 			? InternalRelations.AreRelated(a, b, relation) : ExternalRelations.AreRelated(a, b, relation);
 
+		public void RefreshElements(IEnumerable<MarkupElement> markup)
+		{
+			var elements = GetLinearSequenceVisitor.GetElements(markup);
+
+			InternalRelations.SetElements(elements);
+			ExternalRelations.RefreshElements(elements);
+
+			IsValid = false;
+		}
+
 		public List<RelationNotification> RefreshCache(IEnumerable<MarkupElement> markup)
 		{
 			var elements = GetLinearSequenceVisitor.GetElements(markup);
