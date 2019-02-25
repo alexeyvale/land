@@ -56,14 +56,20 @@ namespace Land.Control
 		private void RelationSaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (RelationSource.Tag is MarkupElement source
-				&& RelationTarget.Tag is MarkupElement target
-				&& RelationCandidatesList.SelectedItem is RelationsTreeNode relation)
+				&& RelationTarget.Tag is MarkupElement target)
 			{
 				var relationsManager = TryGetRelations();
 
 				if (relationsManager != null)
 				{
-					relationsManager.AddExternalRelation(relation.Relation.Value, source, target);
+					foreach (RelationsTreeNode rel in RelationCandidatesList.ItemsSource)
+					{
+						if(rel.IsSelected)
+							relationsManager.AddExternalRelation(rel.Relation.Value, source, target);
+						else
+							relationsManager.RemoveExternalRelation(rel.Relation.Value, source, target);
+					}
+
 					SetStatus("Отношение добавлено", ControlStatus.Success);
 				}
 			}
@@ -75,9 +81,18 @@ namespace Land.Control
 				RelationCandidatesList.ItemsSource = null;
 			else
 			{
-				RelationCandidatesList.ItemsSource =
-					TryGetRelations()?.GetPossibleExternalRelations((MarkupElement)RelationSource.Tag, (MarkupElement)RelationTarget.Tag)
-						.Select(r=>new RelationsTreeNode(r));
+				var relationsManager = TryGetRelations();
+
+				if (relationsManager != null)
+				{
+					var from = (MarkupElement)RelationSource.Tag;
+					var to = (MarkupElement)RelationTarget.Tag;
+
+					RelationCandidatesList.ItemsSource = 
+						relationsManager.GetPossibleExternalRelations(from, to)
+							.Select(r => new RelationsTreeNode(r, relationsManager.AreRelated(from, to, r)))
+							.ToList();
+				}
 			}
 		}
 

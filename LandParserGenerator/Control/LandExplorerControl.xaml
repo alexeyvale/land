@@ -409,12 +409,13 @@
 								<RowDefinition Height="100*"></RowDefinition>
 							</Grid.RowDefinitions>
 							
-							<Label Content="Возможные отношения" Grid.Row="0"/>
+							<Label Content="Настраиваемые отношения" Grid.Row="0"/>
 							<ListView Name="RelationCandidatesList" Grid.Row="1">
 								<ListView.ItemTemplate>
 									<DataTemplate>
 										<StackPanel Orientation="Horizontal">
-											<CheckBox Tag="{Binding Path=Relation}"/>
+											<CheckBox Tag="{Binding Path=Relation}"
+													  IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"/>
 											<TextBlock Text="{Binding Path=Text, Mode=OneWay}" />
 										</StackPanel>
 									</DataTemplate>

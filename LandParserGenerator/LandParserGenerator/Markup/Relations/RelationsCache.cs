@@ -130,16 +130,41 @@ namespace Land.Core.Markup
 			if (!Cache.ContainsKey(type) || !KnownElements.Contains(from) || !KnownElements.Contains(to))
 				return false;
 
-			Cache[type][from].Add(to);
-
-			if (type.GetAttribute<RelationPropertiesAttribute>().IsSymmetric)
+			if (Cache[type][from].Add(to))
 			{
-				Cache[type][to].Add(from);
+				if (type.GetAttribute<RelationPropertiesAttribute>().IsSymmetric)
+				{
+					Cache[type][to].Add(from);
+				}
+
+				if (type.GetAttribute<RelationPropertiesAttribute>().IsTransitive)
+				{
+					FillAsClosure(type, type);
+				}
 			}
 
-			if (type.GetAttribute<RelationPropertiesAttribute>().IsTransitive)
+			return true;
+		}
+
+		/// <summary>
+		/// Удаление связи между элементами
+		/// </summary>
+		public bool RemoveRelation(RelationType type, MarkupElement from, MarkupElement to)
+		{
+			if (!Cache.ContainsKey(type) || !KnownElements.Contains(from) || !KnownElements.Contains(to))
+				return false;
+
+			if (Cache[type][from].Remove(to))
 			{
-				FillAsClosure(type, type);
+				if (type.GetAttribute<RelationPropertiesAttribute>().IsSymmetric)
+				{
+					Cache[type][to].Remove(from);
+				}
+
+				if (type.GetAttribute<RelationPropertiesAttribute>().IsTransitive)
+				{
+					FillAsClosure(type, type);
+				}
 			}
 
 			return true;

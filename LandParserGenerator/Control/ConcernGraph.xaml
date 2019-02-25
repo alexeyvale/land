@@ -99,6 +99,7 @@
 							<CheckBox x:Name="RelationCheckBox"
 									  Checked="RelationCheckBox_CheckedChanged"
 									  Unchecked="RelationCheckBox_CheckedChanged"
+									  IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"
 									  Tag="{Binding Path=Relation}"
 									  Visibility="{Binding Path=Relation, Mode=OneTime, Converter={StaticResource RelationCheckBoxVisibilityConverter}}"/>
 							<TextBlock Text="{Binding Path=Text, Mode=OneWay}" />

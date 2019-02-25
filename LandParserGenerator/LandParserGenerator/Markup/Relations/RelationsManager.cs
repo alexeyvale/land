@@ -160,6 +160,20 @@ namespace Land.Core.Markup
 			}
 		}
 
+		public void RemoveExternalRelation(RelationType type, MarkupElement from, MarkupElement to)
+		{
+			ExternalRelations.RemoveRelation(type, from, to);
+
+			switch (type)
+			{
+				case RelationType.ExistsIfAll:
+				case RelationType.ExistsIfAny:
+					foreach (var point in InternalRelations.GetRelated(from, RelationType.MarksTheSameAs))
+						ExternalRelations.AddRelation(type, point, to);
+					break;
+			}
+		}
+
 		public List<RelationNotification> CheckConsistency()
 		{
 			var notifications = new List<RelationNotification>();

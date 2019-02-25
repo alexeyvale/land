@@ -11,13 +11,15 @@ namespace Land.Control
 		public string Text { get; set; }
 		public RelationType? Relation { get; set; }
 		public List<RelationsTreeNode> Children { get; set; }
+		public bool IsSelected { get; set; }
 
 		public RelationsTreeNode() { }
 
-		public RelationsTreeNode(RelationType relation)
+		public RelationsTreeNode(RelationType relation, bool isSelected = false)
 		{
 			Text = relation.GetDescription();
 			Relation = relation;
+			IsSelected = isSelected;
 		}
 	}
 }
