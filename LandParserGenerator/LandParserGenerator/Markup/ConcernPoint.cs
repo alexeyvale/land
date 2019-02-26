@@ -83,6 +83,7 @@ namespace Land.Core.Markup
 		{
 			Name = name;
 			Context = PointContext.Create(targetInfo);
+			AstNode = targetInfo.TargetNode;
 			Parent = parent;
 
 			base.PropertyChanged += ParentPropertyChanged;
