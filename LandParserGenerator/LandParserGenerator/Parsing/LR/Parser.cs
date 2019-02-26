@@ -16,6 +16,8 @@ namespace Land.Core.Parsing.LR
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
 
+		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
+
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLR1(g);
@@ -23,7 +25,10 @@ namespace Land.Core.Parsing.LR
 
 		protected override Node ParsingAlgorithm(string text, bool enableTracing)
 		{
-			Node root = null;	
+			Node root = null;
+
+			/// Множество индексов токенов, на которых запускалось восстановление
+			PositionsWhereRecoveryStarted = new HashSet<int>();
 
 			/// Готовим лексер
 			LexingStream = new TokenStream(Lexer, text);
@@ -356,7 +361,17 @@ namespace Land.Core.Parsing.LR
 					LexingStream.CurrentToken.Location.Start
 				));
 
-				return null;
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+			}
+
+			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
+			{
+				Log.Add(Message.Error(
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
+					LexingStream.CurrentToken.Location.Start
+				));
+
+				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
 			PointLocation startLocation = null;
