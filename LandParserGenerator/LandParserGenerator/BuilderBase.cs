@@ -77,8 +77,10 @@ namespace Land.Core
 
 			process.WaitForExit();
 
+			var hasErrors = !String.IsNullOrEmpty(antlrErrors.Result);
+
 			/// Если есть ошибки, приводим их к виду, больше соответствующему .land-файлу
-			if(!String.IsNullOrEmpty(antlrErrors.Result))
+			if(hasErrors)
 			{
 				var errorsList = antlrErrors.Result.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());
 				foreach(var error in errorsList)
@@ -106,18 +108,21 @@ namespace Land.Core
 					}
 				}
 			}
+			/// иначе компилируем .cs-файл лексера
+			else
+			{
+				var codeProvider = new CSharpCodeProvider();
 
-			/// Компилируем .cs-файл лексера
+				var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+				compilerParams.GenerateInMemory = true;
+				compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
+				compilerParams.ReferencedAssemblies.Add("System.dll");
 
-			var codeProvider = new CSharpCodeProvider();
+				var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{TempName(lexerName)}.cs");
+				return compilationResult.CompiledAssembly.GetType(lexerName);
+			}
 
-			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
-			compilerParams.GenerateInMemory = true;
-			compilerParams.ReferencedAssemblies.Add("Antlr4.Runtime.Standard.dll");
-			compilerParams.ReferencedAssemblies.Add("System.dll");
-
-			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, $"{TempName(lexerName)}.cs");
-			return compilationResult.CompiledAssembly.GetType(lexerName);
+			return null;
 		}
 
 		public static Grammar BuildGrammar(GrammarType type, string text, List<Message> log)
@@ -145,54 +150,54 @@ namespace Land.Core
 		{
 			var builtGrammar = BuildGrammar(type, text, messages);
 
-			if (messages.Count(m=>m.Type == MessageType.Error) == 0)
-			{
-				builtGrammar.RebuildUserificationCache();
-
-				BaseTable table = null;
-
-				switch(type)
-				{
-					case GrammarType.LL:
-						table = new TableLL1(builtGrammar);
-						break;
-					case GrammarType.LR:
-						table = new TableLR1(builtGrammar);
-						break;
-				}
-
-				messages.AddRange(table.CheckValidity());
-
-				table.ExportToCsv(TempName("current_table.csv"));
-
-				var lexerType = BuildLexer(builtGrammar, "CurrentLexer", messages);
-
-				/// Создаём парсер
-				BaseParser parser = null;
-				switch (type)
-				{
-					case GrammarType.LL:
-						parser = new Parsing.LL.Parser(builtGrammar,
-							new AntlrLexerAdapter(
-								(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-							)
-						);
-						break;
-					case GrammarType.LR:
-						parser = new Parsing.LR.Parser(builtGrammar,
-							new AntlrLexerAdapter(
-								(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
-							)
-						);
-						break;
-				}
-
-				return parser;
-			}
-			else
-			{
+			if (messages.Count(m=>m.Type == MessageType.Error) != 0)
 				return null;
+
+			builtGrammar.RebuildUserificationCache();
+
+			BaseTable table = null;
+
+			switch(type)
+			{
+				case GrammarType.LL:
+					table = new TableLL1(builtGrammar);
+					break;
+				case GrammarType.LR:
+					table = new TableLR1(builtGrammar);
+					break;
 			}
+
+			messages.AddRange(table.CheckValidity());
+
+			table.ExportToCsv(TempName("current_table.csv"));
+
+			var lexerType = BuildLexer(builtGrammar, "CurrentLexer", messages);
+
+			if (messages.Count(m => m.Type == MessageType.Error) != 0)
+				return null;
+
+			/// Создаём парсер
+			BaseParser parser = null;
+
+			switch (type)
+			{
+				case GrammarType.LL:
+					parser = new Parsing.LL.Parser(builtGrammar,
+						new AntlrLexerAdapter(
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+						)
+					);
+					break;
+				case GrammarType.LR:
+					parser = new Parsing.LR.Parser(builtGrammar,
+						new AntlrLexerAdapter(
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+						)
+					);
+					break;
+			}
+
+			return parser;
 		}
 
 		/// <summary>
@@ -218,106 +223,111 @@ namespace Land.Core
 			/// Строим объект грамматики и проверяем, корректно ли прошло построение
 			var builtGrammar = BuildGrammar(type, text, messages);
 
-			if (messages.Count(m => m.Type == MessageType.Error) == 0)
+			/// Проверяем, не появились ли ошибки после построения грамматики
+			if (messages.Count(m => m.Type == MessageType.Error) != 0)
+				return false;
+
+			builtGrammar.RebuildUserificationCache();
+
+			/// Строим таблицу и проверяем, соответствует ли она указанному типу грамматики
+			BaseTable table = null;
+
+			switch (type)
 			{
-				builtGrammar.RebuildUserificationCache();
+				case GrammarType.LL:
+					table = new TableLL1(builtGrammar);
+					break;
+				case GrammarType.LR:
+					table = new TableLR1(builtGrammar);
+					break;
+			}
 
-				/// Строим таблицу и проверяем, соответствует ли она указанному типу грамматики
-				BaseTable table = null;
+			messages.AddRange(table.CheckValidity());
 
-				switch (type)
+			/// Проверяем, не появились ли ошибки после построения таблицы
+			if (messages.Count(m => m.Type == MessageType.Error) != 0)
+				return false;
+
+			var lexerFileName = TempName($"{@namespace.Replace('.', '_')}_Lexer.cs");
+			var parserFileName = TempName($"{@namespace.Replace('.', '_')}_Parser.cs");
+			var grammarFileName = TempName($"{@namespace.Replace('.', '_')}_Grammar.cs");
+			var nodeGeneratorFileName = TempName($"{@namespace.Replace('.', '_')}_NodeGenerator.cs");
+
+			BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
+
+			/// Проверяем, не появились ли ошибки после генерации исходников лексера
+			if (messages.Count(m => m.Type == MessageType.Error) != 0)
+				return false;
+
+			File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
+			File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
+			File.WriteAllText(nodeGeneratorFileName, GetNodeGeneratorText(builtGrammar, @namespace));
+
+			if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
+			{
+				/// Создаём файл ключа
+				Process process = new Process();
+				ProcessStartInfo startInfo = new ProcessStartInfo()
 				{
-					case GrammarType.LL:
-						table = new TableLL1(builtGrammar);
-						break;
-					case GrammarType.LR:
-						table = new TableLR1(builtGrammar);
-						break;
-				}
+					FileName = "cmd.exe",
+					Arguments = $"/C chcp 1251 | \"Resources/sn.exe\" -k \"{keyPath}\"",
+					CreateNoWindow = true,
+					RedirectStandardOutput = true,
+					UseShellExecute = false
+				};
+				process.StartInfo = startInfo;
+				process.Start();
 
-				messages.AddRange(table.CheckValidity());
+				process.WaitForExit();
+			}
 
-				if (messages.Count(m => m.Type == MessageType.Error) == 0)
+			/// Компилируем библиотеку
+			var codeProvider = new CSharpCodeProvider(); ;
+			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
+
+			compilerParams.GenerateInMemory = false;
+			compilerParams.OutputAssembly = Path.Combine(path, $"{@namespace}.dll");
+			compilerParams.ReferencedAssemblies.Add(ANTLR_LIBRARY);
+			compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
+			compilerParams.ReferencedAssemblies.Add("System.dll");
+			compilerParams.ReferencedAssemblies.Add("System.Core.dll");
+			compilerParams.ReferencedAssemblies.Add("mscorlib.dll");
+
+			if (!String.IsNullOrEmpty(keyPath))
+				compilerParams.CompilerOptions = $"/keyfile:\"{keyPath}\"";
+
+			var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName, nodeGeneratorFileName);
+
+			if (compilationResult.Errors.Count == 0)
+			{
+				File.Copy(ANTLR_LIBRARY, Path.Combine(path, ANTLR_LIBRARY), true);
+
+				return true;
+			}
+			else
+			{
+				foreach (System.CodeDom.Compiler.CompilerError error in compilationResult.Errors)
 				{
-					var lexerFileName = TempName($"{@namespace.Replace('.', '_')}_Lexer.cs");
-					var parserFileName = TempName($"{@namespace.Replace('.', '_')}_Parser.cs");
-					var grammarFileName = TempName($"{@namespace.Replace('.', '_')}_Grammar.cs");
-					var nodeGeneratorFileName = TempName($"{@namespace.Replace('.', '_')}_NodeGenerator.cs");
-
-					BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
-					File.WriteAllText(grammarFileName, GetGrammarProviderText(builtGrammar, @namespace));
-					File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
-					File.WriteAllText(nodeGeneratorFileName, GetNodeGeneratorText(builtGrammar, @namespace));
-
-					if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
+					if (error.IsWarning)
 					{
-						/// Создаём файл ключа
-						Process process = new Process();
-						ProcessStartInfo startInfo = new ProcessStartInfo()
-						{
-							FileName = "cmd.exe",
-							Arguments = $"/C chcp 1251 | \"Resources/sn.exe\" -k \"{keyPath}\"",
-							CreateNoWindow = true,
-							RedirectStandardOutput = true,
-							UseShellExecute = false
-						};
-						process.StartInfo = startInfo;
-						process.Start();
-
-						process.WaitForExit();
-					}
-
-					/// Компилируем библиотеку
-					var codeProvider = new CSharpCodeProvider(); ;
-					var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
-
-					compilerParams.GenerateInMemory = false;
-					compilerParams.OutputAssembly = Path.Combine(path, $"{@namespace}.dll");
-					compilerParams.ReferencedAssemblies.Add(ANTLR_LIBRARY);
-					compilerParams.ReferencedAssemblies.Add("Land.Core.dll");
-					compilerParams.ReferencedAssemblies.Add("System.dll");
-					compilerParams.ReferencedAssemblies.Add("System.Core.dll");
-					compilerParams.ReferencedAssemblies.Add("mscorlib.dll");
-
-					if(!String.IsNullOrEmpty(keyPath))
-						compilerParams.CompilerOptions = $"/keyfile:\"{keyPath}\"";
-
-					var compilationResult = codeProvider.CompileAssemblyFromFile(compilerParams, lexerFileName, grammarFileName, parserFileName, nodeGeneratorFileName);
-
-					if (compilationResult.Errors.Count == 0)
-					{
-						File.Copy(ANTLR_LIBRARY, Path.Combine(path, ANTLR_LIBRARY), true);
-
-						return true;
+						messages.Add(Message.Warning(
+							$"Предупреждение: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
+							null,
+							"C# Compiler"
+						));
 					}
 					else
 					{
-						foreach(System.CodeDom.Compiler.CompilerError error in compilationResult.Errors)
-						{
-							if (error.IsWarning)
-							{
-								messages.Add(Message.Warning(
-									$"Предупреждение: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
-									null,
-									"C# Compiler"
-								));
-							}
-							else
-							{
-								messages.Add(Message.Error(
-									$"Ошибка: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
-									null,
-									"C# Compiler"
-								));
-							}
-						}
-
-						return messages.All(m => m.Type != MessageType.Error);
+						messages.Add(Message.Error(
+							$"Ошибка: {error.FileName}; ({error.Line}, {error.Column}); {error.ErrorText}",
+							null,
+							"C# Compiler"
+						));
 					}
 				}
-			}
 
-			return false;
+				return messages.All(m => m.Type != MessageType.Error);
+			}
 		}
 
 		private static string GetGrammarProviderText(Grammar grammar, string @namespace)

@@ -374,6 +374,11 @@ namespace Land.Core.Parsing.LR
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
+			Log.Add(Message.Warning(
+				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				LexingStream.CurrentToken.Location.Start
+			));
+
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
 			IEnumerable<string> value = new List<string>();
