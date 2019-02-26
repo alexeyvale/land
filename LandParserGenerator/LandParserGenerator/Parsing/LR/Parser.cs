@@ -379,8 +379,8 @@ namespace Land.Core.Parsing.LR
 			IEnumerable<string> value = new List<string>();
 
 			var previouslyMatchedSymbol = String.Empty;
-			var pathParts = new HashSet<PathFragment>();
-			var candidates = new HashSet<PathFragment>();
+			var derivationProds = new HashSet<PathFragment>();
+			var recoveryProds = new HashSet<PathFragment>();
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
@@ -409,7 +409,7 @@ namespace Land.Core.Parsing.LR
 				{
 					/// Выбираем пункты, продукции которых потенциально могут участвовать
 					/// в выводе текущего префикса из стартового символа
-					pathParts = new HashSet<PathFragment>(
+					derivationProds = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()]
 							.Where
 							(i =>
@@ -417,20 +417,20 @@ namespace Land.Core.Parsing.LR
 								i.Next == previouslyMatchedSymbol &&
 								/// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
 								/// с той же альтернативой, но точкой на один символ дальше
-								(pathParts.Count == 0 || pathParts.Any(p => p.Alt.Equals(i.Alternative) && p.Pos == i.Position + 1))
+								(derivationProds.Count == 0 || derivationProds.Any(p => p.Alt.Equals(i.Alternative) && p.Pos == i.Position + 1))
 							)
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 					);
 
 					var oldCount = 0;
 
-					while(oldCount != pathParts.Count)
+					while(oldCount != derivationProds.Count)
 					{
-						oldCount = pathParts.Count;
+						oldCount = derivationProds.Count;
 
 						/// Добавляем к списку пункты, порождающие уже добавленные пункты
-						pathParts.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i=>pathParts.Any(p=>p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
+						derivationProds.UnionWith(Table.Items[Stack.PeekState()]
+							.Where(i=>derivationProds.Any(p=>p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 						);
 					}
@@ -438,7 +438,7 @@ namespace Land.Core.Parsing.LR
 					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
 					/// для которых есть пункт с точкой в начале, стоящей перед Any;
 					/// таких в каждом состоянии может быть ровно один
-					candidates = new HashSet<PathFragment>(
+					recoveryProds = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()]
 							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = 0 })
@@ -449,12 +449,12 @@ namespace Land.Core.Parsing.LR
 
 					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
 					/// уже имеющиеся в списке кандидатов пункты
-					while (oldCount != candidates.Count)
+					while (oldCount != recoveryProds.Count)
 					{
-						oldCount = candidates.Count;
+						oldCount = recoveryProds.Count;
 
-						candidates.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i => candidates.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
+						recoveryProds.UnionWith(Table.Items[Stack.PeekState()]
+							.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = iterIdx}));
 
 						++iterIdx;
@@ -462,15 +462,15 @@ namespace Land.Core.Parsing.LR
 
 					/// Оставляем те участки пути, которые фигурируют и в вероятном пути разбора,
 					/// и в путях, которые можно использовать для восстановления
-					candidates.IntersectWith(pathParts);
+					recoveryProds.IntersectWith(derivationProds);
 				}
 			}
 			/// Работаем, пока вероятный путь разбора не пересекается с путём до места восстановления
 			/// или пока в базисных продукциях этого пересечения точка стоит перед последним снятым со стека символом,
 			/// то есть, мы уже успешно разобрали то, что хотим разобрать по-новому
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
-				|| candidates.Count == 0
-				|| candidates.Where(c=>c.Pos > 0).All(c=>c.Alt[c.Pos] == previouslyMatchedSymbol))
+				|| recoveryProds.Count == 0
+				|| recoveryProds.Where(c=>c.Pos > 0).All(c=>c.Alt[c.Pos] == previouslyMatchedSymbol))
 			);
 
 			if (Stack.CountStates > 0)
