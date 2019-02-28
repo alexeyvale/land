@@ -338,7 +338,6 @@ namespace Land.Core.Parsing.LR
 		{
 			public Alternative Alt { get; set; }
 			public int Pos { get; set; }
-			public int Idx { get; set; }
 
 			public override bool Equals(object obj)
 			{
@@ -384,6 +383,7 @@ namespace Land.Core.Parsing.LR
 			IEnumerable<string> value = new List<string>();
 
 			var previouslyMatchedSymbol = String.Empty;
+			var initialIntersectionCount = 0;
 			var derivationProds = new HashSet<PathFragment>();
 			var recoveryProds = new HashSet<PathFragment>();
 
@@ -412,6 +412,28 @@ namespace Land.Core.Parsing.LR
 
 				if (Stack.CountStates > 0)
 				{
+					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
+					/// для которых есть пункт с точкой в начале, стоящей перед Any;
+					/// таких в каждом состоянии может быть ровно один
+					recoveryProds = new HashSet<PathFragment>(
+						Table.Items[Stack.PeekState()]
+							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
+					);
+
+					var oldCount = 0;
+
+					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
+					/// уже имеющиеся в списке кандидатов пункты
+					while (oldCount != recoveryProds.Count)
+					{
+						oldCount = recoveryProds.Count;
+
+						recoveryProds.UnionWith(Table.Items[Stack.PeekState()]
+							.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position }));
+					}
+
 					/// Выбираем пункты, продукции которых потенциально могут участвовать
 					/// в выводе текущего префикса из стартового символа
 					derivationProds = new HashSet<PathFragment>(
@@ -427,7 +449,8 @@ namespace Land.Core.Parsing.LR
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 					);
 
-					var oldCount = 0;
+					initialIntersectionCount = recoveryProds.Intersect(derivationProds).Count();
+					oldCount = 0;
 
 					while(oldCount != derivationProds.Count)
 					{
@@ -440,42 +463,19 @@ namespace Land.Core.Parsing.LR
 						);
 					}
 
-					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
-					/// для которых есть пункт с точкой в начале, стоящей перед Any;
-					/// таких в каждом состоянии может быть ровно один
-					recoveryProds = new HashSet<PathFragment>(
-						Table.Items[Stack.PeekState()]
-							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
-							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = 0 })
-					);
-
-					oldCount = 0;
-					var iterIdx = 1;
-
-					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
-					/// уже имеющиеся в списке кандидатов пункты
-					while (oldCount != recoveryProds.Count)
-					{
-						oldCount = recoveryProds.Count;
-
-						recoveryProds.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
-							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position, Idx = iterIdx}));
-
-						++iterIdx;
-					}
-
 					/// Оставляем те участки пути, которые фигурируют и в вероятном пути разбора,
 					/// и в путях, которые можно использовать для восстановления
 					recoveryProds.IntersectWith(derivationProds);
 				}
 			}
-			/// Работаем, пока вероятный путь разбора не пересекается с путём до места восстановления
-			/// или пока в базисных продукциях этого пересечения точка стоит перед последним снятым со стека символом,
-			/// то есть, мы уже успешно разобрали то, что хотим разобрать по-новому
+			/// Работаем, пока 1) последний снятый со стека символ - это Any,
+			/// или 2) пока нет пересечения вероятного пути вывода и возможного пути восстановления,
+			/// или 3) пока все продукции в изначальном множестве возможных продукций вывода базисные, и продукции в пересечении 
+			/// содержат точку перед снятым со стека символом, то есть, мы уже успешно разобрали то, 
+			/// на чём могли бы восстановиться, и значит, это не родитель места ошибки
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
 				|| recoveryProds.Count == 0
-				|| recoveryProds.Where(c=>c.Pos > 0).All(c=>c.Alt[c.Pos] == previouslyMatchedSymbol))
+				|| initialIntersectionCount == recoveryProds.Count)
 			);
 
 			if (Stack.CountStates > 0)
