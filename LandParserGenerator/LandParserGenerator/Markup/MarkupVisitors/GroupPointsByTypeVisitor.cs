@@ -16,12 +16,12 @@ namespace Land.Core.Markup
 
 		public override void Visit(ConcernPoint point)
 		{
-			if (!Grouped.ContainsKey(point.Context.NodeType))
+			if (!Grouped.ContainsKey(point.Anchor.Context.NodeType))
 			{
-				Grouped[point.Context.NodeType] = new List<ConcernPoint>();
+				Grouped[point.Anchor.Context.NodeType] = new List<ConcernPoint>();
 			}
 
-			Grouped[point.Context.NodeType].Add(point);
+			Grouped[point.Anchor.Context.NodeType].Add(point);
 		}
 
 		public static Dictionary<string, List<ConcernPoint>> GetGroups(IEnumerable<MarkupElement> roots)

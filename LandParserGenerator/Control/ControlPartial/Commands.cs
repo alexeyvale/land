@@ -66,9 +66,12 @@ namespace Land.Control
 
 			if (parent != null)
 			{
-				MarkupManager.RelinkConcernPoint(
-					(parent.DataContext as PointCandidatesPair).Point,
-					State.SelectedItem_MissingTreeView.DataContext as CandidateInfo
+				var candidate = State.SelectedItem_MissingTreeView.DataContext as CandidateInfo;
+
+				MarkupManager.ShiftAnchor(
+					(parent.DataContext as PointCandidatesPair).Point.Anchor,
+					candidate.Context,
+					candidate.Node
 				);
 			}
 		}
@@ -110,6 +113,9 @@ namespace Land.Control
 
 			if (rootTextPair != null)
 			{
+				if (!MarkupManager.IsValid)
+					ApplyMapping_Click(ApplyLocalMapping, null);
+
 				var offset = Editor.GetActiveDocumentOffset();
 
 				if (!String.IsNullOrEmpty(fileName))
@@ -139,12 +145,17 @@ namespace Land.Control
 			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
 
 			if (rootTextPair != null)
+			{
+				if (!MarkupManager.IsValid)
+					ApplyMapping_Click(ApplyLocalMapping, null);
+
 				MarkupManager.AddLand(new TargetFileInfo()
-				{			
+				{
 					FileName = fileName,
 					FileText = rootTextPair.Item2,
 					TargetNode = rootTextPair.Item1
 				});
+			}
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -196,8 +207,8 @@ namespace Land.Control
 				{
 					if(elem is ConcernPoint p)
 					{
-						p.AstNode = stubNode;
-						p.HasIrrelevantLocation = true;
+						p.Anchor.AstNode = stubNode;
+						p.Anchor.HasIrrelevantLocation = true;
 					}
 				});
 

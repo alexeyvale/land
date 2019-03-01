@@ -65,8 +65,8 @@ namespace Land.Control
 					if (EnsureLocationValid(concernPoint))
 					{
 						Editor.SetActiveDocumentAndOffset(
-							concernPoint.Context.FileName,
-							concernPoint.Location.Start
+							concernPoint.Anchor.Context.FileName,
+							concernPoint.Anchor.Location.Start
 						);
 					}
 
@@ -89,8 +89,8 @@ namespace Land.Control
 							if (EnsureLocationValid(concernPoint))
 							{
 								Editor.SetActiveDocumentAndOffset(
-									concernPoint.Context.FileName,
-									concernPoint.Location.Start
+									concernPoint.Anchor.Context.FileName,
+									concernPoint.Anchor.Location.Start
 								);
 							}
 						}

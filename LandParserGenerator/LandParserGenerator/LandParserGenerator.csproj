@@ -83,6 +83,7 @@
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\PairAwareTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Markup\AnchorPoint.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
     <Compile Include="Markup\Relations\RelationsCache.cs" />

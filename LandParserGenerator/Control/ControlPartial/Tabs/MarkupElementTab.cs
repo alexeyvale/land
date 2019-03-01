@@ -30,7 +30,7 @@ namespace Land.Control
 
 				Editor.SetActiveDocumentAndOffset(
 					State.PendingCommand.DocumentName,
-					node.Anchor.Start
+					node.Location.Start
 				);
 			}
 		}
@@ -53,16 +53,19 @@ namespace Land.Control
 				{
 					var point = State.PendingCommand.Target.DataContext is ConcernPoint cPoint
 						? cPoint : (State.PendingCommand.Target.DataContext as PointCandidatesPair).Point;
-
-					MarkupManager.RelinkConcernPoint(
-						point,
-						new TargetFileInfo()
+					var targetInfo = new TargetFileInfo()
 						{
 							FileName = State.PendingCommand.DocumentName,
 							FileText = State.PendingCommand.DocumentText,
 							TargetNode = ((ConcernPointCandidateViewModel)ConcernPointCandidatesList.SelectedItem).Node
-						}
-					);
+						};
+
+					if (ConcernPointShiftAnchor.IsChecked ?? false)
+						MarkupManager.RelinkPoint(point, 
+							PointContext.Create(targetInfo), targetInfo.TargetNode);
+					else
+						MarkupManager.ShiftAnchor(point.Anchor,
+							PointContext.Create(targetInfo), targetInfo.TargetNode);
 
 					point.Name = ConcernPointNameText.Text;
 					point.Comment = ConcernPointCommentText.Text;
@@ -129,6 +132,7 @@ namespace Land.Control
 
 				ConcernPointNameText.Text = pointToRemap?.Name;
 				ConcernPointCommentText.Text = pointToRemap?.Comment;
+				ConcernPointShiftAnchor.IsChecked = false;
 				CustomConcernPointNameEntered = pointToRemap != null;
 			}
 			else

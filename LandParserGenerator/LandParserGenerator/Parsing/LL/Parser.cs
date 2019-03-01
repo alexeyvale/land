@@ -216,7 +216,7 @@ namespace Land.Core.Parsing.LL
 			if (!stopTokens.Contains(token.Name))
 			{
 				/// Проверка на случай, если допропускаем текст в процессе восстановления
-				if (anyNode.Anchor == null)
+				if (anyNode.Location == null)
 					anyNode.SetAnchor(token.Location.Start, token.Location.End);
 
 				/// Смещение для участка, подобранного как текст
@@ -250,7 +250,7 @@ namespace Land.Core.Parsing.LL
 					}
 				}
 
-				anyNode.SetAnchor(anyNode.Anchor.Start, endLocation);
+				anyNode.SetAnchor(anyNode.Location.Start, endLocation);
 
 				if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					return token;
@@ -390,12 +390,12 @@ namespace Land.Core.Parsing.LL
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
-				if (currentNode.Anchor != null)
-					anyNode.SetAnchor(currentNode.Anchor.Start, currentNode.Anchor.End);
+				if (currentNode.Location != null)
+					anyNode.SetAnchor(currentNode.Location.Start, currentNode.Location.End);
 				if (skippedBuffer.Count > 0)
 				{
 					anyNode.SetAnchor(
-						anyNode.Anchor?.Start ?? skippedBuffer.First().Location.Start,
+						anyNode.Location?.Start ?? skippedBuffer.First().Location.Start,
 						skippedBuffer.Last().Location.End
 					);
 				}

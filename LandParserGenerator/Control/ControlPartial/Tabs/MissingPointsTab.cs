@@ -40,7 +40,7 @@ namespace Land.Control
 		private void RefreshMissingPointsList()
 		{
 			MissingTreeView.ItemsSource = MarkupManager.GetConcernPoints()
-				.Where(p => p.HasMissingLocation)
+				.Where(p => p.Anchor.HasMissingLocation)
 				.Select(p => new PointCandidatesPair() { Point = p })
 				.ToList();
 
@@ -49,6 +49,17 @@ namespace Land.Control
 				Tabs.SelectedItem = MissingPointsTab;
 				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
 			}
+		}
+
+		private void ProcessAmbiguities(Dictionary<AnchorPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
+		{
+			var concernPointAmbiguities = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+
+			foreach (var kvp in ambiguities)
+				foreach (var cp in kvp.Key.Links)
+					concernPointAmbiguities[cp] = kvp.Value;
+
+			ProcessAmbiguities(concernPointAmbiguities, globalRemap);
 		}
 
 		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
@@ -93,7 +104,7 @@ namespace Land.Control
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,
-						pair.Node.Anchor.Start
+						pair.Node.Location.Start
 					);
 
 					e.Handled = true;

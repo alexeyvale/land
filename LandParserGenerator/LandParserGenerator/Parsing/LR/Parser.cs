@@ -226,9 +226,9 @@ namespace Land.Core.Parsing.LR
 						? anyNode.Options.AnyOptions[AnyOption.Include] : new HashSet<string>()
 				);
 
-			var startLocation = anyNode.Anchor?.Start 
+			var startLocation = anyNode.Location?.Start 
 				?? token.Location.Start;
-			var endLocation = anyNode.Anchor?.End;
+			var endLocation = anyNode.Location?.End;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
@@ -302,9 +302,9 @@ namespace Land.Core.Parsing.LR
 				);
 
 			var token = LexingStream.CurrentToken;
-			var startLocation = anyNode.Anchor?.Start
+			var startLocation = anyNode.Location?.Start
 				?? token.Location.Start;
-			var endLocation = anyNode.Anchor?.End;
+			var endLocation = anyNode.Location?.End;
 
 			/// Пропускаем токены, пока не найдём тот, для которого
 			/// в текущем состоянии нужно выполнить перенос или свёртку
@@ -393,12 +393,12 @@ namespace Land.Core.Parsing.LR
 			{
 				if (Stack.CountSymbols > 0)
 				{
-					if (Stack.PeekSymbol().Anchor != null)
+					if (Stack.PeekSymbol().Location != null)
 					{
-						startLocation = Stack.PeekSymbol().Anchor.Start;
+						startLocation = Stack.PeekSymbol().Location.Start;
 						if (endLocation == null)
 						{
-							endLocation = Stack.PeekSymbol().Anchor.End;
+							endLocation = Stack.PeekSymbol().Location.End;
 						}
 					}
 

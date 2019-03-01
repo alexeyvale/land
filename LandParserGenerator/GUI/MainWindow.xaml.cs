@@ -526,7 +526,7 @@ namespace Land.GUI
 		{
 			var treeView = (TreeView)sender;
 
-			MoveCaretToSource(((Node)treeView.SelectedItem).Anchor, File_Editor, true, 1);
+			MoveCaretToSource(((Node)treeView.SelectedItem).Location, File_Editor, true, 1);
 		}
 
 		private void File_OpenButton_Click(object sender, RoutedEventArgs e)
@@ -602,13 +602,13 @@ namespace Land.GUI
 				{
 					if (child.Symbol == Grammar.ANY_TOKEN_NAME)
 					{
-						if (child.Anchor != null)
-							AnySegments.Add(new Tuple<int, int>(child.Anchor.Start.Offset, child.Anchor.End.Offset));
+						if (child.Location != null)
+							AnySegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 					else
 					{
-						if (!child.Options.IsLand && child.Anchor != null)
-							TypedWaterSegments.Add(new Tuple<int, int>(child.Anchor.Start.Offset, child.Anchor.End.Offset));
+						if (!child.Options.IsLand && child.Location != null)
+							TypedWaterSegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 
 					Visit(child);
@@ -923,14 +923,14 @@ namespace Land.GUI
 			{
 				if (!point.HasInvalidLocation)
 				{
-					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
+					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Anchor.Context.FileName);
 
 					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
-						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
+						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Anchor.Context.FileName);
 					}
 
-					MoveCaretToSource(point.Location, MappingDebug_OldTextEditor, true);
+					MoveCaretToSource(point.Anchor.Location, MappingDebug_OldTextEditor, true);
 				}
 			}
 		}
@@ -953,7 +953,7 @@ namespace Land.GUI
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
-				var parser = LandExplorer.GetParser(Path.GetExtension(point.Context.FileName));
+				var parser = LandExplorer.GetParser(Path.GetExtension(point.Anchor.Context.FileName));
 
 				/// и при этом парсер сгенерирован
 				if (parser != null)
@@ -981,7 +981,7 @@ namespace Land.GUI
 
 				MappingDebug_SimilaritiesList.ItemsSource = candidates;
 
-				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);
+				MoveCaretToSource(point.Anchor.Location, MappingDebug_OldTextEditor);
 
 				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
 				if (MappingDebug_SimilaritiesList.ItemsSource != null)
@@ -989,7 +989,7 @@ namespace Land.GUI
 					/// значит, в какой-то новый узел мы отобразили старый
 					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Anchor, MappingDebug_NewTextEditor);
+						MoveCaretToSource(((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Location, MappingDebug_NewTextEditor);
 				}
 			}
 		}
@@ -999,7 +999,7 @@ namespace Land.GUI
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
 				var node = ((CandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
-				MoveCaretToSource(node.Anchor, MappingDebug_NewTextEditor);
+				MoveCaretToSource(node.Location, MappingDebug_NewTextEditor);
 			}
 		}
 

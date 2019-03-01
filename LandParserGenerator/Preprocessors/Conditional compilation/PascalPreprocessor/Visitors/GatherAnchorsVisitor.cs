@@ -27,10 +27,10 @@ namespace PascalPreprocessing.ConditionalCompilation
 			}
 			else
 			{
-				if (node.Anchor != null)
+				if (node.Location != null)
 				{
-					Locations.Add(node.Anchor.Start);
-					Locations.Add(node.Anchor.End);
+					Locations.Add(node.Location.Start);
+					Locations.Add(node.Location.End);
 				}
 			}
 

@@ -42,55 +42,55 @@ namespace Land.Core.Markup
 
 		public void RefreshCache(IEnumerable<MarkupElement> markup)
 		{
-			var elements = GetLinearSequenceVisitor.GetElements(markup);
-			var concerns = elements.OfType<Concern>().ToList();
-			var points = elements.OfType<ConcernPoint>().ToList();
+			//var elements = GetLinearSequenceVisitor.GetElements(markup);
+			//var concerns = elements.OfType<Concern>().ToList();
+			//var points = elements.OfType<ConcernPoint>().ToList();
 
-			InternalRelations.SetElements(elements);
-			ExternalRelations.RefreshElements(elements);
+			//InternalRelations.SetElements(elements);
+			//ExternalRelations.RefreshElements(elements);
 
-			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
-			foreach (var concern in concerns)
-				InternalRelations.AddRelation(RelationType.IsLogicalParentOf, concern, concern.Elements);
+			///// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
+			//foreach (var concern in concerns)
+			//	InternalRelations.AddRelation(RelationType.IsLogicalParentOf, concern, concern.Elements);
 
-			InternalRelations.FillAsClosure(RelationType.IsLogicalAncestorOf, RelationType.IsLogicalParentOf);
-			InternalRelations.FillAsTransposition(RelationType.IsLogicalChildOf, RelationType.IsLogicalParentOf);
-			InternalRelations.FillAsTransposition(RelationType.IsLogicalDescendantOf, RelationType.IsLogicalAncestorOf);
+			//InternalRelations.FillAsClosure(RelationType.IsLogicalAncestorOf, RelationType.IsLogicalParentOf);
+			//InternalRelations.FillAsTransposition(RelationType.IsLogicalChildOf, RelationType.IsLogicalParentOf);
+			//InternalRelations.FillAsTransposition(RelationType.IsLogicalDescendantOf, RelationType.IsLogicalAncestorOf);
 
-			/// Строим отношения, связанные с пространственным взаимным расположением точек
-			for (var i = 0; i < points.Count; ++i)
-				for (var j = i + 1; j < points.Count; ++j)
-				{
-					var point1 = points[i];
-					var point2 = points[j];
+			///// Строим отношения, связанные с пространственным взаимным расположением точек
+			//for (var i = 0; i < points.Count; ++i)
+			//	for (var j = i + 1; j < points.Count; ++j)
+			//	{
+			//		var point1 = points[i];
+			//		var point2 = points[j];
 
-					if (point1.Location.End.Offset <= point2.Location.Start.Offset)
-						InternalRelations.AddRelation(RelationType.Preceeds, point1, point2);
+			//		if (point1.Location.End.Offset <= point2.Location.Start.Offset)
+			//			InternalRelations.AddRelation(RelationType.Preceeds, point1, point2);
 					
-					if (point1.Location.Includes(point2.Location))
-						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point2, point1);
+			//		if (point1.Location.Includes(point2.Location))
+			//			InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point2, point1);
 
-					if (point2.Location.Includes(point1.Location))
-						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point1, point2);
-				}
+			//		if (point2.Location.Includes(point1.Location))
+			//			InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point1, point2);
+			//	}
 
-			InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
-			InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
+			//InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
+			//InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
 
-			/// Строим отношение, связывающее точки, помечающие одну и ту же сущность
-			var grouped = points.GroupBy(p => p.AstNode);
+			///// Строим отношение, связывающее точки, помечающие одну и ту же сущность
+			//var grouped = points.GroupBy(p => p.AstNode);
 
-			foreach(var group in grouped)
-			{
-				foreach(var point1 in group)
-					foreach(var point2 in group)
-					{
-						if(point1 != point2)
-							InternalRelations.AddRelation(RelationType.MarksTheSameAs, point2, point1);
-					}
-			}
+			//foreach(var group in grouped)
+			//{
+			//	foreach(var point1 in group)
+			//		foreach(var point2 in group)
+			//		{
+			//			if(point1 != point2)
+			//				InternalRelations.AddRelation(RelationType.MarksTheSameAs, point2, point1);
+			//		}
+			//}
 
-			IsValid = true;
+			//IsValid = true;
 		}
 
 		public HashSet<RelationType> GetPossibleExternalRelations(MarkupElement from, MarkupElement to)
@@ -139,23 +139,27 @@ namespace Land.Core.Markup
 			InternalRelations.AreRelated(point1, point2, RelationType.Preceeds);
 
 		private bool ExistsIfConstraint(MarkupElement point, MarkupElement concern) =>
-			/// Точка либо является потомком функциональности, либо существует
-			/// такая точка-потомок функциональности, что она помечает то же,
-			/// что и точка, которую хотим включить в отношение
-			InternalRelations.AreRelated(point, concern, RelationType.IsLogicalDescendantOf)
-			|| InternalRelations.GetRelated(concern, RelationType.IsLogicalAncestorOf)
-				.OfType<ConcernPoint>().Any(p=> InternalRelations.GetRelated(p, RelationType.MarksTheSameAs).Contains(point)) ;
+			InternalRelations.GetRelated(concern, RelationType.IsLogicalAncestorOf)
+				.OfType<ConcernPoint>().Any(p=> InternalRelations.GetRelated(p, RelationType.MarksTheSameAs).Contains(point));
 
 		public void AddExternalRelation(RelationType type, MarkupElement from, MarkupElement to)
 		{
-			ExternalRelations.AddRelation(type, from, to);
-
 			switch(type)
 			{
 				case RelationType.ExistsIfAll:
 				case RelationType.ExistsIfAny:
-					foreach(var point in InternalRelations.GetRelated(from, RelationType.MarksTheSameAs))
+					ExternalRelations.AddRelation(type, from, to);
+
+					foreach (var point in InternalRelations.GetRelated(from, RelationType.MarksTheSameAs))
 						ExternalRelations.AddRelation(type, point, to);
+					break;
+				case RelationType.MustPreceed:
+					foreach (var point1 in InternalRelations.GetRelated(from, RelationType.MarksTheSameAs))
+						foreach (var point2 in InternalRelations.GetRelated(to, RelationType.MarksTheSameAs))
+							ExternalRelations.AddRelation(type, point1, point2);
+					break;
+				default:
+					ExternalRelations.AddRelation(type, from, to);
 					break;
 			}
 		}

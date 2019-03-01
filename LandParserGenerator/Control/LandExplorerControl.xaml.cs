@@ -147,8 +147,8 @@ namespace Land.Control
 		public List<CandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
-				? MarkupManager.Find(point, 
-					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
+				? MarkupManager.Find(point.Anchor, 
+					new TargetFileInfo() { FileName = point.Anchor.Context.FileName, FileText = fileText, TargetNode = root })
 				: new List<CandidateInfo>();
 		}
 
@@ -358,7 +358,7 @@ namespace Land.Control
 							{
 								segments.Add(new DocumentSegment()
 								{
-									FileName = cp.Context.FileName,
+									FileName = cp.FileName,
 									StartOffset = cp.Location.Start.Offset,
 									EndOffset = cp.Location.End.Offset,
 									CaptureWholeLine = captureWholeLine
@@ -378,7 +378,7 @@ namespace Land.Control
 				{
 					segments.Add(new DocumentSegment()
 					{
-						FileName = concernPoint.Context.FileName,
+						FileName = concernPoint.FileName,
 						StartOffset = concernPoint.Location.Start.Offset,
 						EndOffset = concernPoint.Location.End.Offset,
 						CaptureWholeLine = captureWholeLine
@@ -393,14 +393,14 @@ namespace Land.Control
 		{
 			if (cp.HasInvalidLocation)
 			{
-				var rootTextPair = GetRoot(cp.Context.FileName);
+				var rootTextPair = GetRoot(cp.FileName);
 
 				if (rootTextPair != null)
 				{
 					ProcessAmbiguities(
-						MarkupManager.Remap(cp, new TargetFileInfo()
+						MarkupManager.Remap(cp.Anchor, new TargetFileInfo()
 						{
-							FileName = cp.Context.FileName,
+							FileName = cp.FileName,
 							FileText = rootTextPair.Item2,
 							TargetNode = rootTextPair.Item1
 						}),

@@ -41,15 +41,15 @@ namespace Land.Core.Parsing.Tree
 
 		public string Type => !String.IsNullOrEmpty(Alias) ? Alias : Symbol;
 
-		protected SegmentLocation _anchor;
-		private bool AnchorReady { get; set; } = false;
-		public SegmentLocation Anchor
+		protected SegmentLocation _location;
+		private bool LocationReady { get; set; } = false;
+		public SegmentLocation Location
 		{
 			get
 			{
-				if (!AnchorReady)
+				if (!LocationReady)
 					GetAnchorFromChildren();
-				return _anchor;
+				return _location;
 			}
 		}
 
@@ -68,8 +68,8 @@ namespace Land.Core.Parsing.Tree
 			Children = node.Children;
 			Value = node.Value;
 
-			_anchor = node._anchor;
-			AnchorReady = node.AnchorReady;
+			_location = node._location;
+			LocationReady = node.LocationReady;
 		}
 
 		public void CopyFromNode(Node node)
@@ -81,29 +81,29 @@ namespace Land.Core.Parsing.Tree
 			this.Children = node.Children;
 			this.Value = node.Value;
 
-			this._anchor = node._anchor;
-			this.AnchorReady = node.AnchorReady;
+			this._location = node._location;
+			this.LocationReady = node.LocationReady;
 		}
 
 		protected void GetAnchorFromChildren()
 		{
 			if (Children.Count > 0)
 			{
-				_anchor = Children[0].Anchor;
+				_location = Children[0].Location;
 
 				foreach (var child in Children)
 				{
-					if (child.Anchor == null)
+					if (child.Location == null)
 						child.GetAnchorFromChildren();
 
-					if (_anchor == null)
-						_anchor = child.Anchor;
+					if (_location == null)
+						_location = child.Location;
 					else
-						_anchor = _anchor.SmartMerge(child.Anchor);
+						_location = _location.SmartMerge(child.Location);
 				}
 			}
 
-			AnchorReady = true;
+			LocationReady = true;
 		}
 
 		/// <summary>
@@ -140,8 +140,8 @@ namespace Land.Core.Parsing.Tree
 
 		public void ResetAnchor()
 		{
-			_anchor = null;
-			AnchorReady = false;
+			_location = null;
+			LocationReady = false;
 		}
 
 		public void Reset()
@@ -152,13 +152,13 @@ namespace Land.Core.Parsing.Tree
 
 		public void SetAnchor(PointLocation start, PointLocation end)
 		{
-			_anchor = new SegmentLocation()
+			_location = new SegmentLocation()
 			{
 				Start = start,
 				End = end
 			};
 
-			AnchorReady = true;
+			LocationReady = true;
 		}
 
 		public void SetValue(params string[] vals)

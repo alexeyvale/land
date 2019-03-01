@@ -11,44 +11,58 @@ namespace Land.Core.Markup
 	[DataContract(IsReference = true)]
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
+		#region Anchor
+
+		private AnchorPoint _anchor;
+
 		[DataMember]
-		public PointContext Context { get; set; }
-
-		/// <summary>
-		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
-		/// </summary>
-		public bool HasIrrelevantLocation { get; set; }
-
-		/// <summary>
-		/// Признак того, что координаты потеряны
-		/// </summary>
-		public bool HasMissingLocation => Location == null;
-
-		/// <summary>
-		/// Признак того, что координаты невозможно использовать для перехода
-		/// </summary>
-		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
-
-		/// <summary>
-		/// Узел AST, которому соответствует точка
-		/// </summary>
-		private Node _node;
-		public Node AstNode
+		public AnchorPoint Anchor
 		{
-			get => _node;
+			get
+			{
+				return _anchor;
+			}
 			set
 			{
-				_node = value;
-				HasIrrelevantLocation = false;
+				if (_anchor != null)
+				{
+					_anchor.PropertyChanged -= AnchorPropertyChanged;
+					_anchor.Links.Remove(this);
+				}
 
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+				_anchor = value;
+
+				if (value != null)
+				{
+					_anchor.PropertyChanged += AnchorPropertyChanged;
+					_anchor.Links.Add(this);
+				}
 			}
 		}
 
 		/// <summary>
+		/// Признак того, что координаты невозможно использовать для перехода
+		/// </summary>
+		public bool HasInvalidLocation => Anchor.HasIrrelevantLocation || Anchor.HasMissingLocation;
+
+		/// <summary>
+		/// Имя файла, с которым связана точка
+		/// </summary>
+		public string FileName => Anchor.Context.FileName;
+
+		/// <summary>
+		/// Тип узла дерева, с которым связана точка
+		/// </summary>
+		public string Type => Anchor.Context.NodeType;
+
+		/// <summary>
 		/// Координаты участка в тексте, которому соответствует точка 
 		/// </summary>
-		public SegmentLocation Location => _node?.Anchor;
+		public SegmentLocation Location => Anchor.Location;
+
+		#endregion
+
+		#region PropertyChanged
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
@@ -57,21 +71,27 @@ namespace Land.Core.Markup
 			PropertyChanged?.Invoke(sender, e);
 		}
 
-		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
+		public void AnchorPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			Context = PointContext.Create(targetInfo);
+			PropertyChanged?.Invoke(sender, e);
+		}
 
-			AstNode = targetInfo.TargetNode;
+		#endregion
+
+		public ConcernPoint(AnchorPoint anchor, Concern parent = null)
+		{
+			Anchor = anchor;
+
 			Parent = parent;
-			Name = targetInfo.TargetNode.Type;
+			Name = anchor.AstNode.Type;
 
-			if (targetInfo.TargetNode.Value.Count > 0)
-				Name += ": " + String.Join(" ", targetInfo.TargetNode.Value);
+			if (anchor.AstNode.Value.Count > 0)
+				Name += ": " + String.Join(" ", anchor.AstNode.Value);
 			else
 			{
-				if (targetInfo.TargetNode.Children.Count > 0)
+				if (anchor.AstNode.Children.Count > 0)
 				{
-					Name += ": " + String.Join(" ", targetInfo.TargetNode.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+					Name += ": " + String.Join(" ", anchor.AstNode.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
@@ -79,44 +99,25 @@ namespace Land.Core.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, TargetFileInfo targetInfo, Concern parent = null)
+		public ConcernPoint(string name, AnchorPoint anchor, Concern parent = null)
 		{
+			Anchor = anchor;
+
 			Name = name;
-			Context = PointContext.Create(targetInfo);
-			AstNode = targetInfo.TargetNode;
 			Parent = parent;
 
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, string comment, TargetFileInfo targetInfo, Concern parent = null)
-			: this(name, targetInfo, parent)
+		public ConcernPoint(string name, string comment, AnchorPoint anchor, Concern parent = null)
+			: this(name, anchor, parent)
 		{
 			Comment = comment;
-		}
-
-		public void Relink(TargetFileInfo targetInfo)
-		{
-			AstNode = targetInfo.TargetNode;
-			Context = PointContext.Create(targetInfo);
-		}
-
-		public void Relink(CandidateInfo candidate)
-		{
-			AstNode = candidate.Node;
-			Context = candidate.Context;
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);
 		}
-	}
-
-	public class TargetFileInfo
-	{
-		public string FileName { get; set; }
-		public string FileText { get; set; }
-		public Node TargetNode { get; set; }
 	}
 }

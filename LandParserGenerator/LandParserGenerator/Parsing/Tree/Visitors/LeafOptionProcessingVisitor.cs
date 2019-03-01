@@ -26,11 +26,11 @@ namespace Land.Core.Parsing.Tree
 				node.Value = node.GetValue();
 
 				/// Перед тем, как удалить дочерние узлы, вычисляем соответствие нового листа тексту
-				var tmp = node.Anchor;
+				var tmp = node.Location;
 
 				node.Children.Clear();
 
-				if(node.Anchor != null)
+				if(node.Location != null)
 					node.SetAnchor(tmp.Start, tmp.End);
 			}
 			else
