@@ -12,6 +12,7 @@ namespace Land.Core.Parsing.LR
 	public class Parser: BaseParser
 	{
 		private TableLR1 Table { get; set; }
+		private HashSet<string> RecoverySymbols { get; set; }
 
 		private ParsingStack Stack { get; set; }
 		private TokenStream LexingStream { get; set; }
@@ -21,6 +22,34 @@ namespace Land.Core.Parsing.LR
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLR1(g);
+			RecoverySymbols = new HashSet<string>();
+
+			foreach(var item in Table.Items)
+			{
+				var anyProd = item.FirstOrDefault(m => m.Position == 0 && m.Next == Grammar.ANY_TOKEN_NAME);
+
+				if(anyProd != null)
+				{
+					var recoveryProds = new HashSet<PathFragment>();
+					recoveryProds.Add(new PathFragment { Alt = anyProd.Alternative, Pos = anyProd.Position });
+
+					var oldCount = 0;
+
+					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
+					/// уже имеющиеся в списке кандидатов пункты
+					while (oldCount != recoveryProds.Count)
+					{
+						oldCount = recoveryProds.Count;
+
+						recoveryProds.UnionWith(item.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
+							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position }));
+					}
+
+					RecoverySymbols.UnionWith(
+						recoveryProds.Select(p => p.Alt[p.Pos].Symbol)
+					);
+				}	
+			}
 		}
 
 		protected override Node ParsingAlgorithm(string text, bool enableTracing)
@@ -383,9 +412,8 @@ namespace Land.Core.Parsing.LR
 			IEnumerable<string> value = new List<string>();
 
 			var previouslyMatchedSymbol = String.Empty;
-			var initialIntersectionCount = 0;
 			var derivationProds = new HashSet<PathFragment>();
-			var recoveryProds = new HashSet<PathFragment>();
+			var initialDerivationProds = new HashSet<PathFragment>();
 
 			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
 			/// в котором есть пункт A -> * Any ...
@@ -412,31 +440,9 @@ namespace Land.Core.Parsing.LR
 
 				if (Stack.CountStates > 0)
 				{
-					/// Кандидаты на роль символа, на котором можно восстановиться - символы, 
-					/// для которых есть пункт с точкой в начале, стоящей перед Any;
-					/// таких в каждом состоянии может быть ровно один
-					recoveryProds = new HashSet<PathFragment>(
-						Table.Items[Stack.PeekState()]
-							.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
-							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
-					);
-
-					var oldCount = 0;
-
-					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
-					/// уже имеющиеся в списке кандидатов пункты
-					while (oldCount != recoveryProds.Count)
-					{
-						oldCount = recoveryProds.Count;
-
-						recoveryProds.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
-							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position }));
-					}
-
 					/// Выбираем пункты, продукции которых потенциально могут участвовать
 					/// в выводе текущего префикса из стартового символа
-					derivationProds = new HashSet<PathFragment>(
+					initialDerivationProds = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()]
 							.Where
 							(i =>
@@ -449,8 +455,9 @@ namespace Land.Core.Parsing.LR
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 					);
 
-					initialIntersectionCount = recoveryProds.Intersect(derivationProds).Count();
-					oldCount = 0;
+					derivationProds = new HashSet<PathFragment>(initialDerivationProds);
+
+					var oldCount = 0;
 
 					while(oldCount != derivationProds.Count)
 					{
@@ -462,10 +469,6 @@ namespace Land.Core.Parsing.LR
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 						);
 					}
-
-					/// Оставляем те участки пути, которые фигурируют и в вероятном пути разбора,
-					/// и в путях, которые можно использовать для восстановления
-					recoveryProds.IntersectWith(derivationProds);
 				}
 			}
 			/// Работаем, пока 1) последний снятый со стека символ - это Any,
@@ -474,8 +477,8 @@ namespace Land.Core.Parsing.LR
 			/// содержат точку перед снятым со стека символом, то есть, мы уже успешно разобрали то, 
 			/// на чём могли бы восстановиться, и значит, это не родитель места ошибки
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
-				|| recoveryProds.Count == 0
-				|| initialIntersectionCount == recoveryProds.Count)
+				|| derivationProds.Count == initialDerivationProds.Count
+				|| derivationProds.Except(initialDerivationProds).All(p=>!RecoverySymbols.Contains(p.Alt[p.Pos])))
 			);
 
 			if (Stack.CountStates > 0)
