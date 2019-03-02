@@ -104,6 +104,26 @@ b_x, b_y = zip(*b_points)
 
 ax.scatter(a_x, a_y, marker='.', color='blue')
 
+# считаем площади
+
+
+def in_convex_hull(point, vertices):
+    for i in range(1, len(vertices)):
+        if (vertices[i][0] - vertices[i-1][0]) * (point[1] - vertices[i-1][1]) - \
+                (vertices[i][1] - vertices[i-1][1]) * (point[0] - vertices[i-1][0]) > 0:
+            return False
+    return True
+
+
+def can_make_right_decision(point):
+    return condition(point) and point[0] > s_threshold
+
+
+points_in_search_area = list(filter(lambda p: in_convex_hull(p, search_area), points))
+whole_area = len(points_in_search_area)
+good_area = len(list(filter(condition, points_in_search_area)))
+print('{0:0.2f}'.format(good_area/whole_area))
+
 plt.show()
 
 
