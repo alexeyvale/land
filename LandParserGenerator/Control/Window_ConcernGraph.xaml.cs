@@ -17,9 +17,9 @@ using Land.Core.Markup;
 namespace Land.Control
 {
 	/// <summary>
-	/// Логика взаимодействия для ConcernGraph.xaml
+	/// Логика взаимодействия для Window_ConcernGraph.xaml
 	/// </summary>
-	public partial class ConcernGraph : Window
+	public partial class Window_ConcernGraph : Window
 	{
 		#region Статус
 
@@ -32,20 +32,20 @@ namespace Land.Control
 			switch (status)
 			{
 				case ControlStatus.Error:
-					ConcernGraphStatusBar.Background = LightRed;
+					Window_ConcernGraphStatusBar.Background = LightRed;
 					break;
 				case ControlStatus.Pending:
-					ConcernGraphStatusBar.Background = Brushes.LightGoldenrodYellow;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightGoldenrodYellow;
 					break;
 				case ControlStatus.Ready:
-					ConcernGraphStatusBar.Background = Brushes.LightBlue;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightBlue;
 					break;
 				case ControlStatus.Success:
-					ConcernGraphStatusBar.Background = Brushes.LightGreen;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightGreen;
 					break;
 			}
 
-			ConcernGraphStatus.Content = text;
+			Window_ConcernGraphStatus.Content = text;
 		}
 
 		#endregion
@@ -104,7 +104,7 @@ namespace Land.Control
 		private BidirectionalGraph<object, IEdge<object>> Graph { get; set; }
 		private HashSet<RelationType> RelationsSelected { get; set; } = new HashSet<RelationType>();
 
-		public ConcernGraph(MarkupManager markup)
+		public Window_ConcernGraph(MarkupManager markup)
         {
             InitializeComponent();
 
@@ -151,8 +151,8 @@ namespace Land.Control
 				AdjustForGravity = true
 			};
 
-			ConcernGraphLayout.LayoutAlgorithmType = "KK";
-			ConcernGraphLayout.LayoutParameters = layoutParams;
+			Window_ConcernGraphLayout.LayoutAlgorithmType = "KK";
+			Window_ConcernGraphLayout.LayoutParameters = layoutParams;
 		}
 
 		private void RelationCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
@@ -231,11 +231,11 @@ namespace Land.Control
 					}
 				}
 
-				ConcernGraphLayout.Graph = Graph;
+				Window_ConcernGraphLayout.Graph = Graph;
 
 				foreach (var vertex in Graph.Vertices)
 				{
-					var control = ConcernGraphLayout.GetVertexControl(vertex);
+					var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
 					control.PreviewMouseLeftButtonDown += Vertex_PreviewMouseLeftButtonDown;
 				}
 
@@ -274,20 +274,20 @@ namespace Land.Control
 				{
 					foreach (var vertex in Graph.Vertices)
 					{
-						var control = ConcernGraphLayout.GetVertexControl(vertex);
+						var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
 						control.Foreground = VertexStdForeground;
 					}
 				}
 
 				var groupVertices = new HashSet<object> { vertexContext };
 
-				ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
+				Window_ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
 
 				if (edges != null)
 				{
 					foreach (IEdge<object> edg in edges)
 					{
-						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
+						var curEdge = Window_ConcernGraphLayout.GetEdgeControl(edg);
 						curEdge.Foreground = select ? EdgeInForeground : EdgeStdForeground;
 						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
 
@@ -295,13 +295,13 @@ namespace Land.Control
 					}
 				}
 
-				ConcernGraphLayout.Graph.TryGetOutEdges(vertexContext, out edges);
+				Window_ConcernGraphLayout.Graph.TryGetOutEdges(vertexContext, out edges);
 
 				if (edges != null)
 				{
 					foreach (IEdge<object> edg in edges)
 					{
-						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
+						var curEdge = Window_ConcernGraphLayout.GetEdgeControl(edg);
 						curEdge.Foreground = select ? EdgeOutForeground : EdgeStdForeground;
 						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
 
@@ -313,14 +313,14 @@ namespace Land.Control
 				{
 					foreach (var vertex in Graph.Vertices.Except(groupVertices))
 					{
-						var control = ConcernGraphLayout.GetVertexControl(vertex);
+						var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
 						control.Foreground = VertexHiddenForeground;
 					}
 				}
 			}
 		}
 
-		private void ConcernGraphZoom_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private void Window_ConcernGraphZoom_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton == MouseButton.Left && SelectedVertex != null)
 				UnselectVertex(SelectedVertex);

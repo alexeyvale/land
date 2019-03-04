@@ -50,6 +50,8 @@ namespace Land.Control
 			public bool HighlightConcerns { get; set; }
 		}
 
+		private static readonly string TMP_DIRECTORY = 
+			Path.GetTempPath() + @"\LanD Control";
 		private static readonly string APP_DATA_DIRECTORY = 
 			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control";
 		public static readonly string SETTINGS_FILE_NAME = "LandExplorerSettings.xml";
@@ -67,7 +69,7 @@ namespace Land.Control
 		/// <summary>
 		/// Окно настроек
 		/// </summary>
-		private LandExplorerSettingsWindow SettingsWindow { get; set; }
+		private Window_LandExplorerSettings SettingsWindow { get; set; }
 
 		/// <summary>
 		/// Адаптер редактора, с которым взаимодействует панель
@@ -103,6 +105,18 @@ namespace Land.Control
 		{
 			if (!Directory.Exists(APP_DATA_DIRECTORY))
 				Directory.CreateDirectory(APP_DATA_DIRECTORY);
+
+			if (!Directory.Exists(TMP_DIRECTORY))
+				Directory.CreateDirectory(TMP_DIRECTORY);
+			else
+			{
+				try
+				{
+					Directory.Delete(TMP_DIRECTORY, true);
+					Directory.CreateDirectory(TMP_DIRECTORY);
+				}
+				catch { }
+			}
 		}
 
 		public LandExplorerControl()

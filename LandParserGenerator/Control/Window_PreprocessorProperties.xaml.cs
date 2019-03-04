@@ -10,11 +10,11 @@ using Land.Control.Helpers;
 
 namespace Land.Control
 {
-	public partial class PreprocessorPropertiesWindow : Window
+	public partial class Window_PreprocessorProperties : Window
 	{
 		public List<PreprocessorProperty> Properties { get; private set; }
 
-		public PreprocessorPropertiesWindow(List<PreprocessorProperty> properties)
+		public Window_PreprocessorProperties(List<PreprocessorProperty> properties)
 		{
 			Properties = properties;
 			InitializeComponent();

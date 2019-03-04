@@ -37,6 +37,27 @@ namespace Land.Control
 				: null;
 		}
 
+		private string CopyLibraryToTmp(string path, HashSet<string> dependencies)
+		{
+			var tmpDirectory = Path.Combine(TMP_DIRECTORY, Path.GetRandomFileName());
+
+			while (Directory.Exists(tmpDirectory))
+				tmpDirectory = Path.Combine(TMP_DIRECTORY, Path.GetRandomFileName());
+
+			Directory.CreateDirectory(tmpDirectory);
+
+			var tmpLibraryFile = Path.Combine(tmpDirectory, Path.GetFileName(path));
+			File.Copy(path, tmpLibraryFile);
+
+			foreach (var dependency in dependencies)
+			{
+				if (File.Exists(dependency))
+					File.Copy(dependency, Path.Combine(tmpDirectory, Path.GetFileName(dependency)));
+			}
+
+			return tmpLibraryFile;
+		}
+
 		private Dictionary<string, BaseParser> LoadParsers()
 		{
 			var parsers = new Dictionary<string, BaseParser>();
@@ -55,7 +76,9 @@ namespace Land.Control
 					continue;
 				}
 
-				var parser = (BaseParser)Assembly.LoadFrom(item.ParserPath)
+				var tmpParserFile = CopyLibraryToTmp(item.ParserPath, item.ParserDependencies);
+
+				var parser = (BaseParser)Assembly.LoadFrom(tmpParserFile)
 							.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
 							?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
 
@@ -83,7 +106,9 @@ namespace Land.Control
 					}
 					else
 					{
-						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
+						var tmpPreprocFile = CopyLibraryToTmp(item.PreprocessorPath, item.PreprocessorDependencies);
+
+						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(tmpPreprocFile)
 							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
 							?.GetConstructor(Type.EmptyTypes).Invoke(null);
 

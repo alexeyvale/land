@@ -18,11 +18,11 @@ namespace Land.Control
 	/// <summary>
 	/// Логика взаимодействия для Settings.xaml
 	/// </summary>
-	public partial class LandExplorerSettingsWindow : Window
+	public partial class Window_LandExplorerSettings : Window
 	{
 		public LandExplorerSettings SettingsObject { get; private set; }
 
-		public LandExplorerSettingsWindow(LandExplorerSettings settingsObject)
+		public Window_LandExplorerSettings(LandExplorerSettings settingsObject)
 		{
 			SettingsObject = settingsObject;
 			InitializeComponent();
@@ -44,7 +44,9 @@ namespace Land.Control
 					ParserPath = g.Key.GrammmarPath,
 					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),
                     PreprocessorPath = g.Key.PreprocessorPath,
-                    PreprocessorProperties = g.Select(el=>el.PreprocessorProperties).FirstOrDefault()
+                    PreprocessorProperties = g.Select(el=>el.PreprocessorProperties).FirstOrDefault(),
+					ParserDependencies = g.Select(el => el.ParserDependencies).FirstOrDefault(),
+					PreprocessorDependencies = g.Select(el => el.PreprocessorDependencies).FirstOrDefault(),
 				})
 			);
 
@@ -69,91 +71,107 @@ namespace Land.Control
 			}
 		}
 
-		private void GrammarsGrid_SelectGrammarFile_Click(object sender, RoutedEventArgs e)
+		private void GrammarsGrid_SelectParserFile_Click(object sender, RoutedEventArgs e)
 		{
-			for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
+			ProcessInRowEvent(sender, (ParserSettingsItem item) =>
 			{
-				if (vis is DataGridRow)
+				var openFileDialog = new OpenFileDialog()
 				{
-					GrammarsGrid.CommitEdit();
+					AddExtension = true,
+					Filter = "Динамическая библиотека (*.dll)|*.dll",
+					Title = "Выберите библиотеку парсера"
+				};
 
-					var openFileDialog = new OpenFileDialog()
-					{
-						AddExtension = true,
-						Filter = "Динамическая библиотека (*.dll)|*.dll",
-						Title = "Выберите библиотеку парсера"
-					};
+				if (openFileDialog.ShowDialog() == true)
+				{
+					item.ParserPath = openFileDialog.FileName;
 
-					if (openFileDialog.ShowDialog() == true)
-					{
-						var item = (ParserSettingsItem)((DataGridRow)vis).Item;
-						item.ParserPath = openFileDialog.FileName;
-
-						GrammarsGrid.Items.Refresh();
-					}
-
-					break;
+					GrammarsGrid.Items.Refresh();
 				}
-			}			
+			});		
 		}
 
 		private void GrammarsGrid_SelectPreprocessorFile_Click(object sender, RoutedEventArgs e)
 		{
-			for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
+			ProcessInRowEvent(sender, (ParserSettingsItem item) =>
 			{
-				if (vis is DataGridRow)
+				var openFileDialog = new OpenFileDialog()
 				{
-					GrammarsGrid.CommitEdit();
+					AddExtension = true,
+					Filter = "Динамическая библиотека (*.dll)|*.dll",
+					Title = "Выберите библиотеку препроцессора"
+				};
 
-					var openFileDialog = new OpenFileDialog()
-					{
-						AddExtension = true,
-						Filter = "Динамическая библиотека (*.dll)|*.dll",
-						Title = "Выберите библиотеку препроцессора"
-					};
+				if (openFileDialog.ShowDialog() == true)
+				{
+					item.PreprocessorPath = openFileDialog.FileName;
 
-					if (openFileDialog.ShowDialog() == true)
-					{
-						var item = (ParserSettingsItem)((DataGridRow)vis).Item;
-						item.PreprocessorPath = openFileDialog.FileName;
-
-						GrammarsGrid.Items.Refresh();
-					}
-
-					break;
+					GrammarsGrid.Items.Refresh();
 				}
-			}
+			});
+		}
+
+		private void GrammarsGrid_SelectParserDependencies_Click(object sender, RoutedEventArgs e)
+		{
+			ProcessInRowEvent(sender, (ParserSettingsItem item) =>
+			{
+				if (!String.IsNullOrEmpty(item.ParserPath))
+				{
+					var dependenciesWindow = new Window_LibraryDependencies(item.ParserPath, item.ParserDependencies);
+
+					if (dependenciesWindow.ShowDialog() ?? false)
+						item.ParserDependencies = dependenciesWindow.Selected;
+				}
+			});
+		}
+
+		private void GrammarsGrid_SelectPreprocessorDependencies_Click(object sender, RoutedEventArgs e)
+		{
+			ProcessInRowEvent(sender, (ParserSettingsItem item) =>
+			{
+				if (!String.IsNullOrEmpty(item.PreprocessorPath))
+				{
+					var dependenciesWindow = new Window_LibraryDependencies(item.PreprocessorPath, item.PreprocessorDependencies);
+
+					if (dependenciesWindow.ShowDialog() ?? false)
+						item.PreprocessorDependencies = dependenciesWindow.Selected;
+				}
+			});
 		}
 
 		private void GrammarsGrid_OpenPreprocessorSettings_Click(object sender, RoutedEventArgs e)
+		{
+			ProcessInRowEvent(sender, (ParserSettingsItem item) =>
+			{
+				if (SyncPreprocessorAndProperties(item, out string message))
+				{
+					var settingsWindow = new Window_PreprocessorProperties(item.PreprocessorProperties.Select(p => p.Clone()).ToList());
+					settingsWindow.Owner = this;
+
+					if (settingsWindow.ShowDialog() == true)
+						item.PreprocessorProperties = settingsWindow.Properties;
+				}
+				else
+				{
+					MessageBox.Show(
+						message,
+						"Настройки препроцессора",
+						MessageBoxButton.OK,
+						MessageBoxImage.Information
+					);
+				}
+			});
+		}
+
+		private void ProcessInRowEvent(object sender, Action<ParserSettingsItem> handler)
 		{
 			for (var vis = sender as Visual; vis != null; vis = VisualTreeHelper.GetParent(vis) as Visual)
 			{
 				if (vis is DataGridRow)
 				{
 					GrammarsGrid.CommitEdit();
-
-					/// Находим строчку, в которой нажали на кнопку настроек препроцессора
-					var item = (ParserSettingsItem)((DataGridRow)vis).Item;
-
-					if (SyncPreprocessorAndProperties(item, out string message))
-					{
-						var settingsWindow = new PreprocessorPropertiesWindow(item.PreprocessorProperties.Select(p => p.Clone()).ToList());
-						settingsWindow.Owner = this;
-
-						if (settingsWindow.ShowDialog() == true)
-							item.PreprocessorProperties = settingsWindow.Properties;
-					}
-					else
-					{
-						MessageBox.Show(
-							message,
-							"Настройки препроцессора",
-							MessageBoxButton.OK,
-							MessageBoxImage.Information
-						);
-					}
-
+					/// В обработчик передаём строчку, применительно к которой совершено действие
+					handler((ParserSettingsItem)((DataGridRow)vis).Item);
 					break;
 				}
 			}

@@ -1,4 +1,4 @@
-﻿<Window x:Class="Land.Control.ConcernGraph"
+﻿<Window x:Class="Land.Control.Window_ConcernGraph"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -23,15 +23,15 @@
 			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 
-		<zoom:ZoomControl Name="ConcernGraphZoom" 
-						  PreviewMouseLeftButtonDown="ConcernGraphZoom_PreviewMouseLeftButtonDown"
+		<zoom:ZoomControl Name="Window_ConcernGraphZoom" 
+						  PreviewMouseLeftButtonDown="Window_ConcernGraphZoom_PreviewMouseLeftButtonDown"
 						  Margin="0,0,2,0" 
 						  BorderThickness="1" 
 						  BorderBrush="Gray" 
 						  Grid.Column="0">
-			<graphsharp:GraphLayout Name="ConcernGraphLayout" 
-									Height="{Binding ElementName=ConcernGraphZoom, Path=Height}" 
-									Width="{Binding ElementName=ConcernGraphZoom, Path=Width}" 
+			<graphsharp:GraphLayout Name="Window_ConcernGraphLayout" 
+									Height="{Binding ElementName=Window_ConcernGraphZoom, Path=Height}" 
+									Width="{Binding ElementName=Window_ConcernGraphZoom, Path=Width}" 
 									HorizontalAlignment="Center" 
 									VerticalAlignment="Center" 
 									OverlapRemovalAlgorithmType="FSA" 
@@ -56,8 +56,8 @@
 					<Style TargetType="{x:Type graphsharp:EdgeControl}">
 						<Style.Setters>
 							<Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self},Path=Edge.Info}"/>
-							<Setter Property="Foreground" Value="{x:Static local:ConcernGraph.EdgeStdForeground}"/>
-							<Setter Property="StrokeThickness" Value="{x:Static local:ConcernGraph.EdgeStdWidth}"/>
+							<Setter Property="Foreground" Value="{x:Static local:Window_ConcernGraph.EdgeStdForeground}"/>
+							<Setter Property="StrokeThickness" Value="{x:Static local:Window_ConcernGraph.EdgeStdWidth}"/>
 						</Style.Setters>
 					</Style>
 
@@ -81,7 +81,7 @@
 								</ControlTemplate>
 							</Setter.Value>
 						</Setter>
-						<Setter Property="Foreground" Value="{x:Static local:ConcernGraph.VertexStdForeground}"/>
+						<Setter Property="Foreground" Value="{x:Static local:Window_ConcernGraph.VertexStdForeground}"/>
 					</Style>
 				</graphsharp:GraphLayout.Resources>
 			</graphsharp:GraphLayout>
@@ -117,8 +117,8 @@
 				</TreeView.Resources>
 			</TreeView>
 		</Grid>
-		<StatusBar Name="ConcernGraphStatusBar" Height="30" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Margin="3,0,3,0">
-			<Label Name="ConcernGraphStatus"></Label>
+		<StatusBar Name="Window_ConcernGraphStatusBar" Height="30" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Margin="3,0,3,0">
+			<Label Name="Window_ConcernGraphStatus"></Label>
 		</StatusBar>
 	</Grid>
 </Window>

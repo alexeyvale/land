@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
 using System.Reflection;
+using System.Security.Principal;
 
 using Microsoft.Win32;
 
@@ -227,6 +228,19 @@ namespace Land.GUI
 
 			if (librarySettings.ShowDialog() == true)
 			{
+				/// Для генерации подписанной библиотеки понадобятся права администратора
+				if (librarySettings.Input_IsSignedAssembly.IsChecked == true)
+				{
+					var pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+					if(!pricipal.IsInRole(WindowsBuiltInRole.Administrator))
+					{
+						Grammar_StatusBar.Background = LightRed;
+						Grammar_StatusBarLabel.Content =
+							"Для генерации строго именованной сборки необходимы права администратора";
+						return;
+					}
+				}
+
 				var messages = new List<Message>();
 				var success = BuilderBase.GenerateLibrary(
 					ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,

@@ -222,7 +222,7 @@ namespace Land.Control
 		{
 			if (MarkupManager.IsValid)
 			{
-				var graphWindow = new ConcernGraph(MarkupManager);
+				var graphWindow = new Window_ConcernGraph(MarkupManager);
 				graphWindow.Show();
 			}
 			else
@@ -274,7 +274,7 @@ namespace Land.Control
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
-			SettingsWindow = new LandExplorerSettingsWindow(SettingsObject.Clone());
+			SettingsWindow = new Window_LandExplorerSettings(SettingsObject.Clone());
 			SettingsWindow.Owner = Window.GetWindow(this);
 
 			if (SettingsWindow.ShowDialog() ?? false)
