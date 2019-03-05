@@ -12,6 +12,9 @@ namespace Land.Control
 	public class ParserSettingsItem
 	{
 		[DataMember]
+		public Guid? Id { get; set; }
+
+		[DataMember]
 		public List<string> Extensions { get; set; } = new List<string>();
 
 		[DataMember]
@@ -45,6 +48,7 @@ namespace Land.Control
 		{
 			return new ParserSettingsItem()
 			{
+				Id = Id,
 				Extensions = Extensions,
 				ParserPath = ParserPath,
                 PreprocessorPath = PreprocessorPath,
@@ -58,6 +62,9 @@ namespace Land.Control
 	[DataContract]
 	public class LandExplorerSettings: IExtensibleDataObject
 	{
+		[DataMember]
+		public Guid Id { get; set; }
+
 		[DataMember]
 		public bool SaveAbsolutePath { get; set; }
 
@@ -77,6 +84,7 @@ namespace Land.Control
 		{
 			return new LandExplorerSettings()
 			{
+				Id = Id,
 				SaveAbsolutePath = SaveAbsolutePath,
 				AcceptanceThreshold = AcceptanceThreshold,
 				GarbageThreshold = GarbageThreshold,

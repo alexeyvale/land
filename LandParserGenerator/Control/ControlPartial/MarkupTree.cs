@@ -126,6 +126,7 @@ namespace Land.Control
 
 		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
+			MarkupTreeView.Focus();
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
 			if (item != null)

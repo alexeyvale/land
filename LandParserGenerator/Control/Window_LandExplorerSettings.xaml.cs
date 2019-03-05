@@ -41,6 +41,7 @@ namespace Land.Control
 			SettingsObject.Parsers = new ObservableCollection<ParserSettingsItem>(SettingsObject.Parsers
 				.GroupBy(gr => new { GrammmarPath = gr.ParserPath.Trim(), PreprocessorPath = gr.PreprocessorPath?.Trim() }).Select(g => new ParserSettingsItem()
 				{
+					Id = g.Where(el=>el.Id.HasValue).Select(el=>el.Id).FirstOrDefault() ?? Guid.NewGuid(),
 					ParserPath = g.Key.GrammmarPath,
 					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),
                     PreprocessorPath = g.Key.PreprocessorPath,

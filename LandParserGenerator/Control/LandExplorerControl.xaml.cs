@@ -50,10 +50,12 @@ namespace Land.Control
 			public bool HighlightConcerns { get; set; }
 		}
 
-		private static readonly string TMP_DIRECTORY = 
-			Path.GetTempPath() + @"\LanD Control";
+		private static readonly int CACHE_DIRECTORY_DAYS = 30;
+		
 		private static readonly string APP_DATA_DIRECTORY = 
 			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control";
+		private static readonly string CACHE_DIRECTORY =
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control\Cache";
 		public static readonly string SETTINGS_FILE_NAME = "LandExplorerSettings.xml";
 
 		public static string SETTINGS_DEFAULT_PATH => 
@@ -106,16 +108,19 @@ namespace Land.Control
 			if (!Directory.Exists(APP_DATA_DIRECTORY))
 				Directory.CreateDirectory(APP_DATA_DIRECTORY);
 
-			if (!Directory.Exists(TMP_DIRECTORY))
-				Directory.CreateDirectory(TMP_DIRECTORY);
+			if (!Directory.Exists(CACHE_DIRECTORY))
+				Directory.CreateDirectory(CACHE_DIRECTORY);
 			else
 			{
-				try
+				if ((DateTime.UtcNow - Directory.GetCreationTimeUtc(CACHE_DIRECTORY)).Days > CACHE_DIRECTORY_DAYS)
 				{
-					Directory.Delete(TMP_DIRECTORY, true);
-					Directory.CreateDirectory(TMP_DIRECTORY);
+					try
+					{
+						Directory.Delete(CACHE_DIRECTORY, true);
+						Directory.CreateDirectory(CACHE_DIRECTORY);
+					}
+					catch { }
 				}
-				catch { }
 			}
 		}
 
@@ -268,7 +273,7 @@ namespace Land.Control
 		{
 			/// Загружаем настройки панели способом, определённым в адаптере
 			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH)
-				?? new LandExplorerSettings();
+				?? new LandExplorerSettings() { Id = Guid.NewGuid() };
 
 			SyncMarkupManagerSettings();
 
