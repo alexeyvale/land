@@ -15,7 +15,7 @@
 		<local:MarkupTreeIconVisibilityConverter x:Key="MarkupTreeIconVisibilityConverter" />
 		<local:RelationCheckBoxVisibilityConverter x:Key="RelationCheckBoxVisibilityConverter" />
 
-		<Style TargetType="{x:Type Button}" x:Key="IconButton">
+		<Style TargetType="{x:Type Control}" x:Key="IconButton">
 			<Setter Property="FontSize" Value="12pt"/>
 			<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
 			<Setter Property="Background" Value="Transparent"/>
@@ -43,6 +43,12 @@
 					Style="{StaticResource IconButton}" 
 					ToolTip="Обновить граф"
 					Click="Refresh_Click"></Button>
+			<ToggleButton Content="&#xf1bb;"
+						  Name="ShowAsTree"
+						  ToolTip="Отобразить в виде дерева"
+						  Checked="ShowAsTree_Checked"
+						  Unchecked="ShowAsTree_Checked"
+						  Style="{StaticResource IconButton}"></ToggleButton>
 		</ToolBar>
 		
 		<zoom:ZoomControl Name="Window_ConcernGraphZoom" 
@@ -52,7 +58,7 @@
 						  BorderBrush="Gray" 
 						  Grid.Row="1"
 						  Grid.Column="0">
-			<graphsharp:GraphLayout Name="Window_ConcernGraphLayout" 
+			<graphsharp:GraphLayout Name="ConcernGraphLayout" 
 									Height="{Binding ElementName=Window_ConcernGraphZoom, Path=Height}" 
 									Width="{Binding ElementName=Window_ConcernGraphZoom, Path=Width}" 
 									HorizontalAlignment="Center" 

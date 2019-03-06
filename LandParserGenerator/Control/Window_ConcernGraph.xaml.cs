@@ -151,8 +151,8 @@ namespace Land.Control
 				AdjustForGravity = true
 			};
 
-			Window_ConcernGraphLayout.LayoutAlgorithmType = "KK";
-			Window_ConcernGraphLayout.LayoutParameters = layoutParams;
+			ConcernGraphLayout.LayoutAlgorithmType = "KK";
+			ConcernGraphLayout.LayoutParameters = layoutParams;
 		}
 
 		private void RelationCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
@@ -231,11 +231,11 @@ namespace Land.Control
 					}
 				}
 
-				Window_ConcernGraphLayout.Graph = Graph;
+				ConcernGraphLayout.Graph = Graph;
 
 				foreach (var vertex in Graph.Vertices)
 				{
-					var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
+					var control = ConcernGraphLayout.GetVertexControl(vertex);
 					control.PreviewMouseLeftButtonDown += Vertex_PreviewMouseLeftButtonDown;
 				}
 
@@ -274,20 +274,20 @@ namespace Land.Control
 				{
 					foreach (var vertex in Graph.Vertices)
 					{
-						var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
+						var control = ConcernGraphLayout.GetVertexControl(vertex);
 						control.Foreground = VertexStdForeground;
 					}
 				}
 
 				var groupVertices = new HashSet<object> { vertexContext };
 
-				Window_ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
+				ConcernGraphLayout.Graph.TryGetInEdges(vertexContext, out IEnumerable<IEdge<object>> edges);
 
 				if (edges != null)
 				{
 					foreach (IEdge<object> edg in edges)
 					{
-						var curEdge = Window_ConcernGraphLayout.GetEdgeControl(edg);
+						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
 						curEdge.Foreground = select ? EdgeInForeground : EdgeStdForeground;
 						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
 
@@ -295,13 +295,13 @@ namespace Land.Control
 					}
 				}
 
-				Window_ConcernGraphLayout.Graph.TryGetOutEdges(vertexContext, out edges);
+				ConcernGraphLayout.Graph.TryGetOutEdges(vertexContext, out edges);
 
 				if (edges != null)
 				{
 					foreach (IEdge<object> edg in edges)
 					{
-						var curEdge = Window_ConcernGraphLayout.GetEdgeControl(edg);
+						var curEdge = ConcernGraphLayout.GetEdgeControl(edg);
 						curEdge.Foreground = select ? EdgeOutForeground : EdgeStdForeground;
 						curEdge.StrokeThickness = select ? EdgeSelectedWidth : EdgeStdWidth;
 
@@ -313,7 +313,7 @@ namespace Land.Control
 				{
 					foreach (var vertex in Graph.Vertices.Except(groupVertices))
 					{
-						var control = Window_ConcernGraphLayout.GetVertexControl(vertex);
+						var control = ConcernGraphLayout.GetVertexControl(vertex);
 						control.Foreground = VertexHiddenForeground;
 					}
 				}
@@ -329,6 +329,35 @@ namespace Land.Control
 		private void Refresh_Click(object sender, RoutedEventArgs e)
 		{
 			RebuildGraph();
+		}
+
+		private void ShowAsTree_Checked(object sender, RoutedEventArgs e)
+		{
+			if(ShowAsTree.IsChecked ?? false)
+			{
+				var layoutParams = new GraphSharp.Algorithms
+					.Layout.Simple.Tree.SimpleTreeLayoutParameters()
+				{
+					Direction = GraphSharp.Algorithms.Layout.LayoutDirection.TopToBottom,
+					LayerGap = 50,
+					OptimizeWidthAndHeight = true,
+					SpanningTreeGeneration = GraphSharp.Algorithms
+						.Layout.Simple.Tree.SpanningTreeGeneration.BFS
+				};
+
+				ConcernGraphLayout.LayoutAlgorithmType = "Tree";
+				ConcernGraphLayout.LayoutParameters = layoutParams;
+			}
+			else
+			{
+				var layoutParams = new GraphSharp.Algorithms.Layout.Simple.FDP.KKLayoutParameters
+				{
+					AdjustForGravity = true
+				};
+
+				ConcernGraphLayout.LayoutAlgorithmType = "KK";
+				ConcernGraphLayout.LayoutParameters = layoutParams;
+			}
 		}
 	}
 }
