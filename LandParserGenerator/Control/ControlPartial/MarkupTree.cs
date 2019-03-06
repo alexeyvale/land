@@ -126,7 +126,6 @@ namespace Land.Control
 
 		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			MarkupTreeView.Focus();
 			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
 
 			if (item != null)
@@ -141,6 +140,9 @@ namespace Land.Control
 					State.SelectedItem_MarkupTreeView.IsSelected = false;
 				}
 			}
+
+			MarkupTreeView.Focus();
+			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight(object sender, MouseButtonEventArgs e)
