@@ -325,5 +325,10 @@ namespace Land.Control
 			if (e.ChangedButton == MouseButton.Left && SelectedVertex != null)
 				UnselectVertex(SelectedVertex);
 		}
+
+		private void Refresh_Click(object sender, RoutedEventArgs e)
+		{
+			RebuildGraph();
+		}
 	}
 }
