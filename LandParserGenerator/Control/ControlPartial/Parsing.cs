@@ -45,8 +45,11 @@ namespace Land.Control
 			if (!success)
 				return null;
 
+			var tmpFiles = new HashSet<string>();
+
 			/// Если в целевом месте точно такой же файл, ничего не делаем
 			var tmpLibraryFile = Path.Combine(tmpDirectory, Path.GetFileName(path));
+			tmpFiles.Add(tmpLibraryFile);
 
 			if (!File.Exists(tmpLibraryFile) 
 				|| File.GetLastWriteTimeUtc(path) != File.GetLastWriteTimeUtc(tmpLibraryFile))
@@ -65,6 +68,7 @@ namespace Land.Control
 			foreach (var dependency in dependencies)
 			{
 				var tmpDependencyFile = Path.Combine(tmpDirectory, Path.GetFileName(dependency));
+				tmpFiles.Add(tmpDependencyFile);
 
 				if (File.Exists(dependency))
 				{
@@ -83,6 +87,18 @@ namespace Land.Control
 				}
 				else
 					success = false;
+			}
+
+			/// Удаляем ненужные файлы, оставшиеся от прошлой версии библиотеки
+			if(success)
+			{
+				foreach(var file in Directory.GetFiles(tmpDirectory))
+				{
+					if(!tmpFiles.Contains(file))
+					{
+						try { File.Delete(file); } catch { }
+					}
+				}
 			}
 
 			return tmpLibraryFile;

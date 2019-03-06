@@ -39,13 +39,13 @@ namespace Land.Control
 		public HashSet<string> Selected { get; set; } = new HashSet<string>();
 		public List<PossibleDependencyViewModel> PossibleDependencies { get; set; }
 
-		public Window_LibraryDependencies(string dllPath, HashSet<string> currentDependencies)
+		public Window_LibraryDependencies(string libraryPath, HashSet<string> currentDependencies)
 		{
 			InitializeComponent();
 
-			if (File.Exists(dllPath))
+			if (File.Exists(libraryPath))
 			{
-				PossibleDependencies = Directory.GetFiles(Path.GetDirectoryName(dllPath), "*.dll")
+				PossibleDependencies = Directory.GetFiles(Path.GetDirectoryName(libraryPath), "*.dll")
 					.Select(e => new PossibleDependencyViewModel()
 					{
 						Path = e,
@@ -54,17 +54,20 @@ namespace Land.Control
 						Exists = true
 					}).OrderBy(e => e.Text).ToList();
 
-				PossibleDependencies.RemoveAll(e => e.Path == dllPath);
+				PossibleDependencies.RemoveAll(e => e.Path == libraryPath);
 			}
 			else
 				PossibleDependencies = new List<PossibleDependencyViewModel>();
 
 			foreach (var dependency in currentDependencies)
 			{
-				var possible = PossibleDependencies.FirstOrDefault(d => d.Path.ToLower() == dependency.ToLower());
+				var sameInPossible = PossibleDependencies.FirstOrDefault(d => d.Path.ToLower() == dependency.ToLower());
 
-				if (possible != null)
-					possible.IsSelected = true;
+				if (sameInPossible != null)
+				{
+					sameInPossible.IsSelected = true;
+					Selected.Add(sameInPossible.Path);
+				}
 				else
 					PossibleDependencies.Add(new PossibleDependencyViewModel
 					{
