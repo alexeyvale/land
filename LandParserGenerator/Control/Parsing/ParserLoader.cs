@@ -23,14 +23,14 @@ namespace Land.Control
 			return null;
 		}
 
-		public bool Load(string parserLibraryPath, string preprocessorLibraryPath, 
+		public bool Load(string parserCachedPath, string preprocessorCachedPath, 
 			ParserSettingsItem settings, List<Message> log)
 		{
 			#region Загрузка парсера
 
 			try
 			{
-				Parser = (BaseParser)Assembly.LoadFrom(parserLibraryPath)
+				Parser = (BaseParser)Assembly.LoadFrom(parserCachedPath)
 					.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
 					?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
 			}
@@ -63,7 +63,7 @@ namespace Land.Control
 
 				try
 				{
-					preprocessor = (BasePreprocessor)Assembly.LoadFrom(preprocessorLibraryPath)
+					preprocessor = (BasePreprocessor)Assembly.LoadFrom(preprocessorCachedPath)
 						.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
 						?.GetConstructor(Type.EmptyTypes).Invoke(null);
 				}
@@ -90,7 +90,7 @@ namespace Land.Control
 				if (settings.PreprocessorProperties != null
 					&& settings.PreprocessorProperties.Count > 0)
 				{
-					ConfigurePreprocessor(preprocessor, preprocessorLibraryPath, settings, log);
+					ConfigurePreprocessor(preprocessor, preprocessorCachedPath, settings, log);
 				}
 
 				Parser.SetPreprocessor(preprocessor);
