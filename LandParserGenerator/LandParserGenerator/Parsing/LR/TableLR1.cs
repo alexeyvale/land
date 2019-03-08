@@ -10,6 +10,7 @@ namespace Land.Core.Parsing.LR
 	/// <summary>
 	/// Таблица LR(1) парсинга
 	/// </summary>
+	[Serializable]
 	public class TableLR1: BaseTable
 	{
 		private Dictionary<string, int> Lookaheads { get; set; }

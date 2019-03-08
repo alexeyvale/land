@@ -22,8 +22,16 @@ namespace Land.Control
 {
 	public partial class LandExplorerControl : UserControl
 	{
-		private const string PARSER_PROVIDER_CLASS = "ParserProvider";
-		private const string GET_PARSER_METHOD = "GetParser";
+		public ParserManager Parsers { get; private set; } = new ParserManager();
+
+		private void ReloadParsers()
+		{
+			Log.Clear();
+
+			foreach (var ext in Parsers.Load(SettingsObject, CACHE_DIRECTORY, Log))
+				foreach(var file in ParsedFiles.Keys.Where(f=>Path.GetExtension(f) == ext).ToList())
+					DocumentChangedHandler(file);
+		}
 
 		private Tuple<Node, string> GetRoot(string documentName)
 		{
@@ -37,277 +45,13 @@ namespace Land.Control
 				: null;
 		}
 
-		private string CopyLibraryToTmp(string path, HashSet<string> dependencies, string tmpDirectory, out bool success)
-		{
-			/// Проверяем существование файла, который нужно скопировать
-			success = File.Exists(path);
-
-			if (!success)
-				return null;
-
-			var tmpFiles = new HashSet<string>();
-
-			/// Если в целевом месте точно такой же файл, ничего не делаем
-			var tmpLibraryFile = Path.Combine(tmpDirectory, Path.GetFileName(path));
-			tmpFiles.Add(tmpLibraryFile);
-
-			if (!File.Exists(tmpLibraryFile) 
-				|| File.GetLastWriteTimeUtc(path) != File.GetLastWriteTimeUtc(tmpLibraryFile))
-			{
-				try {
-					File.Copy(path, tmpLibraryFile, true);
-				}
-				catch
-				{
-					success = false;
-					return null;
-				}
-			}
-
-			/// Аналогично проверяем и копируем зависимости
-			foreach (var dependency in dependencies)
-			{
-				var tmpDependencyFile = Path.Combine(tmpDirectory, Path.GetFileName(dependency));
-				tmpFiles.Add(tmpDependencyFile);
-
-				if (File.Exists(dependency))
-				{
-					if (!File.Exists(tmpDependencyFile) 
-						|| File.GetLastWriteTimeUtc(dependency) != File.GetLastWriteTimeUtc(tmpDependencyFile))
-					{
-						try
-						{
-							File.Copy(dependency, tmpDependencyFile);
-						}
-						catch
-						{
-							success = false;
-						}
-					}
-				}
-				else
-					success = false;
-			}
-
-			/// Удаляем ненужные файлы, оставшиеся от прошлой версии библиотеки
-			if(success)
-			{
-				foreach(var file in Directory.GetFiles(tmpDirectory))
-				{
-					if(!tmpFiles.Contains(file))
-					{
-						try { File.Delete(file); } catch { }
-					}
-				}
-			}
-
-			return tmpLibraryFile;
-		}
-
-		private bool EnsureDirectoryExists(string path)
-		{
-			if (!Directory.Exists(path))
-				Directory.CreateDirectory(path);
-
-			return Directory.Exists(path);
-		}
-
-		private Dictionary<string, BaseParser> LoadParsers()
-		{
-			var parsers = new Dictionary<string, BaseParser>();
-
-			#region Обеспечиваем существование временных каталогов
-
-			/// Получаем имя каталога, соответствующего текущим настройкам, и создаём его,
-			/// если он не существует
-			var settingsObjectDirectory = Path.Combine(CACHE_DIRECTORY, SettingsObject.Id.ToString());
-
-			if (!Directory.Exists(settingsObjectDirectory))
-				Directory.CreateDirectory(settingsObjectDirectory);
-
-			var hasLockedFiles = false;
-
-			/// Для каждой записи в наборе парсеров создаём свой каталог, если его не существует
-			var itemsPaths = SettingsObject.Parsers.Select(item =>
-			{
-				if (!File.Exists(item.ParserPath))
-				{
-					Log.Add(Message.Error(
-						$"Файл {item.ParserPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
-						null
-					));
-					return null;
-				}
-
-				if (!String.IsNullOrEmpty(item.PreprocessorPath))
-				{
-					if (!File.Exists(item.PreprocessorPath))
-					{
-						Log.Add(Message.Error(
-							$"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
-							null
-						));
-						return null;
-					}
-				}
-
-				for (var i = 0; i < 2; ++i)
-				{
-					var itemDirectory = Path.Combine(settingsObjectDirectory, item.Id.ToString());
-					EnsureDirectoryExists(itemDirectory);
-
-					var parserDirectory = Path.Combine(itemDirectory, "parser");
-					EnsureDirectoryExists(parserDirectory);
-
-					var preprocDirectory = Path.Combine(itemDirectory, "preprocessor");
-					EnsureDirectoryExists(preprocDirectory);
-
-					var tmpParserFile = CopyLibraryToTmp(item.ParserPath, item.ParserDependencies, 
-						parserDirectory, out bool parserCopySuccess);
-
-					var tmpPreprocFile = CopyLibraryToTmp(item.PreprocessorPath, item.PreprocessorDependencies, 
-						preprocDirectory, out bool preprocCopySuccess);
-
-					/// Если не удалось скопировать более новую версию какой-либо библиотеки на место более старой,
-					/// предполагаем, что библиотеки в каталоге уже используются и нужно создать для парсера новый каталог
-					if (!parserCopySuccess || (!String.IsNullOrEmpty(item.PreprocessorPath) && !preprocCopySuccess))
-					{
-						item.Id = Guid.NewGuid();
-						hasLockedFiles = true;				
-					}
-					else
-						return new { item, parserPath = tmpParserFile, preprocPath = tmpPreprocFile };
-				}
-
-				Log.Add(Message.Error(
-					$"Не удалось скопировать в рабочий каталог библиотеки парсера или препроцессора для {item.ExtensionsString}",
-					null
-				));
-
-				return null;
-			}).Where(i => i != null).ToList();
-
-			if (hasLockedFiles)
-			{
-				Editor.SaveSettings(
-					SettingsObject, SETTINGS_DEFAULT_PATH
-				);
-			}
-
-			#endregion
-
-			/// Генерируем парсер и связываем его с каждым из расширений, указанных для грамматики
-			foreach (var itemPaths in itemsPaths)
-			{
-				BaseParser parser = null;
-
-				try
-				{
-					parser = (BaseParser)Assembly.LoadFrom(itemPaths.parserPath)
-						.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
-						?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
-				}
-				catch (Exception e)
-				{
-					Log.Add(Message.Error(
-						$"При загрузке библиотеки парсера {itemPaths.item.ParserPath} " +
-							$"для расширения {itemPaths.item.ExtensionsString} произошла ошибка:{Environment.NewLine}{e.ToString()}",
-						null
-					));
-					continue;
-				}
-
-				if (parser == null)
-				{
-					Log.Add(Message.Error(
-						$"Не удалось загрузить парсер для расширения {itemPaths.item.ExtensionsString}",
-						null
-					));
-					continue;
-				}
-
-                foreach (var key in itemPaths.item.Extensions)
-					parsers[key] = parser;
-
-				if (!String.IsNullOrEmpty(itemPaths.item.PreprocessorPath))
-				{
-					BasePreprocessor preprocessor = null;
-
-					try
-					{
-						preprocessor = (BasePreprocessor)Assembly.LoadFrom(itemPaths.preprocPath)
-							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-							?.GetConstructor(Type.EmptyTypes).Invoke(null);
-					}
-					catch(Exception e)
-					{
-						Log.Add(Message.Error(
-							$"При загрузке библиотеки препроцессора {itemPaths.item.PreprocessorPath} " +
-								$"для расширения {itemPaths.item.ExtensionsString} произошла ошибка:{Environment.NewLine}{e.ToString()}",
-							null
-						));
-						continue;
-					}
-
-					if(preprocessor == null)
-					{
-						Log.Add(Message.Error(
-							$"Библиотека {itemPaths.item.PreprocessorPath} не содержит описание препроцессора " +
-								$"для расширения {itemPaths.item.ExtensionsString}",
-							null
-						));
-						continue;
-					}
-
-					if (itemPaths.item.PreprocessorProperties != null
-						&& itemPaths.item.PreprocessorProperties.Count > 0)
-					{
-						/// Получаем тип препроцессора из библиотеки
-						var propertiesObjectType = Assembly.LoadFrom(itemPaths.preprocPath)
-							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
-
-						/// Для каждой настройки препроцессора
-						foreach (var property in itemPaths.item.PreprocessorProperties)
-						{
-							/// проверяем, есть ли такое свойство у объекта
-							var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
-
-							if (propertyInfo != null)
-							{
-								var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
-									.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-									.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-								try
-								{
-									propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
-								}
-								catch
-								{
-									Log.Add(Message.Error(
-										$"Не удаётся конвертировать строку '{property.ValueString}' в свойство " +
-											$"'{property.DisplayedName}' препроцессора для расширения {itemPaths.item.ExtensionsString}",
-										null
-									));
-								}
-							}
-						}
-					}
-
-					parser.SetPreprocessor(preprocessor);
-				}
-			}
-
-			return parsers;
-		}
-
 		private Tuple<Node, string> TryParse(string fileName, out bool success, string text = null)
 		{
 			if (!String.IsNullOrEmpty(fileName))
 			{
 				var extension = Path.GetExtension(fileName);
 
-				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
+				if (Parsers[extension] != null)
 				{
 					if (String.IsNullOrEmpty(text))
 						text = GetText(fileName);

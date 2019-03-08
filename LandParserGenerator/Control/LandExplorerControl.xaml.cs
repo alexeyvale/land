@@ -94,11 +94,6 @@ namespace Land.Control
 		public Dictionary<string, Tuple<Node, string>> ParsedFiles { get; set; } = new Dictionary<string, Tuple<Node, string>>();
 
 		/// <summary>
-		/// Словарь парсеров, ключ - расширение файла, к которому парсер можно применить
-		/// </summary>
-		public Dictionary<string, BaseParser> Parsers { get; set; } = new Dictionary<string, BaseParser>();
-
-		/// <summary>
 		/// Лог панели разметки
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
@@ -155,12 +150,6 @@ namespace Land.Control
 		{
 			return Editor.GetDocumentText(fileName) ?? 
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
-		}
-
-		public BaseParser GetParser(string extension)
-		{
-			return Parsers.ContainsKey(extension)
-				? Parsers[extension] : null;
 		}
 
 		public List<CandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
@@ -278,7 +267,7 @@ namespace Land.Control
 			SyncMarkupManagerSettings();
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
-			Parsers = LogFunction(() => LoadParsers(), true, true);
+			LogAction(() => ReloadParsers(), true, true);
 		}
 
 		private void SyncMarkupManagerSettings()

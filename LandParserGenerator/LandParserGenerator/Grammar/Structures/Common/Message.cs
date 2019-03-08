@@ -7,6 +7,7 @@ namespace Land.Core
 {
 	public enum MessageType { Trace, Error, Warning }
 
+	[Serializable]
 	public class Message
 	{
 		public PointLocation Location { get; set; }

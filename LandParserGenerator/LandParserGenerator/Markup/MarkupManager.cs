@@ -73,11 +73,15 @@ namespace Land.Core.Markup
 		/// </summary>
 		public void InvalidatePoints(string fileName)
 		{
+			var stubNode = new Node("");
+			stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+
 			DoWithMarkup((MarkupElement elem) =>
 			{
-				if(elem is ConcernPoint concernPoint 
+				if (elem is ConcernPoint concernPoint
 					&& concernPoint.Context.FileName == fileName)
 				{
+					concernPoint.AstNode = stubNode;
 					concernPoint.HasIrrelevantLocation = true;
 				}
 			});

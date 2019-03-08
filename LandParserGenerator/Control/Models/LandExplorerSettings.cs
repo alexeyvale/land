@@ -8,6 +8,7 @@ using Land.Core;
 
 namespace Land.Control
 {
+	[Serializable]
 	[DataContract]
 	public class ParserSettingsItem
 	{
@@ -15,7 +16,7 @@ namespace Land.Control
 		public Guid? Id { get; set; }
 
 		[DataMember]
-		public List<string> Extensions { get; set; } = new List<string>();
+		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
 		[DataMember]
 		public string ParserPath { get; set; }
@@ -39,8 +40,10 @@ namespace Land.Control
 			set
 			{
 				/// Разбиваем строку на отдельные расширения, добавляем точку, если она отсутствует
-				Extensions = value.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-					.Select(ext => ext.StartsWith(".") ? ext : '.' + ext).ToList();
+				Extensions = new HashSet<string>(
+					value.ToLower().Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+						.Select(ext => ext.StartsWith(".") ? ext : '.' + ext)
+				);
 			}
 		}
 

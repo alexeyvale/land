@@ -43,7 +43,7 @@ namespace Land.Control
 				{
 					Id = g.Where(el=>el.Id.HasValue).Select(el=>el.Id).FirstOrDefault() ?? Guid.NewGuid(),
 					ParserPath = g.Key.GrammmarPath,
-					Extensions = g.SelectMany(el=>el.Extensions).Distinct().ToList(),
+					Extensions = new HashSet<string>(g.SelectMany(el=>el.Extensions)),
                     PreprocessorPath = g.Key.PreprocessorPath,
                     PreprocessorProperties = g.Select(el=>el.PreprocessorProperties).FirstOrDefault(),
 					ParserDependencies = g.Select(el => el.ParserDependencies).FirstOrDefault(),

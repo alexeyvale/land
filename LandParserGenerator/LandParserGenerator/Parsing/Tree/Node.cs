@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Land.Core.Parsing.Tree
 {
-	public class Node
+	public class Node: MarshalByRefObject
 	{
 		/// <summary>
 		/// Родительский узел

@@ -1,7 +1,9 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Land.Control
 {
+	[Serializable]
 	[DataContract(IsReference = true)]
 	public class PreprocessorProperty
 	{

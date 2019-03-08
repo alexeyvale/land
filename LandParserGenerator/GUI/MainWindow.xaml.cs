@@ -967,7 +967,7 @@ namespace Land.GUI
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
-				var parser = LandExplorer.GetParser(Path.GetExtension(point.Context.FileName));
+				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileName)];
 
 				/// и при этом парсер сгенерирован
 				if (parser != null)
