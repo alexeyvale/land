@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RoutineAggregationVisitor.cs" />
-    <Compile Include="PascalPreprocessor.cs" />
+    <Compile Include="PascalPostprocessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

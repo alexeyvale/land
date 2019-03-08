@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conditional compilation", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tree postprocessing", "Tree postprocessing", "{2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPreprocessor", "Preprocessors\Tree postprocessing\PascalPreprocessor\PascalPreprocessor.csproj", "{5BB7C445-36C4-4686-B17A-A163385848A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPostprocessor", "Preprocessors\Tree postprocessing\PascalPostprocessor\PascalPostprocessor.csproj", "{5BB7C445-36C4-4686-B17A-A163385848A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownPostprocessor", "Preprocessors\Tree postprocessing\MarkdownPostprocessor\MarkdownPostprocessor.csproj", "{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}"
 EndProject

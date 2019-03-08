@@ -10,7 +10,7 @@ using Land.Core.Parsing.Tree;
 
 namespace PascalPreprocessing.TreePostprocessing
 {
-	public class PascalPreprocessor : BasePreprocessor
+	public class PascalPostprocessor : BasePreprocessor
 	{
 		private PipelinePreprocessor Pipeline { get; set; } = new PipelinePreprocessor(
 			new PascalPreprocessing.ConditionalCompilation.PascalPreprocessor(),

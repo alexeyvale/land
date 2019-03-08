@@ -134,7 +134,7 @@ namespace Land.Control
 						item.ExtensionsString, localLog);
 
 				foreach (var action in preprocessorCacheActions)
-					DoCacheActions(action, CacheActionLibraryType.Parser,
+					DoCacheActions(action, CacheActionLibraryType.Preprocessor,
 						item.ExtensionsString, localLog);
 
 				if (cacheActions.Any(a => !a.Success ?? true))
