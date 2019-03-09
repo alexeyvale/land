@@ -4,6 +4,34 @@ using System.Linq;
 
 namespace Land.Core.Lexing
 {
+	public class CustomBlockNode
+	{
+		public CustomBlockNode Parent { get; set; }
+
+		public List<CustomBlockNode> Children { get; set; }
+
+		public SegmentLocation Location { get; set; }
+	}
+
+	public class CustomBlockDefinition
+	{
+		public string StartLexemPrefix { get; set; } = "";
+
+		public string StartLexemSuffix { get; set; } = "";
+
+		public string EndLexemPrefix { get; set; } = "";
+
+		public string EndLexemSuffix { get; set; } = "";
+
+		public string BaseToken { get; set; }
+
+		public bool IsStartLexem(string lexem) => 
+			lexem.StartsWith(StartLexemPrefix) && lexem.EndsWith(StartLexemSuffix);
+
+		public bool IsEndLexem(string lexem) => 
+			lexem.StartsWith(EndLexemPrefix) && lexem.EndsWith(EndLexemSuffix);
+	}
+
 	public class PairAwareState
 	{
 		public Stack<PairSymbol> PairStack { get; set; }
@@ -15,7 +43,7 @@ namespace Land.Core.Lexing
 
 	public enum Direction { Forward, Up, Down };
 
-	public class PairAwareTokenStream: TokenStream, IGrammarProvided
+	public class ComplexTokenStream: TokenStream, IGrammarProvided
 	{
 		public Grammar GrammarObject { get; private set; }
 
@@ -36,10 +64,49 @@ namespace Land.Core.Lexing
 		/// </summary>
 		public Direction CurrentTokenDirection { get; private set; }
 
-		public PairAwareTokenStream(Grammar grammar, ILexer lexer, string text, List<Message> log): base(lexer, text)
+		public CustomBlockNode CurrentCustomBlock { get; set; }
+
+		private CustomBlockDefinition CustomBlockDefinition { get; set; }
+
+
+		public ComplexTokenStream(Grammar grammar, ILexer lexer, string text, List<Message> log): base(lexer, text)
 		{
 			GrammarObject = grammar;
 			Log = log;
+
+			BuildCustomBlockDefinition();
+		}
+
+		private void BuildCustomBlockDefinition()
+		{
+			var customBlockBase = GrammarObject.Options
+				.GetSymbols(CustomBlockOption.BASETOKEN).FirstOrDefault();
+
+			if (!String.IsNullOrEmpty(customBlockBase))
+			{
+				CustomBlockDefinition = new CustomBlockDefinition { BaseToken = customBlockBase };
+
+				var start = GrammarObject.Options.GetParams(CustomBlockOption.START);
+
+				if (start.Count > 0)
+					CustomBlockDefinition.StartLexemPrefix = (string)start[0];
+
+				if (start.Count > 1)
+					CustomBlockDefinition.StartLexemSuffix = (string)start[1];
+
+				var end = GrammarObject.Options.GetParams(CustomBlockOption.END);
+
+				if (end.Count > 0)
+					CustomBlockDefinition.EndLexemPrefix = (string)end[0];
+
+				if (end.Count > 1)
+					CustomBlockDefinition.EndLexemSuffix = (string)end[1];
+
+				CurrentCustomBlock = new CustomBlockNode
+				{
+					Children = new List<CustomBlockNode>()
+				};
+			}
 		}
 
 		public PairAwareState GetPairsState()
@@ -85,7 +152,40 @@ namespace Land.Core.Lexing
 			}
 
 			CurrentTokenDirection = Direction.Forward;
+
 			var token = base.GetNextToken();
+
+			if(CustomBlockDefinition != null
+				&& CustomBlockDefinition.BaseToken == token.Name)
+			{
+				if(CustomBlockDefinition.IsStartLexem(token.Text))
+				{
+					CurrentCustomBlock = new CustomBlockNode
+					{
+						Children = new List<CustomBlockNode>(),
+						Location = token.Location,
+						Parent = CurrentCustomBlock
+					};
+
+					CurrentCustomBlock.Parent.Children.Add(CurrentCustomBlock);		
+				}
+				else if (CustomBlockDefinition.IsEndLexem(token.Text))
+				{
+					/// Отлавливаем ситуацию, когда количество закрытий блока не совпадает с количеством открытий
+					if (CurrentCustomBlock.Location == null)
+					{
+						Log.Add(Message.Error(
+							$"Неожиданная закрывающая конструкция {this.GetTokenInfoForMessage(token)} для пользовательского блока",
+							token.Location.Start
+						));
+					}
+					else
+					{
+						CurrentCustomBlock.Location.End = token.Location.End;
+						CurrentCustomBlock = CurrentCustomBlock.Parent;
+					}
+				}
+			}
 
 			/// Предполагается, что токен может быть началом ровно одной пары, или концом ровно одной пары,
 			/// или одновременно началом и концом ровно одной пары

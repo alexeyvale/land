@@ -16,7 +16,7 @@ namespace Land.Core.Parsing.LR
 
 		private ParsingStack Stack { get; set; }
 		private Stack<int> NestingStack { get; set; }
-		private PairAwareTokenStream LexingStream { get; set; }
+		private ComplexTokenStream LexingStream { get; set; }
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
@@ -62,7 +62,7 @@ namespace Land.Core.Parsing.LR
 			/// Создаём стек для уровней вложенности пар
 			NestingStack = new Stack<int>();
 			/// Готовим лексер
-			LexingStream = new PairAwareTokenStream(GrammarObject, Lexer, text, Log);
+			LexingStream = new ComplexTokenStream(GrammarObject, Lexer, text, Log);
 			/// Читаем первую лексему из входного потока
 			var token = LexingStream.GetNextToken();
 			/// Создаём стек

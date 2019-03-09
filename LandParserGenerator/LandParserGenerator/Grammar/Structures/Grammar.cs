@@ -452,7 +452,28 @@ namespace Land.Core
 
 		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
 		{
-			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param.ToString()))}}} );");
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param is string ? $"\"{param}\"" : param.ToString()))}}} );");
+
+			if (symbols == null || symbols.Length == 0)
+			{
+				symbols = new string[] { OptionsManager.GLOBAL_PARAMETERS_SYMBOL };
+				Options.Set(option, symbols, @params);
+			}
+			else
+			{
+				Options.Set(option, symbols, @params);
+
+				var errorSymbols = CheckIfSymbols(symbols);
+				if (errorSymbols.Count > 0)
+					throw new IncorrectGrammarException(
+						$"Символы '{String.Join("', '", errorSymbols)}' не определены в грамматике"
+					);
+			}
+		}
+
+		public void SetOption(CustomBlockOption option, string[] symbols, params dynamic[] @params)
+		{
+			ConstructionLog.Add($"grammar.SetOption(CustomBlockOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param is string ? $"\"{param}\"" : param.ToString()))}}} );");
 
 			if (symbols == null || symbols.Length == 0)
 			{

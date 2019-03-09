@@ -15,7 +15,7 @@ namespace Land.Core.Parsing.LL
 
 		private TableLL1 Table { get; set; }
 		private Stack<Node> Stack { get; set; }
-		private PairAwareTokenStream LexingStream { get; set; }
+		private ComplexTokenStream LexingStream { get; set; }
 
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
@@ -47,7 +47,7 @@ namespace Land.Core.Parsing.LL
 			PositionsWhereRecoveryStarted = new HashSet<int>();
 
 			/// Готовим лексер и стеки
-			LexingStream = new PairAwareTokenStream(GrammarObject, Lexer, text, Log);
+			LexingStream = new ComplexTokenStream(GrammarObject, Lexer, text, Log);
 			Stack = new Stack<Node>();
 			/// Кладём на стек стартовый символ
 			var root = NodeGenerator.Generate(GrammarObject.StartSymbol);

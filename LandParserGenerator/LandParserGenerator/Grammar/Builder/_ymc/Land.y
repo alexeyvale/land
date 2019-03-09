@@ -121,7 +121,7 @@ pair
 	
 pair_border
 	: ID { $$ = new HashSet<string>() { $1 }; }
-	| STRING 
+	| REGEX 
 		{ 	
 			var generated = ConstructedGrammar.GenerateTerminal($1);
 			ConstructedGrammar.AddAnchor(generated, @1.Start);
@@ -307,7 +307,7 @@ quantifier
 	;
 	
 entry_core
-	: STRING
+	: REGEX
 		{ 
 			$$ = ConstructedGrammar.GenerateTerminal($1);
 			ConstructedGrammar.AddAnchor($$, @$.Start);
@@ -375,6 +375,14 @@ category_block
 								ConstructedGrammar.SetOption(mappingOpt, option.Symbols.ToArray(), option.Arguments.ToArray());
 							}, @1.Start);
 						break;
+					case OptionCategory.CUSTOMBLOCK:
+						CustomBlockOption customBlockOption;
+						goodOption = Enum.TryParse(option.Name.ToUpper(), out customBlockOption);
+						if(goodOption)
+							SafeGrammarAction(() => { 			
+								ConstructedGrammar.SetOption(customBlockOption, option.Symbols.ToArray(), option.Arguments.ToArray());
+							}, @1.Start);
+						break;
 					default:
 						break;
 				}
@@ -430,12 +438,13 @@ args
 	
 argument
 	: RNUM { $$ = $1; }
-	| STRING 
+	| REGEX 
 		{
 			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
 			ConstructedGrammar.AddAnchor(generated, @1.Start);		
 			$$ = generated;
 		}
+	| STRING { $$ = $1.Substring(1, $1.Length - 2); }
 	| ID { $$ = $1; }
 	| argument_group { $$ = $1; }
 	;

@@ -9,7 +9,7 @@ namespace Land.Core
 	/// <summary>
 	/// Возможные категории опций
 	/// </summary>
-	public enum OptionCategory { PARSING, NODES, MAPPING }
+	public enum OptionCategory { PARSING, NODES, MAPPING, CUSTOMBLOCK }
 
 	/// <summary>
 	/// Опции, касающиеся построения дерева
@@ -26,6 +26,10 @@ namespace Land.Core
 	/// </summary>
 	public enum MappingOption { PRIORITY, LAND, EXACTMATCH }
 
+	/// <summary>
+	/// Опции, касающиеся выделения псевдосущностей программы
+	/// </summary>
+	public enum CustomBlockOption { START, END, BASETOKEN }
 
 	public class OptionsManager
 	{
@@ -37,6 +41,8 @@ namespace Land.Core
 			new Dictionary<MappingOption, Dictionary<string, List<dynamic>>>();
 		private Dictionary<ParsingOption, Dictionary<string, List<dynamic>>> ParsingOptions { get; set; } = 
 			new Dictionary<ParsingOption, Dictionary<string, List<dynamic>>>();
+		private Dictionary<CustomBlockOption, Dictionary<string, List<dynamic>>> CustomBlockOptions { get; set; } =
+			new Dictionary<CustomBlockOption, Dictionary<string, List<dynamic>>>();
 
 		public void Set(NodeOption opt, params string[] symbols)
 		{
@@ -82,6 +88,17 @@ namespace Land.Core
 			}
 		}
 
+		public void Set(CustomBlockOption opt, string[] symbols, params dynamic[] @params)
+		{
+			if (!CustomBlockOptions.ContainsKey(opt))
+				CustomBlockOptions[opt] = new Dictionary<string, List<dynamic>>();
+			foreach (var smb in symbols)
+			{
+				if (!CustomBlockOptions[opt].ContainsKey(smb))
+					CustomBlockOptions[opt].Add(smb, @params.ToList());
+			}
+		}
+
 		public bool IsSet(NodeOption opt, string symbol = null)
 		{
 			return NodeOptions.ContainsKey(opt) && (symbol == null || NodeOptions[opt].ContainsKey(symbol));
@@ -95,6 +112,11 @@ namespace Land.Core
 		public bool IsSet(MappingOption opt, string symbol = null)
 		{
 			return MappingOptions.ContainsKey(opt) && (symbol == null || MappingOptions[opt].ContainsKey(symbol));
+		}
+
+		public bool IsSet(CustomBlockOption opt, string symbol = null)
+		{
+			return CustomBlockOptions.ContainsKey(opt) && (symbol == null || CustomBlockOptions[opt].ContainsKey(symbol));
 		}
 
 		public HashSet<string> GetSymbols(NodeOption opt)
@@ -112,9 +134,19 @@ namespace Land.Core
 			return IsSet(opt) ? new HashSet<string>(MappingOptions[opt].Keys) : new HashSet<string>();
 		}
 
-		public List<dynamic> GetParams(MappingOption opt, string symbol)
+		public HashSet<string> GetSymbols(CustomBlockOption opt)
+		{
+			return IsSet(opt) ? new HashSet<string>(CustomBlockOptions[opt].Keys) : new HashSet<string>();
+		}
+
+		public List<dynamic> GetParams(MappingOption opt, string symbol = GLOBAL_PARAMETERS_SYMBOL)
 		{
 			return IsSet(opt, symbol) ? MappingOptions[opt][symbol] : new List<dynamic>();
+		}
+
+		public List<dynamic> GetParams(CustomBlockOption opt, string symbol = GLOBAL_PARAMETERS_SYMBOL)
+		{
+			return IsSet(opt, symbol) ? CustomBlockOptions[opt][symbol] : new List<dynamic>();
 		}
 
 		public void Clear(NodeOption opt)
@@ -130,6 +162,11 @@ namespace Land.Core
 		public void Clear(MappingOption opt)
 		{
 			MappingOptions.Remove(opt);
+		}
+
+		public void Clear(CustomBlockOption opt)
+		{
+			CustomBlockOptions.Remove(opt);
 		}
 	}
 
