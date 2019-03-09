@@ -56,10 +56,6 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 	return (int)Tokens.PREC_NONEMPTY;
 }
 
-"," {
-	return (int)Tokens.COMMA;
-}
-
 "=>" {
 	return (int)Tokens.ARROW;
 }
@@ -174,6 +170,10 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 	{STRING} {
 		yylval.strVal = yytext;
 		return (int)Tokens.STRING;
+	}
+	
+	"," {
+		return (int)Tokens.COMMA;
 	}
 }
 

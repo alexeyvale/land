@@ -61,12 +61,6 @@ water					=	(Any | curve_bracketed_water | round_bracketed_water)+
 	leaf name type
 }
 
-%customblock {
-	start("//{")
-	end("//}")
-	basetoken COMMENT
-}
-
 %mapping {
 	land enum class_interface method field
 	priority(3) name

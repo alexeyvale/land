@@ -62,6 +62,12 @@ block		=	'{' Any '}'
 	leaf name type
 }
 
+%customblock {
+	start("/* #begin ", " */")
+	end("/* #end", " */")
+	basetoken COMMENT
+}
+
 %mapping {
 	land enum class_interface method field
 	priority(3) name
