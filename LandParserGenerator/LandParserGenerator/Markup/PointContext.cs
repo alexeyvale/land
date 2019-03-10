@@ -247,7 +247,7 @@ namespace Land.Core.Markup
 				{
 					var current = stack.Pop();
 
-					if (current.Children.Count == 0 && current.Options.Priority > 0)
+					if ((current.Children.Count == 0 || current.Children.All(c=>c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) && current.Options.Priority > 0)
 						headerContext.Add((HeaderContextElement)current);
 					else
 					{
