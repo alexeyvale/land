@@ -264,6 +264,10 @@ namespace Land.Core.Parsing.LL
 
 					if (enableRecovery)
 					{
+						++Statistics.RecoveryTimesAny;
+						Statistics.LongestRollback =
+							Math.Max(Statistics.LongestRollback, LexingStream.CurrentIndex - tokenIndex);
+
 						message.Type = MessageType.Warning;
 						Log.Add(message);
 
@@ -287,7 +291,7 @@ namespace Land.Core.Parsing.LL
 		}
 
 		private IToken ErrorRecovery()
-		{
+		{		
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 			{
 				Log.Add(Message.Error(
@@ -312,6 +316,8 @@ namespace Land.Core.Parsing.LL
 				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
+
+			var recoveryStartTime = DateTime.Now;
 
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Pop();
@@ -421,6 +427,7 @@ namespace Land.Core.Parsing.LL
 					));
 
 					Statistics.RecoveryTimes += 1;
+					Statistics.RecoveryTimeSpent += DateTime.Now - recoveryStartTime;
 
 					return token;
 				}

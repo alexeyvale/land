@@ -63,7 +63,7 @@ namespace Land.Core.Parsing
 				root = ParsingAlgorithm(text, enableTracing);
 			}
 
-			Statistics.TimeSpent = DateTime.Now - parsingStarted;
+			Statistics.GeneralTimeSpent = DateTime.Now - parsingStarted;
 
 			return root;
 		}

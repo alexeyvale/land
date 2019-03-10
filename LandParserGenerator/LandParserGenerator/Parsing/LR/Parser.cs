@@ -314,6 +314,10 @@ namespace Land.Core.Parsing.LR
 
 					if (GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 					{
+						++Statistics.RecoveryTimesAny;
+						Statistics.LongestRollback = 
+							Math.Max(Statistics.LongestRollback, LexingStream.CurrentIndex - tokenIndex);
+
 						message.Type = MessageType.Warning;
 						Log.Add(message);
 
@@ -401,6 +405,8 @@ namespace Land.Core.Parsing.LR
 				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
+
+			var recoveryStartTime = DateTime.Now;
 
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
@@ -515,6 +521,8 @@ namespace Land.Core.Parsing.LR
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					Statistics.RecoveryTimes += 1;
+					Statistics.RecoveryTimeSpent += DateTime.Now - recoveryStartTime;
+
 					return token;
 				}
 			}
