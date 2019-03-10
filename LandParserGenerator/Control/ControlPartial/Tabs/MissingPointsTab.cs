@@ -39,33 +39,43 @@ namespace Land.Control
 
 		private void RefreshMissingPointsList()
 		{
-			MissingTreeView.ItemsSource = MarkupManager.GetConcernPoints()
+			var missingPoints = MarkupManager.GetConcernPoints()
 				.Where(p => p.HasMissingLocation)
 				.Select(p => new PointCandidatesPair() { Point = p })
 				.ToList();
+
+			foreach (PointCandidatesPair pair in missingPoints)
+			{
+				if (State.RecentAmbiguities.ContainsKey(pair.Point))
+					State.RecentAmbiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
+			}
+
+			MissingTreeView.ItemsSource = missingPoints;
+		}
+
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> recentAmbiguities, bool globalRemap)
+		{
+			if (globalRemap)
+				State.RecentAmbiguities = recentAmbiguities;
+			else
+			{
+				foreach (var kvp in recentAmbiguities)
+					State.RecentAmbiguities[kvp.Key] = kvp.Value;
+			}
+
+			foreach (PointCandidatesPair existingAmbiguityInfo in MissingTreeView.ItemsSource)
+			{
+				if (recentAmbiguities.ContainsKey(existingAmbiguityInfo.Point))
+				{
+					existingAmbiguityInfo.Candidates.Clear();
+					recentAmbiguities[existingAmbiguityInfo.Point].ForEach(a => existingAmbiguityInfo.Candidates.Add(a));
+				}
+			}
 
 			if (MissingTreeView.Items.Count > 0)
 			{
 				Tabs.SelectedItem = MissingPointsTab;
 				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
-			}
-		}
-
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
-		{
-			if (globalRemap)
-				State.RecentAmbiguities = ambiguities;
-			else
-			{
-				foreach (var kvp in ambiguities)
-					State.RecentAmbiguities[kvp.Key] = kvp.Value;
-			}
-
-			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
-			foreach (PointCandidatesPair pair in MissingTreeView.ItemsSource)
-			{
-				if (ambiguities.ContainsKey(pair.Point))
-					ambiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
 			}
 		}
 

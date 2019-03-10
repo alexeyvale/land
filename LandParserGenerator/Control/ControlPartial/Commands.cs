@@ -96,7 +96,11 @@ namespace Land.Control
 						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
 							.Select(c => new ConcernPointCandidateViewModel(c));
 
-					ConfigureMarkupElementTab(true, (ConcernPoint)target.DataContext);
+					var point = target.DataContext is PointCandidatesPair pair 
+						? pair.Point 
+						: (ConcernPoint)target.DataContext;
+
+					ConfigureMarkupElementTab(true, point);
 
 					SetStatus("Перепривязка точки", ControlStatus.Pending);
 				}
