@@ -109,6 +109,7 @@
     <Compile Include="Parsing\Tree\Visitors\BaseNodeRetypingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MappingOptionsProcessingVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
+    <Compile Include="Parsing\Tree\Visitors\InsertCustomBlocksVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\RemoveAutoVisitor.cs" />
     <Compile Include="Parsing\Tree\Visitors\CountLandNodesVisitor.cs" />

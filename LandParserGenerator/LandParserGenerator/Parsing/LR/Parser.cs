@@ -16,7 +16,6 @@ namespace Land.Core.Parsing.LR
 
 		private ParsingStack Stack { get; set; }
 		private Stack<int> NestingStack { get; set; }
-		private ComplexTokenStream LexingStream { get; set; }
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
@@ -191,8 +190,17 @@ namespace Land.Core.Parsing.LR
 				}
 			}
 
-			if(root != null)
+			if (root != null)
+			{
 				TreePostProcessing(root);
+
+				if (LexingStream.CustomBlocks.Count > 0)
+				{
+					var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
+					root.Accept(visitor);
+					root = visitor.Root;
+				}
+			}
 
 			return root;
 		}

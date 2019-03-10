@@ -63,8 +63,8 @@ block		=	'{' Any '}'
 }
 
 %customblock {
-	start("/* #begin ", " */")
-	end("/* #end", " */")
+	start("/// land start")
+	end("/// land end")
 	basetoken COMMENT
 }
 

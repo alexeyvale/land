@@ -49,6 +49,9 @@ namespace Land.Core
 		public const string ERROR_TOKEN_NAME = "ERROR";
 		public const string ANY_TOKEN_NAME = "Any";
 
+		// Зарезервированные имена специальных нетерминальных символов
+		public const string CUSTOM_BLOCK_RULE_NAME = "custom_block";
+
 		// Префиксы и счётчики для анонимных токенов и правил
 		public const string AUTO_RULE_PREFIX = "auto__";
 		private int AutoRuleCounter { get; set; } = 0;

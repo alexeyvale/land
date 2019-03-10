@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Land.Core.Parsing.Tree;
+
 namespace Land.Core.Lexing
 {
 	public class CustomBlockNode
 	{
-		public CustomBlockNode Parent { get; set; }
-
-		public List<CustomBlockNode> Children { get; set; }
-
 		public SegmentLocation Location { get; set; }
+
+		public Node Start { get; set; }
+
+		public Node End { get; set; }
+
+		public int StartOffset => Location.Start.Offset;
+
+		public int EndOffset => Location.End.Offset;
 	}
 
 	public class CustomBlockDefinition
@@ -64,10 +70,14 @@ namespace Land.Core.Lexing
 		/// </summary>
 		public Direction CurrentTokenDirection { get; private set; }
 
-		public CustomBlockNode CurrentCustomBlock { get; set; }
+		public List<CustomBlockNode> CustomBlocks { get; set; }
 
+		public Stack<CustomBlockNode> CustomBlockStack { get; set; }
+
+		/// <summary>
+		/// Описание пользовательского блока, задаваемое грамматикой
+		/// </summary>
 		private CustomBlockDefinition CustomBlockDefinition { get; set; }
-
 
 		public ComplexTokenStream(Grammar grammar, ILexer lexer, string text, List<Message> log): base(lexer, text)
 		{
@@ -102,10 +112,8 @@ namespace Land.Core.Lexing
 				if (end.Count > 1)
 					CustomBlockDefinition.EndLexemSuffix = (string)end[1];
 
-				CurrentCustomBlock = new CustomBlockNode
-				{
-					Children = new List<CustomBlockNode>()
-				};
+				CustomBlocks = new List<CustomBlockNode>();
+				CustomBlockStack = new Stack<CustomBlockNode>();
 			}
 		}
 
@@ -160,19 +168,21 @@ namespace Land.Core.Lexing
 			{
 				if(CustomBlockDefinition.IsStartLexem(token.Text))
 				{
-					CurrentCustomBlock = new CustomBlockNode
+					var newBlock = new CustomBlockNode
 					{
-						Children = new List<CustomBlockNode>(),
-						Location = token.Location,
-						Parent = CurrentCustomBlock
+						Location = new SegmentLocation { Start = token.Location.Start },
+						Start = new Node(token.Name, new LocalOptions { ExactMatch = true })			
 					};
 
-					CurrentCustomBlock.Parent.Children.Add(CurrentCustomBlock);		
+					newBlock.Start.SetAnchor(token.Location.Start, token.Location.End);
+					newBlock.Start.SetValue(token.Text);
+
+					CustomBlockStack.Push(newBlock);
 				}
 				else if (CustomBlockDefinition.IsEndLexem(token.Text))
 				{
 					/// Отлавливаем ситуацию, когда количество закрытий блока не совпадает с количеством открытий
-					if (CurrentCustomBlock.Location == null)
+					if (CustomBlockStack.Count == 0)
 					{
 						Log.Add(Message.Error(
 							$"Неожиданная закрывающая конструкция {this.GetTokenInfoForMessage(token)} для пользовательского блока",
@@ -181,8 +191,14 @@ namespace Land.Core.Lexing
 					}
 					else
 					{
-						CurrentCustomBlock.Location.End = token.Location.End;
-						CurrentCustomBlock = CurrentCustomBlock.Parent;
+						var currentBlock = CustomBlockStack.Pop();
+
+						currentBlock.End = new Node(token.Name, new LocalOptions { ExactMatch = true });
+						currentBlock.End.SetAnchor(token.Location.Start, token.Location.End);
+						currentBlock.End.SetValue(token.Text);
+						currentBlock.Location.End = token.Location.End;
+
+						CustomBlocks.Add(currentBlock);
 					}
 				}
 			}

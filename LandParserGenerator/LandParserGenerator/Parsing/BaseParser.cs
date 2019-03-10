@@ -17,6 +17,7 @@ namespace Land.Core.Parsing
 		protected BaseNodeRetypingVisitor NodeRetypingVisitor { get; set; }
 
 		public Grammar GrammarObject { get; protected set; }
+		public ComplexTokenStream LexingStream { get; protected set; }
 		private BasePreprocessor Preproc { get; set; }
 
 		public Statistics Statistics { get; set; }

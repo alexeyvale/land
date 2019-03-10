@@ -239,9 +239,25 @@ namespace Land.Core.Markup
 			}
 			else
 			{
-				return node.Children
-					.Where(c => c.Children.Count == 0 && c.Options.Priority > 0)
-					.Select(c => (HeaderContextElement)c).ToList();
+				var headerContext = new List<HeaderContextElement>();
+
+				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+				while(stack.Any())
+				{
+					var current = stack.Pop();
+
+					if (current.Children.Count == 0 && current.Options.Priority > 0)
+						headerContext.Add((HeaderContextElement)current);
+					else
+					{
+						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
+							for (var i = current.Children.Count - 1; i >= 0; --i)
+								stack.Push(current.Children[i]);
+					}
+				}
+
+				return headerContext;
 			}
 		}
 
@@ -252,7 +268,9 @@ namespace Land.Core.Markup
 
 			while(currentNode != null)
 			{
-				context.Add((AncestorsContextElement)currentNode);
+				if(currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME)
+					context.Add((AncestorsContextElement)currentNode);
+
 				currentNode = currentNode.Parent;
 			}
 
@@ -261,9 +279,27 @@ namespace Land.Core.Markup
 
 		public static List<InnerContextElement> GetInnerContext(TargetFileInfo info)
 		{
-			return info.TargetNode.Children
-					.Where(c => c.Children.Count > 0)
-					.Select(c => new InnerContextElement(c, info.FileText)).ToList();
+			var innerContext = new List<InnerContextElement>();
+
+			var stack = new Stack<Node>(Enumerable.Reverse(info.TargetNode.Children));
+
+			while (stack.Any())
+			{
+				var current = stack.Pop();
+
+				if (current.Children.Count > 0)
+				{
+					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+						innerContext.Add(new InnerContextElement(current, info.FileText));
+					else
+					{
+						for (var i = current.Children.Count - 1; i >= 0; --i)
+							stack.Push(current.Children[i]);
+					}
+				}
+			}
+
+			return innerContext;
 		}
 
 		public static List<SiblingsContextElement> GetSiblingsContext(Node node)

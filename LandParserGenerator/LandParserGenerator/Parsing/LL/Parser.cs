@@ -15,7 +15,6 @@ namespace Land.Core.Parsing.LL
 
 		private TableLL1 Table { get; set; }
 		private Stack<Node> Stack { get; set; }
-		private ComplexTokenStream LexingStream { get; set; }
 
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
@@ -164,6 +163,13 @@ namespace Land.Core.Parsing.LL
 			}
 
 			TreePostProcessing(root);
+
+			if (LexingStream.CustomBlocks.Count > 0)
+			{
+				var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
+				root.Accept(visitor);
+				root = visitor.Root;
+			}
 
 			return root;
 		}
