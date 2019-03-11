@@ -110,12 +110,14 @@
                                     </TabItem>
                                     <TabItem>
                                         <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-                                        <ListBox
-                                            Name="Grammar_ErrorsList"
-                                            MouseDoubleClick="Grammar_ListBox_MouseDoubleClick"
-                                            FontSize="14pt">
-                                        </ListBox>
-                                    </TabItem>
+										<ScrollViewer VerticalScrollBarVisibility="Auto">
+											<ListBox
+												Name="Grammar_ErrorsList"
+												MouseDoubleClick="Grammar_ListBox_MouseDoubleClick"
+												FontSize="14pt">
+											</ListBox>
+										</ScrollViewer>
+									</TabItem>
                                 </TabControl>
                             </Grid>
                         </TabItem>
@@ -161,20 +163,20 @@
                                 <TabControl Grid.Row="2">
                                     <TabItem>
                                         <TabItem.Header>Лог</TabItem.Header>
-                                        <ListBox
-                                            Name="File_LogList"
-                                            MouseDoubleClick="File_ListBox_MouseDoubleClick"
-                                            FontSize="14pt">
-                                        </ListBox>
-                                    </TabItem>
+										<ScrollViewer VerticalScrollBarVisibility="Auto">
+											<ListBox Name="File_LogList" MouseDoubleClick="File_ListBox_MouseDoubleClick" FontSize="14pt"/>
+										</ScrollViewer>
+									</TabItem>
                                     <TabItem>
                                         <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-                                        <ListBox
-                                            Name="File_ErrorsList"
-                                            MouseDoubleClick="File_ListBox_MouseDoubleClick"
-                                            FontSize="14pt">
-                                        </ListBox>
-                                    </TabItem>
+										<ScrollViewer VerticalScrollBarVisibility="Auto">
+											<ListBox
+												Name="File_ErrorsList"
+												MouseDoubleClick="File_ListBox_MouseDoubleClick"
+												FontSize="14pt">
+											</ListBox>
+										</ScrollViewer>
+									</TabItem>
                                     <TabItem>
                                         <TabItem.Header>Статистика</TabItem.Header>
                                         <TextBox
@@ -204,8 +206,10 @@
 									<Separator></Separator>
 									<ComboBox MinWidth="90" MaxWidth="90" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
                                 </ToolBar>
-                                <ListBox FontSize="14pt" Grid.Row="1" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick" ></ListBox>
-                                <StatusBar Name="Batch_StatusBar" Grid.Row="2">
+								<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+									<ListBox FontSize="14pt" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick"></ListBox>
+								</ScrollViewer>
+								<StatusBar Name="Batch_StatusBar" Grid.Row="2">
                                     <Label Name="Batch_PathLabel"></Label>
                                     <Label Name="Batch_StatusBarLabel"></Label>
                                     <ProgressBar Width="200" Height="20" Name="Batch_ParsingProgress" Minimum="0" Maximum="100"></ProgressBar>
@@ -280,20 +284,24 @@
                         <TabControl Grid.Row="3" Name="MarkupTestOutputTabs">
                             <TabItem Name="MarkupTestLogTab">
                                 <TabItem.Header>Лог</TabItem.Header>
-                                <ListBox
-                                    Name="MarkupTestLog"
-                                    MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
-                                    FontSize="14pt">
-                                </ListBox>
-                            </TabItem>
+								<ScrollViewer VerticalScrollBarVisibility="Auto">
+									<ListBox
+										Name="MarkupTestLog"
+										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
+										FontSize="14pt">
+									</ListBox>
+								</ScrollViewer>
+							</TabItem>
                             <TabItem Name="MarkupTestErrorsTab">
                                 <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-                                <ListBox
-                                    Name="MarkupTestErrors"
-                                    MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
-                                    FontSize="14pt">
-                                </ListBox>
-                            </TabItem>
+								<ScrollViewer VerticalScrollBarVisibility="Auto">
+									<ListBox
+										Name="MarkupTestErrors"
+										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
+										FontSize="14pt">
+									</ListBox>
+								</ScrollViewer>
+							</TabItem>
                         </TabControl>
                     </Grid>
 

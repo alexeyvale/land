@@ -54,7 +54,11 @@ namespace Land.Control
 							typeof(ParserLoader).FullName
 						);
 
-						if (loader.Load(response.ParserCachedPath, response.PreprocessorCachedPath, parserItem, log))
+						var loadingResult = loader.Load(response.ParserCachedPath, response.PreprocessorCachedPath, parserItem);
+						if (loadingResult != null)
+							log.Add(loadingResult);
+
+						if (loadingResult?.Type != MessageType.Error)
 							foreach (var ext in parserItem.Extensions)
 								Parsers[ext] = new Tuple<AppDomain, BaseParser>(libraryDomain, loader.Parser);
 

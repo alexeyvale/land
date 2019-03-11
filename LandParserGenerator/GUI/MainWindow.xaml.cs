@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 
 using Land.Core;
+using Land.Core.Parsing;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Markup;
@@ -720,10 +721,9 @@ namespace Land.GUI
 			var errorFiles = new List<string>();
 
 			FrontendUpdateDispatcher.Invoke((Action)(()=>{ Batch_Log.Items.Clear(); }));		
-			var timePerFile = new Dictionary<string, TimeSpan>();
+			var statsPerFile = new Dictionary<string, Statistics>();
 			var landCounts = new Dictionary<string, int>();
 			var landLists = new List<FileLandPair>();
-			var recoveryCount = 0;
 
 			for (; counter < argument.Files.Count; ++counter)
 			{
@@ -736,7 +736,7 @@ namespace Land.GUI
 							File.ReadAllText(argument.Files[counter], GetEncoding(argument.Files[counter])));
 					}));
 
-					timeSpent += Parser.Statistics.TimeSpent;
+					timeSpent += Parser.Statistics.GeneralTimeSpent;
 
 					if (Parser.Log.Any(l=>l.Type == MessageType.Error))
 					{
@@ -748,8 +748,7 @@ namespace Land.GUI
 					}
 					else
 					{
-						timePerFile[argument.Files[counter]] = Parser.Statistics.TimeSpent;
-						recoveryCount += Parser.Statistics.RecoveryTimes;
+						statsPerFile[argument.Files[counter]] = Parser.Statistics;
 
 						var visitor = new CountLandNodesVisitor(true, "name");
 						root.Accept(visitor);
@@ -791,16 +790,28 @@ namespace Land.GUI
 			}
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 дольше всего разбираемых файлов:");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
 
-			/// Выводим предупреждения о наиболее долго разбираемых файлах
-			foreach (var file in timePerFile.OrderByDescending(f=>f.Value).Take(10))
+			foreach (var file in statsPerFile.OrderByDescending(f=>f.Value.GeneralTimeSpent).Take(5))
 			{
 				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"\t{Message.Warning(file.Value.ToString(@"hh\:mm\:ss\:ff"), null)}");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
 			}
 
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"Всего восстановлений: {recoveryCount}");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 файлов с самым долгим восстановлением:");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+
+			foreach (var file in statsPerFile.OrderByDescending(f => f.Value.RecoveryTimeSpent).Take(5))
+			{
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
+			}
+
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "Общая статистика.");
+			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, statsPerFile.Values.Aggregate((s1, s2) => s1 + s2));
 			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
 
 			foreach (var pair in landCounts)

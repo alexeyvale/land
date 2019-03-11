@@ -23,9 +23,11 @@ namespace Land.Control
 			return null;
 		}
 
-		public bool Load(string parserCachedPath, string preprocessorCachedPath, 
-			ParserSettingsItem settings, List<Message> log)
+		public Message Load(string parserCachedPath, string preprocessorCachedPath, 
+			ParserSettingsItem settings)
 		{
+			var log = new List<Message>();
+
 			#region Загрузка парсера
 
 			try
@@ -36,21 +38,19 @@ namespace Land.Control
 			}
 			catch (Exception e)
 			{
-				log.Add(Message.Error(
+				return Message.Error(
 					$"При загрузке библиотеки парсера {settings.ParserPath} " +
 						$"для расширения {settings.ExtensionsString} произошла ошибка:{Environment.NewLine}{e.ToString()}",
 					null
-				));
-				return false;
+				);
 			}
 
 			if (Parser == null)
 			{
-				log.Add(Message.Error(
+				return Message.Error(
 					$"Не удалось загрузить парсер для расширения {settings.ExtensionsString}",
 					null
-				));
-				return false;
+				);
 			}
 
 			#endregion
@@ -69,22 +69,20 @@ namespace Land.Control
 				}
 				catch (Exception e)
 				{
-					log.Add(Message.Error(
+					return Message.Error(
 						$"При загрузке библиотеки препроцессора {settings.PreprocessorPath} " +
 							$"для расширения {settings.ExtensionsString} произошла ошибка:{Environment.NewLine}{e.ToString()}",
 						null
-					));
-					return false;
+					);
 				}
 
 				if (preprocessor == null)
 				{
-					log.Add(Message.Error(
+					return Message.Error(
 						$"Библиотека {settings.PreprocessorPath} не содержит описание препроцессора " +
 							$"для расширения {settings.ExtensionsString}",
 						null
-					));
-					return false;
+					);
 				}
 
 				if (settings.PreprocessorProperties != null
@@ -98,7 +96,7 @@ namespace Land.Control
 
 			#endregion
 
-			return true;
+			return null;
 		}
 
 		private void ConfigurePreprocessor(BasePreprocessor preprocessor, string preprocessorLibraryPath, 
