@@ -333,7 +333,6 @@
 							<EventSetter Event="Unselected" Handler="MissingTreeViewItem_Unselected" />
 							<EventSetter Event="RequestBringIntoView" Handler="TreeViewItem_RequestBringIntoView"/>
 							<EventSetter Event="MouseDoubleClick" Handler="MissingTreeViewItem_MouseDoubleClick"/>
-							<Setter Property="IsExpanded" Value="True"/>
 						</Style>
 					</TreeView.ItemContainerStyle>
 				</TreeView>
