@@ -15,10 +15,10 @@ namespace Land.Control
 	{
 		public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			return value is PointCandidatesPair pair1
+			return value is RemapCandidates pair1
 				? pair1.Point?.Name
-				: value is CandidateInfo pair2
-					? $"{new ConcernPointCandidateViewModel(pair2.Node).ViewHeader}\t{pair2.ToString()}"
+				: value is RemapCandidateInfo pair2
+					? $"{new ExistingConcernPointCandidate(pair2.Node).ViewHeader}\t{pair2.ToString()}"
 					: null;
 		}
 

@@ -110,9 +110,9 @@
     </Compile>
     <Compile Include="Models\LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
-    <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
+    <Compile Include="Models\ConcernPointCandidate.cs" />
     <Compile Include="Models\RelationsTreeNode.cs" />
-    <Compile Include="Models\PointCandidatesPair.cs" />
+    <Compile Include="Models\RemapCandidates.cs" />
     <Compile Include="Window_PreprocessorProperties.xaml.cs">
       <DependentUpon>Window_PreprocessorProperties.xaml</DependentUpon>
     </Compile>

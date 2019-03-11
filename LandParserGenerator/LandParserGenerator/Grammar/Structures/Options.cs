@@ -31,7 +31,7 @@ namespace Land.Core
 	/// </summary>
 	public enum CustomBlockOption { START, END, BASETOKEN }
 
-	public class OptionsManager
+	public class OptionsManager: MarshalByRefObject
 	{
 		public const string GLOBAL_PARAMETERS_SYMBOL = "";
 

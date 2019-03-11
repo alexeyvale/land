@@ -41,10 +41,10 @@ namespace Land.Control
 		{
 			var missingPoints = MarkupManager.GetConcernPoints()
 				.Where(p => p.HasMissingLocation)
-				.Select(p => new PointCandidatesPair() { Point = p })
+				.Select(p => new RemapCandidates() { Point = p })
 				.ToList();
 
-			foreach (PointCandidatesPair pair in missingPoints)
+			foreach (RemapCandidates pair in missingPoints)
 			{
 				if (State.RecentAmbiguities.ContainsKey(pair.Point))
 					State.RecentAmbiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
@@ -53,7 +53,7 @@ namespace Land.Control
 			MissingTreeView.ItemsSource = missingPoints;
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> recentAmbiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<RemapCandidateInfo>> recentAmbiguities, bool globalRemap)
 		{
 			if (globalRemap)
 				State.RecentAmbiguities = recentAmbiguities;
@@ -63,7 +63,7 @@ namespace Land.Control
 					State.RecentAmbiguities[kvp.Key] = kvp.Value;
 			}
 
-			foreach (PointCandidatesPair existingAmbiguityInfo in MissingTreeView.ItemsSource)
+			foreach (RemapCandidates existingAmbiguityInfo in MissingTreeView.ItemsSource)
 			{
 				if (recentAmbiguities.ContainsKey(existingAmbiguityInfo.Point))
 				{
@@ -99,7 +99,7 @@ namespace Land.Control
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
-				if (item.DataContext is CandidateInfo pair)
+				if (item.DataContext is RemapCandidateInfo pair)
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,

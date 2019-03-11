@@ -177,7 +177,7 @@ namespace Land.Core.Markup
 		/// Получение всех узлов, к которым можно привязаться,
 		/// если команда привязки была вызвана в позиции offset
 		/// </summary>
-		public LinkedList<Node> GetConcernPointCandidates(Node root, int offset)
+		public LinkedList<Node> GetConcernPointCandidates(Node root, SegmentLocation selection)
 		{
 			var pointCandidates = new LinkedList<Node>();
 			var currentNode = root;
@@ -189,8 +189,9 @@ namespace Land.Core.Markup
 				if (currentNode.Options.IsLand)
 					pointCandidates.AddFirst(currentNode);
 
-				currentNode = currentNode.Children.Where(c => c.Anchor != null && c.Anchor.Start != null && c.Anchor.End != null
-					&& c.Anchor.Start.Offset <= offset && c.Anchor.End.Offset >= offset).FirstOrDefault();
+				currentNode = currentNode.Children
+					.Where(c => c.Anchor != null && c.Anchor.Includes(selection))
+					.FirstOrDefault();
 			}
 
 			return pointCandidates;
@@ -209,7 +210,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, CandidateInfo candidate)
+		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
 		{
 			point.Relink(candidate);
 
@@ -347,7 +348,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<CandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -385,7 +386,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles)
@@ -396,10 +397,10 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<CandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
-			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -432,13 +433,13 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<CandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
-			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<CandidateInfo>());
+			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<RemapCandidateInfo>());
 
 			foreach (var file in targetFiles)
 			{
@@ -469,9 +470,9 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 			var candidates = ContextFinder.Find(point, targetInfo).OrderByDescending(c=>c.Similarity)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
@@ -484,7 +485,7 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private bool ApplyCandidate(ConcernPoint point, IEnumerable<CandidateInfo> candidates)
+		private bool ApplyCandidate(ConcernPoint point, IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
 			var second = candidates.Skip(1).FirstOrDefault();

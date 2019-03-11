@@ -34,7 +34,7 @@ namespace Land.Control
 
 		private void Command_MissingTree_Delete_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.RemoveElement(((PointCandidatesPair)MissingTreeView.SelectedItem).Point);
+			MarkupManager.RemoveElement(((RemapCandidates)MissingTreeView.SelectedItem).Point);
 		}
 
 		private void Command_MarkupTree_DeleteWithSource_Executed(object sender, RoutedEventArgs e)
@@ -67,8 +67,8 @@ namespace Land.Control
 			if (parent != null)
 			{
 				MarkupManager.RelinkConcernPoint(
-					(parent.DataContext as PointCandidatesPair).Point,
-					State.SelectedItem_MissingTreeView.DataContext as CandidateInfo
+					(parent.DataContext as RemapCandidates).Point,
+					State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
 				);
 			}
 		}
@@ -80,30 +80,25 @@ namespace Land.Control
 
 			if (rootTextPair != null)
 			{
-				var offset = Editor.GetActiveDocumentOffset();
-
-				if (!String.IsNullOrEmpty(fileName))
+				State.PendingCommand = new PendingCommandInfo()
 				{
-					State.PendingCommand = new PendingCommandInfo()
-					{
-						Target = target,
-						DocumentName = fileName,
-						Command = LandExplorerCommand.Relink,
-						DocumentText = rootTextPair.Item2
-					};
+					Target = target,
+					DocumentName = fileName,
+					Command = LandExplorerCommand.Relink,
+					DocumentText = rootTextPair.Item2
+				};
 
-					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
-							.Select(c => new ConcernPointCandidateViewModel(c));
+				ConcernPointCandidatesList.ItemsSource =
+					GetConcernPointCandidates(rootTextPair.Item1, 
+						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
 
-					var point = target.DataContext is PointCandidatesPair pair 
-						? pair.Point 
-						: (ConcernPoint)target.DataContext;
+				var point = target.DataContext is RemapCandidates pair
+					? pair.Point
+					: (ConcernPoint)target.DataContext;
 
-					ConfigureMarkupElementTab(true, point);
+				ConfigureMarkupElementTab(true, point);
 
-					SetStatus("Перепривязка точки", ControlStatus.Pending);
-				}
+				SetStatus("Перепривязка точки", ControlStatus.Pending);
 			}
 		}
 
@@ -114,26 +109,21 @@ namespace Land.Control
 
 			if (rootTextPair != null)
 			{
-				var offset = Editor.GetActiveDocumentOffset();
-
-				if (!String.IsNullOrEmpty(fileName))
+				State.PendingCommand = new PendingCommandInfo()
 				{
-					State.PendingCommand = new PendingCommandInfo()
-					{
-						Target = State.SelectedItem_MarkupTreeView,
-						DocumentName = fileName,
-						Command = LandExplorerCommand.AddPoint,
-						DocumentText = rootTextPair.Item2
-					};
+					Target = State.SelectedItem_MarkupTreeView,
+					DocumentName = fileName,
+					Command = LandExplorerCommand.AddPoint,
+					DocumentText = rootTextPair.Item2
+				};
 
-					ConcernPointCandidatesList.ItemsSource =
-						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
-							.Select(c=>new ConcernPointCandidateViewModel(c));
+				ConcernPointCandidatesList.ItemsSource =
+					GetConcernPointCandidates(rootTextPair.Item1,
+						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
 
-					ConfigureMarkupElementTab(true);
+				ConfigureMarkupElementTab(true);
 
-					SetStatus("Добавление точки", ControlStatus.Pending);
-				}
+				SetStatus("Добавление точки", ControlStatus.Pending);
 			}
 		}
 
@@ -266,14 +256,14 @@ namespace Land.Control
 		{
 			e.CanExecute = MissingTreeView != null
 				&& MissingTreeView.SelectedItem != null
-				&& MissingTreeView.SelectedItem is PointCandidatesPair;
+				&& MissingTreeView.SelectedItem is RemapCandidates;
 		}
 
 		private void Command_MissingTree_HasSelectedCandidate_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = MissingTreeView != null
 				&& MissingTreeView.SelectedItem != null
-				&& MissingTreeView.SelectedItem is CandidateInfo;
+				&& MissingTreeView.SelectedItem is RemapCandidateInfo;
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
@@ -367,6 +357,34 @@ namespace Land.Control
 					SetStatus("Элемент вставлен", ControlStatus.Ready);
 				}
 			}
+		}
+
+		#endregion
+
+		#region Methods
+
+		private List<ConcernPointCandidate> GetConcernPointCandidates(Node root, 
+			SegmentLocation realSelection, SegmentLocation adjustedSelection)
+		{
+			/// Для выделения находим сущности, объемлющие его
+			var candidates = MarkupManager.GetConcernPointCandidates(root, realSelection)
+					.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c)).ToList();
+
+			/// Проверяем, можно ли обрамить его кастомным блоком
+			if (CanCreateCustomBlock(root, adjustedSelection))
+			{
+				candidates.Add(new CustomConcernPointCandidate(
+					realSelection, adjustedSelection, "Новый пользовательский блок"
+				));
+			}
+
+			return candidates;
+		}
+
+		private bool CanCreateCustomBlock(Node root, SegmentLocation selection)
+		{
+			/// TODO: нужно проверять, что грамматика в принципе допускает custom point-ы
+			return true;
 		}
 
 		#endregion

@@ -194,7 +194,7 @@ namespace Land.Core.Parsing.LR
 			{
 				TreePostProcessing(root);
 
-				if (LexingStream.CustomBlocks.Count > 0)
+				if (LexingStream.CustomBlocks?.Count > 0)
 				{
 					var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
 					root.Accept(visitor);

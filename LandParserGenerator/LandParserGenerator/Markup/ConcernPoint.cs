@@ -101,7 +101,7 @@ namespace Land.Core.Markup
 			Context = PointContext.Create(targetInfo);
 		}
 
-		public void Relink(CandidateInfo candidate)
+		public void Relink(RemapCandidateInfo candidate)
 		{
 			AstNode = candidate.Node;
 			Context = candidate.Context;

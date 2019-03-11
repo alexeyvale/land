@@ -171,7 +171,7 @@ namespace Land.Core.Lexing
 					var newBlock = new CustomBlockNode
 					{
 						Location = new SegmentLocation { Start = token.Location.Start },
-						Start = new Node(token.Name, new LocalOptions { ExactMatch = true })			
+						Start = new Node(token.Name, new LocalOptions { ExactMatch = true, Priority = LocalOptions.BASE_PRIORITY })			
 					};
 
 					newBlock.Start.SetAnchor(token.Location.Start, token.Location.End);
@@ -193,7 +193,7 @@ namespace Land.Core.Lexing
 					{
 						var currentBlock = CustomBlockStack.Pop();
 
-						currentBlock.End = new Node(token.Name, new LocalOptions { ExactMatch = true });
+						currentBlock.End = new Node(token.Name);
 						currentBlock.End.SetAnchor(token.Location.Start, token.Location.End);
 						currentBlock.End.SetValue(token.Text);
 						currentBlock.Location.End = token.Location.End;

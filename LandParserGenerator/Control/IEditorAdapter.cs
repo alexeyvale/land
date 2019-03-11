@@ -42,15 +42,25 @@ namespace Land.Control
 		/// </summary>
 		int? GetActiveDocumentOffset();
 
+		/// <summary>
+		/// Получение позиции курсора в активном документе
+		/// </summary>
+		SegmentLocation GetActiveDocumentSelection(bool adjustByLine);
+
 		#endregion
 
 
 		#region Document by name
 
 		/// <summary>
-		/// Полчение текста документа
+		/// Получение текста документа
 		/// </summary>
 		string GetDocumentText(string documentName);
+
+		/// <summary>
+		/// Изменение текста документа
+		/// </summary>
+		void SetDocumentText(string documentName, string text);
 
 		/// <summary>
 		/// Задание активного документа и установка курсора

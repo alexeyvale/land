@@ -40,6 +40,34 @@ namespace Land.GUI
 			return activeTab != null ? EditorWindow.Documents[activeTab].Editor.CaretOffset : (int?)null;
 		}
 
+		public SegmentLocation GetActiveDocumentSelection(bool adjustByLine)
+		{
+			var activeTab = GetActiveDocumentTab();
+
+			if (activeTab != null)
+			{
+				var editor = EditorWindow.Documents[activeTab].Editor;
+
+				var startOffset = adjustByLine
+					? editor.Document.GetLineByOffset(editor.SelectionStart).Offset
+					: editor.SelectionStart;
+				var startPoint = editor.Document.GetLocation(startOffset);
+
+				var endOffset = adjustByLine
+					? editor.Document.GetLineByOffset(editor.SelectionStart + editor.SelectionLength).EndOffset
+					: editor.SelectionStart + editor.SelectionLength;
+				var endPoint = editor.Document.GetLocation(endOffset);
+
+				return new SegmentLocation
+				{
+					Start = new PointLocation(startPoint.Line, startPoint.Column, startOffset),
+					End = new PointLocation(endPoint.Line, endPoint.Column, endOffset),
+				};
+			}
+
+			return null;
+		}
+
 		public string GetActiveDocumentText()
 		{
 			var activeTab = GetActiveDocumentTab();
@@ -51,6 +79,15 @@ namespace Land.GUI
 		{
 			return EditorWindow.Documents.Where(d => d.Value.DocumentName == documentName)
 				.Select(d => d.Value.Editor.Text).FirstOrDefault();
+		}
+
+		public void SetDocumentText(string documentName, string text)
+		{
+			var document = EditorWindow.Documents.Values
+				.Where(d => d.DocumentName == documentName).FirstOrDefault();
+
+			if(document != null)
+				document.Editor.Text = text;
 		}
 
 		public bool HasActiveDocument()

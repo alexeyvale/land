@@ -252,7 +252,7 @@ namespace Land.Core.Markup
 					else
 					{
 						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
-							for (var i = current.Children.Count - 1; i >= 0; --i)
+							for (var i = current.Children.Count - 2; i >= 1; --i)
 								stack.Push(current.Children[i]);
 					}
 				}
@@ -293,7 +293,7 @@ namespace Land.Core.Markup
 						innerContext.Add(new InnerContextElement(current, info.FileText));
 					else
 					{
-						for (var i = current.Children.Count - 1; i >= 0; --i)
+						for (var i = current.Children.Count - 2; i >= 1; --i)
 							stack.Push(current.Children[i]);
 					}
 				}
