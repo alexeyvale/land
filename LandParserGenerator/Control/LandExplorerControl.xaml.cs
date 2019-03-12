@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Threading;
 using System.Windows.Media;
 
 using Microsoft.Win32;
@@ -98,6 +98,8 @@ namespace Land.Control
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
 
+		private Dispatcher FrontendUpdateDispatcher { get; set; }
+
 		static LandExplorerControl()
 		{
 			if (!Directory.Exists(APP_DATA_DIRECTORY))
@@ -123,6 +125,7 @@ namespace Land.Control
         {
 			InitializeComponent();
 
+			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
 
@@ -132,7 +135,7 @@ namespace Land.Control
 		{
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
-			Editor.ShouldLoadSettings += LoadSettings;
+			Editor.ShouldLoadSettings += OnShouldLoadSettings;
 
 			/// Загружаем настройки панели разметки
 			LoadSettings();
@@ -186,7 +189,7 @@ namespace Land.Control
 					break;
 			}
 
-			ControlStatusLabel.Content = text;
+			ControlStatusLabel.Content = $"{DateTime.Now.ToString("HH:mm:ss")} | {text}";
 		}
 
 		#endregion
@@ -258,6 +261,11 @@ namespace Land.Control
 
 		#region Settings
 
+		private void OnShouldLoadSettings()
+		{
+			FrontendUpdateDispatcher.Invoke(LoadSettings);
+		}
+
 		private void LoadSettings()
 		{
 			/// Загружаем настройки панели способом, определённым в адаптере
@@ -268,6 +276,8 @@ namespace Land.Control
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
+
+			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
 		}
 
 		private void SyncMarkupManagerSettings()
@@ -324,23 +334,21 @@ namespace Land.Control
 		private T LogFunction<T>(Func<T> func, bool resetPrevious, bool skipTrace)
 		{
 			if (resetPrevious)
-			{
 				Log.Clear();
-			}
 
 			var result = func();
 			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
+
 			return result;
 		}
 
 		private void LogAction(Action action, bool resetPrevious, bool skipTrace)
 		{
 			if (resetPrevious)
-			{
 				Log.Clear();
-			}
 
 			action();
+
 			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
 		}
 

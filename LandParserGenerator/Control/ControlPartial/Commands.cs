@@ -274,12 +274,13 @@ namespace Land.Control
 			if (SettingsWindow.ShowDialog() ?? false)
 			{
 				SettingsObject = SettingsWindow.SettingsObject;
-				Editor.SaveSettings(
-					SettingsObject, SETTINGS_DEFAULT_PATH
-				);
 
 				SyncMarkupManagerSettings();
 				LogAction(() => ReloadParsers(), true, true);
+
+				Editor.SaveSettings(
+					SettingsObject, SETTINGS_DEFAULT_PATH
+				);
 			}
 		}
 
