@@ -108,17 +108,23 @@ namespace Land.Core.Parsing.Tree
 			{
 				if (blocks.Count > 0)
 				{
-					/// Находим строго вложенные в потомков блоки и обрабатываем их при посещении этих потомков
-					foreach (var child in node.Children.Where(c=>c.Anchor != null))
+					var anchoredNodes = node.Children.Where(c => c.Anchor != null).ToList();
+
+					/// Находим вложенные в потомков блоки и блоки, перекрывающиеся ровно с одним потомком,
+					/// обрабатываем их при рекурсивных посещениях
+					for (var i = 0; i < anchoredNodes.Count; ++i)
 					{
-						var innerBlocks = blocks.SkipWhile(b => b.StartOffset < child.Anchor.Start.Offset)
-							.TakeWhile(b => child.Anchor.Includes(b.Location) && !child.Anchor.Equals(b.Location))
+						var innerBlocks = blocks
+							.Where(b => anchoredNodes[i].Anchor.Overlaps(b.Location) 
+								&& (i == anchoredNodes.Count - 1 || !b.Location.Overlaps(anchoredNodes[i+1].Anchor) && !b.Location.Includes(anchoredNodes[i + 1].Anchor))
+								&& (i == 0 || !b.Location.Overlaps(anchoredNodes[i - 1].Anchor) && !b.Location.Includes(anchoredNodes[i - 1].Anchor))
+								|| anchoredNodes[i].Anchor.Includes(b.Location) && !anchoredNodes[i].Anchor.Equals(b.Location))
 							.ToList();
 
 						foreach (var block in innerBlocks)
 							blocks.Remove(block);
 
-						Visit(child, innerBlocks);
+						Visit(anchoredNodes[i], innerBlocks);
 					}
 
 					foreach (var block in blocks)
