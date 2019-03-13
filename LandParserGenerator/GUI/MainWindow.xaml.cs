@@ -65,7 +65,7 @@ namespace Land.GUI
 
 			/// Подгружаем определение для подсветки синтаксиса, создаём подсветчики и выделители
 			Grammar_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
-				new System.Xml.XmlTextReader(new StreamReader($"../../land.xshd", Encoding.Default)), 
+				new System.Xml.XmlTextReader(new StreamReader($"../../Xshd/land.xshd", Encoding.Default)), 
 				ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
 
 			Grammar_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineBackgroundRenderer(Grammar_Editor.TextArea));
@@ -73,6 +73,20 @@ namespace Land.GUI
 
 			File_Editor.TextArea.TextView.BackgroundRenderers.Add(new CurrentLineBackgroundRenderer(File_Editor.TextArea));
 			File_Editor.TextArea.TextView.BackgroundRenderers.Add(File_SegmentColorizer = new SegmentsBackgroundRenderer(File_Editor.TextArea));
+
+			/// Добавляем определения синтаксиса для дефолтного подсветчика
+			ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.RegisterHighlighting("YACC", new[] { ".y", ".yacc" }, 
+				ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
+					new System.Xml.XmlTextReader(new StreamReader($"../../Xshd/yacc.xshd", Encoding.Default)),
+					ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance
+				)
+			);
+			ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.RegisterHighlighting("Lex", new[] { ".lex" },
+				ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
+					new System.Xml.XmlTextReader(new StreamReader($"../../Xshd/lex.xshd", Encoding.Default)),
+					ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance
+				)
+			);
 
 			/// Загружаем списки последних открытых файлов и каталогов
 			var contentToLoad = new
@@ -574,6 +588,8 @@ namespace Land.GUI
 			{
 				File_Editor.Text = stream.ReadToEnd();
 				File_Editor.Encoding = stream.CurrentEncoding;
+				File_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
+					.Instance.GetDefinitionByExtension(Path.GetExtension(filename));
 			}
 
 			File_ParseButton_Click(null, null);
@@ -585,6 +601,7 @@ namespace Land.GUI
 
 			File_Editor.Text = String.Empty;
 			File_Editor.Encoding = Encoding.UTF8;
+			File_Editor.SyntaxHighlighting = null;
 		}
 
 		private void File_ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -789,48 +806,51 @@ namespace Land.GUI
 				}
 			}
 
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 дольше всего разбираемых файлов:");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-
-			foreach (var file in statsPerFile.OrderByDescending(f=>f.Value.GeneralTimeSpent).Take(5))
+			if (statsPerFile.Count > 0)
 			{
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
-			}
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 дольше всего разбираемых файлов:");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
 
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 файлов с самым долгим восстановлением:");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-
-			foreach (var file in statsPerFile.OrderByDescending(f => f.Value.RecoveryTimeSpent).Take(5))
-			{
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
-			}
-
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "Общая статистика.");
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, statsPerFile.Values.Aggregate((s1, s2) => s1 + s2));
-			FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
-
-			foreach (var pair in landCounts)
-				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
-
-			using (var fs = new StreamWriter(Path.Combine(DOCUMENTS_DIRECTORY, "last_batch_parsing_report.txt")))
-			{
-				fs.WriteLine(BuiltGrammarFilename);
-				fs.WriteLine(argument.DirectoryPath);
-
-				foreach(var file in landLists)
+				foreach (var file in statsPerFile.OrderByDescending(f => f.Value.GeneralTimeSpent).Take(5))
 				{
-					fs.WriteLine("***");
-					fs.WriteLine(file.File);
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
+				}
 
-					foreach(var landEntity in file.Land)
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "5 файлов с самым долгим восстановлением:");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+
+				foreach (var file in statsPerFile.OrderByDescending(f => f.Value.RecoveryTimeSpent).Take(5))
+				{
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning(file.Key, null)}");
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, file.Value.ToString());
+				}
+
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "Общая статистика.");
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, statsPerFile.Values.Aggregate((s1, s2) => s1 + s2));
+				FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, "");
+
+				foreach (var pair in landCounts)
+					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
+
+				using (var fs = new StreamWriter(Path.Combine(DOCUMENTS_DIRECTORY, "last_batch_parsing_report.txt")))
+				{
+					fs.WriteLine(BuiltGrammarFilename);
+					fs.WriteLine(argument.DirectoryPath);
+
+					foreach (var file in landLists)
 					{
-						fs.WriteLine(landEntity.Type);
-						fs.WriteLine(landEntity.Value);
+						fs.WriteLine("***");
+						fs.WriteLine(file.File);
+
+						foreach (var landEntity in file.Land)
+						{
+							fs.WriteLine(landEntity.Type);
+							fs.WriteLine(landEntity.Value);
+						}
 					}
 				}
 			}
@@ -1100,6 +1120,9 @@ namespace Land.GUI
 				var document = CreateDocument(documentName);
 
 				document.Editor.Text = stream.ReadToEnd();
+				document.Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
+					.Instance.GetDefinitionByExtension(Path.GetExtension(documentName));
+
 				stream.Close();
 
 				return document;

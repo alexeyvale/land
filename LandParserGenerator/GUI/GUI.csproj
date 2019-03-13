@@ -112,9 +112,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Xshd\lex.xshd" />
+    <None Include="Xshd\yacc.xshd" />
     <Resource Include="Fonts\Font-Awesome-5-Regular-400.otf" />
     <Resource Include="Fonts\Font-Awesome-5-Solid-900.otf" />
-    <None Include="land.xshd" />
+    <None Include="Xshd\land.xshd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
