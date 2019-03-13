@@ -576,6 +576,8 @@ namespace Land.GUI
 			{
 				File.WriteAllText(saveFileDialog.FileName, File_Editor.Text);
 				File_NameLabel.Content = saveFileDialog.FileName;
+				File_Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
+					.Instance.GetDefinitionByExtension(Path.GetExtension(saveFileDialog.FileName));
 			}
 		}
 

@@ -24,7 +24,7 @@ namespace Land.Control
 	{
 		private void MissingTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item == null)
 			{
@@ -95,7 +95,7 @@ namespace Land.Control
 
 		private void MissingTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{

@@ -226,12 +226,12 @@ namespace Land.Control
 			return null;
 		}
 
-		private static TreeViewItem VisualUpwardSearch(DependencyObject source)
+		private static T VisualUpwardSearch<T>(DependencyObject source) where T: class
 		{
-			while (source != null && !(source is TreeViewItem))
+			while (source != null && !(source is T))
 				source = VisualTreeHelper.GetParent(source);
 
-			return source as TreeViewItem;
+			return source as T;
 		}
 
 		private static T GetFrameworkElementByName<T>(FrameworkElement referenceElement) where T : FrameworkElement
