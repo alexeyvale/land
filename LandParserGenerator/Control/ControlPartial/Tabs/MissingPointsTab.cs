@@ -39,16 +39,18 @@ namespace Land.Control
 
 		private void RefreshMissingPointsList()
 		{
-			MissingTreeView.ItemsSource = MarkupManager.GetConcernPoints()
-				.Where(p => p.Anchor.HasMissingLocation)
+			var missingPoints = MarkupManager.GetConcernPoints()
+				.Where(p => p.Anchor?.HasMissingLocation ?? true)
 				.Select(p => new PointCandidatesPair() { Point = p })
 				.ToList();
 
-			if (MissingTreeView.Items.Count > 0)
+			foreach (PointCandidatesPair pair in missingPoints)
 			{
-				Tabs.SelectedItem = MissingPointsTab;
-				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
+				if (State.RecentAmbiguities.ContainsKey(pair.Point))
+					State.RecentAmbiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
 			}
+
+			MissingTreeView.ItemsSource = missingPoints;
 		}
 
 		private void ProcessAmbiguities(Dictionary<AnchorPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
@@ -62,21 +64,29 @@ namespace Land.Control
 			ProcessAmbiguities(concernPointAmbiguities, globalRemap);
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> recentAmbiguities, bool globalRemap)
 		{
 			if (globalRemap)
-				State.RecentAmbiguities = ambiguities;
+				State.RecentAmbiguities = recentAmbiguities;
 			else
 			{
-				foreach (var kvp in ambiguities)
+				foreach (var kvp in recentAmbiguities)
 					State.RecentAmbiguities[kvp.Key] = kvp.Value;
 			}
 
-			/// В дереве пропавших точек у нас максимум два уровня, где второй уровень - кандидаты
-			foreach (PointCandidatesPair pair in MissingTreeView.ItemsSource)
+			foreach (PointCandidatesPair existingAmbiguityInfo in MissingTreeView.ItemsSource)
 			{
-				if (ambiguities.ContainsKey(pair.Point))
-					ambiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
+				if (recentAmbiguities.ContainsKey(existingAmbiguityInfo.Point))
+				{
+					existingAmbiguityInfo.Candidates.Clear();
+					recentAmbiguities[existingAmbiguityInfo.Point].ForEach(a => existingAmbiguityInfo.Candidates.Add(a));
+				}
+			}
+
+			if (MissingTreeView.Items.Count > 0)
+			{
+				Tabs.SelectedItem = MissingPointsTab;
+				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
 			}
 		}
 

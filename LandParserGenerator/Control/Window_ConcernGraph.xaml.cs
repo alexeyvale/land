@@ -17,9 +17,9 @@ using Land.Core.Markup;
 namespace Land.Control
 {
 	/// <summary>
-	/// Логика взаимодействия для ConcernGraph.xaml
+	/// Логика взаимодействия для Window_ConcernGraph.xaml
 	/// </summary>
-	public partial class ConcernGraph : Window
+	public partial class Window_ConcernGraph : Window
 	{
 		#region Статус
 
@@ -32,20 +32,20 @@ namespace Land.Control
 			switch (status)
 			{
 				case ControlStatus.Error:
-					ConcernGraphStatusBar.Background = LightRed;
+					Window_ConcernGraphStatusBar.Background = LightRed;
 					break;
 				case ControlStatus.Pending:
-					ConcernGraphStatusBar.Background = Brushes.LightGoldenrodYellow;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightGoldenrodYellow;
 					break;
 				case ControlStatus.Ready:
-					ConcernGraphStatusBar.Background = Brushes.LightBlue;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightBlue;
 					break;
 				case ControlStatus.Success:
-					ConcernGraphStatusBar.Background = Brushes.LightGreen;
+					Window_ConcernGraphStatusBar.Background = Brushes.LightGreen;
 					break;
 			}
 
-			ConcernGraphStatus.Content = text;
+			Window_ConcernGraphStatus.Content = text;
 		}
 
 		#endregion
@@ -104,7 +104,7 @@ namespace Land.Control
 		private BidirectionalGraph<object, IEdge<object>> Graph { get; set; }
 		private HashSet<RelationType> RelationsSelected { get; set; } = new HashSet<RelationType>();
 
-		public ConcernGraph(MarkupManager markup)
+		public Window_ConcernGraph(MarkupManager markup)
         {
             InitializeComponent();
 
@@ -320,10 +320,44 @@ namespace Land.Control
 			}
 		}
 
-		private void ConcernGraphZoom_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		private void Window_ConcernGraphZoom_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton == MouseButton.Left && SelectedVertex != null)
 				UnselectVertex(SelectedVertex);
+		}
+
+		private void Refresh_Click(object sender, RoutedEventArgs e)
+		{
+			RebuildGraph();
+		}
+
+		private void ShowAsTree_Checked(object sender, RoutedEventArgs e)
+		{
+			if(ShowAsTree.IsChecked ?? false)
+			{
+				var layoutParams = new GraphSharp.Algorithms
+					.Layout.Simple.Tree.SimpleTreeLayoutParameters()
+				{
+					Direction = GraphSharp.Algorithms.Layout.LayoutDirection.TopToBottom,
+					LayerGap = 50,
+					OptimizeWidthAndHeight = true,
+					SpanningTreeGeneration = GraphSharp.Algorithms
+						.Layout.Simple.Tree.SpanningTreeGeneration.BFS
+				};
+
+				ConcernGraphLayout.LayoutAlgorithmType = "Tree";
+				ConcernGraphLayout.LayoutParameters = layoutParams;
+			}
+			else
+			{
+				var layoutParams = new GraphSharp.Algorithms.Layout.Simple.FDP.KKLayoutParameters
+				{
+					AdjustForGravity = true
+				};
+
+				ConcernGraphLayout.LayoutAlgorithmType = "KK";
+				ConcernGraphLayout.LayoutParameters = layoutParams;
+			}
 		}
 	}
 }

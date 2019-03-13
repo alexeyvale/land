@@ -79,11 +79,15 @@ namespace Land.Core.Markup
 		/// </summary>
 		public void InvalidatePoints(string fileName)
 		{
+			var stubNode = new Node("");
+			stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+
 			Anchors.ForEach(a =>
 			{
 				if (a.Context.FileName == fileName)
 				{
 					a.HasIrrelevantLocation = true;
+					a.AstNode = stubNode;
 				}
 			});
 		}

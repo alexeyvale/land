@@ -492,7 +492,7 @@ namespace " + @namespace + @"
 				child.Accept(this);
 		}
 	}
-
+	
 	public class RuleNode: Node
 	{
 		public RuleNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}
@@ -503,7 +503,7 @@ namespace " + @namespace + @"
 			visitor.Visit(this);
 		}
 	}
-
+	
 	public class TokenNode: Node
 	{
 		public TokenNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}

@@ -8,7 +8,7 @@ using Land.Core.Lexing;
 
 namespace Land.Core.Parsing.Tree
 {
-	public abstract class BaseTreeVisitor
+	public abstract class BaseTreeVisitor: MarshalByRefObject
 	{
 		public virtual void Visit(Node node)
 		{

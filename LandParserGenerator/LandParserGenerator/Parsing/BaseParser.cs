@@ -10,7 +10,7 @@ using Land.Core.Parsing.Preprocessing;
 
 namespace Land.Core.Parsing
 {
-	public abstract class BaseParser: IGrammarProvided
+	public abstract class BaseParser: MarshalByRefObject, IGrammarProvided
 	{
 		protected ILexer Lexer { get; set; }
 		protected BaseNodeGenerator NodeGenerator { get; set; }
@@ -63,7 +63,7 @@ namespace Land.Core.Parsing
 				root = ParsingAlgorithm(text, enableTracing);
 			}
 
-			Statistics.TimeSpent = DateTime.Now - parsingStarted;
+			Statistics.GeneralTimeSpent = DateTime.Now - parsingStarted;
 
 			return root;
 		}

@@ -22,8 +22,16 @@ namespace Land.Control
 {
 	public partial class LandExplorerControl : UserControl
 	{
-		private const string PARSER_PROVIDER_CLASS = "ParserProvider";
-		private const string GET_PARSER_METHOD = "GetParser";
+		public ParserManager Parsers { get; private set; } = new ParserManager();
+
+		private void ReloadParsers()
+		{
+			Log.Clear();
+
+			foreach (var ext in Parsers.Load(SettingsObject, CACHE_DIRECTORY, Log))
+				foreach(var file in ParsedFiles.Keys.Where(f=>Path.GetExtension(f) == ext).ToList())
+					DocumentChangedHandler(file);
+		}
 
 		private Tuple<Node, string> GetRoot(string documentName)
 		{
@@ -37,115 +45,13 @@ namespace Land.Control
 				: null;
 		}
 
-		private Dictionary<string, BaseParser> LoadParsers()
-		{
-			var parsers = new Dictionary<string, BaseParser>();
-
-			/// Генерируем парсер и связываем его с каждым из расширений, 
-			/// указанных для грамматики
-			foreach (var item in SettingsObject.Parsers)
-			{
-				if(!File.Exists(item.ParserPath))
-				{
-					Log.Add(Message.Error(
-						$"Файл {item.ParserPath} не существует, невозможно загрузить парсер для расширения {item.ExtensionsString}",
-						null
-					));
-
-					continue;
-				}
-
-				var parser = (BaseParser)Assembly.LoadFrom(item.ParserPath)
-							.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
-							?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
-
-				if(parser == null)
-				{
-					Log.Add(Message.Error(
-						$"Не удалось загрузить парсер для расширения {item.ExtensionsString}",
-						null
-					));
-
-					continue;
-				}
-
-                foreach (var key in item.Extensions)
-					parsers[key] = parser;
-
-				if (!String.IsNullOrEmpty(item.PreprocessorPath))
-				{
-					if (!File.Exists(item.PreprocessorPath))
-					{
-						Log.Add(Message.Error(
-							$"Файл {item.PreprocessorPath} не существует, невозможно загрузить препроцессор для расширения {item.ExtensionsString}",
-							null
-						));
-					}
-					else
-					{
-						var preprocessor = (BasePreprocessor)Assembly.LoadFrom(item.PreprocessorPath)
-							.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(BasePreprocessor)))
-							?.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-						if (preprocessor != null)
-						{
-							if (item.PreprocessorProperties != null
-								&& item.PreprocessorProperties.Count > 0)
-							{
-								/// Получаем тип препроцессора из библиотеки
-								var propertiesObjectType = Assembly.LoadFrom(item.PreprocessorPath)
-									.GetTypes().FirstOrDefault(t => t.BaseType.Equals(typeof(PreprocessorSettings)));
-
-								/// Для каждой настройки препроцессора
-								foreach (var property in item.PreprocessorProperties)
-								{
-									/// проверяем, есть ли такое свойство у объекта
-									var propertyInfo = propertiesObjectType.GetProperty(property.PropertyName);
-
-									if (propertyInfo != null)
-									{
-										var converter = (PropertyConverter)(((ConverterAttribute)propertyInfo
-											.GetCustomAttribute(typeof(ConverterAttribute))).ConverterType)
-											.GetConstructor(Type.EmptyTypes).Invoke(null);
-
-										try
-										{
-											propertyInfo.SetValue(preprocessor.Properties, converter.ToValue(property.ValueString));
-										}
-										catch
-										{
-											Log.Add(Message.Error(
-												$"Не удаётся конвертировать строку '{property.ValueString}' в свойство '{property.DisplayedName}' препроцессора для расширения {item.ExtensionsString}",
-												null
-											));
-										}
-									}
-								}
-							}
-
-							parser.SetPreprocessor(preprocessor);
-						}
-						else
-						{
-							Log.Add(Message.Error(
-								$"Библиотека {item.PreprocessorPath} не содержит описание препроцессора для расширения {item.ExtensionsString}",
-								null
-							));
-						}
-					}
-				}
-            }
-
-			return parsers;
-		}
-
 		private Tuple<Node, string> TryParse(string fileName, out bool success, string text = null)
 		{
 			if (!String.IsNullOrEmpty(fileName))
 			{
 				var extension = Path.GetExtension(fileName);
 
-				if (Parsers.ContainsKey(extension) && Parsers[extension] != null)
+				if (Parsers[extension] != null)
 				{
 					if (String.IsNullOrEmpty(text))
 						text = GetText(fileName);

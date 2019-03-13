@@ -87,8 +87,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlPartial\Tabs\RelationTab.cs" />
-    <Compile Include="ConcernGraph.xaml.cs">
-      <DependentUpon>ConcernGraph.xaml</DependentUpon>
+    <Compile Include="Parsing\CacheAction.cs" />
+    <Compile Include="Parsing\ParserManager.cs" />
+    <Compile Include="Parsing\ParserLoader.cs" />
+    <Compile Include="Window_ConcernGraph.xaml.cs">
+      <DependentUpon>Window_ConcernGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="ControlPartial\Parsing.cs" />
     <Compile Include="ControlPartial\Tabs\MissingPointsTab.cs" />
@@ -102,18 +105,21 @@
     <Compile Include="Converters\MarkupTreeIconColorConverter.cs" />
     <Compile Include="Converters\MissingListIconVisibilityConverter.cs" />
     <Compile Include="Converters\MarkupTreeIconVisibilityConverter.cs" />
+    <Compile Include="Window_LibraryDependencies.xaml.cs">
+      <DependentUpon>Window_LibraryDependencies.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\LandExplorerSettings.cs" />
     <Compile Include="IEditorAdapter.cs" />
     <Compile Include="Models\ConcernPointCandidateViewModel.cs" />
     <Compile Include="Models\RelationsTreeNode.cs" />
     <Compile Include="Models\PointCandidatesPair.cs" />
-    <Compile Include="PreprocessorPropertiesWindow.xaml.cs">
-      <DependentUpon>PreprocessorPropertiesWindow.xaml</DependentUpon>
+    <Compile Include="Window_PreprocessorProperties.xaml.cs">
+      <DependentUpon>Window_PreprocessorProperties.xaml</DependentUpon>
     </Compile>
-    <Compile Include="LandExplorerSettingsWindow.xaml.cs">
-      <DependentUpon>LandExplorerSettingsWindow.xaml</DependentUpon>
+    <Compile Include="Window_LandExplorerSettings.xaml.cs">
+      <DependentUpon>Window_LandExplorerSettings.xaml</DependentUpon>
     </Compile>
-    <Page Include="ConcernGraph.xaml">
+    <Page Include="Window_ConcernGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -126,11 +132,15 @@
       <DependentUpon>LandExplorerControl.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="PreprocessorPropertiesWindow.xaml">
+    <Page Include="Window_LibraryDependencies.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Window_PreprocessorProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="LandExplorerSettingsWindow.xaml">
+    <Page Include="Window_LandExplorerSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

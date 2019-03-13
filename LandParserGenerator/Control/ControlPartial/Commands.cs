@@ -99,7 +99,11 @@ namespace Land.Control
 						MarkupManager.GetConcernPointCandidates(rootTextPair.Item1, offset.Value)
 							.Select(c => new ConcernPointCandidateViewModel(c));
 
-					ConfigureMarkupElementTab(true, (ConcernPoint)target.DataContext);
+					var point = target.DataContext is PointCandidatesPair pair 
+						? pair.Point 
+						: (ConcernPoint)target.DataContext;
+
+					ConfigureMarkupElementTab(true, point);
 
 					SetStatus("Перепривязка точки", ControlStatus.Pending);
 				}
@@ -233,7 +237,7 @@ namespace Land.Control
 		{
 			if (MarkupManager.IsValid)
 			{
-				var graphWindow = new ConcernGraph(MarkupManager);
+				var graphWindow = new Window_ConcernGraph(MarkupManager);
 				graphWindow.Show();
 			}
 			else
@@ -285,7 +289,7 @@ namespace Land.Control
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
 		{
-			SettingsWindow = new LandExplorerSettingsWindow(SettingsObject.Clone());
+			SettingsWindow = new Window_LandExplorerSettings(SettingsObject.Clone());
 			SettingsWindow.Owner = Window.GetWindow(this);
 
 			if (SettingsWindow.ShowDialog() ?? false)
@@ -296,7 +300,7 @@ namespace Land.Control
 				);
 
 				SyncMarkupManagerSettings();
-				Parsers = LogFunction(() => LoadParsers(), true, true);
+				LogAction(() => ReloadParsers(), true, true);
 			}
 		}
 

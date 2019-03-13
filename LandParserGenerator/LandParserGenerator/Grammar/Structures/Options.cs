@@ -133,6 +133,7 @@ namespace Land.Core
 		}
 	}
 
+	[Serializable]
 	public class LocalOptions
 	{
 		public const double BASE_PRIORITY = 1;

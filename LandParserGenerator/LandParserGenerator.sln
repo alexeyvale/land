@@ -23,9 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Conditional compilation", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tree postprocessing", "Tree postprocessing", "{2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPreprocessor", "Preprocessors\Tree postprocessing\PascalPreprocessor\PascalPreprocessor.csproj", "{5BB7C445-36C4-4686-B17A-A163385848A5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpPreprocessor", "Preprocessors\Tree postprocessing\SharpPreprocessor\SharpPreprocessor.csproj", "{CF232C51-2875-4A92-89A4-A8AEA894E160}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPostprocessor", "Preprocessors\Tree postprocessing\PascalPostprocessor\PascalPostprocessor.csproj", "{5BB7C445-36C4-4686-B17A-A163385848A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownPostprocessor", "Preprocessors\Tree postprocessing\MarkdownPostprocessor\MarkdownPostprocessor.csproj", "{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}"
 EndProject
@@ -69,10 +67,6 @@ Global
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BB7C445-36C4-4686-B17A-A163385848A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF232C51-2875-4A92-89A4-A8AEA894E160}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -91,7 +85,6 @@ Global
 		{86500D9B-BDA6-4A54-B821-159F513B20EA} = {373EC8C3-5355-4019-B833-E46A111B2E41}
 		{2BBDC627-AFB5-44D0-BB15-F48D5FA699EF} = {373EC8C3-5355-4019-B833-E46A111B2E41}
 		{5BB7C445-36C4-4686-B17A-A163385848A5} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
-		{CF232C51-2875-4A92-89A4-A8AEA894E160} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

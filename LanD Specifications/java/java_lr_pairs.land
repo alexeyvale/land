@@ -14,6 +14,11 @@ ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
 
 ANY_TRIGGER_TOKEN	: '@interface'
  
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
+
+ 
 file_content	=	outer_entity*
 
 outer_entity	=	enum | class_interface | water_entity
@@ -23,10 +28,10 @@ enum			=	common_beginning 'enum' name Any block ';'?
 class_interface	=	common_beginning ('class'|'interface') name Any '{' inner_entity* '}' ';'?
 method			=	common_beginning type_parameter? type name arguments Any (';' | block)	
 field			=	common_beginning type_parameter? type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
-water_entity	=	(Any | round_bracketed_water) (block | ';')+
+water_entity	=	Any (block | ';')+
 
 common_beginning	=	(annotation|MODIFIER)*
-init_value			=	'=' (water | %ghost type)+
+init_value			=	'=' (Any | %ghost type)+
 
 name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
@@ -39,13 +44,9 @@ type_parameter		=	'<' type_parameter_list? '>'
 type_parameter_elem	=	('?' | name) (Any | name)+	
 type_parameter_list	=	type_parameter_elem (',' type_parameter_elem)*
 
-arguments	=	'(' (Any|arguments)+ ')'
+arguments	=	'(' Any ')'
 annotation	=	'@' name arguments?
-block		=	'{' (Any|block)+ '}'
-
-round_bracketed_water	=	'(' (Any|round_bracketed_water)+ ')'
-curve_bracketed_water	=	'{' (Any|curve_bracketed_water)+ '}'
-water					=	(Any | curve_bracketed_water | round_bracketed_water)+
+block		=	'{' Any '}'
 
 %%
 

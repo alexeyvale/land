@@ -22,6 +22,7 @@ namespace Land.VisualStudioExtension
 	///  Наследуем пакет от AsyncPackage, так как загрузка 
 	///  при большом количестве парсеров может быть медленной
 	/// </summary>
+	[ProvideBindingPath]
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
 	[ProvideMenuResource("Menus.ctmenu", 1)]

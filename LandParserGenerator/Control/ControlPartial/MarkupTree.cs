@@ -140,6 +140,9 @@ namespace Land.Control
 					State.SelectedItem_MarkupTreeView.IsSelected = false;
 				}
 			}
+
+			MarkupTreeView.Focus();
+			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight(object sender, MouseButtonEventArgs e)

@@ -8,17 +8,27 @@ using Land.Core;
 
 namespace Land.Control
 {
+	[Serializable]
 	[DataContract]
 	public class ParserSettingsItem
 	{
 		[DataMember]
-		public List<string> Extensions { get; set; } = new List<string>();
+		public Guid? Id { get; set; }
+
+		[DataMember]
+		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
 		[DataMember]
 		public string ParserPath { get; set; }
 
 		[DataMember]
+		public HashSet<string> ParserDependencies { get; set; } = new HashSet<string>();
+
+		[DataMember]
 		public string PreprocessorPath { get; set; }
+
+		[DataMember]
+		public HashSet<string> PreprocessorDependencies { get; set; } = new HashSet<string>();
 
 		[DataMember]
 		public List<PreprocessorProperty> PreprocessorProperties { get; set; } = new List<PreprocessorProperty>();
@@ -30,8 +40,10 @@ namespace Land.Control
 			set
 			{
 				/// Разбиваем строку на отдельные расширения, добавляем точку, если она отсутствует
-				Extensions = value.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
-					.Select(ext => ext.StartsWith(".") ? ext : '.' + ext).ToList();
+				Extensions = new HashSet<string>(
+					value.ToLower().Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+						.Select(ext => ext.StartsWith(".") ? ext : '.' + ext)
+				);
 			}
 		}
 
@@ -39,10 +51,13 @@ namespace Land.Control
 		{
 			return new ParserSettingsItem()
 			{
+				Id = Id,
 				Extensions = Extensions,
 				ParserPath = ParserPath,
                 PreprocessorPath = PreprocessorPath,
-                PreprocessorProperties = new List<PreprocessorProperty>(PreprocessorProperties)
+                PreprocessorProperties = new List<PreprocessorProperty>(PreprocessorProperties),
+				ParserDependencies = new HashSet<string>(ParserDependencies),
+				PreprocessorDependencies = new HashSet<string>(PreprocessorDependencies)
 			};
 		}
 	}
@@ -50,6 +65,9 @@ namespace Land.Control
 	[DataContract]
 	public class LandExplorerSettings: IExtensibleDataObject
 	{
+		[DataMember]
+		public Guid Id { get; set; }
+
 		[DataMember]
 		public bool SaveAbsolutePath { get; set; }
 
@@ -69,6 +87,7 @@ namespace Land.Control
 		{
 			return new LandExplorerSettings()
 			{
+				Id = Id,
 				SaveAbsolutePath = SaveAbsolutePath,
 				AcceptanceThreshold = AcceptanceThreshold,
 				GarbageThreshold = GarbageThreshold,

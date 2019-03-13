@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 using Land.Core;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
 
-namespace SharpPreprocessing.TreePostprocessing
+namespace PascalPreprocessing.TreePostprocessing
 {
-	public class SharpPreprocessor : BasePreprocessor
+	public class PascalPostprocessor : BasePreprocessor
 	{
 		private PipelinePreprocessor Pipeline { get; set; } = new PipelinePreprocessor(
-			new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor(),
-			new InternalSharpPreprocessor()
+			new PascalPreprocessing.ConditionalCompilation.PascalPreprocessor(),
+			new InternalPascalPreprocessor()
 		);
 
 		public override void Postprocess(Node root, List<Message> log)
@@ -25,11 +28,11 @@ namespace SharpPreprocessing.TreePostprocessing
 		}
 	}
 
-	internal class InternalSharpPreprocessor : BasePreprocessor
+	internal class InternalPascalPreprocessor : BasePreprocessor
 	{
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			var visitor = new EntityIdentificationVisitor();
+			var visitor = new RoutineAggregationVisitor();
 			root.Accept(visitor);
 
 			Log.AddRange(visitor.Log);

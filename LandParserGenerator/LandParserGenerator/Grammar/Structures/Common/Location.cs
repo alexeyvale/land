@@ -8,6 +8,7 @@ using QUT.Gppg;
 
 namespace Land.Core
 {
+	[Serializable]
 	public class PointLocation
 	{
 		public static int COLUMN_NUMBER_CORRECTION = 1;
@@ -37,6 +38,7 @@ namespace Land.Core
 		}
 	}
 
+	[Serializable]
 	public class SegmentLocation: IMerge<SegmentLocation>
 	{
 		public PointLocation Start { get; set; }
