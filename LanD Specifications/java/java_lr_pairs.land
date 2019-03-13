@@ -46,7 +46,7 @@ type_parameter_list	=	type_parameter_elem (',' type_parameter_elem)*
 
 arguments	=	'(' Any ')'
 annotation	=	'@' name arguments?
-block		=	'{' Any '}'
+block		=	'{' (Any (';' | block))+ '}'
 
 %%
 
