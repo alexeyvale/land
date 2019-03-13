@@ -42,55 +42,55 @@ namespace Land.Core.Markup
 
 		public void RefreshCache(IEnumerable<MarkupElement> markup)
 		{
-			//var elements = GetLinearSequenceVisitor.GetElements(markup);
-			//var concerns = elements.OfType<Concern>().ToList();
-			//var points = elements.OfType<ConcernPoint>().ToList();
+			var elements = GetLinearSequenceVisitor.GetElements(markup);
+			var concerns = elements.OfType<Concern>().ToList();
+			var points = elements.OfType<ConcernPoint>().ToList();
 
-			//InternalRelations.SetElements(elements);
-			//ExternalRelations.RefreshElements(elements);
+			InternalRelations.SetElements(elements);
+			ExternalRelations.RefreshElements(elements);
 
-			///// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
-			//foreach (var concern in concerns)
-			//	InternalRelations.AddRelation(RelationType.IsLogicalParentOf, concern, concern.Elements);
+			/// Строим отношения иерархической принадлежности точек и функциональностей объемлющим функциональностям
+			foreach (var concern in concerns)
+				InternalRelations.AddRelation(RelationType.IsLogicalParentOf, concern, concern.Elements);
 
-			//InternalRelations.FillAsClosure(RelationType.IsLogicalAncestorOf, RelationType.IsLogicalParentOf);
-			//InternalRelations.FillAsTransposition(RelationType.IsLogicalChildOf, RelationType.IsLogicalParentOf);
-			//InternalRelations.FillAsTransposition(RelationType.IsLogicalDescendantOf, RelationType.IsLogicalAncestorOf);
+			InternalRelations.FillAsClosure(RelationType.IsLogicalAncestorOf, RelationType.IsLogicalParentOf);
+			InternalRelations.FillAsTransposition(RelationType.IsLogicalChildOf, RelationType.IsLogicalParentOf);
+			InternalRelations.FillAsTransposition(RelationType.IsLogicalDescendantOf, RelationType.IsLogicalAncestorOf);
 
-			///// Строим отношения, связанные с пространственным взаимным расположением точек
-			//for (var i = 0; i < points.Count; ++i)
-			//	for (var j = i + 1; j < points.Count; ++j)
-			//	{
-			//		var point1 = points[i];
-			//		var point2 = points[j];
+			/// Строим отношения, связанные с пространственным взаимным расположением точек
+			for (var i = 0; i < points.Count; ++i)
+				for (var j = i + 1; j < points.Count; ++j)
+				{
+					var point1 = points[i];
+					var point2 = points[j];
 
-			//		if (point1.Location.End.Offset <= point2.Location.Start.Offset)
-			//			InternalRelations.AddRelation(RelationType.Preceeds, point1, point2);
-					
-			//		if (point1.Location.Includes(point2.Location))
-			//			InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point2, point1);
+					if (point1.Location.End.Offset <= point2.Location.Start.Offset)
+						InternalRelations.AddRelation(RelationType.Preceeds, point1, point2);
 
-			//		if (point2.Location.Includes(point1.Location))
-			//			InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point1, point2);
-			//	}
+					if (point1.Location.Includes(point2.Location))
+						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point2, point1);
 
-			//InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
-			//InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
+					if (point2.Location.Includes(point1.Location))
+						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point1, point2);
+				}
 
-			///// Строим отношение, связывающее точки, помечающие одну и ту же сущность
-			//var grouped = points.GroupBy(p => p.AstNode);
+			InternalRelations.FillAsTransposition(RelationType.Follows, RelationType.Preceeds);
+			InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
 
-			//foreach(var group in grouped)
-			//{
-			//	foreach(var point1 in group)
-			//		foreach(var point2 in group)
-			//		{
-			//			if(point1 != point2)
-			//				InternalRelations.AddRelation(RelationType.MarksTheSameAs, point2, point1);
-			//		}
-			//}
+			/// Строим отношение, связывающее точки, связанные с одним якорем
+			var grouped = points.GroupBy(p => p.Anchor);
 
-			//IsValid = true;
+			foreach (var group in grouped)
+			{
+				foreach (var point1 in group)
+					foreach (var point2 in group)
+					{
+						if (point1 != point2)
+							InternalRelations.AddRelation(RelationType.MarksTheSameAs, point2, point1);
+					}
+			}
+
+			IsValid = true;
 		}
 
 		public HashSet<RelationType> GetPossibleExternalRelations(MarkupElement from, MarkupElement to)
