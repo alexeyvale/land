@@ -169,6 +169,15 @@ namespace Land.Core.Parsing.LL
 				var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
 				root.Accept(visitor);
 				root = visitor.Root;
+
+				foreach (var block in visitor.CustomBlocks)
+				{
+					Log.Add(Message.Error(
+						$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
+							$"не учитываемой при синтаксическом анализе",
+						block.Start.Anchor.Start
+					));
+				}
 			}
 
 			return root;

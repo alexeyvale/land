@@ -36,6 +36,11 @@ namespace Land.Core.Lexing
 
 		public bool IsEndLexem(string lexem) => 
 			lexem.StartsWith(EndLexemPrefix) && lexem.EndsWith(EndLexemSuffix);
+
+		public string GetName(string blockStart) => blockStart
+			.Substring(StartLexemPrefix.Length)
+			.Substring(0, blockStart.Length - StartLexemPrefix.Length - StartLexemSuffix.Length)
+			.Trim();
 	}
 
 	public class PairAwareState
@@ -175,7 +180,7 @@ namespace Land.Core.Lexing
 					};
 
 					newBlock.Start.SetAnchor(token.Location.Start, token.Location.End);
-					newBlock.Start.SetValue(token.Text);
+					newBlock.Start.SetValue(CustomBlockDefinition.GetName(token.Text));
 
 					CustomBlockStack.Push(newBlock);
 				}
@@ -195,7 +200,6 @@ namespace Land.Core.Lexing
 
 						currentBlock.End = new Node(token.Name);
 						currentBlock.End.SetAnchor(token.Location.Start, token.Location.End);
-						currentBlock.End.SetValue(token.Text);
 						currentBlock.Location.End = token.Location.End;
 
 						CustomBlocks.Add(currentBlock);

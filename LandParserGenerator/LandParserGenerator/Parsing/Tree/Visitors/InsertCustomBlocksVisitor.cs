@@ -12,7 +12,7 @@ namespace Land.Core.Parsing.Tree
 	{
 		private Grammar GrammarObject { get; set; }
 
-		private List<CustomBlockNode> CustomBlocks { get; set; }
+		public List<CustomBlockNode> CustomBlocks { get; set; }
 
 		public Node Root { get; set; }
 
@@ -27,11 +27,13 @@ namespace Land.Core.Parsing.Tree
 		public InsertCustomBlocksVisitor(Grammar grammar, List<CustomBlockNode> customBlocks)
 		{
 			GrammarObject = grammar;
-			CustomBlocks = customBlocks;
+			CustomBlocks = new List<CustomBlockNode>(customBlocks);
 		}
 
 		private Node GetNodeFrom(CustomBlockNode block)
 		{
+			CustomBlocks.Remove(block);
+
 			var node = new Node(Grammar.CUSTOM_BLOCK_RULE_NAME, new LocalOptions { IsLand = true });
 
 			node.AddLastChild(block.Start);
@@ -88,11 +90,8 @@ namespace Land.Core.Parsing.Tree
 
 				foreach (var block in outerBlocks)
 				{
-					var newNode = new Node(Grammar.CUSTOM_BLOCK_RULE_NAME, new LocalOptions { IsLand = true });
-
-					newNode.AddFirstChild(block.Start);
-					newNode.AddLastChild(Root);
-					newNode.AddLastChild(block.End);
+					var newNode = GetNodeFrom(block);
+					newNode.InsertChild(Root, 1);
 
 					Root = newNode;
 				}
@@ -131,21 +130,18 @@ namespace Land.Core.Parsing.Tree
 
 						if(innerChildren.Count > 0)
 						{
-							var leftBorder = innerChildren.Take(innerChildren.First().idx)
-								.LastOrDefault(c => c.child.Anchor != null);
+							var leftBorder = node.Children.Take(innerChildren.First().idx)
+								.LastOrDefault(c => c.Anchor != null);
 
-							var rightBorder = innerChildren.Skip(innerChildren.Last().idx + 1)
-								.FirstOrDefault(c => c.child.Anchor != null);
+							var rightBorder = node.Children.Skip(innerChildren.Last().idx + 1)
+								.FirstOrDefault(c => c.Anchor != null);
 
-							if((leftBorder == null || !leftBorder.child.Anchor.Overlaps(block.Location))
-								&& (rightBorder == null || !rightBorder.child.Anchor.Overlaps(block.Location)))
+							if((leftBorder == null || !leftBorder.Anchor.Overlaps(block.Location))
+								&& (rightBorder == null || !rightBorder.Anchor.Overlaps(block.Location)))
 							{
-								var newNode = new Node(Grammar.CUSTOM_BLOCK_RULE_NAME, new LocalOptions { IsLand = true });
-
-								newNode.AddFirstChild(block.Start);
+								var newNode = GetNodeFrom(block);
 								foreach (var inner in innerChildren)
-									newNode.AddLastChild(inner.child);
-								newNode.AddLastChild(block.End);
+									newNode.InsertChild(inner.child, newNode.Children.Count - 1);
 
 								node.Children.RemoveRange(innerChildren.First().idx,
 									innerChildren.Last().idx - innerChildren.First().idx + 1);
