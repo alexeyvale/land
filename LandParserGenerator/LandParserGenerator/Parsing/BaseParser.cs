@@ -65,6 +65,7 @@ namespace Land.Core.Parsing
 			}
 
 			Statistics.GeneralTimeSpent = DateTime.Now - parsingStarted;
+			Statistics.TokensCount = LexingStream.Count;
 
 			return root;
 		}
