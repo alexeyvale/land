@@ -68,7 +68,7 @@ namespace Land.Core.Parsing.Tree
 				linear.AddRange(level);
 
 				foreach (var blockNode in linear)
-					node.AddFirstChild(blockNode);
+					node.AddLastChild(blockNode);
 			}
 		}
 
