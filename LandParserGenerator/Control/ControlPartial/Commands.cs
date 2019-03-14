@@ -374,7 +374,7 @@ namespace Land.Control
 			/// Проверяем, можно ли обрамить его кастомным блоком
 			if (CustomBlockValidator.IsValid(root, adjustedSelection))
 			{
-				candidates.Add(new CustomConcernPointCandidate(
+				candidates.Insert(0, new CustomConcernPointCandidate(
 					realSelection, adjustedSelection, "Новый пользовательский блок"
 				));
 			}
