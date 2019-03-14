@@ -98,8 +98,8 @@ namespace Land.Core
 		public bool Overlaps(SegmentLocation other)
 		{
 			return other != null
-				&& (Start.Offset <= other.Start.Offset && other.Start.Offset <= End.Offset 
-				^ Start.Offset <= other.End.Offset && other.End.Offset <= End.Offset);
+				&& (Start.Offset <= other.Start.Offset && other.Start.Offset <= End.Offset) 
+				^ (Start.Offset <= other.End.Offset && other.End.Offset <= End.Offset);
 		}
 	}
 }

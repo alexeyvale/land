@@ -116,7 +116,7 @@ namespace Land.Core.Parsing.Tree
 					{
 						var innerBlocks = blocks
 							.Where(b => anchoredNodes[i].Anchor.Overlaps(b.Location) 
-								&& (i == anchoredNodes.Count - 1 || !b.Location.Overlaps(anchoredNodes[i+1].Anchor) && !b.Location.Includes(anchoredNodes[i + 1].Anchor))
+								&& (i == anchoredNodes.Count - 1 || !b.Location.Overlaps(anchoredNodes[i + 1].Anchor) && !b.Location.Includes(anchoredNodes[i + 1].Anchor))
 								&& (i == 0 || !b.Location.Overlaps(anchoredNodes[i - 1].Anchor) && !b.Location.Includes(anchoredNodes[i - 1].Anchor))
 								|| anchoredNodes[i].Anchor.Includes(b.Location) && !anchoredNodes[i].Anchor.Equals(b.Location))
 							.ToList();
@@ -153,6 +153,17 @@ namespace Land.Core.Parsing.Tree
 									innerChildren.Last().idx - innerChildren.First().idx + 1);
 
 								node.InsertChild(newNode, innerChildren.First().idx);
+							}
+						}
+						else
+						{
+							var insertionIndex = node.Children.Select((child, idx) => new { child, idx })
+								.LastOrDefault(pair => pair.child.Anchor?.Start.Offset > block.EndOffset)?.idx;
+
+							if(insertionIndex.HasValue)
+							{
+								var newNode = GetNodeFrom(block);
+								node.InsertChild(newNode, insertionIndex.Value);
 							}
 						}
 					}

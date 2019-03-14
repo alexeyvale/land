@@ -372,7 +372,7 @@ namespace Land.Control
 					.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c)).ToList();
 
 			/// Проверяем, можно ли обрамить его кастомным блоком
-			if (CanCreateCustomBlock(root, adjustedSelection))
+			if (CustomBlockValidator.IsValid(root, adjustedSelection))
 			{
 				candidates.Add(new CustomConcernPointCandidate(
 					realSelection, adjustedSelection, "Новый пользовательский блок"
@@ -380,12 +380,6 @@ namespace Land.Control
 			}
 
 			return candidates;
-		}
-
-		private bool CanCreateCustomBlock(Node root, SegmentLocation selection)
-		{
-			/// TODO: нужно проверять, что грамматика в принципе допускает custom point-ы
-			return true;
 		}
 
 		#endregion
