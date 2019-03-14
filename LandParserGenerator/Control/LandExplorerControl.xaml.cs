@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Threading;
 using System.Windows.Media;
 
 using Microsoft.Win32;
@@ -42,8 +42,8 @@ namespace Land.Control
 
 			public MarkupElement BufferedDataContext { get; set; }
 
-			public Dictionary<ConcernPoint, List<CandidateInfo>> RecentAmbiguities { get; set; } =
-				new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			public Dictionary<ConcernPoint, List<RemapCandidateInfo>> RecentAmbiguities { get; set; } =
+				new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -98,6 +98,8 @@ namespace Land.Control
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
 
+		private Dispatcher FrontendUpdateDispatcher { get; set; }
+
 		static LandExplorerControl()
 		{
 			if (!Directory.Exists(APP_DATA_DIRECTORY))
@@ -123,6 +125,7 @@ namespace Land.Control
         {
 			InitializeComponent();
 
+			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
 
@@ -132,7 +135,7 @@ namespace Land.Control
 		{
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
-			Editor.ShouldLoadSettings += LoadSettings;
+			Editor.ShouldLoadSettings += OnShouldLoadSettings;
 
 			/// Загружаем настройки панели разметки
 			LoadSettings();
@@ -152,12 +155,12 @@ namespace Land.Control
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
-		public List<CandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
+		public List<RemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
 				? MarkupManager.Find(point.Anchor, 
-					new TargetFileInfo() { FileName = point.Anchor.Context.FileName, FileText = fileText, TargetNode = root })
-				: new List<CandidateInfo>();
+					new TargetFileInfo() { FileName = point.FileName, FileText = fileText, TargetNode = root })
+				: new List<RemapCandidateInfo>();
 		}
 
 		#endregion
@@ -186,7 +189,7 @@ namespace Land.Control
 					break;
 			}
 
-			ControlStatusLabel.Content = text;
+			ControlStatusLabel.Content = $"{DateTime.Now.ToString("HH:mm:ss")} | {text}";
 		}
 
 		#endregion
@@ -223,12 +226,12 @@ namespace Land.Control
 			return null;
 		}
 
-		private static TreeViewItem VisualUpwardSearch(DependencyObject source)
+		private static T VisualUpwardSearch<T>(DependencyObject source) where T: class
 		{
-			while (source != null && !(source is TreeViewItem))
+			while (source != null && !(source is T))
 				source = VisualTreeHelper.GetParent(source);
 
-			return source as TreeViewItem;
+			return source as T;
 		}
 
 		private static T GetFrameworkElementByName<T>(FrameworkElement referenceElement) where T : FrameworkElement
@@ -258,6 +261,11 @@ namespace Land.Control
 
 		#region Settings
 
+		private void OnShouldLoadSettings()
+		{
+			FrontendUpdateDispatcher.Invoke(LoadSettings);
+		}
+
 		private void LoadSettings()
 		{
 			/// Загружаем настройки панели способом, определённым в адаптере
@@ -268,6 +276,8 @@ namespace Land.Control
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
+
+			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
 		}
 
 		private void SyncMarkupManagerSettings()
@@ -324,23 +334,21 @@ namespace Land.Control
 		private T LogFunction<T>(Func<T> func, bool resetPrevious, bool skipTrace)
 		{
 			if (resetPrevious)
-			{
 				Log.Clear();
-			}
 
 			var result = func();
 			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
+
 			return result;
 		}
 
 		private void LogAction(Action action, bool resetPrevious, bool skipTrace)
 		{
 			if (resetPrevious)
-			{
 				Log.Clear();
-			}
 
 			action();
+
 			Editor.ProcessMessages(Log, skipTrace, resetPrevious);
 		}
 

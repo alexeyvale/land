@@ -15,7 +15,6 @@ namespace Land.Core.Parsing.LL
 
 		private TableLL1 Table { get; set; }
 		private Stack<Node> Stack { get; set; }
-		private PairAwareTokenStream LexingStream { get; set; }
 
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
@@ -47,7 +46,7 @@ namespace Land.Core.Parsing.LL
 			PositionsWhereRecoveryStarted = new HashSet<int>();
 
 			/// Готовим лексер и стеки
-			LexingStream = new PairAwareTokenStream(GrammarObject, Lexer, text, Log);
+			LexingStream = new ComplexTokenStream(GrammarObject, Lexer, text, Log);
 			Stack = new Stack<Node>();
 			/// Кладём на стек стартовый символ
 			var root = NodeGenerator.Generate(GrammarObject.StartSymbol);
@@ -164,6 +163,22 @@ namespace Land.Core.Parsing.LL
 			}
 
 			TreePostProcessing(root);
+
+			if (LexingStream.CustomBlocks?.Count > 0)
+			{
+				var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
+				root.Accept(visitor);
+				root = visitor.Root;
+
+				foreach (var block in visitor.CustomBlocks)
+				{
+					Log.Add(Message.Error(
+						$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
+							$"не учитываемой при синтаксическом анализе",
+						block.Start.Location.Start
+					));
+				}
+			}
 
 			return root;
 		}

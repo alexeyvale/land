@@ -48,6 +48,8 @@ namespace Land.Core.Lexing
 
 		public int CurrentIndex { get; private set; } = -1;
 
+		public int Count => Tokens.Count;
+
 		public IToken MoveTo(int idx)
 		{
 			if (idx >= 0 && idx < Tokens.Count)

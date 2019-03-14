@@ -22,6 +22,8 @@ namespace Land.GUI
 		{
 			EditorWindow = window;
 			SettingsPath = settingsPath;
+
+			RefreshSettingsFileWatcher();
 		}
 
 		#region IEditorAdapter
@@ -40,6 +42,34 @@ namespace Land.GUI
 			return activeTab != null ? EditorWindow.Documents[activeTab].Editor.CaretOffset : (int?)null;
 		}
 
+		public SegmentLocation GetActiveDocumentSelection(bool adjustByLine)
+		{
+			var activeTab = GetActiveDocumentTab();
+
+			if (activeTab != null)
+			{
+				var editor = EditorWindow.Documents[activeTab].Editor;
+
+				var startOffset = adjustByLine
+					? editor.Document.GetLineByOffset(editor.SelectionStart).Offset
+					: editor.SelectionStart;
+				var startPoint = editor.Document.GetLocation(startOffset);
+
+				var endOffset = adjustByLine
+					? editor.Document.GetLineByOffset(editor.SelectionStart + editor.SelectionLength).EndOffset
+					: editor.SelectionStart + editor.SelectionLength;
+				var endPoint = editor.Document.GetLocation(endOffset);
+
+				return new SegmentLocation
+				{
+					Start = new PointLocation(startPoint.Line, startPoint.Column, startOffset),
+					End = new PointLocation(endPoint.Line, endPoint.Column, endOffset),
+				};
+			}
+
+			return null;
+		}
+
 		public string GetActiveDocumentText()
 		{
 			var activeTab = GetActiveDocumentTab();
@@ -51,6 +81,15 @@ namespace Land.GUI
 		{
 			return EditorWindow.Documents.Where(d => d.Value.DocumentName == documentName)
 				.Select(d => d.Value.Editor.Text).FirstOrDefault();
+		}
+
+		public void SetDocumentText(string documentName, string text)
+		{
+			var document = EditorWindow.Documents.Values
+				.Where(d => d.DocumentName == documentName).FirstOrDefault();
+
+			if(document != null)
+				document.Editor.Text = text;
 		}
 
 		public bool HasActiveDocument()
@@ -70,9 +109,7 @@ namespace Land.GUI
 			}
 
 			foreach (var msg in toProcess)
-			{
 				ProcessMessage(msg);
-			}
 		}
 
 		public void ProcessMessage(Message msg)
@@ -142,6 +179,7 @@ namespace Land.GUI
 			using (FileStream fs = new FileStream(SettingsPath, FileMode.Create))
 			{
 				serializer.WriteObject(fs, settings);
+				SettingsWereSaved = true;
 			}
 		}
 
@@ -151,14 +189,56 @@ namespace Land.GUI
 			{
 				DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) });
 
-				using (FileStream fs = new FileStream(SettingsPath, FileMode.Open))
+				using (FileStream fs = new FileStream(SettingsPath, FileMode.Open, FileAccess.Read))
 				{
-					return (LandExplorerSettings)serializer.ReadObject(fs);
+					try
+					{
+						var settings = (LandExplorerSettings)serializer.ReadObject(fs);
+
+						if (SettingsFileWatcher.Path != Path.GetDirectoryName(SettingsPath))
+							SettingsFileWatcher.Path = Path.GetDirectoryName(SettingsPath);
+
+						return settings;
+					}
+					catch
+					{
+						return null;
+					}
 				}
 			}
 			else
 			{
 				return null;
+			}
+		}
+
+		private FileSystemWatcher SettingsFileWatcher { get; set; }
+
+		private bool SettingsWereSaved { get; set; }
+
+		private void RefreshSettingsFileWatcher()
+		{
+			SettingsFileWatcher?.Dispose();
+
+			SettingsFileWatcher = new FileSystemWatcher(Path.GetDirectoryName(SettingsPath));
+			SettingsFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+			SettingsFileWatcher.Changed += SettingsFileChanged_Handler;
+			SettingsFileWatcher.EnableRaisingEvents = true;
+		}
+
+		private void SettingsFileChanged_Handler(object sender, FileSystemEventArgs e)
+		{
+			if (e.FullPath == SettingsPath)
+			{
+				var fileInfo = new FileInfo(SettingsPath);
+
+				if (fileInfo.Length > 0)
+				{
+					if(!SettingsWereSaved)
+						ShouldLoadSettings?.Invoke();
+					else
+						SettingsWereSaved = false;
+				}
 			}
 		}
 

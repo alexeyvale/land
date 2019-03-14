@@ -24,7 +24,7 @@ namespace Land.Control
 	{
 		private void MissingTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item == null)
 			{
@@ -41,10 +41,10 @@ namespace Land.Control
 		{
 			var missingPoints = MarkupManager.GetConcernPoints()
 				.Where(p => p.Anchor?.HasMissingLocation ?? true)
-				.Select(p => new PointCandidatesPair() { Point = p })
+				.Select(p => new RemapCandidates() { Point = p })
 				.ToList();
 
-			foreach (PointCandidatesPair pair in missingPoints)
+			foreach (RemapCandidates pair in missingPoints)
 			{
 				if (State.RecentAmbiguities.ContainsKey(pair.Point))
 					State.RecentAmbiguities[pair.Point].ForEach(a => pair.Candidates.Add(a));
@@ -53,9 +53,9 @@ namespace Land.Control
 			MissingTreeView.ItemsSource = missingPoints;
 		}
 
-		private void ProcessAmbiguities(Dictionary<AnchorPoint, List<CandidateInfo>> ambiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<AnchorPoint, List<RemapCandidateInfo>> ambiguities, bool globalRemap)
 		{
-			var concernPointAmbiguities = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var concernPointAmbiguities = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			foreach (var kvp in ambiguities)
 				foreach (var cp in kvp.Key.Links)
@@ -64,7 +64,7 @@ namespace Land.Control
 			ProcessAmbiguities(concernPointAmbiguities, globalRemap);
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<CandidateInfo>> recentAmbiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<RemapCandidateInfo>> recentAmbiguities, bool globalRemap)
 		{
 			if (globalRemap)
 				State.RecentAmbiguities = recentAmbiguities;
@@ -74,7 +74,7 @@ namespace Land.Control
 					State.RecentAmbiguities[kvp.Key] = kvp.Value;
 			}
 
-			foreach (PointCandidatesPair existingAmbiguityInfo in MissingTreeView.ItemsSource)
+			foreach (RemapCandidates existingAmbiguityInfo in MissingTreeView.ItemsSource)
 			{
 				if (recentAmbiguities.ContainsKey(existingAmbiguityInfo.Point))
 				{
@@ -106,11 +106,11 @@ namespace Land.Control
 
 		private void MissingTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
-				if (item.DataContext is CandidateInfo pair)
+				if (item.DataContext is RemapCandidateInfo pair)
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,

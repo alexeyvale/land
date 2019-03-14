@@ -55,7 +55,7 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
@@ -77,7 +77,7 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_KeyDown(object sender, KeyEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item != null)
 			{
@@ -111,7 +111,7 @@ namespace Land.Control
 
 		private void MarkupTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item == null)
 			{
@@ -126,7 +126,7 @@ namespace Land.Control
 
 		private void MarkupTreeView_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			TreeViewItem item = VisualUpwardSearch(e.OriginalSource as DependencyObject);
+			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
 			if (item != null)
 			{

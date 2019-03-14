@@ -81,6 +81,9 @@ namespace Land.Control
 		public double? GarbageThreshold { get; set; }
 
 		[DataMember]
+		public bool? PreserveIndentation { get; set; }
+
+		[DataMember]
 		public ObservableCollection<ParserSettingsItem> Parsers { get; set; } = new ObservableCollection<ParserSettingsItem>();
 
 		public LandExplorerSettings Clone()
@@ -92,6 +95,7 @@ namespace Land.Control
 				AcceptanceThreshold = AcceptanceThreshold,
 				GarbageThreshold = GarbageThreshold,
 				DistanceToClosestThreshold = DistanceToClosestThreshold,
+				PreserveIndentation = PreserveIndentation,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};
 		}

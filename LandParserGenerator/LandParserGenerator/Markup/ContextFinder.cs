@@ -8,7 +8,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	public class CandidateInfo
+	public class RemapCandidateInfo
 	{
 		private const double HeaderContextWeight = 1;
 		private const double AncestorsContextWeight = 0.5;
@@ -43,13 +43,13 @@ namespace Land.Core.Markup
 		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
 		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
 		/// <returns></returns>
-		public static Dictionary<AnchorPoint, List<CandidateInfo>> Find(
+		public static Dictionary<AnchorPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<AnchorPoint>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
 			TargetFileInfo candidateFileInfo
 		)
 		{
-			var result = new Dictionary<AnchorPoint, List<CandidateInfo>>();
+			var result = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
 
 			foreach (var typePointsPair in points)
 			{
@@ -57,7 +57,7 @@ namespace Land.Core.Markup
 				{
 					var candidates = candidateNodes.ContainsKey(typePointsPair.Key)
 						? candidateNodes[typePointsPair.Key].Select(node =>
-							new CandidateInfo()
+							new RemapCandidateInfo()
 							{
 								Node = node,
 								Context = new PointContext()
@@ -66,7 +66,7 @@ namespace Land.Core.Markup
 									NodeType = node.Type
 								}
 							}).ToList()
-						: new List<CandidateInfo>();
+						: new List<RemapCandidateInfo>();
 
 					foreach (var candidate in candidates)
 					{
@@ -95,7 +95,7 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		public static List<CandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
+		public static List<RemapCandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
 			targetInfo.TargetNode.Accept(visitor);

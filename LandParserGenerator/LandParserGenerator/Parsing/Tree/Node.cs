@@ -125,6 +125,21 @@ namespace Land.Core.Parsing.Tree
 			ResetAnchor();
 		}
 
+		public void InsertChild(Node child, int position)
+		{
+			if (position <= Children.Count)
+			{
+				if (position == Children.Count)
+					AddLastChild(child);
+				else
+				{
+					Children.Insert(position, child);
+					child.Parent = this;
+					ResetAnchor();
+				}
+			}
+		}
+
 		public void AddFirstChild(Node child)
 		{
 			Children.Insert(0, child);

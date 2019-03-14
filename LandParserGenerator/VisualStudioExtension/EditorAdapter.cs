@@ -49,6 +49,39 @@ namespace Land.VisualStudioExtension
 				: (int?)null;
 		}
 
+		public SegmentLocation GetActiveDocumentSelection(bool adjustByLine)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (DteService?.ActiveDocument?.Object("TextDocument") is TextDocument textDocument)
+			{
+				var startPoint = textDocument.Selection.TopPoint.CreateEditPoint();
+				var endPoint = textDocument.Selection.BottomPoint.CreateEditPoint();
+
+				if(adjustByLine)
+				{
+					startPoint.StartOfLine();
+					endPoint.EndOfLine();
+				}
+
+				return new SegmentLocation
+				{
+					Start = new PointLocation(
+							startPoint.Line,
+							startPoint.DisplayColumn,
+							startPoint.AbsoluteCharOffset
+						),
+					End = new PointLocation(
+							endPoint.Line,
+							endPoint.DisplayColumn,
+							endPoint.AbsoluteCharOffset
+						),
+				};
+			}
+
+			return null;
+		}
+
 		public string GetActiveDocumentText()
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
@@ -72,6 +105,19 @@ namespace Land.VisualStudioExtension
 				}
 
 			return null;
+		}
+
+		public void SetDocumentText(string documentName, string text)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			/// Среди открытых документов ищем указанный
+			for (int i = 1; i <= DteService.Documents.Count; ++i)
+				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
+				{
+					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
+						textDoc.CreateEditPoint(textDoc.StartPoint).ReplaceText(textDoc.EndPoint, text, 8);
+				}
 		}
 
 		public bool HasActiveDocument()
@@ -160,7 +206,7 @@ namespace Land.VisualStudioExtension
 
 		#region Settings
 
-		private string WorkingDirectory { get; set; }
+		public string WorkingDirectory { get; set; }
 
 		public void SaveSettings(LandExplorerSettings settings, string defaultPath)
 		{

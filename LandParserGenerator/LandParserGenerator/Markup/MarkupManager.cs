@@ -213,7 +213,7 @@ namespace Land.Core.Markup
 		/// Получение всех узлов, к которым можно привязаться,
 		/// если команда привязки была вызвана в позиции offset
 		/// </summary>
-		public LinkedList<Node> GetConcernPointCandidates(Node root, int offset)
+		public LinkedList<Node> GetConcernPointCandidates(Node root, SegmentLocation selection)
 		{
 			var pointCandidates = new LinkedList<Node>();
 			var currentNode = root;
@@ -226,7 +226,7 @@ namespace Land.Core.Markup
 					pointCandidates.AddFirst(currentNode);
 
 				currentNode = currentNode.Children.Where(c => c.Location != null && c.Location.Start != null && c.Location.End != null
-					&& c.Location.Start.Offset <= offset && c.Location.End.Offset >= offset).FirstOrDefault();
+					&& c.Location.Start.Offset <= selection.Start.Offset && c.Location.End.Offset >= selection.Start.Offset).FirstOrDefault();
 			}
 
 			return pointCandidates;
@@ -400,7 +400,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<CandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
+		public List<RemapCandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -438,7 +438,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<AnchorPoint, List<CandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		public Dictionary<AnchorPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles)
@@ -449,10 +449,10 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<AnchorPoint, List<CandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<AnchorPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = Anchors.GroupBy(a=>a.Context.FileName).ToList();
-			var ambiguous = new Dictionary<AnchorPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -485,13 +485,13 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<AnchorPoint, List<CandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<AnchorPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
-			var ambiguous = new Dictionary<AnchorPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
 
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = Anchors.GroupBy(a => a.Context.NodeType).ToDictionary(g=>g.Key, g=>g.ToList());
-			var accumulator = Anchors.ToDictionary(e => e, e => new List<CandidateInfo>());
+			var accumulator = Anchors.ToDictionary(e => e, e => new List<RemapCandidateInfo>());
 
 			foreach (var file in targetFiles)
 			{
@@ -519,9 +519,9 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		public Dictionary<ConcernPoint, List<CandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			if (point.HasInvalidLocation)
 			{
@@ -536,9 +536,9 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		public Dictionary<AnchorPoint, List<CandidateInfo>> Remap(AnchorPoint anchor, TargetFileInfo targetInfo)
+		public Dictionary<AnchorPoint, List<RemapCandidateInfo>> Remap(AnchorPoint anchor, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<AnchorPoint, List<CandidateInfo>>();
+			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
 
 			if (anchor.HasInvalidLocation)
 			{
@@ -553,7 +553,7 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private bool TryApplyCandidate(ConcernPoint point, IEnumerable<CandidateInfo> candidates)
+		private bool TryApplyCandidate(ConcernPoint point, IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var best = ChooseCandidateToApply(candidates);
 
@@ -569,7 +569,7 @@ namespace Land.Core.Markup
 			}
 		}
 
-		private bool TryApplyCandidate(AnchorPoint anchor, IEnumerable<CandidateInfo> candidates)
+		private bool TryApplyCandidate(AnchorPoint anchor, IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var best = ChooseCandidateToApply(candidates);
 
@@ -585,14 +585,14 @@ namespace Land.Core.Markup
 			}
 		}
 
-		private List<CandidateInfo> GetCandidates(AnchorPoint point, TargetFileInfo targetInfo)
+		private List<RemapCandidateInfo> GetCandidates(AnchorPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo).OrderByDescending(c => c.Similarity)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 		}
 
-		private CandidateInfo ChooseCandidateToApply(IEnumerable<CandidateInfo> candidates)
+		private RemapCandidateInfo ChooseCandidateToApply(IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
 			var second = candidates.Skip(1).FirstOrDefault();

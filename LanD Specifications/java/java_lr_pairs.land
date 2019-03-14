@@ -46,7 +46,7 @@ type_parameter_list	=	type_parameter_elem (',' type_parameter_elem)*
 
 arguments	=	'(' Any ')'
 annotation	=	'@' name arguments?
-block		=	'{' Any '}'
+block		=	'{' (Any (';' | block))+ '}'
 
 %%
 
@@ -60,6 +60,12 @@ block		=	'{' Any '}'
 %nodes {
 	ghost names_list common_beginning outer_entity inner_entity
 	leaf name type
+}
+
+%customblock {
+	start("/// land start")
+	end("/// land end")
+	basetoken COMMENT
 }
 
 %mapping {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
+using System.Windows.Media;
 using System.ComponentModel;
 using System.IO;
 
@@ -81,16 +81,6 @@ namespace Land.Control
 			PossibleDependenciesList.ItemsSource = PossibleDependencies;
 		}
 
-		private void RelationCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
-		{
-			var checkBox = (CheckBox)sender;
-
-			if (checkBox.IsChecked ?? false)
-				Selected.Add(checkBox.Tag.ToString());
-			else
-				Selected.Remove(checkBox.Tag.ToString());
-		}
-
 		private void Button_Save_Click(object sender, RoutedEventArgs e)
 		{
 			this.DialogResult = true;
@@ -111,6 +101,34 @@ namespace Land.Control
 		{
 			foreach (var dep in PossibleDependencies.Where(d=>d.Exists))
 				dep.IsSelected = false;
+		}
+
+		private void PossibleDependenciesList_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			var item = VisualUpwardSearch<ListBoxItem>(e.OriginalSource as DependencyObject);
+
+			if (item != null)
+			{
+				var context = (PossibleDependencyViewModel)item.DataContext;
+
+				if (context.Exists)
+				{
+					context.IsSelected = !context.IsSelected;
+
+					if (context.IsSelected)
+						Selected.Add(context.Path);
+					else
+						Selected.Remove(context.Path);
+				}
+			}
+		}
+
+		private static T VisualUpwardSearch<T>(DependencyObject source) where T : class
+		{
+			while (source != null && !(source is T))
+				source = VisualTreeHelper.GetParent(source);
+
+			return source as T;
 		}
 	}
 }

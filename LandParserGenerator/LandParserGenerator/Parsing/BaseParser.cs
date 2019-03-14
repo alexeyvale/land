@@ -17,6 +17,7 @@ namespace Land.Core.Parsing
 		protected BaseNodeRetypingVisitor NodeRetypingVisitor { get; set; }
 
 		public Grammar GrammarObject { get; protected set; }
+		public ComplexTokenStream LexingStream { get; protected set; }
 		private BasePreprocessor Preproc { get; set; }
 
 		public Statistics Statistics { get; set; }
@@ -64,6 +65,7 @@ namespace Land.Core.Parsing
 			}
 
 			Statistics.GeneralTimeSpent = DateTime.Now - parsingStarted;
+			Statistics.TokensCount = LexingStream.Count;
 
 			return root;
 		}

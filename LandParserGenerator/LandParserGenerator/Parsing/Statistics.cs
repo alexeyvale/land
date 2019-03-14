@@ -9,6 +9,7 @@ namespace Land.Core.Parsing
 {
 	public class Statistics
 	{
+		public int TokensCount { get; set; }
 		public TimeSpan GeneralTimeSpent { get; set; }
 		public TimeSpan RecoveryTimeSpent { get; set; }
 		public int RecoveryTimes { get; set; }
@@ -19,6 +20,7 @@ namespace Land.Core.Parsing
 		{
 			return new Statistics
 			{
+				TokensCount = a.TokensCount + b.TokensCount,
 				GeneralTimeSpent = a.GeneralTimeSpent + b.GeneralTimeSpent,
 				RecoveryTimeSpent = a.RecoveryTimeSpent + b.RecoveryTimeSpent,
 				LongestRollback = a.LongestRollback + b.LongestRollback,
@@ -29,7 +31,8 @@ namespace Land.Core.Parsing
 
 		public override string ToString()
 		{
-			return $"Время парсинга: {GeneralTimeSpent.ToString(@"hh\:mm\:ss\:ff")};{Environment.NewLine}" +
+			return $"Количество токенов: {TokensCount};{Environment.NewLine}" +
+				$"Время парсинга: {GeneralTimeSpent.ToString(@"hh\:mm\:ss\:ff")};{Environment.NewLine}" +
 				$"Время восстановлений от ошибки: {RecoveryTimeSpent.ToString(@"hh\:mm\:ss\:ff")};{Environment.NewLine}" +
 				$"Количество восстановлений от ошибки: {RecoveryTimes};{Environment.NewLine}" +
 				$"Восстановлений при сопоставлении Any: {RecoveryTimesAny};{Environment.NewLine}" +

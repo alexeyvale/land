@@ -25,7 +25,8 @@ ID {LETTER}({LETTER}|{DIGIT})*
 
 LINE_COMMENT "//".*    
 MULTILINE_COMMENT "/*"([^*]|\*[^/])*"*/"
-STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
+LEXER_LITERAL \'([^'\\]*|(\\\\)+|\\[^\\])*\'
+STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 
 %%
 
@@ -55,10 +56,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	return (int)Tokens.PREC_NONEMPTY;
 }
 
-"," {
-	return (int)Tokens.COMMA;
-}
-
 "=>" {
 	return (int)Tokens.ARROW;
 }
@@ -83,11 +80,6 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 "~" return (int)Tokens.IS_LIST_NODE;
 
 // Элементы правила
-
-{STRING} {
-	yylval.strVal = yytext;
-	return (int)Tokens.STRING;
-}
 
 ":" {
 	BEGIN(before_terminal_declaration_body);
@@ -168,6 +160,20 @@ STRING \'([^'\\]*|(\\\\)+|\\[^\\])*\'
 	{RNUM} {
 		yylval.doubleVal = double.Parse(yytext, CultureInfo.InvariantCulture);
 		return (int)Tokens.RNUM;
+	}
+	
+	{LEXER_LITERAL} {
+		yylval.strVal = yytext;
+		return (int)Tokens.REGEX;
+	}
+	
+	{STRING} {
+		yylval.strVal = yytext;
+		return (int)Tokens.STRING;
+	}
+	
+	"," {
+		return (int)Tokens.COMMA;
 	}
 }
 

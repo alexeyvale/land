@@ -17,7 +17,7 @@ namespace Land.Control
 		{
 			var label = (Label)values[0];
 
-			if (values[1] is PointCandidatesPair pair)
+			if (values[1] is RemapCandidates pair)
 			{
 				switch (label.Name)
 				{
