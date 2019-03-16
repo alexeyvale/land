@@ -18,11 +18,6 @@ namespace Land.Control
 
 		public BaseParser Parser { get; set; }
 
-		public override object InitializeLifetimeService()
-		{
-			return null;
-		}
-
 		public Message Load(string parserCachedPath, string preprocessorCachedPath, 
 			ParserSettingsItem settings)
 		{
@@ -133,5 +128,7 @@ namespace Land.Control
 				}
 			}
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }

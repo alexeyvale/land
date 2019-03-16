@@ -91,5 +91,7 @@ namespace Land.Core.Parsing
 
 			root.Accept(new UserifyVisitor(GrammarObject));
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }

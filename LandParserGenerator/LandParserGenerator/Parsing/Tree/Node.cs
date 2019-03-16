@@ -191,5 +191,7 @@ namespace Land.Core.Parsing.Tree
 			return (String.IsNullOrEmpty(Alias) ? Symbol : Alias) 
 				+ (Value.Count > 0 ? ": " + String.Join(" ", Value.Select(v=>v.Trim())) : "");
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }

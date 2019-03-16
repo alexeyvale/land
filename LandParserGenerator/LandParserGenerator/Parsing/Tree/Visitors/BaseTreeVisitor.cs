@@ -15,5 +15,7 @@ namespace Land.Core.Parsing.Tree
 			foreach (var child in node.Children)
 				child.Accept(this);
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }
