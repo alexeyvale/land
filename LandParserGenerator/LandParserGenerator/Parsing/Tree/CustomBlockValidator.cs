@@ -32,13 +32,22 @@ namespace Land.Core.Parsing.Tree
 
 			public void VisitInner(Node node)
 			{
+				/// Потомки, вложенные в область блока или совпадающие с ним
 				var included = node.Children.Where(c => BlockLocation.Includes(c.Anchor)).ToList();
+				/// Потомки, строго пересекающиеся с блоком
 				var overlapped = node.Children.Where(c => BlockLocation.Overlaps(c.Anchor)).ToList();
-				var outer = node.Children.Where(c => c.Anchor != null && c.Anchor.Includes(BlockLocation)).ToList();
+				/// Потомки, охватывающие область блока, но не совпадающие с ним
+				var outer = node.Children.Where(c => c.Anchor != null 
+					&& c.Anchor.Includes(BlockLocation) && !c.Anchor.Equals(BlockLocation)).ToList();
 
 				if (outer.Count == 1)
 				{
-					Visit(outer[0]);
+					/// Если блок вложен в Any, его можно сделать 
+					/// дочерним по отношению к Any
+					if (outer[0].Symbol == Grammar.ANY_TOKEN_NAME)
+						CanInsert = true;
+					else
+						VisitInner(outer[0]);
 				}
 				else if (overlapped.Count == 1 && included.Count == 0)
 				{
@@ -47,7 +56,7 @@ namespace Land.Core.Parsing.Tree
 					if (overlapped[0].Symbol == Grammar.ANY_TOKEN_NAME)
 						CanInsert = true;
 					else
-						Visit(overlapped[0]);
+						VisitInner(overlapped[0]);
 				}
 				/// Если блок включает в себя некоторое количество 
 				/// дочерних узлов текущего узла и ничего не перекрывает,

@@ -69,6 +69,12 @@ block				=	'{' Any '}'
 	leaf name type modifier
 }
 
+%customblock {
+	start("/// land start")
+	end("/// land end")
+	basetoken COMMENT
+}
+
 %mapping {
 	land namespace enum class_struct_interface method field property
 	priority(5) name
