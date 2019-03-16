@@ -76,6 +76,7 @@ namespace Land.Control
 					.Insert(customPoint.AdjustedSelection.End.Offset + customBlockStart.Length, customBlockEnd);
 
 				Editor.SetDocumentText(State.PendingCommand.DocumentName, text);
+				State.PendingCommand.DocumentText = text;
 
 				customPoint.RealSelection.Shift(1, 0, customBlockStart.Length);
 
