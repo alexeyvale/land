@@ -51,7 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Visitors\GatherAnchorsVisitor.cs" />
+    <Compile Include="Visitors\GatherLocationsVisitor.cs" />
     <Compile Include="Visitors\PostprocessVisitor.cs" />
     <Compile Include="Visitors\DirectivesVisitor.cs" />
     <Compile Include="SharpPreprocessorProperties.cs" />

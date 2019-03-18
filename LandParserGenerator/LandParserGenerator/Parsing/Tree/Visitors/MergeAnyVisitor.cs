@@ -25,7 +25,7 @@ namespace Land.Core.Parsing.Tree
 					&& node.Children[i - 1].Symbol == Grammar.ANY_TOKEN_NAME
 					&& node.Children[i].Location != null)
 				{
-					node.Children[i - 1].SetAnchor(
+					node.Children[i - 1].SetLocation(
 						node.Children[i - 1].Location != null ? node.Children[i - 1].Location.Start : node.Children[i].Location.Start,
 						node.Children[i].Location.End
 					);

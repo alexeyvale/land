@@ -110,7 +110,7 @@
                                     </TabItem>
                                     <TabItem>
                                         <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-										<ScrollViewer VerticalScrollBarVisibility="Auto">
+										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox
 												Name="Grammar_ErrorsList"
 												MouseDoubleClick="Grammar_ListBox_MouseDoubleClick"
@@ -163,13 +163,13 @@
                                 <TabControl Grid.Row="2">
                                     <TabItem>
                                         <TabItem.Header>Лог</TabItem.Header>
-										<ScrollViewer VerticalScrollBarVisibility="Auto">
+										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox Name="File_LogList" MouseDoubleClick="File_ListBox_MouseDoubleClick" FontSize="14pt"/>
 										</ScrollViewer>
 									</TabItem>
                                     <TabItem>
                                         <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-										<ScrollViewer VerticalScrollBarVisibility="Auto">
+										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox
 												Name="File_ErrorsList"
 												MouseDoubleClick="File_ListBox_MouseDoubleClick"
@@ -206,7 +206,7 @@
 									<Separator></Separator>
 									<ComboBox MinWidth="90" MaxWidth="90" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
                                 </ToolBar>
-								<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+								<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 									<ListBox FontSize="14pt" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick"></ListBox>
 								</ScrollViewer>
 								<StatusBar Name="Batch_StatusBar" Grid.Row="2">
@@ -284,7 +284,7 @@
                         <TabControl Grid.Row="3" Name="MarkupTestOutputTabs">
                             <TabItem Name="MarkupTestLogTab">
                                 <TabItem.Header>Лог</TabItem.Header>
-								<ScrollViewer VerticalScrollBarVisibility="Auto">
+								<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 									<ListBox
 										Name="MarkupTestLog"
 										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
@@ -294,7 +294,7 @@
 							</TabItem>
                             <TabItem Name="MarkupTestErrorsTab">
                                 <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-								<ScrollViewer VerticalScrollBarVisibility="Auto">
+								<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 									<ListBox
 										Name="MarkupTestErrors"
 										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"

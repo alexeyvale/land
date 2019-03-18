@@ -31,7 +31,7 @@ namespace Land.Core.Parsing.Tree
 				node.Children.Clear();
 
 				if(node.Location != null)
-					node.SetAnchor(tmp.Start, tmp.End);
+					node.SetLocation(tmp.Start, tmp.End);
 			}
 			else
 				base.Visit(node);

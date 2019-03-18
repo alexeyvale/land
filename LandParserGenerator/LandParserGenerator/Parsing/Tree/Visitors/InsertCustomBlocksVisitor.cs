@@ -108,23 +108,23 @@ namespace Land.Core.Parsing.Tree
 			{
 				if (blocks.Count > 0)
 				{
-					var anchoredNodes = node.Children.Where(c => c.Location != null).ToList();
+					var locatedNodes = node.Children.Where(c => c.Location != null).ToList();
 
 					/// Находим вложенные в потомков блоки и блоки, перекрывающиеся ровно с одним потомком,
 					/// обрабатываем их при рекурсивных посещениях
-					for (var i = 0; i < anchoredNodes.Count; ++i)
+					for (var i = 0; i < locatedNodes.Count; ++i)
 					{
 						var innerBlocks = blocks
-							.Where(b => anchoredNodes[i].Location.Overlaps(b.Location) 
-								&& (i == anchoredNodes.Count - 1 || !b.Location.Overlaps(anchoredNodes[i + 1].Location) && !b.Location.Includes(anchoredNodes[i + 1].Location))
-								&& (i == 0 || !b.Location.Overlaps(anchoredNodes[i - 1].Location) && !b.Location.Includes(anchoredNodes[i - 1].Location))
-								|| anchoredNodes[i].Location.Includes(b.Location) && !anchoredNodes[i].Location.Equals(b.Location))
+							.Where(b => locatedNodes[i].Location.Overlaps(b.Location) 
+								&& (i == locatedNodes.Count - 1 || !b.Location.Overlaps(locatedNodes[i + 1].Location) && !b.Location.Includes(locatedNodes[i + 1].Location))
+								&& (i == 0 || !b.Location.Overlaps(locatedNodes[i - 1].Location) && !b.Location.Includes(locatedNodes[i - 1].Location))
+								|| locatedNodes[i].Location.Includes(b.Location) && !locatedNodes[i].Location.Equals(b.Location))
 							.ToList();
 
 						foreach (var block in innerBlocks)
 							blocks.Remove(block);
 
-						Visit(anchoredNodes[i], innerBlocks);
+						Visit(locatedNodes[i], innerBlocks);
 					}
 
 					foreach (var block in blocks)

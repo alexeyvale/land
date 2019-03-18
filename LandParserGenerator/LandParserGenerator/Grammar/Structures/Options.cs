@@ -168,6 +168,8 @@ namespace Land.Core
 		{
 			CustomBlockOptions.Remove(opt);
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 
 	[Serializable]

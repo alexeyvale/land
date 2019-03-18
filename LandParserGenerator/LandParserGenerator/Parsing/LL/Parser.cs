@@ -86,7 +86,7 @@ namespace Land.Core.Parsing.LL
 					/// иначе читаем следующий токен
 					else
 					{
-						node.SetAnchor(token.Location.Start, token.Location.End);
+						node.SetLocation(token.Location.Start, token.Location.End);
 						node.SetValue(token.Text);
 
 						token = LexingStream.GetNextToken();
@@ -232,7 +232,7 @@ namespace Land.Core.Parsing.LL
 			{
 				/// Проверка на случай, если допропускаем текст в процессе восстановления
 				if (anyNode.Location == null)
-					anyNode.SetAnchor(token.Location.Start, token.Location.End);
+					anyNode.SetLocation(token.Location.Start, token.Location.End);
 
 				/// Смещение для участка, подобранного как текст
 				var endLocation = token.Location.End;
@@ -265,7 +265,7 @@ namespace Land.Core.Parsing.LL
 					}
 				}
 
-				anyNode.SetAnchor(anyNode.Location.Start, endLocation);
+				anyNode.SetLocation(anyNode.Location.Start, endLocation);
 
 				if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					return token;
@@ -412,10 +412,10 @@ namespace Land.Core.Parsing.LL
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
 				if (currentNode.Location != null)
-					anyNode.SetAnchor(currentNode.Location.Start, currentNode.Location.End);
+					anyNode.SetLocation(currentNode.Location.Start, currentNode.Location.End);
 				if (skippedBuffer.Count > 0)
 				{
-					anyNode.SetAnchor(
+					anyNode.SetLocation(
 						anyNode.Location?.Start ?? skippedBuffer.First().Location.Start,
 						skippedBuffer.Last().Location.End
 					);

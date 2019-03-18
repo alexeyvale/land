@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 09.03.2019 21:05:54
+// DateTime: 18.03.2019 20:27:09
 // UserName: Алексей
-// Input file <./Land.y - 09.03.2019 21:05:54>
+// Input file <./Land.y - 18.03.2019 20:27:09>
 
 // options: no-lines gplex
 
@@ -75,14 +75,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 09.03.2019 21:05:54
+  // Verbatim content from ./Land.y - 18.03.2019 20:27:09
     public Parser(AbstractScanner<Land.Core.Builder.ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 09.03.2019 21:05:54
+  // End verbatim content from ./Land.y - 18.03.2019 20:27:09
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -273,7 +273,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 { 
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareTerminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-1].strVal, ValueStack[ValueStack.Depth-2].boolVal);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-4].strVal, LocationStack[LocationStack.Depth-4].Start);
+				ConstructedGrammar.AddLocation(ValueStack[ValueStack.Depth-4].strVal, LocationStack[LocationStack.Depth-4].Start);
 			}, LocationStack[LocationStack.Depth-4].Start);
 		}
         break;
@@ -287,7 +287,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclarePair(ValueStack[ValueStack.Depth-6].strVal, ValueStack[ValueStack.Depth-3].strSet, ValueStack[ValueStack.Depth-1].strSet);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-6].strVal, LocationStack[LocationStack.Depth-6].Start);
+				ConstructedGrammar.AddLocation(ValueStack[ValueStack.Depth-6].strVal, LocationStack[LocationStack.Depth-6].Start);
 			}, LocationStack[LocationStack.Depth-6].Start);
 		}
         break;
@@ -297,7 +297,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 13: // pair_border -> REGEX
 { 	
 			var generated = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1].Start);
+			ConstructedGrammar.AddLocation(generated, LocationStack[LocationStack.Depth-1].Start);
 			CurrentSemanticValue.strSet = new HashSet<string>() { generated };
 		}
         break;
@@ -317,7 +317,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 			
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareNonterminal(ValueStack[ValueStack.Depth-3].strVal, ValueStack[ValueStack.Depth-1].altList);
-				ConstructedGrammar.AddAnchor(ValueStack[ValueStack.Depth-3].strVal, LocationStack[LocationStack.Depth-3].Start);
+				ConstructedGrammar.AddLocation(ValueStack[ValueStack.Depth-3].strVal, LocationStack[LocationStack.Depth-3].Start);
 				
 				if(aliases.Count > 0)
 					ConstructedGrammar.AddAliases(ValueStack[ValueStack.Depth-3].strVal, aliases);
@@ -388,7 +388,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 				else
 				{			
 					var generated = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-4].strVal, ValueStack[ValueStack.Depth-2].optQuantVal.Value, ValueStack[ValueStack.Depth-1].boolVal);
-					ConstructedGrammar.AddAnchor(generated, CurrentLocationSpan.Start);
+					ConstructedGrammar.AddLocation(generated, CurrentLocationSpan.Start);
 					
 					CurrentSemanticValue.entryVal = new Entry(generated, opts);
 				}
@@ -488,7 +488,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 37: // entry_core -> REGEX
 { 
 			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateTerminal(ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
+			ConstructedGrammar.AddLocation(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;
       case 38: // entry_core -> ID
@@ -500,7 +500,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 40: // group -> LROUND_BRACKET, body, RROUND_BRACKET
 { 
 			CurrentSemanticValue.strVal = ConstructedGrammar.GenerateNonterminal(ValueStack[ValueStack.Depth-2].altList);
-			ConstructedGrammar.AddAnchor(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
+			ConstructedGrammar.AddLocation(CurrentSemanticValue.strVal, CurrentLocationSpan.Start);
 		}
         break;
       case 43: // category_block -> CATEGORY_NAME, option_or_block
@@ -610,7 +610,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 54: // argument -> REGEX
 {
 			var generated = ConstructedGrammar.GenerateTerminal((string)ValueStack[ValueStack.Depth-1].strVal);
-			ConstructedGrammar.AddAnchor(generated, LocationStack[LocationStack.Depth-1].Start);		
+			ConstructedGrammar.AddLocation(generated, LocationStack[LocationStack.Depth-1].Start);		
 			CurrentSemanticValue.dynamicVal = generated;
 		}
         break;

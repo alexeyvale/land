@@ -105,7 +105,7 @@ namespace Land.Core.Parsing.LR
 					{
 						var tokenNode = NodeGenerator.Generate(token.Name);
 						tokenNode.SetValue(token.Text);
-						tokenNode.SetAnchor(token.Location.Start, token.Location.End);
+						tokenNode.SetLocation(token.Location.Start, token.Location.End);
 
 						var shift = (ShiftAction)action;
 						/// Вносим в стек новое состояние
@@ -314,7 +314,7 @@ namespace Land.Core.Parsing.LR
 			}
 
 			if(endLocation != null)
-				anyNode.SetAnchor(startLocation, endLocation);
+				anyNode.SetLocation(startLocation, endLocation);
 
 			if (token.Name == Grammar.ERROR_TOKEN_NAME)
 				return token;
@@ -522,7 +522,7 @@ namespace Land.Core.Parsing.LR
 				/// снятого со стека символа до места восстановления
 				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
-					anyNode.SetAnchor(startLocation, startLocation);
+					anyNode.SetLocation(startLocation, startLocation);
 				anyNode.Value = value.ToList();
 
 				Log.Add(Message.Warning(

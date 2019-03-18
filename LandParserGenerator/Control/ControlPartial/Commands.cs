@@ -195,7 +195,7 @@ namespace Land.Control
 				MarkupManager.Deserialize(openFileDialog.FileName);
 
 				var stubNode = new Node("");
-				stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+				stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
 
 				MarkupManager.DoWithMarkup(elem =>
 				{

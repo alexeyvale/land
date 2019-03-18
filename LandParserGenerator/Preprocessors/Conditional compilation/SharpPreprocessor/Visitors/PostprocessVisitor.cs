@@ -39,7 +39,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 			/// после правки якорей листьев-потомков
 			if (node.Children.Count > 0)
 			{
-				node.ResetAnchor();
+				node.ResetLocation();
 			}
 			else
 			{

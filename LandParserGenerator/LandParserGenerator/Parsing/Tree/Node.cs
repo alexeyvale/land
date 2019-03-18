@@ -48,7 +48,7 @@ namespace Land.Core.Parsing.Tree
 			get
 			{
 				if (!LocationReady)
-					GetAnchorFromChildren();
+					GetLocationFromChildren();
 				return _location;
 			}
 		}
@@ -85,7 +85,7 @@ namespace Land.Core.Parsing.Tree
 			this.LocationReady = node.LocationReady;
 		}
 
-		protected void GetAnchorFromChildren()
+		protected void GetLocationFromChildren()
 		{
 			if (Children.Count > 0)
 			{
@@ -94,7 +94,7 @@ namespace Land.Core.Parsing.Tree
 				foreach (var child in Children)
 				{
 					if (child.Location == null)
-						child.GetAnchorFromChildren();
+						child.GetLocationFromChildren();
 
 					if (_location == null)
 						_location = child.Location;
@@ -122,7 +122,7 @@ namespace Land.Core.Parsing.Tree
 		{
 			Children.Add(child);
 			child.Parent = this;
-			ResetAnchor();
+			ResetLocation();
 		}
 
 		public void InsertChild(Node child, int position)
@@ -135,7 +135,7 @@ namespace Land.Core.Parsing.Tree
 				{
 					Children.Insert(position, child);
 					child.Parent = this;
-					ResetAnchor();
+					ResetLocation();
 				}
 			}
 		}
@@ -144,16 +144,16 @@ namespace Land.Core.Parsing.Tree
 		{
 			Children.Insert(0, child);
 			child.Parent = this;
-			ResetAnchor();
+			ResetLocation();
 		}
 
 		public void ResetChildren()
 		{
 			Children = new List<Node>();
-			ResetAnchor();
+			ResetLocation();
 		}
 
-		public void ResetAnchor()
+		public void ResetLocation()
 		{
 			_location = null;
 			LocationReady = false;
@@ -165,7 +165,7 @@ namespace Land.Core.Parsing.Tree
 			Value.Clear();
 		}
 
-		public void SetAnchor(PointLocation start, PointLocation end)
+		public void SetLocation(PointLocation start, PointLocation end)
 		{
 			_location = new SegmentLocation()
 			{
@@ -191,5 +191,7 @@ namespace Land.Core.Parsing.Tree
 			return (String.IsNullOrEmpty(Alias) ? Symbol : Alias) 
 				+ (Value.Count > 0 ? ": " + String.Join(" ", Value.Select(v=>v.Trim())) : "");
 		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }

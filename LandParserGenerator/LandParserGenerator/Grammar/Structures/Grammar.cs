@@ -62,7 +62,7 @@ namespace Land.Core
 		public Dictionary<string, string> AutoTokenUserWrittenForm = new Dictionary<string, string>();
 		public Dictionary<string, string> AutoRuleUserWrittenForm = new Dictionary<string, string>();
 		public Dictionary<string, ElementQuantifierPair> AutoRuleQuantifier = new Dictionary<string, ElementQuantifierPair>();
-		private Dictionary<string, PointLocation> _symbolAnchors = new Dictionary<string, PointLocation>();
+		private Dictionary<string, PointLocation> _symbolLocations = new Dictionary<string, PointLocation>();
 
 		// Лог конструирования грамматики
 		public List<string> ConstructionLog = new List<string>();
@@ -144,9 +144,9 @@ namespace Land.Core
 			Aliases[smb] = aliases;
 		}
 
-		public void AddAnchor(string smb, PointLocation loc)
+		public void AddLocation(string smb, PointLocation loc)
 		{
-			_symbolAnchors[smb] = loc;
+			_symbolLocations[smb] = loc;
 
 			/// Если грамматика LL и якорь устанавливается для символа, сгенерированного
 			/// для некоторой сущности с квантификатором +, этот же якорь надо установить
@@ -154,13 +154,13 @@ namespace Land.Core
 			if (Type == GrammarType.LL 
 				&& AutoRuleQuantifier.ContainsKey(smb) 
 				&& AutoRuleQuantifier[smb].Quantifier == Quantifier.ONE_OR_MORE)
-				_symbolAnchors[Rules[smb].Alternatives[0][1]] = loc;
+				_symbolLocations[Rules[smb].Alternatives[0][1]] = loc;
 		}
 
-		public PointLocation GetAnchor(string smb)
+		public PointLocation GetLocation(string smb)
 		{
-			if (_symbolAnchors.ContainsKey(smb))
-				return _symbolAnchors[smb];
+			if (_symbolLocations.ContainsKey(smb))
+				return _symbolLocations[smb];
 			else
 				return null;
 		}
@@ -640,7 +640,7 @@ namespace Land.Core
 				{
 					messages.Add(Message.Trace(
 						rule.ToString(),
-						GetAnchor(rule.Name),
+						GetLocation(rule.Name),
 						"LanD"
 					));
 
@@ -650,7 +650,7 @@ namespace Land.Core
 							if (this[smb] == null)
 								messages.Add(Message.Error(
 									$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
-									GetAnchor(rule.Name),
+									GetLocation(rule.Name),
 									"LanD"
 								));
 
@@ -668,7 +668,7 @@ namespace Land.Core
 										if (this[arg] == null)
 											messages.Add(Message.Error(
 												$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
-												GetAnchor(rule.Name),
+												GetLocation(rule.Name),
 												"LanD"
 											));
 									}
@@ -680,7 +680,7 @@ namespace Land.Core
 								{
 									messages.Add(Message.Error(
 												$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)} пересекаются",
-												GetAnchor(rule.Name),
+												GetLocation(rule.Name),
 												"LanD"
 											));
 								}
@@ -702,7 +702,7 @@ namespace Land.Core
 						{
 							messages.Add(Message.Error(
 								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
-								GetAnchor(nt),
+								GetLocation(nt),
 								"LanD"
 							));
 						}
@@ -711,7 +711,7 @@ namespace Land.Core
 						{
 							messages.Add(Message.Error(
 								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию",
-								GetAnchor(nt),
+								GetLocation(nt),
 								"LanD"
 							));
 						}
@@ -881,7 +881,7 @@ namespace Land.Core
 
 						messages.Add(Message.Warning(
 							$"После символа {Grammar.ANY_TOKEN_NAME} из альтернативы {fromAltUserified} нетерминала {fromNontermUserified} может следовать символ {Grammar.ANY_TOKEN_NAME} из альтернативы {nextAltUserified} нетерминала {nextNontermUserified}",
-							GetAnchor(pair.Item1.NonterminalSymbolName),
+							GetLocation(pair.Item1.NonterminalSymbolName),
 							"LanD"
 						));
 					}

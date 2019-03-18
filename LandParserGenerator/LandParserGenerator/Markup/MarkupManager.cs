@@ -80,7 +80,7 @@ namespace Land.Core.Markup
 		public void InvalidatePoints(string fileName)
 		{
 			var stubNode = new Node("");
-			stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+			stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
 
 			Anchors.ForEach(a =>
 			{

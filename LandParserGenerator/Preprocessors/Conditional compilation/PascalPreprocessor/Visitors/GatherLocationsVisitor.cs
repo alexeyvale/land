@@ -13,7 +13,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 	/// Визитор собирает координаты по всем узлам и сбрасывает предвычисленные
 	/// координаты для нелистовых узлов
 	/// </summary>
-	internal class GatherAnchorsVisitor : BaseTreeVisitor
+	internal class GatherLocationsVisitor : BaseTreeVisitor
 	{
 		public List<PointLocation> Locations { get; set; } = new List<PointLocation>();
 
@@ -23,7 +23,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 			/// после правки якорей листьев-потомков
 			if (node.Children.Count > 0)
 			{
-				node.ResetAnchor();
+				node.ResetLocation();
 			}
 			else
 			{
