@@ -167,6 +167,11 @@ namespace Land.Core
 
 		private string AlreadyDeclaredCheck(string name)
 		{
+			if(name == CUSTOM_BLOCK_RULE_NAME)
+			{
+				return $"Имя {CUSTOM_BLOCK_RULE_NAME} является зарезервированным и не может быть использовано в грамматике";
+			}
+
 			if (Rules.ContainsKey(name))
 			{
 				return $"Повторное определение: символ {name} определён как нетерминальный";
