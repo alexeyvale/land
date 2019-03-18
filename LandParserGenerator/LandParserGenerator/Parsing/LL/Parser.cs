@@ -86,7 +86,7 @@ namespace Land.Core.Parsing.LL
 					/// иначе читаем следующий токен
 					else
 					{
-						node.SetAnchor(token.Location.Start, token.Location.End);
+						node.SetLocation(token.Location.Start, token.Location.End);
 						node.SetValue(token.Text);
 
 						token = LexingStream.GetNextToken();
@@ -175,7 +175,7 @@ namespace Land.Core.Parsing.LL
 					Log.Add(Message.Error(
 						$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
 							$"не учитываемой при синтаксическом анализе",
-						block.Start.Anchor.Start
+						block.Start.Location.Start
 					));
 				}
 			}
@@ -231,8 +231,8 @@ namespace Land.Core.Parsing.LL
 			if (!stopTokens.Contains(token.Name))
 			{
 				/// Проверка на случай, если допропускаем текст в процессе восстановления
-				if (anyNode.Anchor == null)
-					anyNode.SetAnchor(token.Location.Start, token.Location.End);
+				if (anyNode.Location == null)
+					anyNode.SetLocation(token.Location.Start, token.Location.End);
 
 				/// Смещение для участка, подобранного как текст
 				var endLocation = token.Location.End;
@@ -265,7 +265,7 @@ namespace Land.Core.Parsing.LL
 					}
 				}
 
-				anyNode.SetAnchor(anyNode.Anchor.Start, endLocation);
+				anyNode.SetLocation(anyNode.Location.Start, endLocation);
 
 				if (token.Name == Grammar.ERROR_TOKEN_NAME)
 					return token;
@@ -411,12 +411,12 @@ namespace Land.Core.Parsing.LL
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
-				if (currentNode.Anchor != null)
-					anyNode.SetAnchor(currentNode.Anchor.Start, currentNode.Anchor.End);
+				if (currentNode.Location != null)
+					anyNode.SetLocation(currentNode.Location.Start, currentNode.Location.End);
 				if (skippedBuffer.Count > 0)
 				{
-					anyNode.SetAnchor(
-						anyNode.Anchor?.Start ?? skippedBuffer.First().Location.Start,
+					anyNode.SetLocation(
+						anyNode.Location?.Start ?? skippedBuffer.First().Location.Start,
 						skippedBuffer.Last().Location.End
 					);
 				}

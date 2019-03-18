@@ -100,7 +100,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 					});
 
 					if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
-						InitCurrentSegment(node.Anchor.Start);
+						InitCurrentSegment(node.Location.Start);
 
 					break;
 				case elif_node elif_nd:
@@ -114,7 +114,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 							/// всё продолжение будет некомпилируемое
 							Levels.Peek().ExcludeToEnd = true;
 							Levels.Peek().IncludeCurrentSegment = false;
-							InitCurrentSegment(node.Anchor.Start);
+							InitCurrentSegment(node.Location.Start);
 						}
 						else
 						{
@@ -125,7 +125,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 							/// иначе пропустим её одним блоком с предыдущей
 							if (Levels.Peek().IncludeCurrentSegment)
 							{
-								FinCurrentSegment(node.Anchor.End);
+								FinCurrentSegment(node.Location.End);
 								SegmentsToExclude.Add(CurrentSegment);
 							}
 						}
@@ -134,7 +134,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 				case endif_node endif_nd:
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 					{
-						FinCurrentSegment(node.Anchor.End);
+						FinCurrentSegment(node.Location.End);
 						SegmentsToExclude.Add(CurrentSegment);
 					}
 					Levels.Pop();

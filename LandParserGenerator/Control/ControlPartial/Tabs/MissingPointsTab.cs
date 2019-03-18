@@ -103,7 +103,7 @@ namespace Land.Control
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,
-						pair.Node.Anchor.Start
+						pair.Node.Location.Start
 					);
 
 					e.Handled = true;

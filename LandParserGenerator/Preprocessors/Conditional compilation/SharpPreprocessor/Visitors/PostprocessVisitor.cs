@@ -39,13 +39,13 @@ namespace SharpPreprocessing.ConditionalCompilation
 			/// после правки якорей листьев-потомков
 			if (node.Children.Count > 0)
 			{
-				node.ResetAnchor();
+				node.ResetLocation();
 			}
 			else
 			{
-				if (node.Anchor != null)
+				if (node.Location != null)
 				{
-					var start = node.Anchor.Start.Offset + IncludedCharsCount;
+					var start = node.Location.Start.Offset + IncludedCharsCount;
 
 					/// Пока начало содержимого узла в текущих координатах лежит правее
 					/// начала первого не возвращённого в рассмотрение сегмента в координатах исходного файла,
@@ -59,7 +59,7 @@ namespace SharpPreprocessing.ConditionalCompilation
 						IncludedSegmentsCount += 1;
 					}
 
-					node.Anchor.Shift(IncludedLinesCount, 0, IncludedCharsCount);
+					node.Location.Shift(IncludedLinesCount, 0, IncludedCharsCount);
 				}
 			}
 

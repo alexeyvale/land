@@ -67,7 +67,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 		{
 			if (Excluded.Count > 0)
 			{
-				var getLocationsVisitor = new GatherAnchorsVisitor();
+				var getLocationsVisitor = new GatherLocationsVisitor();
 				root.Accept(getLocationsVisitor);
 
 				var locations = log.Where(l => l.Location != null)

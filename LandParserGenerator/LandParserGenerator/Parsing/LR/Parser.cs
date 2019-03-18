@@ -105,7 +105,7 @@ namespace Land.Core.Parsing.LR
 					{
 						var tokenNode = NodeGenerator.Generate(token.Name);
 						tokenNode.SetValue(token.Text);
-						tokenNode.SetAnchor(token.Location.Start, token.Location.End);
+						tokenNode.SetLocation(token.Location.Start, token.Location.End);
 
 						var shift = (ShiftAction)action;
 						/// Вносим в стек новое состояние
@@ -205,7 +205,7 @@ namespace Land.Core.Parsing.LR
 						Log.Add(Message.Error(
 							$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
 								$"не учитываемой при синтаксическом анализе",
-							block.Start.Anchor.Start
+							block.Start.Location.Start
 						));
 					}
 				}
@@ -281,9 +281,9 @@ namespace Land.Core.Parsing.LR
 				);
 			var ignorePairs = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs);
 
-			var startLocation = anyNode.Anchor?.Start 
+			var startLocation = anyNode.Location?.Start 
 				?? token.Location.Start;
-			var endLocation = anyNode.Anchor?.End;
+			var endLocation = anyNode.Location?.End;
 			var anyLevel = LexingStream.GetPairsCount();
 
 			/// Пропускаем токены, пока не найдём тот, для которого
@@ -314,7 +314,7 @@ namespace Land.Core.Parsing.LR
 			}
 
 			if(endLocation != null)
-				anyNode.SetAnchor(startLocation, endLocation);
+				anyNode.SetLocation(startLocation, endLocation);
 
 			if (token.Name == Grammar.ERROR_TOKEN_NAME)
 				return token;
@@ -439,12 +439,12 @@ namespace Land.Core.Parsing.LR
 			{
 				if (Stack.CountSymbols > 0)
 				{
-					if (Stack.PeekSymbol().Anchor != null)
+					if (Stack.PeekSymbol().Location != null)
 					{
-						startLocation = Stack.PeekSymbol().Anchor.Start;
+						startLocation = Stack.PeekSymbol().Location.Start;
 						if (endLocation == null)
 						{
-							endLocation = Stack.PeekSymbol().Anchor.End;
+							endLocation = Stack.PeekSymbol().Location.End;
 						}
 					}
 
@@ -522,7 +522,7 @@ namespace Land.Core.Parsing.LR
 				/// снятого со стека символа до места восстановления
 				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
-					anyNode.SetAnchor(startLocation, startLocation);
+					anyNode.SetLocation(startLocation, startLocation);
 				anyNode.Value = value.ToList();
 
 				Log.Add(Message.Warning(

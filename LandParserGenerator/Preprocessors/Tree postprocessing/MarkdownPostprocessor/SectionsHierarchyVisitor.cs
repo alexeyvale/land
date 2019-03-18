@@ -28,7 +28,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 
 					for (; level < CurrentLevel; --CurrentLevel)
 					{
-						ParentSection.SetAnchor(ParentSection.Anchor.Start, node.Anchor.End);
+						ParentSection.SetLocation(ParentSection.Location.Start, node.Location.End);
 						ParentSection = ParentSection.Parent;
 					}
 					node.CopyFromNode(ParentSection);
@@ -43,7 +43,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 					level = node.Value[0].TakeWhile(c => c == '#').Count();
 					break;
 				default:
-					PossibleEnd = node.Anchor.End;
+					PossibleEnd = node.Location.End;
 					return;
 			}
 
@@ -56,7 +56,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				for (; CurrentLevel < level; ++CurrentLevel)
 				{
 					newNode = new Node("section", new LocalOptions() { IsLand = true });
-					newNode.SetAnchor(node.Anchor.Start, node.Anchor.End);
+					newNode.SetLocation(node.Location.Start, node.Location.End);
 
 					ParentSection.AddLastChild(newNode);
 					ParentSection = newNode;
@@ -71,13 +71,13 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				for (; level <= CurrentLevel; --CurrentLevel)
 				{
 					if (PossibleEnd != null)
-						ParentSection.SetAnchor(ParentSection.Anchor.Start, PossibleEnd);
+						ParentSection.SetLocation(ParentSection.Location.Start, PossibleEnd);
 					ParentSection = ParentSection.Parent;
 				}
 				PossibleEnd = null;
 
 				var newNode = new Node("section", new LocalOptions() { IsLand = true });
-				newNode.SetAnchor(node.Anchor.Start, node.Anchor.End);
+				newNode.SetLocation(node.Location.Start, node.Location.End);
 				newNode.AddLastChild(node);
 
 				ParentSection.AddLastChild(newNode);

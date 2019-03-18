@@ -30,7 +30,7 @@ namespace Land.Control
 
 				Editor.SetActiveDocumentAndOffset(
 					State.PendingCommand.DocumentName,
-					node.Anchor.Start
+					node.Location.Start
 				);
 			}
 		}

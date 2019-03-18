@@ -179,7 +179,7 @@ namespace Land.Core.Lexing
 						Start = new Node(token.Name, new LocalOptions { ExactMatch = true, Priority = LocalOptions.BASE_PRIORITY })			
 					};
 
-					newBlock.Start.SetAnchor(token.Location.Start, token.Location.End);
+					newBlock.Start.SetLocation(token.Location.Start, token.Location.End);
 					newBlock.Start.SetValue(CustomBlockDefinition.GetName(token.Text));
 
 					CustomBlockStack.Push(newBlock);
@@ -199,7 +199,7 @@ namespace Land.Core.Lexing
 						var currentBlock = CustomBlockStack.Pop();
 
 						currentBlock.End = new Node(token.Name);
-						currentBlock.End.SetAnchor(token.Location.Start, token.Location.End);
+						currentBlock.End.SetLocation(token.Location.Start, token.Location.End);
 						currentBlock.Location.End = token.Location.End;
 
 						CustomBlocks.Add(currentBlock);

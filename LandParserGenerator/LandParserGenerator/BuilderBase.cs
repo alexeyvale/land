@@ -98,9 +98,9 @@ namespace Land.Core
 						}
 
 						var errorToken = tokensForLines[int.Parse(parts[2])];
-						var possibleAnchor = grammar.GetAnchor(errorToken);
+						var possibleLocation = grammar.GetLocation(errorToken);
 
-						errors.Add(Message.Error($"Token {errorToken}: {parts[4]}", possibleAnchor, "ANTLR Scanner Generator"));
+						errors.Add(Message.Error($"Token {errorToken}: {parts[4]}", possibleLocation, "ANTLR Scanner Generator"));
 					}
 					catch
 					{

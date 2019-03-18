@@ -80,7 +80,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 						});
 
 						if (!nestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
-							CurrentSegment = new ExcludedSegmentLocation() { Start = node.Anchor.Start };
+							CurrentSegment = new ExcludedSegmentLocation() { Start = node.Location.Start };
 
 						break;
 					case "else":
@@ -93,7 +93,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 								/// всё продолжение будет некомпилируемое
 								Levels.Peek().ExcludeToEnd = true;
 								Levels.Peek().IncludeCurrentSegment = false;
-								CurrentSegment = new ExcludedSegmentLocation() { Start = node.Anchor.Start };
+								CurrentSegment = new ExcludedSegmentLocation() { Start = node.Location.Start };
 							}
 							else
 							{
@@ -103,7 +103,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 								/// иначе пропустим её одним блоком с предыдущей
 								if (Levels.Peek().IncludeCurrentSegment)
 								{
-									CurrentSegment.End = node.Anchor.End;
+									CurrentSegment.End = node.Location.End;
 									CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
 
 									SegmentsToExclude.Add(CurrentSegment);
@@ -114,7 +114,7 @@ namespace PascalPreprocessing.ConditionalCompilation
 					case "endif":
 						if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 						{
-							CurrentSegment.End = node.Anchor.End;
+							CurrentSegment.End = node.Location.End;
 							CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
 
 							SegmentsToExclude.Add(CurrentSegment);

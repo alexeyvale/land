@@ -98,7 +98,7 @@ terminal
 		{ 
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareTerminal($1, $4, $3);
-				ConstructedGrammar.AddAnchor($1, @1.Start);
+				ConstructedGrammar.AddLocation($1, @1.Start);
 			}, @1.Start);
 		}
 	;
@@ -114,7 +114,7 @@ pair
 		{
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclarePair($1, $4, $6);
-				ConstructedGrammar.AddAnchor($1, @1.Start);
+				ConstructedGrammar.AddLocation($1, @1.Start);
 			}, @1.Start);
 		}
 	;
@@ -124,7 +124,7 @@ pair_border
 	| REGEX 
 		{ 	
 			var generated = ConstructedGrammar.GenerateTerminal($1);
-			ConstructedGrammar.AddAnchor(generated, @1.Start);
+			ConstructedGrammar.AddLocation(generated, @1.Start);
 			$$ = new HashSet<string>() { generated };
 		}
 	| LROUND_BRACKET pair_border_group_content RROUND_BRACKET { $$ = $2; }
@@ -144,7 +144,7 @@ nonterminal
 			
 			SafeGrammarAction(() => { 
 				ConstructedGrammar.DeclareNonterminal($1, $3);
-				ConstructedGrammar.AddAnchor($1, @1.Start);
+				ConstructedGrammar.AddLocation($1, @1.Start);
 				
 				if(aliases.Count > 0)
 					ConstructedGrammar.AddAliases($1, aliases);
@@ -216,7 +216,7 @@ entry
 				else
 				{			
 					var generated = ConstructedGrammar.GenerateNonterminal($2, $4.Value, $5);
-					ConstructedGrammar.AddAnchor(generated, @$.Start);
+					ConstructedGrammar.AddLocation(generated, @$.Start);
 					
 					$$ = new Entry(generated, opts);
 				}
@@ -310,7 +310,7 @@ entry_core
 	: REGEX
 		{ 
 			$$ = ConstructedGrammar.GenerateTerminal($1);
-			ConstructedGrammar.AddAnchor($$, @$.Start);
+			ConstructedGrammar.AddLocation($$, @$.Start);
 		}
 	| ID 
 		{ $$ = $1; }
@@ -322,7 +322,7 @@ group
 	: LROUND_BRACKET body RROUND_BRACKET
 		{ 
 			$$ = ConstructedGrammar.GenerateNonterminal($2);
-			ConstructedGrammar.AddAnchor($$, @$.Start);
+			ConstructedGrammar.AddLocation($$, @$.Start);
 		}
 	;
 
@@ -441,7 +441,7 @@ argument
 	| REGEX 
 		{
 			var generated = ConstructedGrammar.GenerateTerminal((string)$1);
-			ConstructedGrammar.AddAnchor(generated, @1.Start);		
+			ConstructedGrammar.AddLocation(generated, @1.Start);		
 			$$ = generated;
 		}
 	| STRING { $$ = $1.Substring(1, $1.Length - 2); }

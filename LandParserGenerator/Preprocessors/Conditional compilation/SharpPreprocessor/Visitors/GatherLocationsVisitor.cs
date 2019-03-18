@@ -7,13 +7,13 @@ using System.IO;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 
-namespace PascalPreprocessing.ConditionalCompilation
+namespace SharpPreprocessing.ConditionalCompilation
 {
 	/// <summary>
 	/// Визитор собирает координаты по всем узлам и сбрасывает предвычисленные
 	/// координаты для нелистовых узлов
 	/// </summary>
-	internal class GatherAnchorsVisitor : BaseTreeVisitor
+	internal class GatherLocationsVisitor : BaseTreeVisitor
 	{
 		public List<PointLocation> Locations { get; set; } = new List<PointLocation>();
 
@@ -23,14 +23,14 @@ namespace PascalPreprocessing.ConditionalCompilation
 			/// после правки якорей листьев-потомков
 			if (node.Children.Count > 0)
 			{
-				node.ResetAnchor();
+				node.ResetLocation();
 			}
 			else
 			{
-				if (node.Anchor != null)
+				if (node.Location != null)
 				{
-					Locations.Add(node.Anchor.Start);
-					Locations.Add(node.Anchor.End);
+					Locations.Add(node.Location.Start);
+					Locations.Add(node.Location.End);
 				}
 			}
 

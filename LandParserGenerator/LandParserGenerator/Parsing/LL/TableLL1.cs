@@ -82,7 +82,7 @@ namespace Land.Core.Parsing.LL
 					{
 						errors.Add(Message.Error(
 							$"Грамматика не является LL(1): для нетерминала {Gram.Userify(nt)} и токена {Gram.Userify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok].Select(e=>Gram.Userify(e)))}",
-							Gram.GetAnchor(nt),
+							Gram.GetLocation(nt),
 							"LanD"
 						));
 					}

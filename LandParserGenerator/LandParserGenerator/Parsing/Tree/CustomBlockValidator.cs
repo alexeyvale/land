@@ -24,7 +24,7 @@ namespace Land.Core.Parsing.Tree
 
 				/// Блок можно вставить как новый корень, если он 
 				/// охватывает область, соответствующую корню, или если корень - это Any
-				if (BlockLocation.Includes(root.Anchor) || root.Symbol == Grammar.ANY_TOKEN_NAME)
+				if (BlockLocation.Includes(root.Location) || root.Symbol == Grammar.ANY_TOKEN_NAME)
 					CanInsert = true;
 				else
 					VisitInner(root);
@@ -33,12 +33,12 @@ namespace Land.Core.Parsing.Tree
 			public void VisitInner(Node node)
 			{
 				/// Потомки, вложенные в область блока или совпадающие с ним
-				var included = node.Children.Where(c => BlockLocation.Includes(c.Anchor)).ToList();
+				var included = node.Children.Where(c => BlockLocation.Includes(c.Location)).ToList();
 				/// Потомки, строго пересекающиеся с блоком
-				var overlapped = node.Children.Where(c => BlockLocation.Overlaps(c.Anchor)).ToList();
+				var overlapped = node.Children.Where(c => BlockLocation.Overlaps(c.Location)).ToList();
 				/// Потомки, охватывающие область блока, но не совпадающие с ним
-				var outer = node.Children.Where(c => c.Anchor != null 
-					&& c.Anchor.Includes(BlockLocation) && !c.Anchor.Equals(BlockLocation)).ToList();
+				var outer = node.Children.Where(c => c.Location != null 
+					&& c.Location.Includes(BlockLocation) && !c.Location.Equals(BlockLocation)).ToList();
 
 				if (outer.Count == 1)
 				{

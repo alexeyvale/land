@@ -74,7 +74,7 @@ namespace Land.Core.Markup
 		public void InvalidatePoints(string fileName)
 		{
 			var stubNode = new Node("");
-			stubNode.SetAnchor(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+			stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
 
 			DoWithMarkup((MarkupElement elem) =>
 			{
@@ -190,7 +190,7 @@ namespace Land.Core.Markup
 					pointCandidates.AddFirst(currentNode);
 
 				currentNode = currentNode.Children
-					.Where(c => c.Anchor != null && c.Anchor.Includes(selection))
+					.Where(c => c.Location != null && c.Location.Includes(selection))
 					.FirstOrDefault();
 			}
 

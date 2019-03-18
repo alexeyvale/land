@@ -48,7 +48,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Координаты участка в тексте, которому соответствует точка 
 		/// </summary>
-		public SegmentLocation Location => _node?.Anchor;
+		public SegmentLocation Location => _node?.Location;
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
