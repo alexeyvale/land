@@ -53,7 +53,7 @@ namespace Land.Control
 			MissingTreeView.ItemsSource = missingPoints;
 		}
 
-		private void ProcessAmbiguities(Dictionary<AnchorPoint, List<RemapCandidateInfo>> ambiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<Anchor, List<RemapCandidateInfo>> ambiguities, bool globalRemap)
 		{
 			var concernPointAmbiguities = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 

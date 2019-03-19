@@ -43,13 +43,13 @@ namespace Land.Core.Markup
 		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
 		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
 		/// <returns></returns>
-		public static Dictionary<AnchorPoint, List<RemapCandidateInfo>> Find(
-			Dictionary<string, List<AnchorPoint>> points, 
+		public static Dictionary<Anchor, List<RemapCandidateInfo>> Find(
+			Dictionary<string, List<Anchor>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
 			TargetFileInfo candidateFileInfo
 		)
 		{
-			var result = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
+			var result = new Dictionary<Anchor, List<RemapCandidateInfo>>();
 
 			foreach (var typePointsPair in points)
 			{
@@ -95,13 +95,13 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		public static List<RemapCandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
+		public static List<RemapCandidateInfo> Find(Anchor point, TargetFileInfo targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
 			targetInfo.TargetNode.Accept(visitor);
 
 			return Find(
-				new Dictionary<string, List<AnchorPoint>> { { point.Context.NodeType, new List<AnchorPoint> { point } } },
+				new Dictionary<string, List<Anchor>> { { point.Context.NodeType, new List<Anchor> { point } } },
 				visitor.Grouped, targetInfo
 			)[point];
 		}

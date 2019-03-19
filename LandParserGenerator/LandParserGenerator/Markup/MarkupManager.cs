@@ -42,7 +42,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Якоря, на которые могут ссылаться точки привязки
 		/// </summary>
-		public List<AnchorPoint> Anchors = new List<AnchorPoint>();
+		public List<Anchor> Anchors = new List<Anchor>();
 
 		/// <summary>
 		/// Событие изменения разметки
@@ -110,20 +110,20 @@ namespace Land.Core.Markup
 			OnMarkupChanged?.Invoke();
 		}
 
-		public AnchorPoint GetAnchor(PointContext context, Node astNode)
+		public Anchor GetAnchor(PointContext context, Node astNode)
 		{
 			var anchor = GetExistingAnchor(astNode);
 
 			if(anchor == null)
 			{
-				anchor = new AnchorPoint(context, astNode);
+				anchor = new Anchor(context, astNode);
 				Anchors.Add(anchor);
 			}
 
 			return anchor;
 		}
 
-		public AnchorPoint GetExistingAnchor(Node astNode)
+		public Anchor GetExistingAnchor(Node astNode)
 		{
 			return Anchors.FirstOrDefault(a => a.AstNode == astNode);
 		}
@@ -235,7 +235,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkPoint(ConcernPoint point, PointContext context, Node astNode)
+		public void ChangeAnchor(ConcernPoint point, PointContext context, Node astNode)
 		{
 			if (point.Anchor.Links.Count == 1)
 				Anchors.Remove(point.Anchor);
@@ -250,7 +250,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Сдвиг узла, к которому привязана точка
 		/// </summary>
-		public void ShiftAnchor(AnchorPoint anchor, PointContext context, Node astNode)
+		public void ShiftAnchor(Anchor anchor, PointContext context, Node astNode)
 		{
 			var existing = GetExistingAnchor(astNode);
 
@@ -325,7 +325,7 @@ namespace Land.Core.Markup
 					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
 						typeof(Concern),
 						typeof(ConcernPoint),
-						typeof(AnchorPoint),
+						typeof(Anchor),
 						typeof(PointContext),
 						typeof(HeaderContextElement),
 						typeof(AncestorsContextElement),
@@ -361,7 +361,7 @@ namespace Land.Core.Markup
 					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
 						typeof(Concern),
 						typeof(ConcernPoint),
-						typeof(AnchorPoint),
+						typeof(Anchor),
 						typeof(PointContext),
 						typeof(HeaderContextElement),
 						typeof(AncestorsContextElement),
@@ -400,7 +400,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<RemapCandidateInfo> Find(AnchorPoint point, TargetFileInfo targetInfo)
+		public List<RemapCandidateInfo> Find(Anchor point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -438,7 +438,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<AnchorPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		public Dictionary<Anchor, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles)
@@ -449,10 +449,10 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<AnchorPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<Anchor, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
 		{
 			var groupedByFile = Anchors.GroupBy(a=>a.Context.FileName).ToList();
-			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
+			var ambiguous = new Dictionary<Anchor, List<RemapCandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -485,9 +485,9 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<AnchorPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<Anchor, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
 		{
-			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
+			var ambiguous = new Dictionary<Anchor, List<RemapCandidateInfo>>();
 
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = Anchors.GroupBy(a => a.Context.NodeType).ToDictionary(g=>g.Key, g=>g.ToList());
@@ -536,9 +536,9 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		public Dictionary<AnchorPoint, List<RemapCandidateInfo>> Remap(AnchorPoint anchor, TargetFileInfo targetInfo)
+		public Dictionary<Anchor, List<RemapCandidateInfo>> Remap(Anchor anchor, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<AnchorPoint, List<RemapCandidateInfo>>();
+			var ambiguous = new Dictionary<Anchor, List<RemapCandidateInfo>>();
 
 			if (anchor.HasInvalidLocation)
 			{
@@ -559,7 +559,7 @@ namespace Land.Core.Markup
 
 			if (best != null)
 			{
-				RelinkPoint(point, best.Context, best.Node);
+				ChangeAnchor(point, best.Context, best.Node);
 				return true;
 			}
 			else
@@ -569,7 +569,7 @@ namespace Land.Core.Markup
 			}
 		}
 
-		private bool TryApplyCandidate(AnchorPoint anchor, IEnumerable<RemapCandidateInfo> candidates)
+		private bool TryApplyCandidate(Anchor anchor, IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var best = ChooseCandidateToApply(candidates);
 
@@ -585,7 +585,7 @@ namespace Land.Core.Markup
 			}
 		}
 
-		private List<RemapCandidateInfo> GetCandidates(AnchorPoint point, TargetFileInfo targetInfo)
+		private List<RemapCandidateInfo> GetCandidates(Anchor point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo).OrderByDescending(c => c.Similarity)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)

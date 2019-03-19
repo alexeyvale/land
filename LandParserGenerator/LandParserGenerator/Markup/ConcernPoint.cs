@@ -13,10 +13,10 @@ namespace Land.Core.Markup
 	{
 		#region Anchor
 
-		private AnchorPoint _anchor;
+		private Anchor _anchor;
 
 		[DataMember]
-		public AnchorPoint Anchor
+		public Anchor Anchor
 		{
 			get
 			{
@@ -78,7 +78,7 @@ namespace Land.Core.Markup
 
 		#endregion
 
-		public ConcernPoint(AnchorPoint anchor, Concern parent = null)
+		public ConcernPoint(Anchor anchor, Concern parent = null)
 		{
 			Anchor = anchor;
 
@@ -99,7 +99,7 @@ namespace Land.Core.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, AnchorPoint anchor, Concern parent = null)
+		public ConcernPoint(string name, Anchor anchor, Concern parent = null)
 		{
 			Anchor = anchor;
 
@@ -109,7 +109,7 @@ namespace Land.Core.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, string comment, AnchorPoint anchor, Concern parent = null)
+		public ConcernPoint(string name, string comment, Anchor anchor, Concern parent = null)
 			: this(name, anchor, parent)
 		{
 			Comment = comment;

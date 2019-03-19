@@ -9,7 +9,7 @@ using Land.Core.Parsing.Tree;
 namespace Land.Core.Markup
 {
 	[DataContract(IsReference = true)]
-	public class AnchorPoint: INotifyPropertyChanged
+	public class Anchor: INotifyPropertyChanged
 	{
 		[DataMember]
 		public PointContext Context { get; set; }
@@ -55,7 +55,7 @@ namespace Land.Core.Markup
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public AnchorPoint(PointContext context, Node astNode)
+		public Anchor(PointContext context, Node astNode)
 		{
 			Context = context;
 			AstNode = astNode;

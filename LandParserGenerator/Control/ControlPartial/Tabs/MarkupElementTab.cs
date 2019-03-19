@@ -117,10 +117,10 @@ namespace Land.Control
 						};
 
 						if (ConcernPointShiftAnchor.IsChecked ?? false)
-							MarkupManager.RelinkPoint(point,
+							MarkupManager.ShiftAnchor(point.Anchor,
 								PointContext.Create(targetInfo), targetInfo.TargetNode);
 						else
-							MarkupManager.ShiftAnchor(point.Anchor,
+							MarkupManager.ChangeAnchor(point,
 								PointContext.Create(targetInfo), targetInfo.TargetNode);
 
 						point.Name = ConcernPointNameText.Text;
