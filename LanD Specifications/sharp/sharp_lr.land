@@ -25,7 +25,6 @@ opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity	=	enum | class_struct_interface | method | field | property | water_entity
-common_beginning	=	entity_attribute* modifier* 
 
 enum			=	common_beginning 'enum' name Any '{' Any '}' ';'?
 class_struct_interface	=	common_beginning ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?
@@ -33,19 +32,21 @@ method			=	common_beginning type name arguments Any (init_expression? ';' | bloc
 field			=	common_beginning type name ('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'
 property		=	common_beginning type name (block (init_value ';')? | init_expression ';')
 water_entity	=	AnyInclude('delegate', 'operator', 'this') (block | ';')+
-		
+
+common_beginning	=	entity_attribute* modifier* 
 modifier			=	MODIFIER | 'extern'
 init_expression		=	'=>' Any
-init_value			=	'=' Any
+init_value			=	'=' init_part+
+init_part			=	Any | type
 
 name_atom	=	ID type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
-tuple		=	'(' type name? (',' type name?)* ')'
-type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
-type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
-type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
+tuple			=	'(' type name? (',' type name?)* ')'
+type_atom		=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
+type			=	type_atom ((('.'|'::') type_atom) | ('[' Any ']'))*!
+type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
 
 entity_attribute	=	'[' Any ']'
 general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
@@ -55,7 +56,7 @@ block				=	'{' Any '}'
 %%
 
 %parsing {
-	recovery
+	recovery entity init_part
 	fragment STRING_INT_CODE
 	start namespace_content
 	skip COMMENT STRING DIRECTIVE
@@ -63,7 +64,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list common_beginning entity
-	leaf name type modifier
+	leaf name type modifier init_expression init_value
 }
 
 %customblock {

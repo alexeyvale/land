@@ -14,8 +14,8 @@ namespace Land.Core.Parsing.LL
 		private const int MAX_RECOVERY_ATTEMPTS = 5;
 
 		private TableLL1 Table { get; set; }
-		private Stack<Node> Stack { get; set; }
 
+		private Stack<Node> Stack { get; set; }
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
 		/// на котором начался разбор нетерминала
@@ -27,10 +27,6 @@ namespace Land.Core.Parsing.LL
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLL1(g);
-
-			/// В ходе парсинга потребуется First,
-			/// учитывающее возможную пустоту ANY
-			g.UseModifiedFirst = true;
 		}
 
 		/// <summary>
@@ -39,7 +35,7 @@ namespace Land.Core.Parsing.LL
 		/// <returns>
 		/// Корень дерева разбора
 		/// </returns>
-		protected override Node ParsingAlgorithm(string text, bool enableTracing)
+		protected override Node ParsingAlgorithm(string text)
 		{
 			/// Контроль вложенностей пар
 			NestingLevel = new Dictionary<Node, int>();
@@ -64,7 +60,7 @@ namespace Land.Core.Parsing.LL
 
 				var stackTop = Stack.Peek();
 
-				if (enableTracing)
+				if (EnableTracing)
 				{
 					Log.Add(Message.Trace(
 						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",

@@ -38,8 +38,9 @@ entity =
 		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
 		
 modifier			=	MODIFIER | 'extern'
-init_expression		=	'=>' (Any | %ghost type)+
-init_value			=	'=' (Any | %ghost type)+
+init_expression		=	'=>' Any
+init_value			=	'=' init_part+
+init_part			=	Any | type
 
 name_atom	=	ID type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
@@ -47,8 +48,8 @@ names_list	=	name (',' name)*
 
 tuple		=	'(' type name? (',' type name?)* ')'
 type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
-type		=	type_atom ((('.'|'::') type_atom) | ('[' ','* ']'))*!
-type_parameters	=	'<' (AnyAvoid(';')|type_parameters)* '>'
+type		=	type_atom ((('.'|'::') type_atom) | ('[' Any ']'))*!
+type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
 
 entity_attribute	=	'[' Any ']'
 general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
@@ -58,7 +59,7 @@ block				=	'{' Any '}'
 %%
 
 %parsing {
-	recovery
+	recovery entity init_part
 	fragment STRING_INT_CODE
 	start namespace_content
 	skip COMMENT STRING DIRECTIVE
@@ -66,7 +67,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list
-	leaf name type modifier
+	leaf name type modifier init_value init_expression
 }
 
 %customblock {

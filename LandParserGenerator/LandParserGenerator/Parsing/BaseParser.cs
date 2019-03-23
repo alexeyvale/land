@@ -22,6 +22,7 @@ namespace Land.Core.Parsing
 
 		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }
+		protected bool EnableTracing { get; set; }
 
 		public BaseParser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null, BaseNodeRetypingVisitor retypeVisitor = null)
 		{
@@ -38,6 +39,7 @@ namespace Land.Core.Parsing
 		{
 			Log = new List<Message>();
 			Statistics = new Statistics();
+			EnableTracing = enableTracing;
 
 			var parsingStarted = DateTime.Now;
 			Node root = null;
@@ -51,7 +53,7 @@ namespace Land.Core.Parsing
 				/// Если препроцессор сработал успешно, можно парсить
 				if (success)
 				{
-					root = ParsingAlgorithm(text, enableTracing);
+					root = ParsingAlgorithm(text);
 					Preproc.Postprocess(root, Log);
 				}
 				else
@@ -61,7 +63,7 @@ namespace Land.Core.Parsing
 			}
 			else
 			{
-				root = ParsingAlgorithm(text, enableTracing);
+				root = ParsingAlgorithm(text);
 			}
 
 			Statistics.GeneralTimeSpent = DateTime.Now - parsingStarted;
@@ -70,7 +72,7 @@ namespace Land.Core.Parsing
 			return root;
 		}
 
-		protected abstract Node ParsingAlgorithm(string text, bool enableTracing);
+		protected abstract Node ParsingAlgorithm(string text);
 
 		public void SetPreprocessor(BasePreprocessor preproc)
 		{

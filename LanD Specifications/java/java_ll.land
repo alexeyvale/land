@@ -11,8 +11,6 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
 ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
-
-ANY_TRIGGER_TOKEN	: '@interface'
  
 CURVE_BRACKETED : %left '{' %right '}'
 ROUND_BRACKETED : %left '(' %right ')'
@@ -21,17 +19,20 @@ SQUARE_BRACKETED : %left '[' %right ']'
  
 file_content	=	entity*
 
-entity	=	enum | class_interface | method | field | water_entity
-
-enum			=	common_beginning 'enum' name Any block ';'?
-class_interface	=	common_beginning ('class'|'interface') name Any '{' entity* '}' ';'?
-method			=	common_beginning type_parameter? type name arguments Any (';' | block)	
-field			=	common_beginning type_parameter? type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
-water_entity	=	AnyInclude('@interface', 'import', 'package') (block | ';')+
-
-common_beginning	=	(annotation|MODIFIER)*
-init_value			=	'=' init_part+
-init_part			=	Any | type
+entity	=	
+	(annotation|MODIFIER)*
+	(
+	 	'enum' name Any '{' Any '}' ';'?					=> enum				|
+		('class'|'interface') name Any '{' entity* '}' ';'?	=> class_interface	|
+		type_parameter? %priority(2) type name
+		(
+	  		arguments Any (';' | block)									=> method	|
+	  		('['']')* init_value? (',' name ('['']')* init_value?)* ';'	=> field
+	  	)
+	) | AnyInclude('@interface', 'import', 'package') (block | ';')+
+	
+init_value	=	'=' init_part+
+init_part	=	Any | type
 
 name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
@@ -42,7 +43,7 @@ type		=	type_atom ((('.'|'::') type_atom) | '['']')*!
 type_parameter	=	'<' (AnyAvoid(';') | name)* '>'
 
 arguments	=	'(' Any ')'
-annotation	=	'@' name arguments?
+annotation	=	'@' name Any
 block		=	'{' Any '}'
 
 %%
@@ -55,14 +56,8 @@ block		=	'{' Any '}'
 }
 
 %nodes {
-	ghost names_list common_beginning entity
+	ghost names_list
 	leaf name type type_parameter
-}
-
-%customblock {
-	start("/// land start")
-	end("/// land end")
-	basetoken COMMENT
 }
 
 %mapping {

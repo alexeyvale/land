@@ -69,14 +69,16 @@ namespace SharpPreprocessing.ConditionalCompilation
 		{
 			if (Excluded.Count > 0)
 			{
-				var getLocationsVisitor = new GatherLocationsVisitor();
-				root.Accept(getLocationsVisitor);
+				var locations = log.Where(l => l.Location != null).Select(l => l.Location);
 
-				var locations = log.Where(l => l.Location != null)
-					.Select(l => l.Location)
-					.Concat(getLocationsVisitor.Locations)
-					.Distinct()
-					.OrderBy(l => l.Offset);
+				if (root != null)
+				{
+					var getLocationsVisitor = new GatherLocationsVisitor();
+					root.Accept(getLocationsVisitor);
+					locations = locations.Concat(getLocationsVisitor.Locations);
+				}
+
+				locations = locations.Distinct().OrderBy(l => l.Offset);
 
 				/// Сколько исключенных из компиляции символов было учтено на данный момент 
 				var includedCharsCount = 0;

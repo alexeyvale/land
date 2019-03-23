@@ -29,7 +29,7 @@ entity =
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface
 		) | Any ('{' Any '}' | ';')+
 
-name		=	ID (('.'|'::') ID)*
+name	=	ID (('.'|'::') ID)*
 
 entity_attribute	=	'[' Any ']'
 general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
@@ -37,7 +37,7 @@ general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
 %%
 
 %parsing {
-	recovery
+	recovery entity
 	fragment STRING_INT_CODE
 	start namespace_content
 	skip COMMENT STRING DIRECTIVE

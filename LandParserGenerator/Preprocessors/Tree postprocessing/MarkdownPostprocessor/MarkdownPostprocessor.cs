@@ -11,10 +11,13 @@ namespace MarkdownPreprocessing.TreePostprocessing
 	{
 		public override void Postprocess(Node root, List<Message> log)
 		{
-			var visitor = new SectionsHierarchyVisitor();
-			root.Accept(visitor);
+			if (root != null)
+			{
+				var visitor = new SectionsHierarchyVisitor();
+				root.Accept(visitor);
+				Log.AddRange(visitor.Log);
+			}
 
-			Log.AddRange(visitor.Log);
 			foreach (var rec in Log)
 				rec.Source = this.GetType().FullName;	
 		}

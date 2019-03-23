@@ -513,6 +513,17 @@ namespace " + @namespace + @"
 		{
 			visitor.Visit(this);
 		}
+	}
+
+	public class " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node : RuleNode
+	{
+		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(Node node): base(node) {}
+
+		public override void Accept(BaseTypedTreeVisitor visitor)
+		{
+			visitor.Visit(this);
+		}
 	}");
 
 

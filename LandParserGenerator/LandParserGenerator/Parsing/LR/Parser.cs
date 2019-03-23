@@ -12,7 +12,6 @@ namespace Land.Core.Parsing.LR
 	public class Parser : BaseParser
 	{
 		private TableLR1 Table { get; set; }
-		private HashSet<string> RecoverySymbols { get; set; }
 
 		private ParsingStack Stack { get; set; }
 		private Stack<int> NestingStack { get; set; }
@@ -22,37 +21,9 @@ namespace Land.Core.Parsing.LR
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLR1(g);
-			RecoverySymbols = new HashSet<string>();
-
-			foreach(var item in Table.Items)
-			{
-				var anyProd = item.FirstOrDefault(m => m.Position == 0 && m.Next == Grammar.ANY_TOKEN_NAME);
-
-				if(anyProd != null)
-				{
-					var recoveryProds = new HashSet<PathFragment>();
-					recoveryProds.Add(new PathFragment { Alt = anyProd.Alternative, Pos = anyProd.Position });
-
-					var oldCount = 0;
-
-					/// Добавляем к списку кандидатов символы, для которых есть пункты, порождающие
-					/// уже имеющиеся в списке кандидатов пункты
-					while (oldCount != recoveryProds.Count)
-					{
-						oldCount = recoveryProds.Count;
-
-						recoveryProds.UnionWith(item.Where(i => recoveryProds.Any(c => c.Pos == 0 && c.Alt.NonterminalSymbolName == i.Next))
-							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position }));
-					}
-
-					RecoverySymbols.UnionWith(
-						recoveryProds.Select(p => p.Alt[p.Pos].Symbol)
-					);
-				}	
-			}
 		}
 
-		protected override Node ParsingAlgorithm(string text, bool enableTracing)
+		protected override Node ParsingAlgorithm(string text)
 		{
 			Node root = null;
 
@@ -76,7 +47,7 @@ namespace Land.Core.Parsing.LR
 
 				var currentState = Stack.PeekState();
 
-				if(enableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
+				if(EnableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
 						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Location.Start
@@ -89,7 +60,7 @@ namespace Land.Core.Parsing.LR
 				{
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
-						token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), false);
+						token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 
 						/// Если при пропуске текста произошла ошибка, прерываем разбор
 						if (token.Name == Grammar.ERROR_TOKEN_NAME)
@@ -112,7 +83,7 @@ namespace Land.Core.Parsing.LR
 						Stack.Push(tokenNode, shift.TargetItemIndex);
 						NestingStack.Push(LexingStream.GetPairsCount());
 
-						if (enableTracing)
+						if (EnableTracing)
 						{
 							Log.Add(Message.Trace(
 								$"Перенос",
@@ -143,7 +114,7 @@ namespace Land.Core.Parsing.LR
 						);
 						NestingStack.Push(LexingStream.GetPairsCount());
 
-						if (enableTracing)
+						if (EnableTracing)
 						{
 							Log.Add(Message.Trace(
 								$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
@@ -177,10 +148,10 @@ namespace Land.Core.Parsing.LR
 					}
 					else
 					{
-						if (enableTracing)
+						if (EnableTracing)
 						{
 							Log.Add(Message.Trace(
-								$"Попытка подобрать токены как Any для состояния {Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+								$"Попытка трактовать текущий токен как начало участка, соответствующего Any",
 								token.Location.Start
 							));
 						}
@@ -224,13 +195,20 @@ namespace Land.Core.Parsing.LR
 				: Table[currentState, token].Single(a => a is ShiftAction);
 		}
 
-		private IToken SkipAny(Node anyNode, bool inRecovery)
+		private IToken SkipAny(Node anyNode, bool enableRecovery)
 		{
 			var nestingCopy = LexingStream.GetPairsState();
 			var stackActions = new LinkedList<Tuple<Node, int?>>();
 			var token = LexingStream.CurrentToken;
 			var tokenIndex = LexingStream.CurrentIndex;
 			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
+
+			if(EnableTracing)
+				Log.Add(Message.Trace(
+					$"Инициирован пропуск Any | Стек: {Stack.ToString(GrammarObject)} | Состояние: {Environment.NewLine}\t\t"
+						+ Table.ToString(Stack.PeekState(), null, "\t\t"),
+					token.Location.Start
+				));
 
 			/// Пока по Any нужно производить свёртки (ячейка таблицы непуста и нет конфликтов)
 			while (rawActions.Count == 1 && rawActions[0] is ReduceAction)
@@ -322,7 +300,7 @@ namespace Land.Core.Parsing.LR
 			/// Если дошли до конца входной строки, и это было не по плану
 			if (!stopTokens.Contains(token.Name))
 			{
-				if (!inRecovery)
+				if (enableRecovery)
 				{
 					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
