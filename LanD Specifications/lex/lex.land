@@ -37,9 +37,11 @@ code_or_empty	=	'%{' Any '%}' => direct_code | SPACE+ (Any LINE_END => direct_co
 
 %%
 
-%parsing start file
-%parsing skip COMMENT LINE_END SPACE
-%parsing fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
+%parsing {
+	start file
+	skip COMMENT LINE_END SPACE
+	fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
+}
 
 %nodes leaf regex_from_decl regex_from_rule
 
