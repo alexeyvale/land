@@ -153,6 +153,11 @@ namespace Land.Core.Parsing.LL
 					}
 					else
 					{
+						Log.Add(Message.Trace(
+							$"Попытка трактовать текущий токен как начало участка, соответствующего Any",
+							token.Location.Start
+						));
+
 						token = Lexer.CreateToken(Grammar.ANY_TOKEN_NAME);
 					}
 				}

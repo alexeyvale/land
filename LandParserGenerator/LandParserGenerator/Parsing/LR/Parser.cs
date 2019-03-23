@@ -457,13 +457,13 @@ namespace Land.Core.Parsing.LR
 
 					var oldCount = 0;
 
-					while(oldCount != derivationProds.Count)
+					while (oldCount != derivationProds.Count)
 					{
 						oldCount = derivationProds.Count;
 
 						/// Добавляем к списку пункты, порождающие уже добавленные пункты
 						derivationProds.UnionWith(Table.Items[Stack.PeekState()]
-							.Where(i=>derivationProds.Any(p=>p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
+							.Where(i => derivationProds.Any(p => p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 						);
 					}
@@ -500,15 +500,20 @@ namespace Land.Core.Parsing.LR
 				/// снятого со стека символа до места восстановления
 				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
-					anyNode.SetLocation(startLocation, startLocation);
+					anyNode.SetLocation(startLocation, endLocation);
 				anyNode.Value = value.ToList();
+
+				Log.Add(Message.Warning(
+					$"Найдено предполагаемое начало {Grammar.ANY_TOKEN_NAME}",
+					anyNode.Location?.Start ?? LexingStream.CurrentToken.Location.Start
+				));
 
 				Log.Add(Message.Warning(
 						$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
 						LexingStream.CurrentToken.Location.Start
-					));
+					));		
 
-				var token = SkipAny(anyNode, true);
+				var token = SkipAny(anyNode, false);
 
 				/// Если Any успешно пропустили и возобновили разбор,
 				/// возвращаем токен, с которого разбор продолжается

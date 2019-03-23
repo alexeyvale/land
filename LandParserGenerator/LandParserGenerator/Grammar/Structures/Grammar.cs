@@ -434,11 +434,53 @@ namespace Land.Core
 						);
 					break;
 				case ParsingOption.SKIP:
-					var errorSymbols = CheckIfTerminals(symbols);
-					if (errorSymbols.Count > 0)
+					var errorSmbSkip = CheckIfTerminals(symbols);
+					if (errorSmbSkip.Count > 0)
 						throw new IncorrectGrammarException(
-							$"Символы '{String.Join("', '", errorSymbols)}' не определены как терминальные"
+							$"Символ{(errorSmbSkip.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSmbSkip)}' " +
+								$"не определен{(errorSmbSkip.Count > 1 ? "ы" : "")} как терминальны{(errorSmbSkip.Count > 1 ? "е" : "й")}"
 						);
+					break;
+				case ParsingOption.RECOVERY:
+					var errorSmbRecovery= CheckIfNonterminals(symbols);
+					if (errorSmbRecovery.Count > 0)
+						throw new IncorrectGrammarException(
+							$"Символ{(errorSmbRecovery.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSmbRecovery)}' " +
+								$"не определен{(errorSmbRecovery.Count > 1 ? "ы" : "")} как нетерминальны{(errorSmbRecovery.Count > 1 ? "е" : "й")}"
+						);
+
+					/// Находим множество нетерминалов, на которых возможно восстановление
+					var recoverySymbols = new HashSet<string>(
+						Rules.Values.Where(r => r.Alternatives
+							.Any(a => a.Count > 0 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)).Select(r => r.Name)
+					);
+					var oldCount = 0;
+
+					while (oldCount != recoverySymbols.Count)
+					{
+						oldCount = recoverySymbols.Count;
+
+						recoverySymbols.UnionWith(
+							Rules.Values.Where(r => r.Alternatives
+								.Any(a => a.Count > 0 && recoverySymbols.Contains(a[0].Symbol))).Select(r => r.Name)
+						);
+					}
+					/// Проверяем, принадлежат ли к этому множеству указанные в грамматике символы
+					if (Options.GetSymbols(ParsingOption.RECOVERY).Count > 0)
+					{
+						foreach (var smb in Options.GetSymbols(ParsingOption.RECOVERY))
+						{
+							if (!recoverySymbols.Contains(smb))
+								throw new IncorrectGrammarException(
+									$"Восстановление на символе '{smb}' невозможно, поскольку из него не выводится строка, " +
+										$"начинающаяся с {Grammar.ANY_TOKEN_NAME}, или перед этим {Grammar.ANY_TOKEN_NAME} в процессе вывода стоит нетерминал"
+								);
+						}
+					}
+					else
+					{
+						Options.Set(ParsingOption.RECOVERY, recoverySymbols.ToArray());
+					}
 					break;
 				default:
 					break;
