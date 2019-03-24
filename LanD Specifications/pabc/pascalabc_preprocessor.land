@@ -3,18 +3,15 @@ STRING_SKIP	: '\'\'' | '\\\\'
 STRING		: '\'' (STRING_SKIP|.)*? '\''
 ID			: [_a-zA-Z][_0-9a-zA-Z]*
 
-file			=	file_element+
-file_element	=	directive|comment_ml|Any
-
+file		=	(directive|comment_ml|Any)+
 comment_ml	=	'{' Any '}'
+
 directive	=	'{$' (('ifdef'|'ifndef'|'define'|'undef') ID | 'else' | 'endif') '}'
 
 %%
 
-%parsing {
-	recovery file_element
-	ignoreundefined
-	start file
-	skip COMMENT_L STRING
-}
+%parsing recovery
+%parsing ignoreundefined
+%parsing start file
+%parsing skip COMMENT_L STRING
  

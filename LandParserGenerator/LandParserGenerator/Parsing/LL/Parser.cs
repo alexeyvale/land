@@ -16,6 +16,7 @@ namespace Land.Core.Parsing.LL
 		private TableLL1 Table { get; set; }
 
 		private Stack<Node> Stack { get; set; }
+		private string StackString => String.Join(" ", Stack.Select(s => GrammarObject.Userify(s.Symbol)));
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
 		/// на котором начался разбор нетерминала
@@ -63,25 +64,21 @@ namespace Land.Core.Parsing.LL
 				if (EnableTracing)
 				{
 					Log.Add(Message.Trace(
-						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Символ на вершине стека: {GrammarObject.Userify(stackTop.Symbol)}",
+						$"Текущий токен: {this.GetTokenInfoForMessage(token)}\t |\t Стек: {StackString}",
 						LexingStream.CurrentToken.Location.Start
 					));
 				}
 
-                /// Если символ на вершине стека совпадает с текущим токеном
-                if(stackTop.Symbol == token.Name)
+				/// Если символ на вершине стека совпадает с текущим токеном
+				if (stackTop.Symbol == token.Name)
                 {
-					/// Снимаем узел со стека и устанавливаем координаты в координаты токена
-					var node = Stack.Pop();
-
-					/// Если текущий токен - признак пропуска символов, запускаем алгоритм
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
-						token = SkipAny(node, true);
+						token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 					}
-					/// иначе читаем следующий токен
 					else
 					{
+						var node = Stack.Pop();
 						node.SetLocation(token.Location.Start, token.Location.End);
 						node.SetValue(token.Text);
 
@@ -95,7 +92,6 @@ namespace Land.Core.Parsing.LL
 				if (GrammarObject[stackTop.Symbol] is NonterminalSymbol)
 				{
 					var alternatives = Table[stackTop.Symbol, token.Name];
-					Alternative alternativeToApply = null;
 
 					/// Сообщаем об ошибке в случае неоднозначной грамматики
 					if (alternatives.Count > 1)
@@ -109,20 +105,13 @@ namespace Land.Core.Parsing.LL
 					/// Если же в ячейке ровно одна альтернатива
 					else if (alternatives.Count == 1)
 					{
-						alternativeToApply = alternatives.Single();
-						Stack.Pop();
-
-						if (!String.IsNullOrEmpty(alternativeToApply.Alias))
-							stackTop.Alias = alternativeToApply.Alias;
-
-						NestingLevel[stackTop] = LexingStream.GetPairsCount();
-
-						for (var i = alternativeToApply.Count - 1; i >= 0; --i)
+						if (token.Name == Grammar.ANY_TOKEN_NAME)
 						{
-							var newNode = NodeGenerator.Generate(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
-
-							stackTop.AddFirstChild(newNode);
-							Stack.Push(newNode);
+							token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
+						}
+						else
+						{
+							ApplyAlternative(alternatives.Single());
 						}
 
 						continue;
@@ -224,7 +213,85 @@ namespace Land.Core.Parsing.LL
 			var nestingCopy = LexingStream.GetPairsState();
 			var tokenIndex = LexingStream.CurrentIndex;
 			var token = LexingStream.CurrentToken;
-			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n=>n.Symbol));
+
+			var stackTop = Stack.Peek();
+
+			if (EnableTracing)
+				Log.Add(Message.Trace(
+					$"Инициирован пропуск Any\t |\t Стек: {StackString}",
+					token.Location.Start
+				));
+
+			/// Пока по Any нужно раскрывать очередной нетерминал
+			while (GrammarObject[stackTop.Symbol] is NonterminalSymbol)
+			{
+				var alt = Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME].FirstOrDefault();
+
+				if (alt != null)
+				{
+					ApplyAlternative(alt);
+					stackTop = Stack.Peek();
+				}
+				else
+				{
+					var message = Message.Trace(
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}",
+						token.Location.Start
+					);
+
+					message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
+					Log.Add(message);
+
+					if (enableRecovery)
+					{
+						++Statistics.RecoveryTimesAny;
+						return ErrorRecovery();
+					}
+					else
+					{
+						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					}
+				}
+			}
+
+			/// В итоге первым терминалом, который окажется на стеке, должен быть Any
+			if (stackTop.Symbol == Grammar.ANY_TOKEN_NAME)
+			{
+				/// Подменяем свежесгенерированный узел для Any на переданный извне
+				anyNode.Options = stackTop.Options.Clone();
+				var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
+				stackTop.Parent.Children.RemoveAt(anyIndex);
+				stackTop.Parent.InsertChild(anyNode, anyIndex);
+				Stack.Pop();
+			}
+			else
+			{
+				var message = Message.Trace(
+					$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}",
+					token.Location.Start
+				);
+
+				message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
+				Log.Add(message);
+
+				if (enableRecovery)
+				{
+					++Statistics.RecoveryTimesAny;
+					return ErrorRecovery();
+				}
+				else
+				{
+					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+				}
+			}
+
+			if (EnableTracing)
+				Log.Add(Message.Trace(
+					$"Поиск окончания последовательности, соответствующей Any\t |\t Стек: {StackString}",
+					token.Location.Start
+				));
+
+			var stopTokens = GetStopTokens(anyNode.Options, Stack.Select(n => n.Symbol));
 			var ignorePairs = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs);
 
 			/// Если Any непустой (текущий токен - это не токен,
@@ -278,14 +345,14 @@ namespace Land.Core.Parsing.LL
 						token.Location.Start
 					);
 
+					message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
+					Log.Add(message);
+
 					if (enableRecovery)
 					{
 						++Statistics.RecoveryTimesAny;
 						Statistics.LongestRollback =
 							Math.Max(Statistics.LongestRollback, LexingStream.CurrentIndex - tokenIndex);
-
-						message.Type = MessageType.Warning;
-						Log.Add(message);
 
 						LexingStream.MoveTo(tokenIndex, nestingCopy);
 						anyNode.Reset();
@@ -296,14 +363,30 @@ namespace Land.Core.Parsing.LL
 					}
 					else
 					{
-						message.Type = MessageType.Error;
-						Log.Add(message);
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 					}
 				}
 			}
 
 			return token;
+		}
+
+		private void ApplyAlternative(Alternative alternativeToApply)
+		{
+			var stackTop = Stack.Pop();
+
+			if (!String.IsNullOrEmpty(alternativeToApply.Alias))
+				stackTop.Alias = alternativeToApply.Alias;
+
+			NestingLevel[stackTop] = LexingStream.GetPairsCount();
+
+			for (var i = alternativeToApply.Count - 1; i >= 0; --i)
+			{
+				var newNode = NodeGenerator.Generate(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
+
+				stackTop.AddFirstChild(newNode);
+				Stack.Push(newNode);
+			}
 		}
 
 		private IToken ErrorRecovery()
@@ -337,9 +420,6 @@ namespace Land.Core.Parsing.LL
 
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Pop();
-			var currentStopTokens = currentNode.Symbol == Grammar.ANY_TOKEN_NAME
-				? GetStopTokens(currentNode.Options, Stack.Select(n => n.Symbol))
-				: (HashSet<string>)null;
 
 			/// Поднимаемся по уже построенной части дерева, пока не встретим пригодный для восстановления нетерминал
 			while
@@ -347,20 +427,9 @@ namespace Land.Core.Parsing.LL
 					currentNode != null &&
 					(
 						/// Отсекаем узел, при попытке разбора которого возникла ошибка
-						!GrammarObject.Rules.ContainsKey(currentNode.Symbol) ||
-						currentNode.Children.Count == 0 ||
-						/// Не восстанавливаемся на символе, если для него и так пошли по Any-альтернативе
-						currentNode.Children[0].Symbol == Grammar.ANY_TOKEN_NAME ||
-						/// Для восстановления подходит символ, у которого есть начинающаяся с Any альтернатива,
-						/// и для которого, в случае, если ошибка произошла при пропуске Any,
-						/// множество стоп-символов не совпадает со множеством стоп-символов для Any, которое не смогли пропустить
-						!GrammarObject.Rules[currentNode.Symbol].Alternatives.Any(a =>
-							a.Elements.FirstOrDefault()?.Symbol == Grammar.ANY_TOKEN_NAME &&
-							(
-								currentStopTokens == null ||
-								!GetStopTokens(a[0].Options, a.Elements.Select(e => e.Symbol).Concat(Stack.Select(s => s.Symbol))).SetEquals(currentStopTokens)
-							)
-						)
+						!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || currentNode.Children.Count == 0 ||
+						/// Для восстановления подходит символ из указанного пользователем множества
+						!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol)
 					)
 				)
 			{
@@ -394,26 +463,17 @@ namespace Land.Core.Parsing.LL
 					skippedBuffer = new List<IToken>();
 				}
 
-				var alternativeToApply = Table[currentNode.Symbol, Grammar.ANY_TOKEN_NAME][0];
-				var anyNode = NodeGenerator.Generate(alternativeToApply[0].Symbol, alternativeToApply[0].Options.Clone());
-				var newChildren = new LinkedList<Node>();
-
-				for (var i = alternativeToApply.Count - 1; i > 0; --i)
-				{
-					var newNode = 
-						NodeGenerator.Generate(alternativeToApply[i].Symbol, alternativeToApply[i].Options.Clone());
-
-					newChildren.AddFirst(newNode);
-					Stack.Push(newNode);
-				}
-
-				newChildren.AddFirst(anyNode);
+				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 
 				anyNode.Value = currentNode.GetValue();
 				anyNode.Value.AddRange(skippedBuffer.Select(t => t.Text));
 
 				if (currentNode.Location != null)
 					anyNode.SetLocation(currentNode.Location.Start, currentNode.Location.End);
+
+				currentNode.ResetChildren();
+				Stack.Push(currentNode);
+
 				if (skippedBuffer.Count > 0)
 				{
 					anyNode.SetLocation(
@@ -422,6 +482,16 @@ namespace Land.Core.Parsing.LL
 					);
 				}
 
+				Log.Add(Message.Warning(
+					$"Найдено предполагаемое начало {Grammar.ANY_TOKEN_NAME}",
+					anyNode.Location?.Start ?? LexingStream.CurrentToken.Location.Start
+				));
+
+				Log.Add(Message.Warning(
+					$"Попытка продолжить разбор на нетерминале {GrammarObject.Userify(currentNode.Symbol)} в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+					LexingStream.CurrentToken.Location.Start
+				));
+
 				/// Пытаемся пропустить Any в этом месте
 				var token = SkipAny(anyNode, false);
 
@@ -429,14 +499,6 @@ namespace Land.Core.Parsing.LL
 				/// возвращаем токен, с которого разбор продолжается
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
-					currentNode.ResetChildren();
-
-					foreach(var child in newChildren)
-						currentNode.AddLastChild(child);
-
-					if (!String.IsNullOrEmpty(alternativeToApply.Alias))
-						currentNode.Alias = alternativeToApply.Alias;
-
 					Log.Add(Message.Warning(
 						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {this.GetTokenInfoForMessage(token)}",
 						token.Location.Start
@@ -446,11 +508,6 @@ namespace Land.Core.Parsing.LL
 					Statistics.RecoveryTimeSpent += DateTime.Now - recoveryStartTime;
 
 					return token;
-				}
-				else
-				{
-					for (var i = 0; i < alternativeToApply.Count - 1; ++i)
-						Stack.Pop();
 				}
 			}
 

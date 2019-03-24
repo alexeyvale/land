@@ -251,12 +251,14 @@ namespace Land.Core.Parsing.LR
 			NestingStack.Push(LexingStream.GetPairsCount());
 			stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
-			var stopTokens = anyNode.Options.AnyOptions.ContainsKey(AnyOption.Except)
-				? anyNode.Options.AnyOptions[AnyOption.Except]
-				: Table.GetExpectedTokens(Stack.PeekState()).Except(
-					anyNode.Options.AnyOptions.ContainsKey(AnyOption.Include) 
-						? anyNode.Options.AnyOptions[AnyOption.Include] : new HashSet<string>()
-				);
+			if(EnableTracing)
+				Log.Add(Message.Trace(
+					$"Поиск окончания последовательности, соответствующей Any | Стек: {Stack.ToString(GrammarObject)} | Состояние: {Environment.NewLine}\t\t" 
+						+ Table.ToString(Stack.PeekState(), null, "\t\t"),
+					token.Location.Start
+				));
+
+			var stopTokens = GetStopTokens(anyNode.Options, Stack.PeekState());
 			var ignorePairs = anyNode.Options.AnyOptions.ContainsKey(AnyOption.IgnorePairs);
 
 			var startLocation = anyNode.Location?.Start 
@@ -355,6 +357,16 @@ namespace Land.Core.Parsing.LR
 			}
 
 			return token;
+		}
+
+		public HashSet<string> GetStopTokens(LocalOptions options, int state)
+		{
+			return options.AnyOptions.ContainsKey(AnyOption.Except)
+				? options.AnyOptions[AnyOption.Except]
+				: new HashSet<string>(
+					Table.GetExpectedTokens(state).Except(options.AnyOptions.ContainsKey(AnyOption.Include) 
+						? options.AnyOptions[AnyOption.Include] : new HashSet<string>())
+				);
 		}
 
 		public class PathFragment
@@ -473,10 +485,10 @@ namespace Land.Core.Parsing.LR
 			/// или 2) пока нет пересечения вероятного пути вывода и возможного пути восстановления,
 			/// или 3) пока все продукции в изначальном множестве возможных продукций вывода базисные, и продукции в пересечении 
 			/// содержат точку перед снятым со стека символом, то есть, мы уже успешно разобрали то, 
-			/// на чём могли бы восстановиться, и значит, это не родитель места ошибки
+			/// на чём могли бы восстановиться, и значит, это не родитель места ошибки,
 			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
 				|| derivationProds.Count == initialDerivationProds.Count
-				|| derivationProds.Except(initialDerivationProds).All(p=>!RecoverySymbols.Contains(p.Alt[p.Pos])))
+				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.RECOVERY, p.Alt[p.Pos])))
 			);
 
 			if (Stack.CountStates > 0)
