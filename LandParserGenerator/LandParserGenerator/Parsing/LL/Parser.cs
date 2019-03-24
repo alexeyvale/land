@@ -11,12 +11,11 @@ namespace Land.Core.Parsing.LL
 {
 	public class Parser: BaseParser
 	{
-		private const int MAX_RECOVERY_ATTEMPTS = 5;
-
 		private TableLL1 Table { get; set; }
 
 		private Stack<Node> Stack { get; set; }
 		private string StackString => String.Join(" ", Stack.Select(s => GrammarObject.Userify(s.Symbol)));
+
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
 		/// на котором начался разбор нетерминала
@@ -422,16 +421,11 @@ namespace Land.Core.Parsing.LL
 			var currentNode = Stack.Pop();
 
 			/// Поднимаемся по уже построенной части дерева, пока не встретим пригодный для восстановления нетерминал
-			while
-				(
-					currentNode != null &&
-					(
-						/// Отсекаем узел, при попытке разбора которого возникла ошибка
-						!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || currentNode.Children.Count == 0 ||
-						/// Для восстановления подходит символ из указанного пользователем множества
-						!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol)
-					)
-				)
+			while (currentNode != null && (
+				/// Отсекаем узел, при попытке разбора которого возникла ошибка
+				!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || currentNode.Children.Count == 0 ||
+				/// Для восстановления подходит символ из указанного пользователем множества
+				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol)))
 			{
 				if (currentNode.Parent != null)
 				{
