@@ -1100,34 +1100,33 @@ namespace Land.Core
 			}			
 		}
 
-		public HashSet<string> First(Alternative alt)
+		public HashSet<string> First(List<string> sequence)
 		{
-			/// FIRST альтернативы - это либо FIRST для первого символа в альтернативе,
-			/// либо, если альтернатива пустая, null
-			if (alt.Count > 0)
+			/// FIRST последовательности - это либо FIRST для первого символа,
+			/// либо, если последовательность пустая, null
+			if (sequence.Count > 0)
 			{
-                var first = new HashSet<string>();
-                var elementsCounter = 0;
+				var first = new HashSet<string>();
+				var elementsCounter = 0;
 
-                /// Если первый элемент альтернативы - нетерминал,
-                /// из которого выводится пустая строка,
-                /// нужно взять first от следующего элемента
-                for (; elementsCounter < alt.Count; ++elementsCounter)
-                {
-					var elemFirst = First(alt[elementsCounter]);
-                    var containsEmpty = elemFirst.Remove(null);
+				/// Если первый элемент - нетерминал, из которого выводится пустая строка,
+				/// нужно взять first от следующего элемента
+				for (; elementsCounter < sequence.Count; ++elementsCounter)
+				{
+					var elemFirst = First(sequence[elementsCounter]);
+					var containsEmpty = elemFirst.Remove(null);
 
-                    first.UnionWith(elemFirst);
+					first.UnionWith(elemFirst);
 
-                    /// Если из текущего элемента нельзя вывести пустую строку
-                    /// и (для модифицированной версии First) он не равен ANY
-                    if (!containsEmpty 
-                        && (!UseModifiedFirst || alt[elementsCounter] != ANY_TOKEN_NAME))
-                        break;
-                }
+					/// Если из текущего элемента нельзя вывести пустую строку
+					/// и (для модифицированной версии First) он не равен ANY
+					if (!containsEmpty
+						&& (!UseModifiedFirst || sequence[elementsCounter] != ANY_TOKEN_NAME))
+						break;
+				}
 
-                if (elementsCounter == alt.Count)
-                    first.Add(null);
+				if (elementsCounter == sequence.Count)
+					first.Add(null);
 
 				return first;
 			}
@@ -1135,6 +1134,11 @@ namespace Land.Core
 			{
 				return new HashSet<string>() { null };
 			}
+		}
+
+		public HashSet<string> First(Alternative alt)
+		{
+			return First(alt.Elements.Select(e => e.Symbol).ToList());
 		}
 
 		public HashSet<string> First(string symbol)

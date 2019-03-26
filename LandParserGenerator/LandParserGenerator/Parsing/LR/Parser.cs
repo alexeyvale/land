@@ -336,7 +336,8 @@ namespace Land.Core.Parsing.LR
 							}
 						}
 
-						return ErrorRecovery();
+						return ErrorRecovery(stopTokens, 
+							token.Name != Grammar.EOF_TOKEN_NAME ? token.Name : null);
 					}
 					else
 					{
@@ -386,7 +387,7 @@ namespace Land.Core.Parsing.LR
 			}
 		}
 
-		private IToken ErrorRecovery()
+		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string errorToken = null)
 		{
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 			{
@@ -419,7 +420,7 @@ namespace Land.Core.Parsing.LR
 			PointLocation endLocation = null;
 			var value = new List<string>();
 
-			var previouslyMatchedSymbol = String.Empty;
+			var previouslyMatched = (Node)null;
 			var derivationProds = new HashSet<PathFragment>();
 			var initialDerivationProds = new HashSet<PathFragment>();
 
@@ -442,7 +443,7 @@ namespace Land.Core.Parsing.LR
 						.Concat(value).ToList();
 
 					/// Запоминаем снятый со стека символ - это то, что было успешно распознано
-					previouslyMatchedSymbol = Stack.PeekSymbol().Symbol;
+					previouslyMatched = Stack.PeekSymbol();
 				}
 
 				Stack.Pop();
@@ -457,7 +458,7 @@ namespace Land.Core.Parsing.LR
 							.Where
 							(i =>
 								/// Точка должна стоять перед символом, только что снятым со стека
-								i.Next == previouslyMatchedSymbol &&
+								i.Next == previouslyMatched.Symbol &&
 								/// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
 								/// с той же альтернативой, но точкой на один символ дальше
 								(derivationProds.Count == 0 || derivationProds.Any(p => p.Alt.Equals(i.Alternative) && p.Pos == i.Position + 1))
@@ -481,14 +482,10 @@ namespace Land.Core.Parsing.LR
 					}
 				}
 			}
-			/// Работаем, пока 1) последний снятый со стека символ - это Any,
-			/// или 2) пока нет пересечения вероятного пути вывода и возможного пути восстановления,
-			/// или 3) пока все продукции в изначальном множестве возможных продукций вывода базисные, и продукции в пересечении 
-			/// содержат точку перед снятым со стека символом, то есть, мы уже успешно разобрали то, 
-			/// на чём могли бы восстановиться, и значит, это не родитель места ошибки,
-			while (Stack.CountStates > 0 && (previouslyMatchedSymbol == Grammar.ANY_TOKEN_NAME
-				|| derivationProds.Count == initialDerivationProds.Count
-				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.RECOVERY, p.Alt[p.Pos])))
+			while (Stack.CountStates > 0 && (derivationProds.Count == initialDerivationProds.Count
+				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.RECOVERY, p.Alt[p.Pos]))
+				|| StartsWithAny(previouslyMatched)
+				|| IsUnsafeAny(stopTokens, errorToken))
 			);
 
 			if (Stack.CountStates > 0)
@@ -498,11 +495,11 @@ namespace Land.Core.Parsing.LR
 					var skippedBuffer = new List<IToken>();
 
 					/// Запоминаем токен, на котором произошла ошибка
-					var errorToken = LexingStream.CurrentToken;
+					var currentToken = LexingStream.CurrentToken;
 					/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
 					/// на котором раскрывали нетерминал
 					LexingStream.GetNextToken(NestingStack.Peek(), out skippedBuffer);
-					skippedBuffer.Insert(0, errorToken);
+					skippedBuffer.Insert(0, currentToken);
 
 					value.AddRange(skippedBuffer.Select(t=>t.Name));
 				}
@@ -545,6 +542,38 @@ namespace Land.Core.Parsing.LR
 			));
 
 			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+		}
+
+		private bool StartsWithAny(Node subtree)
+		{
+			while (subtree.Symbol != Grammar.ANY_TOKEN_NAME
+				&& subtree.Children.Count > 0)
+				subtree = subtree.Children[0];
+
+			return subtree.Symbol == Grammar.ANY_TOKEN_NAME;
+		}
+
+		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string errorToken)
+		{
+			if (oldStopTokens != null && LexingStream.GetPairsCount() == NestingStack.Peek())
+			{
+				var anyOptions = Table.Items[Stack.PeekState()]
+					.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
+					.Select(i => i.Alternative[0].Options)
+					.FirstOrDefault();
+
+				var nextState = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME]
+					.OfType<ShiftAction>().FirstOrDefault()
+					.TargetItemIndex;
+
+				/// 1) множество токенов для остановки не должно совпадать с таковым для ошибочного Any,
+				/// и
+				/// 2) токен, ставший причиной ошибки, не должен входить во множество Avoid для Any, на котором будем восстанавливаться 
+				return GetStopTokens(anyOptions, nextState).SetEquals(oldStopTokens)
+					&& anyOptions.Contains(AnyOption.Avoid, errorToken);
+			}
+
+			return false;
 		}
 	}
 }

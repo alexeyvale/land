@@ -22,11 +22,42 @@ namespace Land.Core.Parsing.LL
 		/// </summary>
 		private Dictionary<Node, int> NestingLevel { get; set; }
 
+		private Dictionary<string, Tuple<LocalOptions, Stack<string>>> RecoveryCache { get; set; }
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
 		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
 		{
 			Table = new TableLL1(g);
+
+			RecoveryCache = new Dictionary<string, Tuple<LocalOptions, Stack<string>>>();
+
+			/// Для каждого из возможных символов для восстановления кешируем дополнительную информацию
+			foreach (var smb in GrammarObject.Options.GetSymbols(ParsingOption.RECOVERY))
+			{
+				var stack = new Stack<string>();
+				stack.Push(smb);
+				LocalOptions anyOptions = null;
+
+				/// Накапливаем символы, которые придётся положить на стек при восстановлении на smb
+				while (true)
+				{
+					var alternative = Table[stack.Peek(), Grammar.ANY_TOKEN_NAME][0];
+					stack.Pop();
+
+					for (var i = alternative.Count - 1; i >= 0; --i)
+						stack.Push(alternative[i]);
+
+					if(alternative[0].Symbol == Grammar.ANY_TOKEN_NAME)
+					{
+						anyOptions = alternative[0].Options;
+						stack.Pop();
+						break;
+					}
+				}
+
+				/// В кеш помещаем цепочку символов и опции Any
+				RecoveryCache[smb] = new Tuple<LocalOptions, Stack<string>>(anyOptions, stack);
+			}
 		}
 
 		/// <summary>
@@ -358,7 +389,8 @@ namespace Land.Core.Parsing.LL
 						///	Возвращаем узел обратно на стек
 						Stack.Push(anyNode);
 
-						return ErrorRecovery();
+						return ErrorRecovery(stopTokens, 
+							token.Name != Grammar.EOF_TOKEN_NAME ? token.Name : null);
 					}
 					else
 					{
@@ -388,7 +420,7 @@ namespace Land.Core.Parsing.LL
 			}
 		}
 
-		private IToken ErrorRecovery()
+		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string errorToken = null)
 		{		
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 			{
@@ -420,12 +452,18 @@ namespace Land.Core.Parsing.LL
 			/// То, что мы хотели разобрать, и не смогли
 			var currentNode = Stack.Pop();
 
-			/// Поднимаемся по уже построенной части дерева, пока не встретим пригодный для восстановления нетерминал
+			/// Поднимаемся по уже построенной части дерева, пока не встретим 
+			/// пригодный для восстановления нетерминал. Ищем дальше, если
 			while (currentNode != null && (
-				/// Отсекаем узел, при попытке разбора которого возникла ошибка
+				/// текущий узел - тот, непосредственно в котором произошла ошибка, или
 				!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || currentNode.Children.Count == 0 ||
-				/// Для восстановления подходит символ из указанного пользователем множества
-				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol)))
+				/// текущий символ не входит в список тех, на которых можно восстановиться, или
+				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol) ||
+				/// при разборе соответствующей сущности уже пошли по Any-ветке
+				ParsedStartsWithAny(currentNode) ||
+				/// ошибка произошла на таком же Any
+				IsUnsafeAny(stopTokens, errorToken, currentNode))
+			)
 			{
 				if (currentNode.Parent != null)
 				{
@@ -445,12 +483,11 @@ namespace Land.Core.Parsing.LL
 
 				if (LexingStream.GetPairsCount() != NestingLevel[currentNode])
 				{
-					/// Запоминаем токен, на котором произошла ошибка
-					var errorToken = LexingStream.CurrentToken;
+					var currentToken = LexingStream.CurrentToken;
 					/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
 					/// на котором раскрывали нетерминал
 					LexingStream.GetNextToken(NestingLevel[currentNode], out skippedBuffer);
-					skippedBuffer.Insert(0, errorToken);
+					skippedBuffer.Insert(0, currentToken);
 				}
 				else
 				{
@@ -511,6 +548,29 @@ namespace Land.Core.Parsing.LL
 			));
 
 			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+		}
+
+		private bool ParsedStartsWithAny(Node subtree)
+		{
+			while (subtree.Symbol != Grammar.ANY_TOKEN_NAME
+				&& subtree.Children.Count > 0)
+				subtree = subtree.Children[0];
+
+			return subtree.Symbol == Grammar.ANY_TOKEN_NAME;
+		}
+
+		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string errorToken, Node currentNode)
+		{
+			/// Any-кандидат не безопасен, если ошибка произошла на Any,
+			/// и 
+			/// при восстановлении мы будем сопоставлять Any на том же уровне, на котором произошла ошибка,
+			/// и
+			/// множество стоп-токенов, имевшее место в случае ошибки, совпадает со множеством, 
+			/// которое будет получено при восстановлении, или
+			/// токен, на котором произошла ошибка, входит в Avoid того Any, на котром будем восстанавливаться
+			return oldStopTokens != null && LexingStream.GetPairsCount() == NestingLevel[currentNode]
+					&& GetStopTokens(RecoveryCache[currentNode.Symbol].Item1, RecoveryCache[currentNode.Symbol].Item2.Concat(Stack.Select(n => n.Symbol))).SetEquals(oldStopTokens)
+					&& RecoveryCache[currentNode.Symbol].Item1.Contains(AnyOption.Avoid, errorToken);
 		}
 	}
 }
