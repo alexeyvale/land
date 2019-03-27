@@ -100,6 +100,8 @@
     <Compile Include="Markup\Relations\RelationsManager.cs" />
     <Compile Include="Markup\TreeVisitors\GroupNodesByTypeVisitor.cs" />
     <Compile Include="Markup\TreeVisitors\LandExplorerVisitor.cs" />
+    <Compile Include="Parsing\LL\Optimized\Parser.cs" />
+    <Compile Include="Parsing\LL\Optimized\TableLL1.cs" />
     <Compile Include="Parsing\Preprocessing\NoopPreprocessor.cs" />
     <Compile Include="Parsing\Preprocessing\PipelinePreprocessor.cs" />
     <Compile Include="Parsing\Preprocessing\BasePreprocessor.cs" />

@@ -28,7 +28,6 @@ namespace Land.Core
 			var grammarOutput = new StreamWriter($"{TempName(lexerName)}.g4");
 
 			grammarOutput.WriteLine($"lexer grammar {lexerName};");
-			grammarOutput.WriteLine();	
 
 			/// Запоминаем соответствия между строчкой в генерируемом файле 
 			/// и тем терминалом, который оказывается на этой строчке
@@ -154,13 +153,14 @@ namespace Land.Core
 				return null;
 
 			builtGrammar.RebuildUserificationCache();
+			builtGrammar.Optimize();
 
 			BaseTable table = null;
 
 			switch(type)
 			{
 				case GrammarType.LL:
-					table = new TableLL1(builtGrammar);
+					table = new Parsing.LL.Optimized.TableLL1(builtGrammar);
 					break;
 				case GrammarType.LR:
 					table = new TableLR1(builtGrammar);
@@ -182,16 +182,18 @@ namespace Land.Core
 			switch (type)
 			{
 				case GrammarType.LL:
-					parser = new Parsing.LL.Parser(builtGrammar,
+					parser = new Parsing.LL.Optimized.Parser(builtGrammar,
 						new AntlrLexerAdapter(
-							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream),
+							builtGrammar
 						)
 					);
 					break;
 				case GrammarType.LR:
 					parser = new Parsing.LR.Parser(builtGrammar,
 						new AntlrLexerAdapter(
-							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
+							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream),
+							builtGrammar
 						)
 					);
 					break;
@@ -253,7 +255,7 @@ namespace Land.Core
 			var grammarFileName = TempName($"{@namespace.Replace('.', '_')}_Grammar.cs");
 			var nodeGeneratorFileName = TempName($"{@namespace.Replace('.', '_')}_NodeGenerator.cs");
 
-			BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName) , messages);
+			BuildLexer(builtGrammar, Path.GetFileNameWithoutExtension(lexerFileName), messages);
 
 			/// Проверяем, не появились ли ошибки после генерации исходников лексера
 			if (messages.Count(m => m.Type == MessageType.Error) != 0)

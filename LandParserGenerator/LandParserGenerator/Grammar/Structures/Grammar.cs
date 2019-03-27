@@ -1481,5 +1481,157 @@ namespace Land.Core
 		{
 			return $"new LocalOptions() {{ NodeOption = {(opts.NodeOption != null ? $"NodeOption.{opts.NodeOption}" : "null")}, Priority = {(opts.Priority != null ? $"{opts.Priority.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}" : "null")}, IsLand = {opts.IsLand.ToString().ToLower()}, AnyOptions = new Dictionary<AnyOption, HashSet<string>>() {{ {String.Join(", ", opts.AnyOptions.Select(op => $"{{AnyOption.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}}}}"))} }} }}";
 		}
+
+		#region Оптимизация
+
+		public Dictionary<int, NonterminalSymbol> RulesIdx { get; private set; } = new Dictionary<int, NonterminalSymbol>();
+		public Dictionary<int, TerminalSymbol> TokensIdx { get; private set; } = new Dictionary<int, TerminalSymbol>();
+
+		public int StartSymbolIdx { get; private set; }
+
+		public Dictionary<string, int> SymbolToIndex { get; set; } = new Dictionary<string, int>();
+		public List<string> IndexToSymbol { get; set; } = new List<string>();
+
+		public const int EOF_TOKEN_INDEX = 10;
+		public const int UNDEFINED_TOKEN_INDEX = 11;
+		public const int ERROR_TOKEN_INDEX = 12;
+		public const int ANY_TOKEN_INDEX = 13;
+
+		private Dictionary<int, HashSet<int?>> FirstCacheIdx { get; set; }
+
+		public HashSet<int?> First(List<int> sequence)
+		{
+			if (sequence.Count > 0)
+			{
+				var first = new HashSet<int?>();
+				var elementsCounter = 0;
+
+				for (; elementsCounter < sequence.Count; ++elementsCounter)
+				{
+					var elemFirst = First(sequence[elementsCounter]);
+					var containsEmpty = elemFirst.Remove(null);
+
+					first.UnionWith(elemFirst);
+
+					/// Если из текущего элемента нельзя вывести пустую строку
+					/// и (для модифицированной версии First) он не равен ANY
+					if (!containsEmpty
+						&& (!UseModifiedFirst || sequence[elementsCounter] != ANY_TOKEN_INDEX))
+						break;
+				}
+
+				if (elementsCounter == sequence.Count)
+					first.Add(null);
+
+				return first;
+			}
+			else
+			{
+				return new HashSet<int?>() { null };
+			}
+		}
+
+		public HashSet<int?> First(int idx)
+		{
+			if (RulesIdx.ContainsKey(idx))
+				return new HashSet<int?>(FirstCacheIdx[idx]);
+			else
+				return new HashSet<int?>() { idx };
+		}
+
+		private Dictionary<int, HashSet<int>> FollowCacheIdx { get; set; }
+
+		public HashSet<int> Follow(int ntIdx)
+		{
+			return FollowCacheIdx[ntIdx];
+		}
+
+		public string Userify(int idx)
+		{
+			return Userify(IndexToSymbol[idx]);
+		}
+
+		public bool Optimize()
+		{
+			if (this.State != GrammarState.Valid && this.State != GrammarState.Valid)
+				return false;
+
+			/// Резервируем первые 10 номеров для служебных целей
+			IndexToSymbol.AddRange(Enumerable.Repeat<string>(null, 10));
+
+			IndexToSymbol.Add(Grammar.EOF_TOKEN_NAME);
+			IndexToSymbol.Add(Grammar.UNDEFINED_TOKEN_NAME);
+			IndexToSymbol.Add(Grammar.ERROR_TOKEN_NAME);
+			IndexToSymbol.Add(Grammar.ANY_TOKEN_NAME);
+
+			SymbolToIndex.Add(Grammar.EOF_TOKEN_NAME, Grammar.EOF_TOKEN_INDEX);
+			SymbolToIndex.Add(Grammar.UNDEFINED_TOKEN_NAME, Grammar.UNDEFINED_TOKEN_INDEX);
+			SymbolToIndex.Add(Grammar.ERROR_TOKEN_NAME, Grammar.ERROR_TOKEN_INDEX);
+			SymbolToIndex.Add(Grammar.ANY_TOKEN_NAME, Grammar.ANY_TOKEN_INDEX);
+
+			TokensIdx[Grammar.EOF_TOKEN_INDEX] = Tokens[Grammar.EOF_TOKEN_NAME];
+			TokensIdx[Grammar.UNDEFINED_TOKEN_INDEX] = Tokens[Grammar.UNDEFINED_TOKEN_NAME];
+			TokensIdx[Grammar.ANY_TOKEN_INDEX] = Tokens[Grammar.ANY_TOKEN_NAME];
+
+			/// Индексируем все токены
+			foreach (var token in Tokens.Values.Where(t=> !String.IsNullOrEmpty(t.Pattern)))
+			{
+				token.Index = IndexToSymbol.Count;
+				TokensIdx[token.Index] = token;
+
+				SymbolToIndex.Add(token.Name, IndexToSymbol.Count);
+				IndexToSymbol.Add(token.Name);
+			}
+
+			/// Индексируем все правила
+			foreach (var rule in Rules.Values)
+			{
+				rule.Index = IndexToSymbol.Count;
+				RulesIdx[rule.Index] = rule;
+
+				SymbolToIndex.Add(rule.Name, IndexToSymbol.Count);
+				IndexToSymbol.Add(rule.Name);
+			}
+
+			/// Запоминаем индекс стартового символа
+			StartSymbolIdx = SymbolToIndex[StartSymbol];
+
+			/// Подставляем индексы в альтернативы
+			foreach (var rule in Rules.Values)
+			{
+				foreach (var alt in rule.Alternatives)
+				{
+					foreach (var entry in alt.Elements)
+					{
+						entry.Index = SymbolToIndex[entry.Symbol];
+						entry.Options.Optimize(this);
+					}
+				}
+			}
+
+			/// Формируем индексный First
+			FirstCacheIdx = new Dictionary<int, HashSet<int?>>();
+
+			foreach(var key in FirstCache.Keys)
+			{
+				FirstCacheIdx[SymbolToIndex[key]] = new HashSet<int?>(
+					FirstCache[key].Select(e=> e!= null ? SymbolToIndex[e] : (int?)null)
+				);
+			}
+
+			/// Формируем индексный Follow
+			FollowCacheIdx = new Dictionary<int, HashSet<int>>();
+
+			foreach (var key in FollowCache.Keys)
+			{
+				FollowCacheIdx[SymbolToIndex[key]] = new HashSet<int>(
+					FollowCache[key].Select(e => SymbolToIndex[e])
+				);
+			}
+
+			return true;
+		}
+
+		#endregion
 	}
 }

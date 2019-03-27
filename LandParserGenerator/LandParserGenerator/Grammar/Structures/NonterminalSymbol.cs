@@ -10,6 +10,7 @@ namespace Land.Core
 	public class NonterminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
+		public int Index { get; set; }
 		public List<Alternative> Alternatives { get; private set; } = new List<Alternative>();
 
 		public int Count { get { return Alternatives.Count; } }

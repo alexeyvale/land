@@ -221,9 +221,31 @@ namespace Land.Core
 				IsLand = IsLand,
 				NodeOption = NodeOption,
 				Priority = Priority,
-				AnyOptions = new Dictionary<AnyOption, HashSet<string>>(AnyOptions)
+				AnyOptions = new Dictionary<AnyOption, HashSet<string>>(AnyOptions),
+
+				AnyOptionsIdx = new Dictionary<AnyOption, HashSet<int>>(AnyOptionsIdx)
 			};
 		}
+
+		#region Оптимизация
+
+		public Dictionary<AnyOption, HashSet<int>> AnyOptionsIdx { get; set; }
+			= new Dictionary<AnyOption, HashSet<int>>();
+
+		public bool ContainsIdx(AnyOption anyOption, int idx)
+		{
+			return AnyOptionsIdx.ContainsKey(anyOption) && AnyOptionsIdx[anyOption].Contains(idx);
+		}
+
+		public void Optimize(Grammar grammar)
+		{
+			AnyOptionsIdx = AnyOptions.ToDictionary(
+				o => o.Key, 
+				o => new HashSet<int>(o.Value.Select(e => grammar.SymbolToIndex[e]))
+			);
+		}
+
+		#endregion
 	}
 
 	public class ArgumentGroup

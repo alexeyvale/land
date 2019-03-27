@@ -10,6 +10,7 @@ namespace Land.Core.Lexing
 	{
         public string Text { get; set; } = String.Empty;
         public string Name { get; private set; }
+		public int Index { get; set; }
 		public SegmentLocation Location { get; set; } = new SegmentLocation()
 		{
 			Start = new PointLocation(0, 0, 0),

@@ -12,11 +12,11 @@ namespace Land.Core.Parsing
 	/// </summary>
 	public abstract class BaseTable
 	{
-		protected Grammar Gram { get; set; }
+		protected Grammar GrammarObject { get; set; }
 
 		public BaseTable(Grammar g)
 		{
-			Gram = g;
+			GrammarObject = g;
 		}
 
 		public abstract List<Message> CheckValidity();

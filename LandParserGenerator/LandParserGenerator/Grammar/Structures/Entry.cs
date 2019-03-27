@@ -16,6 +16,8 @@ namespace Land.Core
 	{
 		public string Symbol { get; set; }
 
+		public int Index { get; set; }
+
 		public LocalOptions Options { get; set; }
 
 		public Entry(string val)

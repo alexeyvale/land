@@ -13,7 +13,6 @@ namespace Land.Core
 	public class AntlrTokenAdapter: Lexing.IToken
 	{
 		private IToken Token { get; set; }
-		private Lexer Lexer { get; set; }
 
 		private SegmentLocation _location = null;
 		public SegmentLocation Location
@@ -50,18 +49,15 @@ namespace Land.Core
 
 		public string Text { get { return Token.Text; } }
 
-		public string Name
-		{
-			get
-			{
-				return Lexer.Vocabulary.GetSymbolicName(Token.Type);
-			}
-		}
+		public string Name { get; private set; }
 
-		public AntlrTokenAdapter(IToken token, Lexer lexer)
+		public int Index { get; set; }
+
+		public AntlrTokenAdapter(IToken token, Grammar  grammar, Lexer lexer)
 		{
 			Token = token;
-			Lexer = lexer;
+			Name = lexer.Vocabulary.GetSymbolicName(Token.Type);
+			Index = grammar.SymbolToIndex[Name];
 		}
 	}
 }

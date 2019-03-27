@@ -10,6 +10,7 @@ namespace Land.Core
 	public class TerminalSymbol: ISymbol
 	{
 		public string Name { get; private set; }
+		public int Index { get; set; }
 		public string Pattern { get; set; }
 
 		/// <summary>

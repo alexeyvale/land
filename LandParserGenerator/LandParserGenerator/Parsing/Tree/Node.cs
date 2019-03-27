@@ -19,6 +19,11 @@ namespace Land.Core.Parsing.Tree
 		public string Symbol { get; set; }
 
 		/// <summary>
+		/// Индекс символа
+		/// </summary>
+		public int Index { get; set; }
+
+		/// <summary>
 		/// Псевдоним символа, которому соответствует узел
 		/// в соответствии с подструктурой
 		/// </summary>

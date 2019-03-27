@@ -11,6 +11,7 @@ namespace Land.Core.Lexing
 		SegmentLocation Location { get; }
 		string Text { get; }
 		string Name { get; }
+		int Index { get; set;  }
 	}
 
 }

@@ -16,9 +16,12 @@ namespace Land.Core
 
 		private Func<ICharStream, Lexer> LexerConstructor { get; set; }
 
-		public AntlrLexerAdapter(Func<ICharStream, Lexer> constructor)
+		private Grammar GrammarObject { get; set; }
+
+		public AntlrLexerAdapter(Func<ICharStream, Lexer> constructor, Grammar grammar)
 		{
 			LexerConstructor = constructor;
+			GrammarObject = grammar;
 		}
 
 		public void SetSourceFile(string filename)
@@ -39,7 +42,7 @@ namespace Land.Core
 
 		public Lexing.IToken NextToken()
 		{
-			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer);
+			 return new AntlrTokenAdapter(Lexer.NextToken(), GrammarObject, Lexer);
 		}
 
         public Land.Core.Lexing.IToken CreateToken(string name)

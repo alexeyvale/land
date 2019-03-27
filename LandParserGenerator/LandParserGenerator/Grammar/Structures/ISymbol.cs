@@ -9,5 +9,7 @@ namespace Land.Core
 	public interface ISymbol
 	{
 		string Name { get; }
+
+		int Index { get; set;  }
 	}
 }

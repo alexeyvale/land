@@ -10,6 +10,7 @@ namespace Land.Core
 	public class PairSymbol: ISymbol
 	{
 		public string Name { get; set; }
+		public int Index { get; set; }
 		public HashSet<string> Left { get; set; }
 		public HashSet<string> Right { get; set; }
 
