@@ -224,6 +224,8 @@ namespace JavaAntlrBaseline
 					}
 				}
 
+				var totalTime = new TimeSpan();
+
 				foreach (var filename in package)
 				{
 					var inputStream = new AntlrInputStream(File.ReadAllText(filename));
@@ -231,7 +233,10 @@ namespace JavaAntlrBaseline
 					var parser = new JavaParser(new CommonTokenStream(lexer));
 
 					/// Запускаем парсинг
+					var startTime = DateTime.Now;
 					var context = parser.compilationUnit();
+					totalTime += DateTime.Now - startTime;
+
 					visitor.SetFile(filename);
 					context.Accept(visitor);
 				}
@@ -243,6 +248,8 @@ namespace JavaAntlrBaseline
 				Console.WriteLine($"enums: {visitor.EnumCounter}");
 				Console.WriteLine($"fields: {visitor.FieldCounter}");
 				Console.WriteLine($"field declarations: {visitor.FieldDeclarationCounter}");
+
+				Console.WriteLine(totalTime.ToString(@"hh\:mm\:ss\:ff"));
 			}
 		}
 	}

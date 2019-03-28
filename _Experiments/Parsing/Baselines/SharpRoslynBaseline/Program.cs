@@ -52,9 +52,14 @@ namespace RoslynParserTest
 				var fieldOutput = new StreamWriter(Path.Combine(args[0], "field_baseline.txt"), false);
 				var methodOutput = new StreamWriter(Path.Combine(args[0], "method_baseline.txt"), false);
 
+				var totalTime = new TimeSpan();
+
 				foreach (var filename in package)
 				{
+					var startTime = DateTime.Now;
 					var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(filename), new CSharpParseOptions());
+					totalTime += DateTime.Now - startTime;
+
 
 					var enums = tree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>()
 						.Where(e=>!e.Identifier.IsMissing).ToList();
@@ -139,6 +144,8 @@ namespace RoslynParserTest
 				Console.WriteLine($"fields: {fieldsCounter}");
 				Console.WriteLine($"properties: {propertiesCounter}");
 				Console.WriteLine($"methods: {methodsCounter}");
+
+				Console.WriteLine(totalTime.ToString(@"hh\:mm\:ss\:ff"));
 			}
 		}
 	}

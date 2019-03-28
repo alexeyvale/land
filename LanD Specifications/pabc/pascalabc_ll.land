@@ -1,6 +1,7 @@
-COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT		: COMMENT_L|COMMENT_ML1|COMMENT_ML2
 COMMENT_L	: '//' ~[\n\r]*
-COMMENT_ML	: '{' .*? '}'
+COMMENT_ML1	: '{' (COMMENT_ML2|.)*? '}'
+COMMENT_ML2 : '(*' (COMMENT_ML1|.)*? '*)'
 STRING_SKIP	: '\'\'' | '\\\\'
 STRING		: '\'' (STRING_SKIP|.)*? '\''
 
