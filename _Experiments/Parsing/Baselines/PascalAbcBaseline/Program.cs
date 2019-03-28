@@ -66,9 +66,14 @@ namespace PascalABCBaseline
 				var classOutput = new StreamWriter(Path.Combine(args[0], "class_type_baseline.txt"), false);
 				var propertyOutput = new StreamWriter(Path.Combine(args[0], "property_baseline.txt"), false);
 
+				var totalTime = new TimeSpan();
+
 				foreach (var filename in package)
-				{
-					var tree = parser.BuildTree(filename, File.ReadAllText(filename, GetEncoding(filename)), PascalABCCompiler.Parsers.ParseMode.Normal);
+				{				
+					var text = File.ReadAllText(filename, GetEncoding(filename));
+					var startTime = DateTime.Now;
+					var tree = parser.BuildTree(filename, text, PascalABCCompiler.Parsers.ParseMode.Normal);
+					totalTime += DateTime.Now - startTime;
 
 					if (tree != null)
 					{
@@ -149,6 +154,8 @@ namespace PascalABCBaseline
 				Console.WriteLine($"routines: {proceduresCounter}");
 				Console.WriteLine($"properties: {propertiesCounter}");
 				Console.WriteLine($"classes: {classesCounter}");
+
+				Console.WriteLine(totalTime.ToString(@"hh\:mm\:ss\:ff"));
 			}
 		}
 	}
