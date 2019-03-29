@@ -33,16 +33,8 @@ namespace Land.Core
 				return _location;
 			}
 		}
-
-		public string Text { get { return Token.Text; } }
-
-		public string Name
-		{
-			get
-			{
-				return Lexer.Vocabulary.GetSymbolicName(Token.Type);
-			}
-		}
+		public string Text => Token.Text;
+		public string Name => Lexer.Vocabulary.GetSymbolicName(Token.Type);
 
 		public AntlrTokenAdapter(IToken token, Lexer lexer)
 		{
