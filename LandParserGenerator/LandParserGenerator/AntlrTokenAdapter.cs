@@ -34,12 +34,14 @@ namespace Land.Core
 			}
 		}
 		public string Text => Token.Text;
-		public string Name => Lexer.Vocabulary.GetSymbolicName(Token.Type);
-		public int Index => Token.Type;
+		public string Name { get; private set; }
+		public int Index { get; set; }
 
-		public AntlrTokenAdapter(IToken token, Lexer lexer)
+		public AntlrTokenAdapter(IToken token, Grammar grammar, Lexer lexer)
 		{
 			Token = token;
+			Name = lexer.Vocabulary.GetSymbolicName(Token.Type);
+			Index = grammar.SymbolToIndex[Name];
 			Lexer = lexer;
 		}
 	}
