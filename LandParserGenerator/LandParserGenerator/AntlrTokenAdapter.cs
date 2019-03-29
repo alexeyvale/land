@@ -35,6 +35,7 @@ namespace Land.Core
 		}
 		public string Text => Token.Text;
 		public string Name => Lexer.Vocabulary.GetSymbolicName(Token.Type);
+		public int Index => Token.Type;
 
 		public AntlrTokenAdapter(IToken token, Lexer lexer)
 		{
