@@ -10,36 +10,24 @@ using Antlr4.Runtime;
 
 namespace Land.Core
 {
-	public class AntlrTokenAdapter: Lexing.IToken
+	public class AntlrTokenAdapter : Lexing.IToken
 	{
 		private IToken Token { get; set; }
-		private Lexer Lexer { get; set; }
 
-		private SegmentLocation _location = null;
-		public SegmentLocation Location
-		{
-			get
-			{
-				if (_location == null)
-				{
-					_location = new SegmentLocation()
-					{
-						Start = new PointLocation(Token.Line, Token.Column, Token.StartIndex),
-						/// Лексический анализатор остановился за концом текущего токена
-						End = new PointLocation(Lexer.Line, Lexer.Column - 1, Token.StopIndex)
-					};
-				}
-
-				return _location;
-			}
-		}
+		public SegmentLocation Location { get; private set; }
 		public string Text => Token.Text;
-		public string Name => Lexer.Vocabulary.GetSymbolicName(Token.Type);
+		public string Name { get; private set; }
 
 		public AntlrTokenAdapter(IToken token, Lexer lexer)
 		{
 			Token = token;
-			Lexer = lexer;
+			Name = lexer.Vocabulary.GetSymbolicName(Token.Type);
+			Location = new SegmentLocation()
+			{
+				Start = new PointLocation(Token.Line, Token.Column, Token.StartIndex),
+				/// Лексический анализатор остановился за концом текущего токена
+				End = new PointLocation(lexer.Line, lexer.Column - 1, Token.StopIndex)
+			};
 		}
 	}
 }
