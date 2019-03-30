@@ -29,6 +29,10 @@ namespace Land.Core.Parsing.LL
 		{
 			Table = new TableLL1(g);
 
+			/// В ходе парсинга потребуется First,
+			/// учитывающее возможную пустоту ANY
+			GrammarObject.UseModifiedFirst = true;
+
 			RecoveryCache = new Dictionary<string, Tuple<LocalOptions, Stack<string>>>();
 
 			/// Для каждого из возможных символов для восстановления кешируем дополнительную информацию
@@ -208,13 +212,8 @@ namespace Land.Core.Parsing.LL
 			/// Если с Any не связана последовательность стоп-символов
 			if (!options.AnyOptions.ContainsKey(AnyOption.Except))
 			{
-				/// Создаём последовательность символов, идущих в стеке после Any
-				var alt = new Alternative();
-				foreach (var elem in followSequence)
-					alt.Add(elem);
-
 				/// Определяем множество токенов, которые могут идти после Any
-				var tokensAfterText = GrammarObject.First(alt);
+				var tokensAfterText = GrammarObject.First(followSequence.ToList());
 				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
 				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
 
