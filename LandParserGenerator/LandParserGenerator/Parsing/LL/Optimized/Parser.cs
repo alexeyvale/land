@@ -144,7 +144,7 @@ namespace Land.Core.Parsing.LL.Optimized
 					/// Если же в ячейке ровно одна альтернатива
 					else if (alternatives.Count == 1)
 					{
-						if (token.Name == Grammar.ANY_TOKEN_NAME)
+						if (token.Index == Grammar.ANY_TOKEN_INDEX)
 						{
 							var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 							anyNode.Index = Grammar.ANY_TOKEN_INDEX;
