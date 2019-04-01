@@ -388,8 +388,8 @@ namespace Land.Core.Parsing.LL
 						///	Возвращаем узел обратно на стек
 						Stack.Push(anyNode);
 
-						return ErrorRecovery(stopTokens, 
-							token.Name != Grammar.EOF_TOKEN_NAME ? token.Name : null);
+						return ErrorRecovery(stopTokens,
+							anyNode.Options.Contains(AnyOption.Avoid, token.Name) ? token.Name : null);
 					}
 					else
 					{
@@ -419,7 +419,7 @@ namespace Land.Core.Parsing.LL
 			}
 		}
 
-		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string errorToken = null)
+		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string avoidedToken = null)
 		{		
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 			{
@@ -452,17 +452,8 @@ namespace Land.Core.Parsing.LL
 			var currentNode = Stack.Pop();
 
 			/// Поднимаемся по уже построенной части дерева, пока не встретим 
-			/// пригодный для восстановления нетерминал. Ищем дальше, если
-			while (currentNode != null && (
-				/// текущий узел - тот, непосредственно в котором произошла ошибка, или
-				!GrammarObject.Rules.ContainsKey(currentNode.Symbol) || currentNode.Children.Count == 0 ||
-				/// текущий символ не входит в список тех, на которых можно восстановиться, или
-				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol) ||
-				/// при разборе соответствующей сущности уже пошли по Any-ветке
-				ParsedStartsWithAny(currentNode) ||
-				/// ошибка произошла на таком же Any
-				IsUnsafeAny(stopTokens, errorToken, currentNode))
-			)
+			/// пригодный для восстановления нетерминал. 
+			do
 			{
 				if (currentNode.Parent != null)
 				{
@@ -475,6 +466,15 @@ namespace Land.Core.Parsing.LL
 				/// Переходим к родителю
 				currentNode = currentNode.Parent;
 			}
+			/// Ищем дальше, если
+			while (currentNode != null && (
+				/// текущий символ не входит в список тех, на которых можно восстановиться, или
+				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol) ||
+				/// при разборе соответствующей сущности уже пошли по Any-ветке
+				ParsedStartsWithAny(currentNode) ||
+				/// ошибка произошла на таком же Any
+				IsUnsafeAny(stopTokens, avoidedToken, currentNode)
+			));
 
 			if(currentNode != null)
 			{
@@ -558,18 +558,14 @@ namespace Land.Core.Parsing.LL
 			return subtree.Symbol == Grammar.ANY_TOKEN_NAME;
 		}
 
-		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string errorToken, Node currentNode)
+		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string avoidedToken, Node currentNode)
 		{
-			/// Any-кандидат не безопасен, если ошибка произошла на Any,
-			/// и 
-			/// при восстановлении мы будем сопоставлять Any на том же уровне, на котором произошла ошибка,
-			/// и
-			/// множество стоп-токенов, имевшее место в случае ошибки, совпадает со множеством, 
-			/// которое будет получено при восстановлении, или
-			/// токен, на котором произошла ошибка, входит в Avoid того Any, на котром будем восстанавливаться
-			return oldStopTokens != null && LexingStream.GetPairsCount() == NestingLevel[currentNode]
-					&& GetStopTokens(RecoveryCache[currentNode.Symbol].Item1, RecoveryCache[currentNode.Symbol].Item2.Concat(Stack.Select(n => n.Symbol))).SetEquals(oldStopTokens)
-					&& RecoveryCache[currentNode.Symbol].Item1.Contains(AnyOption.Avoid, errorToken);
+			return oldStopTokens != null && LexingStream.GetPairsCount() == NestingLevel[currentNode] && (
+				RecoveryCache[currentNode.Symbol].Item1.Contains(AnyOption.Avoid, LexingStream.CurrentToken.Name)
+				|| GetStopTokens(RecoveryCache[currentNode.Symbol].Item1,
+					RecoveryCache[currentNode.Symbol].Item2.Concat(Stack.Select(n => n.Symbol))).Except(oldStopTokens).Count() == 0
+				&& (avoidedToken == null || RecoveryCache[currentNode.Symbol].Item1.Contains(AnyOption.Avoid, avoidedToken))
+			);
 		}
 	}
 }

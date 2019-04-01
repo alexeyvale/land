@@ -336,8 +336,8 @@ namespace Land.Core.Parsing.LR
 							}
 						}
 
-						return ErrorRecovery(stopTokens, 
-							token.Name != Grammar.EOF_TOKEN_NAME ? token.Name : null);
+						return ErrorRecovery(stopTokens,
+							anyNode.Options.Contains(AnyOption.Avoid, token.Name) ? token.Name : null);
 					}
 					else
 					{
@@ -387,7 +387,7 @@ namespace Land.Core.Parsing.LR
 			}
 		}
 
-		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string errorToken = null)
+		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string avoidedToken = null)
 		{
 			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
 			{
@@ -485,7 +485,7 @@ namespace Land.Core.Parsing.LR
 			while (Stack.CountStates > 0 && (derivationProds.Count == initialDerivationProds.Count
 				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.RECOVERY, p.Alt[p.Pos]))
 				|| StartsWithAny(previouslyMatched)
-				|| IsUnsafeAny(stopTokens, errorToken))
+				|| IsUnsafeAny(stopTokens, avoidedToken))
 			);
 
 			if (Stack.CountStates > 0)
@@ -553,7 +553,7 @@ namespace Land.Core.Parsing.LR
 			return subtree.Symbol == Grammar.ANY_TOKEN_NAME;
 		}
 
-		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string errorToken)
+		private bool IsUnsafeAny(HashSet<string> oldStopTokens, string avoidedToken)
 		{
 			if (oldStopTokens != null && LexingStream.GetPairsCount() == NestingStack.Peek())
 			{
@@ -566,11 +566,9 @@ namespace Land.Core.Parsing.LR
 					.OfType<ShiftAction>().FirstOrDefault()
 					.TargetItemIndex;
 
-				/// 1) множество токенов для остановки не должно совпадать с таковым для ошибочного Any,
-				/// и
-				/// 2) токен, ставший причиной ошибки, не должен входить во множество Avoid для Any, на котором будем восстанавливаться 
-				return GetStopTokens(anyOptions, nextState).SetEquals(oldStopTokens)
-					&& anyOptions.Contains(AnyOption.Avoid, errorToken);
+				return anyOptions.Contains(AnyOption.Avoid, LexingStream.CurrentToken.Name)
+					|| GetStopTokens(anyOptions, nextState).Except(oldStopTokens).Count() == 0
+					&& (avoidedToken == null || anyOptions.Contains(AnyOption.Avoid, avoidedToken));
 			}
 
 			return false;
