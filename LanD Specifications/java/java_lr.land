@@ -9,7 +9,7 @@ STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
 STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-KEYWORD	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'const'|'new'|'final'|'synchronized'|'abstract'|'volatile'|'default'
 ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
 
 ANY_TRIGGER_TOKEN	: '@interface'
@@ -29,11 +29,11 @@ method			=	common_beginning type_parameter? type name arguments Any (';' | block
 field			=	common_beginning type_parameter? type name ('['']')* init_value? (',' name ('['']')* init_value?)* ';'
 water_entity	=	AnyInclude('@interface', 'import', 'package') (block | ';')+
 
-common_beginning	=	(annotation|KEYWORD)*
+common_beginning	=	(annotation|MODIFIER)*
 init_value			=	'=' init_part+
 init_part			=	Any | type
 
-name_atom	=	(ID | KEYWORD) type_parameter?
+name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 

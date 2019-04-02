@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-KEYWORD	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -33,8 +33,8 @@ field			=	common_beginning type name ('[' Any ']')? init_value? (',' name ('[' A
 property		=	common_beginning type name (block (init_value ';')? | init_expression ';')
 water_entity	=	AnyInclude('delegate', 'operator', 'this') (block | ';')+
 
-common_beginning	=	entity_attribute* keyword* 
-keyword			=	KEYWORD | 'extern'
+common_beginning	=	entity_attribute* modifier* 
+modifier			=	MODIFIER | 'extern'
 init_expression		=	'=>' Any
 init_value			=	'=' init_part+
 init_part			=	Any | type
@@ -64,7 +64,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list common_beginning entity
-	leaf name type keyword init_expression init_value
+	leaf name type modifier init_expression init_value
 }
 
 %customblock {
@@ -77,5 +77,5 @@ block				=	'{' Any '}'
 	land namespace enum class_struct_interface method field property
 	priority(5) name
 	priority(0.5) arguments
-	exactmatch keyword
+	exactmatch modifier
 }

@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-KEYWORD	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -25,7 +25,7 @@ opening_directive	=	('using'|'extern') Any ';'
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity =
-		entity_attribute* keyword*
+		entity_attribute* modifier*
 		(
 		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
@@ -37,7 +37,7 @@ entity =
 		  	)
 		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
 		
-keyword			=	KEYWORD | 'extern'
+modifier			=	MODIFIER | 'extern'
 init_expression		=	'=>' Any
 init_value			=	'=' init_part+
 init_part			=	Any | type
@@ -67,7 +67,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list
-	leaf name type keyword init_value init_expression
+	leaf name type modifier init_value init_expression
 }
 
 %customblock {
@@ -79,5 +79,5 @@ block				=	'{' Any '}'
 %mapping {
 	land namespace enum class_struct_interface method field property
 	priority(5) name
-	exactmatch keyword
+	exactmatch modifier
 }
