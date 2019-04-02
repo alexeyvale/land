@@ -11,7 +11,7 @@ STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'ref'|'public'|'private'|'protected'|'internal'|'static'|'new'|'sealed'|'unsafe'|'abstract'|'readonly'|'partial'
+KEYWORD	: 'ref'|'public'|'private'|'protected'|'internal'|'static'|'new'|'sealed'|'unsafe'|'abstract'|'readonly'|'partial'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -24,7 +24,7 @@ namespace_content	=	(namespace|entity|general_attribute)*
 namespace			=	'namespace' name '{' namespace_content '}'
 
 entity =
-		entity_attribute* MODIFIER*
+		entity_attribute* KEYWORD*
 		(
 			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface
 		) | Any ('{' Any '}' | ';')+
@@ -50,5 +50,5 @@ general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
 %mapping {
 	land namespace class_struct_interface
 	priority(5) name
-	exactmatch MODIFIER
+	exactmatch KEYWORD
 }
