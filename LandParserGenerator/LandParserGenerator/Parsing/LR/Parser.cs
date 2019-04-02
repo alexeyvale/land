@@ -53,10 +53,7 @@ namespace Land.Core.Parsing.LR
 						token.Location.Start
 					));
 
-				/// Знаем, что предпринять, если действие однозначно
-				/// или существует выбор между shift и reduce (тогда выбираем shift)
-				if (Table[currentState, token.Name].Count == 1
-					|| Table[currentState, token.Name].Count == 2 && Table[currentState, token.Name].Any(a => a is ShiftAction))
+				if (Table[currentState, token.Name].Count > 0)
 				{
 					if (token.Name == Grammar.ANY_TOKEN_NAME)
 					{
@@ -190,9 +187,8 @@ namespace Land.Core.Parsing.LR
 			if (Table[currentState, token].Count == 0)
 				return null;
 
-			return Table[currentState, token].Count == 1
-				? Table[currentState, token].Single()
-				: Table[currentState, token].Single(a => a is ShiftAction);
+			return Table[currentState, token].OfType<ShiftAction>().FirstOrDefault()
+				?? Table[currentState, token].First();
 		}
 
 		private IToken SkipAny(Node anyNode, bool enableRecovery)
@@ -201,7 +197,7 @@ namespace Land.Core.Parsing.LR
 			var stackActions = new LinkedList<Tuple<Node, int?>>();
 			var token = LexingStream.CurrentToken;
 			var tokenIndex = LexingStream.CurrentIndex;
-			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
+			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
 
 			if(EnableTracing)
 				Log.Add(Message.Trace(
@@ -211,9 +207,9 @@ namespace Land.Core.Parsing.LR
 				));
 
 			/// Пока по Any нужно производить свёртки (ячейка таблицы непуста и нет конфликтов)
-			while (rawActions.Count == 1 && rawActions[0] is ReduceAction)
+			while (rawActions.Count == 1 && rawActions.First() is ReduceAction)
 			{
-				var reduce = (ReduceAction)rawActions[0];
+				var reduce = (ReduceAction)rawActions.First();
 				var parentNode = NodeGenerator.Generate(reduce.ReductionAlternative.NonterminalSymbolName);
 
 				/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
@@ -237,7 +233,7 @@ namespace Land.Core.Parsing.LR
 				NestingStack.Push(LexingStream.GetPairsCount());
 				stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
-				rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME].ToList();
+				rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
 			}
 
 			/// Берём опции из нужного вхождения Any

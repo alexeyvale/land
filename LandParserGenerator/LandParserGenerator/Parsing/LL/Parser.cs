@@ -127,17 +127,7 @@ namespace Land.Core.Parsing.LL
 				{
 					var alternatives = Table[stackTop.Symbol, token.Name];
 
-					/// Сообщаем об ошибке в случае неоднозначной грамматики
-					if (alternatives.Count > 1)
-					{
-						Log.Add(Message.Error(
-							$"Неоднозначная грамматика: для нетерминала {GrammarObject.Userify(stackTop.Symbol)} и входного символа {GrammarObject.Userify(token.Name)} допустимо несколько альтернатив",
-							token.Location.Start
-						));
-						break;
-					}
-					/// Если же в ячейке ровно одна альтернатива
-					else if (alternatives.Count == 1)
+					if (alternatives.Count > 0)
 					{
 						if (token.Name == Grammar.ANY_TOKEN_NAME)
 						{
@@ -145,7 +135,7 @@ namespace Land.Core.Parsing.LL
 						}
 						else
 						{
-							ApplyAlternative(alternatives.Single());
+							ApplyAlternative(alternatives[0]);
 						}
 
 						continue;
@@ -507,7 +497,7 @@ namespace Land.Core.Parsing.LL
 				if (skippedBuffer.Count > 0)
 				{
 					anyNode.SetLocation(
-						anyNode.Location?.Start ?? skippedBuffer.First().Location.Start,
+						anyNode.Location?.Start ?? skippedBuffer[0].Location.Start,
 						skippedBuffer.Last().Location.End
 					);
 				}
