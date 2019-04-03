@@ -32,7 +32,7 @@ entity	=
 	) | AnyInclude('@interface', 'import', 'package') (block | ';')+
 	
 init_value	=	'=' init_part+
-init_part	=	Any | type_parameter
+init_part	=	Any | type
 
 name_atom	=	(ID | MODIFIER) type_parameter?
 name		=	name_atom (('.'|'::') name_atom)*
