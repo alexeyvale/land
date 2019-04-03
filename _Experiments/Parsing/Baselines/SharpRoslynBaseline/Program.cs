@@ -45,6 +45,7 @@ namespace RoslynParserTest
 				var propertiesCounter = 0;
 				var methodsCounter = 0;
 				var fieldsCounter = 0;
+				var fieldDeclarationCounter = 0;
 
 				var classOutput = new StreamWriter(Path.Combine(args[0], "class_struct_interface_baseline.txt"), false);
 				var enumOutput = new StreamWriter(Path.Combine(args[0], "enum_baseline.txt"), false);
@@ -72,8 +73,10 @@ namespace RoslynParserTest
 							enumOutput.WriteLine(node.Identifier);
 					}
 
-					var fields = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>()
-						.SelectMany(f=>f.Declaration.Variables)
+					var fieldDeclarations = tree.GetRoot().DescendantNodes().OfType<FieldDeclarationSyntax>().ToList();
+					fieldDeclarationCounter += fieldDeclarations.Count;
+
+					var fields = fieldDeclarations.SelectMany(f => f.Declaration.Variables)
 						.Where(e => !e.Identifier.IsMissing).ToList();
 					if (fields.Count > 0)
 					{
@@ -142,6 +145,7 @@ namespace RoslynParserTest
 				Console.WriteLine($"enums: {enumsCounter}");
 				Console.WriteLine($"classes: {classesCounter}");
 				Console.WriteLine($"fields: {fieldsCounter}");
+				Console.WriteLine($"field declarations: {fieldDeclarationCounter}");
 				Console.WriteLine($"properties: {propertiesCounter}");
 				Console.WriteLine($"methods: {methodsCounter}");
 
