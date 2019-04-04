@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.IO;
 using System.Reflection;
 using System.Security.Principal;
+using System.Runtime.Serialization.Json;
 
 using Microsoft.Win32;
 
@@ -844,6 +845,12 @@ namespace Land.GUI
 
 				foreach (var pair in landCounts)
 					FrontendUpdateDispatcher.Invoke(OnPackageFileParsingError, $"{Message.Warning($"{pair.Key}:\t{pair.Value}", null)}");
+
+				DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Statistics[]));
+				using (FileStream fs = new FileStream(Path.Combine(DOCUMENTS_DIRECTORY, "last_batch_parsing_stats.json"), FileMode.OpenOrCreate))
+				{
+					jsonFormatter.WriteObject(fs, statsPerFile.Values.ToArray());
+				}
 
 				using (var fs = new StreamWriter(Path.Combine(DOCUMENTS_DIRECTORY, "last_batch_parsing_report.txt")))
 				{

@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Land.Core.Parsing
 {
+	[DataContract]
 	public class Statistics
 	{
+		[DataMember]
+		public int CharsCount { get; set; }
+		[DataMember]
 		public int TokensCount { get; set; }
+		[DataMember]
 		public TimeSpan GeneralTimeSpent { get; set; }
+		[DataMember]
 		public TimeSpan RecoveryTimeSpent { get; set; }
+		[DataMember]
 		public int RecoveryTimes { get; set; }
+		[DataMember]
 		public int RecoveryTimesAny { get; set; }
+		[DataMember]
 		public int LongestRollback { get; set; }
 
 		public static Statistics operator+(Statistics a, Statistics b)
