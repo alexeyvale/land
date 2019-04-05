@@ -131,7 +131,20 @@ namespace Land.Core.Parsing.LL
 					{
 						if (token.Name == Grammar.ANY_TOKEN_NAME)
 						{
-							token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
+							/// Поддерживаем свойство immediate error detection для Any
+							var runtimeFirst = Stack.Select(e => e.Symbol).ToList();
+
+							if (GrammarObject.First(runtimeFirst).Contains(Grammar.ANY_TOKEN_NAME))
+								token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
+							else
+							{
+								Log.Add(Message.Warning(
+									$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", runtimeFirst.Select(t => GrammarObject.Userify(t)))}",
+									token.Location.Start
+								));
+
+								token = ErrorRecovery();
+							}
 						}
 						else
 						{
@@ -244,65 +257,17 @@ namespace Land.Core.Parsing.LL
 			/// Пока по Any нужно раскрывать очередной нетерминал
 			while (GrammarObject[stackTop.Symbol] is NonterminalSymbol)
 			{
-				var alt = Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME].FirstOrDefault();
-
-				if (alt != null)
-				{
-					ApplyAlternative(alt);
-					stackTop = Stack.Peek();
-				}
-				else
-				{
-					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}",
-						token.Location.Start
-					);
-
-					message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
-					Log.Add(message);
-
-					if (enableRecovery)
-					{
-						++Statistics.RecoveryTimesAny;
-						return ErrorRecovery();
-					}
-					else
-					{
-						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-					}
-				}
+				ApplyAlternative(Table[stackTop.Symbol, Grammar.ANY_TOKEN_NAME][0]);
+				stackTop = Stack.Peek();
 			}
 
 			/// В итоге первым терминалом, который окажется на стеке, должен быть Any
-			if (stackTop.Symbol == Grammar.ANY_TOKEN_NAME)
-			{
-				/// Подменяем свежесгенерированный узел для Any на переданный извне
-				anyNode.Options = stackTop.Options.Clone();
-				var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
-				stackTop.Parent.Children.RemoveAt(anyIndex);
-				stackTop.Parent.InsertChild(anyNode, anyIndex);
-				Stack.Pop();
-			}
-			else
-			{
-				var message = Message.Trace(
-					$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}",
-					token.Location.Start
-				);
-
-				message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
-				Log.Add(message);
-
-				if (enableRecovery)
-				{
-					++Statistics.RecoveryTimesAny;
-					return ErrorRecovery();
-				}
-				else
-				{
-					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
-				}
-			}
+			/// Подменяем свежесгенерированный узел для Any на переданный извне
+			anyNode.Options = stackTop.Options.Clone();
+			var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
+			stackTop.Parent.Children.RemoveAt(anyIndex);
+			stackTop.Parent.InsertChild(anyNode, anyIndex);
+			Stack.Pop();
 
 			if (EnableTracing)
 				Log.Add(Message.Trace(

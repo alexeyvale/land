@@ -358,12 +358,16 @@ namespace Land.Core.Parsing.LR
 
 		public HashSet<string> GetStopTokens(LocalOptions options, int state)
 		{
-			return options.AnyOptions.ContainsKey(AnyOption.Except)
+			var stopTokens = options.AnyOptions.ContainsKey(AnyOption.Except)
 				? options.AnyOptions[AnyOption.Except]
 				: new HashSet<string>(
 					Table.GetExpectedTokens(state).Except(options.AnyOptions.ContainsKey(AnyOption.Include) 
 						? options.AnyOptions[AnyOption.Include] : new HashSet<string>())
 				);
+
+			stopTokens.Remove(Grammar.ANY_TOKEN_NAME);
+
+			return stopTokens;
 		}
 
 		public class PathFragment
