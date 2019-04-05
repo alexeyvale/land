@@ -194,7 +194,6 @@ namespace Land.Core.Parsing.LR
 		private IToken SkipAny(Node anyNode, bool enableRecovery)
 		{
 			var nestingCopy = LexingStream.GetPairsState();
-			var stackActions = new LinkedList<Tuple<Node, int?>>();
 			var token = LexingStream.CurrentToken;
 			var tokenIndex = LexingStream.CurrentIndex;
 			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
@@ -215,11 +214,6 @@ namespace Land.Core.Parsing.LR
 				/// Снимаем со стека символы ветки, по которой нужно произвести свёртку
 				for (var i = 0; i < reduce.ReductionAlternative.Count; ++i)
 				{
-					stackActions.AddFirst(new Tuple<Node, int?>(
-						Stack.PeekSymbol(),
-						Stack.PeekState()
-					));
-
 					parentNode.AddFirstChild(Stack.PeekSymbol());
 					Stack.Pop();
 					NestingStack.Pop();
@@ -231,7 +225,6 @@ namespace Land.Core.Parsing.LR
 					Table.Transitions[Stack.PeekState()][reduce.ReductionAlternative.NonterminalSymbolName]
 				);
 				NestingStack.Push(LexingStream.GetPairsCount());
-				stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
 				rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
 			}
@@ -245,7 +238,6 @@ namespace Land.Core.Parsing.LR
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 			NestingStack.Push(LexingStream.GetPairsCount());
-			stackActions.AddFirst(new Tuple<Node, int?>(null, null));
 
 			if(EnableTracing)
 				Log.Add(Message.Trace(
@@ -315,22 +307,6 @@ namespace Land.Core.Parsing.LR
 						Log.Add(message);
 
 						LexingStream.MoveTo(tokenIndex, nestingCopy);
-
-						/// Приводим стек в состояние, 
-						/// в котором он был до начала пропуска Any
-						foreach (var action in stackActions)
-						{
-							if (action.Item1 == null)
-							{
-								Stack.Pop();
-								NestingStack.Pop();
-							}
-							else
-							{
-								Stack.Push(action.Item1, action.Item2);
-								NestingStack.Push(LexingStream.GetPairsCount());
-							}
-						}
 
 						return ErrorRecovery(stopTokens,
 							anyNode.Options.Contains(AnyOption.Avoid, token.Name) ? token.Name : null);
