@@ -20,7 +20,7 @@ SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
 
 
 program			=	program_element*
-program_element	=	island | Any
+program_element	=	island | AnyIgnorePairs
 
 island		=	if | switch
 if			=	'if' round_bracketed (block | island | Any (block|';')) (else)?!
