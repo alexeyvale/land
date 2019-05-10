@@ -54,9 +54,9 @@
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
-%type <strVal> entry_core group optional_alias
+%type <strVal> entry_core group optional_alias grammar_entity
 %type <entryVal> entry
-%type <strList> identifiers
+%type <strList> grammar_entities_list
 %type <altList> body
 %type <boolVal> prec_nonempty opt_linestart
 %type <argGroupVal> argument_group
@@ -410,7 +410,7 @@ options
 	;
 	
 option
-	: OPTION_NAME opt_args identifiers
+	: OPTION_NAME opt_args grammar_entities_list
 		{
 			$$ = new OptionDeclaration()
 			{
@@ -460,9 +460,31 @@ argument_group
 		}
 	;
 
-identifiers
-	: identifiers ID { $$ = $1; $$.Add($2); }
+grammar_entities_list
+	: grammar_entities_list grammar_entity 
+		{ 
+			$$ = $1;	
+			if(!String.IsNullOrEmpty($2))
+				$$.Add($2);
+		}
 	| { $$ = new List<string>(); }
+	;
+	
+grammar_entity
+	: ID { $$ = $1; }
+	| REGEX 
+		{ 
+			$$ = ConstructedGrammar.GetTerminal($1);
+			
+			if(String.IsNullOrEmpty($$))
+			{
+				Log.Add(Message.Error(
+					"Не найден токен, определяемый регулярным выражением " + $1,
+					@1.Start,
+					"LanD"
+				));
+			}
+		}
 	;
 	
 %%
@@ -482,4 +504,3 @@ private void SafeGrammarAction(Action action, PointLocation loc)
 		));
 	}
 }
-

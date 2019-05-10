@@ -28,10 +28,10 @@ entity =
 		entity_attribute* modifier*
 		(
 		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
-			('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
-			%priority(2) type name
+			%priority(0.3) %exactmatch ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
+			type name
 			(
-		  		%priority(0.5) arguments Any (init_expression? ';' | block)				=> method	|
+		  		arguments Any (init_expression? ';' | block)							=> method	|
 		  		('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'	=> field	|
 		  		(block (init_value ';')? | init_expression ';')							=> property
 		  	)
@@ -67,7 +67,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list
-	leaf name type modifier init_value init_expression
+	leaf name type modifier arguments
 }
 
 %customblock {
@@ -78,6 +78,9 @@ block				=	'{' Any '}'
 
 %mapping {
 	land namespace enum class_struct_interface method field property
-	priority(5) name
+	priority(0.1) modifier
+	priority(0.7) name
+	priority(0.3) type arguments
+	priority(0) '{' '}' ';' ','
 	exactmatch modifier
 }

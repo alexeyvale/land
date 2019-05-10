@@ -328,15 +328,15 @@ namespace Land.Core
 			return newName;
 		}
 
-		//Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
+		/// Добавляем к терминалам регулярное выражение, в чистом виде встреченное в грамматике
 		public string GenerateTerminal(string pattern)
 		{
 			ConstructionLog.Add($"grammar.GenerateTerminal(@\"{pattern.Replace("\"", "\"\"")}\");");
 
-			//Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
-			foreach (var token in Tokens.Values)
-				if (token.Pattern != null && token.Pattern.Equals(pattern))
-					return token.Name;
+			/// Если оно уже сохранено с каким-то именем, не дублируем, а возвращаем это имя
+			var existing = GetTerminal(pattern);
+			if (!String.IsNullOrEmpty(existing))
+				return existing;
 
 			var newName = AUTO_TOKEN_PREFIX + AutoTokenCounter++;
 			Tokens.Add(newName, new TerminalSymbol(newName, pattern));
@@ -344,6 +344,10 @@ namespace Land.Core
 
 			return newName;
 		}
+
+		/// Ищем уже объявленный терминал, соответствующий паттерну
+		public string GetTerminal(string pattern) =>
+			Tokens.Values.FirstOrDefault(t => t.Pattern == pattern)?.Name;
 
 		public void DeclareTerminal(string name,  string pattern, bool lineStart = false)
 		{
@@ -502,7 +506,7 @@ namespace Land.Core
 
 		public void SetOption(MappingOption option, string[] symbols, params dynamic[] @params)
 		{
-			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param is string ? $"\"{param}\"" : param.ToString()))}}} );");
+			ConstructionLog.Add($"grammar.SetOption(MappingOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => GetParamString(param)))}}} );");
 
 			if (symbols == null || symbols.Length == 0)
 			{
@@ -523,7 +527,7 @@ namespace Land.Core
 
 		public void SetOption(CustomBlockOption option, string[] symbols, params dynamic[] @params)
 		{
-			ConstructionLog.Add($"grammar.SetOption(CustomBlockOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => param is string ? $"\"{param}\"" : param.ToString()))}}} );");
+			ConstructionLog.Add($"grammar.SetOption(CustomBlockOption.{option}, new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => GetParamString(param)))}}} );");
 
 			if (symbols == null || symbols.Length == 0)
 			{
@@ -541,6 +545,10 @@ namespace Land.Core
 					);
 			}
 		}
+
+		private string GetParamString(dynamic param) =>
+			param is string ? $"\"{param}\"" : param is double ?
+				param.ToString().Replace(',', '.') : param.ToString();
 
 		private List<string> CheckIfNonterminals(params string[] symbols)
 		{
