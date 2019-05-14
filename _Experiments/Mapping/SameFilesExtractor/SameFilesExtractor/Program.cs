@@ -35,12 +35,6 @@ namespace SameFilesExtractor
 
 				foreach (var name in common)
 				{
-					var counter = 0;
-					var testFileName = $"{{0}}_{Path.GetFileNameWithoutExtension(name)}{Path.GetExtension(name)}";
-
-					//while (File.Exists(Path.Combine(args[3], String.Format(testFileName, counter))))
-					//	++counter;
-
 					File.Copy(args[0] + name,
 						Path.Combine(basePath, $"{Path.GetFileNameWithoutExtension(name)}{Path.GetExtension(name)}"), true);
 
