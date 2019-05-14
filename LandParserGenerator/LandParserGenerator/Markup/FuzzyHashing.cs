@@ -9,12 +9,12 @@ namespace Land.Core.Markup
 {
 	public static class FuzzyHashing
 	{
-		public const int MIN_TEXT_LENGTH = 50;
+		public const int MIN_TEXT_LENGTH = 25;
 
 		public static byte[] GetFuzzyHash(string text)
 		{
 			var tlshObject = new TLSH.HashObject();
-			var textBytes = Encoding.UTF8.GetBytes(text);
+			var textBytes = Encoding.Unicode.GetBytes(text);
 			tlshObject.final(textBytes, (uint)textBytes.Length, 1);
 			return tlshObject.getHash();
 		}

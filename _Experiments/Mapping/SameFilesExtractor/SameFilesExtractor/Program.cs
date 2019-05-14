@@ -19,8 +19,13 @@ namespace SameFilesExtractor
 					Directory.Delete(args[3], true);
 				Directory.CreateDirectory(args[3]);
 
+				var basePath = Path.Combine(args[3], "base");
+				Directory.CreateDirectory(basePath);
+				var modifiedPath = Path.Combine(args[3], "modified");
+				Directory.CreateDirectory(modifiedPath);
+
 				var first = Directory.GetFiles(args[0], args[2], SearchOption.AllDirectories)
-					.Select(path => path.Substring(args[1].Length));
+					.Select(path => path.Substring(args[0].Length));
 
 				var second = Directory.GetFiles(args[1], args[2], SearchOption.AllDirectories)
 					.Select(path => path.Substring(args[1].Length));
@@ -31,16 +36,16 @@ namespace SameFilesExtractor
 				foreach (var name in common)
 				{
 					var counter = 0;
-					var testFileName = $"{Path.GetFileNameWithoutExtension(name)}-first{{0}}{Path.GetExtension(name)}";
+					var testFileName = $"{{0}}_{Path.GetFileNameWithoutExtension(name)}{Path.GetExtension(name)}";
 
-					while (File.Exists(Path.Combine(args[3], String.Format(testFileName, counter))))
-						++counter;
+					//while (File.Exists(Path.Combine(args[3], String.Format(testFileName, counter))))
+					//	++counter;
 
 					File.Copy(args[0] + name,
-						Path.Combine(args[3], $"{Path.GetFileNameWithoutExtension(name)}-first{counter}{Path.GetExtension(name)}"), true);
+						Path.Combine(basePath, $"{Path.GetFileNameWithoutExtension(name)}{Path.GetExtension(name)}"), true);
 
 					File.Copy(args[1] + name,
-						Path.Combine(args[3], $"{Path.GetFileNameWithoutExtension(name)}-second{counter}{Path.GetExtension(name)}"), true);
+						Path.Combine(modifiedPath, $"{Path.GetFileNameWithoutExtension(name)}{Path.GetExtension(name)}"), true);
 				}
 			}
 		}
