@@ -267,8 +267,9 @@ namespace Land.Core.Markup
 			var currentNode = node.Parent;
 
 			while(currentNode != null)
-			{
-				if(currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME)
+			{			
+				if(currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME 
+					&& currentNode.Options.IsLand)
 					context.Add((AncestorsContextElement)currentNode);
 
 				currentNode = currentNode.Parent;
