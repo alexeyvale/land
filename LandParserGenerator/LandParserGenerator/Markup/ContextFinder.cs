@@ -194,6 +194,57 @@ namespace Land.Core.Markup
 			return 1;
 		}
 
+		private static double LevenshteinUnmodified<T>(IEnumerable<T> a, IEnumerable<T> b)
+		{
+			if (a.Count() == 0 ^ b.Count() == 0)
+				return 0;
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
+
+			var denominator = Math.Max(a.Count(), b.Count());
+
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count()
+				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
+				++commonPrefixLength;
+			a = a.Skip(commonPrefixLength).ToList();
+			b = b.Skip(commonPrefixLength).ToList();
+
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Count() && commonSuffixLength < b.Count()
+				&& a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
+				++commonSuffixLength;
+			a = a.Take(a.Count() - commonSuffixLength).ToList();
+			b = b.Take(b.Count() - commonSuffixLength).ToList();
+
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
+
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Count() + 1, b.Count() + 1];
+			distances[0, 0] = 0;
+
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Count(); ++i)
+				distances[i, 0] = i;
+			for (int j = 1; j <= b.Count(); ++j)
+				distances[0, j] = j;
+
+			for (int i = 1; i <= a.Count(); i++)
+				for (int j = 1; j <= b.Count(); j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = 1 - DispatchLevenshtein(a.ElementAt(i - 1), b.ElementAt(j - 1));
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
+
+			return 1 - distances[a.Count(), b.Count()] / denominator;
+		}
+
 		///  Похожесть на основе расстояния Левенштейна
 		private static double Levenshtein<T>(IEnumerable<T> a, IEnumerable<T> b)
 		{
