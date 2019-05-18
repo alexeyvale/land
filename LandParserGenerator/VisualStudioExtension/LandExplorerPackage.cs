@@ -66,6 +66,8 @@ namespace Land.VisualStudioExtension
 
 		protected override void Dispose(bool disposing)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			base.Dispose(disposing);
 			ServiceEventAggregator.DisposeInstance();
 		}

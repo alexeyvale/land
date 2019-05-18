@@ -103,7 +103,11 @@ namespace PascalPreprocessing.ConditionalCompilation
 								/// иначе пропустим её одним блоком с предыдущей
 								if (Levels.Peek().IncludeCurrentSegment)
 								{
-									CurrentSegment.End = node.Location.End;
+									CurrentSegment.End = new PointLocation(
+											node.Location.Start.Line.Value,
+											node.Location.Length,
+											node.Location.End.Offset
+										);
 									CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
 
 									SegmentsToExclude.Add(CurrentSegment);
@@ -114,7 +118,11 @@ namespace PascalPreprocessing.ConditionalCompilation
 					case "endif":
 						if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 						{
-							CurrentSegment.End = node.Location.End;
+							CurrentSegment.End = new PointLocation(
+									node.Location.Start.Line.Value,
+									node.Location.Length,
+									node.Location.End.Offset
+								);
 							CurrentSegment.EndsOnEol = Text[CurrentSegment.End.Offset] == '\n';
 
 							SegmentsToExclude.Add(CurrentSegment);

@@ -30,6 +30,8 @@ namespace Land.GUI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		public const int COLUMN_CORRECTION_ITEM = 1;
+
 		private readonly string APP_DATA_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD IDE";
 		private readonly string DOCUMENTS_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace";
 		private readonly string DOCUMENTS_DLL_DIRECTORY = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\LanD Workspace\dll";
@@ -456,20 +458,17 @@ namespace Land.GUI
 
 			if (lb.SelectedIndex != -1)
 			{
-				var msg = lb.SelectedItem as Land.Core.Message;
-				if (msg != null && msg.Location != null)
+				if (lb.SelectedItem is Land.Core.Message msg 
+					&& msg.Location != null)
 				{
 					/// Если координаты не выходят за пределы файла, устанавливаем курсор в соответствии с ними, 
 					/// иначе ставим курсор в позицию после последнего элемента последней строки
-					int start = 0;
-					if(msg.Location.Line <= Grammar_Editor.Document.LineCount)
-						start = Grammar_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
-					else
-						start = Grammar_Editor.Document.GetOffset(Grammar_Editor.Document.LineCount, Grammar_Editor.Document.Lines[Grammar_Editor.Document.LineCount-1].Length + 1);
+					int start = msg.Location.Line <= Grammar_Editor.Document.LineCount
+						? msg.Location.Offset : Grammar_Editor.Document.TextLength;
 
 					Grammar_Editor.Focus();
 					Grammar_Editor.Select(start, 0);
-					Grammar_Editor.ScrollToLine(msg.Location.Line);
+					Grammar_Editor.ScrollToLine(msg.Location.Line.Value);
 				}
 			}
 		}
@@ -625,10 +624,9 @@ namespace Land.GUI
 					&& msg.Location.Line > 0 
 					&& msg.Location.Line <= File_Editor.Document.LineCount)
 				{
-					var start = File_Editor.Document.GetOffset(msg.Location.Line, msg.Location.Column);
 					File_Editor.Focus();
-					File_Editor.Select(start, 0);
-					File_Editor.ScrollToLine(File_Editor.Document.GetLocation(start).Line);
+					File_Editor.Select(msg.Location.Offset, 0);
+					File_Editor.ScrollToLine(msg.Location.Line.Value);
 				}
 			}
 		}

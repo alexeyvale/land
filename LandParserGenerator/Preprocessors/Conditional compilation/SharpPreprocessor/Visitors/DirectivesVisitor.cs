@@ -125,7 +125,12 @@ namespace SharpPreprocessing.ConditionalCompilation
 							/// иначе пропустим её одним блоком с предыдущей
 							if (Levels.Peek().IncludeCurrentSegment)
 							{
-								FinCurrentSegment(node.Location.End);
+								FinCurrentSegment(new PointLocation(
+									node.Location.Start.Line, 
+									node.Location.Length, 
+									node.Location.End.Offset)
+								);
+
 								SegmentsToExclude.Add(CurrentSegment);
 							}
 						}
@@ -134,7 +139,12 @@ namespace SharpPreprocessing.ConditionalCompilation
 				case endif_node endif_nd:
 					if (!Levels.Peek().NestedInExcluded && !Levels.Peek().IncludeCurrentSegment)
 					{
-						FinCurrentSegment(node.Location.End);
+						FinCurrentSegment(new PointLocation(
+							node.Location.Start.Line,
+							node.Location.Length,
+							node.Location.End.Offset)
+						);
+
 						SegmentsToExclude.Add(CurrentSegment);
 					}
 					Levels.Pop();

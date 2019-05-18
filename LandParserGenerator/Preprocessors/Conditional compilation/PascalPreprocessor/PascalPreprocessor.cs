@@ -100,8 +100,9 @@ namespace PascalPreprocessing.ConditionalCompilation
 						&& Excluded[includedSegmentsCount].Start.Offset <= start)
 					{
 						includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
-						includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line +
-							(Excluded[includedSegmentsCount].EndsOnEol ? 1 : 0);
+						includedLinesCount += Excluded[includedSegmentsCount].End.Line.Value 
+							- Excluded[includedSegmentsCount].Start.Line.Value 
+							+ (Excluded[includedSegmentsCount].EndsOnEol ? 1 : 0);
 
 						if (Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
 							&& Excluded[includedSegmentsCount].Start.Line == currentLineIndex)
@@ -110,10 +111,10 @@ namespace PascalPreprocessing.ConditionalCompilation
 						}
 						else
 						{
-							currentLineIndex = Excluded[includedSegmentsCount].End.Line;
+							currentLineIndex = Excluded[includedSegmentsCount].End.Line.Value;
 							includedColumnsCount = Excluded[includedSegmentsCount].Start.Line == Excluded[includedSegmentsCount].End.Line
 								? Excluded[includedSegmentsCount].Length.Value
-								: Excluded[includedSegmentsCount].End.Column + 1;
+								: Excluded[includedSegmentsCount].End.Column.Value + 1;
 						}
 
 						start += Excluded[includedSegmentsCount].Length.Value;

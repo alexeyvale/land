@@ -182,8 +182,8 @@ namespace Land.VisualStudioExtension
 			var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
 
 			mgr.NavigateToLineAndColumn(buffer, ref logicalView, 
-				location.Line - 1, location.Column - 1, 
-				location.Line - 1, location.Column - 1);
+				location.Line.Value - 1, location.Column.Value, 
+				location.Line.Value - 1, location.Column.Value);
 		}
 
 		public void SetSegments(List<DocumentSegment> segments, Color color)

@@ -98,7 +98,8 @@ namespace SharpPreprocessing.ConditionalCompilation
 						&& Excluded[includedSegmentsCount].Start.Offset <= start)
 					{
 						includedCharsCount += Excluded[includedSegmentsCount].Length.Value;
-						includedLinesCount += Excluded[includedSegmentsCount].End.Line - Excluded[includedSegmentsCount].Start.Line + 1;
+						includedLinesCount += Excluded[includedSegmentsCount].End.Line.Value 
+							- Excluded[includedSegmentsCount].Start.Line.Value + 1;
 						start += Excluded[includedSegmentsCount].Length.Value;
 						includedSegmentsCount += 1;
 					}

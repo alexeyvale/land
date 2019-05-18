@@ -11,30 +11,45 @@ namespace Land.Core
 	[Serializable]
 	public class PointLocation
 	{
-		public static int COLUMN_NUMBER_CORRECTION = 1;
+		public int? Line { get; private set; }
 
-		public int Line { get; set; }
-		public int Column { get; set; }
-		public int Offset { get; set; }
+		public int? Column { get;  private set; }
 
-		public PointLocation(int ln, int col, int offset)
+		public int Offset { get; private set; }
+
+		public PointLocation(int offset)
+		{
+			Offset = offset;
+		}
+
+		public PointLocation(int? ln, int? col, int offset)
 		{
 			Line = ln;
-			Column = col + COLUMN_NUMBER_CORRECTION;
+			Column = col;
 			Offset = offset;
 		}
 
 		public void Shift(int lnDelta, int colDelta, int offsetDelta)
 		{
-			Line += lnDelta;
-			Column += colDelta;
 			Offset += offsetDelta;
 
-			if (Line <= 0 || Offset < 0)
+			if(Line.HasValue)
 			{
-				Line = 1;
-				Offset = 0;
+				Line += lnDelta;
+				Column += colDelta;
+
+				if (Line <= 0 || Offset < 0)
+				{
+					Line = 1;
+					Offset = 0;
+				}
+
+				if (Column <= 0)
+					Column = 0;
 			}
+
+			if (Offset < 0)
+				Offset = 0;
 		}
 	}
 
