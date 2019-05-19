@@ -107,7 +107,7 @@ namespace Land.Core.Markup
 
 			/// Удаляем из текста все пробельные символы
 			var text = System.Text.RegularExpressions.Regex.Replace(
-				fileText.Substring(node.Location.Start.Offset, node.Location.Length.Value), "[\n\r\f\t ]", ""
+				fileText.Substring(node.Location.Start.Offset, node.Location.Length.Value), "[\n\r\f\t ]", " "
 			);
 
 			TextLength = text.Length;

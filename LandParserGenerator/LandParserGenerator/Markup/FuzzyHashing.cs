@@ -33,7 +33,7 @@ namespace Land.Core.Markup
 			tlsh1.fromTlshStr(hash1);
 			tlsh2.fromTlshStr(hash2);
 
-			return Math.Max(0, (600 - tlsh1.totalDiff(tlsh2)) / 600.0);
+			return Math.Max(0, (300 - tlsh1.totalDiff(tlsh2)) / 300.0);
 		}
 	}
 }

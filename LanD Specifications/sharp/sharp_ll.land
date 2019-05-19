@@ -78,9 +78,13 @@ block				=	'{' Any '}'
 
 %mapping {
 	land namespace enum class_struct_interface method field property
+	
 	priority(0.1) modifier
-	priority(0.7) name
+	priority(0.8) name
 	priority(0.3) type arguments
 	priority(0) '{' '}' ';' ','
+	
+	// comparable init_expression block
+	
 	exactmatch modifier
 }

@@ -376,18 +376,11 @@ namespace Land.Core.Markup
 		{
 			if (a.EqualsIgnoreValue(b))
 			{
-				var score = 0d;
-
-				if (a.Text != null && b.Text != null)
-					score = Levenshtein(a.Text, b.Text);
-				else if (a.Hash != null && b.Hash != null)
-					score = FuzzyHashing.CompareHashes(a.Hash, b.Hash);
-				/// Если мы попали сюда, строка из одного контекста не захеширована, 
-				/// так как слишком короткая, а в другом контексте есть только хэш без текста. 
-				/// Такое возможно только если длина одной строки меньше MIN_TEXT_LENGTH, 
-				/// а второй - больше MAX_TEXT_LENGTH
-				else
-					score = 0;
+				var score = a.Text != null && b.Text != null
+					? Levenshtein(a.Text, b.Text)
+					: a.Hash != null && b.Hash != null
+						? FuzzyHashing.CompareHashes(a.Hash, b.Hash)
+						: 0;
 
 				return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)InnerContextElement.MAX_TEXT_LENGTH ? 0 : score;
 			}
