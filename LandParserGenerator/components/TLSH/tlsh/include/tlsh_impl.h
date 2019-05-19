@@ -58,7 +58,7 @@
 #ifndef HEADER_TLSH_IMPL_H
 #define HEADER_TLSH_IMPL_H
 
-#define SLIDING_WND_SIZE  5
+#define SLIDING_WND_SIZE  8
 
 #define BUCKETS           256
 #define Q_BITS            2    // 2 bits; quartile value 0, 1, 2, 3
