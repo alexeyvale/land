@@ -78,7 +78,7 @@ namespace VisualStudioExtension.Highlighting
 			{
 				var snapshotSpan = new SnapshotSpan(
 					 currentSnapshot, 
-					 new Span(segment.StartOffset, segment.EndOffset - segment.StartOffset)
+					 new Span(segment.StartOffset, segment.EndOffset - segment.StartOffset + 1)
 				);
 				res.Add(new TagSpan<SegmentHighlighterTag>(snapshotSpan,
 					 new SegmentHighlighterTag()));
