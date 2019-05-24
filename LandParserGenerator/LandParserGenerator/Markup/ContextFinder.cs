@@ -382,7 +382,8 @@ namespace Land.Core.Markup
 						? FuzzyHashing.CompareHashes(a.Hash, b.Hash)
 						: 0;
 
-				return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)InnerContextElement.MAX_TEXT_LENGTH ? 0 : score;
+				return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)InnerContextElement.MAX_TEXT_LENGTH 
+					? 0 : score;
 			}
 			else
 				return 0;
