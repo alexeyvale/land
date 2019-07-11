@@ -14,7 +14,7 @@ namespace Comparison
 		const string MarkupFolder = @"D:\Repositories\_mapping\Roslyn\Common\base";
 		const string RelinkFolder = @"D:\Repositories\_mapping\Roslyn\Common\modified";
 		const int EntitiesPerFile = 2;
-		const int FilesTake = 500;
+		const int FilesTake = 3000;
 		static readonly Random RandomGen = new Random(7);
 
 		public class GetNodeSequenceVisitor: BaseTreeVisitor
@@ -136,6 +136,8 @@ namespace Comparison
 					sameFirstPos = new List<Tuple<string, string>>(),
 					differentFirstPos = new List<Tuple<string, string>>();
 
+				List<string> similarities = new List<string>();
+
 				entities[key].ContextFinder = new BasicContextFinder();
 				var basicRemapResult = entities[key].Remap(searchArea.Select(e => new TargetFileInfo
 				{
@@ -158,6 +160,27 @@ namespace Comparison
 
 				foreach (var cp in basicRemapResult.Keys)
 				{
+					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
+						&& (basicRemapResult[cp].Count == 1
+							|| (1 - basicRemapResult[cp][1].Similarity) >= (1 - basicRemapResult[cp][0].Similarity) * 1.5);
+
+					var isModifiedAuto = modifiedRemapResult.ContainsKey(cp) && modifiedRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
+						&& (modifiedRemapResult[cp].Count == 1
+							|| (1 - modifiedRemapResult[cp][1].Similarity) >= (1 - modifiedRemapResult[cp][0].Similarity) * 1.5);
+
+					var sameFirst = basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
+						&& String.Join("", modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value))
+							.StartsWith(String.Join("", basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
+
+					if (sameFirst && basicRemapResult[cp][0].Similarity == 1 
+						&& modifiedRemapResult[cp][0].Similarity == 1)
+						continue;
+
+					if (basicRemapResult[cp].Count == 1)
+						similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity }");
+					else if (basicRemapResult[cp].Count > 1)
+						similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity };{ basicRemapResult[cp][1].Similarity };{ modifiedRemapResult[cp][1].Similarity }");
+
 					report.WriteLine(Path.GetFileName(cp.Context.FileName));
 					report.WriteLine("*");
 
@@ -179,18 +202,6 @@ namespace Comparison
 					report.WriteLine();
 					report.WriteLine("**************************************************************");
 					report.WriteLine();
-
-					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-						&& (basicRemapResult[cp].Count == 1
-							|| (1 - basicRemapResult[cp][1].Similarity) >= (1 - basicRemapResult[cp][0].Similarity) * 1.5);
-
-					var isModifiedAuto = modifiedRemapResult.ContainsKey(cp) && modifiedRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-						&& (modifiedRemapResult[cp].Count == 1
-							|| (1 - modifiedRemapResult[cp][1].Similarity) >= (1 - modifiedRemapResult[cp][0].Similarity) * 1.5);
-
-					var sameFirst = basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
-						&& String.Join("", modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value))
-							.StartsWith(String.Join("", basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
 
 					var tuple = new Tuple<string, string>(
 							cp.Context.FileName,
@@ -223,6 +234,7 @@ namespace Comparison
 							differentFirstPos.Add(tuple);
 					}
 				}
+				File.WriteAllLines($"{key}_similarities.txt", similarities);
 				File.WriteAllLines($"{key}_modifiedOnlyAutoResult.txt",
 					modifiedOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 				File.WriteAllLines($"{key}_basicOnlyAutoResult.txt",

@@ -419,7 +419,7 @@ namespace Land.Core.Markup
 					foreach (var kvp in result)
 					{
 						var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
-							.TakeWhile(c=>c.Similarity >= GarbageThreshold)
+							//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 							.Take(AmbiguityTopCount).ToList();
 
 						if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
@@ -460,7 +460,7 @@ namespace Land.Core.Markup
 			foreach (var kvp in accumulator)
 			{
 				var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
-					.TakeWhile(c => c.Similarity >= GarbageThreshold)
+					//.TakeWhile(c => c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
 				if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
