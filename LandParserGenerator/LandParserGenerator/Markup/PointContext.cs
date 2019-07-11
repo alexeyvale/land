@@ -89,7 +89,9 @@ namespace Land.Core.Markup
 	[DataContract(IsReference = true)]
 	public class InnerContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
-		public const int MAX_TEXT_LENGTH = 200;
+		public const int MAX_TEXT_LENGTH = 100;
+
+		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		[DataMember]
 		public byte[] Hash { get; set; }
@@ -104,6 +106,7 @@ namespace Land.Core.Markup
 		{
 			Type = node.Type;
 			Priority = node.Options.Priority.Value;
+			HeaderContext = PointContext.GetHeaderContext(node);
 
 			/// Удаляем из текста все пробельные символы
 			var text = System.Text.RegularExpressions.Regex.Replace(

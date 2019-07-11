@@ -28,7 +28,7 @@ entity =
 		entity_attribute* modifier*
 		(
 		 	'enum' name Any '{' Any '}' ';'?								=> enum	|
-			%priority(0.3) %exactmatch ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?	=> class_struct_interface	|
+			%priority(0.3) %exactmatch ('class'|'struct'|'interface') name Any class_body ';'?	=> class_struct_interface	|
 			type name
 			(
 		  		arguments Any (init_expression? ';' | block)							=> method	|
@@ -36,7 +36,8 @@ entity =
 		  		(block (init_value ';')? | init_expression ';')							=> property
 		  	)
 		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
-		
+
+class_body			=	'{' entity* '}'
 modifier			=	MODIFIER | 'extern'
 init_expression		=	'=>' Any
 init_value			=	'=' init_part+

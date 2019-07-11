@@ -83,6 +83,7 @@
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\ComplexTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
+    <Compile Include="Markup\RemapCandidateInfo.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
     <Compile Include="Markup\Relations\RelationsCache.cs" />

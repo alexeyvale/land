@@ -310,7 +310,7 @@ namespace Land.Control
 				}).Where(r => r != null).ToList();
 
 				ProcessAmbiguities(
-					MarkupManager.Remap(forest, sender == ApplyLocalMapping),
+					MarkupManager.Remap(forest, sender == ApplyLocalMapping, true),
 					true
 				);
 			}, true, false);

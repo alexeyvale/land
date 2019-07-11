@@ -81,7 +81,7 @@ namespace Land.Control
 		/// <summary>
 		/// Менеджер разметки
 		/// </summary>
-		private MarkupManager MarkupManager { get; set; } = new MarkupManager();
+		private MarkupManager MarkupManager { get; set; } = new MarkupManager(new BasicContextFinder());
 
 		/// <summary>
 		/// Состояние контрола

@@ -12,8 +12,9 @@ namespace Land.Core.Markup
 {
 	public class MarkupManager
 	{
-		public MarkupManager()
+		public MarkupManager(IContextFinder contextFinder)
 		{
+			ContextFinder = contextFinder;
 			OnMarkupChanged += InvalidateRelations;
 		}
 
@@ -33,6 +34,8 @@ namespace Land.Core.Markup
 			relationsManager = null;
 			return new List<RelationNotification>();
 		}
+
+		public IContextFinder ContextFinder { get; set; }
 
 		/// <summary>
 		/// Коллекция точек привязки
@@ -386,18 +389,18 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
 		{
 			var ambiguous = useLocalRemap
-				? LocalRemap(targetFiles)
-				: GlobalRemap(targetFiles);
+				? LocalRemap(targetFiles, allowAutoDecisions)
+				: GlobalRemap(targetFiles, allowAutoDecisions);
 
 			OnMarkupChanged?.Invoke();
 
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -419,7 +422,7 @@ namespace Land.Core.Markup
 							.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 							.Take(AmbiguityTopCount).ToList();
 
-						if (!ApplyCandidate(kvp.Key, candidates))
+						if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
 							ambiguous[kvp.Key] = candidates;
 					}
 				}
@@ -433,7 +436,7 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
@@ -460,7 +463,7 @@ namespace Land.Core.Markup
 					.TakeWhile(c => c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
-				if (!ApplyCandidate(kvp.Key, candidates))
+				if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
 					ambiguous[kvp.Key] = candidates;
 			}
 
