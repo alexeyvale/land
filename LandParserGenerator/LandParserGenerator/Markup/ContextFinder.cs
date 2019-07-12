@@ -20,6 +20,8 @@ namespace Land.Core.Markup
 
 	public class BasicContextFinder : IContextFinder
 	{
+		private const int INNER_CONTEXT_LIMIT = 10;
+
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
@@ -68,7 +70,10 @@ namespace Land.Core.Markup
 						candidate.Context.InnerContext = PointContext.GetInnerContext(
 							new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
 						);
-						candidate.InnerSimilarity = Levenshtein(point.Context.InnerContext, candidate.Context.InnerContext);
+						candidate.InnerSimilarity = Levenshtein(
+							point.Context.InnerContext.Take(INNER_CONTEXT_LIMIT), 
+							candidate.Context.InnerContext.Take(INNER_CONTEXT_LIMIT)
+						);
 					}
 
 					result[point] = candidates;
@@ -148,8 +153,6 @@ namespace Land.Core.Markup
 				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
 			if (a is IEnumerable<HeaderContextElement>)
 				return Levenshtein((IEnumerable<HeaderContextElement>)a, (IEnumerable<HeaderContextElement>)b);
-			if (a is IEnumerable<AncestorsContextElement>)
-				return Levenshtein((IEnumerable<AncestorsContextElement>)a, (IEnumerable<AncestorsContextElement>)b);
 			else if (a is string)
 				return Levenshtein((IEnumerable<char>)a, (IEnumerable<char>)b);
 			else if (a is HeaderContextElement)
@@ -350,8 +353,6 @@ namespace Land.Core.Markup
 				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
 			if (a is IEnumerable<HeaderContextElement>)
 				return Levenshtein((IEnumerable<HeaderContextElement>)a, (IEnumerable<HeaderContextElement>)b);
-			if (a is IEnumerable<AncestorsContextElement>)
-				return Levenshtein((IEnumerable<AncestorsContextElement>)a, (IEnumerable<AncestorsContextElement>)b);
 			else if (a is string)
 				return Levenshtein((IEnumerable<char>)a, (IEnumerable<char>)b);
 			else if (a is HeaderContextElement)

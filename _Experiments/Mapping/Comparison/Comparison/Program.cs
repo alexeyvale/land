@@ -190,14 +190,14 @@ namespace Comparison
 					foreach (var landCandidate in basicRemapResult[cp].Take(5))
 					{
 						report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-						report.WriteLine(landCandidate.Similarity);
+						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}]");
 					}
 					report.WriteLine("*");
 
 					foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 					{
 						report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-						report.WriteLine(landCandidate.Similarity);
+						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}]");
 					}
 					report.WriteLine();
 					report.WriteLine("**************************************************************");
