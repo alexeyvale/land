@@ -13,8 +13,8 @@ namespace Comparison
 	{
 		const string MarkupFolder = @"D:\Repositories\_mapping\Roslyn\Common\base";
 		const string RelinkFolder = @"D:\Repositories\_mapping\Roslyn\Common\modified";
-		const int EntitiesPerFile = 2;
-		const int FilesTake = 3000;
+		const int EntitiesPerFile = 3;
+		const int FilesTake = 4417;
 		static readonly Random RandomGen = new Random(7);
 
 		public class GetNodeSequenceVisitor: BaseTreeVisitor
@@ -84,8 +84,11 @@ namespace Comparison
 				{
 					var subseq = visitor.Sequence.Where(n => n.Type == key).ToList();
 
-					for (var i = 0; i < Math.Min(EntitiesPerFile, subseq.Count); ++i)
+					for (var i = 0; i < EntitiesPerFile; ++i)
 					{
+						if (subseq.Count == 0)
+							break;
+
 						var index = RandomGen.Next(0, subseq.Count);
 
 						entities[key].AddConcernPoint(new TargetFileInfo
