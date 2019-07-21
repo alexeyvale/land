@@ -90,6 +90,7 @@
                                         ShowLineNumbers="True"
                                         FontFamily="Consolas"
                                         TextChanged="Grammar_Editor_TextChanged"
+										PreviewMouseWheel="Control_PreviewMouseWheel"
                                         FontSize="12pt">
                                     </avalonedit:TextEditor>
                                     <StatusBar Name="Grammar_StatusBar" Grid.Row="2">
@@ -153,7 +154,8 @@
                                         Grid.Row="1"
                                         ShowLineNumbers="True"
                                         FontFamily="Consolas"
-                                        FontSize="12pt">
+                                        FontSize="12pt"
+										PreviewMouseWheel="Control_PreviewMouseWheel">
                                     </avalonedit:TextEditor>
                                     <StatusBar Name="File_StatusBar" Grid.Row="2">
                                         <Label Name="File_StatusBarLabel"></Label>

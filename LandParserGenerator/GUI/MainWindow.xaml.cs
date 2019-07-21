@@ -172,6 +172,24 @@ namespace Land.GUI
 
 		#region Генерация парсера
 
+		private const int MIN_FONT_SIZE = 8;
+		private const int MAX_FONT_SIZE = 40;
+
+		private void Control_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			var controlSender = sender as System.Windows.Controls.Control;
+
+			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Control)
+			{
+				e.Handled = true;
+				double oldSize = controlSender.FontSize;
+				if (e.Delta > 0 && controlSender.FontSize < MAX_FONT_SIZE)
+					++controlSender.FontSize;
+				else if(controlSender.FontSize > MIN_FONT_SIZE)
+					--controlSender.FontSize;
+			}
+		}
+
 		/// <summary>
 		/// Текущая открытая грамматика
 		/// </summary>
