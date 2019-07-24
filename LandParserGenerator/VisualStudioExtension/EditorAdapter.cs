@@ -275,7 +275,7 @@ namespace Land.VisualStudioExtension
 
 		#region Methods
 
-		public IEnumerable<Project> GetAllProjects(Solution sln)
+		private IEnumerable<Project> GetAllProjects(Solution sln)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 

@@ -23,7 +23,7 @@
     </Window.Resources>
     <Grid Margin="10">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="170"></RowDefinition>
+			<RowDefinition Height="30"></RowDefinition>
 			<RowDefinition Height="100*"></RowDefinition>
 			<RowDefinition Height="30"></RowDefinition>
 		</Grid.RowDefinitions>
@@ -39,18 +39,12 @@
 					<Setter Property="FormatString" Value="F2"></Setter>
 				</Style>
 			</StackPanel.Resources>
-			
+
 			<CheckBox Name="SaveAbsolutePathBool" 
 					  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}"
 					  Margin="0, 5, 0, 10"
 					  Content="Сохранять в разметке абсолютные пути к файлам">
 			</CheckBox>
-			<Label Content="Похожесть, начиная с которой разрешается автоматическая перепривязка"></Label>
-			<xctk:DoubleUpDown Name="AcceptanceThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.AcceptanceThreshold, Mode=TwoWay}"/>
-			<Label Content="Отступ от лучшего варианта, начиная с которого разрешается автоматическая перепривязка"></Label>
-			<xctk:DoubleUpDown Name="DistanceToClosestThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.DistanceToClosestThreshold, Mode=TwoWay}"/>
-			<Label Content="Похожесть, значения ниже которой игнорируются при перепривязке"></Label>
-			<xctk:DoubleUpDown Name="GarbageThresholdDouble" Value="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.GarbageThreshold, Mode=TwoWay}"/>
 		</StackPanel>
 		
 		<DockPanel Grid.Row="1" Margin="0,10,0,0">

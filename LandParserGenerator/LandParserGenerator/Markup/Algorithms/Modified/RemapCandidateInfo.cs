@@ -8,13 +8,8 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	public class RemapCandidateInfo
+	public class ModifiedRemapCandidateInfo: IRemapCandidateInfo
 	{
-		private const double HeaderContextWeight = 1;
-		private const double AncestorsContextWeight = 0.5;
-		private const double InnerContextWeight = 0.6;
-		private const double SiblingsContextWeight = 0.4;
-
 		public Node Node { get; set; }
 		public PointContext Context { get; set; }
 
@@ -23,11 +18,9 @@ namespace Land.Core.Markup
 		public double? InnerSimilarity { get; set; }
 		public double? SiblingsSimilarity { get; set; }
 
-		public double Similarity => 
-			((HeaderSimilarity ?? 1) * HeaderContextWeight 
-			+ (AncestorSimilarity ?? 1) * AncestorsContextWeight
-			+ (InnerSimilarity ?? 1) * InnerContextWeight)
-			/ (HeaderContextWeight + AncestorsContextWeight + InnerContextWeight);
+		public double? Similarity { get; set; }
+
+		public bool IsAuto { get; set; }
 
 		public override string ToString()
 		{

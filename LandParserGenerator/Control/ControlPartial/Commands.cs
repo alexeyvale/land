@@ -68,7 +68,7 @@ namespace Land.Control
 			{
 				MarkupManager.RelinkConcernPoint(
 					(parent.DataContext as RemapCandidates).Point,
-					State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
+					State.SelectedItem_MissingTreeView.DataContext as IRemapCandidateInfo
 				);
 			}
 		}
@@ -263,7 +263,7 @@ namespace Land.Control
 		{
 			e.CanExecute = MissingTreeView != null
 				&& MissingTreeView.SelectedItem != null
-				&& MissingTreeView.SelectedItem is RemapCandidateInfo;
+				&& MissingTreeView.SelectedItem is IRemapCandidateInfo;
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e)
@@ -275,7 +275,6 @@ namespace Land.Control
 			{
 				SettingsObject = SettingsWindow.SettingsObject;
 
-				SyncMarkupManagerSettings();
 				LogAction(() => ReloadParsers(), true, true);
 
 				Editor.SaveSettings(

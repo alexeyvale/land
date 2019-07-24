@@ -83,7 +83,12 @@
     <Compile Include="Lexing\ILexer.cs" />
     <Compile Include="Lexing\ComplexTokenStream.cs" />
     <Compile Include="Lexing\TokenStream.cs" />
-    <Compile Include="Markup\RemapCandidateInfo.cs" />
+    <Compile Include="Markup\Algorithms\Basic\ContextFinder.cs" />
+    <Compile Include="Markup\Algorithms\Basic\RemapCandidateInfo.cs" />
+    <Compile Include="Markup\Algorithms\IContextFinder.cs" />
+    <Compile Include="Markup\Algorithms\Modified\ContextFinder.cs" />
+    <Compile Include="Markup\Algorithms\Modified\RemapCandidateInfo.cs" />
+    <Compile Include="Markup\Algorithms\IRemapCandidateInfo.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
     <Compile Include="Markup\Relations\RelationsCache.cs" />
@@ -94,7 +99,6 @@
     <Compile Include="Markup\PointContext.cs" />
     <Compile Include="Markup\Concern.cs" />
     <Compile Include="Markup\ConcernPoint.cs" />
-    <Compile Include="Markup\ContextFinder.cs" />
     <Compile Include="Markup\MarkupElement.cs" />
     <Compile Include="Markup\MarkupManager.cs" />
     <Compile Include="Markup\MarkupVisitors\BaseMarkupVisitor.cs" />

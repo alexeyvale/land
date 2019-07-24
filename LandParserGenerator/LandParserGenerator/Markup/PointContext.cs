@@ -124,6 +124,25 @@ namespace Land.Core.Markup
 				Text = text;
 		}
 
+		public InnerContextElement(List<SegmentLocation> locations, string fileText)
+		{
+			/// Удаляем из текста все пробельные символы
+			var text = String.Join(" ", locations.Select(l => 
+				System.Text.RegularExpressions.Regex.Replace(
+					fileText.Substring(l.Start.Offset, l.Length.Value), "[\n\r\f\t ]", " "
+				)
+			));
+			TextLength = text.Length;
+
+			/// Хэш от строки можем посчитать, только если длина строки
+			/// больше заданной константы
+			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+				Hash = FuzzyHashing.GetFuzzyHash(text);
+
+			if (text.Length <= MAX_TEXT_LENGTH)
+				Text = text;
+		}
+
 		public bool EqualsIgnoreValue(object obj)
 		{
 			if (obj is InnerContextElement elem)
@@ -218,6 +237,12 @@ namespace Land.Core.Markup
 		public List<InnerContextElement> InnerContext { get; set; }
 
 		/// <summary>
+		/// Внутренний контекст в виде одной сущности
+		/// </summary>
+		[DataMember]
+		public InnerContextElement InnerContextElement { get; set; }
+
+		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
 		/// </summary>
 		[DataMember]
@@ -282,10 +307,11 @@ namespace Land.Core.Markup
 			return context;
 		}
 
-		public static List<InnerContextElement> GetInnerContext(TargetFileInfo info)
+		public static Tuple<List<InnerContextElement>, InnerContextElement> 
+			GetInnerContext(TargetFileInfo info)
 		{
 			var innerContext = new List<InnerContextElement>();
-
+			var locations = new List<SegmentLocation>();
 			var stack = new Stack<Node>(Enumerable.Reverse(info.TargetNode.Children));
 
 			while (stack.Any())
@@ -295,7 +321,10 @@ namespace Land.Core.Markup
 				if (current.Children.Count > 0)
 				{
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+					{
+						locations.Add(current.Location);
 						innerContext.Add(new InnerContextElement(current, info.FileText));
+					}
 					else
 					{
 						for (var i = current.Children.Count - 2; i >= 1; --i)
@@ -304,7 +333,8 @@ namespace Land.Core.Markup
 				}
 			}
 
-			return innerContext;
+			return new Tuple<List<InnerContextElement>, InnerContextElement>(
+				innerContext, new InnerContextElement(locations, info.FileText));
 		}
 
 		public static List<SiblingsContextElement> GetSiblingsContext(Node node)
@@ -316,15 +346,20 @@ namespace Land.Core.Markup
 
 		public static PointContext Create(TargetFileInfo info)
 		{
-			return new PointContext()
+			var point = new PointContext()
 			{
 				FileName = info.FileName,
 				NodeType = info.TargetNode.Type,
 				HeaderContext = GetHeaderContext(info.TargetNode),
 				AncestorsContext = GetAncestorsContext(info.TargetNode),
-				InnerContext = GetInnerContext(info),
 				SiblingsContext = GetSiblingsContext(info.TargetNode)
 			};
+
+			var innerContexts = GetInnerContext(info);
+			point.InnerContext = innerContexts.Item1;
+			point.InnerContextElement = innerContexts.Item2;
+
+			return point;
 		}
 	}
 

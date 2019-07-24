@@ -42,8 +42,8 @@ namespace Land.Control
 
 			public MarkupElement BufferedDataContext { get; set; }
 
-			public Dictionary<ConcernPoint, List<RemapCandidateInfo>> RecentAmbiguities { get; set; } =
-				new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			public Dictionary<ConcernPoint, List<IRemapCandidateInfo>> RecentAmbiguities { get; set; } =
+				new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -81,7 +81,7 @@ namespace Land.Control
 		/// <summary>
 		/// Менеджер разметки
 		/// </summary>
-		private MarkupManager MarkupManager { get; set; } = new MarkupManager(new BasicContextFinder());
+		private MarkupManager MarkupManager { get; set; } = new MarkupManager(new ModifiedContextFinder());
 
 		/// <summary>
 		/// Состояние контрола
@@ -144,6 +144,13 @@ namespace Land.Control
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 		}
 
+		public void SwitchMarkupBackend(bool useBasic)
+		{
+			MarkupManager.ContextFinder = useBasic
+				? (IContextFinder)new BasicContextFinder()
+				: (IContextFinder)new ModifiedContextFinder();
+		}
+
 		public ObservableCollection<MarkupElement> GetMarkup()
 		{
 			return MarkupManager.Markup;
@@ -155,12 +162,12 @@ namespace Land.Control
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
-		public List<RemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
+		public List<IRemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
 				? MarkupManager.Find(point, 
 					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
-				: new List<RemapCandidateInfo>();
+				: new List<IRemapCandidateInfo>();
 		}
 
 		#endregion
@@ -272,32 +279,10 @@ namespace Land.Control
 			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH)
 				?? new LandExplorerSettings() { Id = Guid.NewGuid() };
 
-			SyncMarkupManagerSettings();
-
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
 
 			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
-		}
-
-		private void SyncMarkupManagerSettings()
-		{
-			/// Если в настройках отсутствуют пороги, помещаем туда дефолтные значения
-			/// из менеджера разметки, иначе настраиваем менеджер в соответствии с настройками
-			if (!SettingsObject.GarbageThreshold.HasValue)
-				SettingsObject.GarbageThreshold = MarkupManager.GarbageThreshold;
-			else
-				MarkupManager.GarbageThreshold = SettingsObject.GarbageThreshold.Value;
-
-			if (!SettingsObject.DistanceToClosestThreshold.HasValue)
-				SettingsObject.DistanceToClosestThreshold = MarkupManager.DistanceToClosestThreshold;
-			else
-				MarkupManager.DistanceToClosestThreshold = SettingsObject.DistanceToClosestThreshold.Value;
-
-			if (!SettingsObject.AcceptanceThreshold.HasValue)
-				SettingsObject.AcceptanceThreshold = MarkupManager.AcceptanceThreshold;
-			else
-				MarkupManager.AcceptanceThreshold = SettingsObject.AcceptanceThreshold.Value;
 		}
 
 		#endregion

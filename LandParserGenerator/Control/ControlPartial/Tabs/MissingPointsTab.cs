@@ -53,7 +53,7 @@ namespace Land.Control
 			MissingTreeView.ItemsSource = missingPoints;
 		}
 
-		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<RemapCandidateInfo>> recentAmbiguities, bool globalRemap)
+		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<IRemapCandidateInfo>> recentAmbiguities, bool globalRemap)
 		{
 			if (globalRemap)
 				State.RecentAmbiguities = recentAmbiguities;
@@ -99,7 +99,7 @@ namespace Land.Control
 
 			if (item != null && e.ChangedButton == MouseButton.Left)
 			{
-				if (item.DataContext is RemapCandidateInfo pair)
+				if (item.DataContext is IRemapCandidateInfo pair)
 				{
 					Editor.SetActiveDocumentAndOffset(
 						pair.Context.FileName,

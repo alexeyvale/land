@@ -72,15 +72,6 @@ namespace Land.Control
 		public bool SaveAbsolutePath { get; set; }
 
 		[DataMember]
-		public double? AcceptanceThreshold { get; set; }
-
-		[DataMember]
-		public double? DistanceToClosestThreshold { get; set; }
-
-		[DataMember]
-		public double? GarbageThreshold { get; set; }
-
-		[DataMember]
 		public bool? PreserveIndentation { get; set; }
 
 		[DataMember]
@@ -92,9 +83,6 @@ namespace Land.Control
 			{
 				Id = Id,
 				SaveAbsolutePath = SaveAbsolutePath,
-				AcceptanceThreshold = AcceptanceThreshold,
-				GarbageThreshold = GarbageThreshold,
-				DistanceToClosestThreshold = DistanceToClosestThreshold,
 				PreserveIndentation = PreserveIndentation,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};

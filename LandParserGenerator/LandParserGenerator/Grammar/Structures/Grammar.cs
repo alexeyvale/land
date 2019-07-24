@@ -772,8 +772,11 @@ namespace Land.Core
 						}
 					}
 
-					/// Также добавляем предупреждения о последовательно идущих Any
-					messages.AddRange(CheckConsecutiveAny());
+					if (Rules.ContainsKey(StartSymbol))
+					{
+						/// Также добавляем предупреждения о последовательно идущих Any
+						messages.AddRange(CheckConsecutiveAny());
+					}
 				}
 
 				/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках

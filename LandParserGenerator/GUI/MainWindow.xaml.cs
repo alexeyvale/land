@@ -1053,8 +1053,9 @@ namespace Land.GUI
 			/// Если для текущего нового текста построено дерево и просчитано отображение
 			if (!NewTextChanged)
 			{
-				var candidates = LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
-					.OrderByDescending(c=>c.Similarity).ToList();
+				var candidates = 
+					LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
+					.ToList();
 
 				MappingDebug_SimilaritiesList.ItemsSource = candidates;
 
@@ -1066,7 +1067,7 @@ namespace Land.GUI
 					/// значит, в какой-то новый узел мы отобразили старый
 					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
 					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((RemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Location, MappingDebug_NewTextEditor);
+						MoveCaretToSource(((IRemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Location, MappingDebug_NewTextEditor);
 				}
 			}
 		}
@@ -1075,7 +1076,7 @@ namespace Land.GUI
 		{
 			if(MappingDebug_SimilaritiesList.SelectedItem != null)
 			{
-				var node = ((RemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
+				var node = ((IRemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
 				MoveCaretToSource(node.Location, MappingDebug_NewTextEditor);
 			}
 		}
@@ -1254,7 +1255,13 @@ namespace Land.GUI
 			}
 		}
 
-		#endregion
+		private void UseBasicContextsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+		{
+			LandExplorer.SwitchMarkupBackend(
+				UseBasicContextsCheckBox.IsChecked ?? false
+			);	
+		}
 
+		#endregion
 	}
 }

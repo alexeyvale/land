@@ -213,7 +213,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
+		public void RelinkConcernPoint(ConcernPoint point, IRemapCandidateInfo candidate)
 		{
 			point.Relink(candidate);
 
@@ -351,7 +351,7 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<IRemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -369,17 +369,6 @@ namespace Land.Core.Markup
 		#region Перепривязка
 
 		/// <summary>
-		/// Значение похожести, ниже которого нельзя выполнять автоматическую перепривязку
-		/// </summary>
-		public double AcceptanceThreshold { get; set; } = 0.8;
-
-		/// <summary>
-		/// Дельта похожести между лучшим кандидатом и следующим, при которой можно автоматически
-		/// перепривязаться к лучшему кандидату
-		/// </summary>
-		public double DistanceToClosestThreshold { get; set; } = 0.05;
-
-		/// <summary>
 		/// Размер топа кандидатов, ранжированных по похожести, возвращаемого при неоднозначности
 		/// </summary>
 		public int AmbiguityTopCount { get; set; } = 10;
@@ -389,7 +378,7 @@ namespace Land.Core.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
+		public Dictionary<ConcernPoint, List<IRemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles, allowAutoDecisions)
@@ -400,10 +389,10 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
+		private Dictionary<ConcernPoint, List<IRemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
-			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
@@ -418,7 +407,7 @@ namespace Land.Core.Markup
 
 					foreach (var kvp in result)
 					{
-						var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+						var candidates = kvp.Value
 							//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 							.Take(AmbiguityTopCount).ToList();
 
@@ -436,13 +425,13 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
+		private Dictionary<ConcernPoint, List<IRemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			var ambiguous = new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
 
 			/// Группируем точки привязки по типу помеченной сущности 
 			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
-			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<RemapCandidateInfo>());
+			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<IRemapCandidateInfo>());
 
 			foreach (var file in targetFiles)
 			{
@@ -459,7 +448,7 @@ namespace Land.Core.Markup
 
 			foreach (var kvp in accumulator)
 			{
-				var candidates = kvp.Value.OrderByDescending(c => c.Similarity)
+				var candidates = kvp.Value
 					//.TakeWhile(c => c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
@@ -473,10 +462,10 @@ namespace Land.Core.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<IRemapCandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var candidates = ContextFinder.Find(point, targetInfo).OrderByDescending(c=>c.Similarity)
+			var ambiguous = new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
+			var candidates = ContextFinder.Find(point, targetInfo)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 
@@ -488,23 +477,19 @@ namespace Land.Core.Markup
 			return ambiguous;
 		}
 
-		private bool ApplyCandidate(ConcernPoint point, IEnumerable<RemapCandidateInfo> candidates)
+		private bool ApplyCandidate(ConcernPoint point, IEnumerable<IRemapCandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
-			var second = candidates.Skip(1).FirstOrDefault();
 
-			if (first != null && first.Similarity >= AcceptanceThreshold
-				&& (second == null || first.Similarity - second.Similarity >= DistanceToClosestThreshold))
+			if (first?.IsAuto ?? false)
 			{
 				point.Context = first.Context;
 				point.AstNode = first.Node;
-
 				return true;
 			}
 			else
 			{
 				point.AstNode = null;
-
 				return false;
 			}
 		}
