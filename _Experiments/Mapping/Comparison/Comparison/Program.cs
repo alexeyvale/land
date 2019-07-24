@@ -139,7 +139,8 @@ namespace Comparison
 					sameFirstPos = new List<Tuple<string, string>>(),
 					differentFirstPos = new List<Tuple<string, string>>();
 
-				List<string> similarities = new List<string>();
+				var similarities = new List<string>();
+				var start = DateTime.Now;
 
 				entities[key].ContextFinder = new BasicContextFinder();
 				var basicRemapResult = entities[key].Remap(searchArea.Select(e => new TargetFileInfo
@@ -149,7 +150,9 @@ namespace Comparison
 					TargetNode = e.Value.Item2
 				}).ToList(), true, false);
 
-				Console.WriteLine($"Basic remapping done!");
+				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
+
+				start = DateTime.Now;
 
 				entities[key].ContextFinder = new ModifiedContextFinder();
 				var modifiedRemapResult = entities[key].Remap(searchArea.Select(e => new TargetFileInfo
@@ -159,7 +162,7 @@ namespace Comparison
 					TargetNode = e.Value.Item2
 				}).ToList(), true, false);
 
-				Console.WriteLine($"Modified remapping done!");
+				Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
 				foreach (var cp in basicRemapResult.Keys)
 				{
