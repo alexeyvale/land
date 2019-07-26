@@ -241,7 +241,7 @@ namespace Land.Core.Markup
 					: Levenshtein(String.Join("", a.Value), String.Join("", b.Value));
 			}
 			else
-				return 0;
+				return double.MinValue;
 		}
 
 		private static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
