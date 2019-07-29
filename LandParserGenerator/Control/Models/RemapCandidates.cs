@@ -13,7 +13,7 @@ namespace Land.Control
 	{
 		public ConcernPoint Point { get; set; }
 
-		public ObservableCollection<IRemapCandidateInfo> Candidates { get; set; } =
-			new ObservableCollection<IRemapCandidateInfo>();
+		public ObservableCollection<RemapCandidateInfo> Candidates { get; set; } =
+			new ObservableCollection<RemapCandidateInfo>();
 	}
 }

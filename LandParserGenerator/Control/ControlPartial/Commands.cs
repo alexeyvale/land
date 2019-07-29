@@ -68,7 +68,7 @@ namespace Land.Control
 			{
 				MarkupManager.RelinkConcernPoint(
 					(parent.DataContext as RemapCandidates).Point,
-					State.SelectedItem_MissingTreeView.DataContext as IRemapCandidateInfo
+					State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
 				);
 			}
 		}
@@ -263,7 +263,7 @@ namespace Land.Control
 		{
 			e.CanExecute = MissingTreeView != null
 				&& MissingTreeView.SelectedItem != null
-				&& MissingTreeView.SelectedItem is IRemapCandidateInfo;
+				&& MissingTreeView.SelectedItem is RemapCandidateInfo;
 		}
 
 		private void Settings_Click(object sender, RoutedEventArgs e)

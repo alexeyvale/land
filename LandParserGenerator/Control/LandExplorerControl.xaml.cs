@@ -42,8 +42,8 @@ namespace Land.Control
 
 			public MarkupElement BufferedDataContext { get; set; }
 
-			public Dictionary<ConcernPoint, List<IRemapCandidateInfo>> RecentAmbiguities { get; set; } =
-				new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
+			public Dictionary<ConcernPoint, List<RemapCandidateInfo>> RecentAmbiguities { get; set; } =
+				new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			public PendingCommandInfo PendingCommand { get; set; }		
 
@@ -162,12 +162,12 @@ namespace Land.Control
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
-		public List<IRemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
+		public List<RemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
 				? MarkupManager.Find(point, 
 					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
-				: new List<IRemapCandidateInfo>();
+				: new List<RemapCandidateInfo>();
 		}
 
 		#endregion

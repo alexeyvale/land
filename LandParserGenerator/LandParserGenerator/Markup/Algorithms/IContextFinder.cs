@@ -9,11 +9,11 @@ namespace Land.Core.Markup
 {
 	public interface IContextFinder
 	{
-		Dictionary<ConcernPoint, List<IRemapCandidateInfo>> Find(
+		Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points,
 			Dictionary<string, List<Node>> candidateNodes,
 			TargetFileInfo candidateFileInfo);
 
-		List<IRemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo);
+		List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo);
 	}
 }

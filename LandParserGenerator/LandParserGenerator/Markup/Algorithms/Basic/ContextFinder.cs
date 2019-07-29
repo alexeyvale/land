@@ -31,13 +31,13 @@ namespace Land.Core.Markup
 		/// <param name="points">Точки привязки, сгруппированные по типу связанного с ними узла</param>
 		/// <param name="candidateNodes">Узлы дерева, среди которых нужно найти соответствующие точкам, также сгруппированные по типу</param>
 		/// <returns></returns>
-		public Dictionary<ConcernPoint, List<IRemapCandidateInfo>> Find(
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points,
 			Dictionary<string, List<Node>> candidateNodes,
 			TargetFileInfo candidateFileInfo
 		)
 		{
-			var result = new Dictionary<ConcernPoint, List<IRemapCandidateInfo>>();
+			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			foreach (var typePointsPair in points)
 			{
@@ -45,7 +45,7 @@ namespace Land.Core.Markup
 				{
 					var candidates = candidateNodes.ContainsKey(typePointsPair.Key)
 						? candidateNodes[typePointsPair.Key].Select(node =>
-							new BasicRemapCandidateInfo()
+							new RemapCandidateInfo()
 							{
 								Node = node,
 								Context = new PointContext()
@@ -53,8 +53,8 @@ namespace Land.Core.Markup
 									FileName = candidateFileInfo.FileName,
 									NodeType = node.Type
 								}
-							} as IRemapCandidateInfo).ToList()
-						: new List<IRemapCandidateInfo>();
+							}).ToList()
+						: new List<RemapCandidateInfo>();
 
 					foreach (var candidate in candidates)
 					{
@@ -82,6 +82,9 @@ namespace Land.Core.Markup
 						);
 					}
 
+					candidates.ForEach(c => c.Similarity = 
+						(3 * c.HeaderSimilarity + 2 * c.AncestorSimilarity + c.InnerSimilarity) / 6);
+
 					result[point] = candidates.OrderByDescending(c => c.Similarity).ToList();
 
 					var first = result[point].FirstOrDefault();
@@ -97,8 +100,8 @@ namespace Land.Core.Markup
 
 			return result;
 		}
-
-		public List<IRemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		
+		public List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
 			targetInfo.TargetNode.Accept(visitor);

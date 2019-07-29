@@ -17,7 +17,7 @@ namespace Land.Control
 		{
 			return value is RemapCandidates pair1
 				? pair1.Point?.Name
-				: value is IRemapCandidateInfo pair2
+				: value is RemapCandidateInfo pair2
 					? $"{new ExistingConcernPointCandidate(pair2.Node).ViewHeader}\t{pair2.ToString()}"
 					: null;
 		}

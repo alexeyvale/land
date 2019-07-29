@@ -174,13 +174,10 @@ namespace Comparison
 						&& (modifiedRemapResult[cp].Count == 1
 							|| (1 - modifiedRemapResult[cp][1].Similarity) >= (1 - modifiedRemapResult[cp][0].Similarity) * 1.5);
 
-					var sameFirst = basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
+					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0
+						|| basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
 						&& String.Join("", modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value))
 							.StartsWith(String.Join("", basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
-
-					if (sameFirst && basicRemapResult[cp][0].Similarity == 1 
-						&& modifiedRemapResult[cp][0].Similarity == 1)
-						continue;
 
 					if (basicRemapResult[cp].Count == 1)
 						similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity }");
@@ -196,14 +193,14 @@ namespace Comparison
 					foreach (var landCandidate in basicRemapResult[cp].Take(5))
 					{
 						report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}]");
+						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
 					}
 					report.WriteLine("*");
 
 					foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 					{
 						report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}]");
+						report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
 					}
 					report.WriteLine();
 					report.WriteLine("**************************************************************");
