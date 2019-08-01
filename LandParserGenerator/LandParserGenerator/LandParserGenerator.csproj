@@ -86,6 +86,8 @@
     <Compile Include="Markup\Algorithms\Basic\ContextFinder.cs" />
     <Compile Include="Markup\Algorithms\IContextFinder.cs" />
     <Compile Include="Markup\Algorithms\Modified\ContextFinder.cs" />
+    <Compile Include="Markup\Algorithms\Modified\WeightsHeuristics.cs" />
+    <Compile Include="Markup\Algorithms\Modified\SimilarityHeuristics.cs" />
     <Compile Include="Markup\Algorithms\RemapCandidateInfo.cs" />
     <Compile Include="Markup\FuzzyHashing.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />

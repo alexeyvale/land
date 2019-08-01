@@ -7,17 +7,10 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
+	public enum ContextType { Header, Ancestors, Inner }
+
 	public class ModifiedContextFinder: IContextFinder
 	{
-		public enum ContextType { Header, Ancestors, Inner }
-
-		public class ContextFeatures
-		{
-			public double MaxValue { get; set; }
-			public double GapFromMax { get; set; }
-			public double MedianGap { get; set; }
-		}
-
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
@@ -73,7 +66,7 @@ namespace Land.Core.Markup
 							candidate.Context.InnerContextElement);
 					}
 
-					SetTotalSimilarity(point.Context, candidates);
+					EvaluateSimilarity(point.Context, candidates);
 
 					result[point] = candidates.OrderByDescending(c=>c.Similarity).ToList();
 
@@ -91,111 +84,58 @@ namespace Land.Core.Markup
 			return result;
 		}
 
-		private void SetTotalSimilarity(PointContext sourceContext,
+		private void EvaluateSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)
 		{
 			if (candidates.Count == 0)
 				return;
 
-			const int MAX_CONTEXT_WEIGHT = 3;
-
-			/// Это можно сделать статическими проверками на этапе формирования грамматики
-			var useInner = candidates.Any(c => c.Context.InnerContextElement.TextLength > 0)
-					|| sourceContext.InnerContextElement.TextLength > 0;
-			var useHeader = candidates.Any(c => c.Context.HeaderContext.Count > 0)
-				|| sourceContext.HeaderContext.Count > 0;
-			var useAncestors = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
-				|| sourceContext.AncestorsContext.Count > 0);
-
 			/// Проверяем, какие контексты не задействованы, их вес равен 0
-			var weights = new Dictionary<ContextType, double> { { ContextType.Ancestors, useAncestors ? 1 : 0 },
-				{ ContextType.Header, useHeader ? 1 : 0 }, { ContextType.Inner, useInner ? 1 : 0 } };
-
-			if (candidates.Count == 1)
-			{
-				candidates[0].Similarity = (weights[ContextType.Header] * candidates[0].HeaderSimilarity
-					+ weights[ContextType.Ancestors] * candidates[0].AncestorSimilarity
-					+ weights[ContextType.Inner] * candidates[0].InnerSimilarity) / weights.Values.Sum();
-				return;
-			}
-
-			/// Сортируем кандидатов по похожести каждого из контекстов
-			var orderedByHeader = candidates.OrderByDescending(c => c.HeaderSimilarity).ToList();
-			var orderedByAncestors = candidates.OrderByDescending(c => c.AncestorSimilarity).ToList();
-			var orderedByInner = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
-
-			/// Считаем разности между последовательно идущими отсортированными по похожести элементами
-			var headerGaps = new List<double>(orderedByHeader.Count - 1);
-			for (var i = 0; i < orderedByHeader.Count - 1; ++i)
-				headerGaps.Add(orderedByHeader[i].HeaderSimilarity - orderedByHeader[i + 1].HeaderSimilarity);
-			headerGaps = headerGaps.OrderByDescending(e => e).ToList();
-			var ancestorGaps = new List<double>(orderedByAncestors.Count - 1);
-			for (var i = 0; i < orderedByAncestors.Count - 1; ++i)
-				ancestorGaps.Add(orderedByAncestors[i].AncestorSimilarity - orderedByAncestors[i + 1].AncestorSimilarity);
-			ancestorGaps = ancestorGaps.OrderByDescending(e => e).ToList();
-			var innerGaps = new List<double>(orderedByInner.Count - 1);
-			for (var i = 0; i < orderedByHeader.Count - 1; ++i)
-				innerGaps.Add(orderedByInner[i].InnerSimilarity - orderedByInner[i + 1].InnerSimilarity);
-			innerGaps = innerGaps.OrderByDescending(e => e).ToList();
-
-			var features = new Dictionary<ContextType, ContextFeatures>
-			{
-				{
-					ContextType.Ancestors, new ContextFeatures
-					{
-						MaxValue = orderedByAncestors.First().AncestorSimilarity,
-						GapFromMax = orderedByAncestors[0].AncestorSimilarity - orderedByAncestors[1].AncestorSimilarity,
-						MedianGap = ancestorGaps.Count % 2 == 0
-							? (ancestorGaps[ancestorGaps.Count / 2] + ancestorGaps[ancestorGaps.Count / 2 - 1]) / 2
-							: ancestorGaps[ancestorGaps.Count / 2]
-					}
-				},
-				{
-					ContextType.Header, new ContextFeatures
-					{
-						MaxValue = orderedByAncestors.First().HeaderSimilarity,
-						GapFromMax = orderedByHeader[0].HeaderSimilarity - orderedByHeader[1].HeaderSimilarity,
-						MedianGap = headerGaps.Count % 2 == 0
-							? (headerGaps[headerGaps.Count / 2] + headerGaps[headerGaps.Count / 2 - 1]) / 2
-							: headerGaps[headerGaps.Count / 2]
-					}
-				},
-				{
-					ContextType.Inner, new ContextFeatures
-					{
-						MaxValue = orderedByInner.First().InnerSimilarity,
-						GapFromMax = orderedByInner[0].InnerSimilarity - orderedByInner[1].InnerSimilarity,
-						MedianGap = innerGaps.Count % 2 == 0
-							? (innerGaps[innerGaps.Count / 2] + innerGaps[innerGaps.Count / 2 - 1]) / 2
-							: innerGaps[innerGaps.Count / 2]
-					}
-				}
+			var weights = new Dictionary<ContextType, double?> {
+				{ ContextType.Ancestors, null },
+				{ ContextType.Header, null },
+				{ ContextType.Inner, null }
 			};
 
-			/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
-			/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
-			var contextsToPrioritize = new List<ContextType>();
-
-			foreach (var kvp in features)
+			/// Если кандидат один, выводим его оценку с весами по умолчанию
+			if (candidates.Count == 1)
 			{
-				if (kvp.Value.MedianGap < 0.04 && kvp.Value.GapFromMax < 0.04)
-					weights[kvp.Key] = 1;
-				else
-					contextsToPrioritize.Add(kvp.Key);
+				var defaultHeuristic = new DefaultWeightsHeuristic();
+				defaultHeuristic.TuneWeights(sourceContext, candidates, weights);
+			}
+			else
+			{
+				var tuningHeuristicType = typeof(IWeightsHeuristic);
+
+				var tuningHeuristics = AppDomain.CurrentDomain.GetAssemblies()
+					.SelectMany(s => s.GetTypes())
+					.Where(p => p.IsClass && tuningHeuristicType.IsAssignableFrom(p))
+					.Select(t=>(IWeightsHeuristic)t.GetConstructor(Type.EmptyTypes).Invoke(null))
+					.OrderByDescending(h=>h.Priority)
+					.ToList();
+
+				var scoringheuristicType = typeof(ISimilarityHeuristic);
+
+				var scoringheuristics = AppDomain.CurrentDomain.GetAssemblies()
+					.SelectMany(s => s.GetTypes())
+					.Where(p => p.IsClass && scoringheuristicType.IsAssignableFrom(p))
+					.Select(t => (ISimilarityHeuristic)t.GetConstructor(Type.EmptyTypes).Invoke(null))
+					.OrderByDescending(h => h.Priority)
+					.ToList();
+
+				foreach (var h in tuningHeuristics)
+					h.TuneWeights(sourceContext, candidates, weights);
+
+				foreach (var h in scoringheuristics)
+					h.PredictSimilarity(sourceContext, candidates);
 			}
 
-			/// Доп.проверка для внутреннего контекста
-			if (features[ContextType.Inner].MaxValue <= 0.65)
-			{
-				weights[ContextType.Inner] = 1;
-				contextsToPrioritize.Remove(ContextType.Inner);
-			}
+			/// Если какие-то веса остались неустановленными, обнуляем
+			foreach (var key in weights.Keys)
+				if (weights[key] == null)
+					weights[key] = 0;
 
-			contextsToPrioritize = contextsToPrioritize.OrderByDescending(c => features[c].MedianGap).ToList();
-			for (var i = 0; i < contextsToPrioritize.Count; ++i)
-				weights[contextsToPrioritize[i]] = MAX_CONTEXT_WEIGHT - i;
-
-			candidates.ForEach(c => ((RemapCandidateInfo)c).Similarity =
+			candidates.ForEach(c => c.Similarity = c.Similarity ??
 				(weights[ContextType.Ancestors] * c.AncestorSimilarity + weights[ContextType.Inner] * c.InnerSimilarity + weights[ContextType.Header] * c.HeaderSimilarity)
 				/ weights.Values.Sum());
 		}
