@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:Land.Control"
         mc:Ignorable="d"
         Title="Настройки" Height="600" Width="1000" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Icon="Resources/AppIcon.ico"
@@ -29,17 +28,6 @@
 		</Grid.RowDefinitions>
 
 		<StackPanel Grid.Row="0" Name="AutoPropertiesStack">
-			<StackPanel.Resources>
-				<Style TargetType="xctk:DoubleUpDown">
-					<Setter Property="Increment" Value=".01"></Setter>
-					<Setter Property="Width" Value="100"></Setter>
-					<Setter Property="HorizontalAlignment" Value="Left"></Setter>
-					<Setter Property="Maximum" Value="1"></Setter>
-					<Setter Property="Minimum" Value="0"></Setter>
-					<Setter Property="FormatString" Value="F2"></Setter>
-				</Style>
-			</StackPanel.Resources>
-
 			<CheckBox Name="SaveAbsolutePathBool" 
 					  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}"
 					  Margin="0, 5, 0, 10"
