@@ -267,15 +267,13 @@ namespace Land.Core.Markup
 
 			using (FileStream fs = new FileStream(fileName, FileMode.Create))
 			{
-				using (var gZipStream = new GZipStream(fs, CompressionLevel.Optimal))
+				var unit = new SerializationUnit()
 				{
-					var unit = new SerializationUnit()
-					{
-						Markup = Markup,
-						ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
-					};
+					Markup = Markup,
+					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
+				};
 
-					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
+				DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
 						typeof(Concern),
 						typeof(ConcernPoint),
 						typeof(PointContext),
@@ -286,8 +284,7 @@ namespace Land.Core.Markup
 						typeof(RelatedPair<MarkupElement>)
 					});
 
-					serializer.WriteObject(gZipStream, unit);
-				}
+				serializer.WriteObject(fs, unit);
 			}
 
 			if (useRelativePaths)
@@ -311,9 +308,7 @@ namespace Land.Core.Markup
 
 			using (FileStream fs = new FileStream(fileName, FileMode.Open))
 			{
-				using (var gZipStream = new GZipStream(fs, CompressionMode.Decompress))
-				{
-					DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
+				DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
 						typeof(Concern),
 						typeof(ConcernPoint),
 						typeof(PointContext),
@@ -324,17 +319,16 @@ namespace Land.Core.Markup
 						typeof(RelatedPair<MarkupElement>)
 					});
 
-					var unit = (SerializationUnit)serializer.ReadObject(gZipStream);
+				var unit = (SerializationUnit)serializer.ReadObject(fs);
 
-					/// Фиксируем разметку
-					Markup = unit.Markup;
-					
-					/// Запоминаем external-отношения между функциональностями
-					Relations.RefreshElements(Markup);
+				/// Фиксируем разметку
+				Markup = unit.Markup;
 
-					foreach (var pair in unit.ExternalRelatons)
-						Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);
-				}
+				/// Запоминаем external-отношения между функциональностями
+				Relations.RefreshElements(Markup);
+
+				foreach (var pair in unit.ExternalRelatons)
+					Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);
 			}
 
 			DoWithMarkup((MarkupElement elem) =>
