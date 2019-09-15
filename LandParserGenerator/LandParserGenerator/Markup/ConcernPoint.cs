@@ -8,7 +8,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
 		[DataMember]
@@ -56,6 +56,8 @@ namespace Land.Core.Markup
 		{
 			PropertyChanged?.Invoke(sender, e);
 		}
+
+		public ConcernPoint() { }
 
 		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
 		{

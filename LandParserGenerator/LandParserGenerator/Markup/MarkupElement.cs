@@ -8,7 +8,7 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public abstract class MarkupElement: INotifyPropertyChanged
 	{
 		private string _name;
@@ -37,7 +37,6 @@ namespace Land.Core.Markup
 			}
 		}
 
-		[DataMember]
 		public Concern Parent { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;

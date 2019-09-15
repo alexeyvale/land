@@ -66,23 +66,69 @@ namespace Land.Core.Markup
 							candidate.Context.InnerContextElement);
 					}
 
+					foreach (var candidate in candidates)
+					{
+						candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
+							new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
+						);
+					}
+
 					EvaluateSimilarity(point.Context, candidates);
 
-					result[point] = candidates.OrderByDescending(c=>c.Similarity).ToList();
+					result[point] = candidates = 
+						candidates.OrderByDescending(c=>c.Similarity).ToList();
 
 					var first = result[point].FirstOrDefault();
 					var second = result[point].Skip(1).FirstOrDefault();
 
 					if (first != null)
 					{
-						first.IsAuto = first.Similarity >= 0.6
-							&& (second == null || 1 - second.Similarity >= (1 - first.Similarity) * 1.5);
+						first.IsAuto = IsSimilarEnough(first) 
+							&& AreDistantEnough(first, second);
+					}
+
+					/// Проверку горизонтального контекста выполняем только если
+					/// есть несколько кандидатов с одинаковыми оценками похожести
+					if (first != null && !first.IsAuto 
+						&& IsSimilarEnough(first) && second != null)
+					{
+						var identicalCandidates = candidates.TakeWhile(c =>
+							c.HeaderSimilarity == first.HeaderSimilarity &&
+							c.InnerSimilarity == first.InnerSimilarity &&
+							c.AncestorSimilarity == first.AncestorSimilarity).ToList();
+
+						var nextClosestCandidate = candidates.Skip(identicalCandidates.Count).FirstOrDefault();
+
+						if(nextClosestCandidate == null || AreDistantEnough(first, nextClosestCandidate))
+						{
+							var siblingsSimilarities = identicalCandidates.Select(c => new
+							{
+								BeforeSimilarity = EvalSimilarity(point.Context.SiblingsContext.Before, c.Context.SiblingsContext.Before),
+								AfterSimilarity = EvalSimilarity(point.Context.SiblingsContext.After, c.Context.SiblingsContext.After),
+								Candidate = c
+							}).ToList();
+
+							var bestBefore = siblingsSimilarities.OrderByDescending(e => e.BeforeSimilarity).First();
+							var bestAfter = siblingsSimilarities.OrderByDescending(e => e.AfterSimilarity ).First();
+
+							if (bestBefore == bestAfter)
+							{
+								bestBefore.Candidate.IsAuto = true;
+								candidates.Remove(bestBefore.Candidate);
+								candidates.Insert(0, bestBefore.Candidate);
+							}
+						}
 					}
 				}
 			}
 
 			return result;
 		}
+
+		private bool IsSimilarEnough(RemapCandidateInfo candidate) => 
+			candidate.Similarity >= 0.6;
+		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
+			second == null || 1 - second.Similarity >= (1 - first.Similarity) * 1.5;
 
 		private void EvaluateSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)
@@ -265,7 +311,7 @@ namespace Land.Core.Markup
 				return a.Equals(b) ? 1 : 0;
 		}
 
-		private static double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
+		public static double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
 		{
 			if (a.EqualsIgnoreValue(b))
 			{
@@ -277,7 +323,12 @@ namespace Land.Core.Markup
 				return double.MinValue;
 		}
 
-		private static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
+		public static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
+		{
+			return a.Type == b.Type ? EvalSimilarity(a.Content, b.Content) : 0;
+		}
+
+		public static double EvalSimilarity(TextOrHash a, TextOrHash b)
 		{
 			var score = a.Text != null && b.Text != null
 				? Levenshtein(a.Text, b.Text)
@@ -285,11 +336,11 @@ namespace Land.Core.Markup
 					? FuzzyHashing.CompareHashes(a.Hash, b.Hash)
 					: 0;
 
-			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)InnerContextElement.MAX_TEXT_LENGTH 
+			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)TextOrHash.MAX_TEXT_LENGTH
 				? 0 : score;
 		}
 
-		private static double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
+		public static double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
 		{
 			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
 		}

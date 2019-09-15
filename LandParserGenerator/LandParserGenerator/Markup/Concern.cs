@@ -9,8 +9,8 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Core.Markup
 {
-	[DataContract(IsReference = true)]
-	public class Concern: MarkupElement
+	[DataContract]
+	public class Concern : MarkupElement
 	{
 		[DataMember]
 		public ObservableCollection<MarkupElement> Elements { get; set; }
@@ -21,6 +21,8 @@ namespace Land.Core.Markup
 		{
 			PropertyChanged?.Invoke(sender, e);
 		}
+
+		public Concern() { }
 
 		public Concern(string name, Concern parent = null)
 		{

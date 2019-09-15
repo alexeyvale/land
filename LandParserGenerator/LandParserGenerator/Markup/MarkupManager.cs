@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
-using System.IO.Compression;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 using Land.Core.Parsing.Tree;
 
@@ -265,7 +264,7 @@ namespace Land.Core.Markup
 				});
 			}
 
-			using (FileStream fs = new FileStream(fileName, FileMode.Create))
+			using (StreamWriter fs = new StreamWriter(fileName, false))
 			{
 				var unit = new SerializationUnit()
 				{
@@ -273,18 +272,7 @@ namespace Land.Core.Markup
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
-				DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
-						typeof(Concern),
-						typeof(ConcernPoint),
-						typeof(PointContext),
-						typeof(HeaderContextElement),
-						typeof(AncestorsContextElement),
-						typeof(ObservableCollection<MarkupElement>),
-						typeof(List<RelatedPair<MarkupElement>>),
-						typeof(RelatedPair<MarkupElement>)
-					});
-
-				serializer.WriteObject(fs, unit);
+				fs.Write(JsonConvert.SerializeObject(unit, Formatting.Indented));
 			}
 
 			if (useRelativePaths)
@@ -306,23 +294,26 @@ namespace Land.Core.Markup
 		{
 			Clear();
 
-			using (FileStream fs = new FileStream(fileName, FileMode.Open))
+			using (StreamReader fs = new StreamReader(fileName))
 			{
-				DataContractSerializer serializer = new DataContractSerializer(typeof(SerializationUnit), new List<Type>() {
-						typeof(Concern),
-						typeof(ConcernPoint),
-						typeof(PointContext),
-						typeof(HeaderContextElement),
-						typeof(AncestorsContextElement),
-						typeof(ObservableCollection<MarkupElement>),
-						typeof(List<RelatedPair<MarkupElement>>),
-						typeof(RelatedPair<MarkupElement>)
+				var unit = JsonConvert.DeserializeObject<SerializationUnit>(fs.ReadToEnd(),
+					new JsonSerializerSettings()
+					{
+						Converters = { new MarkupElementConverter() }
 					});
-
-				var unit = (SerializationUnit)serializer.ReadObject(fs);
 
 				/// Фиксируем разметку
 				Markup = unit.Markup;
+
+				/// Восстанавливаем обратные связи между потомками и предками
+				DoWithMarkup(e =>
+				{
+					if (e is Concern c)
+					{
+						foreach (var elem in c.Elements)
+							elem.Parent = c;
+					}
+				});
 
 				/// Запоминаем external-отношения между функциональностями
 				Relations.RefreshElements(Markup);

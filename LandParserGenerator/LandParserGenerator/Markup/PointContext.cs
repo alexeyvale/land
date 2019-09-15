@@ -14,7 +14,7 @@ namespace Land.Core.Markup
 		bool EqualsIgnoreValue(object obj);
 	}
 
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public abstract class TypedPrioritizedContextElement
 	{
 		[DataMember]
@@ -24,7 +24,7 @@ namespace Land.Core.Markup
 		public string Type { get; set; }
 	}
 
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
 		[DataMember]
@@ -86,21 +86,16 @@ namespace Land.Core.Markup
 		}
 	}
 
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class InnerContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
-		public const int MAX_TEXT_LENGTH = 100;
-
+		/// Для базовой версии алгоритмов перепривязки
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		[DataMember]
-		public byte[] Hash { get; set; }
+		public TextOrHash Content { get; set; }
 
-		[DataMember]
-		public int TextLength { get; set; }
-
-		[DataMember]
-		public string Text { get; set; }
+		public InnerContextElement() { }
 
 		public InnerContextElement(Node node, string fileText)
 		{
@@ -109,38 +104,22 @@ namespace Land.Core.Markup
 			HeaderContext = PointContext.GetHeaderContext(node);
 
 			/// Удаляем из текста все пробельные символы
-			var text = System.Text.RegularExpressions.Regex.Replace(
-				fileText.Substring(node.Location.Start.Offset, node.Location.Length.Value), "[\n\r\f\t ]", " "
+			var text = fileText.Substring(
+				node.Location.Start.Offset, 
+				node.Location.Length.Value
 			);
 
-			TextLength = text.Length;
-
-			/// Хэш от строки можем посчитать, только если длина строки
-			/// больше заданной константы
-			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
-				Hash = FuzzyHashing.GetFuzzyHash(text);
-
-			if (text.Length <= MAX_TEXT_LENGTH)
-				Text = text;
+			Content = new TextOrHash(text);
 		}
 
 		public InnerContextElement(List<SegmentLocation> locations, string fileText)
 		{
 			/// Удаляем из текста все пробельные символы
 			var text = String.Join(" ", locations.Select(l => 
-				System.Text.RegularExpressions.Regex.Replace(
-					fileText.Substring(l.Start.Offset, l.Length.Value), "[\n\r\f\t ]", " "
-				)
+				fileText.Substring(l.Start.Offset, l.Length.Value)
 			));
-			TextLength = text.Length;
 
-			/// Хэш от строки можем посчитать, только если длина строки
-			/// больше заданной константы
-			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
-				Hash = FuzzyHashing.GetFuzzyHash(text);
-
-			if (text.Length <= MAX_TEXT_LENGTH)
-				Text = text;
+			Content = new TextOrHash(text);
 		}
 
 		public bool EqualsIgnoreValue(object obj)
@@ -155,7 +134,7 @@ namespace Land.Core.Markup
 		}
 	}
 
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class AncestorsContextElement
 	{
 		[DataMember]
@@ -200,22 +179,51 @@ namespace Land.Core.Markup
 		}
 	}
 
-	[DataContract(IsReference = true)]
-	public class SiblingsContextElement
+	[DataContract]
+	public class SiblingsContext
 	{
 		[DataMember]
-		public string Type { get; set; }
+		public TextOrHash Before { get; set; }
 
-		public static explicit operator SiblingsContextElement(Node node)
+		[DataMember]
+		public TextOrHash After { get; set; }
+	}
+
+	[DataContract]
+	public class TextOrHash
+	{
+		public const int MAX_TEXT_LENGTH = 100;
+
+		[DataMember]
+		public string Text { get; set; }
+
+		[DataMember]
+		public int TextLength { get; set; }
+
+		[DataMember]
+		public byte[] Hash { get; set; }
+
+		public TextOrHash() { }
+
+		public TextOrHash(string text)
 		{
-			return new SiblingsContextElement()
-			{
-				Type = node.Type
-			};
+			text = System.Text.RegularExpressions.Regex.Replace(
+				text, "[\n\r\f\t ]+", " "
+			);
+
+			TextLength = text.Length;
+
+			/// Хэш от строки можем посчитать, только если длина строки
+			/// больше заданной константы
+			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+				Hash = FuzzyHashing.GetFuzzyHash(text);
+
+			if (text.Length <= MAX_TEXT_LENGTH)
+				Text = text;
 		}
 	}
 
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class PointContext
 	{
 		[DataMember]
@@ -252,7 +260,7 @@ namespace Land.Core.Markup
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
 		/// </summary>
 		[DataMember]
-		public List<SiblingsContextElement> SiblingsContext { get; set; }
+		public SiblingsContext SiblingsContext { get; set; }
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)
 		{
@@ -307,8 +315,7 @@ namespace Land.Core.Markup
 			return context;
 		}
 
-		public static Tuple<List<InnerContextElement>, InnerContextElement> 
-			GetInnerContext(TargetFileInfo info)
+		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(TargetFileInfo info)
 		{
 			var innerContext = new List<InnerContextElement>();
 			var locations = new List<SegmentLocation>();
@@ -337,11 +344,43 @@ namespace Land.Core.Markup
 				innerContext, new InnerContextElement(locations, info.FileText));
 		}
 
-		public static List<SiblingsContextElement> GetSiblingsContext(Node node)
+		public static SiblingsContext GetSiblingsContext(TargetFileInfo info)
 		{
-			return node.Parent != null 
-				? node.Parent.Children.Select(c => (SiblingsContextElement)c).ToList()
-				: new List<SiblingsContextElement>();
+			/// Находим островного родителя
+			var parentNode = info.TargetNode.Parent;
+			while (parentNode != null && !parentNode.Options.IsLand)
+				parentNode = parentNode.Parent;
+
+			/// Если это корень, горизонтального контекста нет
+			if (parentNode == null)
+				return null;
+
+			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
+			var siblings = parentNode.Children;
+			for (var i = 0; i < siblings.Count; ++i)
+			{
+				if (!siblings[i].Options.IsLand)
+				{
+					var current = siblings[i];
+					siblings.RemoveAt(i);
+					siblings.InsertRange(i, current.Children);
+				}
+			}
+
+			/// Индекс помечаемого элемента
+			var markedElementIndex = siblings.IndexOf(info.TargetNode);
+
+			return new SiblingsContext
+			{
+				Before = new TextOrHash(String.Join(" ", siblings
+					.Take(markedElementIndex)
+					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+				)),
+				After = new TextOrHash(String.Join(" ", siblings
+					.Skip(markedElementIndex + 1)
+					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+				))
+			};
 		}
 
 		public static PointContext Create(TargetFileInfo info)
@@ -352,7 +391,7 @@ namespace Land.Core.Markup
 				NodeType = info.TargetNode.Type,
 				HeaderContext = GetHeaderContext(info.TargetNode),
 				AncestorsContext = GetAncestorsContext(info.TargetNode),
-				SiblingsContext = GetSiblingsContext(info.TargetNode)
+				SiblingsContext = GetSiblingsContext(info)
 			};
 
 			var innerContexts = GetInnerContext(info);

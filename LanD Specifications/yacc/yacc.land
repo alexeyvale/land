@@ -18,7 +18,8 @@ declaration		=	symbol_declaration | other_declaration | Any
 symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
 other_declaration = DECLARATION_NAME Any
 rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'
-alternative		=	(ID | block | LITERAL | '%prec')*
+alternative		=	alternative_element*
+alternative_element	=	ID | block | LITERAL | '%prec'
 block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 
 %%
@@ -31,5 +32,6 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 }
 
 %nodes ghost declaration
+%nodes leaf alternative_element
 
-%mapping land symbol_declaration rule alternative
+%mapping land symbol_declaration rule alternative alternative_element

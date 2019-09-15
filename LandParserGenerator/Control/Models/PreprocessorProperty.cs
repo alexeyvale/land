@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Land.Control
 {
 	[Serializable]
-	[DataContract(IsReference = true)]
+	[DataContract]
 	public class PreprocessorProperty
 	{
 		[DataMember]

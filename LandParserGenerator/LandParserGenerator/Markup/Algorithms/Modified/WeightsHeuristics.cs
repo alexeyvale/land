@@ -26,8 +26,8 @@ namespace Land.Core.Markup
 			List<RemapCandidateInfo> candidates, Dictionary<ContextType, double?> weights)
 		{
 			/// Это можно сделать статическими проверками на этапе формирования грамматики
-			var useInner = candidates.Any(c => c.Context.InnerContextElement.TextLength > 0)
-					|| source.InnerContextElement.TextLength > 0;
+			var useInner = candidates.Any(c => c.Context.InnerContextElement.Content.TextLength > 0)
+					|| source.InnerContextElement.Content.TextLength > 0;
 			var useHeader = candidates.Any(c => c.Context.HeaderContext.Count > 0)
 				|| source.HeaderContext.Count > 0;
 			var useAncestors = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
