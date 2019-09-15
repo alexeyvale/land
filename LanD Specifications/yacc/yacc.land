@@ -35,3 +35,4 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 %nodes leaf alternative_element
 
 %mapping land symbol_declaration rule alternative alternative_element
+%mapping priority(0) ':' ';'
