@@ -127,8 +127,10 @@ namespace Land.Core.Markup
 
 		private bool IsSimilarEnough(RemapCandidateInfo candidate) => 
 			candidate.Similarity >= 0.6;
+
 		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
-			second == null || 1 - second.Similarity >= (1 - first.Similarity) * 1.5;
+			second == null || second.Similarity != 1 
+				&& 1 - second.Similarity >= (1 - first.Similarity) * 1.5;
 
 		private void EvaluateSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)
