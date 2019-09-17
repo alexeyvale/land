@@ -84,7 +84,5 @@ block				=	'{' Any '}'
 	priority(0.3) type arguments
 	priority(0) '{' '}' ';' ',' '=>' '='
 	
-	// comparable init_expression block
-	
 	exactmatch modifier
 }

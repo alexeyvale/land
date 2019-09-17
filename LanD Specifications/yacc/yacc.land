@@ -31,8 +31,18 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 	recovery
 }
 
-%nodes ghost declaration
-%nodes leaf alternative_element
+%customblock {
+	start("/// land start")
+	end("/// land end")
+	basetoken COMMENT
+}
 
-%mapping land symbol_declaration rule alternative alternative_element
-%mapping priority(0) ':' ';'
+%nodes {
+	ghost declaration
+	leaf alternative_element
+}
+
+%mapping {
+	land symbol_declaration rule alternative alternative_element
+	priority(0) ':' ';'
+}
