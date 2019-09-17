@@ -44,7 +44,8 @@ namespace Land.Core.Parsing.Tree
 				{
 					/// Если блок вложен в Any, его можно сделать 
 					/// дочерним по отношению к Any
-					if (outer[0].Symbol == Grammar.ANY_TOKEN_NAME)
+					if (outer[0].Symbol == Grammar.ANY_TOKEN_NAME
+						&& outer[0].Children.Count == 0)
 						CanInsert = true;
 					else
 						VisitInner(outer[0]);
@@ -53,18 +54,26 @@ namespace Land.Core.Parsing.Tree
 				{
 					/// Если блок перекрывает Any и ничего не включает в себя,
 					/// его можно сделать дочерним по отношению к Any
-					if (overlapped[0].Symbol == Grammar.ANY_TOKEN_NAME)
+					if (overlapped[0].Symbol == Grammar.ANY_TOKEN_NAME
+						&& overlapped[0].Children.Count == 0)
 						CanInsert = true;
-					else
+					/// В противном случае смотрим на структуру того, с чем есть перекрытие,
+					/// при этом пользовательский блок не может перекрываться с пользовательским блоком
+					else if(overlapped[0].Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME)
 						VisitInner(overlapped[0]);
 				}
 				/// Если блок включает в себя некоторое количество 
 				/// дочерних узлов текущего узла и ничего не перекрывает,
 				/// им можно заменить эти дочерние узлы;
 				/// если блок вообще ничего не перекрывает и ни с чем не пересекается,
-				/// его можно вставить между дочерними узлами
-				else if (included.Count > 0 && overlapped.Count == 0
-					|| included.Count == 0 && overlapped.Count == 0)
+				/// его можно вставить между дочерними узлами;
+				/// при этом не допускается включение в блок
+				/// границы другого блока
+				else if (included.Count > 0 && overlapped.Count == 0 &&
+						(node.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME ||
+							!included.Any(n => n.Location.Start.Line == node.Location.Start.Line) &&
+							!included.Any(n => n.Location.Start.Line == node.Location.End.Line))
+						|| included.Count == 0 && overlapped.Count == 0)
 				{
 					CanInsert = true;
 				}

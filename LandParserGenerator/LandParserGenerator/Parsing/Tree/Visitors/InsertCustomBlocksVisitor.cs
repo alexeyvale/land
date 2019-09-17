@@ -70,7 +70,7 @@ namespace Land.Core.Parsing.Tree
 				linear.AddRange(level);
 
 				foreach (var blockNode in linear)
-					node.AddLastChild(blockNode);
+					node.AddLastChild(blockNode, true);
 			}
 		}
 

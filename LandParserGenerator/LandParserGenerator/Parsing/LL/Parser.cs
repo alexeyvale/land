@@ -268,8 +268,7 @@ namespace Land.Core.Parsing.LL
 			/// Подменяем свежесгенерированный узел для Any на переданный извне
 			anyNode.Options = stackTop.Options.Clone();
 			var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
-			stackTop.Parent.Children.RemoveAt(anyIndex);
-			stackTop.Parent.InsertChild(anyNode, anyIndex);
+			stackTop.Parent.ReplaceChild(anyNode, anyIndex);
 			Stack.Pop();
 
 			if (EnableTracing)

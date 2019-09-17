@@ -118,14 +118,33 @@ namespace Land.Core.Parsing.Tree
 			return Children.SelectMany(c => c.GetValue()).ToList();
 		}
 
-		public void AddLastChild(Node child)
+		public void AddLastChild(Node child, bool mergeLocation = false)
 		{
 			Children.Add(child);
 			child.Parent = this;
-			ResetLocation();
+
+			if (mergeLocation)
+			{
+				_location = Location != null
+					? Location.SmartMerge(child.Location)
+					: child.Location;
+			}
+			else
+			{
+				ResetLocation();
+			}
 		}
 
-		public void InsertChild(Node child, int position)
+		public void ReplaceChild(Node child, int position, bool mergeLocation = false)
+		{
+			if (position <= Children.Count)
+			{
+				Children.RemoveAt(position);
+				InsertChild(child, position, mergeLocation);
+			}
+		}
+
+		public void InsertChild(Node child, int position, bool mergeLocation = false)
 		{
 			if (position <= Children.Count)
 			{
@@ -135,16 +154,36 @@ namespace Land.Core.Parsing.Tree
 				{
 					Children.Insert(position, child);
 					child.Parent = this;
-					ResetLocation();
+
+					if (mergeLocation)
+					{
+						_location = Location != null
+							? Location.SmartMerge(child.Location)
+							: child.Location;
+					}
+					else
+					{
+						ResetLocation();
+					}
 				}
 			}
 		}
 
-		public void AddFirstChild(Node child)
+		public void AddFirstChild(Node child, bool mergeLocation = false)
 		{
 			Children.Insert(0, child);
 			child.Parent = this;
-			ResetLocation();
+
+			if (mergeLocation)
+			{
+				_location = Location != null
+					? Location.SmartMerge(child.Location)
+					: child.Location;
+			}
+			else
+			{
+				ResetLocation();
+			}
 		}
 
 		public void ResetChildren()
