@@ -68,13 +68,15 @@ namespace Land.VisualStudioExtension
 				{
 					Start = new PointLocation(
 							startPoint.Line,
-							startPoint.DisplayColumn,
-							startPoint.AbsoluteCharOffset
+							startPoint.LineCharOffset,
+							/// Махинации, связанные с особенностями учёта
+							/// студией конца строки
+							startPoint.AbsoluteCharOffset + startPoint.Line - 1
 						),
 					End = new PointLocation(
 							endPoint.Line,
-							endPoint.DisplayColumn,
-							endPoint.AbsoluteCharOffset
+							endPoint.LineCharOffset,
+							endPoint.AbsoluteCharOffset + startPoint.Line
 						),
 				};
 			}
@@ -117,6 +119,23 @@ namespace Land.VisualStudioExtension
 				{
 					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
 						textDoc.CreateEditPoint(textDoc.StartPoint).ReplaceText(textDoc.EndPoint, text, 8);
+				}
+		}
+
+		public void InsertText(string documentName, string text, PointLocation point)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			/// Среди открытых документов ищем указанный
+			for (int i = 1; i <= DteService.Documents.Count; ++i)
+				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
+				{
+					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
+					{					
+						var editPoint = textDoc.CreateEditPoint();
+						editPoint.MoveToAbsoluteOffset(GetVSOffset(point));
+						editPoint.Insert(text);
+					}
 				}
 		}
 
@@ -283,6 +302,8 @@ namespace Land.VisualStudioExtension
 				.Cast<Project>()
 				.SelectMany(GetProjects);
 		}
+
+		private int GetVSOffset(PointLocation loc) => loc.Offset - loc.Line.Value + 1;
 
 		private IEnumerable<Project> GetProjects(Project project)
 		{

@@ -92,6 +92,15 @@ namespace Land.GUI
 				document.Editor.Text = text;
 		}
 
+		public void InsertText(string documentName, string text, PointLocation point)
+		{
+			var document = EditorWindow.Documents.Values
+				.Where(d => d.DocumentName == documentName).FirstOrDefault();
+
+			if (document != null)
+				document.Editor.Document.Insert(point.Offset, text);
+		}
+
 		public bool HasActiveDocument()
 		{
 			return EditorWindow.Documents.Count > 0;

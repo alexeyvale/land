@@ -72,11 +72,18 @@ namespace Land.Control
 				var customBlockEnd = $"{Environment.NewLine}{indentationString}{endBorders.ElementAtOrDefault(0)}{endBorders.ElementAtOrDefault(1)}";
 
 				/// Вставляем их в текст
-				text = text.Insert(customPoint.AdjustedSelection.Start.Offset, customBlockStart)
-					.Insert(customPoint.AdjustedSelection.End.Offset + customBlockStart.Length, customBlockEnd);
+				Editor.InsertText(State.PendingCommand.DocumentName, customBlockStart, 
+					customPoint.AdjustedSelection.Start);
+				Editor.InsertText(State.PendingCommand.DocumentName, customBlockEnd, 
+					new PointLocation(
+						customPoint.AdjustedSelection.End.Line + 1,
+						customPoint.AdjustedSelection.End.Column,
+						customPoint.AdjustedSelection.End.Offset + customBlockStart.Length
+					)
+				);
 
-				Editor.SetDocumentText(State.PendingCommand.DocumentName, text);
-				State.PendingCommand.DocumentText = text;
+				State.PendingCommand.DocumentText = 
+					Editor.GetDocumentText(State.PendingCommand.DocumentName);
 
 				customPoint.RealSelection.Shift(1, 0, customBlockStart.Length);
 

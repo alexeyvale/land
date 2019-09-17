@@ -67,6 +67,11 @@ namespace Land.Control
 		/// </summary>
 		void SetActiveDocumentAndOffset(string documentName, PointLocation location);
 
+		/// <summary>
+		/// Вставка текста в указанную позицию в документе
+		/// </summary>
+		void InsertText(string documentName, string text, PointLocation point);
+
 		#endregion
 
 
