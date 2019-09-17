@@ -69,14 +69,13 @@ namespace Land.VisualStudioExtension
 					Start = new PointLocation(
 							startPoint.Line,
 							startPoint.LineCharOffset,
-							/// Махинации, связанные с особенностями учёта
-							/// студией конца строки
-							startPoint.AbsoluteCharOffset + startPoint.Line - 1
+							/// Махинации, связанные с особенностями учёта конца строки
+							startPoint.AbsoluteCharOffset + startPoint.Line - 2
 						),
 					End = new PointLocation(
 							endPoint.Line,
 							endPoint.LineCharOffset,
-							endPoint.AbsoluteCharOffset + startPoint.Line
+							endPoint.AbsoluteCharOffset + endPoint.Line - 2
 						),
 				};
 			}
@@ -303,7 +302,7 @@ namespace Land.VisualStudioExtension
 				.SelectMany(GetProjects);
 		}
 
-		private int GetVSOffset(PointLocation loc) => loc.Offset - loc.Line.Value + 1;
+		private int GetVSOffset(PointLocation loc) => loc.Offset - loc.Line.Value + 2;
 
 		private IEnumerable<Project> GetProjects(Project project)
 		{
