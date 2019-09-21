@@ -66,10 +66,11 @@ namespace Land.Control
 
 				var indentationString = String.Join("", text.Skip(customPoint.AdjustedSelection.Start.Offset)
 					.TakeWhile(c => c == ' ' || c == '\t'));
+				var expectedLineEnd = Editor.GetDocumentLineEnd(State.PendingCommand.DocumentName);
 
 				/// Формируем границы блока
-				var customBlockStart = $"{indentationString}{startBorders.ElementAtOrDefault(0)} {pointName} {startBorders.ElementAtOrDefault(1)}{Environment.NewLine}";
-				var customBlockEnd = $"{Environment.NewLine}{indentationString}{endBorders.ElementAtOrDefault(0)}{endBorders.ElementAtOrDefault(1)}";
+				var customBlockStart = $"{indentationString}{startBorders.ElementAtOrDefault(0)} {pointName} {startBorders.ElementAtOrDefault(1)}{expectedLineEnd}";
+				var customBlockEnd = $"{expectedLineEnd}{indentationString}{endBorders.ElementAtOrDefault(0)}{endBorders.ElementAtOrDefault(1)}";
 
 				/// Вставляем их в текст
 				Editor.InsertText(State.PendingCommand.DocumentName, customBlockStart, 

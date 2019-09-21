@@ -53,6 +53,11 @@ namespace Land.Control
 		#region Document by name
 
 		/// <summary>
+		/// Получение признака конца строки в документе
+		/// </summary>
+		string GetDocumentLineEnd(string documentName);
+
+		/// <summary>
 		/// Получение текста документа
 		/// </summary>
 		string GetDocumentText(string documentName);

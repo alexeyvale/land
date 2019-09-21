@@ -15,12 +15,13 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Land.Core;
 using Land.Control;
 
-using VisualStudioExtension.Highlighting;
-
 namespace Land.VisualStudioExtension
 {
 	public class EditorAdapter : IEditorAdapter
 	{
+		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
+		private const string DEFAULT_LINE_END = "\n\r";
+
 		private DTE2 DteService => ServiceEventAggregator.Instance.DteService;
 
 		public delegate void SetSegmentstHandler(List<DocumentSegment> e);
@@ -53,12 +54,14 @@ namespace Land.VisualStudioExtension
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			if (DteService?.ActiveDocument?.Object("TextDocument") is TextDocument textDocument)
+			if (DteService?.ActiveDocument?.Object("TextDocument") is TextDocument doc)
 			{
-				var startPoint = textDocument.Selection.TopPoint.CreateEditPoint();
-				var endPoint = textDocument.Selection.BottomPoint.CreateEditPoint();
+				var lineEndLength = GetDocumentLineEnd(doc).Length;
+				var isOneLineDocument = doc.StartPoint.Line == doc.EndPoint.Line;
+				var startPoint = doc.Selection.TopPoint.CreateEditPoint();
+				var endPoint = doc.Selection.BottomPoint.CreateEditPoint();
 
-				if(adjustByLine)
+				if (adjustByLine)
 				{
 					startPoint.StartOfLine();
 					endPoint.EndOfLine();
@@ -70,12 +73,14 @@ namespace Land.VisualStudioExtension
 							startPoint.Line,
 							startPoint.LineCharOffset,
 							/// Махинации, связанные с особенностями учёта конца строки
-							startPoint.AbsoluteCharOffset + startPoint.Line - 2
+							startPoint.AbsoluteCharOffset +
+								(isOneLineDocument ? 0 : startPoint.Line * (lineEndLength - 1) - lineEndLength)
 						),
 					End = new PointLocation(
 							endPoint.Line,
 							endPoint.LineCharOffset,
-							endPoint.AbsoluteCharOffset + endPoint.Line - 2
+							endPoint.AbsoluteCharOffset +
+								(isOneLineDocument ? 0 : endPoint.Line * (lineEndLength - 1) - lineEndLength)
 						),
 				};
 			}
@@ -93,17 +98,27 @@ namespace Land.VisualStudioExtension
 				: null;
 		}
 
+		public string GetDocumentLineEnd(string documentName)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			var doc = GetTextDocument(documentName);
+
+			return doc != null
+				? GetDocumentLineEnd(doc)
+				: null;
+		}
+
 		public string GetDocumentText(string documentName)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			/// Среди открытых документов ищем указанный
-			for (int i = 1; i <= DteService.Documents.Count; ++i)
-				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
-				{
-					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
-						return textDoc.CreateEditPoint(textDoc.StartPoint).GetText(textDoc.EndPoint);
-				}
+			var doc = GetTextDocument(documentName);
+
+			if (doc != null)
+			{
+				return doc.CreateEditPoint(doc.StartPoint).GetText(doc.EndPoint);
+			}
 
 			return null;
 		}
@@ -112,30 +127,29 @@ namespace Land.VisualStudioExtension
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			/// Среди открытых документов ищем указанный
-			for (int i = 1; i <= DteService.Documents.Count; ++i)
-				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
-				{
-					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
-						textDoc.CreateEditPoint(textDoc.StartPoint).ReplaceText(textDoc.EndPoint, text, 8);
-				}
+			var doc = GetTextDocument(documentName);
+
+			if (doc != null)
+			{
+				doc.CreateEditPoint(doc.StartPoint).ReplaceText(doc.EndPoint, text, 8);
+			}
 		}
 
 		public void InsertText(string documentName, string text, PointLocation point)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			/// Среди открытых документов ищем указанный
-			for (int i = 1; i <= DteService.Documents.Count; ++i)
-				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
-				{
-					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
-					{					
-						var editPoint = textDoc.CreateEditPoint();
-						editPoint.MoveToAbsoluteOffset(GetVSOffset(point));
-						editPoint.Insert(text);
-					}
-				}
+			var doc = GetTextDocument(documentName);
+
+			if (doc != null)
+			{
+				var lineEndLength = GetDocumentLineEnd(doc).Length;
+				var isOneLineDocument = doc.StartPoint.Line == doc.EndPoint.Line;
+				var editPoint = doc.CreateEditPoint();
+
+				editPoint.MoveToAbsoluteOffset(GetVSOffset(point, isOneLineDocument ? 0 : lineEndLength));
+				editPoint.Insert(text);
+			}
 		}
 
 		public bool HasActiveDocument()
@@ -211,14 +225,12 @@ namespace Land.VisualStudioExtension
 			foreach (var group in segments.GroupBy(s => s.FileName))
 			{
 				for (int i = 1; i <= DteService.Documents.Count; ++i)
-					if (DteService.Documents.Item(i).FullName.Equals(group.Key, StringComparison.CurrentCultureIgnoreCase))
-					{
-						if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
-						{
-							OnSetSegments(group.ToList());
-							break;
-						}
-					}
+				{
+					var doc = GetTextDocument(group.Key);
+
+					if (doc != null)
+						OnSetSegments(group.ToList());
+				}
 			}
 		}
 
@@ -293,6 +305,23 @@ namespace Land.VisualStudioExtension
 
 		#region Methods
 
+		private TextDocument GetTextDocument(string documentName)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			/// Среди открытых документов ищем указанный
+			for (int i = 1; i <= DteService.Documents.Count; ++i)
+				if (DteService.Documents.Item(i).FullName.Equals(documentName, StringComparison.CurrentCultureIgnoreCase))
+				{
+					if (DteService.Documents.Item(i).Object() is TextDocument textDoc)
+						return textDoc;
+
+					break;
+				}
+
+			return null;
+		}
+
 		private IEnumerable<Project> GetAllProjects(Solution sln)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
@@ -302,7 +331,8 @@ namespace Land.VisualStudioExtension
 				.SelectMany(GetProjects);
 		}
 
-		private int GetVSOffset(PointLocation loc) => loc.Offset - loc.Line.Value + 2;
+		private int GetVSOffset(PointLocation loc, int lineEndLength) =>
+			loc.Offset - loc.Line.Value * (lineEndLength - 1) + lineEndLength;
 
 		private IEnumerable<Project> GetProjects(Project project)
 		{
@@ -323,6 +353,17 @@ namespace Land.VisualStudioExtension
 			}
 
 			return new[] { project };
+		}
+
+		private string GetDocumentLineEnd(TextDocument doc)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			return doc.StartPoint.Line == doc.EndPoint.Line ? DEFAULT_LINE_END
+				: String.Join("", doc.CreateEditPoint(doc.StartPoint)
+					.GetLines(1, 3)
+					.SkipWhile(c => !LINE_END_SYMBOLS.Contains(c))
+					.TakeWhile(c => LINE_END_SYMBOLS.Contains(c)));
 		}
 
 		#endregion

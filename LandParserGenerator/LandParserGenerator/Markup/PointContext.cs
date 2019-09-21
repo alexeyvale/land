@@ -374,10 +374,12 @@ namespace Land.Core.Markup
 			{
 				Before = new TextOrHash(String.Join(" ", siblings
 					.Take(markedElementIndex)
+					.Where(n => n.Location != null)
 					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				)),
 				After = new TextOrHash(String.Join(" ", siblings
 					.Skip(markedElementIndex + 1)
+					.Where(n => n.Location != null)
 					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				))
 			};
