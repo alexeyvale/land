@@ -14,6 +14,9 @@ namespace Land.GUI
 {
 	public class EditorAdapter : IEditorAdapter
 	{
+		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
+		private const string DEFAULT_LINE_END = "\n\r";
+
 		private MainWindow EditorWindow { get; set; }
 		private string SettingsPath { get; set; }
 		private Action<string> DocumentSavingCallback { get; set; }
@@ -75,6 +78,17 @@ namespace Land.GUI
 			var activeTab = GetActiveDocumentTab();
 
 			return activeTab != null ? EditorWindow.Documents[activeTab].Editor.Text : null;
+		}
+
+		public string GetDocumentLineEnd(string documentName)
+		{
+			var text = String.Join("", GetDocumentText(documentName)
+				?.SkipWhile(c=>!LINE_END_SYMBOLS.Contains(c))
+				.TakeWhile(c=>LINE_END_SYMBOLS.Contains(c))
+			);
+
+			return !String.IsNullOrEmpty(text)
+				? text : DEFAULT_LINE_END;
 		}
 
 		public string GetDocumentText(string documentName)
