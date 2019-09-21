@@ -11,10 +11,16 @@ namespace MarkdownPreprocessing.TreePostprocessing
 	public class SectionsHierarchyVisitor : BaseTreeVisitor
 	{
 		public List<Message> Log { get; set; } = new List<Message>();
+		private BaseNodeGenerator NodeGenerator { get; set; }
 
 		private int CurrentLevel { get; set; } = 0;
 		private Node ParentSection { get; set; }
 		private PointLocation PossibleEnd { get; set; }
+
+		public SectionsHierarchyVisitor(BaseNodeGenerator nodeGenerator)
+		{
+			NodeGenerator = nodeGenerator;
+		}
 
 		public override void Visit(Node node)
 		{
@@ -23,7 +29,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 			switch (node.Type)
 			{
 				case "file":
-					ParentSection = new Node("file", node.Options);
+					ParentSection = NodeGenerator.Generate("file", node.Options);
 					base.Visit(node);
 
 					for (; level < CurrentLevel; --CurrentLevel)
@@ -55,7 +61,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				/// опускаемся до него
 				for (; CurrentLevel < level; ++CurrentLevel)
 				{
-					newNode = new Node("section", new LocalOptions() { IsLand = true });
+					newNode = NodeGenerator.Generate("section", new LocalOptions() { IsLand = true });
 					newNode.SetLocation(node.Location.Start, node.Location.End);
 
 					ParentSection.AddLastChild(newNode);
@@ -76,7 +82,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				}
 				PossibleEnd = null;
 
-				var newNode = new Node("section", new LocalOptions() { IsLand = true });
+				var newNode = NodeGenerator.Generate("section", new LocalOptions() { IsLand = true });
 				newNode.SetLocation(node.Location.Start, node.Location.End);
 				newNode.AddLastChild(node);
 

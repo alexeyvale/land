@@ -176,7 +176,11 @@ namespace Land.Core.Lexing
 					var newBlock = new CustomBlockNode
 					{
 						Location = new SegmentLocation { Start = token.Location.Start },
-						Start = new Node(token.Name, new LocalOptions { ExactMatch = true, Priority = LocalOptions.BASE_PRIORITY })			
+
+						/// Можно не типизировать, типизируем при вставке блоков в дерево
+						Start = new Node(token.Name, new LocalOptions {
+							ExactMatch = true, Priority = LocalOptions.BASE_PRIORITY
+						})			
 					};
 
 					newBlock.Start.SetLocation(token.Location.Start, token.Location.End);

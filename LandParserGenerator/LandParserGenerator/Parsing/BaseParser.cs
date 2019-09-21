@@ -77,7 +77,11 @@ namespace Land.Core.Parsing
 
 		public void SetPreprocessor(BasePreprocessor preproc)
 		{
-			Preproc = preproc;
+			if (preproc != null)
+			{
+				Preproc = preproc;
+				Preproc.NodeGenerator = NodeGenerator;
+			}
 		}
 
 		protected void TreePostProcessing(Node root)

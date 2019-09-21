@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 using Land.Core.Lexing;
 
@@ -10,6 +9,8 @@ namespace Land.Core.Parsing.Tree
 {
 	public class InsertCustomBlocksVisitor : BaseTreeVisitor
 	{
+		private BaseNodeGenerator NodeGenerator { get; set; }
+
 		private Grammar GrammarObject { get; set; }
 
 		public List<CustomBlockNode> CustomBlocks { get; set; }
@@ -24,9 +25,13 @@ namespace Land.Core.Parsing.Tree
 		/// Последовательность пользовательских блоков, полученная
 		/// в результате постфиксного обхода соответствующего дерева
 		/// </param>
-		public InsertCustomBlocksVisitor(Grammar grammar, List<CustomBlockNode> customBlocks)
+		public InsertCustomBlocksVisitor(
+			Grammar grammar, 
+			BaseNodeGenerator nodeGenerator,
+			List<CustomBlockNode> customBlocks)
 		{
 			GrammarObject = grammar;
+			NodeGenerator = nodeGenerator;
 			CustomBlocks = new List<CustomBlockNode>(customBlocks);
 		}
 
@@ -34,10 +39,10 @@ namespace Land.Core.Parsing.Tree
 		{
 			CustomBlocks.Remove(block);
 
-			var node = new Node(Grammar.CUSTOM_BLOCK_RULE_NAME, new LocalOptions { IsLand = true });
+			var node = NodeGenerator.Generate(Grammar.CUSTOM_BLOCK_RULE_NAME, new LocalOptions { IsLand = true });
 
-			node.AddLastChild(block.Start);
-			node.AddLastChild(block.End);
+			node.AddLastChild(NodeGenerator.Generate(block.Start));
+			node.AddLastChild(NodeGenerator.Generate(block.End));
 
 			return node;
 		}

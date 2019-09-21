@@ -13,7 +13,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 		{
 			if (root != null)
 			{
-				var visitor = new SectionsHierarchyVisitor();
+				var visitor = new SectionsHierarchyVisitor(NodeGenerator);
 				root.Accept(visitor);
 				Log.AddRange(visitor.Log);
 			}

@@ -7,6 +7,8 @@ namespace Land.Core.Parsing.Preprocessing
 {
 	public abstract class BasePreprocessor
 	{
+		public virtual BaseNodeGenerator NodeGenerator { get; set; }
+
 		public virtual List<Message> Log { get; set; } = new List<Message>();
 
 		public abstract string Preprocess(string text, out bool success);

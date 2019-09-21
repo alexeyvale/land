@@ -196,7 +196,7 @@ namespace Land.Core.Parsing.LL
 
 			if (LexingStream.CustomBlocks?.Count > 0)
 			{
-				var visitor = new InsertCustomBlocksVisitor(GrammarObject, LexingStream.CustomBlocks);
+				var visitor = new InsertCustomBlocksVisitor(GrammarObject, NodeGenerator, LexingStream.CustomBlocks);
 				root.Accept(visitor);
 				root = visitor.Root;
 
