@@ -356,7 +356,7 @@ namespace Land.Core.Markup
 				return null;
 
 			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
-			var siblings = parentNode.Children;
+			var siblings = new List<Node>(parentNode.Children);
 			for (var i = 0; i < siblings.Count; ++i)
 			{
 				if (!siblings[i].Options.IsLand)

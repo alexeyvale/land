@@ -82,7 +82,7 @@ block				=	'{' Any '}'
 	priority(0.1) modifier
 	priority(0.8) name
 	priority(0.3) type arguments
-	priority(0) '{' '}' ';' ',' '=>' '='
+	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
 	
 	exactmatch modifier
 }
