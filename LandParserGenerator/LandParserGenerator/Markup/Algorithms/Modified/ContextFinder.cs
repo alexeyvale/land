@@ -66,13 +66,6 @@ namespace Land.Core.Markup
 							candidate.Context.InnerContextElement);
 					}
 
-					foreach (var candidate in candidates)
-					{
-						candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
-							new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
-						);
-					}
-
 					EvaluateSimilarity(point.Context, candidates);
 
 					result[point] = candidates = 
@@ -97,25 +90,40 @@ namespace Land.Core.Markup
 							c.InnerSimilarity == first.InnerSimilarity &&
 							c.AncestorSimilarity == first.AncestorSimilarity).ToList();
 
-						var nextClosestCandidate = candidates.Skip(identicalCandidates.Count).FirstOrDefault();
-
-						if(nextClosestCandidate == null || AreDistantEnough(first, nextClosestCandidate))
+						if (identicalCandidates.Count > 1)
 						{
-							var siblingsSimilarities = identicalCandidates.Select(c => new
-							{
-								BeforeSimilarity = EvalSimilarity(point.Context.SiblingsContext.Before, c.Context.SiblingsContext.Before),
-								AfterSimilarity = EvalSimilarity(point.Context.SiblingsContext.After, c.Context.SiblingsContext.After),
-								Candidate = c
-							}).ToList();
+							var nextClosestCandidate = candidates.Skip(identicalCandidates.Count).FirstOrDefault();
 
-							var bestBefore = siblingsSimilarities.OrderByDescending(e => e.BeforeSimilarity).First();
-							var bestAfter = siblingsSimilarities.OrderByDescending(e => e.AfterSimilarity ).First();
-
-							if (bestBefore == bestAfter)
+							if (nextClosestCandidate == null || AreDistantEnough(first, nextClosestCandidate))
 							{
-								bestBefore.Candidate.IsAuto = true;
-								candidates.Remove(bestBefore.Candidate);
-								candidates.Insert(0, bestBefore.Candidate);
+								foreach(var candidate in identicalCandidates)
+								{
+									candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
+										new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
+									);
+								}
+
+								var writer = System.IO.File.AppendText("log.txt");
+								writer.WriteLine(point.Context.FileName);
+								writer.WriteLine(String.Join(" ", point.Context.HeaderContext.Select(e=>String.Join("", e.Value))));
+								writer.Close();
+
+								var siblingsSimilarities = identicalCandidates.Select(c => new
+								{
+									BeforeSimilarity = EvalSimilarity(point.Context.SiblingsContext.Before, c.Context.SiblingsContext.Before),
+									AfterSimilarity = EvalSimilarity(point.Context.SiblingsContext.After, c.Context.SiblingsContext.After),
+									Candidate = c
+								}).ToList();
+
+								var bestBefore = siblingsSimilarities.OrderByDescending(e => e.BeforeSimilarity).First();
+								var bestAfter = siblingsSimilarities.OrderByDescending(e => e.AfterSimilarity).First();
+
+								if (bestBefore == bestAfter)
+								{
+									bestBefore.Candidate.IsAuto = true;
+									candidates.Remove(bestBefore.Candidate);
+									candidates.Insert(0, bestBefore.Candidate);
+								}
 							}
 						}
 					}
