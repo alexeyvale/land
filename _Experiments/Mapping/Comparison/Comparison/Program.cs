@@ -166,13 +166,8 @@ namespace Comparison
 
 				foreach (var cp in basicRemapResult.Keys)
 				{
-					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-						&& (basicRemapResult[cp].Count == 1
-							|| (1 - basicRemapResult[cp][1].Similarity) >= (1 - basicRemapResult[cp][0].Similarity) * 1.5);
-
-					var isModifiedAuto = modifiedRemapResult.ContainsKey(cp) && modifiedRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-						&& (modifiedRemapResult[cp].Count == 1
-							|| (1 - modifiedRemapResult[cp][1].Similarity) >= (1 - modifiedRemapResult[cp][0].Similarity) * 1.5);
+					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
+					var isModifiedAuto = modifiedRemapResult.ContainsKey(cp) && (modifiedRemapResult[cp].FirstOrDefault()?.IsAuto ?? false);
 
 					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0
 						|| basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
