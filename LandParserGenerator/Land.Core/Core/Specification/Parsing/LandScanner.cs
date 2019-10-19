@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 19.10.2019 23:12:23
+//  DateTime: 20.10.2019 0:33:21
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 19.10.2019 23:12:23>
+//  GPLEX input file <./Land.lex - 20.10.2019 0:33:21>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -129,8 +129,8 @@ namespace Land.Core.Specification.Parsing
         
         enum Result {accept, noMatch, contextFound};
 
-        const int maxAccept = 37;
-        const int initial = 38;
+        const int maxAccept = 38;
+        const int initial = 39;
         const int eofNum = 0;
         const int goStart = -1;
         const int INITIAL = 0;
@@ -173,10 +173,10 @@ public List<Message> Log = new List<Message>();
         }
     };
 
-    static int[] startState = new int[] {38, 55, 66, 67, 68, 70, 
+    static int[] startState = new int[] {39, 56, 67, 68, 70, 72, 
         0};
 
-   static int[] anchorState = new int[] {39, 55, 66, 67, 68, 70, 
+   static int[] anchorState = new int[] {40, 56, 67, 68, 70, 72, 
         0};
 
 #region CompressedCharacterMap
@@ -206,7 +206,7 @@ public List<Message> Log = new List<Message>();
     }
 #endregion
 
-    static Table[] NxS = new Table[71] {
+    static Table[] NxS = new Table[73] {
 /* NxS[   0] */ new Table(0, 0, 0, null),
 /* NxS[   1] */ new Table(0, 0, -1, null),
 /* NxS[   2] */ new Table(0, 0, -1, null),
@@ -215,7 +215,7 @@ public List<Message> Log = new List<Message>();
 /* NxS[   5] */ new Table(8, 1, -1, new sbyte[] {21}),
 /* NxS[   6] */ new Table(9, 19, -1, new sbyte[] {6, 6, -1, 6, 6, 6, 
           6, 6, -1, -1, -1, 6, 6, 6, 6, 6, 6, -1, 20}),
-/* NxS[   7] */ new Table(29, 18, -1, new sbyte[] {51, -1, -1, -1, -1, -1, 
+/* NxS[   7] */ new Table(29, 18, -1, new sbyte[] {52, -1, -1, -1, -1, -1, 
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 7}),
 /* NxS[   8] */ new Table(0, 0, -1, null),
 /* NxS[   9] */ new Table(0, 0, -1, null),
@@ -227,8 +227,8 @@ public List<Message> Log = new List<Message>();
 /* NxS[  15] */ new Table(0, 0, -1, null),
 /* NxS[  16] */ new Table(0, 0, -1, null),
 /* NxS[  17] */ new Table(0, 0, -1, null),
-/* NxS[  18] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 46, 46, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
+/* NxS[  18] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 47, 47, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
 /* NxS[  19] */ new Table(10, 1, -1, new sbyte[] {19}),
 /* NxS[  20] */ new Table(0, 0, -1, null),
 /* NxS[  21] */ new Table(0, 0, -1, null),
@@ -237,7 +237,7 @@ public List<Message> Log = new List<Message>();
 /* NxS[  24] */ new Table(9, 19, -1, new sbyte[] {24, 24, -1, 24, 24, 24, 
           24, 24, -1, -1, -1, 24, 24, 24, 24, 24, 24, -1, 20}),
 /* NxS[  25] */ new Table(0, 0, -1, null),
-/* NxS[  26] */ new Table(20, 1, -1, new sbyte[] {56}),
+/* NxS[  26] */ new Table(20, 1, -1, new sbyte[] {57}),
 /* NxS[  27] */ new Table(0, 0, -1, null),
 /* NxS[  28] */ new Table(0, 0, -1, null),
 /* NxS[  29] */ new Table(0, 1, 29, new sbyte[] {-1}),
@@ -245,69 +245,73 @@ public List<Message> Log = new List<Message>();
           30, 30, -1, -1, -1, 30, 30, 30, 30, 30, 30}),
 /* NxS[  31] */ new Table(0, 0, -1, null),
 /* NxS[  32] */ new Table(0, 0, -1, null),
-/* NxS[  33] */ new Table(0, 0, -1, null),
-/* NxS[  34] */ new Table(9, 17, -1, new sbyte[] {34, 34, -1, 34, 34, 34, 
-          34, 34, -1, -1, -1, 34, 34, 34, 34, 34, 34}),
-/* NxS[  35] */ new Table(0, 0, -1, null),
-/* NxS[  36] */ new Table(9, 17, -1, new sbyte[] {36, 36, -1, 36, 36, 36, 
-          36, 36, -1, -1, -1, 36, 36, 36, 36, 36, 36}),
-/* NxS[  37] */ new Table(0, 0, -1, null),
-/* NxS[  38] */ new Table(26, 30, 24, new sbyte[] {-1, 11, 12, -1, 42, -1, 
-          43, 13, -1, -1, -1, 40, -1, 1, 2, 3, 4, 5, -1, 24, 7, 54, 
+/* NxS[  33] */ new Table(9, 17, -1, new sbyte[] {33, 33, -1, 33, 33, 33, 
+          33, 33, -1, -1, -1, 33, 33, 33, 33, 33, 33}),
+/* NxS[  34] */ new Table(0, 0, -1, null),
+/* NxS[  35] */ new Table(9, 17, -1, new sbyte[] {35, 35, -1, 35, 35, 35, 
+          35, 35, -1, -1, -1, 35, 35, 35, 35, 35, 35}),
+/* NxS[  36] */ new Table(0, 0, -1, null),
+/* NxS[  37] */ new Table(9, 17, -1, new sbyte[] {37, 37, -1, 37, 37, 37, 
+          37, 37, -1, -1, -1, 37, 37, 37, 37, 37, 37}),
+/* NxS[  38] */ new Table(0, 0, -1, null),
+/* NxS[  39] */ new Table(26, 30, 24, new sbyte[] {-1, 11, 12, -1, 43, -1, 
+          44, 13, -1, -1, -1, 41, -1, 1, 2, 3, 4, 5, -1, 24, 7, 55, 
           24, 24, 24, 24, 24, 8, 9, 10}),
-/* NxS[  39] */ new Table(26, 30, 6, new sbyte[] {-1, 11, 12, -1, 42, -1, 
-          43, 13, -1, -1, -1, 40, -1, 1, 2, 3, 4, 5, -1, 6, 7, 41, 
+/* NxS[  40] */ new Table(26, 30, 6, new sbyte[] {-1, 11, 12, -1, 43, -1, 
+          44, 13, -1, -1, -1, 41, -1, 1, 2, 3, 4, 5, -1, 6, 7, 42, 
           6, 6, 6, 6, 6, 8, 9, 10}),
-/* NxS[  40] */ new Table(1, 3, -1, new sbyte[] {22, -1, 52}),
-/* NxS[  41] */ new Table(9, 17, -1, new sbyte[] {46, -1, 16, 47, 46, 46, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46}),
-/* NxS[  42] */ new Table(26, 5, 42, new sbyte[] {45, 42, 42, 42, 15}),
-/* NxS[  43] */ new Table(26, 7, 43, new sbyte[] {44, 43, 43, 43, 43, 43, 
+/* NxS[  41] */ new Table(1, 3, -1, new sbyte[] {22, -1, 53}),
+/* NxS[  42] */ new Table(9, 17, -1, new sbyte[] {47, -1, 16, 48, 47, 47, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47}),
+/* NxS[  43] */ new Table(26, 5, 43, new sbyte[] {46, 43, 43, 43, 15}),
+/* NxS[  44] */ new Table(26, 7, 44, new sbyte[] {45, 44, 44, 44, 44, 44, 
           14}),
-/* NxS[  44] */ new Table(0, 36, 43, new sbyte[] {43, 43, 43, 43, 43, 43, 
+/* NxS[  45] */ new Table(0, 36, 44, new sbyte[] {44, 44, 44, 44, 44, 44, 
+          44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 
+          44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44}),
+/* NxS[  46] */ new Table(0, 36, 43, new sbyte[] {43, 43, 43, 43, 43, 43, 
           43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 
           43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43, 43}),
-/* NxS[  45] */ new Table(0, 36, 42, new sbyte[] {42, 42, 42, 42, 42, 42, 
-          42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 
-          42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42}),
-/* NxS[  46] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 46, 46, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
-/* NxS[  47] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 48, 46, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
-/* NxS[  48] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 46, 49, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
-/* NxS[  49] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 46, 46, 
-          50, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
-/* NxS[  50] */ new Table(9, 19, -1, new sbyte[] {46, 46, -1, 46, 46, 46, 
-          46, 18, -1, -1, -1, 46, 46, 46, 46, 46, 46, -1, 17}),
-/* NxS[  51] */ new Table(10, 1, -1, new sbyte[] {19}),
-/* NxS[  52] */ new Table(3, 1, 52, new sbyte[] {53}),
-/* NxS[  53] */ new Table(1, 1, 52, new sbyte[] {23}),
-/* NxS[  54] */ new Table(9, 17, -1, new sbyte[] {46, -1, -1, 47, 46, 46, 
-          46, 46, -1, -1, -1, 46, 46, 46, 46, 46, 46}),
-/* NxS[  55] */ new Table(0, 12, 25, new sbyte[] {-1, 25, -1, 25, 25, 25, 
+/* NxS[  47] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 47, 47, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
+/* NxS[  48] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 49, 47, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
+/* NxS[  49] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 47, 50, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
+/* NxS[  50] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 47, 47, 
+          51, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
+/* NxS[  51] */ new Table(9, 19, -1, new sbyte[] {47, 47, -1, 47, 47, 47, 
+          47, 18, -1, -1, -1, 47, 47, 47, 47, 47, 47, -1, 17}),
+/* NxS[  52] */ new Table(10, 1, -1, new sbyte[] {19}),
+/* NxS[  53] */ new Table(3, 1, 53, new sbyte[] {54}),
+/* NxS[  54] */ new Table(1, 1, 53, new sbyte[] {23}),
+/* NxS[  55] */ new Table(9, 17, -1, new sbyte[] {47, -1, -1, 48, 47, 47, 
+          47, 47, -1, -1, -1, 47, 47, 47, 47, 47, 47}),
+/* NxS[  56] */ new Table(0, 12, 25, new sbyte[] {-1, 25, -1, 25, 25, 25, 
           25, 25, 25, 25, 25, 26}),
-/* NxS[  56] */ new Table(13, 9, -1, new sbyte[] {57, -1, -1, -1, -1, -1, 
-          -1, -1, 58}),
-/* NxS[  57] */ new Table(23, 1, -1, new sbyte[] {60}),
-/* NxS[  58] */ new Table(22, 1, -1, new sbyte[] {59}),
-/* NxS[  59] */ new Table(16, 1, -1, new sbyte[] {27}),
-/* NxS[  60] */ new Table(21, 1, -1, new sbyte[] {61}),
-/* NxS[  61] */ new Table(24, 1, -1, new sbyte[] {62}),
-/* NxS[  62] */ new Table(16, 1, -1, new sbyte[] {63}),
-/* NxS[  63] */ new Table(25, 1, -1, new sbyte[] {64}),
-/* NxS[  64] */ new Table(12, 1, -1, new sbyte[] {65}),
-/* NxS[  65] */ new Table(16, 1, -1, new sbyte[] {28}),
-/* NxS[  66] */ new Table(0, 1, 29, new sbyte[] {-1}),
-/* NxS[  67] */ new Table(34, 28, -1, new sbyte[] {31, 32, -1, 40, -1, -1, 
-          -1, -1, -1, -1, -1, 30, -1, -1, 30, 30, 30, 30, 30, -1, -1, -1, 
+/* NxS[  57] */ new Table(13, 9, -1, new sbyte[] {58, -1, -1, -1, -1, -1, 
+          -1, -1, 59}),
+/* NxS[  58] */ new Table(23, 1, -1, new sbyte[] {61}),
+/* NxS[  59] */ new Table(22, 1, -1, new sbyte[] {60}),
+/* NxS[  60] */ new Table(16, 1, -1, new sbyte[] {27}),
+/* NxS[  61] */ new Table(21, 1, -1, new sbyte[] {62}),
+/* NxS[  62] */ new Table(24, 1, -1, new sbyte[] {63}),
+/* NxS[  63] */ new Table(16, 1, -1, new sbyte[] {64}),
+/* NxS[  64] */ new Table(25, 1, -1, new sbyte[] {65}),
+/* NxS[  65] */ new Table(12, 1, -1, new sbyte[] {66}),
+/* NxS[  66] */ new Table(16, 1, -1, new sbyte[] {28}),
+/* NxS[  67] */ new Table(0, 1, 29, new sbyte[] {-1}),
+/* NxS[  68] */ new Table(34, 28, -1, new sbyte[] {31, 32, -1, 41, -1, -1, 
+          -1, -1, -1, -1, -1, 30, -1, 69, 30, 30, 30, 30, 30, -1, -1, -1, 
           30, 30, 30, 30, 30, 30}),
-/* NxS[  68] */ new Table(9, 29, -1, new sbyte[] {34, 7, 69, 34, 34, 34, 
-          34, 34, -1, -1, -1, 34, 34, 34, 34, 34, 34, -1, 11, 12, -1, 42, 
-          -1, 43, 13, -1, 35, 33, 40}),
-/* NxS[  69] */ new Table(9, 17, -1, new sbyte[] {36, -1, -1, 36, 36, 36, 
-          36, 36, -1, -1, -1, 36, 36, 36, 36, 36, 36}),
-/* NxS[  70] */ new Table(27, 1, -1, new sbyte[] {37}),
+/* NxS[  69] */ new Table(9, 17, -1, new sbyte[] {33, -1, -1, 33, 33, 33, 
+          33, 33, -1, -1, -1, 33, 33, 33, 33, 33, 33}),
+/* NxS[  70] */ new Table(9, 29, -1, new sbyte[] {35, 7, 71, 35, 35, 35, 
+          35, 35, -1, -1, -1, 35, 35, 35, 35, 35, 35, -1, 11, 12, -1, 43, 
+          -1, 44, 13, -1, 36, 34, 41}),
+/* NxS[  71] */ new Table(9, 17, -1, new sbyte[] {37, -1, -1, 37, 37, 37, 
+          37, 37, -1, -1, -1, 37, 37, 37, 37, 37, 37}),
+/* NxS[  72] */ new Table(27, 1, -1, new sbyte[] {38}),
     };
 
 int NextState() {
@@ -801,7 +805,7 @@ BEGIN(in_options);
             break;
         case 17:
 yy_push_state(before_args);	
-	yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
+	yylval.strVal = yytext.Trim('%').Trim('(');	
 	return (int)Tokens.CATEGORY_NAME;
             break;
         case 18:
@@ -855,20 +859,24 @@ return (int)Tokens.LCURVE_BRACKET;
 return (int)Tokens.RCURVE_BRACKET;
             break;
         case 33:
-BEGIN(in_options);
+yylval.strVal = yytext.Trim('%');	
+		return (int)Tokens.CATEGORY_NAME;
             break;
         case 34:
+BEGIN(in_options);
+            break;
+        case 35:
 yylval.strVal = yytext;
 		return (int)Tokens.ID;
             break;
-        case 35:
+        case 36:
 BEGIN(in_options);
 		return (int)Tokens.RCURVE_BRACKET;
             break;
-        case 36:
+        case 37:
 yyerror("Встречено имя категории '{0}', ожидалось продолжение опции", yytext);
             break;
-        case 37:
+        case 38:
 yy_pop_state();
 		return (int)Tokens.ARGS_LROUND_BRACKET;
             break;

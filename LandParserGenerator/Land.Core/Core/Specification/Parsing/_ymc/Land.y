@@ -346,7 +346,12 @@ options_section
 category_block
 	: CATEGORY_NAME option_or_block
 		{
-			
+			foreach(var option in $2)
+			{
+				SafeGrammarAction(() => {
+					ConstructedGrammar.SetOption($1, option.Name, option.Symbols, option.Arguments);
+				}, @1.Start);
+			}
 		}
 	;
 

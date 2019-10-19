@@ -117,7 +117,7 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 
 "%"{ID}"(" {	
 	yy_push_state(before_args);	
-	yylval.strVal = yytext.ToLower().Trim('%').Trim('(');	
+	yylval.strVal = yytext.Trim('%').Trim('(');	
 	return (int)Tokens.CATEGORY_NAME;
 }
 
@@ -165,6 +165,11 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 }
 
 <in_options> {
+	"%"{ID} {	
+		yylval.strVal = yytext.Trim('%');	
+		return (int)Tokens.CATEGORY_NAME;
+	}
+
 	{ID} {
 		BEGIN(in_option);	
 		yylval.strVal = yytext;

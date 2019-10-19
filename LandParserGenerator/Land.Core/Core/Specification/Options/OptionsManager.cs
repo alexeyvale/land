@@ -56,9 +56,9 @@ namespace Land.Core.Specification
 		/// Получение символов, для которых установлена опция
 		/// </summary>
 		public HashSet<string> GetSymbols(string group, string option) =>
-			new HashSet<string>(Options.Where(o => o.Value.IsSet(group, option)).Select(o => o.Key));
+			new HashSet<string>(Options.Where(o => o.Key != LANGUAGE_PARAMETERS_SYMBOL && o.Value.IsSet(group, option)).Select(o => o.Key));
 
-		public HashSet<string> GetSymbols() => new HashSet<string>(Options.Keys);
+		public HashSet<string> GetSymbols() => new HashSet<string>(Options.Keys.Except(new List<string> { LANGUAGE_PARAMETERS_SYMBOL }));
 
 		/// <summary>
 		/// Получение параметров опции для заданного символа

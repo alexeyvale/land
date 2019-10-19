@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 19.10.2019 23:12:23
+// DateTime: 20.10.2019 0:33:21
 // UserName: Алексей
-// Input file <./Land.y - 19.10.2019 23:12:23>
+// Input file <./Land.y - 20.10.2019 0:33:21>
 
 // options: no-lines gplex
 
@@ -78,14 +78,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 19.10.2019 23:12:23
+  // Verbatim content from ./Land.y - 20.10.2019 0:33:21
     public Parser(AbstractScanner<ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 19.10.2019 23:12:23
+  // End verbatim content from ./Land.y - 20.10.2019 0:33:21
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -528,7 +528,12 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
         break;
       case 46: // category_block -> CATEGORY_NAME, option_or_block
 {
-			
+			foreach(var option in ValueStack[ValueStack.Depth-1].optionsList)
+			{
+				SafeGrammarAction(() => {
+					ConstructedGrammar.SetOption(ValueStack[ValueStack.Depth-2].strVal, option.Name, option.Symbols, option.Arguments);
+				}, LocationStack[LocationStack.Depth-2].Start);
+			}
 		}
         break;
       case 47: // option_or_block -> option

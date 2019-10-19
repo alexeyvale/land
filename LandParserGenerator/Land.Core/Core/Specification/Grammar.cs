@@ -415,7 +415,7 @@ namespace Land.Core.Specification
 
 			#region Проверка корректности задания опции
 
-			if (Enum.TryParse<OptionGroups>(option.ToUpper(), out var optionGroup))
+			if (Enum.TryParse<OptionGroups>(group.ToUpper(), out var optionGroup))
 			{
 				List<string> errorSymbols = null;
 
