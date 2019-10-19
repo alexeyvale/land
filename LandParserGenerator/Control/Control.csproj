@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlPartial\Tabs\RelationTab.cs" />
+    <Compile Include="Models\LanguageSettings.cs" />
     <Compile Include="Parsing\CacheAction.cs" />
     <Compile Include="Parsing\ParserManager.cs" />
     <Compile Include="Parsing\ParserLoader.cs" />
@@ -160,9 +161,9 @@
       <Project>{e45c5fce-03bf-44e8-b9b2-ba3c98350856}</Project>
       <Name>Control.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LandParserGenerator\LandParserGenerator.csproj">
+    <ProjectReference Include="..\Land.Core\Land.Core.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
-      <Name>LandParserGenerator</Name>
+      <Name>Land.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

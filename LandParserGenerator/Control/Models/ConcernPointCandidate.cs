@@ -4,7 +4,7 @@ using System.Linq;
 
 using Land.Core;
 using Land.Core.Parsing.Tree;
-using Land.Core.Markup;
+using Land.Markup.Binding;
 
 namespace Land.Control
 {
@@ -26,7 +26,8 @@ namespace Land.Control
 		{
 			Node = node;
 			ViewHeader = String.Join(" ",
-				PointContext.GetHeaderContext(node).Select(c => String.Join("", c.Value)));
+				PointContext.GetHeaderContext(node).Select(c => String.Join("", c.Value))
+			);
 		}
 	}
 

@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 
 using Land.Core;
+using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
 
 namespace MarkdownPreprocessing.TreePostprocessing
 {
 	public class SectionsHierarchyVisitor : BaseTreeVisitor
 	{
+		private const string SECTION_RULE_NAME = "section";
+
 		public List<Message> Log { get; set; } = new List<Message>();
 		private BaseNodeGenerator NodeGenerator { get; set; }
 
@@ -61,7 +64,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				/// опускаемся до него
 				for (; CurrentLevel < level; ++CurrentLevel)
 				{
-					newNode = NodeGenerator.Generate("section", new LocalOptions() { IsLand = true });
+					newNode = NodeGenerator.Generate(SECTION_RULE_NAME);
 					newNode.SetLocation(node.Location.Start, node.Location.End);
 
 					ParentSection.AddLastChild(newNode);
@@ -82,7 +85,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				}
 				PossibleEnd = null;
 
-				var newNode = NodeGenerator.Generate("section", new LocalOptions() { IsLand = true });
+				var newNode = NodeGenerator.Generate(SECTION_RULE_NAME);
 				newNode.SetLocation(node.Location.Start, node.Location.End);
 				newNode.AddLastChild(node);
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
-
 using Land.Core.Parsing;
 using Land.Core;
+using Land.Markup.CoreExtension;
 
 namespace Land.Control
 {
@@ -90,6 +90,11 @@ namespace Land.Control
 
 			return invalidatedExtensions;
 		}
+
+		public Dictionary<string, LanguageSettings> GetLanguageDependentSettings() =>
+			Parsers.ToDictionary(p => p.Key, p => new LanguageSettings(
+				p.Value.Item2.GrammarObject.Options.GetOptions()
+			));
 
 		private bool EnsureDirectoryExists(string path)
 		{

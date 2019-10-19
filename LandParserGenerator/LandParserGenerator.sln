@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandParserGenerator", "LandParserGenerator\LandParserGenerator.csproj", "{F1276A3B-A504-47A3-B858-8224EF265795}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Land.Core", "Land.Core\Land.Core.csproj", "{F1276A3B-A504-47A3-B858-8224EF265795}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{8F271B4E-CC67-4661-B856-88ECA83464A4}"
 EndProject

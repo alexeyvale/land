@@ -11,16 +11,16 @@ using System.IO;
 using System.Reflection;
 using System.Security.Principal;
 using System.Runtime.Serialization.Json;
-
 using Microsoft.Win32;
-
 using ICSharpCode.AvalonEdit;
-
 using Land.Core;
+using Land.Core.Specification;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
-using Land.Core.Markup;
+using Land.Markup;
+using Land.Markup.CoreExtension;
+using Land.Markup.Binding;
 using Land.Control;
 
 namespace Land.GUI
@@ -236,7 +236,7 @@ namespace Land.GUI
 
 			var messages = new List<Message>();
 
-			Parser = BuilderBase.BuildParser(
+			Parser = Builder.BuildParser(
 				ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,
 				Grammar_Editor.Text,
 				messages
@@ -285,7 +285,7 @@ namespace Land.GUI
 				}
 
 				var messages = new List<Message>();
-				var success = BuilderBase.GenerateLibrary(
+				var success = Builder.GenerateLibrary(
 					ParsingLL.IsChecked ?? false ? GrammarType.LL : GrammarType.LR,
 					Grammar_Editor.Text,
 					librarySettings.Input_Namespace.Text,
@@ -665,7 +665,7 @@ namespace Land.GUI
 					}
 					else
 					{
-						if (!child.Options.IsLand && child.Location != null)
+						if (!child.Options.IsSet(MarkupOption.LAND) && child.Location != null)
 							TypedWaterSegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 

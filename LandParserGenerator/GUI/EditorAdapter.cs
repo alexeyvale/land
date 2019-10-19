@@ -5,9 +5,7 @@ using System.Windows.Controls;
 using System.IO;
 using System.Windows.Media;
 using System.Runtime.Serialization;
-
 using Land.Core;
-using Land.Core.Markup;
 using Land.Control;
 
 namespace Land.GUI

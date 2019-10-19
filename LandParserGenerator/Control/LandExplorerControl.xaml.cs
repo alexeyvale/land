@@ -12,10 +12,9 @@ using System.Windows.Media;
 using Microsoft.Win32;
 
 using Land.Core;
-using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
-using Land.Core.Parsing.Preprocessing;
-using Land.Core.Markup;
+using Land.Markup;
+using Land.Markup.Binding;
 using Land.Control.Helpers;
 
 namespace Land.Control
@@ -67,6 +66,8 @@ namespace Land.Control
 		/// Настройки панели
 		/// </summary>
 		private LandExplorerSettings SettingsObject { get; set; }
+
+		private Dictionary<string, LanguageSettings> LanguageDependentSettings;
 
 		/// <summary>
 		/// Окно настроек
@@ -281,6 +282,9 @@ namespace Land.Control
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
+
+			/// Из загруженных парсеров получаем информацию об опциях грамматики
+			LanguageDependentSettings = Parsers.GetLanguageDependentSettings();
 
 			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
 		}

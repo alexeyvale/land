@@ -15,7 +15,7 @@ using Land.Core;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
-using Land.Core.Markup;
+using Land.Markup;
 using Land.Control.Helpers;
 
 namespace Land.Control

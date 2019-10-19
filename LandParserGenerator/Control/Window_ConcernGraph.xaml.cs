@@ -8,11 +8,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.ComponentModel;
-
 using QuickGraph;
 using GraphSharp.Controls;
-
-using Land.Core.Markup;
+using Land.Markup;
+using Land.Markup.Relations;
 
 namespace Land.Control
 {

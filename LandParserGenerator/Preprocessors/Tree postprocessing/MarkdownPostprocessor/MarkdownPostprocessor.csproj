@@ -51,9 +51,9 @@
     <Compile Include="SectionsHierarchyVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\../../LandParserGenerator\LandParserGenerator.csproj">
+    <ProjectReference Include="..\..\..\Land.Core\Land.Core.csproj">
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
-      <Name>LandParserGenerator</Name>
+      <Name>Land.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

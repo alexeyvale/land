@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using Land.Core.Markup;
+using Land.Markup;
+using Land.Markup.Binding;
 
 namespace Land.Control
 {
