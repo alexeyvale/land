@@ -17,7 +17,7 @@ entity	=
 	(
 	 	'enum' name Any '{' Any '}' ';'?					=> enum				|
 		('class'|'interface') name Any '{' entity* '}' ';'?	=> class_interface	|
-		%priority(2) type name
+		%markup(priority(2)) type name
 		(
 	  		arguments Any (';' | block)						=> method	|
 	  		init_value? (',' name init_value?)* ';'			=> field
@@ -50,7 +50,7 @@ block		=	'{' Any '}'
 	leaf name type type_parameter
 }
 
-%mapping {
+%markup {
 	land enum class_interface method field
 	priority(3) name
 }

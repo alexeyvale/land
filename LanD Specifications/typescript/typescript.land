@@ -59,7 +59,7 @@ block				=	'{' Any '}'
 	leaf name type init_expression init_value
 }
 
-%mapping {
+%markup {
 	land enum class_struct_interface method field property
 	priority(5) name
 	priority(0.5) arguments

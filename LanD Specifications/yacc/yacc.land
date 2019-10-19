@@ -42,7 +42,7 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 	leaf alternative_element
 }
 
-%mapping {
+%markup {
 	land symbol_declaration rule alternative alternative_element
 	priority(0) ':' ';'
 }

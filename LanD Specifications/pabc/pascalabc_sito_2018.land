@@ -16,7 +16,7 @@ const				=	'const' const_atom+
 const_atom			=	ID '=' Any ';'
 var					=	'var' var_atom+
 var_atom			=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
-procedure			=	'procedure' %priority(2) name %priority(2) arguments? ';' block ';'
+procedure			=	'procedure' %markup(priority(2)) name %markup(priority(2)) arguments? ';' block ';'
 arguments			=	'(' (arguments_element (';' arguments_element)*)? ')'
 arguments_element	=	('var'|'const')? ID (',' ID)* ':' Any
 
@@ -41,4 +41,4 @@ names_list	=	name (',' name)*
 %nodes ghost operator
 %nodes leaf name
 
-%mapping land assign_or_call if case case_option pseudo_block var var_atom const const_atom procedure
+%markup land assign_or_call if case case_option pseudo_block var var_atom const const_atom procedure

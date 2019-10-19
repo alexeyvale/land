@@ -62,4 +62,4 @@ name_tail_element	=	ID|'.'|'[' Any ']'|'<' ID '>'
 
 %nodes leaf name
 
-%mapping land var_atom const_atom type_atom outer_routine inner_routine
+%markup land var_atom const_atom type_atom outer_routine inner_routine

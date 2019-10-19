@@ -10,8 +10,10 @@ directive	=	'{$' (('ifdef'|'ifndef'|'define'|'undef') ID | 'else' | 'endif') '}'
 
 %%
 
-%parsing recovery
-%parsing ignoreundefined
-%parsing start file
-%parsing skip COMMENT_L STRING
+%parsing {
+	recovery
+	ignoreundefined
+	start file
+	skip COMMENT_L STRING
+}
  

@@ -47,7 +47,7 @@ water					=	(Any | curve_bracketed_water | round_bracketed_water)+
 	leaf name type type_parameter init_value
 }
 
-%mapping {
+%markup {
 	land enum class_interface method field field_declaration
 	priority(3) name
 }

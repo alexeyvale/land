@@ -45,4 +45,4 @@ code_or_empty	=	'%{' Any '%}' => direct_code | SPACE+ (Any LINE_END => direct_co
 
 %nodes leaf regex_from_decl regex_from_rule
 
-%mapping land group rule
+%markup land group rule

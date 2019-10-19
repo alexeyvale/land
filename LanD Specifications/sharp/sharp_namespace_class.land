@@ -47,7 +47,7 @@ general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
 	leaf name
 }
 
-%mapping {
+%markup {
 	land namespace class_struct_interface
 	priority(5) name
 	exactmatch MODIFIER

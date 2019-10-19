@@ -33,14 +33,14 @@ section			=	(class_member | routine_element | block | Any) (';' section)? | (con
 
 class_member	=	attribute* ('class'|'static')? 
 					(
-						%ghost var_atom							=> field	|
+						%nodes(ghost) var_atom					=> field	|
 						'property' name Any ':' (block|Any)+	=> property	|
-						%ghost routine							=> method
+						%nodes(ghost) routine					=> method
 					)
 
 routine				=	routine_header routine_init? // начало процедуры, к которому на этапе постобработки приконкатенируем остальное
 routine_element		=	OTHER_MODIFIER Any (=> modifier_headed_part | routine_init	=> routine_tail)
-routine_header		=	ROUTINE_TYPE %priority(2) name? Any ('(' Any ')')? (':' Any)?
+routine_header		=	ROUTINE_TYPE %markup(priority(2)) name? Any ('(' Any ')')? (':' Any)?
 routine_init		=	':=' (Any|block)
 
 name_atom			=	'^'? ID
@@ -66,4 +66,4 @@ attribute	=	'[' Any ']'
 	list section
 }
 
-%mapping land class_type field property routine method
+%markup land class_type field property routine method

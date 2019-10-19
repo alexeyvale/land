@@ -53,7 +53,7 @@ block		=	'{' Any '}'
 	basetoken COMMENT
 }
 
-%mapping {
+%markup {
 	land enum class_interface method field
 	priority(3) name
 }
