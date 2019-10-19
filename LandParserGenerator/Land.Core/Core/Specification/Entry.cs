@@ -22,12 +22,14 @@ namespace Land.Core.Specification
 		{
 			Symbol = val;
 			Options = new SymbolOptionsManager();
+			Arguments = new SymbolArguments();
 		}
 
 		public Entry(string val, SymbolOptionsManager opts)
 		{
 			Symbol = val;
 			Options = opts;
+			Arguments = new SymbolArguments();
 		}
 
 		public Entry(string val, SymbolOptionsManager opts, SymbolArguments args)
