@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
-
 using Antlr4.Runtime;
 
-namespace Land.Core
+namespace Land.Core.Lexing
 {
-	public class AntlrLexerAdapter: Lexing.ILexer
+	public class AntlrLexerAdapter: ILexer
 	{
 		private Lexer Lexer { get; set; }
 
@@ -37,14 +34,14 @@ namespace Land.Core
 			Lexer = LexerConstructor(stream);
 		}
 
-		public Lexing.IToken NextToken()
+		public IToken NextToken()
 		{
 			 return new AntlrTokenAdapter(Lexer.NextToken(), Lexer);
 		}
 
-        public Land.Core.Lexing.IToken CreateToken(string name)
+        public IToken CreateToken(string name)
         {
-            return new Lexing.StubToken(name);
+            return new StubToken(name);
         }
     }
 }

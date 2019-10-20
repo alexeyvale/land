@@ -409,7 +409,7 @@ namespace Land.Core.Specification
 
 		public void SetOption(string group, string option, List<string> symbols, List<dynamic> @params)
 		{
-			ConstructionLog.Add($"grammar.SetOption(\"{group}\", \"{option}\", new string[] {{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new dynamic[]{{ {String.Join(", ", @params.Select(param => GetParamString(param)))}}} );");
+			ConstructionLog.Add($"grammar.SetOption(\"{group}\", \"{option}\", new List<string>{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new List<dynamic>{{ {String.Join(", ", @params.Select(param => GetParamString(param)))} }} );");
 
 			Options.Set(group, option, symbols.ToList(), @params);
 
@@ -1451,7 +1451,7 @@ namespace Land.Core.Specification
 
 		public string GetConstructionLog(SymbolArguments args)
 		{
-			return $"new SymbolArguments() {{ AnyOptions = new Dictionary<SymbolArguments.AnyOptions, HashSet<string>>{{ {String.Join(", ", args.AnyArguments.Select(op => $"{{AnyArgument.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}}}}"))} }} }} ";
+			return $"new SymbolArguments() {{ AnyArguments = new Dictionary<AnyArgument, HashSet<string>>{{ {String.Join(", ", args.AnyArguments.Select(op => $"{{AnyArgument.{op.Key}, new HashSet<string>(){{{String.Join(", ", op.Value.Select(v => $"\"{v}\""))}}}}}"))} }} }} ";
 		}
 
 		public string GetConstructionLog(SymbolOptionsManager opts)

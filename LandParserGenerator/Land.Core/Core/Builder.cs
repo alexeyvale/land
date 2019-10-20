@@ -9,6 +9,7 @@ using Microsoft.CSharp;
 
 using SpecParsing = Land.Core.Specification.Parsing;
 using Land.Core.Specification;
+using Land.Core.Lexing;
 using Land.Core.Parsing;
 using Land.Core.Parsing.LL;
 using Land.Core.Parsing.LR;
@@ -336,7 +337,7 @@ namespace Land.Core
 		{
 			return
 @"
-using Land.Core;
+using Land.Core.Specification;
 using System.Collections.Generic;
 
 namespace " + @namespace + @"
@@ -359,7 +360,8 @@ namespace " + @namespace + @"
 @"
 using System;
 using System.Reflection;
-using Land.Core;
+using Land.Core.Specification;
+using Land.Core.Lexing;
 using Land.Core.Parsing;
 
 namespace " + @namespace + @"
@@ -408,7 +410,7 @@ namespace " + @namespace + @"
 			nodeClassesSource.AppendLine("using System.Linq;");
 			nodeClassesSource.AppendLine("using System.Reflection;");
 
-			nodeClassesSource.AppendLine("using Land.Core;");
+			nodeClassesSource.AppendLine("using Land.Core.Specification;");
 			nodeClassesSource.AppendLine("using Land.Core.Parsing.Tree;");
 
 			nodeClassesSource.AppendLine($"namespace {@namespace} {{");
@@ -422,9 +424,9 @@ namespace " + @namespace + @"
 		public NodeGenerator(Grammar grammar): base(grammar)
 		{
 			Cache[BASE_RULE_TYPE] = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + BASE_RULE_TYPE)
-				.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) ;
+				.GetConstructor(new Type[] { typeof(string), typeof(SymbolOptionsManager), typeof(SymbolArguments) }) ;
 			Cache[BASE_TOKEN_TYPE] = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + BASE_TOKEN_TYPE)
-				.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) ;
+				.GetConstructor(new Type[] { typeof(string), typeof(SymbolOptionsManager), typeof(SymbolArguments) }) ;
 
 			foreach (var smb in grammar.Rules.Keys)
 			{
@@ -433,7 +435,7 @@ namespace " + @namespace + @"
 				else
 				{
 					var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
-					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_RULE_TYPE];
+					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(SymbolOptionsManager), typeof(SymbolArguments) }) : Cache[BASE_RULE_TYPE];
 				}
 			}
 
@@ -444,7 +446,7 @@ namespace " + @namespace + @"
 				else
 				{
 					var type = Assembly.GetExecutingAssembly().GetType(""" + @namespace + @"."" + smb + ""_node"");
-					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(LocalOptions) }) : Cache[BASE_TOKEN_TYPE];
+					Cache[smb] = type != null ? type.GetConstructor(new Type[] { typeof(string), typeof(SymbolOptionsManager), typeof(SymbolArguments) }) : Cache[BASE_TOKEN_TYPE];
 				}
 			}
 		}
@@ -497,7 +499,7 @@ namespace " + @namespace + @"
 	
 	public class RuleNode: Node
 	{
-		public RuleNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public RuleNode(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public RuleNode(Node node): base(node) {}
 
 		public virtual void Accept(BaseTypedTreeVisitor visitor)
@@ -508,7 +510,7 @@ namespace " + @namespace + @"
 	
 	public class TokenNode: Node
 	{
-		public TokenNode(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public TokenNode(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public TokenNode(Node node): base(node) {}
 
 		public virtual void Accept(BaseTypedTreeVisitor visitor)
@@ -519,7 +521,7 @@ namespace " + @namespace + @"
 
 	public class " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node : RuleNode
 	{
-		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(Node node): base(node) {}
 
 		public override void Accept(BaseTypedTreeVisitor visitor)
@@ -533,7 +535,7 @@ namespace " + @namespace + @"
 				nodeClassesSource.AppendLine(@"
 	public class " + name + @"_node : RuleNode 
 	{
-		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + name + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public " + name + @"_node(Node node): base(node) {}
 
 		public override void Accept(BaseTypedTreeVisitor visitor)
@@ -547,7 +549,7 @@ namespace " + @namespace + @"
 					nodeClassesSource.AppendLine(@"
 	public class " + alias + @"_node : " + kvp.Key + @"_node 
 	{
-		public " + alias + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + alias + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public " + alias + @"_node(Node node): base(node) {}
 
 		public override void Accept(BaseTypedTreeVisitor visitor)
@@ -560,7 +562,7 @@ namespace " + @namespace + @"
 				nodeClassesSource.AppendLine(@"
 	public class " + name + @"_node : TokenNode 
 	{
-		public " + name + @"_node(string symbol, LocalOptions opts = null): base(symbol, opts) {}
+		public " + name + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
 		public " + name + @"_node(Node node): base(node) {}
 
 		public override void Accept(BaseTypedTreeVisitor visitor)

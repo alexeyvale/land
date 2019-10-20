@@ -4,21 +4,18 @@ using System.Linq;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
-using System.Threading.Tasks;
 
-using Antlr4.Runtime;
-
-namespace Land.Core
+namespace Land.Core.Lexing
 {
-	public class AntlrTokenAdapter : Lexing.IToken
+	public class AntlrTokenAdapter : IToken
 	{
-		private IToken Token { get; set; }
+		private Antlr4.Runtime.IToken Token { get; set; }
 
 		public SegmentLocation Location { get; private set; }
 		public string Text => Token.Text;
 		public string Name { get; private set; }
 
-		public AntlrTokenAdapter(IToken token, Lexer lexer)
+		public AntlrTokenAdapter(Antlr4.Runtime.IToken token, Antlr4.Runtime.Lexer lexer)
 		{
 			Token = token;
 			Name = lexer.Vocabulary.GetSymbolicName(Token.Type);

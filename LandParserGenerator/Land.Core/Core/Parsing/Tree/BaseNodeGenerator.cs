@@ -23,13 +23,13 @@ namespace Land.Core.Parsing.Tree
 			SymbolArguments args = null)
 		{
 			return (Node)Cache[Cache.ContainsKey(symbol) ? symbol : BASE_NODE_TYPE]
-				.Invoke(new object[] { symbol, opts });
+				.Invoke(new object[] { symbol, opts, args });
 		}
 
 		public virtual Node Generate(Node node)
 		{
 			return (Node)Cache[Cache.ContainsKey(node.Symbol) ? node.Symbol : BASE_NODE_TYPE]
-				.Invoke(new object[] { node.Symbol, node.Options });
+				.Invoke(new object[] { node.Symbol, node.Options, node.Arguments });
 		}
 	}
 }

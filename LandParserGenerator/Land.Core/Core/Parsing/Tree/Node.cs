@@ -57,10 +57,11 @@ namespace Land.Core.Parsing.Tree
 			}
 		}
 
-		public Node(string symbol, SymbolOptionsManager opts = null)
+		public Node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null)
 		{
 			Symbol = symbol;
 			Options = opts ?? new SymbolOptionsManager();
+			Arguments = args ?? new SymbolArguments();
 		}
 
 		public Node(Node node)
@@ -68,6 +69,7 @@ namespace Land.Core.Parsing.Tree
 			Symbol = node.Symbol;
 			UserifiedSymbol = node.UserifiedSymbol;
 			Options = node.Options;
+			Arguments = node.Arguments;
 			Parent = node.Parent;
 			Alias = node.Alias;
 			Children = node.Children;
