@@ -409,7 +409,7 @@ namespace Land.Core.Specification
 
 		public void SetOption(string group, string option, List<string> symbols, List<dynamic> @params)
 		{
-			ConstructionLog.Add($"grammar.SetOption(\"{group}\", \"{option}\", new List<string>{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new List<dynamic>{{ {String.Join(", ", @params.Select(param => GetParamString(param)))} }} );");
+			ConstructionLog.Add($"grammar.SetOption(\"{group}\", \"{option}\", new List<string>{{ {String.Join(", ", symbols.Select(smb => $"\"{smb}\""))} }}, new List<dynamic>{{ {String.Join(", ", @params.Select(param => GetParamString(param)))} }});");
 
 			Options.Set(group, option, symbols.ToList(), @params);
 
@@ -1456,7 +1456,7 @@ namespace Land.Core.Specification
 
 		public string GetConstructionLog(SymbolOptionsManager opts)
 		{
-			return $"new SymbolOptionsManager(new Dictionary<string, Dictionary<string, List<dynamic>>>{{{String.Join(", ", opts.CloneRaw().Select(g=>$"{{{g.Key}, new Dictionary<string, List<dynamic>>{{{String.Join(", ", g.Value.Select(o=>$"{{{o.Key}, new List<dynamic>{{{String.Join(", ", o.Value.Select(p=>p.Tostring()))}}}}}"))}}}}}"))}}})";
+			return $"new SymbolOptionsManager(new Dictionary<string, Dictionary<string, List<dynamic>>>{{{String.Join(", ", opts.CloneRaw().Select(g=>$"{{{g.Key}, new Dictionary<string, List<dynamic>>{{{String.Join(", ", g.Value.Select(o=>$"{{{o.Key}, new List<dynamic>{{{String.Join(", ", o.Value.Select(p => GetParamString(p)))}}}}}"))}}}}}"))}}})";
 		}
 	}
 }
