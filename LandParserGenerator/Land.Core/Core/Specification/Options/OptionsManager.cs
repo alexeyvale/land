@@ -76,10 +76,13 @@ namespace Land.Core.Specification
 		/// <summary>
 		/// Получение опций для заданного символа
 		/// </summary>
-		public SymbolOptionsManager GetOptions(string symbol = null) =>
-			Options.ContainsKey(symbol) 
-				? Options[symbol] 
-				: symbol == null ? Options[LANGUAGE_PARAMETERS_SYMBOL] : null;
+		public SymbolOptionsManager GetOptions(string symbol = null)
+		{
+			if (String.IsNullOrEmpty(symbol))
+				symbol = LANGUAGE_PARAMETERS_SYMBOL;
+
+			return Options.ContainsKey(symbol) ? Options[symbol] : null;
+		}
 
 		/// <summary>
 		/// Слияние хранимых опций для символа и переданных на вход

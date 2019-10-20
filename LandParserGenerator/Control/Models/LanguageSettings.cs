@@ -9,11 +9,14 @@ namespace Land.Control
 {
 	public class LanguageSettings
 	{
-		public bool UseHorizontalContext { get; private set; }
+		public bool UseHorizontalContext { get; private set; } = false;
 
 		public LanguageSettings(SymbolOptionsManager opts)
 		{
-			UseHorizontalContext = opts.IsSet(MarkupOption.USEHORIZONTAAL);
+			if (opts != null)
+			{
+				UseHorizontalContext = opts.IsSet(MarkupOption.USEHORIZONTAAL);
+			}
 		}
 	}
 }
