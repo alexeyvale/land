@@ -6,17 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-
 using Microsoft.Win32;
-
 using Land.Core;
-using Land.Core.Parsing;
 using Land.Core.Parsing.Tree;
-using Land.Core.Parsing.Preprocessing;
-using Land.Markup;
-using Land.Control.Helpers;
+using Land.Markup.CoreExtension;
 
 namespace Land.Control
 {
@@ -61,6 +54,11 @@ namespace Land.Control
 
 					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
 					Log.AddRange(Parsers[extension].Log);
+
+					if (root != null)
+					{
+						root.Accept(new MarkupOptionsProcessingVisitor(Parsers[extension].GrammarObject));
+					}
 
 					return success ? new Tuple<Node, string>(root, text) : null;
 				}

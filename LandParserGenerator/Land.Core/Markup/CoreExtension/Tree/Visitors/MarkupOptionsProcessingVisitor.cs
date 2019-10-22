@@ -36,7 +36,7 @@ namespace Land.Markup.CoreExtension
 			}
 
 			if (Land.Contains(node.Symbol) || Land.Contains(node.Alias))
-				node.Options.IsSet(MarkupOption.LAND);
+				node.Options.Set(MarkupOption.LAND);
 
 			if (GrammarObject.Options.IsSet(MarkupOption.EXACTMATCH, node.Symbol)
 				|| !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(MarkupOption.EXACTMATCH, node.Alias))

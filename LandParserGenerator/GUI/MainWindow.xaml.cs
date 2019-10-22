@@ -777,6 +777,11 @@ namespace Land.GUI
 					{
 						root = File_Parse(argument.Files[counter], 
 							File.ReadAllText(argument.Files[counter], GetEncoding(argument.Files[counter])));
+
+						if (root != null)
+						{
+							root.Accept(new MarkupOptionsProcessingVisitor(Parser.GrammarObject));
+						}
 					}));
 
 					timeSpent += Parser.Statistics.GeneralTimeSpent;
