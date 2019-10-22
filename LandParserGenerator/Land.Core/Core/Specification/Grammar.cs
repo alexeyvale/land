@@ -30,8 +30,11 @@ namespace Land.Core.Specification
 		// Информация обо всех установленных опциях
 		public OptionsManager Options { get; private set; } = new OptionsManager();
 
+		// Стартовый символ грамматики
+		public string StartSymbol => 
+			Options?.GetSymbols(ParsingOption.START).FirstOrDefault();
+
 		// Содержание грамматики
-		public string StartSymbol { get; private set; }
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
 		public Dictionary<string, TerminalSymbol> Tokens { get; private set; } = new Dictionary<string, TerminalSymbol>();
 		public Dictionary<string, PairSymbol> Pairs { get; private set; } = new Dictionary<string, PairSymbol>();
@@ -435,7 +438,6 @@ namespace Land.Core.Specification
 							switch (parsingOption)
 							{
 								case ParsingOption.START:
-									StartSymbol = Options.GetSymbols(ParsingOption.START).FirstOrDefault();
 									if (CheckIfNonterminals(new List<string> { StartSymbol }).Count > 0)
 										throw new IncorrectGrammarException(
 											$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
