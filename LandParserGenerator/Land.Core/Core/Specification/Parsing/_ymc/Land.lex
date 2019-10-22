@@ -116,6 +116,7 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 }
 
 "%"{ID}"(" {	
+	yyless(yytext.Length - 1);
 	yy_push_state(before_args);	
 	yylval.strVal = yytext.Trim('%').Trim('(');	
 	return (int)Tokens.CATEGORY_NAME;

@@ -6,9 +6,9 @@
 //
 //  GPLEX Version:  1.2.2
 //  Machine:  DESKTOP-QMIGNCH
-//  DateTime: 20.10.2019 0:33:21
+//  DateTime: 22.10.2019 20:46:26
 //  UserName: Алексей
-//  GPLEX input file <./Land.lex - 20.10.2019 0:33:21>
+//  GPLEX input file <./Land.lex - 22.10.2019 20:46:26>
 //  GPLEX frame file <embedded resource>
 //
 //  Option settings: unicode, parser, stack, minimize
@@ -804,7 +804,8 @@ BEGIN(in_options);
 	return (int)Tokens.PROC;
             break;
         case 17:
-yy_push_state(before_args);	
+yyless(yytext.Length - 1);
+	yy_push_state(before_args);	
 	yylval.strVal = yytext.Trim('%').Trim('(');	
 	return (int)Tokens.CATEGORY_NAME;
             break;
