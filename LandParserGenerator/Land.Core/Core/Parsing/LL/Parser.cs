@@ -383,7 +383,7 @@ namespace Land.Core.Parsing.LL
 
 		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string avoidedToken = null)
 		{		
-			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			if (!GrammarObject.Options.IsRecoveryEnabled())
 			{
 				Log.Add(Message.Error(
 					$"Возобновление разбора в случае ошибки отключено",

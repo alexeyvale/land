@@ -49,7 +49,8 @@ namespace Land.Core.Specification
 			if (String.IsNullOrEmpty(symbol))
 				symbol = LANGUAGE_PARAMETERS_SYMBOL;
 
-			return Options[symbol].IsSet(group, option);
+			return Options.ContainsKey(symbol) && 
+				Options[symbol].IsSet(group, option);
 		}
 
 		/// <summary>

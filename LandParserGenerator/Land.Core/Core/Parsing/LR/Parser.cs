@@ -298,7 +298,7 @@ namespace Land.Core.Parsing.LR
 						token.Location.Start
 					);
 
-					if (GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+					if (GrammarObject.Options.IsRecoveryEnabled())
 					{
 						++Statistics.RecoveryTimesAny;
 						Statistics.LongestRollback = 
@@ -366,7 +366,7 @@ namespace Land.Core.Parsing.LR
 
 		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string avoidedToken = null)
 		{
-			if (!GrammarObject.Options.IsSet(ParsingOption.RECOVERY))
+			if (!GrammarObject.Options.IsRecoveryEnabled())
 			{
 				Log.Add(Message.Error(
 					$"Возобновление разбора в случае ошибки отключено",

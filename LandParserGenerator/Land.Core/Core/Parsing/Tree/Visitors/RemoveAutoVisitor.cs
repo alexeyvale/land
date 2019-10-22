@@ -7,8 +7,6 @@ namespace Land.Core.Parsing.Tree
 {
 	public class RemoveAutoVisitor: GrammarProvidedTreeVisitor
 	{
-		protected Grammar grammar { get; set; }
-
 		public RemoveAutoVisitor(Grammar g) : base(g) { }
 
 		public override void Visit(Node node)

@@ -92,6 +92,9 @@ namespace Land.Core.Specification
 
 		#region Кастомные методы для конкретных опций
 
+		public static bool IsRecoveryEnabled(this OptionsManager manager) =>
+			manager.GetSymbols().Any(s => manager.IsSet(ParsingOption.RECOVERY, s));
+
 		#endregion
 	}
 
@@ -148,11 +151,14 @@ namespace Land.Core.Specification
 			CustomBlockOption option) =>
 			manager.Clear(OptionGroups.CUSTOMBLOCK.ToString(), option.ToString());
 
+		#region Кастомные методы для конкретных опций
 
 		public static List<NodeOption> GetNodeOptions(this SymbolOptionsManager manager) =>
 			manager.GetOptions(OptionGroups.NODES.ToString()).Select(o => (NodeOption)Enum.Parse(typeof(NodeOption), o)).ToList();
 
 		public static List<ParsingOption> GetParsingOptions(this SymbolOptionsManager manager) =>
 			manager.GetOptions(OptionGroups.PARSING.ToString()).Select(o => (ParsingOption)Enum.Parse(typeof(ParsingOption), o)).ToList();
+
+		#endregion
 	}
 }

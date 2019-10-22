@@ -8,16 +8,14 @@ namespace Land.Core.Parsing.Tree
 {
 	public class LeafOptionProcessingVisitor : GrammarProvidedTreeVisitor
 	{
-		protected Grammar grammar { get; set; }
-
 		public LeafOptionProcessingVisitor(Grammar g) : base(g) { }
 
 		public override void Visit(Node node)
 		{
 			/// Если текущий узел должен быть листовым
 			if (node.Options.IsSet(NodeOption.LEAF) || 
-				!node.Options.GetNodeOptions().Any() && (grammar.Options.IsSet(NodeOption.LEAF, node.Symbol) ||
-				!String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LEAF, node.Alias)))
+				!node.Options.GetNodeOptions().Any() && (GrammarObject.Options.IsSet(NodeOption.LEAF, node.Symbol) ||
+				!String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.LEAF, node.Alias)))
 			{
 				node.Value = node.GetValue();
 

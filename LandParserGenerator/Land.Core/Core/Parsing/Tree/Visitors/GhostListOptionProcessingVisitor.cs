@@ -9,8 +9,6 @@ namespace Land.Core.Parsing.Tree
 {
 	public class GhostListOptionProcessingVisitor : GrammarProvidedTreeVisitor
 	{
-		protected Grammar grammar { get; set; }
-
 		public GhostListOptionProcessingVisitor(Grammar g) : base(g) { }
 
 		public override void Visit(Node node)
@@ -20,8 +18,8 @@ namespace Land.Core.Parsing.Tree
 			{
 				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
 				if (node.Children[i].Options.IsSet(NodeOption.GHOST) || !node.Children[i].Options.GetNodeOptions().Any()
-					&& (grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
-					|| !String.IsNullOrEmpty(node.Children[i].Alias) && grammar.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)))
+					&& (GrammarObject.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
+					|| !String.IsNullOrEmpty(node.Children[i].Alias) && GrammarObject.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
@@ -36,8 +34,8 @@ namespace Land.Core.Parsing.Tree
 				}
 			}
 
-			var listForAlias = !String.IsNullOrEmpty(node.Alias) && grammar.Options.IsSet(NodeOption.LIST, node.Alias);
-			var listForSymbol = grammar.Options.IsSet(NodeOption.LIST, node.Symbol);
+			var listForAlias = !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.LIST, node.Alias);
+			var listForSymbol = GrammarObject.Options.IsSet(NodeOption.LIST, node.Symbol);
 
 			// Если символ помечен как List, убираем подузлы того же типа
 			if (node.Options.IsSet(NodeOption.LIST) 

@@ -8,8 +8,6 @@ namespace Land.Core.Parsing.Tree
 {
 	public class MergeAnyVisitor: GrammarProvidedTreeVisitor
 	{
-		protected Grammar grammar { get; set; }
-
 		public MergeAnyVisitor(Grammar g) : base(g) { }
 
 		public override void Visit(Node node)

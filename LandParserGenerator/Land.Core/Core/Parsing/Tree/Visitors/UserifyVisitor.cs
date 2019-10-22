@@ -8,13 +8,11 @@ namespace Land.Core.Parsing.Tree
 {
 	public class UserifyVisitor: GrammarProvidedTreeVisitor
 	{
-		protected Grammar grammar { get; set; }
-
 		public UserifyVisitor(Grammar g) : base(g) { }
 
 		public override void Visit(Node node)
 		{
-			node.UserifiedSymbol = grammar.Userify(node.Symbol);
+			node.UserifiedSymbol = GrammarObject.Userify(node.Symbol);
 			base.Visit(node);
 		}
 	}
