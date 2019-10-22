@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
+using Land.Markup.CoreExtension;
 
 namespace MarkdownPreprocessing.TreePostprocessing
 {
@@ -85,7 +85,10 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				}
 				PossibleEnd = null;
 
-				var newNode = NodeGenerator.Generate(SECTION_RULE_NAME);
+				var newNodeOptions = new SymbolOptionsManager();
+				newNodeOptions.Set(MarkupOption.LAND);
+
+				var newNode = NodeGenerator.Generate(SECTION_RULE_NAME, newNodeOptions);
 				newNode.SetLocation(node.Location.Start, node.Location.End);
 				newNode.AddLastChild(node);
 
