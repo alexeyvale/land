@@ -125,7 +125,7 @@ namespace Comparison
 
 				searchArea[file] = new ParsedFile
 				{
-					Name = file,
+					Name = Path.GetFileName(file),
 					Root = landParser.Parse(text),
 					Text = text,
 					MarkupSettings = markupSettings
