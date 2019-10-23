@@ -1458,7 +1458,7 @@ namespace Land.Core.Specification
 
 		public string GetConstructionLog(SymbolOptionsManager opts)
 		{
-			return $"new SymbolOptionsManager(new Dictionary<string, Dictionary<string, List<dynamic>>>{{{String.Join(", ", opts.CloneRaw().Select(g=>$"{{{g.Key}, new Dictionary<string, List<dynamic>>{{{String.Join(", ", g.Value.Select(o=>$"{{{o.Key}, new List<dynamic>{{{String.Join(", ", o.Value.Select(p => GetParamString(p)))}}}}}"))}}}}}"))}}})";
+			return $"new SymbolOptionsManager(new Dictionary<string, Dictionary<string, List<dynamic>>>{{{String.Join(", ", opts.CloneRaw().Select(g=>$"{{\"{g.Key}\", new Dictionary<string, List<dynamic>>{{{String.Join(", ", g.Value.Select(o=>$"{{\"{o.Key}\", new List<dynamic>{{{String.Join(", ", o.Value.Select(p => GetParamString(p)))}}}}}"))}}}}}"))}}})";
 		}
 	}
 }
