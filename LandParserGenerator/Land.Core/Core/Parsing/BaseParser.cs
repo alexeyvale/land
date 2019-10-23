@@ -22,7 +22,7 @@ namespace Land.Core.Parsing
 		protected BaseNodeRetypingVisitor NodeRetypingVisitor { get; set; }
 		
 		private BasePreprocessor Preproc { get; set; }
-		private List<Type> TreeVisitors { get; set; }
+		private List<Func<Grammar, GrammarProvidedTreeVisitor>> VisitorConstructors { get; set; } = new List<Func<Grammar, GrammarProvidedTreeVisitor>>();
 
 		public Statistics Statistics { get; set; }
 		public List<Message> Log { get; protected set; }
@@ -88,6 +88,11 @@ namespace Land.Core.Parsing
 			}
 		}
 
+		public void SetVisitor(Func<Grammar, GrammarProvidedTreeVisitor> constructor)
+		{
+			VisitorConstructors.Add(constructor);
+		}
+
 		protected void TreePostProcessing(Node root)
 		{
 			root.Accept(new RemoveAutoVisitor(GrammarObject));
@@ -98,7 +103,13 @@ namespace Land.Core.Parsing
 
 			NodeRetypingVisitor.Root = root;
 			root.Accept(NodeRetypingVisitor);
-			root = NodeRetypingVisitor.Root;	
+			root = NodeRetypingVisitor.Root;
+
+			VisitorConstructors.ForEach(c =>
+			{
+				var visitor = c.Invoke(GrammarObject);
+				root.Accept(visitor);
+			});
 		}
 
 		public override object InitializeLifetimeService() => null;

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Reflection;
-
 using Land.Core;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Preprocessing;
 using Land.Control.Helpers;
+using Land.Markup.CoreExtension;
 
 namespace Land.Control
 {
@@ -47,6 +47,9 @@ namespace Land.Control
 					null
 				);
 			}
+
+			/// Добавляем в коллекцию визиторов парсера визитор для обработки опций разметки
+			Parser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 
 			#endregion
 

@@ -7,16 +7,13 @@ using Land.Core.Parsing.Tree;
 
 namespace Land.Markup.CoreExtension
 {
-	public class MarkupOptionsProcessingVisitor : BaseTreeVisitor
+	public class MarkupOptionsProcessingVisitor : GrammarProvidedTreeVisitor
 	{
-		private Grammar GrammarObject { get; set; }
-
 		private HashSet<string> Land { get; set; }
 		private Dictionary<string, double> GlobalPriorities { get; set; }
 
-		public MarkupOptionsProcessingVisitor(Grammar g)
+		public MarkupOptionsProcessingVisitor(Grammar g): base(g)
 		{
-			GrammarObject = g;
 			Land = g.Options.GetSymbols(MarkupOption.LAND);
 
 			GlobalPriorities = g.Options.GetSymbols(MarkupOption.PRIORITY)

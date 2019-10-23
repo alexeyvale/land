@@ -55,11 +55,6 @@ namespace Land.Control
 					Parsers[extension].Log.ForEach(l => l.FileName = fileName);
 					Log.AddRange(Parsers[extension].Log);
 
-					if (root != null)
-					{
-						root.Accept(new MarkupOptionsProcessingVisitor(Parsers[extension].GrammarObject));
-					}
-
 					return success ? new ParsedFile
 					{
 						Name = fileName,

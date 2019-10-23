@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-
 using AspectCore;
-using Land.Core.Markup;
+using Land.Markup;
+using Land.Markup.CoreExtension;
+using Land.Markup.Binding;
 using Land.Core.Parsing.Tree;
 
 namespace Comparison
@@ -40,6 +41,7 @@ namespace Comparison
 
 			/// Создаём парсер C# и менеджер разметки из библиотеки LanD
 			var landParser = sharp.ParserProvider.GetParser();
+			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
 
 			var errors = new List<string>();
@@ -91,11 +93,11 @@ namespace Comparison
 
 						var index = RandomGen.Next(0, subseq.Count);
 
-						entities[key].AddConcernPoint(new TargetFileInfo
+						entities[key].AddConcernPoint(new ParsedFile
 						{
-							FileName = Path.GetFileName(file),
-							FileText = text,
-							TargetNode = subseq[index]
+							Name = Path.GetFileName(file),
+							Text = text,
+							Root = subseq[index]
 						});
 
 						subseq.RemoveAt(index);
@@ -143,11 +145,11 @@ namespace Comparison
 				var start = DateTime.Now;
 
 				entities[key].ContextFinder = new BasicContextFinder();
-				var basicRemapResult = entities[key].Remap(searchArea.Select(e => new TargetFileInfo
+				var basicRemapResult = entities[key].Remap(searchArea.Select(e => new ParsedFile
 				{
-					FileName = Path.GetFileName(e.Key),
-					FileText = e.Value.Item1,
-					TargetNode = e.Value.Item2
+					Name = Path.GetFileName(e.Key),
+					Text = e.Value.Item1,
+					Root = e.Value.Item2
 				}).ToList(), true, false);
 
 				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
@@ -155,11 +157,11 @@ namespace Comparison
 				start = DateTime.Now;
 
 				entities[key].ContextFinder = new ModifiedContextFinder();
-				var modifiedRemapResult = entities[key].Remap(searchArea.Select(e => new TargetFileInfo
+				var modifiedRemapResult = entities[key].Remap(searchArea.Select(e => new ParsedFile
 				{
-					FileName = Path.GetFileName(e.Key),
-					FileText = e.Value.Item1,
-					TargetNode = e.Value.Item2
+					Name = Path.GetFileName(e.Key),
+					Text = e.Value.Item1,
+					Root = e.Value.Item2
 				}).ToList(), true, false);
 
 				Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");

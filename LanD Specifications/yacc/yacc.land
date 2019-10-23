@@ -45,4 +45,5 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 %markup {
 	land symbol_declaration rule alternative alternative_element
 	priority(0) ':' ';'
+	usehorizontal
 }
