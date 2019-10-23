@@ -44,6 +44,8 @@ namespace Comparison
 			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
 
+			var markupSettings = new LanguageMarkupSettings(landParser.GrammarObject.Options.GetOptions());
+
 			var errors = new List<string>();
 
 			/////////////////////////////////////////////// STAGE 1
@@ -116,12 +118,18 @@ namespace Comparison
 			counter = 0;
 			files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
 
-			var searchArea = new Dictionary<string, Tuple<string, Node>>();
+			var searchArea = new Dictionary<string, ParsedFile>();
 			foreach(var file in files)
 			{
 				var text = File.ReadAllText(file);
-				var landRoot = landParser.Parse(text);
-				searchArea[file] = new Tuple<string, Node>(text, landRoot);
+
+				searchArea[file] = new ParsedFile
+				{
+					Name = file,
+					Root = landParser.Parse(text),
+					Text = text,
+					MarkupSettings = markupSettings
+				};
 
 				++counter;
 				if (counter % 600 == 0)
@@ -145,24 +153,14 @@ namespace Comparison
 				var start = DateTime.Now;
 
 				entities[key].ContextFinder = new BasicContextFinder();
-				var basicRemapResult = entities[key].Remap(searchArea.Select(e => new ParsedFile
-				{
-					Name = Path.GetFileName(e.Key),
-					Text = e.Value.Item1,
-					Root = e.Value.Item2
-				}).ToList(), true, false);
+				var basicRemapResult = entities[key].Remap(searchArea.Values.ToList(), true, false);
 
 				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
 
 				start = DateTime.Now;
 
 				entities[key].ContextFinder = new ModifiedContextFinder();
-				var modifiedRemapResult = entities[key].Remap(searchArea.Select(e => new ParsedFile
-				{
-					Name = Path.GetFileName(e.Key),
-					Text = e.Value.Item1,
-					Root = e.Value.Item2
-				}).ToList(), true, false);
+				var modifiedRemapResult = entities[key].Remap(searchArea.Values.ToList(), true, false);
 
 				Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
