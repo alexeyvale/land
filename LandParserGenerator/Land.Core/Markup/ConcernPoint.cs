@@ -4,9 +4,11 @@ using System.Linq;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Land.Core;
+using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
 using Land.Markup.Tree;
 using Land.Markup.Binding;
+using Land.Markup.CoreExtension;
 
 namespace Land.Markup
 {
@@ -61,21 +63,21 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(TargetFileInfo targetInfo, Concern parent = null)
+		public ConcernPoint(ParsedFile targetInfo, Concern parent = null)
 		{
 			Context = PointContext.Create(targetInfo);
 
-			AstNode = targetInfo.TargetNode;
+			AstNode = targetInfo.Root;
 			Parent = parent;
-			Name = targetInfo.TargetNode.Type;
+			Name = targetInfo.Root.Type;
 
-			if (targetInfo.TargetNode.Value.Count > 0)
-				Name += ": " + String.Join(" ", targetInfo.TargetNode.Value);
+			if (targetInfo.Root.Value.Count > 0)
+				Name += ": " + String.Join(" ", targetInfo.Root.Value);
 			else
 			{
-				if (targetInfo.TargetNode.Children.Count > 0)
+				if (targetInfo.Root.Children.Count > 0)
 				{
-					Name += ": " + String.Join(" ", targetInfo.TargetNode.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+					Name += ": " + String.Join(" ", targetInfo.Root.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
@@ -83,25 +85,25 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, TargetFileInfo targetInfo, Concern parent = null)
+		public ConcernPoint(string name, ParsedFile targetInfo, Concern parent = null)
 		{
 			Name = name;
 			Context = PointContext.Create(targetInfo);
-			AstNode = targetInfo.TargetNode;
+			AstNode = targetInfo.Root;
 			Parent = parent;
 
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, string comment, TargetFileInfo targetInfo, Concern parent = null)
+		public ConcernPoint(string name, string comment, ParsedFile targetInfo, Concern parent = null)
 			: this(name, targetInfo, parent)
 		{
 			Comment = comment;
 		}
 
-		public void Relink(TargetFileInfo targetInfo)
+		public void Relink(ParsedFile targetInfo)
 		{
-			AstNode = targetInfo.TargetNode;
+			AstNode = targetInfo.Root;
 			Context = PointContext.Create(targetInfo);
 		}
 
@@ -117,10 +119,26 @@ namespace Land.Markup
 		}
 	}
 
-	public class TargetFileInfo
+	public class ParsedFile
 	{
-		public string FileName { get; set; }
-		public string FileText { get; set; }
-		public Node TargetNode { get; set; }
+		public string Name { get; set; }
+		public string Text { get; set; }
+		public Node Root { get; set; }
+		public LanguageMarkupSettings MarkupSettings { get; set; }
+	}
+
+	public class LanguageMarkupSettings : MarshalByRefObject
+	{
+		public bool UseHorizontalContext { get; private set; } = false;
+
+		public LanguageMarkupSettings(SymbolOptionsManager opts)
+		{
+			if (opts != null)
+			{
+				UseHorizontalContext = opts.IsSet(MarkupOption.USEHORIZONTAAL);
+			}
+		}
+
+		public override object InitializeLifetimeService() => null;
 	}
 }

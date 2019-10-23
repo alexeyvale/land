@@ -12,8 +12,8 @@ namespace Land.Markup.Binding
 		Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points,
 			Dictionary<string, List<Node>> candidateNodes,
-			TargetFileInfo candidateFileInfo);
+			ParsedFile candidateFileInfo);
 
-		List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo);
+		List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo);
 	}
 }

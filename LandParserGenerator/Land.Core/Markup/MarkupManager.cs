@@ -121,7 +121,7 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(TargetFileInfo sourceInfo, string name = null, string comment = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(ParsedFile sourceInfo, string name = null, string comment = null, Concern parent = null)
 		{
 			var point = new ConcernPoint(sourceInfo, parent);
 
@@ -138,11 +138,11 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(TargetFileInfo sourceInfo)
+		public void AddLand(ParsedFile sourceInfo)
 		{
 			var visitor = new LandExplorerVisitor();
 			/// При добавлении всей суши к разметке, в качестве целевого узла передаётся корень дерева
-			sourceInfo.TargetNode.Accept(visitor);
+			sourceInfo.Root.Accept(visitor);
 
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
@@ -160,7 +160,7 @@ namespace Land.Markup
 
 					foreach (var point in subgroup)
 					{
-						sourceInfo.TargetNode = point;
+						sourceInfo.Root = point;
 						AddElement(new ConcernPoint(sourceInfo, subconcern));
 					}
 				}
@@ -171,7 +171,7 @@ namespace Land.Markup
 
 				foreach (var point in points)
 				{
-					sourceInfo.TargetNode = point;
+					sourceInfo.Root = point;
 					AddElement(new ConcernPoint(sourceInfo, concern));
 				}
 			}
@@ -206,7 +206,7 @@ namespace Land.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, TargetFileInfo targetInfo)
+		public void RelinkConcernPoint(ConcernPoint point, ParsedFile targetInfo)
 		{
 			point.Relink(targetInfo);
 
@@ -340,7 +340,7 @@ namespace Land.Markup
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
 		/// </summary>
-		public List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
 			return ContextFinder.Find(point, targetInfo);
 		}
@@ -367,7 +367,7 @@ namespace Land.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<TargetFileInfo> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<ParsedFile> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
 		{
 			var ambiguous = useLocalRemap
 				? LocalRemap(targetFiles, allowAutoDecisions)
@@ -378,19 +378,19 @@ namespace Land.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<ParsedFile> targetFiles, bool allowAutoDecisions)
 		{
 			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			foreach(var fileGroup in groupedByFile)
 			{
-				var file = targetFiles.Where(f => f.FileName == fileGroup.Key).FirstOrDefault();
+				var file = targetFiles.Where(f => f.Name == fileGroup.Key).FirstOrDefault();
 
 				if(file != null)
 				{
 					var groupedByType = fileGroup.Value.GroupBy(p => p.Context.NodeType).ToDictionary(g => g.Key, g => g.ToList());
-					var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedByType.Keys);
+					var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.Root, groupedByType.Keys);
 
 					var result = ContextFinder.Find(groupedByType, groupedFiles, file);
 
@@ -414,7 +414,7 @@ namespace Land.Markup
 			return ambiguous;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<TargetFileInfo> targetFiles, bool allowAutoDecisions)
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<ParsedFile> targetFiles, bool allowAutoDecisions)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
@@ -426,7 +426,7 @@ namespace Land.Markup
 			{
 				/// Группируем узлы AST файла, к которому попытаемся перепривязаться,
 				/// по типам точек, к которым требуется перепривязка
-				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.TargetNode, groupedPoints.Keys);
+				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.Root, groupedPoints.Keys);
 
 				/// Похожести, посчитанные для сущностей из текущего файла
 				var currentRes = ContextFinder.Find(groupedPoints, groupedFiles, file);
@@ -451,7 +451,7 @@ namespace Land.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, TargetFileInfo targetInfo)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, ParsedFile targetInfo)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 			var candidates = ContextFinder.Find(point, targetInfo)

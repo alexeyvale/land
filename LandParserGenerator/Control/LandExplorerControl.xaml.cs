@@ -67,8 +67,6 @@ namespace Land.Control
 		/// </summary>
 		private LandExplorerSettings SettingsObject { get; set; }
 
-		private Dictionary<string, LanguageSettings> LanguageDependentSettings;
-
 		/// <summary>
 		/// Окно настроек
 		/// </summary>
@@ -92,7 +90,7 @@ namespace Land.Control
 		/// <summary>
 		/// Деревья для файлов, к которым осуществлена привязка
 		/// </summary>
-		public Dictionary<string, Tuple<Node, string>> ParsedFiles { get; set; } = new Dictionary<string, Tuple<Node, string>>();
+		public Dictionary<string, ParsedFile> ParsedFiles { get; set; } = new Dictionary<string, ParsedFile>();
 
 		/// <summary>
 		/// Лог панели разметки
@@ -167,7 +165,7 @@ namespace Land.Control
 		{
 			return root != null
 				? MarkupManager.Find(point, 
-					new TargetFileInfo() { FileName = point.Context.FileName, FileText = fileText, TargetNode = root })
+					new Markup.ParsedFile() { Name = point.Context.FileName, Text = fileText, Root = root })
 				: new List<RemapCandidateInfo>();
 		}
 
@@ -283,9 +281,6 @@ namespace Land.Control
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
 
-			/// Из загруженных парсеров получаем информацию об опциях грамматики
-			LanguageDependentSettings = Parsers.GetLanguageDependentSettings();
-
 			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
 		}
 
@@ -398,17 +393,12 @@ namespace Land.Control
 		{
 			if (cp.HasInvalidLocation)
 			{
-				var rootTextPair = GetRoot(cp.Context.FileName);
+				var parsedFile = GetParsed(cp.Context.FileName);
 
-				if (rootTextPair != null)
+				if (parsedFile != null)
 				{
 					ProcessAmbiguities(
-						MarkupManager.Remap(cp, new TargetFileInfo()
-						{
-							FileName = cp.Context.FileName,
-							FileText = rootTextPair.Item2,
-							TargetNode = rootTextPair.Item1
-						}),
+						MarkupManager.Remap(cp, parsedFile),
 						false
 					);
 				}

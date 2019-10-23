@@ -316,11 +316,11 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(TargetFileInfo info)
+		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(ParsedFile info)
 		{
 			var innerContext = new List<InnerContextElement>();
 			var locations = new List<SegmentLocation>();
-			var stack = new Stack<Node>(Enumerable.Reverse(info.TargetNode.Children));
+			var stack = new Stack<Node>(Enumerable.Reverse(info.Root.Children));
 
 			while (stack.Any())
 			{
@@ -331,7 +331,7 @@ namespace Land.Markup.Binding
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
 						locations.Add(current.Location);
-						innerContext.Add(new InnerContextElement(current, info.FileText));
+						innerContext.Add(new InnerContextElement(current, info.Text));
 					}
 					else
 					{
@@ -342,13 +342,13 @@ namespace Land.Markup.Binding
 			}
 
 			return new Tuple<List<InnerContextElement>, InnerContextElement>(
-				innerContext, new InnerContextElement(locations, info.FileText));
+				innerContext, new InnerContextElement(locations, info.Text));
 		}
 
-		public static SiblingsContext GetSiblingsContext(TargetFileInfo info)
+		public static SiblingsContext GetSiblingsContext(ParsedFile info)
 		{
 			/// Находим островного родителя
-			var parentNode = info.TargetNode.Parent;
+			var parentNode = info.Root.Parent;
 			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.LAND))
 				parentNode = parentNode.Parent;
 
@@ -369,31 +369,31 @@ namespace Land.Markup.Binding
 			}
 
 			/// Индекс помечаемого элемента
-			var markedElementIndex = siblings.IndexOf(info.TargetNode);
+			var markedElementIndex = siblings.IndexOf(info.Root);
 
 			return new SiblingsContext
 			{
 				Before = new TextOrHash(String.Join(" ", siblings
 					.Take(markedElementIndex)
 					.Where(n => n.Location != null)
-					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+					.Select(n => info.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				)),
 				After = new TextOrHash(String.Join(" ", siblings
 					.Skip(markedElementIndex + 1)
 					.Where(n => n.Location != null)
-					.Select(n => info.FileText.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+					.Select(n => info.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				))
 			};
 		}
 
-		public static PointContext Create(TargetFileInfo info)
+		public static PointContext Create(ParsedFile info)
 		{
 			var point = new PointContext()
 			{
-				FileName = info.FileName,
-				NodeType = info.TargetNode.Type,
-				HeaderContext = GetHeaderContext(info.TargetNode),
-				AncestorsContext = GetAncestorsContext(info.TargetNode),
+				FileName = info.Name,
+				NodeType = info.Root.Type,
+				HeaderContext = GetHeaderContext(info.Root),
+				AncestorsContext = GetAncestorsContext(info.Root),
 				SiblingsContext = GetSiblingsContext(info)
 			};
 

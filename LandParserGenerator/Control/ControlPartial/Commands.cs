@@ -74,20 +74,20 @@ namespace Land.Control
 		private void Command_Relink_Executed(TreeViewItem target)
 		{
 			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
+			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
-			if (rootTextPair != null)
+			if (parsedFile != null)
 			{
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = target,
 					DocumentName = fileName,
 					Command = LandExplorerCommand.Relink,
-					DocumentText = rootTextPair.Item2
+					DocumentText = parsedFile.Text
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(rootTextPair.Item1, 
+					GetConcernPointCandidates(parsedFile.Root, 
 						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
 
 				var point = target.DataContext is RemapCandidates pair
@@ -103,20 +103,20 @@ namespace Land.Control
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
 			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
+			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
-			if (rootTextPair != null)
+			if (parsedFile != null)
 			{
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = State.SelectedItem_MarkupTreeView,
 					DocumentName = fileName,
 					Command = LandExplorerCommand.AddPoint,
-					DocumentText = rootTextPair.Item2
+					DocumentText = parsedFile.Text
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(rootTextPair.Item1,
+					GetConcernPointCandidates(parsedFile.Root,
 						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
 
 				ConfigureMarkupElementTab(true);
@@ -128,15 +128,10 @@ namespace Land.Control
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
 			var fileName = Editor.GetActiveDocumentName();
-			var rootTextPair = LogFunction(() => GetRoot(fileName), true, false);
+			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
-			if (rootTextPair != null)
-				MarkupManager.AddLand(new TargetFileInfo()
-				{			
-					FileName = fileName,
-					FileText = rootTextPair.Item2,
-					TargetNode = rootTextPair.Item1
-				});
+			if (parsedFile != null)
+				MarkupManager.AddLand(parsedFile);
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -292,19 +287,13 @@ namespace Land.Control
 				var forest = (sender == ApplyLocalMapping
 					? MarkupManager.GetReferencedFiles()
 					: GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles()
-				).Select(f =>
-				{
-					var parsed = TryParse(f, out bool success);
-
-					return success
-						? new TargetFileInfo()
-						{
-							FileName = f,
-							FileText = parsed.Item2,
-							TargetNode = parsed.Item1
-						}
-						: null;
-				}).Where(r => r != null).ToList();
+				)
+					.Select(f =>
+					{
+						var parsedFile = TryParse(f, out bool success);
+						return success ? parsedFile : null;
+					})
+					.Where(r => r != null).ToList();
 
 				ProcessAmbiguities(
 					MarkupManager.Remap(forest, sender == ApplyLocalMapping, true),

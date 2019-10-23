@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using Land.Core;
-using Land.Core.Parsing.Tree;
+using Land.Markup;
 using Land.Markup.CoreExtension;
 
 namespace Land.Control
@@ -26,7 +26,7 @@ namespace Land.Control
 					DocumentChangedHandler(file);
 		}
 
-		private Tuple<Node, string> GetRoot(string documentName)
+		private ParsedFile GetParsed(string documentName)
 		{
 			return !String.IsNullOrEmpty(documentName)
 				/// Если связанный с точкой файл разбирали и он не изменился с прошлого разбора,
@@ -38,7 +38,7 @@ namespace Land.Control
 				: null;
 		}
 
-		private Tuple<Node, string> TryParse(string fileName, out bool success, string text = null)
+		private ParsedFile TryParse(string fileName, out bool success, string text = null)
 		{
 			if (!String.IsNullOrEmpty(fileName))
 			{
@@ -60,7 +60,13 @@ namespace Land.Control
 						root.Accept(new MarkupOptionsProcessingVisitor(Parsers[extension].GrammarObject));
 					}
 
-					return success ? new Tuple<Node, string>(root, text) : null;
+					return success ? new ParsedFile
+					{
+						Name = fileName,
+						Root = root,
+						Text = text,
+						MarkupSettings = Parsers.GetMarkupSettings(extension)
+					} : null;
 				}
 				else
 				{

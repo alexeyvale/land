@@ -88,11 +88,11 @@ namespace Land.Control
 				customPoint.RealSelection.Shift(1, 0, customBlockStart.Length);
 
 				/// Переразбираем изменённый текст
-				var rootTextPair = LogFunction(() => GetRoot(State.PendingCommand.DocumentName), true, false);
+				var parsedFile = LogFunction(() => GetParsed(State.PendingCommand.DocumentName), true, false);
 
 				/// Теперь в дереве должен появиться узел, соответствующий пользовательскому блоку
 				var customBlockNode = MarkupManager
-					.GetConcernPointCandidates(rootTextPair.Item1, customPoint.RealSelection)
+					.GetConcernPointCandidates(parsedFile.Root, customPoint.RealSelection)
 					.FirstOrDefault(cand => cand.Type == Grammar.CUSTOM_BLOCK_RULE_NAME);
 
 				return customBlockNode != null
@@ -120,11 +120,11 @@ namespace Land.Control
 
 						MarkupManager.RelinkConcernPoint(
 							point,
-							new TargetFileInfo()
+							new Markup.ParsedFile()
 							{
-								FileName = State.PendingCommand.DocumentName,
-								FileText = State.PendingCommand.DocumentText,
-								TargetNode = selectedCandidate.Node
+								Name = State.PendingCommand.DocumentName,
+								Text = State.PendingCommand.DocumentText,
+								Root = selectedCandidate.Node
 							}
 						);
 
@@ -134,11 +134,11 @@ namespace Land.Control
 					else
 					{
 						MarkupManager.AddConcernPoint(
-							new TargetFileInfo()
+							new Markup.ParsedFile()
 							{
-								FileName = State.PendingCommand.DocumentName,
-								FileText = State.PendingCommand.DocumentText,
-								TargetNode = selectedCandidate.Node
+								Name = State.PendingCommand.DocumentName,
+								Text = State.PendingCommand.DocumentText,
+								Root = selectedCandidate.Node
 							},
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,

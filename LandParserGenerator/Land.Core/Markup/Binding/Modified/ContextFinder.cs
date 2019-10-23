@@ -19,7 +19,7 @@ namespace Land.Markup.Binding
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
-			TargetFileInfo candidateFileInfo
+			ParsedFile candidateFileInfo
 		)
 		{
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -35,7 +35,7 @@ namespace Land.Markup.Binding
 								Node = node,
 								Context = new PointContext()
 								{
-									FileName = candidateFileInfo.FileName,
+									FileName = candidateFileInfo.Name,
 									NodeType = node.Type
 								}
 							} as RemapCandidateInfo).ToList()
@@ -56,7 +56,7 @@ namespace Land.Markup.Binding
 					foreach (var candidate in candidates)
 					{
 						var inner = PointContext.GetInnerContext(
-							new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
+							new ParsedFile() { Name = candidateFileInfo.Name, Text = candidateFileInfo.Text, Root = candidate.Node }
 						);
 						candidate.Context.InnerContext = inner.Item1;
 						candidate.Context.InnerContextElement = inner.Item2;
@@ -98,7 +98,7 @@ namespace Land.Markup.Binding
 								foreach(var candidate in identicalCandidates)
 								{
 									candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
-										new TargetFileInfo() { FileName = candidateFileInfo.FileName, FileText = candidateFileInfo.FileText, TargetNode = candidate.Node }
+										new ParsedFile() { Name = candidateFileInfo.Name, Text = candidateFileInfo.Text, Root = candidate.Node }
 									);
 								}
 
@@ -196,10 +196,10 @@ namespace Land.Markup.Binding
 		}
 
 
-		public List<RemapCandidateInfo> Find(ConcernPoint point, TargetFileInfo targetInfo)
+		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
 			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
-			targetInfo.TargetNode.Accept(visitor);
+			targetInfo.Root.Accept(visitor);
 
 			return Find(
 				new Dictionary<string, List<ConcernPoint>> { { point.Context.NodeType, new List<ConcernPoint> { point } } },

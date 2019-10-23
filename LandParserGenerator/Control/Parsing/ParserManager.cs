@@ -5,16 +5,18 @@ using System.IO;
 using System.Reflection;
 using Land.Core.Parsing;
 using Land.Core;
-using Land.Markup.CoreExtension;
+using Land.Markup;
 
 namespace Land.Control
 {
 	public class ParserManager
 	{
-		private Dictionary<string, Tuple<AppDomain, BaseParser>> Parsers { get; set; } = 
-			new Dictionary<string, Tuple<AppDomain, BaseParser>> ();
+		private Dictionary<string, ParserInfo> Parsers { get; set; } = 
+			new Dictionary<string, ParserInfo> ();
 
-		public BaseParser this[string ext] => Parsers.ContainsKey(ext) ? Parsers[ext].Item2 : null;
+		public BaseParser this[string ext] => Parsers.ContainsKey(ext) ? Parsers[ext].Parser : null;
+
+		public LanguageMarkupSettings GetMarkupSettings(string ext) => Parsers.ContainsKey(ext) ? Parsers[ext].MarkupSettings : null;
 
 		public HashSet<string> Load(LandExplorerSettings settingsObject, string cacheDirectoryPath, List<Message> log)
 		{
@@ -27,18 +29,18 @@ namespace Land.Control
 
 			/// Запоминаем ранее загруженные парсеры
 			var oldParsers = Parsers.ToDictionary(kvp=>kvp.Key, kvp => new {
-				ParserId = kvp.Value.Item1.FriendlyName,
+				ParserId = kvp.Value.Domain.FriendlyName,
 				Unloaded = false,
 				DomainParserPair = kvp.Value
 			});
-			Parsers = new Dictionary<string, Tuple<AppDomain, BaseParser>>();
+			Parsers = new Dictionary<string, ParserInfo>();
 
 			foreach (var parserItem in settingsObject.Parsers)
 			{
 				/// Ищем существующий домен, в который загружена старая версия парсера
 				var existingDomain = oldParsers.Values
 					.FirstOrDefault(i => !i.Unloaded && i.ParserId == parserItem.Id.ToString())
-					?.DomainParserPair.Item1;
+					?.DomainParserPair.Domain;
 
 				/// Проверяем, нужно ли перезагрузить текущий парсер
 				var response = RefreshParserCache(settingsObjectDirectory, parserItem, existingDomain, log);
@@ -60,7 +62,13 @@ namespace Land.Control
 
 						if (loadingResult?.Type != MessageType.Error)
 							foreach (var ext in parserItem.Extensions)
-								Parsers[ext] = new Tuple<AppDomain, BaseParser>(libraryDomain, loader.Parser);
+								Parsers[ext] = new ParserInfo
+								{
+									Domain = libraryDomain,
+									Parser = loader.Parser,
+									MarkupSettings = new LanguageMarkupSettings(
+										loader.Parser.GrammarObject.Options.GetOptions())
+								};
 
 						invalidatedExtensions.UnionWith(parserItem.Extensions);
 					}
@@ -75,7 +83,7 @@ namespace Land.Control
 			}
 
 			/// Удаляем неиспользуемые закешированные парсеры для данного файла настроек
-			var directoriesInUse = new HashSet<string>(Parsers.Values.Select(v => v.Item1.FriendlyName));
+			var directoriesInUse = new HashSet<string>(Parsers.Values.Select(v => v.Domain.FriendlyName));
 
 			foreach(var directory in Directory.GetDirectories(settingsObjectDirectory))
 			{
@@ -86,15 +94,10 @@ namespace Land.Control
 			}
 
 			invalidatedExtensions.UnionWith(oldParsers.Where(kvp => !Parsers.ContainsKey(kvp.Key)
-					|| kvp.Value.ParserId != Parsers[kvp.Key].Item1.FriendlyName).Select(kvp => kvp.Key));
+					|| kvp.Value.ParserId != Parsers[kvp.Key].Domain.FriendlyName).Select(kvp => kvp.Key));
 
 			return invalidatedExtensions;
 		}
-
-		public Dictionary<string, LanguageSettings> GetLanguageDependentSettings() =>
-			Parsers.ToDictionary(p => p.Key, p => new LanguageSettings(
-				p.Value.Item2.GrammarObject.Options.GetOptions()
-			));
 
 		private bool EnsureDirectoryExists(string path)
 		{
