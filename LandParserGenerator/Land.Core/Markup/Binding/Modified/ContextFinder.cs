@@ -19,7 +19,7 @@ namespace Land.Markup.Binding
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			Dictionary<string, List<ConcernPoint>> points, 
 			Dictionary<string, List<Node>> candidateNodes, 
-			ParsedFile candidateFileInfo
+			ParsedFile actualFile
 		)
 		{
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -35,7 +35,7 @@ namespace Land.Markup.Binding
 								Node = node,
 								Context = new PointContext()
 								{
-									FileName = candidateFileInfo.Name,
+									FileName = actualFile.Name,
 									NodeType = node.Type
 								}
 							} as RemapCandidateInfo).ToList()
@@ -56,7 +56,7 @@ namespace Land.Markup.Binding
 					foreach (var candidate in candidates)
 					{
 						var inner = PointContext.GetInnerContext(
-							new ParsedFile() { Name = candidateFileInfo.Name, Text = candidateFileInfo.Text, Root = candidate.Node }
+							new ParsedFile() { Name = actualFile.Name, Text = actualFile.Text, Root = candidate.Node }
 						);
 						candidate.Context.InnerContext = inner.Item1;
 						candidate.Context.InnerContextElement = inner.Item2;
@@ -81,8 +81,9 @@ namespace Land.Markup.Binding
 
 					/// Проверку горизонтального контекста выполняем только если
 					/// есть несколько кандидатов с одинаковыми оценками похожести
-					if (first != null && !first.IsAuto 
-						&& IsSimilarEnough(first) && second != null)
+					if (actualFile.MarkupSettings.UseHorizontalContext &&
+						first != null && !first.IsAuto &&
+						IsSimilarEnough(first) && second != null)
 					{
 						var identicalCandidates = candidates.TakeWhile(c =>
 							c.HeaderSimilarity == first.HeaderSimilarity &&
@@ -98,7 +99,7 @@ namespace Land.Markup.Binding
 								foreach(var candidate in identicalCandidates)
 								{
 									candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
-										new ParsedFile() { Name = candidateFileInfo.Name, Text = candidateFileInfo.Text, Root = candidate.Node }
+										new ParsedFile() { Name = actualFile.Name, Text = actualFile.Text, Root = candidate.Node }
 									);
 								}
 
