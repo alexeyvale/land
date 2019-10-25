@@ -15,7 +15,7 @@ namespace Comparison
 		const string MarkupFolder = @"D:\Repositories\_mapping\Roslyn\Common\base";
 		const string RelinkFolder = @"D:\Repositories\_mapping\Roslyn\Common\modified";
 		const int EntitiesPerFile = 3;
-		const int FilesTake = 4417;
+		const int FilesTake = 1000;
 		static readonly Random RandomGen = new Random(7);
 
 		public class GetNodeSequenceVisitor: BaseTreeVisitor

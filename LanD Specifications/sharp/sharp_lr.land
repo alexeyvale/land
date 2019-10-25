@@ -28,9 +28,11 @@ entity	=	enum | class_struct_interface | method | field | property | water_entit
 
 enum			=	common_beginning 'enum' name Any '{' Any '}' ';'?
 class_struct_interface	=	common_beginning ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?
-method			=	common_beginning type name arguments Any (init_expression? ';' | block)
+method			=	common_beginning type name arguments Any method_body
+method_body		=	init_expression? ';' | block
 field			=	common_beginning type name ('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'
-property		=	common_beginning type name (block (init_value ';')? | init_expression ';')
+property		=	common_beginning type name property_body
+property_body	=	(block (init_value ';')? | init_expression ';')
 water_entity	=	AnyInclude('delegate', 'operator', 'this') (block | ';')+
 
 common_beginning	=	entity_attribute* modifier* 
@@ -64,7 +66,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list common_beginning entity
-	leaf name type modifier
+	leaf name type modifier arguments init_value
 }
 
 %customblock {
@@ -75,7 +77,11 @@ block				=	'{' Any '}'
 
 %markup {
 	land namespace enum class_struct_interface method field property
-	priority(5) name
+	priority(0.1) modifier
+	priority(0.8) name
 	priority(0.5) arguments
+	priority(0.3) type
+	priority(0.1) init_value
+	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
 	exactmatch modifier
 }

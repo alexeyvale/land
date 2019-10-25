@@ -64,7 +64,6 @@ namespace Land.Markup.Binding
 			Dictionary<ContextType, double?> weights)
 		{
 			var MAX_WEIGHT = weights.Count;
-			const double MIN_GAP = 0.04;
 
 			var features = new Dictionary<ContextType, ContextFeatures>
 			{
@@ -77,9 +76,10 @@ namespace Land.Markup.Binding
 			/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
 			var contextsToPrioritize = new List<ContextType>();
 
-			foreach (var kvp in features)
+			foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
 			{
-				if (kvp.Value.MedianGap <= MIN_GAP && kvp.Value.GapFromMax <= MIN_GAP)
+				if (kvp.Value.MaxValue < 0.6 ||
+					(1 - kvp.Value.MaxValue) * 1.5 > kvp.Value.MedianGap)
 					weights[kvp.Key] = 1;
 				else
 					contextsToPrioritize.Add(kvp.Key);
@@ -123,7 +123,7 @@ namespace Land.Markup.Binding
 	/// </summary>
 	public class LowerChangedInnerPriority : IWeightsHeuristic
 	{
-		const double GARBAGE_INNER_THRESHOLD = 0.65;
+		const double GARBAGE_INNER_THRESHOLD = 0.6;
 
 		public long Priority => 20;
 
@@ -133,7 +133,7 @@ namespace Land.Markup.Binding
 			Dictionary<ContextType, double?> weights)
 		{
 			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_INNER_THRESHOLD)
-				weights[ContextType.Inner] = 1;
+				weights[ContextType.Inner] = 0;
 
 			return weights;
 		}
