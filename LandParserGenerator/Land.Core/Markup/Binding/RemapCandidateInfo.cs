@@ -8,6 +8,7 @@ namespace Land.Markup.Binding
 	public class RemapCandidateInfo
 	{
 		public Node Node { get; set; }
+		public ParsedFile File { get; set; }
 		public PointContext Context { get; set; }
 
 		public double HeaderSimilarity { get; set; }

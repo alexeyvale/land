@@ -18,7 +18,11 @@ namespace Land.Core.Parsing.LR
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
-		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
+		public Parser(
+			Grammar g,
+			ILexer lexer,
+			BaseNodeGenerator nodeGen = null,
+			BaseNodeRetypingVisitor retypingVisitor = null) : base(g, lexer, nodeGen, retypingVisitor)
 		{
 			Table = new TableLR1(g);
 		}

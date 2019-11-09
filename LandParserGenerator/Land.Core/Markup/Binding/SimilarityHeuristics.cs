@@ -6,16 +6,6 @@ using System.Text;
 
 namespace Land.Markup.Binding
 {
-	public interface ISimilarityHeuristic
-	{
-		long Priority { get; }
-
-		List<RemapCandidateInfo> PredictSimilarity(
-			PointContext source,
-			List<RemapCandidateInfo> candidates
-		);
-	}
-
 	/// <summary>
 	/// Присваивает итоговую оценку 1 кандидату с полностью совпадающими заголовком и предками
 	/// </summary>

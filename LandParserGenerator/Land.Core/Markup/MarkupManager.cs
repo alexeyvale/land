@@ -38,7 +38,7 @@ namespace Land.Markup
 			return new List<RelationNotification>();
 		}
 
-		public IContextFinder ContextFinder { get; set; }
+		public ContextFinder ContextFinder { get; private set; } = new ContextFinder();
 
 		/// <summary>
 		/// Коллекция точек привязки

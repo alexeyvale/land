@@ -26,7 +26,11 @@ namespace Land.Core.Parsing.LL
 		private Dictionary<string, Tuple<SymbolArguments, Stack<string>>> RecoveryCache { get; set; }
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
-		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
+		public Parser(
+			Grammar g, 
+			ILexer lexer, 
+			BaseNodeGenerator nodeGen = null, 
+			BaseNodeRetypingVisitor retypingVisitor = null) : base(g, lexer, nodeGen, retypingVisitor)
 		{
 			Table = new TableLL1(g);
 

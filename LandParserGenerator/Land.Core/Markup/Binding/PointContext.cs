@@ -183,55 +183,70 @@ namespace Land.Markup.Binding
 	[DataContract]
 	public class SiblingsContext
 	{
+		[DataContract]
+		public class ClosestElement
+		{
+			[DataMember]
+			public List<HeaderContextElement> HeaderContext { get; set; }
+			[DataMember]
+			public InnerContextElement InnerContext { get; set; }
+		}
+
 		[DataMember]
 		public TextOrHash Before { get; set; }
 
 		[DataMember]
 		public TextOrHash After { get; set; }
+
+		[DataMember]
+		public List<ClosestElement> Closest { get; set; }
 	}
 
 	[DataContract]
-	public class TextOrHash
+	public class FileContext
 	{
-		public const int MAX_TEXT_LENGTH = 100;
-
+		/// <summary>
+		/// Имя файла
+		/// </summary>
 		[DataMember]
-		public string Text { get; set; }
+		public string Name { get; set; }
 
+		/// <summary>
+		/// Количество строк
+		/// </summary>
 		[DataMember]
-		public int TextLength { get; set; }
+		public int LineCount { get; set; }
 
+		/// <summary>
+		/// Нечёткий хеш содержимого файла
+		/// </summary>
 		[DataMember]
-		public byte[] Hash { get; set; }
+		public TextOrHash Content { get; set; }
 
-		public TextOrHash() { }
-
-		public TextOrHash(string text)
-		{
-			text = System.Text.RegularExpressions.Regex.Replace(
-				text, "[\n\r\f\t ]+", " "
-			);
-
-			TextLength = text.Length;
-
-			/// Хэш от строки можем посчитать, только если длина строки
-			/// больше заданной константы
-			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
-				Hash = FuzzyHashing.GetFuzzyHash(text);
-
-			if (text.Length <= MAX_TEXT_LENGTH)
-				Text = text;
-		}
+		/// <summary>
+		/// Номер строки, с которой начинается помеченный элемент
+		/// </summary>
+		[DataMember]
+		public int Line { get; set; }
 	}
 
 	[DataContract]
 	public class PointContext
 	{
 		[DataMember]
-		public string FileName { get; set; }
-
-		[DataMember]
 		public string NodeType { get; set; }
+
+		/// <summary>
+		/// Хеш текста, соответствующего сущности
+		/// </summary>
+		[DataMember]
+		public byte[] Hash { get; set; }
+
+		/// <summary>
+		/// Контекст файла, в котором находится помеченный элемент
+		/// </summary>
+		[DataMember]
+		public FileContext FileContext { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
@@ -262,6 +277,43 @@ namespace Land.Markup.Binding
 		/// </summary>
 		[DataMember]
 		public SiblingsContext SiblingsContext { get; set; }
+
+		/// <summary>
+		/// Инициализация всех контекстов, кроме горизонтального
+		/// </summary>
+		public PointContext(Node node, ParsedFile file)
+		{
+			NodeType = node.Type;
+			Hash = GetHash(node, file);
+			FileContext = GetFileContext(file);
+			HeaderContext = GetHeaderContext(node);
+			AncestorsContext = GetAncestorsContext(node);
+
+			var innerContexts = GetInnerContext(node, file);
+			InnerContext = innerContexts.Item1;
+			InnerContextElement = innerContexts.Item2;
+		}
+
+		public PointContext(Node node, ParsedFile file, List<ParsedFile> searchArea): this(node, file)
+		{
+			SiblingsContext = GetSiblingsContext(node, file, searchArea);
+		}
+
+		public static byte[] GetHash(Node node, ParsedFile file)
+		{
+			/// Считаем хеш от всего текста помечаемого элемента за вычетом пробельных символов
+			using (var md5 = System.Security.Cryptography.MD5.Create())
+			{
+				var text = file.Text.Substring(
+					node.Location.Start.Offset,
+					node.Location.Length.Value
+				);
+
+				return md5.ComputeHash(Encoding.ASCII.GetBytes(
+					System.Text.RegularExpressions.Regex.Replace(text, "[\n\r\f\t ]+", "")
+				));
+			}
+		}
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)
 		{
@@ -316,11 +368,11 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(ParsedFile info)
+		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(Node node, ParsedFile file)
 		{
 			var innerContext = new List<InnerContextElement>();
 			var locations = new List<SegmentLocation>();
-			var stack = new Stack<Node>(Enumerable.Reverse(info.Root.Children));
+			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
 			while (stack.Any())
 			{
@@ -331,7 +383,7 @@ namespace Land.Markup.Binding
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
 						locations.Add(current.Location);
-						innerContext.Add(new InnerContextElement(current, info.Text));
+						innerContext.Add(new InnerContextElement(current, file.Text));
 					}
 					else
 					{
@@ -342,13 +394,16 @@ namespace Land.Markup.Binding
 			}
 
 			return new Tuple<List<InnerContextElement>, InnerContextElement>(
-				innerContext, new InnerContextElement(locations, info.Text));
+				innerContext, new InnerContextElement(locations, file.Text));
 		}
 
-		public static SiblingsContext GetSiblingsContext(ParsedFile info)
+		public static SiblingsContext GetSiblingsContext(
+			Node node, 
+			ParsedFile file,
+			List<ParsedFile> searchArea)
 		{
 			/// Находим островного родителя
-			var parentNode = info.Root.Parent;
+			var parentNode = node.Parent;
 			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.LAND))
 				parentNode = parentNode.Parent;
 
@@ -369,39 +424,74 @@ namespace Land.Markup.Binding
 			}
 
 			/// Индекс помечаемого элемента
-			var markedElementIndex = siblings.IndexOf(info.Root);
+			var markedElementIndex = siblings.IndexOf(node);
+			siblings.RemoveAt(markedElementIndex);
 
-			return new SiblingsContext
+			var context = new SiblingsContext
 			{
 				Before = new TextOrHash(String.Join(" ", siblings
 					.Take(markedElementIndex)
 					.Where(n => n.Location != null)
-					.Select(n => info.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				)),
 				After = new TextOrHash(String.Join(" ", siblings
-					.Skip(markedElementIndex + 1)
+					.Skip(markedElementIndex)
 					.Where(n => n.Location != null)
-					.Select(n => info.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
-				))
+					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
+				)),
+				Closest = new List<SiblingsContext.ClosestElement>()
 			};
+
+			if(searchArea != null)
+			{
+			}
+
+			return context;
 		}
 
-		public static PointContext Create(ParsedFile info)
+		public static FileContext GetFileContext(ParsedFile targetInfo)
 		{
-			var point = new PointContext()
+			return new FileContext
 			{
-				FileName = info.Name,
-				NodeType = info.Root.Type,
-				HeaderContext = GetHeaderContext(info.Root),
-				AncestorsContext = GetAncestorsContext(info.Root),
-				SiblingsContext = GetSiblingsContext(info)
+				Name = targetInfo.Name,
+				LineCount = targetInfo.Text.Count(c => c == '\n') + 1,
+				Line = targetInfo.Root.Location.Start.Line.Value,
+				Content = new TextOrHash(targetInfo.Text)
 			};
+		}
+	}
 
-			var innerContexts = GetInnerContext(info);
-			point.InnerContext = innerContexts.Item1;
-			point.InnerContextElement = innerContexts.Item2;
+	[DataContract]
+	public class TextOrHash
+	{
+		public const int MAX_TEXT_LENGTH = 100;
 
-			return point;
+		[DataMember]
+		public string Text { get; set; }
+
+		[DataMember]
+		public int TextLength { get; set; }
+
+		[DataMember]
+		public byte[] Hash { get; set; }
+
+		public TextOrHash() { }
+
+		public TextOrHash(string text)
+		{
+			text = System.Text.RegularExpressions.Regex.Replace(
+				text, "[\n\r\f\t ]+", " "
+			);
+
+			TextLength = text.Length;
+
+			/// Хэш от строки можем посчитать, только если длина строки
+			/// больше заданной константы
+			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+				Hash = FuzzyHashing.GetFuzzyHash(text);
+
+			if (text.Length <= MAX_TEXT_LENGTH)
+				Text = text;
 		}
 	}
 

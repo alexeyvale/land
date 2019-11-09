@@ -30,8 +30,7 @@ namespace Land.Control
 		{
 			public TreeViewItem Target { get; set; }
 			public LandExplorerCommand? Command { get; set; }
-			public string DocumentName { get; set; }
-			public string DocumentText { get; set; }
+			public ParsedFile Document { get; set; }
 		}
 
 		public class ControlState
@@ -141,13 +140,6 @@ namespace Land.Control
 
 			/// В TreeView будем показывать текущее дерево разметки
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
-		}
-
-		public void SwitchMarkupBackend(bool useBasic)
-		{
-			MarkupManager.ContextFinder = useBasic
-				? (IContextFinder)new BasicContextFinder()
-				: (IContextFinder)new ModifiedContextFinder();
 		}
 
 		public ObservableCollection<MarkupElement> GetMarkup()
@@ -358,7 +350,7 @@ namespace Land.Control
 							{
 								segments.Add(new DocumentSegment()
 								{
-									FileName = cp.Context.FileName,
+									FileName = cp.Context.FileContext.Name,
 									StartOffset = cp.Location.Start.Offset,
 									EndOffset = cp.Location.End.Offset,
 									CaptureWholeLine = captureWholeLine
@@ -378,7 +370,7 @@ namespace Land.Control
 				{
 					segments.Add(new DocumentSegment()
 					{
-						FileName = concernPoint.Context.FileName,
+						FileName = concernPoint.Context.FileContext.Name,
 						StartOffset = concernPoint.Location.Start.Offset,
 						EndOffset = concernPoint.Location.End.Offset,
 						CaptureWholeLine = captureWholeLine

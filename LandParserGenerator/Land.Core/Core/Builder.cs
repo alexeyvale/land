@@ -363,12 +363,13 @@ using System.Reflection;
 using Land.Core.Specification;
 using Land.Core.Lexing;
 using Land.Core.Parsing;
+using Land.Core.Parsing.Tree;
 
 namespace " + @namespace + @"
 {
 	public static class ParserProvider
 	{
-		public static BaseParser GetParser()
+		public static BaseParser GetParser(bool buildTypedTree = true)
 		{
 			var grammar = GrammarProvider.GetGrammar();
 			var lexerType = Assembly.GetExecutingAssembly().GetType(""" + @namespace.Replace('.', '_') + @"_Lexer"");
@@ -382,7 +383,8 @@ namespace " + @namespace + @"
 						new AntlrLexerAdapter(
 							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
 						),
-						new NodeGenerator(grammar)
+						buildTypedTree ? new NodeGenerator(grammar) : null,
+						buildTypedTree ? new NodeRetypingVisitor(grammar) : null
 					);
 					break;
 				case GrammarType.LR:
@@ -390,7 +392,8 @@ namespace " + @namespace + @"
 						new AntlrLexerAdapter(
 							(Antlr4.Runtime.ICharStream stream) => (Antlr4.Runtime.Lexer)Activator.CreateInstance(lexerType, stream)
 						),
-						new NodeGenerator(grammar)
+						buildTypedTree ? new NodeGenerator(grammar) : null,
+						buildTypedTree ? new NodeRetypingVisitor(grammar) : null
 					);
 					break;
 			}
@@ -473,7 +476,7 @@ namespace " + @namespace + @"
 
 		public override void Visit(Node node)
 		{
-			if(Cache.ContainsKey(node.Alias))
+			if(!String.IsNullOrEmpty(node.Alias) && Cache.ContainsKey(node.Alias))
 			{
 				var newNode = (Node)Cache[node.Alias].Invoke(new object[] { node });
 
@@ -497,6 +500,7 @@ namespace " + @namespace + @"
 		}
 	}
 	
+	[Serializable]
 	public class RuleNode: Node
 	{
 		public RuleNode(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
@@ -508,6 +512,7 @@ namespace " + @namespace + @"
 		}
 	}
 	
+	[Serializable]
 	public class TokenNode: Node
 	{
 		public TokenNode(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
@@ -519,6 +524,7 @@ namespace " + @namespace + @"
 		}
 	}
 
+	[Serializable]
 	public class " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node : RuleNode
 	{
 		public " + Grammar.CUSTOM_BLOCK_RULE_NAME + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
@@ -533,6 +539,7 @@ namespace " + @namespace + @"
 
 			foreach (var name in grammar.Rules.Keys.Where(key=>!key.StartsWith(Grammar.AUTO_RULE_PREFIX)))
 				nodeClassesSource.AppendLine(@"
+	[Serializable]
 	public class " + name + @"_node : RuleNode 
 	{
 		public " + name + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
@@ -547,6 +554,7 @@ namespace " + @namespace + @"
 			foreach (var kvp in grammar.Aliases)
 				foreach (var alias in kvp.Value)
 					nodeClassesSource.AppendLine(@"
+	[Serializable]
 	public class " + alias + @"_node : " + kvp.Key + @"_node 
 	{
 		public " + alias + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}
@@ -560,6 +568,7 @@ namespace " + @namespace + @"
 
 			foreach (var name in grammar.Tokens.Keys.Where(key => !key.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
 				nodeClassesSource.AppendLine(@"
+	[Serializable]
 	public class " + name + @"_node : TokenNode 
 	{
 		public " + name + @"_node(string symbol, SymbolOptionsManager opts = null, SymbolArguments args = null): base(symbol, opts, args) {}

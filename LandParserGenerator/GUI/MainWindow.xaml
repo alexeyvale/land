@@ -276,14 +276,8 @@
                             <Separator></Separator>
                             <Button Name="SaveDocumentButton" Content="Сохранить" Click="SaveDocumentButton_Click"/>
                             <Separator></Separator>
-                            <Button Name="CloseDocumentButton" Content="Закрыть" Click="CloseDocumentButton_Click"/>
-							<Separator></Separator>
-							<CheckBox Margin="10 0 0 0" 
-									  Content="Базовые контексты"
-									  Name="UseBasicContextsCheckBox"
-									  Checked="UseBasicContextsCheckBox_CheckedChanged"
-									  Unchecked="UseBasicContextsCheckBox_CheckedChanged"></CheckBox>
-                        </ToolBar>
+							<Button Name="CloseDocumentButton" Content="Закрыть" Click="CloseDocumentButton_Click"/>
+						</ToolBar>
 
                         <TabControl Grid.Row="1" Name="DocumentTabs" Background="WhiteSmoke">
                         </TabControl>

@@ -81,9 +81,8 @@ namespace Land.Control
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = target,
-					DocumentName = fileName,
 					Command = LandExplorerCommand.Relink,
-					DocumentText = parsedFile.Text
+					Document = parsedFile
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
@@ -110,9 +109,8 @@ namespace Land.Control
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = State.SelectedItem_MarkupTreeView,
-					DocumentName = fileName,
-					Command = LandExplorerCommand.AddPoint,
-					DocumentText = parsedFile.Text
+					Document = parsedFile,
+					Command = LandExplorerCommand.AddPoint
 				};
 
 				ConcernPointCandidatesList.ItemsSource =

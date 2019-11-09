@@ -6,17 +6,6 @@ using System.Text;
 
 namespace Land.Markup.Binding
 {
-	public interface IWeightsHeuristic
-	{
-		long Priority { get; }
-
-		Dictionary<ContextType, double?> TuneWeights(
-			PointContext source,
-			List<RemapCandidateInfo> candidates,
-			Dictionary<ContextType, double?> weights
-		);
-	}
-
 	public class EmptyContextHeuristic : IWeightsHeuristic
 	{
 		public long Priority => 100;

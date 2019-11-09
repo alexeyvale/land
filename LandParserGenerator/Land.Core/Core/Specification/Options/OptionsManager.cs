@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace Land.Core.Specification
 {
-	public class OptionsManager: MarshalByRefObject
+	[Serializable]
+	public class OptionsManager
 	{
 		private const string LANGUAGE_PARAMETERS_SYMBOL = "";
 
@@ -118,8 +119,6 @@ namespace Land.Core.Specification
 				Options = this.Options.ToDictionary(g => g.Key, g => g.Value.Clone())
 			};
 		}
-
-		public override object InitializeLifetimeService() => null;
 	}
 
 	public class ArgumentGroup

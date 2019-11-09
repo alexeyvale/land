@@ -28,7 +28,11 @@ namespace Land.Core.Parsing
 		public List<Message> Log { get; protected set; }
 		protected bool EnableTracing { get; set; }
 
-		public BaseParser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null, BaseNodeRetypingVisitor retypeVisitor = null)
+		public BaseParser(
+			Grammar g, 
+			ILexer lexer, 
+			BaseNodeGenerator nodeGen = null, 
+			BaseNodeRetypingVisitor retypeVisitor = null)
 		{
 			GrammarObject = g;
 			Lexer = lexer;
