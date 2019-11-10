@@ -98,6 +98,8 @@
     <Compile Include="Markup\Binding\RemapCandidateInfo.cs" />
     <Compile Include="Markup\Binding\FuzzyHashing.cs" />
     <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />
+    <Compile Include="Markup\CoreExtension\Tree\ContextCachingNode.cs" />
+    <Compile Include="Markup\CoreExtension\Tree\Visitors\NodeRetypingVisitor.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
     <Compile Include="Markup\Relations\RelationsCache.cs" />
     <Compile Include="Markup\MarkupElementConverter.cs" />

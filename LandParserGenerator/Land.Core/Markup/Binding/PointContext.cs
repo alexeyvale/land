@@ -88,50 +88,20 @@ namespace Land.Markup.Binding
 	}
 
 	[DataContract]
-	public class InnerContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
+	public class InnerContext
 	{
-		/// Для базовой версии алгоритмов перепривязки
-		public List<HeaderContextElement> HeaderContext { get; set; }
-
 		[DataMember]
 		public TextOrHash Content { get; set; }
 
-		public InnerContextElement() { }
+		public InnerContext() { }
 
-		public InnerContextElement(Node node, string fileText)
+		public InnerContext(List<SegmentLocation> locations, string fileText)
 		{
-			Type = node.Type;
-			Priority = node.Options.GetPriority().Value;
-			HeaderContext = PointContext.GetHeaderContext(node);
-
-			/// Удаляем из текста все пробельные символы
-			var text = fileText.Substring(
-				node.Location.Start.Offset, 
-				node.Location.Length.Value
-			);
-
-			Content = new TextOrHash(text);
-		}
-
-		public InnerContextElement(List<SegmentLocation> locations, string fileText)
-		{
-			/// Удаляем из текста все пробельные символы
 			var text = String.Join(" ", locations.Select(l => 
 				fileText.Substring(l.Start.Offset, l.Length.Value)
 			));
 
 			Content = new TextOrHash(text);
-		}
-
-		public bool EqualsIgnoreValue(object obj)
-		{
-			if (obj is InnerContextElement elem)
-			{
-				return ReferenceEquals(this, elem) || Priority == elem.Priority
-					&& Type == elem.Type;
-			}
-
-			return false;
 		}
 	}
 
@@ -189,7 +159,7 @@ namespace Land.Markup.Binding
 			[DataMember]
 			public List<HeaderContextElement> HeaderContext { get; set; }
 			[DataMember]
-			public InnerContextElement InnerContext { get; set; }
+			public InnerContext InnerContext { get; set; }
 		}
 
 		[DataMember]
@@ -222,19 +192,22 @@ namespace Land.Markup.Binding
 		/// </summary>
 		[DataMember]
 		public TextOrHash Content { get; set; }
-
-		/// <summary>
-		/// Номер строки, с которой начинается помеченный элемент
-		/// </summary>
-		[DataMember]
-		public int Line { get; set; }
 	}
 
 	[DataContract]
 	public class PointContext
 	{
+		/// <summary>
+		/// Тип сущности, которой соответствует точка привязки
+		/// </summary>
 		[DataMember]
-		public string NodeType { get; set; }
+		public string Type { get; set; }
+
+		/// <summary>
+		/// Номер строки в файле, на которой начинается сущность
+		/// </summary>
+		[DataMember]
+		public int Line { get; set; }
 
 		/// <summary>
 		/// Хеш текста, соответствующего сущности
@@ -255,16 +228,10 @@ namespace Land.Markup.Binding
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		/// <summary>
-		/// Контекст потомков узла, к которому привязана точка разметки
-		/// </summary>
-		[DataMember]
-		public List<InnerContextElement> InnerContext { get; set; }
-
-		/// <summary>
 		/// Внутренний контекст в виде одной сущности
 		/// </summary>
 		[DataMember]
-		public InnerContextElement InnerContextElement { get; set; }
+		public InnerContext InnerContext { get; set; }
 
 		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
@@ -283,15 +250,13 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public PointContext(Node node, ParsedFile file)
 		{
-			NodeType = node.Type;
+			Type = node.Type;
+			Line = node.Location.Start.Line.Value;
 			Hash = GetHash(node, file);
-			FileContext = GetFileContext(file);
+			FileContext = file.BindingContext;
 			HeaderContext = GetHeaderContext(node);
 			AncestorsContext = GetAncestorsContext(node);
-
-			var innerContexts = GetInnerContext(node, file);
-			InnerContext = innerContexts.Item1;
-			InnerContextElement = innerContexts.Item2;
+			InnerContext = GetInnerContext(node, file);
 		}
 
 		public PointContext(Node node, ParsedFile file, List<ParsedFile> searchArea): this(node, file)
@@ -368,9 +333,8 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static Tuple<List<InnerContextElement>, InnerContextElement> GetInnerContext(Node node, ParsedFile file)
+		public static InnerContext GetInnerContext(Node node, ParsedFile file)
 		{
-			var innerContext = new List<InnerContextElement>();
 			var locations = new List<SegmentLocation>();
 			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
@@ -383,7 +347,6 @@ namespace Land.Markup.Binding
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
 						locations.Add(current.Location);
-						innerContext.Add(new InnerContextElement(current, file.Text));
 					}
 					else
 					{
@@ -393,8 +356,7 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return new Tuple<List<InnerContextElement>, InnerContextElement>(
-				innerContext, new InnerContextElement(locations, file.Text));
+			return new InnerContext(locations, file.Text);
 		}
 
 		public static SiblingsContext GetSiblingsContext(
@@ -449,14 +411,13 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static FileContext GetFileContext(ParsedFile targetInfo)
+		public static FileContext GetFileContext(string name, string text)
 		{
 			return new FileContext
 			{
-				Name = targetInfo.Name,
-				LineCount = targetInfo.Text.Count(c => c == '\n') + 1,
-				Line = targetInfo.Root.Location.Start.Line.Value,
-				Content = new TextOrHash(targetInfo.Text)
+				Name = name,
+				LineCount = text.Count(c => c == '\n') + 1,
+				Content = new TextOrHash(text)
 			};
 		}
 	}
@@ -480,7 +441,7 @@ namespace Land.Markup.Binding
 		public TextOrHash(string text)
 		{
 			text = System.Text.RegularExpressions.Regex.Replace(
-				text, "[\n\r\f\t ]+", " "
+				text, "[\n\r\f\t ]+", ""
 			);
 
 			TextLength = text.Length;

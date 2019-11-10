@@ -79,7 +79,7 @@ namespace Land.Control
 		/// <summary>
 		/// Менеджер разметки
 		/// </summary>
-		private MarkupManager MarkupManager { get; set; } = new MarkupManager(new ModifiedContextFinder());
+		private MarkupManager MarkupManager { get; set; }
 
 		/// <summary>
 		/// Состояние контрола
@@ -123,6 +123,7 @@ namespace Land.Control
         {
 			InitializeComponent();
 
+			MarkupManager = new MarkupManager(GetParsed);
 			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
@@ -157,7 +158,12 @@ namespace Land.Control
 		{
 			return root != null
 				? MarkupManager.Find(point, 
-					new Markup.ParsedFile() { Name = point.Context.FileName, Text = fileText, Root = root })
+					new ParsedFile()
+					{
+						Text = fileText,
+						Root = root,
+						BindingContext = PointContext.GetFileContext(point.Context.FileContext.Name, fileText)
+					})
 				: new List<RemapCandidateInfo>();
 		}
 
@@ -385,15 +391,15 @@ namespace Land.Control
 		{
 			if (cp.HasInvalidLocation)
 			{
-				var parsedFile = GetParsed(cp.Context.FileName);
+				var forest = (GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
+					.Select(f => TryParse(f, null, out bool success, true))
+					.Where(r => r != null)
+					.ToList();
 
-				if (parsedFile != null)
-				{
-					ProcessAmbiguities(
-						MarkupManager.Remap(cp, parsedFile),
-						false
-					);
-				}
+				ProcessAmbiguities(
+					MarkupManager.Remap(cp, forest),
+					false
+				);
 			}
 
 			return !cp.HasInvalidLocation;

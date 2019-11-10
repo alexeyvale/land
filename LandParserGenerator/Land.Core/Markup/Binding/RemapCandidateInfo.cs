@@ -20,6 +20,8 @@ namespace Land.Markup.Binding
 
 		public bool IsAuto { get; set; }
 
+		public string DebugInfo { get; set; }
+
 		public override string ToString()
 		{
 			return $"{String.Format("{0:f4}", Similarity)} [H: {String.Format("{0:f2}", HeaderSimilarity)}; A: {String.Format("{0:f2}", AncestorSimilarity)}; I: {String.Format("{0:f2}", InnerSimilarity)}]";

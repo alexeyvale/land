@@ -14,12 +14,12 @@ namespace Land.Markup.Tree
 
 		public override void Visit(ConcernPoint point)
 		{
-			if (!Grouped.ContainsKey(point.Context.FileName))
+			if (!Grouped.ContainsKey(point.Context.FileContext.Name))
 			{
-				Grouped[point.Context.FileName] = new List<ConcernPoint>();
+				Grouped[point.Context.FileContext.Name] = new List<ConcernPoint>();
 			}
 
-			Grouped[point.Context.FileName].Add(point);
+			Grouped[point.Context.FileContext.Name].Add(point);
 		}
 
 		public static Dictionary<string, List<ConcernPoint>> GetGroups(IEnumerable<MarkupElement> roots)

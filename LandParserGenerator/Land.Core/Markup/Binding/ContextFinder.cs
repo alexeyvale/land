@@ -73,7 +73,7 @@ namespace Land.Markup.Binding
 			/// если название то же и содержимое почти не изменилось
 			var sameFile = searchArea.FirstOrDefault(f =>
 				f.Name.ToLower() == point.Context.FileContext.Name.ToLower() &&
-				AreFilesSimilarEnough(f.FuzzyHashedContent, point.Context.FileContext.Content));
+				AreFilesSimilarEnough(f.BindingContext.Content, point.Context.FileContext.Content));
 
 			if (sameFile != null)
 			{
@@ -81,24 +81,30 @@ namespace Land.Markup.Binding
 					return null;
 
 				/// Проверяем, насколько изменилось количество строк в файле
-				var lineDifference = point.Context.FileContext.LineCount -
-					PointContext.GetFileContext(sameFile).LineCount;
+				var lineDifference = sameFile.BindingContext.LineCount -
+					point.Context.FileContext.LineCount;
 
 				/// Находим все сущности того же типа
-				var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.Type });
 				sameFile.Root.Accept(visitor);
+
+				bool InRange(int val, int left, int right) => val >= left && val <= right; 
 
 				/// Среди них отбираем те, что отстоят от расположения помеченной сущности
 				/// не более чем на количество добавленных/удалённых строк
-				var candidates = visitor.Grouped[point.Context.NodeType].Where(n =>
-					n.Location.Start.Line >= point.Context.FileContext.Line - lineDifference ||
-					n.Location.Start.Line <= point.Context.FileContext.Line + lineDifference
-				).Select(n => new RemapCandidateInfo
-				{
-					Node = n,
-					File = sameFile,
-					Context = new PointContext(n, sameFile)
-				}).ToList();
+				var candidates = visitor.Grouped[point.Context.Type]
+					.Where(n =>
+						lineDifference >= 0 && 
+							InRange(n.Location.Start.Line.Value, point.Context.Line, point.Context.Line + lineDifference) ||
+						lineDifference <= 0 && 
+							InRange(n.Location.Start.Line.Value, point.Context.Line + lineDifference, point.Context.Line)
+					)
+					.Select(n => new RemapCandidateInfo
+					{
+						Node = n,
+						File = sameFile,
+						Context = new PointContext(n, sameFile)
+					}).ToList();
 
 				return EvaluateCandidates(point, candidates, sameFile.MarkupSettings);
 			}
@@ -108,25 +114,25 @@ namespace Land.Markup.Binding
 
 		private List<RemapCandidateInfo> GlobalSearch(
 			ConcernPoint point, 
-			List<ParsedFile> searchArea)
+			List<ParsedFile> searchArea,
+			bool similarOnly)
 		{
-			/// Ищем похожие по контенту файлы
-			var similarFiles = searchArea
-				.Where(f => AreFilesSimilarEnough(f.FuzzyHashedContent, point.Context.FileContext.Content))
+			var files = searchArea
+				.Where(f => !similarOnly || AreFilesSimilarEnough(f.BindingContext.Content, point.Context.FileContext.Content))
 				.ToList();
 
 			var candidates = new List<RemapCandidateInfo>();
 
 			/// Находим все сущности того же типа
-			foreach (var file in similarFiles)
+			foreach (var file in files)
 			{
 				if (!EnsureRootExists(file))
 					continue;
 
-				var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.NodeType });
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.Type });
 				file.Root.Accept(visitor);
 
-				candidates.AddRange(visitor.Grouped[point.Context.NodeType]
+				candidates.AddRange(visitor.Grouped[point.Context.Type]
 					.Select(n => new RemapCandidateInfo
 					{
 						Node = n,
@@ -137,8 +143,8 @@ namespace Land.Markup.Binding
 				);		
 			}
 
-			return similarFiles.Count > 0
-				? EvaluateCandidates(point, candidates, similarFiles.First().MarkupSettings)
+			return files.Count > 0
+				? EvaluateCandidates(point, candidates, files.First().MarkupSettings)
 				: candidates;
 		}
 
@@ -209,7 +215,7 @@ namespace Land.Markup.Binding
 				candidate.AncestorSimilarity =
 					Levenshtein(point.Context.AncestorsContext, candidate.Context.AncestorsContext);
 				candidate.InnerSimilarity =
-					DispatchLevenshtein(point.Context.InnerContextElement, candidate.Context.InnerContextElement);
+					DispatchLevenshtein(point.Context.InnerContext, candidate.Context.InnerContext);
 			}
 
 			ComputeSimilarity(point.Context, candidates);
@@ -239,7 +245,7 @@ namespace Land.Markup.Binding
 			List<ParsedFile> searchArea
 		)
 		{
-			var groupedPoints = points.GroupBy(p => p.Context.NodeType)
+			var groupedPoints = points.GroupBy(p => p.Context.Type)
 				.ToDictionary(e=>e.Key, e=>e.ToList());
 
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -261,7 +267,12 @@ namespace Land.Markup.Binding
 
 			if (searchResult.Count == 0 || !searchResult.First().IsAuto)
 			{
-				searchResult = GlobalSearch(point, searchArea);
+				searchResult = GlobalSearch(point, searchArea, true);
+
+				if (searchResult.Count == 0)
+				{
+					searchResult = GlobalSearch(point, searchArea, false);
+				}
 			}
 
 			return searchResult;
@@ -282,8 +293,8 @@ namespace Land.Markup.Binding
 				return Levenshtein((IEnumerable<char>)a, (IEnumerable<char>)b);
 			else if (a is HeaderContextElement)
 				return EvalSimilarity(a as HeaderContextElement, b as HeaderContextElement);
-			else if(a is InnerContextElement)
-				return EvalSimilarity(a as InnerContextElement, b as InnerContextElement);
+			else if(a is InnerContext)
+				return EvalSimilarity(a as InnerContext, b as InnerContext);
 			else if (a is AncestorsContextElement)
 				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
 			else
@@ -302,9 +313,9 @@ namespace Land.Markup.Binding
 				return double.MinValue;
 		}
 
-		public static double EvalSimilarity(InnerContextElement a, InnerContextElement b)
+		public static double EvalSimilarity(InnerContext a, InnerContext b)
 		{
-			return a.Type == b.Type ? EvalSimilarity(a.Content, b.Content) : 0;
+			return EvalSimilarity(a.Content, b.Content);
 		}
 
 		public static double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
@@ -314,11 +325,10 @@ namespace Land.Markup.Binding
 
 		public static double EvalSimilarity(TextOrHash a, TextOrHash b)
 		{
-			var score = a.Text != null && b.Text != null
-				? Levenshtein(a.Text, b.Text)
-				: a.Hash != null && b.Hash != null
+			var score = a.Hash != null && b.Hash != null
 					? FuzzyHashing.CompareHashes(a.Hash, b.Hash)
-					: 0;
+					: a.Text != null && b.Text != null
+						? Levenshtein(a.Text, b.Text) : 0;
 
 			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)TextOrHash.MAX_TEXT_LENGTH
 				? 0 : score;
@@ -412,8 +422,6 @@ namespace Land.Markup.Binding
 			{
 				case HeaderContextElement headerContext:
 					return headerContext.Priority;
-				case InnerContextElement innerContext:
-					return innerContext.Priority;
 				default:
 					return 1;
 			}
@@ -455,35 +463,12 @@ namespace Land.Markup.Binding
 			}
 			else
 			{
-				var tuningHeuristicType = typeof(IWeightsHeuristic);
-
-				var tuningHeuristics = AppDomain.CurrentDomain.GetAssemblies()
-					.SelectMany(s => s.GetTypes())
-					.Where(p => p.IsClass && tuningHeuristicType.IsAssignableFrom(p))
-					.Select(t => (IWeightsHeuristic)t.GetConstructor(Type.EmptyTypes).Invoke(null))
-					.OrderByDescending(h => h.Priority)
-					.ToList();
-
-				var scoringheuristicType = typeof(ISimilarityHeuristic);
-
-				var scoringheuristics = AppDomain.CurrentDomain.GetAssemblies()
-					.SelectMany(s => s.GetTypes())
-					.Where(p => p.IsClass && scoringheuristicType.IsAssignableFrom(p))
-					.Select(t => (ISimilarityHeuristic)t.GetConstructor(Type.EmptyTypes).Invoke(null))
-					.OrderByDescending(h => h.Priority)
-					.ToList();
-
-				foreach (var h in tuningHeuristics)
+				foreach (var h in TuningHeuristics)
 					h.TuneWeights(sourceContext, candidates, weights);
 
-				foreach (var h in scoringheuristics)
+				foreach (var h in ScoringHeuristics)
 					h.PredictSimilarity(sourceContext, candidates);
 			}
-
-			/// Если какие-то веса остались неустановленными, обнуляем
-			foreach (var key in weights.Keys)
-				if (weights[key] == null)
-					weights[key] = 0;
 
 			candidates.ForEach(c => c.Similarity = c.Similarity ??
 				(weights[ContextType.Ancestors] * c.AncestorSimilarity + weights[ContextType.Inner] * c.InnerSimilarity + weights[ContextType.Header] * c.HeaderSimilarity)

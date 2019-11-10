@@ -15,10 +15,20 @@ namespace Land.Markup
 {
 	public class MarkupManager
 	{
-		public MarkupManager(IContextFinder contextFinder)
+		public MarkupManager(Func<string, ParsedFile> getParsed)
 		{
-			ContextFinder = contextFinder;
+			ContextFinder.GetParsed = getParsed;
 			OnMarkupChanged += InvalidateRelations;
+
+			#region Подключение эвристик
+
+			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
+			ContextFinder.SetHeuristic(typeof(PrioritizeByGapHeuristic));
+			ContextFinder.SetHeuristic(typeof(LowerChangedInnerPriority));
+			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
+			ContextFinder.SetHeuristic(typeof(SameHeaderAndAncestorsHeuristic));
+
+			#endregion
 		}
 
 		private RelationsManager Relations { get; set; } = new RelationsManager();
@@ -85,7 +95,7 @@ namespace Land.Markup
 			DoWithMarkup((MarkupElement elem) =>
 			{
 				if (elem is ConcernPoint concernPoint
-					&& concernPoint.Context.FileName == fileName)
+					&& concernPoint.Context.FileContext.Name == fileName)
 				{
 					concernPoint.AstNode = stubNode;
 					concernPoint.HasIrrelevantLocation = true;
@@ -121,9 +131,9 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(ParsedFile sourceInfo, string name = null, string comment = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(Node node, ParsedFile file, string name = null, string comment = null, Concern parent = null)
 		{
-			var point = new ConcernPoint(sourceInfo, parent);
+			var point = new ConcernPoint(node, file, parent);
 
 			if (!String.IsNullOrEmpty(name))
 				point.Name = name;
@@ -138,11 +148,10 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(ParsedFile sourceInfo)
+		public void AddLand(ParsedFile file)
 		{
 			var visitor = new LandExplorerVisitor();
-			/// При добавлении всей суши к разметке, в качестве целевого узла передаётся корень дерева
-			sourceInfo.Root.Accept(visitor);
+			file.Root.Accept(visitor);
 
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
@@ -158,21 +167,20 @@ namespace Land.Markup
 					/// создаём подфункциональность
 					var subconcern = AddConcern(subgroup.Key, null, concern);
 
-					foreach (var point in subgroup)
+					foreach (var node in subgroup)
 					{
-						sourceInfo.Root = point;
-						AddElement(new ConcernPoint(sourceInfo, subconcern));
+						AddElement(new ConcernPoint(node, file, subconcern));
 					}
 				}
 
 				/// Остальные добавляются напрямую к функциональности, соответствующей символу
-				var points = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
+				var nodes = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
 					.SelectMany(s => s).ToList();
 
-				foreach (var point in points)
+				foreach (var node in nodes)
 				{
-					sourceInfo.Root = point;
-					AddElement(new ConcernPoint(sourceInfo, concern));
+					file.Root = node;
+					AddElement(new ConcernPoint(node, file, concern));
 				}
 			}
 
@@ -206,9 +214,9 @@ namespace Land.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, ParsedFile targetInfo)
+		public void RelinkConcernPoint(ConcernPoint point, Node node, ParsedFile file)
 		{
-			point.Relink(targetInfo);
+			point.Relink(node, file);
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -261,8 +269,8 @@ namespace Land.Markup
 				{
 					if (elem is ConcernPoint p)
 					{
-						p.Context.FileName = Uri.UnescapeDataString(
-							directoryUri.MakeRelativeUri(new Uri(p.Context.FileName)).ToString()
+						p.Context.FileContext.Name = Uri.UnescapeDataString(
+							directoryUri.MakeRelativeUri(new Uri(p.Context.FileContext.Name)).ToString()
 						);
 					}
 				});
@@ -286,8 +294,8 @@ namespace Land.Markup
 				{
 					if (elem is ConcernPoint p)
 					{
-						p.Context.FileName = Path.GetFullPath(
-							Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileName)
+						p.Context.FileContext.Name = Path.GetFullPath(
+							Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileContext.Name)
 						);
 					}
 				});
@@ -328,10 +336,10 @@ namespace Land.Markup
 
 			DoWithMarkup((MarkupElement elem) =>
 			{
-				if (elem is ConcernPoint p && !Path.IsPathRooted(p.Context.FileName))
+				if (elem is ConcernPoint p && !Path.IsPathRooted(p.Context.FileContext.Name))
 				{
-					p.Context.FileName = Path.GetFullPath(
-						Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileName)
+					p.Context.FileContext.Name = Path.GetFullPath(
+						Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileContext.Name)
 					);
 				}
 			});
@@ -342,7 +350,7 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(point, targetInfo);
+			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo });
 		}
 
 		/// <summary>
@@ -367,83 +375,22 @@ namespace Land.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<ParsedFile> targetFiles, bool useLocalRemap, bool allowAutoDecisions)
-		{
-			var ambiguous = useLocalRemap
-				? LocalRemap(targetFiles, allowAutoDecisions)
-				: GlobalRemap(targetFiles, allowAutoDecisions);
-
-			OnMarkupChanged?.Invoke();
-
-			return ambiguous;
-		}
-
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> LocalRemap(List<ParsedFile> targetFiles, bool allowAutoDecisions)
-		{
-			var groupedByFile = GroupPointsByFileVisitor.GetGroups(Markup);
-			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-
-			foreach(var fileGroup in groupedByFile)
-			{
-				var file = targetFiles.Where(f => f.Name == fileGroup.Key).FirstOrDefault();
-
-				if(file != null)
-				{
-					var groupedByType = fileGroup.Value.GroupBy(p => p.Context.NodeType).ToDictionary(g => g.Key, g => g.ToList());
-					var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.Root, groupedByType.Keys);
-
-					var result = ContextFinder.Find(groupedByType, groupedFiles, file);
-
-					foreach (var kvp in result)
-					{
-						var candidates = kvp.Value
-							//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
-							.Take(AmbiguityTopCount).ToList();
-
-						if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
-							ambiguous[kvp.Key] = candidates;
-					}
-				}
-				else
-				{
-					foreach (var point in fileGroup.Value)
-						point.AstNode = null;
-				}
-			}
-
-			return ambiguous;
-		}
-
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> GlobalRemap(List<ParsedFile> targetFiles, bool allowAutoDecisions)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<ParsedFile> searchArea, bool allowAutoDecisions)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			var result = ContextFinder.Find(GetConcernPoints(), searchArea);
 
-			/// Группируем точки привязки по типу помеченной сущности 
-			var groupedPoints = GroupPointsByTypeVisitor.GetGroups(Markup);
-			var accumulator = groupedPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => new List<RemapCandidateInfo>());
-
-			foreach (var file in targetFiles)
-			{
-				/// Группируем узлы AST файла, к которому попытаемся перепривязаться,
-				/// по типам точек, к которым требуется перепривязка
-				var groupedFiles = GroupNodesByTypeVisitor.GetGroups(file.Root, groupedPoints.Keys);
-
-				/// Похожести, посчитанные для сущностей из текущего файла
-				var currentRes = ContextFinder.Find(groupedPoints, groupedFiles, file);
-
-				foreach (var kvp in currentRes)
-					accumulator[kvp.Key].AddRange(kvp.Value);
-			}
-
-			foreach (var kvp in accumulator)
+			foreach (var kvp in result)
 			{
 				var candidates = kvp.Value
-					//.TakeWhile(c => c.Similarity >= GarbageThreshold)
+					//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
 				if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
 					ambiguous[kvp.Key] = candidates;
 			}
+
+			OnMarkupChanged?.Invoke();
 
 			return ambiguous;
 		}
@@ -451,10 +398,12 @@ namespace Land.Markup
 		/// <summary>
 		/// Перепривязка точки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(ConcernPoint point, ParsedFile targetInfo)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
+			ConcernPoint point, 
+			List<ParsedFile> searchArea)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var candidates = ContextFinder.Find(point, targetInfo)
+			var candidates = ContextFinder.Find(point, searchArea)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 

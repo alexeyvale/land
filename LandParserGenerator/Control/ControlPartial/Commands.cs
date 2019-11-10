@@ -278,23 +278,13 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				/// В случае, если запросили перепривязку в пределах
-				/// рабочего множества файлов, а это множество не установлено,
-				/// проводим перепривязку в пределах файлов, на которые
-				/// ссылаются имеющиеся точки
-				var forest = (sender == ApplyLocalMapping
-					? MarkupManager.GetReferencedFiles()
-					: GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles()
-				)
-					.Select(f =>
-					{
-						var parsedFile = TryParse(f, out bool success);
-						return success ? parsedFile : null;
-					})
-					.Where(r => r != null).ToList();
+				var forest = (GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
+					.Select(f => TryParse(f, null, out bool success, true))
+					.Where(r => r != null)
+					.ToList();
 
 				ProcessAmbiguities(
-					MarkupManager.Remap(forest, sender == ApplyLocalMapping, true),
+					MarkupManager.Remap(forest, true),
 					true
 				);
 			}, true, false);
