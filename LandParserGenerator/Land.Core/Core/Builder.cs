@@ -44,14 +44,14 @@ namespace Land.Core
 
 			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
 			{
-				var fragment = grammar.Options.GetSymbols(ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
+				var fragment = grammar.Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
 				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern}{(grammar.Tokens[token].LineStart ? $" {{this.InputStream.LA(-1 - Text.Length) == 10 || this.InputStream.LA(-1 - Text.Length) == -1}}?" : "")} ;");
 				tokensForLines[++linesCounter] = grammar.Userify(token);
 			}
 
 			grammarOutput.WriteLine(@"WS: [ \n\r\t\u00A0] -> skip ;");
 
-			if (grammar.Options.IsSet(ParsingOption.IGNOREUNDEFINED))
+			if (grammar.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.IGNOREUNDEFINED))
 				grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
 			else
 				grammarOutput.WriteLine(@"UNDEFINED: . ;");

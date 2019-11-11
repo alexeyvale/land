@@ -143,7 +143,7 @@ namespace Land.Core.Parsing.LR
 				else
 				{
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
+					if (GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.GetNextToken();
 					}
@@ -464,7 +464,7 @@ namespace Land.Core.Parsing.LR
 				}
 			}
 			while (Stack.CountStates > 0 && (derivationProds.Count == initialDerivationProds.Count
-				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.RECOVERY, p.Alt[p.Pos]))
+				|| derivationProds.Except(initialDerivationProds).All(p => !GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY, p.Alt[p.Pos]))
 				|| StartsWithAny(previouslyMatched)
 				|| IsUnsafeAny(stopTokens, avoidedToken))
 			);

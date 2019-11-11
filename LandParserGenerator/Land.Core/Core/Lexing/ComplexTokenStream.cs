@@ -96,13 +96,13 @@ namespace Land.Core.Lexing
 		private void BuildCustomBlockDefinition()
 		{
 			var customBlockBase = GrammarObject.Options
-				.GetSymbols(CustomBlockOption.BASETOKEN).FirstOrDefault();
+				.GetSymbols(CustomBlockOption.GROUP_NAME, CustomBlockOption.BASETOKEN).FirstOrDefault();
 
 			if (!String.IsNullOrEmpty(customBlockBase))
 			{
 				CustomBlockDefinition = new CustomBlockDefinition { BaseToken = customBlockBase };
 
-				var start = GrammarObject.Options.GetParams(CustomBlockOption.START);
+				var start = GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.START);
 
 				if (start.Count > 0)
 					CustomBlockDefinition.StartLexemPrefix = (string)start[0];
@@ -110,7 +110,7 @@ namespace Land.Core.Lexing
 				if (start.Count > 1)
 					CustomBlockDefinition.StartLexemSuffix = (string)start[1];
 
-				var end = GrammarObject.Options.GetParams(CustomBlockOption.END);
+				var end = GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.END);
 
 				if (end.Count > 0)
 					CustomBlockDefinition.EndLexemPrefix = (string)end[0];

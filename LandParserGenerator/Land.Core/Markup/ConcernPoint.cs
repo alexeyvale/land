@@ -155,7 +155,7 @@ namespace Land.Markup
 		{
 			if (opts != null)
 			{
-				UseHorizontalContext = opts.IsSet(MarkupOption.USEHORIZONTAAL);
+				UseHorizontalContext = opts.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USEHORIZONTAAL);
 			}
 		}
 	}

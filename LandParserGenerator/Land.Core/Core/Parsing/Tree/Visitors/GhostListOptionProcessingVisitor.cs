@@ -17,9 +17,9 @@ namespace Land.Core.Parsing.Tree
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
 				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
-				if (node.Children[i].Options.IsSet(NodeOption.GHOST) || !node.Children[i].Options.GetNodeOptions().Any()
-					&& (GrammarObject.Options.IsSet(NodeOption.GHOST, node.Children[i].Symbol) 
-					|| !String.IsNullOrEmpty(node.Children[i].Alias) && GrammarObject.Options.IsSet(NodeOption.GHOST, node.Children[i].Alias)))
+				if (node.Children[i].Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST) || !node.Children[i].Options.GetOptions(NodeOption.GROUP_NAME).Any()
+					&& (GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Symbol) 
+					|| !String.IsNullOrEmpty(node.Children[i].Alias) && GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Alias)))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
@@ -34,12 +34,12 @@ namespace Land.Core.Parsing.Tree
 				}
 			}
 
-			var listForAlias = !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.LIST, node.Alias);
-			var listForSymbol = GrammarObject.Options.IsSet(NodeOption.LIST, node.Symbol);
+			var listForAlias = !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LIST, node.Alias);
+			var listForSymbol = GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LIST, node.Symbol);
 
 			// Если символ помечен как List, убираем подузлы того же типа
-			if (node.Options.IsSet(NodeOption.LIST) 
-				|| !node.Options.GetNodeOptions().Any() && (listForAlias || listForSymbol))
+			if (node.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LIST) 
+				|| !node.Options.GetOptions(NodeOption.GROUP_NAME).Any() && (listForAlias || listForSymbol))
 			{
 				for (var i = 0; i < node.Children.Count; ++i)
 				{

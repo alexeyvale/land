@@ -58,9 +58,9 @@ namespace Land.Control
 
 			if (Parsers[extension] != null)
 			{
-				var startBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.START)
+				var startBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.START)
 					.Select(e=>(string)e).ToList();
-				var endBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.END)
+				var endBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.END)
 					.Select(e => (string)e).ToList();
 
 				var indentationString = String.Join("", text.Skip(customPoint.AdjustedSelection.Start.Offset)

@@ -665,7 +665,7 @@ namespace Land.GUI
 					}
 					else
 					{
-						if (!child.Options.IsSet(MarkupOption.LAND) && child.Location != null)
+						if (!child.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND) && child.Location != null)
 							TypedWaterSegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 

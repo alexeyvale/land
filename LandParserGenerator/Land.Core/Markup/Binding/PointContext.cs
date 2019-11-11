@@ -82,7 +82,7 @@ namespace Land.Markup.Binding
 				Type = node.Type,
 				Value = node.Value,
 				Priority = node.Options.GetPriority().Value,
-				ExactMatch = node.Options.IsSet(MarkupOption.EXACTMATCH)
+				ExactMatch = node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH)
 			};
 		}
 	}
@@ -324,7 +324,7 @@ namespace Land.Markup.Binding
 			while(currentNode != null)
 			{			
 				if(currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME 
-					&& currentNode.Options.IsSet(MarkupOption.LAND))
+					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 					context.Add((AncestorsContextElement)currentNode);
 
 				currentNode = currentNode.Parent;
@@ -366,7 +366,7 @@ namespace Land.Markup.Binding
 		{
 			/// Находим островного родителя
 			var parentNode = node.Parent;
-			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.LAND))
+			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 				parentNode = parentNode.Parent;
 
 			/// Если это корень, горизонтального контекста нет
@@ -377,7 +377,7 @@ namespace Land.Markup.Binding
 			var siblings = new List<Node>(parentNode.Children);
 			for (var i = 0; i < siblings.Count; ++i)
 			{
-				if (!siblings[i].Options.IsSet(MarkupOption.LAND))
+				if (!siblings[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 				{
 					var current = siblings[i];
 					siblings.RemoveAt(i);

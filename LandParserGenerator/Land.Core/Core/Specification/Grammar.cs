@@ -32,7 +32,7 @@ namespace Land.Core.Specification
 
 		// Стартовый символ грамматики
 		public string StartSymbol => 
-			Options?.GetSymbols(ParsingOption.START).FirstOrDefault();
+			Options?.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.START).FirstOrDefault();
 
 		// Содержание грамматики
 		public Dictionary<string, NonterminalSymbol> Rules { get; private set; } = new Dictionary<string, NonterminalSymbol>();
@@ -418,88 +418,85 @@ namespace Land.Core.Specification
 
 			#region Проверка корректности задания опции
 
-			if (Enum.TryParse<OptionGroups>(group.ToUpper(), out var optionGroup))
+			group = group.ToLower();
+			option = option.ToLower();
+
+			List<string> errorSymbols = null;
+
+			switch (group)
 			{
-				List<string> errorSymbols = null;
+				case NodeOption.GROUP_NAME:
+					errorSymbols = CheckIfNonterminals(symbols).Intersect(CheckIfAliases(symbols)).ToList();
+					if (errorSymbols.Count > 0)
+						throw new IncorrectGrammarException(
+							$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
+								$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+						);
+					break;
+				case ParsingOption.GROUP_NAME:
+					switch (option)
+					{
+						case ParsingOption.START:
+							if (CheckIfNonterminals(new List<string> { StartSymbol }).Count > 0)
+								throw new IncorrectGrammarException(
+									$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
+								);
+							break;
+						case ParsingOption.SKIP:
+							errorSymbols = CheckIfTerminals(symbols);
+							if (errorSymbols.Count > 0)
+								throw new IncorrectGrammarException(
+									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
+										$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как терминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+								);
+							break;
+						case ParsingOption.RECOVERY:
+							errorSymbols = CheckIfNonterminals(symbols);
+							if (errorSymbols.Count > 0)
+								throw new IncorrectGrammarException(
+									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
+										$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+								);
 
-				switch (optionGroup)
-				{
-					case OptionGroups.NODES:
-						errorSymbols = CheckIfNonterminals(symbols).Intersect(CheckIfAliases(symbols)).ToList();
-						if (errorSymbols.Count > 0)
-							throw new IncorrectGrammarException(
-								$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-									$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+							/// Находим множество нетерминалов, на которых возможно восстановление
+							var recoverySymbols = new HashSet<string>(
+								Rules.Values.Where(r => r.Alternatives
+									.Any(a => a.Count > 0 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)).Select(r => r.Name)
 							);
-						break;
-					case OptionGroups.PARSING:
-						if (Enum.TryParse<ParsingOption>(option.ToUpper(), out var parsingOption))
-						{
-							switch (parsingOption)
+							var oldCount = 0;
+
+							while (oldCount != recoverySymbols.Count)
 							{
-								case ParsingOption.START:
-									if (CheckIfNonterminals(new List<string> { StartSymbol }).Count > 0)
-										throw new IncorrectGrammarException(
-											$"В качестве стартового указан символ '{StartSymbol}', не являющийся нетерминальным"
-										);
-									break;
-								case ParsingOption.SKIP:
-									errorSymbols = CheckIfTerminals(symbols);
-									if (errorSymbols.Count > 0)
-										throw new IncorrectGrammarException(
-											$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-												$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как терминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
-										);
-									break;
-								case ParsingOption.RECOVERY:
-									errorSymbols = CheckIfNonterminals(symbols);
-									if (errorSymbols.Count > 0)
-										throw new IncorrectGrammarException(
-											$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-												$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
-										);
+								oldCount = recoverySymbols.Count;
 
-									/// Находим множество нетерминалов, на которых возможно восстановление
-									var recoverySymbols = new HashSet<string>(
-										Rules.Values.Where(r => r.Alternatives
-											.Any(a => a.Count > 0 && a[0].Symbol == Grammar.ANY_TOKEN_NAME)).Select(r => r.Name)
-									);
-									var oldCount = 0;
-
-									while (oldCount != recoverySymbols.Count)
-									{
-										oldCount = recoverySymbols.Count;
-
-										recoverySymbols.UnionWith(
-											Rules.Values.Where(r => r.Alternatives
-												.Any(a => a.Count > 0 && recoverySymbols.Contains(a[0].Symbol))).Select(r => r.Name)
-										);
-									}
-
-									/// Если при установке опции переданы конкретные символы, проверяем, возможно ли на них восстановление
-									if (Options.GetSymbols(ParsingOption.RECOVERY).Count > 0)
-									{
-										foreach (var smb in Options.GetSymbols(ParsingOption.RECOVERY))
-										{
-											if (!recoverySymbols.Contains(smb))
-												throw new IncorrectGrammarException(
-													$"Восстановление на символе '{smb}' невозможно, поскольку из него не выводится строка, " +
-														$"начинающаяся с {Grammar.ANY_TOKEN_NAME}, или перед этим {Grammar.ANY_TOKEN_NAME} в процессе вывода стоит нетерминал"
-												);
-										}
-									}
-									/// Иначе считаем, что восстановление разрешено везде, где оно возможно
-									else
-									{
-										Options.Set(ParsingOption.RECOVERY, recoverySymbols.ToList(), null);
-									}
-									break;
-								default:
-									break;
+								recoverySymbols.UnionWith(
+									Rules.Values.Where(r => r.Alternatives
+										.Any(a => a.Count > 0 && recoverySymbols.Contains(a[0].Symbol))).Select(r => r.Name)
+								);
 							}
-						}
-						break;
-				}
+
+							/// Если при установке опции переданы конкретные символы, проверяем, возможно ли на них восстановление
+							if (Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY).Count > 0)
+							{
+								foreach (var smb in Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY))
+								{
+									if (!recoverySymbols.Contains(smb))
+										throw new IncorrectGrammarException(
+											$"Восстановление на символе '{smb}' невозможно, поскольку из него не выводится строка, " +
+												$"начинающаяся с {Grammar.ANY_TOKEN_NAME}, или перед этим {Grammar.ANY_TOKEN_NAME} в процессе вывода стоит нетерминал"
+										);
+								}
+							}
+							/// Иначе считаем, что восстановление разрешено везде, где оно возможно
+							else
+							{
+								Options.Set(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY, recoverySymbols.ToList(), null);
+							}
+							break;
+						default:
+							break;
+					}
+					break;
 			}
 
 			#endregion
@@ -550,14 +547,14 @@ namespace Land.Core.Specification
 						new string[]{ StartSymbol }
 					}));
 
-					this.Options.Clear(ParsingOption.START);
-					Options.Set(ParsingOption.START, new List<string> { newStartName }, null);
+					this.Options.Clear(ParsingOption.GROUP_NAME, ParsingOption.START);
+					Options.Set(ParsingOption.GROUP_NAME, ParsingOption.START, new List<string> { newStartName }, null);
 				}
 			}
 
 			/// Игнорируем регистр в строковых литералах, исключая экранированные символы
 			/// и символы Юникод в формате \uXXXX
-			if(Options.IsSet(ParsingOption.IGNORECASE))
+			if(Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.IGNORECASE))
 			{
 				var regex = new Regex(@"'([^'\\]*|(\\\\)+|\\[^\\])*'");
 
@@ -1425,7 +1422,7 @@ namespace Land.Core.Specification
 					foreach(var option in smbManager.GetOptions(group))
 					{
 						if (this.Type == GrammarType.LR &&
-							group.Equals(OptionGroups.PARSING.ToString(), StringComparison.CurrentCultureIgnoreCase) &&
+							group.Equals(ParsingOption.GROUP_NAME.ToString(), StringComparison.CurrentCultureIgnoreCase) &&
 							option.Equals(ParsingOption.START.ToString(), StringComparison.CurrentCultureIgnoreCase))
 						{
 							result += $"%{group} {option} {Rules[StartSymbol].Alternatives[0][0]}{Environment.NewLine}";

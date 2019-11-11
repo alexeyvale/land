@@ -13,9 +13,9 @@ namespace Land.Core.Parsing.Tree
 		public override void Visit(Node node)
 		{
 			/// Если текущий узел должен быть листовым
-			if (node.Options.IsSet(NodeOption.LEAF) || 
-				!node.Options.GetNodeOptions().Any() && (GrammarObject.Options.IsSet(NodeOption.LEAF, node.Symbol) ||
-				!String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.LEAF, node.Alias)))
+			if (node.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF) || 
+				!node.Options.GetOptions(NodeOption.GROUP_NAME).Any() && (GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Symbol) ||
+				!String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Alias)))
 			{
 				node.Value = node.GetValue();
 

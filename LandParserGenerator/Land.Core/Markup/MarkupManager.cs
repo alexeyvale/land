@@ -200,7 +200,7 @@ namespace Land.Markup
 			/// содержащие текущую позицию каретки
 			while (currentNode != null)
 			{
-				if (currentNode.Options.IsSet(MarkupOption.LAND))
+				if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 					pointCandidates.AddFirst(currentNode);
 
 				currentNode = currentNode.Children
