@@ -14,8 +14,10 @@ namespace Land.Core.Parsing.Tree
 		{
 			/// Если текущий узел должен быть листовым
 			if (node.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF) || 
-				!node.Options.GetOptions(NodeOption.GROUP_NAME).Any() && (GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Symbol) ||
-				!String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Alias)))
+				!node.Options.GetOptions(NodeOption.GROUP_NAME).Any() && 
+				(GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Symbol) ||
+				!String.IsNullOrEmpty(node.Alias) && 
+				GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.LEAF, node.Alias)))
 			{
 				node.Value = node.GetValue();
 

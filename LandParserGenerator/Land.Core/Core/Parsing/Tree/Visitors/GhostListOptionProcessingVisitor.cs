@@ -17,9 +17,11 @@ namespace Land.Core.Parsing.Tree
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
 				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
-				if (node.Children[i].Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST) || !node.Children[i].Options.GetOptions(NodeOption.GROUP_NAME).Any()
-					&& (GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Symbol) 
-					|| !String.IsNullOrEmpty(node.Children[i].Alias) && GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Alias)))
+				if (node.Children[i].Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST) || 
+					!node.Children[i].Options.GetOptions(NodeOption.GROUP_NAME).Any() &&
+					(GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Symbol) ||
+					!String.IsNullOrEmpty(node.Children[i].Alias) && 
+					GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Alias)))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
