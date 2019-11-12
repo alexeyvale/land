@@ -69,11 +69,9 @@ namespace Land.Markup.Binding
 			ConcernPoint point, 
 			List<ParsedFile> searchArea)
 		{
-			/// Считаем, что файл почти не изменился, 
-			/// если название то же и содержимое почти не изменилось
+			/// Ищем файл с тем же названием
 			var sameFile = searchArea.FirstOrDefault(f =>
-				f.Name.ToLower() == point.Context.FileContext.Name.ToLower() &&
-				AreFilesSimilarEnough(f.BindingContext.Content, point.Context.FileContext.Content));
+				f.Name.ToLower() == point.Context.FileContext.Name.ToLower());
 
 			if (sameFile != null)
 			{
