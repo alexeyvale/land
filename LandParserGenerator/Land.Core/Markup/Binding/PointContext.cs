@@ -153,23 +153,20 @@ namespace Land.Markup.Binding
 	[DataContract]
 	public class SiblingsContext
 	{
-		[DataContract]
-		public class ClosestElement
-		{
-			[DataMember]
-			public List<HeaderContextElement> HeaderContext { get; set; }
-			[DataMember]
-			public InnerContext InnerContext { get; set; }
-		}
-
 		[DataMember]
 		public TextOrHash Before { get; set; }
 
 		[DataMember]
 		public TextOrHash After { get; set; }
+	}
 
+	[DataContract]
+	public class ClosestContextElement
+	{
 		[DataMember]
-		public List<ClosestElement> Closest { get; set; }
+		public List<HeaderContextElement> HeaderContext { get; set; }
+		[DataMember]
+		public InnerContext InnerContext { get; set; }
 	}
 
 	[DataContract]
@@ -246,22 +243,35 @@ namespace Land.Markup.Binding
 		public SiblingsContext SiblingsContext { get; set; }
 
 		/// <summary>
-		/// Инициализация всех контекстов, кроме горизонтального
+		/// Контекст наиболее похожих на помеченный элементов
 		/// </summary>
-		public PointContext(Node node, ParsedFile file)
+		[DataMember]
+		public List<ClosestContextElement> ClosestContext { get; set; }
+
+		public static PointContext GetLightContext(Node node, ParsedFile file)
 		{
-			Type = node.Type;
-			Line = node.Location.Start.Line.Value;
-			Hash = GetHash(node, file);
-			FileContext = file.BindingContext;
-			HeaderContext = GetHeaderContext(node);
-			AncestorsContext = GetAncestorsContext(node);
-			InnerContext = GetInnerContext(node, file);
+			return new PointContext
+			{
+				Type = node.Type,
+				Line = node.Location.Start.Line.Value,
+				Hash = GetHash(node, file),
+				FileContext = file.BindingContext,
+				HeaderContext = GetHeaderContext(node),
+				AncestorsContext = GetAncestorsContext(node),
+				InnerContext = GetInnerContext(node, file),
+			};
 		}
 
-		public PointContext(Node node, ParsedFile file, List<ParsedFile> searchArea): this(node, file)
+		public static PointContext GetFullContext(Node node, ParsedFile file, List<ParsedFile> searchArea, Func<string, ParsedFile> getParsed)
 		{
-			SiblingsContext = GetSiblingsContext(node, file, searchArea);
+			var context = GetLightContext(node, file);
+
+			if (file.MarkupSettings.UseHorizontalContext)
+				context.SiblingsContext = GetSiblingsContext(node, file);
+
+			context.ClosestContext = GetClosestContext(node, file, context, searchArea, getParsed);
+
+			return context;
 		}
 
 		public static byte[] GetHash(Node node, ParsedFile file)
@@ -282,28 +292,43 @@ namespace Land.Markup.Binding
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)
 		{
+			var cachingNode = (ContextCachingNode)node;
+
+			/// Если есть закешированный контекст, возвращаем его
+			//if (cachingNode.HeaderContext != null)
+			//return cachingNode.HeaderContext;
+
+			/// Иначе вычисляем контекст заголовка
+			/// Листовой узел сам себе заголовок
 			if (node.Value.Count > 0)
 			{
-				return new List<HeaderContextElement>() { new HeaderContextElement()
+				cachingNode.HeaderContext = new List<HeaderContextElement>()
 				{
-					 Type = node.Type,
-					 Priority = 1,
-					 Value = node.Value
-				}};
+					new HeaderContextElement()
+					{
+						 Type = node.Type,
+						 Priority = 1,
+						 Value = node.Value
+					}
+				};
 			}
+			/// Для нелистового ищем листовых непосредственных потомков
 			else
 			{
-				var headerContext = new List<HeaderContextElement>();
+				cachingNode.HeaderContext = new List<HeaderContextElement>();
 
 				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
-				while(stack.Any())
+				while (stack.Any())
 				{
 					var current = stack.Pop();
 
-					if ((current.Children.Count == 0 || current.Children.All(c=>c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) 
-						&& current.Options.GetPriority() > 0)
-						headerContext.Add((HeaderContextElement)current);
+					if ((current.Children.Count == 0 ||
+						current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) &&
+						current.Options.GetPriority() > 0)
+					{
+						cachingNode.HeaderContext.Add((HeaderContextElement)current);
+					}
 					else
 					{
 						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
@@ -311,9 +336,9 @@ namespace Land.Markup.Binding
 								stack.Push(current.Children[i]);
 					}
 				}
-
-				return headerContext;
 			}
+
+			return cachingNode.HeaderContext;
 		}
 
 		public static List<AncestorsContextElement> GetAncestorsContext(Node node)
@@ -321,9 +346,9 @@ namespace Land.Markup.Binding
 			var context = new List<AncestorsContextElement>();
 			var currentNode = node.Parent;
 
-			while(currentNode != null)
-			{			
-				if(currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME 
+			while (currentNode != null)
+			{
+				if (currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME
 					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 					context.Add((AncestorsContextElement)currentNode);
 
@@ -359,10 +384,7 @@ namespace Land.Markup.Binding
 			return new InnerContext(locations, file.Text);
 		}
 
-		public static SiblingsContext GetSiblingsContext(
-			Node node, 
-			ParsedFile file,
-			List<ParsedFile> searchArea)
+		public static SiblingsContext GetSiblingsContext(Node node, ParsedFile file)
 		{
 			/// Находим островного родителя
 			var parentNode = node.Parent;
@@ -401,12 +423,7 @@ namespace Land.Markup.Binding
 					.Where(n => n.Location != null)
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				)),
-				Closest = new List<SiblingsContext.ClosestElement>()
 			};
-
-			if(searchArea != null)
-			{
-			}
 
 			return context;
 		}
@@ -419,6 +436,48 @@ namespace Land.Markup.Binding
 				LineCount = text.Count(c => c == '\n') + 1,
 				Content = new TextOrHash(text)
 			};
+		}
+
+		public static List<ClosestContextElement> GetClosestContext(
+			Node node,
+			ParsedFile file,
+			PointContext nodeContext,
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getRoot)
+		{
+			const double CLOSE_ELEMENT_THRESHOLD = 0.8;
+
+			/// Отбираем файлы, наиболее похожие на содержащий помечаемый элемент
+			var similarFiles = searchArea
+				.Where(f => ContextFinder.AreFilesSimilarEnough(f.BindingContext.Content, file.BindingContext.Content))
+				.ToList();
+
+			var candidates = new List<ClosestContextElement>();
+
+			foreach (var similarFile in similarFiles)
+			{
+				if (similarFile.Root == null)
+					similarFile.Root = getRoot(file.Name)?.Root;
+
+				/// Если не смогли распарсить файл, переходим к следующему
+				if (similarFile.Root == null)
+					continue;
+
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
+				file.Root.Accept(visitor);
+
+				/// Для каждого элемента вычисляем контекст заголовка и внутренний контекст
+				candidates.AddRange(visitor.Grouped[node.Type]
+					.Select(n => new ClosestContextElement
+					{
+						HeaderContext = GetHeaderContext(node),
+						InnerContext = GetInnerContext(node, similarFile)
+					})
+				);
+			}
+
+			return candidates.Where(c => ContextFinder.EvalSimilarity(c.HeaderContext, nodeContext.HeaderContext) > CLOSE_ELEMENT_THRESHOLD &&
+				ContextFinder.EvalSimilarity(c.InnerContext, nodeContext.InnerContext) > CLOSE_ELEMENT_THRESHOLD).ToList();
 		}
 	}
 

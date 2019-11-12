@@ -129,7 +129,7 @@ namespace Land.Control
 			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
 			if (parsedFile != null)
-				MarkupManager.AddLand(parsedFile);
+				MarkupManager.AddLand(parsedFile, GetPointSearchArea(), GetParsed);
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -278,13 +278,8 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				var forest = (GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
-					.Select(f => TryParse(f, null, out bool success, true))
-					.Where(r => r != null)
-					.ToList();
-
 				ProcessAmbiguities(
-					MarkupManager.Remap(forest, true),
+					MarkupManager.Remap(GetPointSearchArea(), true),
 					true
 				);
 			}, true, false);

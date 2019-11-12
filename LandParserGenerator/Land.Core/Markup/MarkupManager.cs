@@ -131,9 +131,18 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление точки привязки
 		/// </summary>
-		public ConcernPoint AddConcernPoint(Node node, ParsedFile file, string name = null, string comment = null, Concern parent = null)
+		public ConcernPoint AddConcernPoint(
+			Node node, 
+			ParsedFile file, 
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getRoot, 
+			string name = null, 
+			string comment = null, 
+			Concern parent = null)
 		{
-			var point = new ConcernPoint(node, file, parent);
+			var point = new ConcernPoint(
+				node, PointContext.GetFullContext(node, file, searchArea, getRoot), parent
+			);
 
 			if (!String.IsNullOrEmpty(name))
 				point.Name = name;
@@ -148,7 +157,10 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(ParsedFile file)
+		public void AddLand(
+			ParsedFile file,
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getRoot)
 		{
 			var visitor = new LandExplorerVisitor();
 			file.Root.Accept(visitor);
@@ -169,7 +181,9 @@ namespace Land.Markup
 
 					foreach (var node in subgroup)
 					{
-						AddElement(new ConcernPoint(node, file, subconcern));
+						AddElement(new ConcernPoint(
+							node, PointContext.GetFullContext(node, file, searchArea, getRoot), subconcern)
+						);
 					}
 				}
 
@@ -179,8 +193,9 @@ namespace Land.Markup
 
 				foreach (var node in nodes)
 				{
-					file.Root = node;
-					AddElement(new ConcernPoint(node, file, concern));
+					AddElement(new ConcernPoint(
+						node, PointContext.GetFullContext(node, file, searchArea, getRoot), concern)
+					);
 				}
 			}
 
@@ -214,9 +229,14 @@ namespace Land.Markup
 		/// <summary>
 		/// Смена узла, к которому привязана точка
 		/// </summary>
-		public void RelinkConcernPoint(ConcernPoint point, Node node, ParsedFile file)
+		public void RelinkConcernPoint(
+			ConcernPoint point, 
+			Node node, 
+			ParsedFile file,
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getRoot)
 		{
-			point.Relink(node, file);
+			point.Relink(node, PointContext.GetFullContext(node, file, searchArea, getRoot));
 
 			OnMarkupChanged?.Invoke();
 		}

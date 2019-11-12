@@ -286,6 +286,12 @@ namespace Land.Control
 
 		#region Other helpers
 
+		private List<ParsedFile> GetPointSearchArea() =>
+			(GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
+				.Select(f => TryParse(f, null, out bool success, true))
+				.Where(r => r != null)
+				.ToList();
+
 		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
 			if (paths == null)
@@ -391,13 +397,8 @@ namespace Land.Control
 		{
 			if (cp.HasInvalidLocation)
 			{
-				var forest = (GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
-					.Select(f => TryParse(f, null, out bool success, true))
-					.Where(r => r != null)
-					.ToList();
-
 				ProcessAmbiguities(
-					MarkupManager.Remap(cp, forest),
+					MarkupManager.Remap(cp, GetPointSearchArea()),
 					false
 				);
 			}

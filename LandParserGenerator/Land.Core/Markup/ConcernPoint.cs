@@ -63,9 +63,9 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(Node node, ParsedFile file, Concern parent = null)
+		public ConcernPoint(Node node, PointContext context, Concern parent = null)
 		{
-			Context = new PointContext(node, file);
+			Context = context;
 			AstNode = node;
 			Parent = parent;
 			Name = node.Type;
@@ -84,26 +84,21 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, Node node, ParsedFile file, Concern parent = null)
+		public ConcernPoint(string name, string comment, Node node, PointContext context, Concern parent = null)
 		{
-			Context = new PointContext(node, file);
+			Context = context;
 			AstNode = node;
 			Parent = parent;
 			Name = name;
+			Comment = comment;
 
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, Node node, string comment, ParsedFile targetInfo, Concern parent = null)
-			: this(name, node, targetInfo, parent)
+		public void Relink(Node node, PointContext context)
 		{
-			Comment = comment;
-		}
-
-		public void Relink(Node node, ParsedFile targetInfo)
-		{
-			AstNode = targetInfo.Root;
-			Context = new PointContext(node, targetInfo);
+			AstNode = node;
+			Context = context;
 		}
 
 		public void Relink(RemapCandidateInfo candidate)

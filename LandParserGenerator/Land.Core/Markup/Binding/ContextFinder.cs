@@ -101,7 +101,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = sameFile,
-						Context = new PointContext(n, sameFile)
+						Context = PointContext.GetLightContext(n, sameFile)
 					}).ToList();
 
 				return EvaluateCandidates(point, candidates, sameFile.MarkupSettings);
@@ -135,7 +135,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = file,
-						Context = new PointContext(n, file)
+						Context = PointContext.GetLightContext(n, file)
 					})
 					.ToList()
 				);		
@@ -172,7 +172,7 @@ namespace Land.Markup.Binding
 						foreach (var candidate in identicalCandidates)
 						{
 							candidate.Context.SiblingsContext =
-								PointContext.GetSiblingsContext(candidate.Node, candidate.File, null);
+								PointContext.GetSiblingsContext(candidate.Node, candidate.File);
 						}
 
 						var writer = System.IO.File.AppendText("log.txt");
@@ -299,6 +299,11 @@ namespace Land.Markup.Binding
 				return a.Equals(b) ? 1 : 0;
 		}
 
+		#region EvalSimilarity
+
+		public static double EvalSimilarity(List<HeaderContextElement> a, List<HeaderContextElement> b) => 
+			Levenshtein(a, b);
+
 		public static double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
 		{
 			if (a.EqualsIgnoreValue(b))
@@ -331,6 +336,8 @@ namespace Land.Markup.Binding
 			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)TextOrHash.MAX_TEXT_LENGTH
 				? 0 : score;
 		}
+
+		#endregion
 
 		#region Methods 
 
