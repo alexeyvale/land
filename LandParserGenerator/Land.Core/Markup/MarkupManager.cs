@@ -135,13 +135,13 @@ namespace Land.Markup
 			Node node, 
 			ParsedFile file, 
 			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getRoot, 
+			Func<string, ParsedFile> getParsed, 
 			string name = null, 
 			string comment = null, 
 			Concern parent = null)
 		{
 			var point = new ConcernPoint(
-				node, PointContext.GetFullContext(node, file, searchArea, getRoot), parent
+				node, PointContext.GetFullContext(node, file, searchArea, getParsed), parent
 			);
 
 			if (!String.IsNullOrEmpty(name))
@@ -160,7 +160,7 @@ namespace Land.Markup
 		public void AddLand(
 			ParsedFile file,
 			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getRoot)
+			Func<string, ParsedFile> getParsed)
 		{
 			var visitor = new LandExplorerVisitor();
 			file.Root.Accept(visitor);
@@ -182,7 +182,7 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, PointContext.GetFullContext(node, file, searchArea, getRoot), subconcern)
+							node, PointContext.GetFullContext(node, file, searchArea, getParsed), subconcern)
 						);
 					}
 				}
@@ -194,7 +194,7 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, PointContext.GetFullContext(node, file, searchArea, getRoot), concern)
+						node, PointContext.GetFullContext(node, file, searchArea, getParsed), concern)
 					);
 				}
 			}
@@ -234,9 +234,9 @@ namespace Land.Markup
 			Node node, 
 			ParsedFile file,
 			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getRoot)
+			Func<string, ParsedFile> getParsed)
 		{
-			point.Relink(node, PointContext.GetFullContext(node, file, searchArea, getRoot));
+			point.Relink(node, PointContext.GetFullContext(node, file, searchArea, getParsed));
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -370,7 +370,7 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo });
+			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo }, false);
 		}
 
 		/// <summary>
@@ -395,10 +395,13 @@ namespace Land.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(List<ParsedFile> searchArea, bool allowAutoDecisions)
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
+			List<ParsedFile> searchArea,
+			bool localOnly,
+			bool allowAutoDecisions)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var result = ContextFinder.Find(GetConcernPoints(), searchArea);
+			var result = ContextFinder.Find(GetConcernPoints(), searchArea, localOnly);
 
 			foreach (var kvp in result)
 			{
@@ -420,10 +423,11 @@ namespace Land.Markup
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			ConcernPoint point, 
-			List<ParsedFile> searchArea)
+			List<ParsedFile> searchArea,
+			bool localOnly)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var candidates = ContextFinder.Find(point, searchArea)
+			var candidates = ContextFinder.Find(point, searchArea, localOnly)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 

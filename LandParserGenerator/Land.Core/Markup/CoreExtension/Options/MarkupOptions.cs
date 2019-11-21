@@ -15,7 +15,7 @@ namespace Land.Markup.CoreExtension
 		public const string PRIORITY = "priority";
 		public const string LAND = "land";
 		public const string EXACTMATCH = "exactmatch";
-		public const string USEHORIZONTAAL = "usehorizontal";
+		public const string USESIBLINGS = "usesiblings";
 	}
 
 	public static class OptionsExtension

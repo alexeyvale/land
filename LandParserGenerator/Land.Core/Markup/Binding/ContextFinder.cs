@@ -101,16 +101,16 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = sameFile,
-						Context = PointContext.GetLightContext(n, sameFile)
+						Context = PointContext.GetCoreContext(n, sameFile)
 					}).ToList();
 
-				return EvaluateCandidates(point, candidates, sameFile.MarkupSettings);
+				return EvalCandidates(point, candidates, sameFile.MarkupSettings);
 			}
 
 			return new List<RemapCandidateInfo>();
 		}
 
-		private List<RemapCandidateInfo> GlobalSearch(
+		public List<RemapCandidateInfo> GlobalSearch(
 			ConcernPoint point, 
 			List<ParsedFile> searchArea,
 			bool similarOnly)
@@ -135,14 +135,14 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = file,
-						Context = PointContext.GetLightContext(n, file)
+						Context = PointContext.GetCoreContext(n, file)
 					})
 					.ToList()
 				);		
 			}
 
 			return files.Count > 0
-				? EvaluateCandidates(point, candidates, files.First().MarkupSettings)
+				? EvalCandidates(point, candidates, files.First().MarkupSettings)
 				: candidates;
 		}
 
@@ -201,24 +201,25 @@ namespace Land.Markup.Binding
 			}
 		}
 
-		private List<RemapCandidateInfo> EvaluateCandidates(
+		private List<RemapCandidateInfo> EvalCandidates(
 			ConcernPoint point,
 			List<RemapCandidateInfo> candidates,
 			LanguageMarkupSettings markupSettings)
 		{
 			foreach (var candidate in candidates)
+				ComputeCoreContextSimilarities(point.Context, candidate);
+
+			ComputeTotalSimilarity(point.Context, candidates);
+
+			if (!markupSettings.UseSiblingsContext)
 			{
-				candidate.HeaderSimilarity =
-					Levenshtein(point.Context.HeaderContext, candidate.Context.HeaderContext);
-				candidate.AncestorSimilarity =
-					Levenshtein(point.Context.AncestorsContext, candidate.Context.AncestorsContext);
-				candidate.InnerSimilarity =
-					DispatchLevenshtein(point.Context.InnerContext, candidate.Context.InnerContext);
+				/// Отсеиваем похожих кандидатов, которые существовали в момент привязки
+				candidates = candidates
+					.OrderByDescending(c => c.Similarity)
+					.Where(c=>!point.Context.ClosestContext
+						.Any(e=>e.HeaderInnerHash.SequenceEqual(c.Context.HeaderInnerHash) && e.AncestorsHash.SequenceEqual(c.Context.AncestorsHash)))
+					.ToList();
 			}
-
-			ComputeSimilarity(point.Context, candidates);
-
-			candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
 
 			var first = candidates.FirstOrDefault();
 			var second = candidates.Skip(1).FirstOrDefault();
@@ -229,10 +230,21 @@ namespace Land.Markup.Binding
 					&& AreDistantEnough(first, second);
 			}
 
-			if (markupSettings.UseHorizontalContext)
+			/// Отсеиваем очень похожих кандидатов с непохожими соседями
+			if (markupSettings.UseSiblingsContext)
 				CheckHorizontalContext(point, candidates);
 
 			return candidates;
+		}
+
+		private void ComputeCoreContextSimilarities(PointContext point, RemapCandidateInfo candidate)
+		{
+			candidate.HeaderSimilarity =
+					Levenshtein(point.HeaderContext, candidate.Context.HeaderContext);
+			candidate.AncestorSimilarity =
+				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
+			candidate.InnerSimilarity =
+				DispatchLevenshtein(point.InnerContext, candidate.Context.InnerContext);
 		}
 
 		/// <summary>
@@ -240,8 +252,8 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			List<ConcernPoint> points,
-			List<ParsedFile> searchArea
-		)
+			List<ParsedFile> searchArea,
+			bool localOnly)
 		{
 			var groupedPoints = points.GroupBy(p => p.Context.Type)
 				.ToDictionary(e=>e.Key, e=>e.ToList());
@@ -252,18 +264,21 @@ namespace Land.Markup.Binding
 			{
 				foreach (var point in groupedPoints[pointType])
 				{
-					result[point] = Find(point, searchArea);
+					result[point] = Find(point, searchArea, localOnly);
 				}
 			}
 
 			return result;
 		}
 
-		public List<RemapCandidateInfo> Find(ConcernPoint point, List<ParsedFile> searchArea)
+		public List<RemapCandidateInfo> Find(
+			ConcernPoint point, 
+			List<ParsedFile> searchArea,
+			bool localOnly)
 		{
 			var searchResult = LocalSearch(point, searchArea);
 
-			if (searchResult.Count == 0 || !searchResult.First().IsAuto)
+			if ((searchResult.Count == 0 || !searchResult.First().IsAuto) && !localOnly)
 			{
 				searchResult = GlobalSearch(point, searchArea, true);
 
@@ -447,7 +462,7 @@ namespace Land.Markup.Binding
 			second == null || second.Similarity != 1
 				&& 1 - second.Similarity >= (1 - first.Similarity) * 1.5;
 
-		private void ComputeSimilarity(PointContext sourceContext,
+		private void ComputeTotalSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)
 		{
 			if (candidates.Count == 0)

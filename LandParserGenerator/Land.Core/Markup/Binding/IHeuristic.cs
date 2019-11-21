@@ -22,8 +22,6 @@ namespace Land.Markup.Binding
 
 	public interface ISimilarityHeuristic: IHeuristic
 	{
-		long Priority { get; }
-
 		List<RemapCandidateInfo> PredictSimilarity(
 			PointContext source,
 			List<RemapCandidateInfo> candidates

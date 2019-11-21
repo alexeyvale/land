@@ -144,13 +144,13 @@ namespace Land.Markup
 	[Serializable]
 	public class LanguageMarkupSettings
 	{
-		public bool UseHorizontalContext { get; private set; } = false;
+		public bool UseSiblingsContext { get; private set; } = false;
 
 		public LanguageMarkupSettings(SymbolOptionsManager opts)
 		{
 			if (opts != null)
 			{
-				UseHorizontalContext = opts.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USEHORIZONTAAL);
+				UseSiblingsContext = opts.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS);
 			}
 		}
 	}

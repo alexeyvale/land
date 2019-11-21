@@ -164,9 +164,10 @@ namespace Land.Markup.Binding
 	public class ClosestContextElement
 	{
 		[DataMember]
-		public List<HeaderContextElement> HeaderContext { get; set; }
+		public byte[] AncestorsHash { get; set; }
+
 		[DataMember]
-		public InnerContext InnerContext { get; set; }
+		public byte[] HeaderInnerHash { get; set; }
 	}
 
 	[DataContract]
@@ -210,7 +211,7 @@ namespace Land.Markup.Binding
 		/// Хеш текста, соответствующего сущности
 		/// </summary>
 		[DataMember]
-		public byte[] Hash { get; set; }
+		public byte[] HeaderInnerHash { get; set; }
 
 		/// <summary>
 		/// Контекст файла, в котором находится помеченный элемент
@@ -230,6 +231,9 @@ namespace Land.Markup.Binding
 		[DataMember]
 		public InnerContext InnerContext { get; set; }
 
+		[DataMember]
+		public byte[] AncestorsHash { get; set; }
+
 		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
 		/// </summary>
@@ -248,25 +252,32 @@ namespace Land.Markup.Binding
 		[DataMember]
 		public List<ClosestContextElement> ClosestContext { get; set; }
 
-		public static PointContext GetLightContext(Node node, ParsedFile file)
+		public static PointContext GetCoreContext(Node node, ParsedFile file)
 		{
+			var ancestors = GetAncestorsContexAndHash(node);
+
 			return new PointContext
 			{
 				Type = node.Type,
 				Line = node.Location.Start.Line.Value,
-				Hash = GetHash(node, file),
 				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
-				AncestorsContext = GetAncestorsContext(node),
 				InnerContext = GetInnerContext(node, file),
+				HeaderInnerHash = GetHash(node, file),
+				AncestorsContext = ancestors.Item1,
+				AncestorsHash = ancestors.Item2,	
 			};
 		}
 
-		public static PointContext GetFullContext(Node node, ParsedFile file, List<ParsedFile> searchArea, Func<string, ParsedFile> getParsed)
+		public static PointContext GetFullContext(
+			Node node, 
+			ParsedFile file, 
+			List<ParsedFile> searchArea, 
+			Func<string, ParsedFile> getParsed)
 		{
-			var context = GetLightContext(node, file);
+			var context = GetCoreContext(node, file);
 
-			if (file.MarkupSettings.UseHorizontalContext)
+			if (file.MarkupSettings.UseSiblingsContext)
 				context.SiblingsContext = GetSiblingsContext(node, file);
 
 			context.ClosestContext = GetClosestContext(node, file, context, searchArea, getParsed);
@@ -276,16 +287,21 @@ namespace Land.Markup.Binding
 
 		public static byte[] GetHash(Node node, ParsedFile file)
 		{
-			/// Считаем хеш от всего текста помечаемого элемента за вычетом пробельных символов
-			using (var md5 = System.Security.Cryptography.MD5.Create())
-			{
-				var text = file.Text.Substring(
+			var text = file.Text.Substring(
 					node.Location.Start.Offset,
 					node.Location.Length.Value
 				);
 
+			return GetHash(text);
+		}
+
+		public static byte[] GetHash(string text)
+		{
+			/// Считаем хеш от всего текста помечаемого элемента за вычетом пробельных символов
+			using (var md5 = System.Security.Cryptography.MD5.Create())
+			{
 				return md5.ComputeHash(Encoding.ASCII.GetBytes(
-					System.Text.RegularExpressions.Regex.Replace(text, "[\n\r\f\t ]+", "")
+					System.Text.RegularExpressions.Regex.Replace(text.ToLower(), "[\n\r\f\t ]+", "")
 				));
 			}
 		}
@@ -341,7 +357,7 @@ namespace Land.Markup.Binding
 			return cachingNode.HeaderContext;
 		}
 
-		public static List<AncestorsContextElement> GetAncestorsContext(Node node)
+		public static Tuple<List<AncestorsContextElement>, byte[]> GetAncestorsContexAndHash(Node node)
 		{
 			var context = new List<AncestorsContextElement>();
 			var currentNode = node.Parent;
@@ -355,7 +371,10 @@ namespace Land.Markup.Binding
 				currentNode = currentNode.Parent;
 			}
 
-			return context;
+			return new Tuple<List<AncestorsContextElement>, byte[]>(
+				context,
+				GetHash(String.Join("", context.Select(e => String.Join("", e.HeaderContext.SelectMany(h => h.Value)))))
+			);
 		}
 
 		public static InnerContext GetInnerContext(Node node, ParsedFile file)
@@ -443,7 +462,7 @@ namespace Land.Markup.Binding
 			ParsedFile file,
 			PointContext nodeContext,
 			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getRoot)
+			Func<string, ParsedFile> getParsed)
 		{
 			const double CLOSE_ELEMENT_THRESHOLD = 0.8;
 
@@ -452,13 +471,16 @@ namespace Land.Markup.Binding
 				.Where(f => ContextFinder.AreFilesSimilarEnough(f.BindingContext.Content, file.BindingContext.Content))
 				.ToList();
 
-			var candidates = new List<ClosestContextElement>();
+			foreach (var f in similarFiles)
+			{
+				if (f.Root == null)
+					f.Root = getParsed(f.Name)?.Root;
+			};
+
+			var candidates = new List<PointContext>();
 
 			foreach (var similarFile in similarFiles)
 			{
-				if (similarFile.Root == null)
-					similarFile.Root = getRoot(file.Name)?.Root;
-
 				/// Если не смогли распарсить файл, переходим к следующему
 				if (similarFile.Root == null)
 					continue;
@@ -466,18 +488,23 @@ namespace Land.Markup.Binding
 				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
 				file.Root.Accept(visitor);
 
-				/// Для каждого элемента вычисляем контекст заголовка и внутренний контекст
-				candidates.AddRange(visitor.Grouped[node.Type]
-					.Select(n => new ClosestContextElement
-					{
-						HeaderContext = GetHeaderContext(node),
-						InnerContext = GetInnerContext(node, similarFile)
-					})
+				/// Для каждого элемента вычисляем основные контексты
+				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
+					.Select(n => PointContext.GetCoreContext(n, similarFile))
 				);
 			}
 
-			return candidates.Where(c => ContextFinder.EvalSimilarity(c.HeaderContext, nodeContext.HeaderContext) > CLOSE_ELEMENT_THRESHOLD &&
-				ContextFinder.EvalSimilarity(c.InnerContext, nodeContext.InnerContext) > CLOSE_ELEMENT_THRESHOLD).ToList();
+			return candidates
+				.Where(c => 
+					ContextFinder.EvalSimilarity(c.HeaderContext, nodeContext.HeaderContext) > CLOSE_ELEMENT_THRESHOLD &&
+					ContextFinder.EvalSimilarity(c.InnerContext, nodeContext.InnerContext) > CLOSE_ELEMENT_THRESHOLD
+				)
+				.Select(c => new ClosestContextElement
+				{
+					AncestorsHash = c.AncestorsHash,
+					HeaderInnerHash = c.HeaderInnerHash
+				})
+				.ToList();
 		}
 	}
 
@@ -500,7 +527,7 @@ namespace Land.Markup.Binding
 		public TextOrHash(string text)
 		{
 			text = System.Text.RegularExpressions.Regex.Replace(
-				text, "[\n\r\f\t ]+", ""
+				text.ToLower(), "[\n\r\f\t ]+", ""
 			);
 
 			TextLength = text.Length;
