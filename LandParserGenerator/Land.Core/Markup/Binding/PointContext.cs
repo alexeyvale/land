@@ -285,6 +285,22 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
+		public static PointContext ExtendToFullContext(
+			PointContext coreContext,
+			Node node,		
+			ParsedFile file,
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getParsed)
+		{
+			if (file.MarkupSettings.UseSiblingsContext)
+				coreContext.SiblingsContext = GetSiblingsContext(node, file);
+
+			coreContext.ClosestContext = 
+				GetClosestContext(node, file, coreContext, searchArea, getParsed);
+
+			return coreContext;
+		}
+
 		public static byte[] GetHash(Node node, ParsedFile file)
 		{
 			var text = file.Text.Substring(

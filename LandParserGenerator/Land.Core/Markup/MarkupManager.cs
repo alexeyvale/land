@@ -409,7 +409,8 @@ namespace Land.Markup
 					//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
-				if (!allowAutoDecisions || !ApplyCandidate(kvp.Key, candidates))
+				if (!allowAutoDecisions || 
+					!ApplyCandidate(kvp.Key, candidates, searchArea, ContextFinder.GetParsed))
 					ambiguous[kvp.Key] = candidates;
 			}
 
@@ -431,7 +432,7 @@ namespace Land.Markup
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 
-			if (!ApplyCandidate(point, candidates))
+			if (!ApplyCandidate(point, candidates, searchArea, ContextFinder.GetParsed))
 				ambiguous[point] = candidates;
 
 			OnMarkupChanged?.Invoke();
@@ -439,13 +440,19 @@ namespace Land.Markup
 			return ambiguous;
 		}
 
-		private bool ApplyCandidate(ConcernPoint point, IEnumerable<RemapCandidateInfo> candidates)
+		private bool ApplyCandidate(
+			ConcernPoint point, 
+			IEnumerable<RemapCandidateInfo> candidates,
+			List<ParsedFile> searchArea,
+			Func<string, ParsedFile> getParsed)
 		{
 			var first = candidates.FirstOrDefault();
 
 			if (first?.IsAuto ?? false)
 			{
-				point.Context = first.Context;
+				point.Context = PointContext.ExtendToFullContext(
+					first.Context, first.Node, first.File, searchArea, getParsed
+				);
 				point.AstNode = first.Node;
 				return true;
 			}
