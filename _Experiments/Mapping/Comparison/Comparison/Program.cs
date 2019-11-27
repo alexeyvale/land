@@ -239,9 +239,9 @@ namespace Comparison
 
 					if (hasChanged)
 					{
-						if (coreRemapResult[cp].Count == 1)
+						if (coreRemapResult[cp].Count == 1 && landRemapResult[cp].Count == 1)
 							similarities.Add($"{ coreRemapResult[cp].GetNodeSimilarity(0) };{ landRemapResult[cp][0].Similarity }");
-						else if (coreRemapResult[cp].Count > 1)
+						else if (coreRemapResult[cp].Count > 1 && landRemapResult[cp].Count > 1)
 							similarities.Add($"{ coreRemapResult[cp].GetNodeSimilarity(0) };{ landRemapResult[cp][0].Similarity };{ coreRemapResult[cp].GetNodeSimilarity(1) };{ landRemapResult[cp][1].Similarity }");
 
 						report.WriteLine(Path.GetFileName(cp.Context.FileContext.Name));
