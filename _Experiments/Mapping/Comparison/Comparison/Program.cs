@@ -34,8 +34,10 @@ namespace Comparison
 		/// </summary>
 		static Tuple<List<ParsedFile>, List<PointOfInterest>> GetSearchArea(
 			Land.Core.Parsing.BaseParser landParser,
+			ParserWrapper coreParser,
 			List<string> files,
-			List<string> errors)
+			List<string> landErrors,
+			List<string> coreErrors)
 		{
 			var landSearchArea = new List<ParsedFile>();
 
@@ -50,7 +52,7 @@ namespace Comparison
 				/// Парсим при помощи LanD
 				var landRoot = landParser.Parse(text);
 				if (landParser.Log.Any(l => l.Type == Land.Core.MessageType.Error))
-					errors.Add(file);
+					landErrors.Add(file);
 
 				var visitor = new NodeRetypingVisitor(null);
 				landRoot.Accept(visitor);
@@ -85,6 +87,12 @@ namespace Comparison
 				coreSearchArea.Add(visitor.Root);
 			}
 
+			//foreach(var file in files)
+			//{
+			//	var coreRoot = coreParser.ParseText(File.ReadAllText(file), file);
+			//	coreSearchArea.Add(coreRoot);
+			//}
+
 			Console.WriteLine($"LanD to Core conversion done in {DateTime.Now - start}");
 
 			return new Tuple<List<ParsedFile>, List<PointOfInterest>>(landSearchArea, coreSearchArea);
@@ -106,7 +114,10 @@ namespace Comparison
 			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
 
-			var errors = new List<string>();
+			var coreParser = new ParserWrapper("../../components/AspectCore");
+
+			var landErrors = new List<string>();
+			var coreErrors = new List<string>();
 
 			/////////////////////////////////////////////// STAGE 1
 
@@ -132,7 +143,7 @@ namespace Comparison
 				File.Copy(file, $"./test/{Path.GetFileName(file)}");
 
 			/// Парсим отобранные файлы
-			var searchArea = GetSearchArea(landParser, files.ToList(), errors);
+			var searchArea = GetSearchArea(landParser, coreParser, files.ToList(), landErrors, coreErrors);
 
 			/// Привязываемся к сущностям, случайным образом выбирая нужное их количество в каждом файле
 			for(var j=0; j< searchArea.Item1.Count; ++j)
@@ -157,8 +168,8 @@ namespace Comparison
 
 						entities[key].Item2.Add(TreeSearchEngine.FindPointByLocation(
 							searchArea.Item2[j],
-							subseq[index].Location.Start.Line.Value,
-							subseq[index].Location.Start.Column.Value
+							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Line.Value,
+							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Column.Value
 						).FirstOrDefault());
 
 						subseq.RemoveAt(index);
@@ -177,7 +188,7 @@ namespace Comparison
 			counter = 0;
 			files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
 
-			searchArea = GetSearchArea(landParser, files.ToList(), errors);
+			searchArea = GetSearchArea(landParser, coreParser, files.ToList(), landErrors, coreErrors);
 
 			Console.WriteLine("Remapping...");
 
@@ -237,7 +248,7 @@ namespace Comparison
 						landRemapResult[cp][0].InnerSimilarity != 1 ||
 						landRemapResult[cp][0].AncestorSimilarity != 1;
 
-					if (hasChanged)
+					if (hasChanged || !isLandAuto || !isCoreAuto)
 					{
 						if (coreRemapResult[cp].Count == 1 && landRemapResult[cp].Count == 1)
 							similarities.Add($"{ coreRemapResult[cp].GetNodeSimilarity(0) };{ landRemapResult[cp][0].Similarity }");
@@ -300,6 +311,7 @@ namespace Comparison
 						}
 					}
 				}
+				File.WriteAllLines($"{key}_similarities.txt", similarities);
 				File.WriteAllLines($"{key}_coreOnlyAutoResult.txt",
 					coreOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 				File.WriteAllLines($"{key}_landOnlyAutoResult.txt",
@@ -313,6 +325,7 @@ namespace Comparison
 				File.WriteAllLines($"{key}_differentFirstPos.txt",
 					differentFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 
+				Console.WriteLine($"Total: {landRemapResult.Count}");
 				Console.WriteLine($"Land only auto: {landOnlyAutoResult.Count}");
 				Console.WriteLine($"Core only auto: {coreOnlyAutoResult.Count}");
 				Console.WriteLine($"Same auto: {sameAutoResult.Count}");

@@ -83,7 +83,7 @@ namespace Comparison
 
 						--i;
 					}
-					else if(children[i].Value?.Count > 0)
+					else if(children[i].Value?.Count > 0 && children[i].Options.GetPriority() > 0)
 					{
 						children.RemoveAt(i);
 						--i;
