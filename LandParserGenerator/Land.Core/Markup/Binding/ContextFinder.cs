@@ -12,7 +12,9 @@ namespace Land.Markup.Binding
 	public class ContextFinder
 	{
 		private const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		private const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		private const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
+		private const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		private const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
@@ -104,7 +106,7 @@ namespace Land.Markup.Binding
 						Context = PointContext.GetCoreContext(n, sameFile)
 					}).ToList();
 
-				return EvalCandidates(point, candidates, sameFile.MarkupSettings);
+				return EvalCandidates(point, candidates, sameFile.MarkupSettings, LOCAL_CANDIDATE_SIMILARITY_THRESHOLD);
 			}
 
 			return new List<RemapCandidateInfo>();
@@ -142,7 +144,7 @@ namespace Land.Markup.Binding
 			}
 
 			return files.Count > 0
-				? EvalCandidates(point, candidates, files.First().MarkupSettings)
+				? EvalCandidates(point, candidates, files.First().MarkupSettings, GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD)
 				: candidates;
 		}
 
@@ -156,7 +158,7 @@ namespace Land.Markup.Binding
 			/// Проверку горизонтального контекста выполняем только если
 			/// есть несколько кандидатов с одинаковыми оценками похожести
 			if (first != null && !first.IsAuto &&
-				IsSimilarEnough(first) && second != null)
+				IsSimilarEnough(first, GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD) && second != null)
 			{
 				var identicalCandidates = candidates.TakeWhile(c =>
 					c.HeaderSimilarity == first.HeaderSimilarity &&
@@ -204,7 +206,8 @@ namespace Land.Markup.Binding
 		private List<RemapCandidateInfo> EvalCandidates(
 			ConcernPoint point,
 			List<RemapCandidateInfo> candidates,
-			LanguageMarkupSettings markupSettings)
+			LanguageMarkupSettings markupSettings,
+			double similarityThreshold)
 		{
 			foreach (var candidate in candidates)
 				ComputeCoreContextSimilarities(point.Context, candidate);
@@ -226,7 +229,7 @@ namespace Land.Markup.Binding
 
 			if (first != null)
 			{
-				first.IsAuto = IsSimilarEnough(first)
+				first.IsAuto = IsSimilarEnough(first, similarityThreshold)
 					&& AreDistantEnough(first, second);
 			}
 
@@ -278,11 +281,11 @@ namespace Land.Markup.Binding
 		{
 			var searchResult = LocalSearch(point, searchArea);
 
-			if ((searchResult.Count == 0 || !searchResult.First().IsAuto) && !localOnly)
+			if ((searchResult.Count == 0 || !searchResult.First().IsAuto))
 			{
 				searchResult = GlobalSearch(point, searchArea, true);
 
-				if (searchResult.Count == 0)
+				if (searchResult.Count == 0 && !localOnly)
 				{
 					searchResult = GlobalSearch(point, searchArea, false);
 				}
@@ -455,12 +458,12 @@ namespace Land.Markup.Binding
 			return file.Root != null;
 		}
 
-		private bool IsSimilarEnough(RemapCandidateInfo candidate) =>
-			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
+		private bool IsSimilarEnough(RemapCandidateInfo candidate, double threshold) =>
+			candidate.Similarity >= threshold;
 
 		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
 			second == null || second.Similarity != 1
-				&& 1 - second.Similarity >= (1 - first.Similarity) * 1.5;
+				&& 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
 		private void ComputeTotalSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)

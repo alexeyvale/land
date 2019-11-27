@@ -278,9 +278,15 @@ namespace Land.Markup.Binding
 			var context = GetCoreContext(node, file);
 
 			if (file.MarkupSettings.UseSiblingsContext)
+			{
 				context.SiblingsContext = GetSiblingsContext(node, file);
-
-			context.ClosestContext = GetClosestContext(node, file, context, searchArea, getParsed);
+			}
+			else
+			{
+				context.ClosestContext = GetClosestContext(
+					node, file, context, searchArea, getParsed
+				);
+			}
 
 			return context;
 		}
