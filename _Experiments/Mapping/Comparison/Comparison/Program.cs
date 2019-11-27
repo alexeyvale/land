@@ -157,8 +157,8 @@ namespace Comparison
 
 						entities[key].Item2.Add(TreeSearchEngine.FindPointByLocation(
 							searchArea.Item2[j],
-							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Line.Value,
-							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Column.Value
+							subseq[index].Location.Start.Line.Value,
+							subseq[index].Location.Start.Column.Value
 						).FirstOrDefault());
 
 						subseq.RemoveAt(index);
@@ -195,7 +195,7 @@ namespace Comparison
 				var similarities = new List<string>();
 				var start = DateTime.Now;
 
-				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, false, true);
+				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, true, false);
 
 				Console.WriteLine($"LanD remapping done in {DateTime.Now - start}");
 
@@ -220,16 +220,16 @@ namespace Comparison
 
 				foreach (var cp in landRemapResult.Keys)
 				{
-					var isLandAuto = landRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-						&& (landRemapResult[cp].Count == 1
-							|| (1 - landRemapResult[cp][1].Similarity) >= (1 - landRemapResult[cp][0].Similarity) * 1.5);
+					var isLandAuto = landRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
 
-					var isCoreAuto = coreRemapResult[cp].GetNodeSimilarity(0) >= 0.6
-						&& (coreRemapResult[cp].Count == 1
-							|| (1 - coreRemapResult[cp].GetNodeSimilarity(1)) >= (1 - coreRemapResult[cp].GetNodeSimilarity(0)) * 2);
+					var isCoreAuto = coreRemapResult[cp].Singular ||
+						(coreRemapResult[cp].Count >= 2 && 
+						coreRemapResult[cp].GetNodeSimilarity(1) != 1 && 
+						(1 - coreRemapResult[cp].GetNodeSimilarity(1)) >= (1 - coreRemapResult[cp].GetNodeSimilarity(0)) * 2);
 
-					var sameFirst = coreRemapResult[cp].Count > 0 && landRemapResult[cp].Count > 0
-						&& String.Join("", coreRemapResult[cp][0].Context[0].Name)
+					var sameFirst = coreRemapResult[cp].Count == 0 && landRemapResult[cp].Count == 0 ||
+						coreRemapResult[cp].Count > 0 && landRemapResult[cp].Count > 0 &&
+						String.Join("", coreRemapResult[cp][0].Context[0].Name)
 							.StartsWith(String.Join("", landRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
 
 					var hasChanged = landRemapResult[cp].Count == 0 ||
@@ -253,8 +253,8 @@ namespace Comparison
 						for (var j = 0; j < coreRemapResult[cp].Count && j < 5; ++j)
 						{
 							var coreCandidate = coreRemapResult[cp][j];
-							report.WriteLine(String.Join(" ", coreCandidate.Context[0].Name));
-							report.WriteLine(coreRemapResult[cp].GetNodeSimilarity(j));
+							report.WriteLine(coreCandidate.Context[0].Name != null ? String.Join(" ", coreCandidate.Context[0].Name) : "");
+							report.WriteLine($"{coreRemapResult[cp].GetNodeSimilarity(j)} {(j == 0 && isCoreAuto ? "*" : "")}");
 						}
 
 						report.WriteLine("*");

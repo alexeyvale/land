@@ -26,14 +26,9 @@ namespace Comparison
 		}
 
 		public override void Visit(Node node)
-		{		
+		{
 			/// Создаём узел, хранящий актуальные текстовые координаты
-			var newNode = new PointOfInterest(new QUT.Gppg.LexLocation(
-					node.Location.Start.Line ?? 0,
-					node.Location.Start.Column ?? 0,
-					node.Location.End.Line ?? 0,
-					node.Location.End.Column ?? 0
-				));
+			var newNode = new PointOfInterest();
 			/// Коллекция потомков, которые могут попасть в новое дерево
 			var children = new List<Node>(node.Children.Where(c=>c.Location != null));
 			/// Заголовок узла
@@ -119,6 +114,18 @@ namespace Comparison
 			{
 				Visit(child);
 			}
+
+			var lastItemLocation = newNode.Items.LastOrDefault()?.Location;
+
+			newNode.Location = node.Location != null ?
+				new QUT.Gppg.LexLocation(
+					node.Location.Start.Line ?? 0,
+					node.Location.Start.Column ?? 0,
+					lastItemLocation?.EndLine ?? 
+						lastItemLocation?.StartLine ?? node.Location.Start.Line ?? 0,
+					lastItemLocation?.EndColumn ?? 
+						lastItemLocation?.StartColumn ?? node.Location.Start.Column ?? 0
+				) : null;
 
 			CurrentParent = oldParent;
 		}
