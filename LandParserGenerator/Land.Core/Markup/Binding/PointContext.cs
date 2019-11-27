@@ -502,7 +502,7 @@ namespace Land.Markup.Binding
 					continue;
 
 				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
-				file.Root.Accept(visitor);
+				similarFile.Root.Accept(visitor);
 
 				/// Для каждого элемента вычисляем основные контексты
 				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
