@@ -11,9 +11,13 @@ namespace Land.Markup.Binding
 
 	public class ContextFinder
 	{
+		private enum SearchType { SameFile, SimilarFiles, AllFiles }
+
 		private const double FILE_SIMILARITY_THRESHOLD = 0.8;
+
 		private const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
 		private const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+
 		private const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
@@ -112,14 +116,37 @@ namespace Land.Markup.Binding
 			return new List<RemapCandidateInfo>();
 		}
 
-		public List<RemapCandidateInfo> GlobalSearch(
+		private List<RemapCandidateInfo> DoSearch(
 			ConcernPoint point, 
 			List<ParsedFile> searchArea,
-			bool similarOnly)
+			SearchType searchType)
 		{
-			var files = searchArea
-				.Where(f => !similarOnly || AreFilesSimilarEnough(f.BindingContext.Content, point.Context.FileContext.Content))
-				.ToList();
+			List<ParsedFile> files = null;
+			
+			switch(searchType)
+			{
+				/// При поиске в том же файле ищем тот же файл по полному совпадению пути,
+				/// если не находим - только по имени
+				case SearchType.SameFile:
+					files = searchArea.Where(f => f.Name == point.Context.FileContext.Name).ToList();
+
+					if (files.Count == 0)
+					{
+						files = searchArea.Where(f => Path.GetFileName(f.Name) == 
+							Path.GetFileName(point.Context.FileContext.Name)).ToList();
+					}
+					break;
+				/// Похожие файлы ищем на основе хеша содержимого
+				case SearchType.SimilarFiles:
+					files = searchArea
+						.Where(f => AreFilesSimilarEnough(f.BindingContext.Content, point.Context.FileContext.Content))
+						.ToList();
+					break;
+				/// В противном случае проводим поиск по всей области
+				default:
+					files = searchArea;
+					break;
+			}
 
 			var candidates = new List<RemapCandidateInfo>();
 
@@ -144,7 +171,8 @@ namespace Land.Markup.Binding
 			}
 
 			return files.Count > 0
-				? EvalCandidates(point, candidates, files.First().MarkupSettings, GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD)
+				? EvalCandidates(point, candidates, files.First().MarkupSettings, 
+					searchType == SearchType.SameFile ? LOCAL_CANDIDATE_SIMILARITY_THRESHOLD : GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD)
 				: candidates;
 		}
 
@@ -279,19 +307,17 @@ namespace Land.Markup.Binding
 			List<ParsedFile> searchArea,
 			bool localOnly)
 		{
-			var searchResult = LocalSearch(point, searchArea);
+			var searchResult = DoSearch(point, searchArea, SearchType.SameFile);
 
-			if ((searchResult.Count == 0 || !searchResult.First().IsAuto))
-			{
-				searchResult = GlobalSearch(point, searchArea, true);
+			if(localOnly || (searchResult.FirstOrDefault()?.IsAuto ?? false))
+				return searchResult;
 
-				if (searchResult.Count == 0 && !localOnly)
-				{
-					searchResult = GlobalSearch(point, searchArea, false);
-				}
-			}
+			searchResult = DoSearch(point, searchArea, SearchType.SimilarFiles);
 
-			return searchResult;
+			if (searchResult.Count > 0 && searchResult.FirstOrDefault().IsAuto)
+				return searchResult;
+
+			return DoSearch(point, searchArea, SearchType.AllFiles);
 		}
 
 		public static bool AreFilesSimilarEnough(TextOrHash a, TextOrHash b) =>
