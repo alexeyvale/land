@@ -29,6 +29,10 @@ namespace Land.Markup.Binding
 			if (!useInner)
 				weights[ContextType.Inner] = 0;
 
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
+
 			return weights;
 		}
 	}
@@ -67,8 +71,8 @@ namespace Land.Markup.Binding
 
 			foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
 			{
-				if (kvp.Value.MaxValue < 0.6 ||
-					(1 - kvp.Value.MaxValue) * 1.5 > kvp.Value.MedianGap)
+				if (kvp.Value.MaxValue < ContextFinder.GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD ||
+					(1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
 					weights[kvp.Key] = 1;
 				else
 					contextsToPrioritize.Add(kvp.Key);
@@ -79,6 +83,10 @@ namespace Land.Markup.Binding
 
 			for (var i = 0; i < contextsToPrioritize.Count; ++i)
 				weights[contextsToPrioritize[i]] = MAX_WEIGHT - i;
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
 
 			return weights;
 		}
@@ -123,6 +131,10 @@ namespace Land.Markup.Binding
 		{
 			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_INNER_THRESHOLD)
 				weights[ContextType.Inner] = 0;
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
 
 			return weights;
 		}

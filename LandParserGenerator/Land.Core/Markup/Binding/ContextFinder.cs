@@ -13,12 +13,12 @@ namespace Land.Markup.Binding
 	{
 		private enum SearchType { SameFile, SimilarFiles, AllFiles }
 
-		private const double FILE_SIMILARITY_THRESHOLD = 0.8;
+		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
 
-		private const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
-		private const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		public const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
+		public const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 
-		private const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
+		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
