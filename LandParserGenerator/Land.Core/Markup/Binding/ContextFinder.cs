@@ -107,7 +107,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = sameFile,
-						Context = PointContext.GetCoreContext(n, sameFile)
+						Context = new PointContext { Core = ContextCore.Get(n, sameFile) }
 					}).ToList();
 
 				return EvalCandidates(point, candidates, sameFile.MarkupSettings, LOCAL_CANDIDATE_SIMILARITY_THRESHOLD);
@@ -164,7 +164,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = file,
-						Context = PointContext.GetCoreContext(n, file)
+						Context = new PointContext { Core = ContextCore.Get(n, file) }
 					})
 					.ToList()
 				);		
@@ -231,7 +231,7 @@ namespace Land.Markup.Binding
 			}
 		}
 
-		private List<RemapCandidateInfo> EvalCandidates(
+		public List<RemapCandidateInfo> EvalCandidates(
 			ConcernPoint point,
 			List<RemapCandidateInfo> candidates,
 			LanguageMarkupSettings markupSettings,
@@ -242,14 +242,12 @@ namespace Land.Markup.Binding
 
 			ComputeTotalSimilarity(point.Context, candidates);
 
+			candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
+
 			if (!markupSettings.UseSiblingsContext)
 			{
 				/// Отсеиваем похожих кандидатов, которые существовали в момент привязки
-				candidates = candidates
-					.OrderByDescending(c => c.Similarity)
-					.Where(c=>!point.Context.ClosestContext
-						.Any(e=>e.HeaderInnerHash.SequenceEqual(c.Context.HeaderInnerHash) && e.AncestorsHash.SequenceEqual(c.Context.AncestorsHash)))
-					.ToList();
+				
 			}
 
 			var first = candidates.FirstOrDefault();

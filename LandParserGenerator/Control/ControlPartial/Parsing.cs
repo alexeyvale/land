@@ -86,7 +86,7 @@ namespace Land.Control
 						Root = root,
 						Text = text,
 						MarkupSettings = Parsers.GetMarkupSettings(extension),
-						BindingContext = PointContext.GetFileContext(fileName, text)
+						BindingContext = ContextCore.GetFileContext(fileName, text)
 					} : null;
 				}
 				else

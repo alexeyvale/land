@@ -93,6 +93,7 @@
     <Compile Include="Core\Lexing\TokenStream.cs" />
     <Compile Include="Markup\Binding\ContextFinder.cs" />
     <Compile Include="Markup\Binding\IHeuristic.cs" />
+    <Compile Include="Markup\Binding\ContextCore.cs" />
     <Compile Include="Markup\Binding\WeightsHeuristics.cs" />
     <Compile Include="Markup\Binding\SimilarityHeuristics.cs" />
     <Compile Include="Markup\Binding\RemapCandidateInfo.cs" />
