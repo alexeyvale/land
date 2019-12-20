@@ -280,8 +280,7 @@ namespace Land.Control
 			{
 				ProcessAmbiguities(
 					MarkupManager.Remap(
-						GetPointSearchArea(), 
-						sender == ApplyLocalMapping, 
+						GetPointSearchArea(),
 						true
 					),
 					true

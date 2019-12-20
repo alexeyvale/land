@@ -398,7 +398,7 @@ namespace Land.Control
 			if (cp.HasInvalidLocation)
 			{
 				ProcessAmbiguities(
-					MarkupManager.Remap(cp, GetPointSearchArea(), false),
+					MarkupManager.Remap(cp, GetPointSearchArea()),
 					false
 				);
 			}

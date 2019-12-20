@@ -370,7 +370,7 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo }, false);
+			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo });
 		}
 
 		/// <summary>
@@ -397,11 +397,10 @@ namespace Land.Markup
 
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			List<ParsedFile> searchArea,
-			bool localOnly,
 			bool allowAutoDecisions)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var result = ContextFinder.Find(GetConcernPoints(), searchArea, localOnly);
+			var result = ContextFinder.Find(GetConcernPoints(), searchArea);
 
 			foreach (var kvp in result)
 			{
@@ -424,11 +423,10 @@ namespace Land.Markup
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			ConcernPoint point, 
-			List<ParsedFile> searchArea,
-			bool localOnly)
+			List<ParsedFile> searchArea)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var candidates = ContextFinder.Find(point, searchArea, localOnly)
+			var candidates = ContextFinder.Find(point, searchArea)
 				.TakeWhile(c => c.Similarity >= GarbageThreshold)
 				.Take(AmbiguityTopCount).ToList();
 
