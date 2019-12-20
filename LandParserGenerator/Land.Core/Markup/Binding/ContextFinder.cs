@@ -11,9 +11,9 @@ namespace Land.Markup.Binding
 
 	public class ContextFinder
 	{
-		private enum SearchType { SameFile, SimilarFiles, AllFiles }
+		private enum SearchType { SameFile, SimilarFiles }
 
-		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
+		public const double FILE_SIMILARITY_THRESHOLD = 0.6;
 
 		public const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
 		public const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
@@ -283,8 +283,7 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
 			List<ConcernPoint> points,
-			List<ParsedFile> searchArea,
-			bool localOnly)
+			List<ParsedFile> searchArea)
 		{
 			var groupedPoints = points.GroupBy(p => p.Context.Type)
 				.ToDictionary(e=>e.Key, e=>e.ToList());
@@ -295,7 +294,7 @@ namespace Land.Markup.Binding
 			{
 				foreach (var point in groupedPoints[pointType])
 				{
-					result[point] = Find(point, searchArea, localOnly);
+					result[point] = Find(point, searchArea);
 				}
 			}
 
@@ -304,20 +303,16 @@ namespace Land.Markup.Binding
 
 		public List<RemapCandidateInfo> Find(
 			ConcernPoint point, 
-			List<ParsedFile> searchArea,
-			bool localOnly)
+			List<ParsedFile> searchArea)
 		{
 			var searchResult = DoSearch(point, searchArea, SearchType.SameFile);
 
-			if(localOnly || (searchResult.FirstOrDefault()?.IsAuto ?? false))
+			if(searchResult.FirstOrDefault()?.IsAuto ?? false)
 				return searchResult;
 
 			searchResult = DoSearch(point, searchArea, SearchType.SimilarFiles);
 
-			if (searchResult.Count > 0 && searchResult.FirstOrDefault().IsAuto)
-				return searchResult;
-
-			return DoSearch(point, searchArea, SearchType.AllFiles);
+			return searchResult;
 		}
 
 		public static bool AreFilesSimilarEnough(TextOrHash a, TextOrHash b) =>
