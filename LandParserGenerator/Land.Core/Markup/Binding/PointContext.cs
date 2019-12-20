@@ -10,6 +10,146 @@ using Land.Markup.CoreExtension;
 
 namespace Land.Markup.Binding
 {
+	public interface IEqualsIgnoreValue
+	{
+		bool EqualsIgnoreValue(object obj);
+	}
+
+	[DataContract]
+	public abstract class TypedPrioritizedContextElement
+	{
+		[DataMember]
+		public double Priority { get; set; }
+
+		[DataMember]
+		public string Type { get; set; }
+	}
+
+	[DataContract]
+	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
+	{
+		[DataMember]
+		public bool ExactMatch { get; set; }
+
+		[DataMember]
+		public List<string> Value { get; set; }
+
+		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
+		public bool EqualsIgnoreValue(object obj)
+		{
+			if (obj is HeaderContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Priority == elem.Priority
+					&& Type == elem.Type
+					&& ExactMatch == elem.ExactMatch;
+			}
+
+			return false;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if(obj is HeaderContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Priority == elem.Priority 
+					&& Type == elem.Type
+					&& ExactMatch == elem.ExactMatch
+					&& Value.SequenceEqual(elem.Value);
+			}
+
+			return false;
+		}
+
+		public static bool operator ==(HeaderContextElement a, HeaderContextElement b)
+		{
+			return a.Equals(b);
+		}
+
+		public static bool operator !=(HeaderContextElement a, HeaderContextElement b)
+		{
+			return !a.Equals(b);
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
+		public static explicit operator HeaderContextElement(Node node)
+		{
+			return new HeaderContextElement()
+			{
+				Type = node.Type,
+				Value = node.Value,
+				Priority = node.Options.GetPriority().Value,
+				ExactMatch = node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH)
+			};
+		}
+	}
+
+	[DataContract]
+	public class InnerContext
+	{
+		[DataMember]
+		public TextOrHash Content { get; set; }
+
+		public InnerContext() { }
+
+		public InnerContext(List<SegmentLocation> locations, string fileText)
+		{
+			var text = String.Join(" ", locations.Select(l => 
+				fileText.Substring(l.Start.Offset, l.Length.Value)
+			));
+
+			Content = new TextOrHash(text);
+		}
+	}
+
+	[DataContract]
+	public class AncestorsContextElement
+	{
+		[DataMember]
+		public string Type { get; set; }
+
+		[DataMember]
+		public List<HeaderContextElement> HeaderContext { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			if (obj is AncestorsContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Type == elem.Type
+					&& HeaderContext.SequenceEqual(elem.HeaderContext);
+			}
+
+			return false;
+		}
+
+		public static bool operator ==(AncestorsContextElement a, AncestorsContextElement b)
+		{
+			return a.Equals(b);
+		}
+
+		public static bool operator !=(AncestorsContextElement a, AncestorsContextElement b)
+		{
+			return !a.Equals(b);
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
+		public static explicit operator AncestorsContextElement(Node node)
+		{
+			return new AncestorsContextElement()
+			{
+				Type = node.Type,
+				HeaderContext = PointContext.GetHeaderContext(node)
+			};
+		}
+	}
+
 	[DataContract]
 	public class SiblingsContext
 	{
@@ -21,26 +161,71 @@ namespace Land.Markup.Binding
 	}
 
 	[DataContract]
+	public class FileContext
+	{
+		/// <summary>
+		/// Имя файла
+		/// </summary>
+		[DataMember]
+		public string Name { get; set; }
+
+		/// <summary>
+		/// Количество строк
+		/// </summary>
+		[DataMember]
+		public int LineCount { get; set; }
+
+		/// <summary>
+		/// Нечёткий хеш содержимого файла
+		/// </summary>
+		[DataMember]
+		public TextOrHash Content { get; set; }
+	}
+
+	[DataContract]
 	public class PointContext
 	{
+		public int LinksCounter { get; private set; } = 0;
+
+		public void AddLink() => ++LinksCounter;
+
+		public void RemoveLink() => --LinksCounter;
+
+		/// <summary>
+		/// Тип сущности, которой соответствует точка привязки
+		/// </summary>
 		[DataMember]
-		public ContextCore Core { get; set; }
-
-		#region Core contexts
-
-		public List<HeaderContextElement> HeaderContext => Core?.HeaderContext;
-		public List<AncestorsContextElement> AncestorsContext => Core?.AncestorsContext;
-		public InnerContext InnerContext => Core?.InnerContext;
-		public FileContext FileContext => Core?.FileContext;
-		public string Type => Core?.Type;
-
-		#endregion
+		public string Type { get; set; }
 
 		/// <summary>
 		/// Номер строки в файле, на которой начинается сущность
 		/// </summary>
 		[DataMember]
 		public int Line { get; set; }
+
+		/// <summary>
+		/// Контекст файла, в котором находится помеченный элемент
+		/// </summary>
+		[DataMember]
+		public FileContext FileContext { get; set; }
+
+		/// <summary>
+		/// Контекст заголовка узла, к которому привязана точка разметки
+		/// </summary>
+		[DataMember]
+		public List<HeaderContextElement> HeaderContext { get; set; }
+
+		/// <summary>
+		/// Внутренний контекст в виде одной сущности
+		/// </summary>
+		[DataMember]
+		public InnerContext InnerContext { get; set; }
+
+		/// <summary>
+		/// Контекст предков узла, к которому привязана точка разметки
+		/// </summary>
+		[DataMember]
+		public List<AncestorsContextElement> AncestorsContext { get; set; }
 
 		/// <summary>
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
@@ -52,34 +237,49 @@ namespace Land.Markup.Binding
 		/// Контекст наиболее похожих на помеченный элементов
 		/// </summary>
 		[DataMember]
-		public List<ContextCore> ClosestContext { get; set; }
+		public List<PointContext> ClosestContext { get; set; }
 
-		public static PointContext Get(
+		public static PointContext GetCoreContext(
+			Node node,
+			ParsedFile file)
+		{
+			return new PointContext
+			{
+				Type = node.Type,
+				Line = node.Location.Start.Line.Value,
+				FileContext = file.BindingContext,
+				HeaderContext = GetHeaderContext(node),
+				InnerContext = GetInnerContext(node, file),
+				AncestorsContext = GetAncestorsContexAndHash(node)
+			};
+		}
+
+		public static PointContext GetFullContext(
 			Node node, 
 			ParsedFile file, 
 			List<ParsedFile> searchArea, 
 			Func<string, ParsedFile> getParsed,
 			ContextFinder contextFinder,
-			ContextCore core = null)
+			PointContext core = null)
 		{
-			var context = new PointContext
+			if (core == null || core.SiblingsContext == null && core.ClosestContext == null)
 			{
-				Core = core ?? ContextCore.Get(node, file),
-				Line = node.Location.Start.Line.Value
-			};
+				if (core == null)
+					core = PointContext.GetCoreContext(node, file);
 
-			if (file.MarkupSettings.UseSiblingsContext)
-			{
-				context.SiblingsContext = GetSiblingsContext(node, file);
-			}
-			else
-			{
-				context.ClosestContext = GetClosestContext(
-					node, file, context, searchArea, getParsed, contextFinder
-				);
+				if (file.MarkupSettings.UseSiblingsContext)
+				{
+					core.SiblingsContext = GetSiblingsContext(node, file);
+				}
+				else
+				{
+					core.ClosestContext = GetClosestContext(
+						node, file, core, searchArea, getParsed, contextFinder
+					);
+				}
 			}
 
-			return context;
+			return core;
 		}
 
 		public static byte[] GetHash(Node node, ParsedFile file)
@@ -101,6 +301,110 @@ namespace Land.Markup.Binding
 					System.Text.RegularExpressions.Regex.Replace(text.ToLower(), "[\n\r\f\t ]+", "")
 				));
 			}
+		}
+
+		public static List<HeaderContextElement> GetHeaderContext(Node node)
+		{
+			var cachingNode = (ContextCachingNode)node;
+
+			/// Если есть закешированный контекст, возвращаем его
+			//if (cachingNode.HeaderContext != null)
+			//return cachingNode.HeaderContext;
+
+			/// Иначе вычисляем контекст заголовка
+			/// Листовой узел сам себе заголовок
+			if (node.Value.Count > 0)
+			{
+				cachingNode.HeaderContext = new List<HeaderContextElement>()
+				{
+					new HeaderContextElement()
+					{
+						 Type = node.Type,
+						 Priority = 1,
+						 Value = node.Value
+					}
+				};
+			}
+			/// Для нелистового ищем листовых непосредственных потомков
+			else
+			{
+				cachingNode.HeaderContext = new List<HeaderContextElement>();
+
+				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+				while (stack.Any())
+				{
+					var current = stack.Pop();
+
+					if ((current.Children.Count == 0 ||
+						current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) &&
+						current.Options.GetPriority() > 0)
+					{
+						cachingNode.HeaderContext.Add((HeaderContextElement)current);
+					}
+					else
+					{
+						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
+							for (var i = current.Children.Count - 2; i >= 1; --i)
+								stack.Push(current.Children[i]);
+					}
+				}
+			}
+
+			return cachingNode.HeaderContext;
+		}
+
+		public static List<AncestorsContextElement> GetAncestorsContexAndHash(Node node)
+		{
+			var context = new List<AncestorsContextElement>();
+			var currentNode = node.Parent;
+
+			while (currentNode != null)
+			{
+				if (currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME
+					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+					context.Add((AncestorsContextElement)currentNode);
+
+				currentNode = currentNode.Parent;
+			}
+
+			return context;
+		}
+
+		public static InnerContext GetInnerContext(Node node, ParsedFile file)
+		{
+			var locations = new List<SegmentLocation>();
+			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+			while (stack.Any())
+			{
+				var current = stack.Pop();
+
+				if (current.Children.Count > 0)
+				{
+					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+					{
+						locations.Add(current.Location);
+					}
+					else
+					{
+						for (var i = current.Children.Count - 2; i >= 1; --i)
+							stack.Push(current.Children[i]);
+					}
+				}
+			}
+
+			return new InnerContext(locations, file.Text);
+		}
+
+		public static FileContext GetFileContext(string name, string text)
+		{
+			return new FileContext
+			{
+				Name = name,
+				LineCount = text.Count(c => c == '\n') + 1,
+				Content = new TextOrHash(text)
+			};
 		}
 
 		public static SiblingsContext GetSiblingsContext(Node node, ParsedFile file)
@@ -147,7 +451,7 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static List<ContextCore> GetClosestContext(
+		public static List<PointContext> GetClosestContext(
 			Node node,
 			ParsedFile file,
 			PointContext nodeContext,
@@ -181,7 +485,7 @@ namespace Land.Markup.Binding
 
 				/// Для каждого элемента вычисляем основные контексты
 				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
-					.Select(n => new RemapCandidateInfo { Context = new PointContext { Core = ContextCore.Get(n, similarFile) } })
+					.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, similarFile) })
 				);
 			}
 
@@ -189,7 +493,51 @@ namespace Land.Markup.Binding
 				.TakeWhile(c => c.SiblingsSimilarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 
-			return candidates.Select(c=>c.Context.Core).ToList();
+			return candidates.Select(c=>c.Context).ToList();
 		}
+	}
+
+	[DataContract]
+	public class TextOrHash
+	{
+		public const int MAX_TEXT_LENGTH = 100;
+
+		[DataMember]
+		public string Text { get; set; }
+
+		[DataMember]
+		public int TextLength { get; set; }
+
+		[DataMember]
+		public byte[] Hash { get; set; }
+
+		public TextOrHash() { }
+
+		public TextOrHash(string text)
+		{
+			text = System.Text.RegularExpressions.Regex.Replace(
+				text.ToLower(), "[\n\r\f\t ]+", ""
+			);
+
+			TextLength = text.Length;
+
+			/// Хэш от строки можем посчитать, только если длина строки
+			/// больше заданной константы
+			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+				Hash = FuzzyHashing.GetFuzzyHash(text);
+
+			if (text.Length <= MAX_TEXT_LENGTH)
+				Text = text;
+		}
+	}
+
+	public class EqualsIgnoreValueComparer :
+		IEqualityComparer<IEqualsIgnoreValue>
+	{
+		public bool Equals(IEqualsIgnoreValue e1,
+			IEqualsIgnoreValue e2) => e1.EqualsIgnoreValue(e2);
+
+		public int GetHashCode(IEqualsIgnoreValue e)
+			=> e.GetHashCode();
 	}
 }

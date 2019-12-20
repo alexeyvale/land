@@ -141,7 +141,7 @@ namespace Land.Markup
 			Concern parent = null)
 		{
 			var point = new ConcernPoint(
-				node, PointContext.Get(node, file, searchArea, getParsed, ContextFinder), parent
+				node, ContextFinder.ContextManager.GetContext(node, file, searchArea, getParsed, ContextFinder), parent
 			);
 
 			if (!String.IsNullOrEmpty(name))
@@ -182,7 +182,7 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, PointContext.Get(node, file, searchArea, getParsed, ContextFinder), subconcern)
+							node, ContextFinder.ContextManager.GetContext(node, file, searchArea, getParsed, ContextFinder), subconcern)
 						);
 					}
 				}
@@ -194,7 +194,7 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, PointContext.Get(node, file, searchArea, getParsed, ContextFinder), concern)
+						node, ContextFinder.ContextManager.GetContext(node, file, searchArea, getParsed, ContextFinder), concern)
 					);
 				}
 			}
@@ -236,7 +236,7 @@ namespace Land.Markup
 			List<ParsedFile> searchArea,
 			Func<string, ParsedFile> getParsed)
 		{
-			point.Relink(node, PointContext.Get(node, file, searchArea, getParsed, ContextFinder));
+			point.Relink(node, ContextFinder.ContextManager.GetContext(node, file, searchArea, getParsed, ContextFinder));
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -450,8 +450,8 @@ namespace Land.Markup
 
 			if (first?.IsAuto ?? false)
 			{
-				point.Context = PointContext.Get(
-					first.Node, first.File, searchArea, getParsed, ContextFinder, first.Context.Core
+				point.Context = ContextFinder.ContextManager.GetContext(
+					first.Node, first.File, searchArea, getParsed, ContextFinder
 				);
 				point.AstNode = first.Node;
 				return true;

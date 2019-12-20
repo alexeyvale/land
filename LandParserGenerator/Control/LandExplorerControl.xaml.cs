@@ -162,7 +162,7 @@ namespace Land.Control
 					{
 						Text = fileText,
 						Root = root,
-						BindingContext = ContextCore.GetFileContext(point.Context.FileContext.Name, fileText)
+						BindingContext = PointContext.GetFileContext(point.Context.FileContext.Name, fileText)
 					})
 				: new List<RemapCandidateInfo>();
 		}

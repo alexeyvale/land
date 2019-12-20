@@ -22,6 +22,8 @@ namespace Land.Markup.Binding
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
+		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
+
 		public List<IWeightsHeuristic> TuningHeuristics { get; private set; } = 
 			new List<IWeightsHeuristic>();
 		public List<ISimilarityHeuristic> ScoringHeuristics { get; private set; } = 
@@ -107,7 +109,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = sameFile,
-						Context = new PointContext { Core = ContextCore.Get(n, sameFile) }
+						Context = ContextManager.GetContext(n, sameFile)
 					}).ToList();
 
 				return EvalCandidates(point, candidates, sameFile.MarkupSettings, LOCAL_CANDIDATE_SIMILARITY_THRESHOLD);
@@ -164,7 +166,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = file,
-						Context = new PointContext { Core = ContextCore.Get(n, file) }
+						Context = ContextManager.GetContext(n, file)
 					})
 					.ToList()
 				);		

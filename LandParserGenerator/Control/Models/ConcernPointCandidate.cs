@@ -26,7 +26,7 @@ namespace Land.Control
 		{
 			Node = node;
 			ViewHeader = String.Join(" ",
-				ContextCore.GetHeaderContext(node).Select(c => String.Join("", c.Value))
+				PointContext.GetHeaderContext(node).Select(c => String.Join("", c.Value))
 			);
 		}
 	}
