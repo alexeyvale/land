@@ -16,7 +16,7 @@ namespace Land.Markup.Binding
 		public double InnerSimilarity { get; set; }
 		public double SiblingsSimilarity { get; set; }
 
-		public double? Similarity { get; set;  }
+		public double? Similarity { get; set; }
 
 		public bool IsAuto { get; set; }
 

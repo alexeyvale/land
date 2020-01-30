@@ -250,7 +250,7 @@ namespace Land.Markup.Binding
 				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
 				InnerContext = GetInnerContext(node, file),
-				AncestorsContext = GetAncestorsContexAndHash(node)
+				AncestorsContext = GetAncestorsContext(node)
 			};
 		}
 
@@ -354,7 +354,7 @@ namespace Land.Markup.Binding
 			return cachingNode.HeaderContext;
 		}
 
-		public static List<AncestorsContextElement> GetAncestorsContexAndHash(Node node)
+		public static List<AncestorsContextElement> GetAncestorsContext(Node node)
 		{
 			var context = new List<AncestorsContextElement>();
 			var currentNode = node.Parent;
@@ -463,7 +463,7 @@ namespace Land.Markup.Binding
 
 			/// Отбираем файлы, наиболее похожие на содержащий помечаемый элемент
 			var similarFiles = searchArea
-				.Where(f => ContextFinder.AreFilesSimilarEnough(f.BindingContext.Content, file.BindingContext.Content))
+				.Where(f => contextFinder.AreFilesSimilarEnough(f.BindingContext.Content, file.BindingContext.Content))
 				.ToList();
 
 			foreach (var f in similarFiles)
@@ -489,7 +489,7 @@ namespace Land.Markup.Binding
 				);
 			}
 
-			candidates = contextFinder.EvalCandidates(new ConcernPoint(node, nodeContext), candidates, new LanguageMarkupSettings(null), 1)
+			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), 1)
 				.TakeWhile(c => c.SiblingsSimilarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 

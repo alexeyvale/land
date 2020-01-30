@@ -370,7 +370,7 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(point, new List<ParsedFile> { targetInfo });
+			return ContextFinder.Find(new List<ConcernPoint> { point }, new List<ParsedFile> { targetInfo })[point];
 		}
 
 		/// <summary>
@@ -425,13 +425,25 @@ namespace Land.Markup
 			ConcernPoint point, 
 			List<ParsedFile> searchArea)
 		{
-			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var candidates = ContextFinder.Find(point, searchArea)
-				.TakeWhile(c => c.Similarity >= GarbageThreshold)
-				.Take(AmbiguityTopCount).ToList();
+			var points = GetConcernPoints()
+				.Where(p => p.Context.Type == point.Context.Type && p.Context.FileContext.Name == point.Context.FileContext.Name)
+				.ToList();
 
-			if (!ApplyCandidate(point, candidates, searchArea, ContextFinder.GetParsed))
-				ambiguous[point] = candidates;
+			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			var result = ContextFinder.Find(points, searchArea);
+			var keys = result.Keys.ToList();
+
+			foreach (var key in keys)
+			{
+				result[key] = result[key]
+					.TakeWhile(c => c.Similarity >= GarbageThreshold)
+					.Take(AmbiguityTopCount)
+					.ToList();
+
+				if (!ApplyCandidate(key, result[key], searchArea, ContextFinder.GetParsed))
+					ambiguous[point] = result[key];
+			}
 
 			OnMarkupChanged?.Invoke();
 
