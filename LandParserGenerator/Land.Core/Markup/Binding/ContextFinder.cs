@@ -35,16 +35,11 @@ namespace Land.Markup.Binding
 			}
 		}
 
-		private enum SearchType { SameFile, SimilarFiles }
+		private enum SearchType { SameFile, SimilarFiles, AllFiles }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.6;
-
-		public const double LOCAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.8;
-		public const double GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
-
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
-
-		private Dictionary<StringPair, double> LevenshteinCache { get; set; } = new Dictionary<StringPair, double>();
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
@@ -159,13 +154,40 @@ namespace Land.Markup.Binding
 			var contextsToPoints = points.GroupBy(p => p.Context)
 				.ToDictionary(g=>g.Key, g=>g.ToList());
 
+			/// Задаём граф списком смежностей - каждый из исходных контекстов 
+			/// связан со всеми кандидатами, вес ребра - похожесть
 			var graph = points.SelectMany(p => files.First().MarkupSettings.UseSiblingsContext ? new HashSet<PointContext> { p.Context } : new HashSet<PointContext>(p.Context.ClosestContext) { p.Context })
 				.ToDictionary(p => p, p => candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList());
 
 			foreach(var elem in graph)
 			{
-				EvalCandidates(elem.Key, elem.Value, files.First().MarkupSettings,
-					searchType == SearchType.SameFile ? LOCAL_CANDIDATE_SIMILARITY_THRESHOLD : GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD);
+				EvalCandidates(elem.Key, elem.Value, files.First().MarkupSettings, 
+					CANDIDATE_SIMILARITY_THRESHOLD);
+			}
+
+			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			/// Сразу обрабатываем стопроцентные совпадения, уменьшая размерность
+			/// задачи поиска паросочетания максимального веса
+			foreach (var src in graph.Keys.ToList())
+			{
+				var perfectMatch = graph[src].FirstOrDefault(e => e.Similarity == 1);
+
+				if(perfectMatch != null)
+				{
+					perfectMatch.IsAuto = true;
+
+					var allCandidates = graph[src];
+					graph.Remove(src);
+
+					var candidateIndex = allCandidates.IndexOf(perfectMatch);
+
+					foreach (var val in graph.Values)
+						val.RemoveAt(candidateIndex);
+
+					foreach (var point in contextsToPoints[src])
+						result[point] = allCandidates;
+				}
 			}
 
 			var scores = new double[graph.Count + 1, candidates.Count + 1];
@@ -186,7 +208,6 @@ namespace Land.Markup.Binding
 			}
 
 			var bestMatches = FindMaximumMatching(scores);
-			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			for (i = 1; i < bestMatches.Length; ++i)
 			{
@@ -200,8 +221,7 @@ namespace Land.Markup.Binding
 						graph[indicesToContexts[i]].Remove(bestMatch);
 						graph[indicesToContexts[i]].Insert(0, bestMatch);
 
-						if (IsSimilarEnough(bestMatch, 
-							searchType == SearchType.SameFile ? LOCAL_CANDIDATE_SIMILARITY_THRESHOLD : GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD))
+						if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
 						{
 							bestMatch.IsAuto = true;
 						}
@@ -300,7 +320,7 @@ namespace Land.Markup.Binding
 			/// Проверку горизонтального контекста выполняем только если
 			/// есть несколько кандидатов с одинаковыми оценками похожести
 			if (first != null && !first.IsAuto &&
-				IsSimilarEnough(first, GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD) && second != null)
+				IsSimilarEnough(first, CANDIDATE_SIMILARITY_THRESHOLD) && second != null)
 			{
 				var identicalCandidates = candidates.TakeWhile(c =>
 					c.HeaderSimilarity == first.HeaderSimilarity &&
@@ -430,7 +450,7 @@ namespace Land.Markup.Binding
 			if (a is IEnumerable<HeaderContextElement>)
 				return Levenshtein((IEnumerable<HeaderContextElement>)a, (IEnumerable<HeaderContextElement>)b);
 			else if (a is string)
-				return LevenshteinCached(a as string, b as string);
+				return Levenshtein(a as string, b as string);
 			else if (a is HeaderContextElement)
 				return EvalSimilarity(a as HeaderContextElement, b as HeaderContextElement);
 			else if (a is InnerContext)
@@ -452,7 +472,7 @@ namespace Land.Markup.Binding
 			{
 				return a.ExactMatch
 					? String.Join("", a.Value) == String.Join("", b.Value) ? 1 : 0
-					: LevenshteinCached(String.Join("", a.Value), String.Join("", b.Value));
+					: Levenshtein(String.Join("", a.Value), String.Join("", b.Value));
 			}
 			else
 				return double.MinValue;
@@ -563,16 +583,55 @@ namespace Land.Markup.Binding
 			return 1 - distances[a.Count(), b.Count()] / denominator;
 		}
 
-		private double LevenshteinCached(string a, string b)
+		private double Levenshtein(string a, string b)
 		{
-			var key = new StringPair(a, b);
+			if (a.Length == 0 ^ b.Length == 0)
+				return 0;
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
 
-			if (!LevenshteinCache.ContainsKey(key))
-			{
-				LevenshteinCache[key] = Levenshtein(a, b);
-			}
+			var denominator = (double)Math.Max(a.Length, b.Length);
 
-			return LevenshteinCache[key];
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Length && commonPrefixLength < b.Length
+				&& a[commonPrefixLength].Equals(b[commonPrefixLength]))
+				++commonPrefixLength;
+			a = a.Substring(commonPrefixLength);
+			b = b.Substring(commonPrefixLength);
+
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Length && commonSuffixLength < b.Length
+				&& a[a.Length - 1 - commonSuffixLength].Equals(b[b.Length - 1 - commonSuffixLength]))
+				++commonSuffixLength;
+			a = a.Substring(0, a.Length - commonSuffixLength);
+			b = b.Substring(0, b.Length - commonSuffixLength);
+
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
+
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Length + 1, b.Length + 1];
+			distances[0, 0] = 0;
+
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Length; ++i)
+				distances[i, 0] = distances[i - 1, 0] + 1;
+			for (int j = 1; j <= b.Length; ++j)
+				distances[0, j] = distances[0, j - 1] + 1;
+
+			for (int i = 1; i <= a.Length; i++)
+				for (int j = 1; j <= b.Length; j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = a[i - 1] == b[j - 1] ? 0 : 1;
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
+
+			return 1 - distances[a.Length, b.Length] / denominator;
 		}
 
 		private static double PriorityCoefficient(object elem)

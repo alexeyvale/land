@@ -71,7 +71,7 @@ namespace Land.Markup.Binding
 
 			foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
 			{
-				if (kvp.Value.MaxValue < ContextFinder.GLOBAL_CANDIDATE_SIMILARITY_THRESHOLD ||
+				if (kvp.Value.MaxValue < ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD ||
 					(1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
 					weights[kvp.Key] = 1;
 				else
