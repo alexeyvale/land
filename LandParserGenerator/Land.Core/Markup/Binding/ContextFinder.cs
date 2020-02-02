@@ -184,49 +184,53 @@ namespace Land.Markup.Binding
 
 					foreach (var val in graph.Values)
 						val.RemoveAt(candidateIndex);
+					candidates.RemoveAt(candidateIndex);
 
 					foreach (var point in contextsToPoints[src])
 						result[point] = allCandidates;
 				}
 			}
 
-			var scores = new double[graph.Count + 1, candidates.Count + 1];
-			var indicesToContexts = new PointContext[scores.GetLength(0)];
-
-			var i = 1;
-			foreach (var from in graph)
+			if (graph.Count > 0)
 			{
-				indicesToContexts[i] = from.Key;
+				var scores = new double[graph.Count + 1, candidates.Count + 1];
+				var indicesToContexts = new PointContext[scores.GetLength(0)];
 
-				var j = 1;
-				foreach (var to in from.Value)
+				var i = 1;
+				foreach (var from in graph)
 				{
-					scores[i, j] = -to.Similarity ?? 0;
-					++j;
-				}
-				++i;
-			}
+					indicesToContexts[i] = from.Key;
 
-			var bestMatches = FindMaximumMatching(scores);
-
-			for (i = 1; i < bestMatches.Length; ++i)
-			{
-				if (contextsToPoints.ContainsKey(indicesToContexts[i]))
-				{
-					foreach (var point in contextsToPoints[indicesToContexts[i]])
+					var j = 1;
+					foreach (var to in from.Value)
 					{
-						var bestMatch = graph[indicesToContexts[i]][bestMatches[i] - 1];
+						scores[i, j] = -to.Similarity ?? 0;
+						++j;
+					}
+					++i;
+				}
 
-						graph[indicesToContexts[i]].ForEach(c => c.IsAuto = false);
-						graph[indicesToContexts[i]].Remove(bestMatch);
-						graph[indicesToContexts[i]].Insert(0, bestMatch);
+				var bestMatches = FindMaximumMatching(scores);
 
-						if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
+				for (i = 1; i < bestMatches.Length; ++i)
+				{
+					if (contextsToPoints.ContainsKey(indicesToContexts[i]))
+					{
+						foreach (var point in contextsToPoints[indicesToContexts[i]])
 						{
-							bestMatch.IsAuto = true;
-						}
+							var bestMatch = graph[indicesToContexts[i]][bestMatches[i] - 1];
 
-						result[point] = graph[indicesToContexts[i]];
+							graph[indicesToContexts[i]].ForEach(c => c.IsAuto = false);
+							graph[indicesToContexts[i]].Remove(bestMatch);
+							graph[indicesToContexts[i]].Insert(0, bestMatch);
+
+							if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
+							{
+								bestMatch.IsAuto = true;
+							}
+
+							result[point] = graph[indicesToContexts[i]];
+						}
 					}
 				}
 			}
@@ -411,14 +415,15 @@ namespace Land.Markup.Binding
 			List<ConcernPoint> points,
 			List<ParsedFile> searchArea)
 		{
-			var groupedPoints = points.GroupBy(p => p.Context.Type)
+			var groupedPoints = points
+				.GroupBy(p => new { p.Context.Type, FileName = p.Context.FileContext.Name })
 				.ToDictionary(e=>e.Key, e=>e.ToList());
 
 			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			foreach (var pointType in groupedPoints.Keys)
+			foreach (var groupKey in groupedPoints.Keys)
 			{
-				var groupResult = FindGroup(groupedPoints[pointType], searchArea);
+				var groupResult = FindGroup(groupedPoints[groupKey], searchArea);
 
 				foreach(var elem in groupResult)
 				{
