@@ -169,7 +169,7 @@ namespace Land.Markup.Binding
 
 			/// Сразу обрабатываем стопроцентные совпадения, уменьшая размерность
 			/// задачи поиска паросочетания максимального веса
-			foreach (var src in graph.Keys.ToList())
+			foreach (var src in graph.Keys.Where(k => contextsToPoints.ContainsKey(k)).ToList())
 			{
 				var perfectMatch = graph[src].FirstOrDefault(e => e.Similarity == 1);
 
@@ -186,12 +186,14 @@ namespace Land.Markup.Binding
 						val.RemoveAt(candidateIndex);
 					candidates.RemoveAt(candidateIndex);
 
+					allCandidates = allCandidates.OrderByDescending(c => c.Similarity).ToList();
+
 					foreach (var point in contextsToPoints[src])
 						result[point] = allCandidates;
 				}
 			}
 
-			if (graph.Count > 0)
+			if (graph.Keys.Any(k => contextsToPoints.ContainsKey(k)))
 			{
 				var scores = new double[graph.Count + 1, candidates.Count + 1];
 				var indicesToContexts = new PointContext[scores.GetLength(0)];
@@ -219,10 +221,11 @@ namespace Land.Markup.Binding
 						foreach (var point in contextsToPoints[indicesToContexts[i]])
 						{
 							var bestMatch = graph[indicesToContexts[i]][bestMatches[i] - 1];
+							var allCandidates = graph[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
 
-							graph[indicesToContexts[i]].ForEach(c => c.IsAuto = false);
-							graph[indicesToContexts[i]].Remove(bestMatch);
-							graph[indicesToContexts[i]].Insert(0, bestMatch);
+							allCandidates.ForEach(c => c.IsAuto = false);
+							allCandidates.Remove(bestMatch);
+							allCandidates.Insert(0, bestMatch);
 
 							if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
 							{
