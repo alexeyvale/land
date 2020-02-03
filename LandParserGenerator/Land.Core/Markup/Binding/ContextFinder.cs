@@ -232,7 +232,7 @@ namespace Land.Markup.Binding
 								bestMatch.IsAuto = true;
 							}
 
-							result[point] = graph[indicesToContexts[i]];
+							result[point] = allCandidates;
 						}
 					}
 				}
