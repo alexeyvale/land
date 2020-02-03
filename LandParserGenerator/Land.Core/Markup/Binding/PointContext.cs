@@ -461,12 +461,7 @@ namespace Land.Markup.Binding
 		{
 			const double CLOSE_ELEMENT_THRESHOLD = 0.8;
 
-			/// Отбираем файлы, наиболее похожие на содержащий помечаемый элемент
-			var similarFiles = searchArea
-				.Where(f => contextFinder.AreFilesSimilarEnough(f.BindingContext.Content, file.BindingContext.Content))
-				.ToList();
-
-			foreach (var f in similarFiles)
+			foreach (var f in searchArea)
 			{
 				if (f.Root == null)
 					f.Root = getParsed(f.Name)?.Root;
@@ -474,7 +469,7 @@ namespace Land.Markup.Binding
 
 			var candidates = new List<RemapCandidateInfo>();
 
-			foreach (var similarFile in similarFiles)
+			foreach (var similarFile in searchArea)
 			{
 				/// Если не смогли распарсить файл, переходим к следующему
 				if (similarFile.Root == null)

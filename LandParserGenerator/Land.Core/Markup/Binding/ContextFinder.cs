@@ -120,7 +120,7 @@ namespace Land.Markup.Binding
 				/// Похожие файлы ищем на основе хеша содержимого
 				case SearchType.SimilarFiles:
 					files = searchArea
-						.Where(f => AreFilesSimilarEnough(f.BindingContext.Content, points[0].Context.FileContext.Content))
+						.Where(f => AreFilesSimilarEnough(f.BindingContext, points[0].Context.FileContext))
 						.ToList();
 					break;
 				/// В противном случае проводим поиск по всей области
@@ -446,8 +446,8 @@ namespace Land.Markup.Binding
 			return searchResult;
 		}
 
-		public bool AreFilesSimilarEnough(TextOrHash a, TextOrHash b) =>
-			EvalSimilarity(a, b) > FILE_SIMILARITY_THRESHOLD;
+		public bool AreFilesSimilarEnough(FileContext a, FileContext b) =>
+			EvalSimilarity(a.Content, b.Content) > FILE_SIMILARITY_THRESHOLD;
 
 		/// Похожесть новой последовательности на старую 
 		/// при переходе от последовательности a к последовательности b
