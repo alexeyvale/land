@@ -153,11 +153,25 @@ namespace Land.Markup.Binding
 
 			var contextsToPoints = points.GroupBy(p => p.Context)
 				.ToDictionary(g=>g.Key, g=>g.ToList());
+			var contextsSet = new HashSet<PointContext>();
+
+			if(files.First().MarkupSettings.UseSiblingsContext)
+			{
+				contextsSet.UnionWith(points.Select(p => p.Context));
+			}
+			else
+			{
+				foreach (var point in points)
+				{
+					contextsSet.Add(point.Context);
+					contextsSet.UnionWith(point.Context.ClosestContext);
+				}
+			}
 
 			/// Задаём граф списком смежностей - каждый из исходных контекстов 
 			/// связан со всеми кандидатами, вес ребра - похожесть
-			var graph = points.SelectMany(p => files.First().MarkupSettings.UseSiblingsContext ? new HashSet<PointContext> { p.Context } : new HashSet<PointContext>(p.Context.ClosestContext) { p.Context })
-				.ToDictionary(p => p, p => candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList());
+			var graph = contextsSet.ToDictionary(p => p, 
+				p => candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList());
 
 			foreach(var elem in graph)
 			{
@@ -193,128 +207,68 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			if (graph.Keys.Any(k => contextsToPoints.ContainsKey(k)))
+			/// Если есть изменившиеся помеченные сущности, и остались кандидаты
+			if (graph.Count > 0 && graph.First().Value.Count > 0
+				&& graph.Keys.Any(k => contextsToPoints.ContainsKey(k)))
 			{
-				var scores = new double[graph.Count + 1, candidates.Count + 1];
+				var scores = new int[graph.Count, candidates.Count];
 				var indicesToContexts = new PointContext[scores.GetLength(0)];
 
-				var i = 1;
+				var i = 0;
 				foreach (var from in graph)
 				{
 					indicesToContexts[i] = from.Key;
 
-					var j = 1;
+					var j = 0;
 					foreach (var to in from.Value)
 					{
-						scores[i, j] = -to.Similarity ?? 0;
+						scores[i , j] = (int?)(1000 * -to.Similarity) ?? 0;
 						++j;
 					}
 					++i;
 				}
 
-				var bestMatches = FindMaximumMatching(scores);
+				var bestMatchesFinder = new AssignmentProblem();
+				var bestMatches = bestMatchesFinder.Compute(scores);
 
-				for (i = 1; i < bestMatches.Length; ++i)
+				for (i = 0; i < bestMatches.Length; ++i)
 				{
 					if (contextsToPoints.ContainsKey(indicesToContexts[i]))
 					{
-						foreach (var point in contextsToPoints[indicesToContexts[i]])
+						if (bestMatches[i] != -1)
 						{
-							var bestMatch = graph[indicesToContexts[i]][bestMatches[i] - 1];
-							var allCandidates = graph[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
-
-							allCandidates.ForEach(c => c.IsAuto = false);
-							allCandidates.Remove(bestMatch);
-							allCandidates.Insert(0, bestMatch);
-
-							if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
+							foreach (var point in contextsToPoints[indicesToContexts[i]])
 							{
-								bestMatch.IsAuto = true;
-							}
+								var bestMatch = graph[indicesToContexts[i]][(int)bestMatches[i]];
+								var allCandidates = graph[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
 
-							result[point] = allCandidates;
+								allCandidates.ForEach(c => c.IsAuto = false);
+								allCandidates.Remove(bestMatch);
+								allCandidates.Insert(0, bestMatch);
+
+								if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
+								{
+									bestMatch.IsAuto = true;
+								}
+
+								result[point] = allCandidates;
+							}
+						}
+						else
+						{
+							foreach (var point in contextsToPoints[indicesToContexts[i]])
+							{
+								var allCandidates = graph[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
+								allCandidates.ForEach(c => c.IsAuto = false);
+
+								result[point] = allCandidates;
+							}
 						}
 					}
 				}
 			}
 
 			return files.Count > 0 ? result : null;
-		}
-
-		private int[] FindMaximumMatching(double[,] similarities)
-		{
-			var lines = new double[similarities.GetLength(0)];
-			var columns = new double[similarities.GetLength(1)];
-			var matching = new int[columns.Length];
-			var way = new int[columns.Length];
-
-			for (int i = 1; i < lines.Length; ++i)
-			{
-				matching[0] = i;
-
-				var j0 = 0;
-				var minv = new double[columns.Length];
-				var used = new bool[columns.Length];
-
-				do
-				{
-					used[j0] = true;
-					int i0 = matching[j0], j1 = 0;
-					double delta = 0;
-
-					for (int j = 1; j < columns.Length; ++j)
-					{
-						if (!used[j])
-						{
-							var cur = similarities[i0, j] - lines[i0] - columns[j];
-
-							if (cur < minv[j])
-							{
-								minv[j] = cur;
-								way[j] = j0;
-							}
-
-							if (minv[j] < delta)
-							{
-								delta = minv[j];
-								j1 = j;
-							}
-						}
-					}
-
-					for (int j = 0; j < columns.Length; ++j)
-					{
-						if (used[j])
-						{
-							lines[matching[j]] += delta;
-							columns[j] -= delta;
-						}
-						else
-						{
-							minv[j] -= delta;
-						}
-					}
-
-					j0 = j1;
-				}
-				while (matching[j0] != 0);
-
-				do
-				{
-					int j1 = way[j0];
-					matching[j0] = matching[j1];
-					j0 = j1;
-				} while (j0 != 0);
-			}
-
-			var ans = new int[lines.Length];
-
-			for (int j = 1; j < columns.Length; ++j)
-			{
-				ans[matching[j]] = j;
-			}
-
-			return ans;
 		}
 
 		private void CheckHorizontalContext(
@@ -441,7 +395,7 @@ namespace Land.Markup.Binding
 			List<ConcernPoint> points, 
 			List<ParsedFile> searchArea)
 		{
-			var searchResult = DoSearch(points, searchArea, SearchType.SimilarFiles);
+			var searchResult = DoSearch(points, searchArea, SearchType.SameFile);
 
 			return searchResult;
 		}

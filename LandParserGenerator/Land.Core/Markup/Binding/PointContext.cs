@@ -469,23 +469,23 @@ namespace Land.Markup.Binding
 
 			var candidates = new List<RemapCandidateInfo>();
 
-			foreach (var similarFile in searchArea)
+			foreach (var searchFile in searchArea)
 			{
 				/// Если не смогли распарсить файл, переходим к следующему
-				if (similarFile.Root == null)
+				if (searchFile.Root == null)
 					continue;
 
 				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
-				similarFile.Root.Accept(visitor);
+				searchFile.Root.Accept(visitor);
 
 				/// Для каждого элемента вычисляем основные контексты
 				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
-					.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, similarFile) })
+					.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, searchFile) })
 				);
 			}
 
 			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), 1)
-				.TakeWhile(c => c.SiblingsSimilarity >= CLOSE_ELEMENT_THRESHOLD)
+				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 
 			return candidates.Select(c=>c.Context).ToList();

@@ -92,6 +92,7 @@
     <Compile Include="Core\Lexing\ComplexTokenStream.cs" />
     <Compile Include="Core\Lexing\TokenStream.cs" />
     <Compile Include="Markup\Binding\ContextFinder.cs" />
+    <Compile Include="Markup\Binding\Munkres.cs" />
     <Compile Include="Markup\Binding\IHeuristic.cs" />
     <Compile Include="Markup\Binding\PointContextManager.cs" />
     <Compile Include="Markup\Binding\WeightsHeuristics.cs" />

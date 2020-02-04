@@ -93,7 +93,7 @@ namespace Comparison
 			//	coreSearchArea.Add(coreRoot);
 			//}
 
-			Console.WriteLine($"LanD to Core conversion done in {DateTime.Now - start}");
+			Console.WriteLine($"Got Core forest in {DateTime.Now - start}");
 
 			return new Tuple<List<ParsedFile>, List<PointOfInterest>>(landSearchArea, coreSearchArea);
 		}
@@ -206,7 +206,7 @@ namespace Comparison
 				var similarities = new List<string>();
 				var start = DateTime.Now;
 
-				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, true, false);
+				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, false);
 
 				Console.WriteLine($"LanD remapping done in {DateTime.Now - start}");
 
