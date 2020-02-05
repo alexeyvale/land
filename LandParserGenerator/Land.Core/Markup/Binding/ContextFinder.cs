@@ -207,6 +207,20 @@ namespace Land.Markup.Binding
 				}
 			}
 
+			/// Убираем из списка кандидатов тех, которые ни на что не похожи в достаточной степени
+			var lowSimilarityCandidates = Enumerable.Range(0, candidates.Count)
+				.Where(i => graph.All(e => e.Value[i].Similarity < CANDIDATE_SIMILARITY_THRESHOLD))
+				.Reverse()
+				.ToList();
+
+			foreach(var idx in lowSimilarityCandidates)
+			{
+				candidates.RemoveAt(idx);
+
+				foreach(var list in graph.Values)
+					list.RemoveAt(idx);
+			}
+
 			/// Если есть изменившиеся помеченные сущности, и остались кандидаты
 			if (graph.Count > 0 && graph.First().Value.Count > 0
 				&& graph.Keys.Any(k => contextsToPoints.ContainsKey(k)))
