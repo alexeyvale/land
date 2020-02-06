@@ -17,10 +17,13 @@ namespace Land.Markup.Binding
 			PointContext source,
 			List<RemapCandidateInfo> candidates)
 		{
-			var bestMatch = candidates.Where(c => c.HeaderSimilarity == 1 && c.AncestorSimilarity == 1).ToList();
+			if (source.HeaderContext.Count > 0)
+			{
+				var bestMatch = candidates.Where(c => c.HeaderSimilarity == 1 && c.AncestorSimilarity == 1).ToList();
 
-			if (bestMatch.Count == 1)
-				bestMatch.Single().Similarity = 1;
+				if (bestMatch.Count == 1)
+					bestMatch.Single().Similarity = 1;
+			}
 
 			return candidates;
 		}
