@@ -33,8 +33,9 @@ namespace Land.Markup.Binding
 {
 	public class AssignmentProblem
 	{
+		public bool Transposed { get; set; } = false;
 		public int[,] Weights { get; set; }
-		public int[][] M { get; set; }
+		public int[,] M { get; set; }
 		public int[,] Path { get; set; }
 		public int[] RowCover { get; set; }
 		public int[] ColCover { get; set; }
@@ -76,7 +77,7 @@ namespace Land.Markup.Binding
 				{
 					if (Weights[r, c] == 0 && RowCover[r] == 0 && ColCover[c] == 0)
 					{
-						M[r][c] = 1;
+						M[r, c] = 1;
 						RowCover[r] = 1;
 						ColCover[c] = 1;
 					}
@@ -97,7 +98,7 @@ namespace Land.Markup.Binding
 			int colcount;
 			for (int r = 0; r < NRow; r++)
 				for (int c = 0; c < NCol; c++)
-					if (M[r][c] == 1)
+					if (M[r, c] == 1)
 						ColCover[c] = 1;
 
 			colcount = 0;
@@ -144,7 +145,7 @@ namespace Land.Markup.Binding
 		{
 			bool tmp = false;
 			for (int c = 0; c < NCol; c++)
-				if (M[row][c] == 1)
+				if (M[row, c] == 1)
 					tmp = true;
 			return tmp;
 		}
@@ -153,7 +154,7 @@ namespace Land.Markup.Binding
 		{
 			col = -1;
 			for (int c = 0; c < NCol; c++)
-				if (M[row][c] == 1)
+				if (M[row, c] == 1)
 					col = c;
 		}
 
@@ -179,7 +180,7 @@ namespace Land.Markup.Binding
 				}
 				else
 				{
-					M[row][col] = 2;
+					M[row, col] = 2;
 					if (star_in_row(row))
 					{
 						find_star_in_row(row, ref col);
@@ -202,24 +203,24 @@ namespace Land.Markup.Binding
 		{
 			r = -1;
 			for (int i = 0; i < NRow; i++)
-				if (M[i][c] == 1)
+				if (M[i, c] == 1)
 					r = i;
 		}
 
 		private void find_prime_in_row(int r, ref int c)
 		{
 			for (int j = 0; j < NCol; j++)
-				if (M[r][j] == 2)
+				if (M[r, j] == 2)
 					c = j;
 		}
 
 		private void augment_path()
 		{
 			for (int p = 0; p < PathCount; p++)
-				if (M[Path[p, 0]][Path[p, 1]] == 1)
-					M[Path[p, 0]][Path[p, 1]] = 0;
+				if (M[Path[p, 0], Path[p, 1]] == 1)
+					M[Path[p, 0], Path[p, 1]] = 0;
 				else
-					M[Path[p, 0]][Path[p, 1]] = 1;
+					M[Path[p, 0], Path[p, 1]] = 1;
 		}
 
 		private void clear_covers()
@@ -234,8 +235,8 @@ namespace Land.Markup.Binding
 		{
 			for (int r = 0; r < NRow; r++)
 				for (int c = 0; c < NCol; c++)
-					if (M[r][c] == 2)
-						M[r][c] = 0;
+					if (M[r, c] == 2)
+						M[r, c] = 0;
 		}
 
 
@@ -309,17 +310,40 @@ namespace Land.Markup.Binding
 			Step = 4;
 		}
 
+		private int[,] Transpose(int[,] matrix)
+		{
+			var newMatrix = new int[
+				matrix.GetLength(1), 
+				matrix.GetLength(0)
+			];
+
+			for (int i = 0; i < matrix.GetLength(0); i++)
+			{
+				for (int j = 0; j < matrix.GetLength(1); j++)
+				{
+					newMatrix[j, i] = matrix[i, j];
+				}
+			}
+
+			return newMatrix;
+		}
+
 		public int[] Compute(int[,] weights)
 		{
-			Weights = weights;
+			if(weights.GetLength(0) > weights.GetLength(1))
+			{
+				Transposed = true;
+				Weights = Transpose(weights);
+			}
+			else
+			{
+				Weights = weights;
+			}
+
 			NRow = Weights.GetLength(0);
 			NCol = Weights.GetLength(1);
 
-			M = new int[NRow][];
-			for (var i = 0; i < NRow; ++i)
-			{
-				M[i] = new int[NCol];
-			}
+			M = new int[NRow, NCol];
 
 			RowCover = new int[NRow];
 			ColCover = new int[NCol];
@@ -355,7 +379,20 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return M.Select(row => Array.FindIndex(row, e=>e==1)).ToArray();
+			if (Transposed)
+				M = Transpose(M);
+
+			var result = new int[M.GetLength(0)];
+
+			for (var i = 0; i < M.GetLength(0); ++i)
+			{
+				result[i] = Enumerable.Range(0, M.GetLength(1))
+					.Select(j => new { idx = j, elem = M[i, j] })
+					.FirstOrDefault(e => e.elem == 1)
+					?.idx ?? -1;
+			}
+
+			return result;
 		}
 	}
 }

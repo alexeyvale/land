@@ -236,7 +236,7 @@ namespace Land.Markup.Binding
 					var j = 0;
 					foreach (var to in from.Value)
 					{
-						scores[i , j] = (int?)(1000 * -to.Similarity) ?? 0;
+						scores[i, j] = (int)(1000 * (1 - (to.Similarity ?? 0)));
 						++j;
 					}
 					++i;
@@ -649,20 +649,11 @@ namespace Land.Markup.Binding
 				{ ContextType.Inner, null }
 			};
 
-			/// Если кандидат один, выводим его оценку с весами по умолчанию
-			if (candidates.Count == 1)
-			{
-				var defaultHeuristic = new DefaultWeightsHeuristic();
-				defaultHeuristic.TuneWeights(sourceContext, candidates, weights);
-			}
-			else
-			{
-				foreach (var h in TuningHeuristics)
-					h.TuneWeights(sourceContext, candidates, weights);
+			foreach (var h in TuningHeuristics)
+				h.TuneWeights(sourceContext, candidates, weights);
 
-				foreach (var h in ScoringHeuristics)
-					h.PredictSimilarity(sourceContext, candidates);
-			}
+			foreach (var h in ScoringHeuristics)
+				h.PredictSimilarity(sourceContext, candidates);
 
 			candidates.ForEach(c => c.Similarity = c.Similarity ??
 				(weights[ContextType.Ancestors] * c.AncestorSimilarity + weights[ContextType.Inner] * c.InnerSimilarity + weights[ContextType.Header] * c.HeaderSimilarity)

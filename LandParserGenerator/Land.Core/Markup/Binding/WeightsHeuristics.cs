@@ -56,37 +56,40 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			var MAX_WEIGHT = weights.Count;
+			if (candidates.Count > 1)
+			{
+				var MAX_WEIGHT = weights.Count;
 
-			var features = new Dictionary<ContextType, ContextFeatures>
+				var features = new Dictionary<ContextType, ContextFeatures>
 			{
 				{ ContextType.Ancestors, GetFeatures(candidates, (c)=>c.AncestorSimilarity) },
 				{ ContextType.Header,  GetFeatures(candidates, (c)=>c.HeaderSimilarity) },
 				{ ContextType.Inner,  GetFeatures(candidates, (c)=>c.InnerSimilarity) }
 			};
 
-			/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
-			/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
-			var contextsToPrioritize = new List<ContextType>();
+				/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
+				/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
+				var contextsToPrioritize = new List<ContextType>();
 
-			foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
-			{
-				if (kvp.Value.MaxValue < ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD ||
-					(1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
-					weights[kvp.Key] = 1;
-				else
-					contextsToPrioritize.Add(kvp.Key);
+				foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
+				{
+					if (kvp.Value.MaxValue < ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD ||
+						(1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
+						weights[kvp.Key] = 1;
+					else
+						contextsToPrioritize.Add(kvp.Key);
+				}
+
+				contextsToPrioritize = contextsToPrioritize
+					.OrderByDescending(c => features[c].MedianGap).ToList();
+
+				for (var i = 0; i < contextsToPrioritize.Count; ++i)
+					weights[contextsToPrioritize[i]] = MAX_WEIGHT - i;
+
+				System.Diagnostics.Trace.WriteLine(
+					$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+				);
 			}
-
-			contextsToPrioritize = contextsToPrioritize
-				.OrderByDescending(c => features[c].MedianGap).ToList();
-
-			for (var i = 0; i < contextsToPrioritize.Count; ++i)
-				weights[contextsToPrioritize[i]] = MAX_WEIGHT - i;
-
-			System.Diagnostics.Trace.WriteLine(
-				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
-			);
 
 			return weights;
 		}
