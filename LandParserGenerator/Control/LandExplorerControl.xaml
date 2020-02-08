@@ -106,7 +106,8 @@
 				
                 <Separator Margin="7"></Separator>
 
-				<Button Content="&#xf337;" ToolTip="Обновить привязки" Click="ApplyMapping_Click" Name="ApplyMapping"></Button>
+				<Button Content="&#xf337;" ToolTip="Обновить привязки локально" Click="ApplyMapping_Click" Name="ApplyMappingLocal"></Button>
+				<Button Content="&#xf0b2;" ToolTip="Обновить привязки глобально" Click="ApplyMapping_Click" Name="ApplyMappingGlobal"></Button>
 				<Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
             </ToolBar>
             <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"

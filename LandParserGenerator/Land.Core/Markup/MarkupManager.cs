@@ -370,7 +370,11 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(new List<ConcernPoint> { point }, new List<ParsedFile> { targetInfo })[point];
+			return ContextFinder.Find(
+				new List<ConcernPoint> { point }, 
+				new List<ParsedFile> { targetInfo }, 
+				ContextFinder.SearchType.Local
+			)[point];
 		}
 
 		/// <summary>
@@ -397,10 +401,11 @@ namespace Land.Markup
 
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			List<ParsedFile> searchArea,
-			bool allowAutoDecisions)
+			bool allowAutoDecisions,
+			ContextFinder.SearchType searchType)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var result = ContextFinder.Find(GetConcernPoints(), searchArea);
+			var result = ContextFinder.Find(GetConcernPoints(), searchArea, searchType);
 
 			foreach (var kvp in result)
 			{
@@ -431,7 +436,7 @@ namespace Land.Markup
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			var result = ContextFinder.Find(points, searchArea);
+			var result = ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Local);
 			var keys = result.Keys.ToList();
 
 			foreach (var key in keys)

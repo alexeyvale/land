@@ -281,7 +281,10 @@ namespace Land.Control
 				ProcessAmbiguities(
 					MarkupManager.Remap(
 						GetPointSearchArea(),
-						true
+						true,
+						sender == ApplyMappingLocal 
+							? ContextFinder.SearchType.Local 
+							: ContextFinder.SearchType.Global
 					),
 					true
 				);

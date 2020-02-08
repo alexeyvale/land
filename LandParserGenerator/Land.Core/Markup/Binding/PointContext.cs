@@ -469,20 +469,27 @@ namespace Land.Markup.Binding
 
 			var candidates = new List<RemapCandidateInfo>();
 
-			foreach (var searchFile in searchArea)
-			{
-				/// Если не смогли распарсить файл, переходим к следующему
-				if (searchFile.Root == null)
-					continue;
+			var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
+			file.Root.Accept(visitor);
 
-				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
-				searchFile.Root.Accept(visitor);
+			candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
+				.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, file) })
+			);
 
-				/// Для каждого элемента вычисляем основные контексты
-				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
-					.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, searchFile) })
-				);
-			}
+			//foreach (var searchFile in searchArea)
+			//{
+			//	/// Если не смогли распарсить файл, переходим к следующему
+			//	if (searchFile.Root == null)
+			//		continue;
+
+			//	var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
+			//	searchFile.Root.Accept(visitor);
+
+			//	/// Для каждого элемента вычисляем основные контексты
+			//	candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
+			//		.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, searchFile) })
+			//	);
+			//}
 
 			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), 1)
 				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)

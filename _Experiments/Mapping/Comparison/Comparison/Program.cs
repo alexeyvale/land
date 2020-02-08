@@ -206,7 +206,7 @@ namespace Comparison
 				var similarities = new List<string>();
 				var start = DateTime.Now;
 
-				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, false);
+				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, false, ContextFinder.SearchType.Local);
 
 				Console.WriteLine($"LanD remapping done in {DateTime.Now - start}");
 
