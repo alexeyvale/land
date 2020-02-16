@@ -150,6 +150,55 @@ namespace Land.Markup.Binding
 		}
 	}
 
+	#region Old
+
+	[DataContract]
+	public class ContextElement
+	{
+		[DataMember]
+		public string Type { get; set; }
+
+		[DataMember]
+		public List<HeaderContextElement> HeaderContext { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			if (obj is ContextElement elem)
+			{
+				return ReferenceEquals(this, elem) || Type == elem.Type
+					&& HeaderContext.SequenceEqual(elem.HeaderContext);
+			}
+
+			return false;
+		}
+
+		public static bool operator ==(ContextElement a, ContextElement b)
+		{
+			return a.Equals(b);
+		}
+
+		public static bool operator !=(ContextElement a, ContextElement b)
+		{
+			return !a.Equals(b);
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
+
+		public static explicit operator ContextElement(Node node)
+		{
+			return new ContextElement()
+			{
+				Type = node.Type,
+				HeaderContext = PointContext.GetHeaderContext(node)
+			};
+		}
+	}
+
+	#endregion
+
 	[DataContract]
 	public class SiblingsContext
 	{
@@ -239,6 +288,15 @@ namespace Land.Markup.Binding
 		[DataMember]
 		public List<PointContext> ClosestContext { get; set; }
 
+		#region Old
+
+		public string Name =>
+			String.Join("", this.HeaderContext.Where(e => e.Type == "name").SelectMany(e => e.Value));
+
+		public List<ContextElement> InnerContext_old { get; set; }
+
+		#endregion
+
 		public static PointContext GetCoreContext(
 			Node node,
 			ParsedFile file)
@@ -250,7 +308,10 @@ namespace Land.Markup.Binding
 				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
 				InnerContext = GetInnerContext(node, file),
-				AncestorsContext = GetAncestorsContext(node)
+				AncestorsContext = GetAncestorsContext(node),
+				#region Old
+				InnerContext_old = GetInnerContext_old(node, file)
+				#endregion			
 			};
 		}
 
@@ -397,6 +458,36 @@ namespace Land.Markup.Binding
 			return new InnerContext(locations, file.Text);
 		}
 
+		#region Old
+
+		public static List<ContextElement> GetInnerContext_old(Node node, ParsedFile file)
+		{
+			var result = new List<ContextElement>();
+			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+			while (stack.Any())
+			{
+				var current = stack.Pop();
+
+				if (current.Children.Count > 0)
+				{
+					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+					{
+						result.Add((ContextElement)current);
+					}
+					else
+					{
+						for (var i = current.Children.Count - 2; i >= 1; --i)
+							stack.Push(current.Children[i]);
+					}
+				}
+			}
+
+			return result;
+		}
+
+		#endregion
+
 		public static FileContext GetFileContext(string name, string text)
 		{
 			return new FileContext
@@ -476,22 +567,7 @@ namespace Land.Markup.Binding
 				.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, file) })
 			);
 
-			//foreach (var searchFile in searchArea)
-			//{
-			//	/// Если не смогли распарсить файл, переходим к следующему
-			//	if (searchFile.Root == null)
-			//		continue;
-
-			//	var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
-			//	searchFile.Root.Accept(visitor);
-
-			//	/// Для каждого элемента вычисляем основные контексты
-			//	candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
-			//		.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, searchFile) })
-			//	);
-			//}
-
-			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), 1)
+			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null))
 				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 

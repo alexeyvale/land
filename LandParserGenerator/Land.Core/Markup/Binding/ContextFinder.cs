@@ -176,7 +176,7 @@ namespace Land.Markup.Binding
 			foreach(var elem in evaluationResults)
 			{
 				EvalCandidates(elem.Key, elem.Value, files.First().MarkupSettings, 
-					CANDIDATE_SIMILARITY_THRESHOLD);
+					searchType == SearchType.Global);
 			}
 
 			var result = ignoreClosest
@@ -266,15 +266,20 @@ namespace Land.Markup.Binding
 					{
 						/// Если найдено наилучшее соответствие
 						if (bestMatches[i] != -1)
-						{
-							var bestMatch = evaluationResults[indicesToContexts[i]][bestMatches[i]];
+						{					
+							/// Сортируем всех кандидатов по похожести
 							var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
+							/// Запоминаем наилучшее соответствие и его индекс в отсортированном списке
+							var bestMatch = evaluationResults[indicesToContexts[i]][bestMatches[i]];
+							var bestIndex = allCandidates.IndexOf(bestMatch);
+							/// Берём следующий за ним элемент
+							var second = allCandidates.Count > bestIndex + 1 ? allCandidates[bestIndex + 1] : null;
 
-							allCandidates.ForEach(c => c.IsAuto = false);
 							allCandidates.Remove(bestMatch);
 							allCandidates.Insert(0, bestMatch);
 
-							if (IsSimilarEnough(bestMatch, CANDIDATE_SIMILARITY_THRESHOLD))
+							if (IsSimilarEnough(bestMatch) 
+								&& (second == null || AreDistantEnough(bestMatch, second)))
 							{
 								bestMatch.IsAuto = true;
 							}
@@ -311,7 +316,7 @@ namespace Land.Markup.Binding
 			/// Проверку горизонтального контекста выполняем только если
 			/// есть несколько кандидатов с одинаковыми оценками похожести
 			if (first != null && !first.IsAuto &&
-				IsSimilarEnough(first, CANDIDATE_SIMILARITY_THRESHOLD) && second != null)
+				IsSimilarEnough(first) && second != null)
 			{
 				var identicalCandidates = candidates.TakeWhile(c =>
 					c.HeaderSimilarity == first.HeaderSimilarity &&
@@ -360,27 +365,30 @@ namespace Land.Markup.Binding
 			PointContext point,
 			List<RemapCandidateInfo> candidates,
 			LanguageMarkupSettings markupSettings,
-			double similarityThreshold)
+			bool orderAndSetAuto = true)
 		{
 			foreach (var candidate in candidates)
 				ComputeCoreContextSimilarities(point, candidate);
 
 			ComputeTotalSimilarity(point, candidates);
 
-			candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
-
-			var first = candidates.FirstOrDefault();
-			var second = candidates.Skip(1).FirstOrDefault();
-
-			if (first != null)
+			if(orderAndSetAuto)
 			{
-				first.IsAuto = IsSimilarEnough(first, similarityThreshold)
-					&& AreDistantEnough(first, second);
-			}
+				candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
 
-			/// Отсеиваем очень похожих кандидатов с непохожими соседями
-			if (markupSettings.UseSiblingsContext)
-				CheckHorizontalContext(point, candidates);
+				var first = candidates.FirstOrDefault();
+				var second = candidates.Skip(1).FirstOrDefault();
+
+				if (first != null)
+				{
+					first.IsAuto = IsSimilarEnough(first)
+						&& AreDistantEnough(first, second);
+				}
+
+				/// Отсеиваем очень похожих кандидатов с непохожими соседями
+				if (markupSettings.UseSiblingsContext)
+					CheckHorizontalContext(point, candidates);
+			}
 
 			return candidates;
 		}
@@ -411,7 +419,7 @@ namespace Land.Markup.Binding
 
 			foreach (var groupKey in groupedPoints.Keys)
 			{
-				var groupResult = FindGroup(groupedPoints[groupKey], searchArea, searchType);
+				var groupResult = DoSearch(groupedPoints[groupKey], searchArea, searchType);
 
 				foreach(var elem in groupResult)
 				{
@@ -420,16 +428,6 @@ namespace Land.Markup.Binding
 			}
 
 			return overallResult;
-		}
-
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> FindGroup(
-			List<ConcernPoint> points, 
-			List<ParsedFile> searchArea,
-			SearchType searchType)
-		{
-			var searchResult = DoSearch(points, searchArea, searchType);
-
-			return searchResult;
 		}
 
 		public bool AreFilesSimilarEnough(FileContext a, FileContext b) =>
@@ -647,8 +645,8 @@ namespace Land.Markup.Binding
 			return file.Root != null;
 		}
 
-		private bool IsSimilarEnough(RemapCandidateInfo candidate, double threshold) =>
-			candidate.Similarity >= threshold;
+		private bool IsSimilarEnough(RemapCandidateInfo candidate) =>
+			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
 		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
 			second == null || second.Similarity != 1

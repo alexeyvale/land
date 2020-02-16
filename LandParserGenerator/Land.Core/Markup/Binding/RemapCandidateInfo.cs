@@ -11,6 +11,10 @@ namespace Land.Markup.Binding
 		public ParsedFile File { get; set; }
 		public PointContext Context { get; set; }
 
+		#region Old
+		public double NameSimilarity { get; set; }
+		#endregion
+
 		public double HeaderSimilarity { get; set; }
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }

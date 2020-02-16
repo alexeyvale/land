@@ -33,16 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AspectCore, Version=0.2.0.0, Culture=neutral, PublicKeyToken=0ce852d0de895a4c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>components\AspectCore\AspectCore.dll</HintPath>
-    </Reference>
     <Reference Include="Land.Core">
       <HintPath>components\LanD\Land.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="LWParserCS2, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>components\AspectCore\LWParserCS2.dll</HintPath>
     </Reference>
     <Reference Include="sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=95a72bebf843c5e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -61,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LandToCoreConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

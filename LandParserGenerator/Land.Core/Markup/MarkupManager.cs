@@ -140,6 +140,8 @@ namespace Land.Markup
 			string comment = null, 
 			Concern parent = null)
 		{
+			Remap(node.Type, file.Name, searchArea);
+
 			var point = new ConcernPoint(
 				node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), getParsed, ContextFinder), parent
 			);
@@ -168,6 +170,8 @@ namespace Land.Markup
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
 			{
+				Remap(group.Key, file.Name, searchArea);
+
 				var concern = AddConcern(group.Key);
 
 				/// В пределах символа группируем по псевдониму
@@ -399,6 +403,19 @@ namespace Land.Markup
 		/// </summary>
 		public double GarbageThreshold { get; set; } = 0.4;
 
+		/// <summary>
+		/// Перепривязка всех точек разметки
+		/// </summary>
+		/// <param name="searchArea">
+		/// Множество файлов проекта
+		/// </param>
+		/// <param name="allowAutoDecisions">
+		/// Признак того, что разрешено проводить автоматическую перепривязку
+		/// </param>
+		/// <param name="searchType">
+		/// Поиск точки проводится по тому же файлу или по всему проекту
+		/// </param>
+		/// <returns></returns>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			List<ParsedFile> searchArea,
 			bool allowAutoDecisions,
@@ -424,14 +441,16 @@ namespace Land.Markup
 		}
 
 		/// <summary>
-		/// Перепривязка точки
+		/// Перепривязка всех точек заданного типа в заданном файле
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
-			ConcernPoint point, 
+			string pointType,
+			string fileName,
 			List<ParsedFile> searchArea)
 		{
 			var points = GetConcernPoints()
-				.Where(p => p.Context.Type == point.Context.Type && p.Context.FileContext.Name == point.Context.FileContext.Name)
+				.Where(p => p.Context.Type == pointType
+					&& p.Context.FileContext.Name == fileName)
 				.ToList();
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -447,7 +466,7 @@ namespace Land.Markup
 					.ToList();
 
 				if (!ApplyCandidate(key, result[key], searchArea, ContextFinder.GetParsed))
-					ambiguous[point] = result[key];
+					ambiguous[key] = result[key];
 			}
 
 			OnMarkupChanged?.Invoke();

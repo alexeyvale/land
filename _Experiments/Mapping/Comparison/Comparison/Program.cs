@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using AspectCore;
+﻿using Land.Core.Parsing.Tree;
 using Land.Markup;
-using Land.Markup.CoreExtension;
 using Land.Markup.Binding;
-using Land.Core.Parsing.Tree;
+using Land.Markup.CoreExtension;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Comparison
 {
@@ -32,12 +31,10 @@ namespace Comparison
 		/// <summary>
 		/// Парсинг набора файлов и получение их АСТ в форматах LanD и Core
 		/// </summary>
-		static Tuple<List<ParsedFile>, List<PointOfInterest>> GetSearchArea(
+		static List<ParsedFile> GetSearchArea(
 			Land.Core.Parsing.BaseParser landParser,
-			ParserWrapper coreParser,
 			List<string> files,
-			List<string> landErrors,
-			List<string> coreErrors)
+			List<string> landErrors)
 		{
 			var landSearchArea = new List<ParsedFile>();
 
@@ -75,37 +72,17 @@ namespace Comparison
 
 			Console.WriteLine($"LanD parsing done in {DateTime.Now - start}");
 
-			var coreSearchArea = new List<PointOfInterest>();
-			start = DateTime.Now;
-
-			/// Преобразуем построенные LanD деревья в формат AspectCore
-			foreach (var file in landSearchArea)
-			{
-				var visitor = new LandToCoreConverter(landParser.GrammarObject, file.Name);
-				file.Root.Accept(visitor);
-
-				coreSearchArea.Add(visitor.Root);
-			}
-
-			//foreach(var file in files)
-			//{
-			//	var coreRoot = coreParser.ParseText(File.ReadAllText(file), file);
-			//	coreSearchArea.Add(coreRoot);
-			//}
-
-			Console.WriteLine($"Got Core forest in {DateTime.Now - start}");
-
-			return new Tuple<List<ParsedFile>, List<PointOfInterest>>(landSearchArea, coreSearchArea);
+			return landSearchArea;
 		}
 
 		static void Main(string[] args)
 		{
-			var entities = new Dictionary<string, Tuple<MarkupManager, List<PointOfInterest>>>
+			var entities = new Dictionary<string, MarkupManager>
 			{
-				{ "class_struct_interface", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(null), new List<PointOfInterest>()) },
-				{ "method", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(null), new List<PointOfInterest>()) },
-				{ "field", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(null), new List<PointOfInterest>()) },
-				{ "property", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(null), new List<PointOfInterest>()) }
+				{ "class_struct_interface", new MarkupManager(null) },
+				{ "method", new MarkupManager(null) },
+				{ "field", new MarkupManager(null) },
+				{ "property", new MarkupManager(null) },
 			};
 
 			/// Создаём парсер C# и менеджер разметки из библиотеки LanD	
@@ -114,10 +91,7 @@ namespace Comparison
 			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
 
-			var coreParser = new ParserWrapper("../../components/AspectCore");
-
 			var landErrors = new List<string>();
-			var coreErrors = new List<string>();
 
 			/////////////////////////////////////////////// STAGE 1
 
@@ -143,13 +117,13 @@ namespace Comparison
 				File.Copy(file, $"./test/{Path.GetFileName(file)}");
 
 			/// Парсим отобранные файлы
-			var searchArea = GetSearchArea(landParser, coreParser, files.ToList(), landErrors, coreErrors);
+			var searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
 			/// Привязываемся к сущностям, случайным образом выбирая нужное их количество в каждом файле
-			for(var j=0; j< searchArea.Item1.Count; ++j)
+			for(var j=0; j< searchArea.Count; ++j)
 			{		
 				var visitor = new GetNodeSequenceVisitor();
-				searchArea.Item1[j].Root.Accept(visitor);
+				searchArea[j].Root.Accept(visitor);
 
 				foreach(var key in entities.Keys)
 				{
@@ -160,17 +134,11 @@ namespace Comparison
 						if (subseq.Count == 0) break;
 						var index = RandomGen.Next(0, subseq.Count);
 
-						entities[key].Item1.AddConcernPoint(
+						entities[key].AddConcernPoint(
 							subseq[index], 
-							searchArea.Item1[j], 
-							searchArea.Item1, 
+							searchArea[j], 
+							searchArea, 
 							null);
-
-						entities[key].Item2.Add(TreeSearchEngine.FindPointByLocation(
-							searchArea.Item2[j],
-							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Line.Value,
-							subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Column.Value
-						).FirstOrDefault());
 
 						subseq.RemoveAt(index);
 					}
@@ -188,7 +156,7 @@ namespace Comparison
 			counter = 0;
 			files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
 
-			searchArea = GetSearchArea(landParser, coreParser, files.ToList(), landErrors, coreErrors);
+			searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
 			Console.WriteLine("Remapping...");
 
@@ -198,62 +166,46 @@ namespace Comparison
 			{
 				List<Tuple<string, string>> sameAutoResult = new List<Tuple<string, string>>(),
 					differentAutoResult = new List<Tuple<string, string>>(),
-					landOnlyAutoResult = new List<Tuple<string, string>>(),
-					coreOnlyAutoResult = new List<Tuple<string, string>>(),
+					modifiedOnlyAutoResult = new List<Tuple<string, string>>(),
+					basicOnlyAutoResult = new List<Tuple<string, string>>(),
 					sameFirstPos = new List<Tuple<string, string>>(),
 					differentFirstPos = new List<Tuple<string, string>>();
 
 				var similarities = new List<string>();
 				var start = DateTime.Now;
 
-				var landRemapResult = entities[key].Item1.Remap(searchArea.Item1, false, ContextFinder.SearchType.Local);
+				var modifiedRemapResult = entities[key].Remap(searchArea, false, ContextFinder.SearchType.Local);
 
-				Console.WriteLine($"LanD remapping done in {DateTime.Now - start}");
-
-				var coreRemapResult = new Dictionary<ConcernPoint, TreeSearchResult>();
-				var landPoints = entities[key].Item1.GetConcernPoints();
+				Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
 				start = DateTime.Now;
 
-				for (var i = 0; i < entities[key].Item2.Count; ++i)
+				var helper = new Helper();
+				var basicRemapResult = helper.Remap(entities[key].GetConcernPoints(), searchArea);
+
+				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
+
+				foreach (var cp in modifiedRemapResult.Keys)
 				{
-					var poi = entities[key].Item2[i];
-					var parsed = searchArea.Item2
-						.Select((elem, idx) => new { elem, idx } )
-						.Where(e => Path.GetFileNameWithoutExtension(e.elem.FileName) == Path.GetFileNameWithoutExtension(poi.FileName))
-						.FirstOrDefault();
+					var isModifiedAuto = modifiedRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
+					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
 
-					coreRemapResult[landPoints[i]] =
-						TreeSearchEngine.FindPointInTree2(parsed.elem, poi, searchArea.Item1[parsed.idx].Text);
-				}
+					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0 ||
+						basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0 &&
+						modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)
+							.SequenceEqual(basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value));
 
-				Console.WriteLine($"Core remapping done in {DateTime.Now - start}");
+					var hasChanged = modifiedRemapResult[cp].Count == 0 ||
+						modifiedRemapResult[cp][0].HeaderSimilarity != 1 ||
+						modifiedRemapResult[cp][0].InnerSimilarity != 1 ||
+						modifiedRemapResult[cp][0].AncestorSimilarity != 1;
 
-				foreach (var cp in landRemapResult.Keys)
-				{
-					var isLandAuto = landRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
-
-					var isCoreAuto = coreRemapResult[cp].Singular ||
-						(coreRemapResult[cp].Count >= 2 && 
-						coreRemapResult[cp].GetNodeSimilarity(1) != 1 && 
-						(1 - coreRemapResult[cp].GetNodeSimilarity(1)) >= (1 - coreRemapResult[cp].GetNodeSimilarity(0)) * 2);
-
-					var sameFirst = coreRemapResult[cp].Count == 0 && landRemapResult[cp].Count == 0 ||
-						coreRemapResult[cp].Count > 0 && landRemapResult[cp].Count > 0 &&
-						String.Join("", coreRemapResult[cp][0].Context[0].Name)
-							.StartsWith(String.Join("", landRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
-
-					var hasChanged = landRemapResult[cp].Count == 0 ||
-						landRemapResult[cp][0].HeaderSimilarity != 1 ||
-						landRemapResult[cp][0].InnerSimilarity != 1 ||
-						landRemapResult[cp][0].AncestorSimilarity != 1;
-
-					if (hasChanged || !isLandAuto || !isCoreAuto)
+					if (hasChanged || !isModifiedAuto || !isBasicAuto)
 					{
-						if (coreRemapResult[cp].Count == 1 && landRemapResult[cp].Count == 1)
-							similarities.Add($"{ coreRemapResult[cp].GetNodeSimilarity(0) };{ landRemapResult[cp][0].Similarity }");
-						else if (coreRemapResult[cp].Count > 1 && landRemapResult[cp].Count > 1)
-							similarities.Add($"{ coreRemapResult[cp].GetNodeSimilarity(0) };{ landRemapResult[cp][0].Similarity };{ coreRemapResult[cp].GetNodeSimilarity(1) };{ landRemapResult[cp][1].Similarity }");
+						if (basicRemapResult[cp].Count == 1 && modifiedRemapResult[cp].Count == 1)
+							similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity }");
+						else if (basicRemapResult[cp].Count > 1 && modifiedRemapResult[cp].Count > 1)
+							similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity };{ basicRemapResult[cp][1].Similarity };{ modifiedRemapResult[cp][1].Similarity }");
 
 						report.WriteLine(Path.GetFileName(cp.Context.FileContext.Name));
 						report.WriteLine("*");
@@ -261,16 +213,15 @@ namespace Comparison
 						report.WriteLine(String.Join(" ", cp.Context.HeaderContext.SelectMany(c => c.Value)));
 						report.WriteLine("*");
 
-						for (var j = 0; j < coreRemapResult[cp].Count && j < 5; ++j)
+						foreach (var landCandidate in basicRemapResult[cp].Take(5))
 						{
-							var coreCandidate = coreRemapResult[cp][j];
-							report.WriteLine(coreCandidate.Context[0].Name != null ? String.Join(" ", coreCandidate.Context[0].Name) : "");
-							report.WriteLine($"{coreRemapResult[cp].GetNodeSimilarity(j)} {(j == 0 && isCoreAuto ? "*" : "")}");
+							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
+							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.NameSimilarity}; {landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
 						}
 
 						report.WriteLine("*");
 
-						foreach (var landCandidate in landRemapResult[cp].Take(5))
+						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
 							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
@@ -284,9 +235,9 @@ namespace Comparison
 								String.Join(" ", cp.Context.HeaderContext.SelectMany(h => h.Value))
 							);
 
-						if (isLandAuto)
+						if (isModifiedAuto)
 						{
-							if (isCoreAuto)
+							if (isBasicAuto)
 							{
 								if (sameFirst)
 									sameAutoResult.Add(tuple);
@@ -295,12 +246,12 @@ namespace Comparison
 							}
 							else
 							{
-								landOnlyAutoResult.Add(tuple);
+								modifiedOnlyAutoResult.Add(tuple);
 							}
 						}
-						else if (isCoreAuto)
+						else if (isBasicAuto)
 						{
-							coreOnlyAutoResult.Add(tuple);
+							basicOnlyAutoResult.Add(tuple);
 						}
 						else
 						{
@@ -312,10 +263,10 @@ namespace Comparison
 					}
 				}
 				File.WriteAllLines($"{key}_similarities.txt", similarities);
-				File.WriteAllLines($"{key}_coreOnlyAutoResult.txt",
-					coreOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-				File.WriteAllLines($"{key}_landOnlyAutoResult.txt",
-					landOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+				File.WriteAllLines($"{key}_basicOnlyAutoResult.txt",
+					basicOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+				File.WriteAllLines($"{key}_modifiedOnlyAutoResult.txt",
+					modifiedOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 				File.WriteAllLines($"{key}_sameAutoResult.txt",
 					sameAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 				File.WriteAllLines($"{key}_differentAutoResult.txt",
@@ -325,9 +276,9 @@ namespace Comparison
 				File.WriteAllLines($"{key}_differentFirstPos.txt",
 					differentFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 
-				Console.WriteLine($"Total: {landRemapResult.Count}");
-				Console.WriteLine($"Land only auto: {landOnlyAutoResult.Count}");
-				Console.WriteLine($"Core only auto: {coreOnlyAutoResult.Count}");
+				Console.WriteLine($"Total: {modifiedRemapResult.Count}");
+				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");
+				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
 				Console.WriteLine($"Same auto: {sameAutoResult.Count}");
 				Console.WriteLine($"Different auto: {differentAutoResult.Count}");
 				Console.WriteLine($"Same first: {sameFirstPos.Count}");
@@ -340,5 +291,283 @@ namespace Comparison
 			Console.WriteLine("Job's done!");
 			Console.ReadLine();
 		}
+	}
+
+	public class Helper
+	{
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
+		public const int INNER_CONTEXT_LENGTH = 10;
+
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
+			List<ConcernPoint> points,
+			List<ParsedFile> searchArea)
+		{
+			var groupedPoints = points
+				.GroupBy(p => new { p.Context.Type, FileName = p.Context.FileContext.Name })
+				.ToDictionary(e => e.Key, e => e.ToList());
+
+			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			foreach (var groupKey in groupedPoints.Keys)
+			{
+				var groupResult = DoSearch(groupedPoints[groupKey], searchArea);
+
+				foreach (var elem in groupResult)
+				{
+					overallResult[elem.Key] = elem.Value;
+				}
+			}
+
+			return overallResult;
+		}
+
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSearch(
+			List<ConcernPoint> points,
+			List<ParsedFile> searchArea)
+		{
+			var type = points[0].Context.Type;
+			var file = points[0].Context.FileContext;
+
+			var files = searchArea.Where(f => f.Name == file.Name).ToList();
+
+			var candidates = new List<RemapCandidateInfo>();
+
+			/// Находим все сущности того же типа
+			foreach (var currentFile in files)
+			{
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { type });
+				currentFile.Root.Accept(visitor);
+
+				candidates.AddRange(visitor.Grouped[type]
+					.Select(n => new RemapCandidateInfo
+					{
+						Node = n,
+						File = currentFile,
+						Context = PointContext.GetCoreContext(n, currentFile)
+					})
+					.ToList()
+				);
+			}
+
+			/// Запоминаем соответствие контекстов точкам привязки
+			var contextsToPoints = points.GroupBy(p => p.Context)
+				.ToDictionary(g => g.Key, g => g.ToList());
+
+			var contextsSet = new HashSet<PointContext>();
+			contextsSet.UnionWith(points.Select(p => p.Context));
+
+			var evaluationResults = contextsSet.ToDictionary(p => p,
+				p => candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList());
+
+			foreach (var key in evaluationResults.Keys.ToList())
+			{
+				evaluationResults[key] = EvalCandidates(key, evaluationResults[key], files.First().MarkupSettings,
+					CANDIDATE_SIMILARITY_THRESHOLD);
+			}
+
+			var result = contextsToPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => evaluationResults[e.Context]);
+
+			return files.Count > 0 ? result : null;
+		}
+
+		public List<RemapCandidateInfo> EvalCandidates(
+			PointContext point,
+			List<RemapCandidateInfo> candidates,
+			LanguageMarkupSettings markupSettings,
+			double similarityThreshold)
+		{
+			foreach (var candidate in candidates)
+				ComputeCoreContextSimilarities(point, candidate);
+
+			ComputeTotalSimilarity(point, candidates);
+
+			candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
+
+			var first = candidates.FirstOrDefault();
+			var second = candidates.Skip(1).FirstOrDefault();
+
+			if (first != null)
+			{
+				first.IsAuto = IsSimilarEnough(first, similarityThreshold)
+					&& AreDistantEnough(first, second);
+			}
+
+			return candidates;
+		}
+
+		private void ComputeCoreContextSimilarities(PointContext point, RemapCandidateInfo candidate)
+		{
+			candidate.NameSimilarity =
+				Levenshtein(point.Name, candidate.Context.Name);
+			candidate.HeaderSimilarity =
+				Levenshtein(point.HeaderContext, candidate.Context.HeaderContext);
+			candidate.AncestorSimilarity =
+				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
+			candidate.InnerSimilarity =
+				EvalSimilarity(point.InnerContext_old, candidate.Context.InnerContext_old);
+		}
+
+		/// Похожесть новой последовательности на старую 
+		/// при переходе от последовательности a к последовательности b
+		private double DispatchLevenshtein<T>(T a, T b)
+		{
+			if (a is IEnumerable<string>)
+				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
+			if (a is IEnumerable<HeaderContextElement>)
+				return Levenshtein((IEnumerable<HeaderContextElement>)a, (IEnumerable<HeaderContextElement>)b);
+			else if (a is string)
+				return Levenshtein(a as string, b as string);
+			else if (a is HeaderContextElement)
+				return EvalSimilarity(a as HeaderContextElement, b as HeaderContextElement);
+			else if (a is AncestorsContextElement)
+				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
+			else
+				return a.Equals(b) ? 1 : 0;
+		}
+
+		#region EvalSimilarity
+
+		private double EvalSimilarity(List<ContextElement> a, List<ContextElement> b)
+		{
+			var source = a.Take(INNER_CONTEXT_LENGTH).ToList();
+			return source.Except(b.Take(INNER_CONTEXT_LENGTH)).Count() / (double)source.Count;
+		}
+		
+		public double EvalSimilarity(List<HeaderContextElement> a, List<HeaderContextElement> b) =>
+			Levenshtein(a, b);
+
+		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
+		{
+			return Levenshtein(String.Join("", a.Value), String.Join("", b.Value));
+		}
+
+		public double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
+		{
+			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
+		}
+
+		#endregion
+
+		#region Methods 
+
+		///  Похожесть на основе расстояния Левенштейна
+		private double Levenshtein<T>(IEnumerable<T> a, IEnumerable<T> b)
+		{
+			if (a.Count() == 0 ^ b.Count() == 0)
+				return 0;
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
+
+			var denominator  = Math.Max(a.Count(), b.Count());
+
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count()
+				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
+				++commonPrefixLength;
+			a = a.Skip(commonPrefixLength).ToList();
+			b = b.Skip(commonPrefixLength).ToList();
+
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Count() && commonSuffixLength < b.Count()
+				&& a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
+				++commonSuffixLength;
+			a = a.Take(a.Count() - commonSuffixLength).ToList();
+			b = b.Take(b.Count() - commonSuffixLength).ToList();
+
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
+
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Count() + 1, b.Count() + 1];
+			distances[0, 0] = 0;
+
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Count(); ++i)
+				distances[i, 0] = distances[i - 1, 0] + 1;
+			for (int j = 1; j <= b.Count(); ++j)
+				distances[0, j] = distances[0, j - 1] + 1;
+
+			for (int i = 1; i <= a.Count(); i++)
+				for (int j = 1; j <= b.Count(); j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = 1 - DispatchLevenshtein(a.ElementAt(i - 1), b.ElementAt(j - 1));
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
+
+			return 1 - distances[a.Count(), b.Count()] / denominator;
+		}
+
+		private double Levenshtein(string a, string b)
+		{
+			if (a.Length == 0 ^ b.Length == 0)
+				return 0;
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
+
+			var denominator = (double)Math.Max(a.Length, b.Length);
+
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Length && commonPrefixLength < b.Length
+				&& a[commonPrefixLength].Equals(b[commonPrefixLength]))
+				++commonPrefixLength;
+			a = a.Substring(commonPrefixLength);
+			b = b.Substring(commonPrefixLength);
+
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Length && commonSuffixLength < b.Length
+				&& a[a.Length - 1 - commonSuffixLength].Equals(b[b.Length - 1 - commonSuffixLength]))
+				++commonSuffixLength;
+			a = a.Substring(0, a.Length - commonSuffixLength);
+			b = b.Substring(0, b.Length - commonSuffixLength);
+
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
+
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Length + 1, b.Length + 1];
+			distances[0, 0] = 0;
+
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Length; ++i)
+				distances[i, 0] = distances[i - 1, 0] + 1;
+			for (int j = 1; j <= b.Length; ++j)
+				distances[0, j] = distances[0, j - 1] + 1;
+
+			for (int i = 1; i <= a.Length; i++)
+				for (int j = 1; j <= b.Length; j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = a[i - 1] == b[j - 1] ? 0 : 1;
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
+
+			return 1 - distances[a.Length, b.Length] / denominator;
+		}
+
+		private bool IsSimilarEnough(RemapCandidateInfo candidate, double threshold) =>
+			candidate.Similarity >= threshold;
+
+		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
+			second == null || second.Similarity != 1
+				&& 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+
+		private void ComputeTotalSimilarity(PointContext sourceContext,
+			List<RemapCandidateInfo> candidates)
+		{
+			candidates.ForEach(c => c.Similarity = c.Similarity ??
+				(2 * c.AncestorSimilarity + 1 * c.InnerSimilarity + 1 * c.HeaderSimilarity + 3 * c.NameSimilarity) / 7);
+		}
+
+		#endregion
 	}
 }
