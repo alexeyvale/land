@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
@@ -15,23 +15,19 @@ namespace Land.Markup.Binding
 		bool EqualsIgnoreValue(object obj);
 	}
 
-	[DataContract]
+	[JsonObject(IsReference = true)]
 	public abstract class TypedPrioritizedContextElement
 	{
-		[DataMember]
 		public double Priority { get; set; }
 
-		[DataMember]
 		public string Type { get; set; }
 	}
 
-	[DataContract]
+	[JsonObject]
 	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
-		[DataMember]
 		public bool ExactMatch { get; set; }
 
-		[DataMember]
 		public List<string> Value { get; set; }
 
 		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
@@ -87,10 +83,9 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[DataContract]
+	[JsonObject]
 	public class InnerContext
 	{
-		[DataMember]
 		public TextOrHash Content { get; set; }
 
 		public InnerContext() { }
@@ -105,13 +100,11 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[DataContract]
+	[JsonObject]
 	public class AncestorsContextElement
 	{
-		[DataMember]
 		public string Type { get; set; }
 
-		[DataMember]
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		public override bool Equals(object obj)
@@ -152,13 +145,11 @@ namespace Land.Markup.Binding
 
 	#region Old
 
-	[DataContract]
+	[JsonObject]
 	public class ContextElement
 	{
-		[DataMember]
 		public string Type { get; set; }
 
-		[DataMember]
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		public override bool Equals(object obj)
@@ -199,39 +190,34 @@ namespace Land.Markup.Binding
 
 	#endregion
 
-	[DataContract]
+	[JsonObject]
 	public class SiblingsContext
 	{
-		[DataMember]
 		public TextOrHash Before { get; set; }
 
-		[DataMember]
 		public TextOrHash After { get; set; }
 	}
 
-	[DataContract]
+	[JsonObject(IsReference = true)]
 	public class FileContext
 	{
 		/// <summary>
 		/// Имя файла
 		/// </summary>
-		[DataMember]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// Количество строк
 		/// </summary>
-		[DataMember]
 		public int LineCount { get; set; }
 
 		/// <summary>
 		/// Нечёткий хеш содержимого файла
 		/// </summary>
-		[DataMember]
 		public TextOrHash Content { get; set; }
 	}
 
-	[DataContract]
+	[JsonObject(IsReference = true)]
 	public class PointContext
 	{
 		public int LinksCounter { get; private set; } = 0;
@@ -243,49 +229,41 @@ namespace Land.Markup.Binding
 		/// <summary>
 		/// Тип сущности, которой соответствует точка привязки
 		/// </summary>
-		[DataMember]
 		public string Type { get; set; }
 
 		/// <summary>
 		/// Номер строки в файле, на которой начинается сущность
 		/// </summary>
-		[DataMember]
 		public int Line { get; set; }
 
 		/// <summary>
 		/// Контекст файла, в котором находится помеченный элемент
 		/// </summary>
-		[DataMember]
 		public FileContext FileContext { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
 		/// </summary>
-		[DataMember]
 		public List<HeaderContextElement> HeaderContext { get; set; }
 
 		/// <summary>
 		/// Внутренний контекст в виде одной сущности
 		/// </summary>
-		[DataMember]
 		public InnerContext InnerContext { get; set; }
 
 		/// <summary>
 		/// Контекст предков узла, к которому привязана точка разметки
 		/// </summary>
-		[DataMember]
 		public List<AncestorsContextElement> AncestorsContext { get; set; }
 
 		/// <summary>
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
 		/// </summary>
-		[DataMember]
 		public SiblingsContext SiblingsContext { get; set; }
 
 		/// <summary>
 		/// Контекст наиболее похожих на помеченный элементов
 		/// </summary>
-		[DataMember]
 		public List<PointContext> ClosestContext { get; set; }
 
 		#region Old
@@ -293,6 +271,7 @@ namespace Land.Markup.Binding
 		public string Name =>
 			String.Join("", this.HeaderContext.Where(e => e.Type == "name").SelectMany(e => e.Value));
 
+		[JsonIgnore]
 		public List<ContextElement> InnerContext_old { get; set; }
 
 		#endregion
@@ -575,18 +554,15 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[DataContract]
+	[JsonObject]
 	public class TextOrHash
 	{
 		public const int MAX_TEXT_LENGTH = 100;
 
-		[DataMember]
 		public string Text { get; set; }
 
-		[DataMember]
 		public int TextLength { get; set; }
 
-		[DataMember]
 		public byte[] Hash { get; set; }
 
 		public TextOrHash() { }

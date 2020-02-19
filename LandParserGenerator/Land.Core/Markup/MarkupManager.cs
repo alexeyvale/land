@@ -285,19 +285,21 @@ namespace Land.Markup
 
 		public void Serialize(string fileName, bool useRelativePaths)
 		{
+			List<FileContext> fileContexts = null;
+			
 			if (useRelativePaths)
 			{
+				fileContexts = ContextFinder.ContextManager.GetFileContexts();
+
 				/// Превращаем указанные в точках привязки абсолютные пути в пути относительно файла разметки
 				var directoryUri = new Uri(Path.GetDirectoryName(fileName) + "/");
-				DoWithMarkup((MarkupElement elem) =>
+
+				foreach (var file in fileContexts)
 				{
-					if (elem is ConcernPoint p)
-					{
-						p.Context.FileContext.Name = Uri.UnescapeDataString(
-							directoryUri.MakeRelativeUri(new Uri(p.Context.FileContext.Name)).ToString()
-						);
-					}
-				});
+					file.Name = Uri.UnescapeDataString(
+						directoryUri.MakeRelativeUri(new Uri(file.Name)).ToString()
+					);
+				}
 			}
 
 			using (StreamWriter fs = new StreamWriter(fileName, false))
@@ -313,16 +315,12 @@ namespace Land.Markup
 
 			if (useRelativePaths)
 			{
-				/// Трансформируем пути обратно в абсолютные
-				DoWithMarkup((MarkupElement elem) =>
+				foreach (var file in fileContexts)
 				{
-					if (elem is ConcernPoint p)
-					{
-						p.Context.FileContext.Name = Path.GetFullPath(
-							Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileContext.Name)
-						);
-					}
-				});
+					file.Name = Path.GetFullPath(
+						Path.Combine(Path.GetDirectoryName(fileName), file.Name)
+					);
+				}
 			}
 		}
 

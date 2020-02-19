@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[DataContract]
+	[JsonObject] 
 	public abstract class MarkupElement: INotifyPropertyChanged
 	{
 		private string _name;
 		private string _comment;
 
-		[DataMember]
 		public string Name {
 			get => _name;
 			set
@@ -24,7 +23,6 @@ namespace Land.Markup
 			}
 		}
 
-		[DataMember]
 		public string Comment
 		{
 			get => _comment;

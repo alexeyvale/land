@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
@@ -12,31 +12,35 @@ using Land.Markup.CoreExtension;
 
 namespace Land.Markup
 {
-	[DataContract]
+	[JsonObject]
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
-		[DataMember]
 		public PointContext Context { get; set; }
 
 		/// <summary>
 		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
 		/// </summary>
+		[JsonIgnore]
 		public bool HasIrrelevantLocation { get; set; }
 
 		/// <summary>
 		/// Признак того, что координаты потеряны
 		/// </summary>
+		[JsonIgnore]
 		public bool HasMissingLocation => Location == null;
 
 		/// <summary>
 		/// Признак того, что координаты невозможно использовать для перехода
 		/// </summary>
+		[JsonIgnore]
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
 		/// <summary>
 		/// Узел AST, которому соответствует точка
 		/// </summary>
 		private Node _node;
+
+		[JsonIgnore]
 		public Node AstNode
 		{
 			get => _node;

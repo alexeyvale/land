@@ -4,14 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[DataContract]
+	[JsonObject(IsReference = true)]
 	public class Concern : MarkupElement
 	{
-		[DataMember]
 		public ObservableCollection<MarkupElement> Elements { get; set; }
 
 		public new event PropertyChangedEventHandler PropertyChanged;

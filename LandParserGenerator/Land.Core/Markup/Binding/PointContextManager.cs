@@ -48,5 +48,8 @@ namespace Land.Markup.Binding
 					.GetFullContext(node, file, searchArea, getParsed, contextFinder, Cache[node]);
 			}
 		}
+
+		public List<FileContext> GetFileContexts() =>
+			Cache.Values.Select(e => e.FileContext).Distinct().ToList();
 	}
 }
