@@ -302,15 +302,15 @@ namespace Land.Markup.Binding
 						}
 					}
 				}
-			}
-			/// Остались точки, которые нужно перепривязать, но не осталось кандидатов
-			else
-			{
-				foreach (var context in evaluationResults.Keys.Where(k => contextsToPoints.ContainsKey(k)))
+				/// Остались точки, которые нужно перепривязать, но не осталось кандидатов
+				else
 				{
-					foreach (var point in contextsToPoints[context])
+					foreach (var context in evaluationResults.Keys.Where(k => contextsToPoints.ContainsKey(k)))
 					{
-						result[point] = new List<RemapCandidateInfo>();
+						foreach (var point in contextsToPoints[context])
+						{
+							result[point] = new List<RemapCandidateInfo>();
+						}
 					}
 				}
 			}
