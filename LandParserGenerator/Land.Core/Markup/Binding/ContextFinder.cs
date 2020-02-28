@@ -233,72 +233,84 @@ namespace Land.Markup.Binding
 			}
 
 			/// Если есть изменившиеся помеченные сущности, и остались кандидаты
-			if (evaluationResults.Count > 0 
-				&& evaluationResults.First().Value.Count > 0
-				&& evaluationResults.Keys.Any(k => contextsToPoints.ContainsKey(k)))
+			if (evaluationResults.Keys.Any(k => contextsToPoints.ContainsKey(k)))
 			{
-				var scores = new int[
-					evaluationResults.Count, 
-					evaluationResults.First().Value.Count
-				];
-				var indicesToContexts = new PointContext[evaluationResults.Count];
-
-				var i = 0;
-				foreach (var from in evaluationResults)
+				if (evaluationResults.First().Value.Count > 0)
 				{
-					indicesToContexts[i] = from.Key;
+					var scores = new int[
+						evaluationResults.Count,
+						evaluationResults.First().Value.Count
+					];
+					var indicesToContexts = new PointContext[evaluationResults.Count];
 
-					for (var j = 0; j < from.Value.Count; ++j)
+					var i = 0;
+					foreach (var from in evaluationResults)
 					{
-						scores[i, j] = (int)(1000 * (1 - (from.Value[j].Similarity ?? 0)));
-					}
-					++i;
-				}
+						indicesToContexts[i] = from.Key;
 
-				/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
-				var bestMatchesFinder = new AssignmentProblem();
-				var bestMatches = bestMatchesFinder.Compute(scores);
-
-				for (i = 0; i < bestMatches.Length; ++i)
-				{
-					/// Для результатов, соответствующих точкам привязки
-					if (contextsToPoints.ContainsKey(indicesToContexts[i]))
-					{
-						/// Если найдено наилучшее соответствие
-						if (bestMatches[i] != -1)
-						{					
-							/// Сортируем всех кандидатов по похожести
-							var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
-							/// Запоминаем наилучшее соответствие и его индекс в отсортированном списке
-							var bestMatch = evaluationResults[indicesToContexts[i]][bestMatches[i]];
-							var bestIndex = allCandidates.IndexOf(bestMatch);
-							/// Берём следующий за ним элемент
-							var second = allCandidates.Count > bestIndex + 1 ? allCandidates[bestIndex + 1] : null;
-
-							allCandidates.Remove(bestMatch);
-							allCandidates.Insert(0, bestMatch);
-
-							if (IsSimilarEnough(bestMatch) 
-								&& (second == null || AreDistantEnough(bestMatch, second)))
-							{
-								bestMatch.IsAuto = true;
-							}
-
-							foreach (var point in contextsToPoints[indicesToContexts[i]])
-							{
-								result[point] = allCandidates;
-							}
-						}
-						else
+						for (var j = 0; j < from.Value.Count; ++j)
 						{
-							foreach (var point in contextsToPoints[indicesToContexts[i]])
-							{
-								var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
-								allCandidates.ForEach(c => c.IsAuto = false);
+							scores[i, j] = (int)(1000 * (1 - (from.Value[j].Similarity ?? 0)));
+						}
+						++i;
+					}
 
-								result[point] = allCandidates;
+					/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
+					var bestMatchesFinder = new AssignmentProblem();
+					var bestMatches = bestMatchesFinder.Compute(scores);
+
+					for (i = 0; i < bestMatches.Length; ++i)
+					{
+						/// Для результатов, соответствующих точкам привязки
+						if (contextsToPoints.ContainsKey(indicesToContexts[i]))
+						{
+							/// Если найдено наилучшее соответствие
+							if (bestMatches[i] != -1)
+							{
+								/// Сортируем всех кандидатов по похожести
+								var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
+								/// Запоминаем наилучшее соответствие и его индекс в отсортированном списке
+								var bestMatch = evaluationResults[indicesToContexts[i]][bestMatches[i]];
+								var bestIndex = allCandidates.IndexOf(bestMatch);
+								/// Берём следующий за ним элемент
+								var second = allCandidates.Count > bestIndex + 1 ? allCandidates[bestIndex + 1] : null;
+
+								allCandidates.Remove(bestMatch);
+								allCandidates.Insert(0, bestMatch);
+
+								if (IsSimilarEnough(bestMatch)
+									&& (second == null || AreDistantEnough(bestMatch, second)))
+								{
+									bestMatch.IsAuto = true;
+								}
+
+								foreach (var point in contextsToPoints[indicesToContexts[i]])
+								{
+									result[point] = allCandidates;
+								}
+							}
+							else
+							{
+								foreach (var point in contextsToPoints[indicesToContexts[i]])
+								{
+									var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
+									allCandidates.ForEach(c => c.IsAuto = false);
+
+									result[point] = allCandidates;
+								}
 							}
 						}
+					}
+				}
+			}
+			/// Остались точки, которые нужно перепривязать, но не осталось кандидатов
+			else
+			{
+				foreach (var context in evaluationResults.Keys.Where(k => contextsToPoints.ContainsKey(k)))
+				{
+					foreach (var point in contextsToPoints[context])
+					{
+						result[point] = new List<RemapCandidateInfo>();
 					}
 				}
 			}
@@ -649,8 +661,8 @@ namespace Land.Markup.Binding
 			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
 		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
-			second == null || second.Similarity != 1
-				&& 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+			second == null || first.Similarity == 1 && second.Similarity != 1
+				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
 		private void ComputeTotalSimilarity(PointContext sourceContext,
 			List<RemapCandidateInfo> candidates)
