@@ -55,23 +55,38 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
-
-			if (item != null && e.ChangedButton == MouseButton.Left)
+			if(e.ChangedButton == MouseButton.Left)
 			{
-				/// При клике по точке переходим к ней
-				if (item.DataContext is ConcernPoint concernPoint)
-				{
-					if (EnsureLocationValid(concernPoint))
-					{
-						Editor.SetActiveDocumentAndOffset(
-							concernPoint.Context.FileContext.Name,
-							concernPoint.Location.Start
-						);
-					}
+				var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
 
-					e.Handled = true;
+				if (item != null && item.DataContext is ConcernPoint concernPoint)
+				{
+					if (sender == item)
+					{
+						/// При клике по точке переходим к ней
+						if (EnsureLocationValid(concernPoint))
+						{
+							Editor.SetActiveDocumentAndOffset(
+								concernPoint.Context.FileContext.Name,
+								concernPoint.Location.Start
+							);
+						}
+
+						item.InvalidateVisual();
+					}
+					else
+					{
+						if (!concernPoint.HasInvalidLocation)
+						{
+							Editor.SetActiveDocumentAndOffset(
+								concernPoint.Context.FileContext.Name,
+								null
+							);
+						}
+					}
 				}
+
+				e.Handled = true;
 			}
 		}
 

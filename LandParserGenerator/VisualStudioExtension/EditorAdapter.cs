@@ -211,11 +211,15 @@ namespace Land.VisualStudioExtension
 						return;
 				}
 			}
-			var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
 
-			mgr.NavigateToLineAndColumn(buffer, ref logicalView, 
-				location.Line.Value - 1, location.Column.Value, 
-				location.Line.Value - 1, location.Column.Value);
+			if (location != null)
+			{
+				var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
+
+				mgr.NavigateToLineAndColumn(buffer, ref logicalView,
+					location.Line.Value - 1, location.Column.Value,
+					location.Line.Value - 1, location.Column.Value);
+			}
 		}
 
 		public void SetSegments(List<DocumentSegment> segments, Color color)
