@@ -394,5 +394,84 @@ namespace Land.Markup.Binding
 
 			return result;
 		}
+
+		private int[] FindMaximumMatching(int[,] weights)
+		{
+			if (weights.GetLength(0) > weights.GetLength(1))
+				weights = Transpose(weights);
+
+			var lines = new double[weights.GetLength(0)];
+			var columns = new double[weights.GetLength(1)];
+			var matching = new int[columns.Length];
+			var way = new int[columns.Length];
+
+			for (int i = 1; i < lines.Length; ++i)
+			{
+				matching[0] = i;
+
+				var j0 = 0;
+				var minv = new double[columns.Length];
+				var used = new bool[columns.Length];
+
+				do
+				{
+					used[j0] = true;
+					int i0 = matching[j0], j1 = 0;
+					double delta = 0;
+
+					for (int j = 1; j < columns.Length; ++j)
+					{
+						if (!used[j])
+						{
+							var cur = weights[i0, j] - lines[i0] - columns[j];
+
+							if (cur < minv[j])
+							{
+								minv[j] = cur;
+								way[j] = j0;
+							}
+
+							if (minv[j] < delta)
+							{
+								delta = minv[j];
+								j1 = j;
+							}
+						}
+					}
+
+					for (int j = 0; j < columns.Length; ++j)
+					{
+						if (used[j])
+						{
+							lines[matching[j]] += delta;
+							columns[j] -= delta;
+						}
+						else
+						{
+							minv[j] -= delta;
+						}
+					}
+
+					j0 = j1;
+				}
+				while (matching[j0] != 0);
+
+				do
+				{
+					int j1 = way[j0];
+					matching[j0] = matching[j1];
+					j0 = j1;
+				} while (j0 != 0);
+			}
+
+			var ans = new int[lines.Length];
+
+			for (int j = 1; j < columns.Length; ++j)
+			{
+				ans[matching[j]] = j;
+			}
+
+			return ans;
+		}
 	}
 }
