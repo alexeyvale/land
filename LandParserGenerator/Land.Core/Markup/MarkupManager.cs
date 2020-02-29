@@ -101,6 +101,8 @@ namespace Land.Markup
 					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
+
+			ContextFinder.ContextManager.ClearCache(fileName);
 		}
 
 		/// <summary>

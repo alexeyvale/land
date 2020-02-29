@@ -10,14 +10,6 @@ namespace Land.Markup.Binding
 	{
 		private Dictionary<Node, PointContext> Cache { get; set; } = new Dictionary<Node, PointContext>();
 
-		public void CollectGarbage()
-		{
-			var keysToDispose = Cache.Where(c => c.Value.LinksCounter <= 0).Select(c => c.Key).ToList();
-
-			foreach (var key in keysToDispose)
-				Cache.Remove(key);
-		}
-
 		public PointContext GetContext(
 			Node node,
 			ParsedFile file)
@@ -46,6 +38,17 @@ namespace Land.Markup.Binding
 			{
 				return PointContext
 					.GetFullContext(node, file, searchArea, getParsed, contextFinder, Cache[node]);
+			}
+		}
+
+		public void ClearCache(string fileName)
+		{
+			var keysToRemove = Cache.Where(e => e.Value.FileContext.Name == fileName)
+				.Select(e=>e.Key).ToList();
+
+			foreach(var key in keysToRemove)
+			{
+				Cache.Remove(key);
 			}
 		}
 

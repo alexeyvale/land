@@ -220,12 +220,6 @@ namespace Land.Markup.Binding
 	[JsonObject(IsReference = true)]
 	public class PointContext
 	{
-		public int LinksCounter { get; private set; } = 0;
-
-		public void AddLink() => ++LinksCounter;
-
-		public void RemoveLink() => --LinksCounter;
-
 		/// <summary>
 		/// Тип сущности, которой соответствует точка привязки
 		/// </summary>
