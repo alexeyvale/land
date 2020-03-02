@@ -84,9 +84,9 @@ namespace Land.Control
 							);
 						}
 					}
-				}
 
-				e.Handled = true;
+					e.Handled = true;
+				}
 			}
 		}
 
