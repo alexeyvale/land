@@ -128,14 +128,15 @@
 											<Setter.Value>
 												<MultiBinding Converter="{StaticResource MarkupTreeIconVisibilityConverter}">
 													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
-													<Binding Path="." />
+													<!--<Binding Path="." />-->
+													<Binding Path="HasMissingLocation"/>
 												</MultiBinding>
 											</Setter.Value>
 										</Setter>
 										<Setter Property="Foreground">
 											<Setter.Value>
 												<MultiBinding Converter="{StaticResource MarkupTreeIconColorConverter}">
-													<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
+													<!--<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>-->
 													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsFocused" />
 													<Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeViewItem}}" Path="IsSelectionActive" />
 												</MultiBinding>
@@ -146,7 +147,7 @@
 								
 								<Label Name="ConcernIcon"  Content="&#xf07b;" FontFamily="{StaticResource FontAwesomeSolid}"/>
 								<Label Name="PointIcon"  Content="&#xf192;" FontFamily="{StaticResource FontAwesomeRegular}"/>
-								<Label Name="MissingIcon"  Content="&#xf06a;" FontFamily="{StaticResource FontAwesomeSolid}"/>
+								<Label Name="MissingIcon"  Content="&#xf111;" FontFamily="{StaticResource FontAwesomeRegular}"/>
 							</Grid>
 							<Grid>
 								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />

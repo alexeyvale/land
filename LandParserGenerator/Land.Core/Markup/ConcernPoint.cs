@@ -50,6 +50,7 @@ namespace Land.Markup
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasMissingLocation"));
 			}
 		}
 

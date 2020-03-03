@@ -16,24 +16,27 @@ namespace Land.Control
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
 			var label = (Label)values[0];
-			var markupElement = (MarkupElement)values[1];
+
+			/// Признак актуальности координат есть только у точки привязки
+			var hasMissingLocation = values[1] == DependencyProperty.UnsetValue 
+				? (bool?)null : (bool)values[1];
 
 			switch (label.Name)
 			{
 				case "MissingIcon":
-					return markupElement is ConcernPoint point1 
-						? point1.HasMissingLocation
+					return hasMissingLocation.HasValue
+						? hasMissingLocation.Value
 							? Visibility.Visible : Visibility.Collapsed 
 						: Visibility.Collapsed;
 
 				case "PointIcon":
-					return markupElement is ConcernPoint point2
-						? point2.HasMissingLocation
+					return hasMissingLocation.HasValue
+						? hasMissingLocation.Value
 							? Visibility.Collapsed : Visibility.Visible
 						: Visibility.Collapsed;
 
 				case "ConcernIcon":
-					return markupElement is Concern
+					return !hasMissingLocation.HasValue
 						? Visibility.Visible : Visibility.Collapsed;
 			}
 

@@ -15,15 +15,12 @@ namespace Land.Control
 	{
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
-			var label = (Label)values[0];
-			var IsFocused = (bool)values[1];
-			var IsSelectionActive = (bool)values[2];
+			var IsFocused = (bool)values[0];
+			var IsSelectionActive = (bool)values[1];
 
 			return IsFocused && IsSelectionActive
 				? Brushes.WhiteSmoke
-				: label.Name == "MissingIcon"
-					? Brushes.IndianRed
-					: Brushes.DimGray;
+				: Brushes.DimGray;
 		}
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
