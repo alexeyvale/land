@@ -46,9 +46,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\components\Antlr\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="QUT.ShiftReduceParser">
       <HintPath>..\components\GPPG\QUT.ShiftReduceParser.dll</HintPath>
     </Reference>
@@ -154,7 +151,6 @@
     <None Include="Core\Specification\Parsing\_ymc\Land.lex" />
     <None Include="Core\Specification\Parsing\_ymc\Land.y" />
     <None Include="keys.snk" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\antlr-4.7-complete.jar">
