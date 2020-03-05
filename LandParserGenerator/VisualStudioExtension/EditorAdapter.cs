@@ -197,23 +197,23 @@ namespace Land.VisualStudioExtension
 				return;
 			}
 
-			/// В открытом документе устанавливаем курсор в нужную позицию
-			frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out object docData);
-
-			var buffer = docData as VsTextBuffer;
-			if (buffer == null)
-			{
-				if (docData is IVsTextBufferProvider bufferProvider)
-				{
-					ErrorHandler.ThrowOnFailure(bufferProvider.GetTextBuffer(out IVsTextLines lines));
-					buffer = lines as VsTextBuffer;
-					if (buffer == null)
-						return;
-				}
-			}
-
 			if (location != null)
 			{
+				/// В открытом документе устанавливаем курсор в нужную позицию
+				frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out object docData);
+
+				var buffer = docData as VsTextBuffer;
+				if (buffer == null)
+				{
+					if (docData is IVsTextBufferProvider bufferProvider)
+					{
+						ErrorHandler.ThrowOnFailure(bufferProvider.GetTextBuffer(out IVsTextLines lines));
+						buffer = lines as VsTextBuffer;
+						if (buffer == null)
+							return;
+					}
+				}
+			
 				var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
 
 				mgr.NavigateToLineAndColumn(buffer, ref logicalView,

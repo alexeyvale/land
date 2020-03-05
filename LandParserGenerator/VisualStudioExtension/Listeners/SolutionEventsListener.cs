@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -18,6 +18,8 @@ namespace Land.VisualStudioExtension.Listeners
 	{
 		public int OnAfterOpenSolution(object pUnkReserved, int fNewSolution)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			ServiceEventAggregator.Instance.OnSolutionOpened();
 
 			return VSConstants.S_OK;

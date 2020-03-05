@@ -1,22 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using Land.Markup;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-
-using Microsoft.Win32;
-
-using Land.Core;
-using Land.Core.Parsing;
-using Land.Core.Parsing.Tree;
-using Land.Core.Parsing.Preprocessing;
-using Land.Markup;
-using Land.Control.Helpers;
 
 namespace Land.Control
 {
@@ -57,11 +42,14 @@ namespace Land.Control
 		{
 			if(e.ChangedButton == MouseButton.Left)
 			{
-				var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
+				/// Двойной клик по элементы дерева всплывает до корня дерева
+				var processingItemData = (MarkupElement)((TreeViewItem)sender).DataContext;
 
-				if (item != null && item.DataContext is ConcernPoint concernPoint)
+				if (processingItemData.Parent == null)
 				{
-					if (sender == item)
+					var clickedItem = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
+
+					if (clickedItem != null && clickedItem.DataContext is ConcernPoint concernPoint)
 					{
 						/// При клике по точке переходим к ней
 						if (EnsureLocationValid(concernPoint))
@@ -72,20 +60,10 @@ namespace Land.Control
 							);
 						}
 
-						item.InvalidateVisual();
-					}
-					else
-					{
-						if (!concernPoint.HasInvalidLocation)
-						{
-							Editor.SetActiveDocumentAndOffset(
-								concernPoint.Context.FileContext.Name,
-								null
-							);
-						}
-					}
+						clickedItem.InvalidateVisual();
 
-					e.Handled = true;
+						e.Handled = true;
+					}
 				}
 			}
 		}

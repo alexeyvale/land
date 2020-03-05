@@ -4,12 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
 using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[JsonObject(IsReference = true)]
 	public class Concern : MarkupElement
 	{
 		public ObservableCollection<MarkupElement> Elements { get; set; }

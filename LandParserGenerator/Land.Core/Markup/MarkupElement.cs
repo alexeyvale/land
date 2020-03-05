@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ComponentModel;
 using Newtonsoft.Json;
+using System.ComponentModel;
 using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[JsonObject] 
 	public abstract class MarkupElement: INotifyPropertyChanged
 	{
 		private string _name;
@@ -34,6 +33,7 @@ namespace Land.Markup
 			}
 		}
 
+		[JsonIgnore]
 		public Concern Parent { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;

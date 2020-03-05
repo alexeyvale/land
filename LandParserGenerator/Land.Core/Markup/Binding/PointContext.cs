@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
@@ -15,7 +14,6 @@ namespace Land.Markup.Binding
 		bool EqualsIgnoreValue(object obj);
 	}
 
-	[JsonObject(IsReference = true)]
 	public abstract class TypedPrioritizedContextElement
 	{
 		public double Priority { get; set; }
@@ -23,7 +21,6 @@ namespace Land.Markup.Binding
 		public string Type { get; set; }
 	}
 
-	[JsonObject]
 	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
 	{
 		public bool ExactMatch { get; set; }
@@ -83,7 +80,6 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[JsonObject]
 	public class InnerContext
 	{
 		public TextOrHash Content { get; set; }
@@ -100,7 +96,6 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[JsonObject]
 	public class AncestorsContextElement
 	{
 		public string Type { get; set; }
@@ -145,7 +140,6 @@ namespace Land.Markup.Binding
 
 	#region Old
 
-	[JsonObject]
 	public class ContextElement
 	{
 		public string Type { get; set; }
@@ -190,7 +184,6 @@ namespace Land.Markup.Binding
 
 	#endregion
 
-	[JsonObject]
 	public class SiblingsContext
 	{
 		public TextOrHash Before { get; set; }
@@ -198,7 +191,6 @@ namespace Land.Markup.Binding
 		public TextOrHash After { get; set; }
 	}
 
-	[JsonObject(IsReference = true)]
 	public class FileContext
 	{
 		/// <summary>
@@ -217,7 +209,6 @@ namespace Land.Markup.Binding
 		public TextOrHash Content { get; set; }
 	}
 
-	[JsonObject(IsReference = true)]
 	public class PointContext
 	{
 		/// <summary>
@@ -265,7 +256,6 @@ namespace Land.Markup.Binding
 		public string Name =>
 			String.Join("", this.HeaderContext.Where(e => e.Type == "name").SelectMany(e => e.Value));
 
-		[JsonIgnore]
 		public List<ContextElement> InnerContext_old { get; set; }
 
 		#endregion
@@ -548,7 +538,6 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	[JsonObject]
 	public class TextOrHash
 	{
 		public const int MAX_TEXT_LENGTH = 100;
