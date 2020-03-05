@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
@@ -193,6 +194,8 @@ namespace Land.Markup.Binding
 
 	public class FileContext
 	{
+		public Guid? Id { get; set; }
+
 		/// <summary>
 		/// Имя файла
 		/// </summary>
@@ -211,6 +214,8 @@ namespace Land.Markup.Binding
 
 	public class PointContext
 	{
+		public Guid? Id { get; set; }
+
 		/// <summary>
 		/// Тип сущности, которой соответствует точка привязки
 		/// </summary>
@@ -221,10 +226,40 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public int Line { get; set; }
 
+		private FileContext _fileContext;
+
 		/// <summary>
 		/// Контекст файла, в котором находится помеченный элемент
 		/// </summary>
-		public FileContext FileContext { get; set; }
+		[JsonIgnore]
+		public FileContext FileContext
+		{
+			get { return _fileContext; }
+
+			set
+			{
+				_fileContext = value;
+
+				if (!_fileContext.Id.HasValue)
+				{
+					if (this.FileContextId != Guid.Empty)
+					{
+						_fileContext.Id = this.FileContextId;
+					}
+					else
+					{
+						_fileContext.Id = Guid.NewGuid();
+					}
+				}
+
+				if (this.FileContextId == Guid.Empty)
+				{
+					this.FileContextId = _fileContext.Id.Value;
+				}
+			}
+		}
+
+		public Guid FileContextId { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
@@ -246,10 +281,37 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public SiblingsContext SiblingsContext { get; set; }
 
+		private List<PointContext> _closestContext;
+
 		/// <summary>
 		/// Контекст наиболее похожих на помеченный элементов
 		/// </summary>
-		public List<PointContext> ClosestContext { get; set; }
+		[JsonIgnore]
+		public List<PointContext> ClosestContext
+		{
+			get { return _closestContext; }
+
+			set
+			{
+				_closestContext = value;
+
+				if (_closestContext != null)
+				{
+					foreach (var elem in _closestContext)
+					{
+						if (!elem.Id.HasValue)
+						{
+							elem.Id = Guid.NewGuid();
+						}
+					}
+
+					ClosestContextIds = 
+						_closestContext.Select(e => e.Id.Value).ToList();
+				}
+			}
+		}
+
+		public List<Guid> ClosestContextIds { get; set; }
 
 		#region Old
 
@@ -514,6 +576,7 @@ namespace Land.Markup.Binding
 			ContextFinder contextFinder)
 		{
 			const double CLOSE_ELEMENT_THRESHOLD = 0.8;
+			const int MAX_COUNT = 10;
 
 			foreach (var f in searchArea)
 			{
@@ -531,6 +594,7 @@ namespace Land.Markup.Binding
 			);
 
 			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null))
+				.Take(MAX_COUNT)
 				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 

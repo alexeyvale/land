@@ -265,6 +265,20 @@ namespace Land.Markup
 			return GetLinearSequenceVisitor.GetPoints(Markup);
 		}
 
+		public HashSet<PointContext> GetPointContexts()
+		{
+			var contextsSet = new HashSet<PointContext>();
+			var points = GetConcernPoints();
+
+			foreach (var point in points)
+			{
+				contextsSet.Add(point.Context);
+				contextsSet.UnionWith(point.Context.ClosestContext);
+			}
+
+			return contextsSet;
+		}
+
 		/// <summary>
 		/// Перемещение элемента разметки к новому родителю
 		/// </summary>
@@ -306,9 +320,13 @@ namespace Land.Markup
 
 			using (StreamWriter fs = new StreamWriter(fileName, false))
 			{
+				var pointContexts = GetPointContexts();
+
 				var unit = new SerializationUnit()
 				{
 					Markup = Markup,
+					PointContexts = pointContexts,
+					FileContexts = new HashSet<FileContext>(pointContexts.Select(e=>e.FileContext)),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
@@ -341,13 +359,32 @@ namespace Land.Markup
 				/// Фиксируем разметку
 				Markup = unit.Markup;
 
-				/// Восстанавливаем обратные связи между потомками и предками
+				/// Восстанавливаем обратные связи между потомками и предками,
+				/// восстанавливаем связи с контекстами
+				var contexts = unit.PointContexts.ToDictionary(e => e.Id.Value, e => e);
+				var fileContexts = unit.FileContexts.ToDictionary(e => e.Id.Value, e => e);
+
+				foreach (var context in unit.PointContexts)
+				{
+					context.ClosestContext = 
+						context.ClosestContextIds?.Select(e => contexts[e]).ToList();
+					context.FileContext =
+						fileContexts[context.FileContextId];
+				}
+
 				DoWithMarkup(e =>
 				{
 					if (e is Concern c)
 					{
 						foreach (var elem in c.Elements)
+						{
 							elem.Parent = c;
+						}
+					}
+					else
+					{
+						var p = (ConcernPoint)e;
+						p.Context = contexts[p.ContextId];
 					}
 				});
 
@@ -487,6 +524,7 @@ namespace Land.Markup
 				point.Context = ContextFinder.ContextManager.GetContext(
 					first.Node, first.File, GetSimilarOnly(first.File, searchArea), getParsed, ContextFinder
 				);
+
 				point.AstNode = first.Node;
 				return true;
 			}

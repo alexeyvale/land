@@ -14,7 +14,37 @@ namespace Land.Markup
 {
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
-		public PointContext Context { get; set; }
+		public Guid ContextId { get; set; }
+
+		private PointContext _context;
+
+		[JsonIgnore]
+		public PointContext Context
+		{
+			get { return _context; }
+
+			set
+			{
+				_context = value;
+
+				if (!_context.Id.HasValue)
+				{
+					if(this.ContextId != Guid.Empty)
+					{
+						_context.Id = this.ContextId;
+					}
+					else
+					{
+						_context.Id = Guid.NewGuid();
+					}			
+				}
+
+				if (this.ContextId == Guid.Empty)
+				{
+					this.ContextId = _context.Id.Value;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
