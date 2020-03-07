@@ -194,7 +194,7 @@ namespace Land.Markup.Binding
 
 	public class FileContext
 	{
-		public Guid? Id { get; set; }
+		public HashSet<Guid> LinkedPoints { get; set; } = new HashSet<Guid>();
 
 		/// <summary>
 		/// Имя файла
@@ -214,7 +214,32 @@ namespace Land.Markup.Binding
 
 	public class PointContext
 	{
-		public Guid? Id { get; set; }
+		public HashSet<Guid> LinkedPoints { get; private set; } = 
+			new HashSet<Guid>();
+
+		public HashSet<Tuple<Guid, int>> LinkedClosestPoints { get; private set; } = 
+			new HashSet<Tuple<Guid, int>>();
+
+		public void LinkPoint(Guid pointId)
+		{
+			this.LinkedPoints.Add(pointId);
+
+			/// Проверки на != null нужны для десериализации
+
+			for (var i = 0; i < this.ClosestContext.Count; ++i)
+			{
+				if (this.ClosestContext[i] != null)
+				{
+					this.ClosestContext[i].LinkedClosestPoints
+						.Add(new Tuple<Guid, int>(pointId, i));
+				}
+			}
+
+			if (this.FileContext != null)
+			{
+				this.FileContext.LinkedPoints.Add(pointId);
+			}
+		}
 
 		/// <summary>
 		/// Тип сущности, которой соответствует точка привязки
@@ -239,27 +264,9 @@ namespace Land.Markup.Binding
 			set
 			{
 				_fileContext = value;
-
-				if (!_fileContext.Id.HasValue)
-				{
-					if (this.FileContextId != Guid.Empty)
-					{
-						_fileContext.Id = this.FileContextId;
-					}
-					else
-					{
-						_fileContext.Id = Guid.NewGuid();
-					}
-				}
-
-				if (this.FileContextId == Guid.Empty)
-				{
-					this.FileContextId = _fileContext.Id.Value;
-				}
+				_fileContext.LinkedPoints.UnionWith(LinkedPoints);
 			}
 		}
-
-		public Guid FileContextId { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
@@ -281,7 +288,7 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public SiblingsContext SiblingsContext { get; set; }
 
-		private List<PointContext> _closestContext;
+		private List<PointContext> _closestContext = new List<PointContext>();
 
 		/// <summary>
 		/// Контекст наиболее похожих на помеченный элементов
@@ -295,23 +302,24 @@ namespace Land.Markup.Binding
 			{
 				_closestContext = value;
 
-				if (_closestContext != null)
+				for (var i = 0; i < this.ClosestContext.Count; ++i)
 				{
-					foreach (var elem in _closestContext)
-					{
-						if (!elem.Id.HasValue)
-						{
-							elem.Id = Guid.NewGuid();
-						}
-					}
-
-					ClosestContextIds = 
-						_closestContext.Select(e => e.Id.Value).ToList();
+					ClosestContext[i].LinkedClosestPoints
+						.UnionWith(LinkedPoints.Select(id => new Tuple<Guid, int>(id, i)));
 				}
 			}
 		}
 
-		public List<Guid> ClosestContextIds { get; set; }
+		[JsonProperty]
+		private int ClosestContextCount
+		{
+			get { return ClosestContext.Count; }
+
+			set
+			{
+				ClosestContext = Enumerable.Repeat((PointContext)null, value).ToList();
+			}
+		}
 
 		#region Old
 

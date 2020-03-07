@@ -328,7 +328,7 @@ namespace Land.Markup.Binding
 			return newMatrix;
 		}
 
-		public int[] Compute(int[,] weights)
+		public int[] Compute1(int[,] weights)
 		{
 			if(weights.GetLength(0) > weights.GetLength(1))
 			{
@@ -395,7 +395,7 @@ namespace Land.Markup.Binding
 			return result;
 		}
 
-		private int[] FindMaximumMatching(int[,] weights)
+		public int[] Compute2(int[,] weights)
 		{
 			if (weights.GetLength(0) > weights.GetLength(1))
 				weights = Transpose(weights);

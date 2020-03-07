@@ -14,7 +14,7 @@ namespace Land.Markup
 {
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
-		public Guid ContextId { get; set; }
+		public Guid Id { get; set; } = Guid.NewGuid();
 
 		private PointContext _context;
 
@@ -26,23 +26,7 @@ namespace Land.Markup
 			set
 			{
 				_context = value;
-
-				if (!_context.Id.HasValue)
-				{
-					if(this.ContextId != Guid.Empty)
-					{
-						_context.Id = this.ContextId;
-					}
-					else
-					{
-						_context.Id = Guid.NewGuid();
-					}			
-				}
-
-				if (this.ContextId == Guid.Empty)
-				{
-					this.ContextId = _context.Id.Value;
-				}
+				_context.LinkPoint(Id);
 			}
 		}
 

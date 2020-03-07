@@ -10,6 +10,7 @@ namespace Land.Markup.Binding
 	public static class FuzzyHashing
 	{
 		public const int MIN_TEXT_LENGTH = 25;
+		public const int TLSH_HASH_LENGTH = 138;
 
 		public static byte[] GetFuzzyHash(string text)
 		{
@@ -17,7 +18,9 @@ namespace Land.Markup.Binding
 			{
 				var textBytes = Encoding.Unicode.GetBytes(text);
 				tlshObject.final(textBytes, (uint)textBytes.Length, 1);
-				return tlshObject.getHash();
+
+				return tlshObject.getHash()
+					.Take(TLSH_HASH_LENGTH).ToArray();
 			}
 		}
 

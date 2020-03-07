@@ -257,7 +257,7 @@ namespace Land.Markup.Binding
 
 					/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
 					var bestMatchesFinder = new AssignmentProblem();
-					var bestMatches = bestMatchesFinder.Compute(scores);
+					var bestMatches = bestMatchesFinder.Compute1(scores);
 
 					for (i = 0; i < bestMatches.Length; ++i)
 					{

@@ -361,15 +361,30 @@ namespace Land.Markup
 
 				/// Восстанавливаем обратные связи между потомками и предками,
 				/// восстанавливаем связи с контекстами
-				var contexts = unit.PointContexts.ToDictionary(e => e.Id.Value, e => e);
-				var fileContexts = unit.FileContexts.ToDictionary(e => e.Id.Value, e => e);
+				var points = GetConcernPoints().ToDictionary(e=>e.Id, e=>e);
 
 				foreach (var context in unit.PointContexts)
 				{
-					context.ClosestContext = 
-						context.ClosestContextIds?.Select(e => contexts[e]).ToList();
-					context.FileContext =
-						fileContexts[context.FileContextId];
+					foreach(var id in context.LinkedPoints)
+					{
+						points[id].Context = context;
+					}
+				}
+
+				foreach(var fileContext in unit.FileContexts)
+				{
+					foreach (var id in fileContext.LinkedPoints)
+					{
+						points[id].Context.FileContext = fileContext;
+					}
+				}
+
+				foreach (var context in unit.PointContexts)
+				{
+					foreach (var pair in context.LinkedClosestPoints)
+					{
+						points[pair.Item1].Context.ClosestContext[pair.Item2] = context;
+					}
 				}
 
 				DoWithMarkup(e =>
@@ -380,11 +395,6 @@ namespace Land.Markup
 						{
 							elem.Parent = c;
 						}
-					}
-					else
-					{
-						var p = (ConcernPoint)e;
-						p.Context = contexts[p.ContextId];
 					}
 				});
 
