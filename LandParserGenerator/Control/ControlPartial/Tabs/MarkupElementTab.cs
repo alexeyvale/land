@@ -28,7 +28,7 @@ namespace Land.Control
 				var node = candidate.Node;
 
 				Editor.SetActiveDocumentAndOffset(
-					State.PendingCommand.DocumentName,
+					State.PendingCommand.Document.Name,
 					node.Location.Start
 				);
 			}
@@ -51,30 +51,30 @@ namespace Land.Control
 
 			/// Если требуется привязка к ещё не существующему пользовательскому блоку,
 			var customPoint = (CustomConcernPointCandidate)ConcernPointCandidatesList.SelectedItem;
-			var text = Editor.GetDocumentText(State.PendingCommand.DocumentName);
+			var text = Editor.GetDocumentText(State.PendingCommand.Document.Name);
 
 			/// нам понадобится парсер для файла, к содержимому которого хотим привязаться
-			var extension = Path.GetExtension(State.PendingCommand.DocumentName);
+			var extension = Path.GetExtension(State.PendingCommand.Document.Name);
 
 			if (Parsers[extension] != null)
 			{
-				var startBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.START)
+				var startBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.START)
 					.Select(e=>(string)e).ToList();
-				var endBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.END)
+				var endBorders = Parsers[extension].GrammarObject.Options.GetParams(CustomBlockOption.GROUP_NAME, CustomBlockOption.END)
 					.Select(e => (string)e).ToList();
 
 				var indentationString = String.Join("", text.Skip(customPoint.AdjustedSelection.Start.Offset)
 					.TakeWhile(c => c == ' ' || c == '\t'));
-				var expectedLineEnd = Editor.GetDocumentLineEnd(State.PendingCommand.DocumentName);
+				var expectedLineEnd = Editor.GetDocumentLineEnd(State.PendingCommand.Document.Name);
 
 				/// Формируем границы блока
 				var customBlockStart = $"{indentationString}{startBorders.ElementAtOrDefault(0)} {pointName} {startBorders.ElementAtOrDefault(1)}{expectedLineEnd}";
 				var customBlockEnd = $"{expectedLineEnd}{indentationString}{endBorders.ElementAtOrDefault(0)}{endBorders.ElementAtOrDefault(1)}";
 
 				/// Вставляем их в текст
-				Editor.InsertText(State.PendingCommand.DocumentName, customBlockStart, 
+				Editor.InsertText(State.PendingCommand.Document.Name, customBlockStart, 
 					customPoint.AdjustedSelection.Start);
-				Editor.InsertText(State.PendingCommand.DocumentName, customBlockEnd, 
+				Editor.InsertText(State.PendingCommand.Document.Name, customBlockEnd, 
 					new PointLocation(
 						customPoint.AdjustedSelection.End.Line + 1,
 						customPoint.AdjustedSelection.End.Column,
@@ -82,13 +82,11 @@ namespace Land.Control
 					)
 				);
 
-				State.PendingCommand.DocumentText = 
-					Editor.GetDocumentText(State.PendingCommand.DocumentName);
-
 				customPoint.RealSelection.Shift(1, 0, customBlockStart.Length);
 
 				/// Переразбираем изменённый текст
-				var parsedFile = LogFunction(() => GetParsed(State.PendingCommand.DocumentName), true, false);
+				var parsedFile = State.PendingCommand.Document =
+					LogFunction(() => GetParsed(State.PendingCommand.Document.Name), true, false);
 
 				/// Теперь в дереве должен появиться узел, соответствующий пользовательскому блоку
 				var customBlockNode = MarkupManager
@@ -120,12 +118,10 @@ namespace Land.Control
 
 						MarkupManager.RelinkConcernPoint(
 							point,
-							new Markup.ParsedFile()
-							{
-								Name = State.PendingCommand.DocumentName,
-								Text = State.PendingCommand.DocumentText,
-								Root = selectedCandidate.Node
-							}
+							selectedCandidate.Node,
+							State.PendingCommand.Document,
+							GetPointSearchArea(),
+							GetParsed
 						);
 
 						point.Name = ConcernPointNameText.Text;
@@ -134,12 +130,10 @@ namespace Land.Control
 					else
 					{
 						MarkupManager.AddConcernPoint(
-							new Markup.ParsedFile()
-							{
-								Name = State.PendingCommand.DocumentName,
-								Text = State.PendingCommand.DocumentText,
-								Root = selectedCandidate.Node
-							},
+							selectedCandidate.Node,
+							State.PendingCommand.Document,
+							GetPointSearchArea(),
+							GetParsed,
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,
 							State.PendingCommand.Target?.DataContext as Concern

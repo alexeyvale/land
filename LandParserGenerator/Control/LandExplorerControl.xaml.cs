@@ -30,8 +30,7 @@ namespace Land.Control
 		{
 			public TreeViewItem Target { get; set; }
 			public LandExplorerCommand? Command { get; set; }
-			public string DocumentName { get; set; }
-			public string DocumentText { get; set; }
+			public ParsedFile Document { get; set; }
 		}
 
 		public class ControlState
@@ -80,7 +79,7 @@ namespace Land.Control
 		/// <summary>
 		/// Менеджер разметки
 		/// </summary>
-		private MarkupManager MarkupManager { get; set; } = new MarkupManager(new ModifiedContextFinder());
+		private MarkupManager MarkupManager { get; set; }
 
 		/// <summary>
 		/// Состояние контрола
@@ -124,6 +123,7 @@ namespace Land.Control
         {
 			InitializeComponent();
 
+			MarkupManager = new MarkupManager(GetParsed);
 			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
@@ -143,13 +143,6 @@ namespace Land.Control
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 		}
 
-		public void SwitchMarkupBackend(bool useBasic)
-		{
-			MarkupManager.ContextFinder = useBasic
-				? (IContextFinder)new BasicContextFinder()
-				: (IContextFinder)new ModifiedContextFinder();
-		}
-
 		public ObservableCollection<MarkupElement> GetMarkup()
 		{
 			return MarkupManager.Markup;
@@ -165,7 +158,12 @@ namespace Land.Control
 		{
 			return root != null
 				? MarkupManager.Find(point, 
-					new Markup.ParsedFile() { Name = point.Context.FileName, Text = fileText, Root = root })
+					new ParsedFile()
+					{
+						Text = fileText,
+						Root = root,
+						BindingContext = PointContext.GetFileContext(point.Context.FileContext.Name, fileText)
+					})
 				: new List<RemapCandidateInfo>();
 		}
 
@@ -288,6 +286,12 @@ namespace Land.Control
 
 		#region Other helpers
 
+		private List<ParsedFile> GetPointSearchArea() =>
+			(GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
+				.Select(f => TryParse(f, null, out bool success, true))
+				.Where(r => r != null)
+				.ToList();
+
 		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
 			if (paths == null)
@@ -358,7 +362,7 @@ namespace Land.Control
 							{
 								segments.Add(new DocumentSegment()
 								{
-									FileName = cp.Context.FileName,
+									FileName = cp.Context.FileContext.Name,
 									StartOffset = cp.Location.Start.Offset,
 									EndOffset = cp.Location.End.Offset,
 									CaptureWholeLine = captureWholeLine
@@ -378,7 +382,7 @@ namespace Land.Control
 				{
 					segments.Add(new DocumentSegment()
 					{
-						FileName = concernPoint.Context.FileName,
+						FileName = concernPoint.Context.FileContext.Name,
 						StartOffset = concernPoint.Location.Start.Offset,
 						EndOffset = concernPoint.Location.End.Offset,
 						CaptureWholeLine = captureWholeLine
@@ -393,15 +397,14 @@ namespace Land.Control
 		{
 			if (cp.HasInvalidLocation)
 			{
-				var parsedFile = GetParsed(cp.Context.FileName);
-
-				if (parsedFile != null)
-				{
-					ProcessAmbiguities(
-						MarkupManager.Remap(cp, parsedFile),
-						false
-					);
-				}
+				ProcessAmbiguities(
+					MarkupManager.Remap(
+						cp.Context.Type, 
+						cp.Context.FileContext.Name, 
+						GetPointSearchArea()
+					),
+					false
+				);
 			}
 
 			return !cp.HasInvalidLocation;

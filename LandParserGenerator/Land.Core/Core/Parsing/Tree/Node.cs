@@ -5,7 +5,8 @@ using Land.Core.Specification;
 
 namespace Land.Core.Parsing.Tree
 {
-	public class Node: MarshalByRefObject
+	[Serializable]
+	public class Node
 	{
 		/// <summary>
 		/// Родительский узел
@@ -238,7 +239,5 @@ namespace Land.Core.Parsing.Tree
 			return (String.IsNullOrEmpty(Alias) ? UserifiedSymbol ?? Symbol : Alias) 
 				+ (Value.Count > 0 ? ": " + String.Join(" ", Value.Select(v=>v.Trim())) : "");
 		}
-
-		public override object InitializeLifetimeService() => null;
 	}
 }

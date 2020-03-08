@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace Land.Core.Specification
 {
-	public class SymbolOptionsManager : MarshalByRefObject
+	[Serializable]
+	public class SymbolOptionsManager
 	{
 		/// <summary>
 		/// Первый ключ - имя группы, второй - имя опции, для каждой опции хранится список параметров
@@ -105,8 +106,6 @@ namespace Land.Core.Specification
 				g => g.Key, g => g.Value.ToDictionary(
 					o => o.Key, o => o.Value.ToList())
 			);
-
-		public override object InitializeLifetimeService() => null;
 
 		private void EnsureGroupExists(string group)
 		{

@@ -8,11 +8,11 @@ using Land.Core.Lexing;
 
 namespace Land.Core.Parsing.Tree
 {
-	public class BaseNodeRetypingVisitor: BaseTreeVisitor
+	public class BaseNodeRetypingVisitor: GrammarProvidedTreeVisitor
 	{
 		public Node Root { get; set; }
 
-		public BaseNodeRetypingVisitor(Grammar grammar) { }
+		public BaseNodeRetypingVisitor(Grammar grammar): base(grammar) { }
 
 		public override void Visit(Node node)
 		{ }

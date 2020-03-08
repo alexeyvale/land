@@ -8,16 +8,23 @@ namespace Land.Markup.Binding
 	public class RemapCandidateInfo
 	{
 		public Node Node { get; set; }
+		public ParsedFile File { get; set; }
 		public PointContext Context { get; set; }
+
+		#region Old
+		public double NameSimilarity { get; set; }
+		#endregion
 
 		public double HeaderSimilarity { get; set; }
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
 		public double SiblingsSimilarity { get; set; }
 
-		public double? Similarity { get; set;  }
+		public double? Similarity { get; set; }
 
 		public bool IsAuto { get; set; }
+
+		public string DebugInfo { get; set; }
 
 		public override string ToString()
 		{

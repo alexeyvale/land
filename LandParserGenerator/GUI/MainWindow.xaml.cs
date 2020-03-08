@@ -665,7 +665,7 @@ namespace Land.GUI
 					}
 					else
 					{
-						if (!child.Options.IsSet(MarkupOption.LAND) && child.Location != null)
+						if (!child.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND) && child.Location != null)
 							TypedWaterSegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 
@@ -1005,11 +1005,11 @@ namespace Land.GUI
 			{
 				if (!point.HasInvalidLocation)
 				{
-					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
+					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileContext.Name);
 
 					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
-						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
+						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileContext.Name);
 					}
 
 					MoveCaretToSource(point.Location, MappingDebug_OldTextEditor, true);
@@ -1035,7 +1035,7 @@ namespace Land.GUI
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
-				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileName)];
+				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileContext.Name)];
 
 				/// и при этом парсер сгенерирован
 				if (parser != null)
@@ -1258,13 +1258,6 @@ namespace Land.GUI
 					EditorAdapter.SetActiveDocumentAndOffset(msg.FileName, msg.Location);
 				}
 			}
-		}
-
-		private void UseBasicContextsCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
-		{
-			LandExplorer.SwitchMarkupBackend(
-				UseBasicContextsCheckBox.IsChecked ?? false
-			);	
 		}
 
 		#endregion

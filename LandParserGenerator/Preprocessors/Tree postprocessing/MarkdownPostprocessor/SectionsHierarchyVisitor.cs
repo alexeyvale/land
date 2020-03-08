@@ -86,7 +86,7 @@ namespace MarkdownPreprocessing.TreePostprocessing
 				PossibleEnd = null;
 
 				var newNodeOptions = new SymbolOptionsManager();
-				newNodeOptions.Set(MarkupOption.LAND);
+				newNodeOptions.Set(MarkupOption.GROUP_NAME, MarkupOption.LAND, null);
 
 				var newNode = NodeGenerator.Generate(SECTION_RULE_NAME, newNodeOptions);
 				newNode.SetLocation(node.Location.Start, node.Location.End);

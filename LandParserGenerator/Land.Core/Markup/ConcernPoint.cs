@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
@@ -12,31 +12,46 @@ using Land.Markup.CoreExtension;
 
 namespace Land.Markup
 {
-	[DataContract]
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
-		[DataMember]
-		public PointContext Context { get; set; }
+		private PointContext _context;
+
+		[JsonIgnore]
+		public PointContext Context
+		{
+			get { return _context; }
+
+			set
+			{
+				_context = value;
+				_context.LinkPoint(Id);
+			}
+		}
 
 		/// <summary>
 		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
 		/// </summary>
+		[JsonIgnore]
 		public bool HasIrrelevantLocation { get; set; }
 
 		/// <summary>
 		/// Признак того, что координаты потеряны
 		/// </summary>
+		[JsonIgnore]
 		public bool HasMissingLocation => Location == null;
 
 		/// <summary>
 		/// Признак того, что координаты невозможно использовать для перехода
 		/// </summary>
+		[JsonIgnore]
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
 		/// <summary>
 		/// Узел AST, которому соответствует точка
 		/// </summary>
 		private Node _node;
+
+		[JsonIgnore]
 		public Node AstNode
 		{
 			get => _node;
@@ -46,12 +61,14 @@ namespace Land.Markup
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasMissingLocation"));
 			}
 		}
 
 		/// <summary>
 		/// Координаты участка в тексте, которому соответствует точка 
 		/// </summary>
+		[JsonIgnore]
 		public SegmentLocation Location => _node?.Location;
 
 		public new event PropertyChangedEventHandler PropertyChanged;
@@ -63,21 +80,20 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(ParsedFile targetInfo, Concern parent = null)
+		public ConcernPoint(Node node, PointContext context, Concern parent = null)
 		{
-			Context = PointContext.Create(targetInfo);
-
-			AstNode = targetInfo.Root;
+			Context = context;
+			AstNode = node;
 			Parent = parent;
-			Name = targetInfo.Root.Type;
+			Name = node.Type;
 
-			if (targetInfo.Root.Value.Count > 0)
-				Name += ": " + String.Join(" ", targetInfo.Root.Value);
+			if (node.Value.Count > 0)
+				Name += ": " + String.Join(" ", node.Value);
 			else
 			{
-				if (targetInfo.Root.Children.Count > 0)
+				if (node.Children.Count > 0)
 				{
-					Name += ": " + String.Join(" ", targetInfo.Root.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+					Name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
 						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
 				}
 			}
@@ -85,26 +101,21 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, ParsedFile targetInfo, Concern parent = null)
+		public ConcernPoint(string name, string comment, Node node, PointContext context, Concern parent = null)
 		{
-			Name = name;
-			Context = PointContext.Create(targetInfo);
-			AstNode = targetInfo.Root;
+			Context = context;
+			AstNode = node;
 			Parent = parent;
+			Name = name;
+			Comment = comment;
 
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public ConcernPoint(string name, string comment, ParsedFile targetInfo, Concern parent = null)
-			: this(name, targetInfo, parent)
+		public void Relink(Node node, PointContext context)
 		{
-			Comment = comment;
-		}
-
-		public void Relink(ParsedFile targetInfo)
-		{
-			AstNode = targetInfo.Root;
-			Context = PointContext.Create(targetInfo);
+			AstNode = node;
+			Context = context;
 		}
 
 		public void Relink(RemapCandidateInfo candidate)
@@ -121,24 +132,43 @@ namespace Land.Markup
 
 	public class ParsedFile
 	{
-		public string Name { get; set; }
+		/// <summary>
+		/// Текст файла
+		/// </summary>
 		public string Text { get; set; }
+
+		/// <summary>
+		/// Корень АСД для данного файла
+		/// </summary>
 		public Node Root { get; set; }
+
+		/// <summary>
+		/// Описывающий файл контекст, используемый при перепривязке
+		/// </summary>
+		public FileContext BindingContext { get; set; }
+
+		/// <summary>
+		/// Специфичные для языка настройки перепривязки
+		/// </summary>
 		public LanguageMarkupSettings MarkupSettings { get; set; }
+
+		/// <summary>
+		/// Имя файла
+		/// </summary>
+		public string Name => BindingContext?.Name;
 	}
 
-	public class LanguageMarkupSettings : MarshalByRefObject
+	[Serializable]
+	public class LanguageMarkupSettings
 	{
-		public bool UseHorizontalContext { get; private set; } = false;
+		public bool UseSiblingsContext { get; private set; } = false;
 
 		public LanguageMarkupSettings(SymbolOptionsManager opts)
 		{
 			if (opts != null)
 			{
-				UseHorizontalContext = opts.IsSet(MarkupOption.USEHORIZONTAAL);
+				UseSiblingsContext = opts.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS);
 			}
 		}
-
-		public override object InitializeLifetimeService() => null;
 	}
 }

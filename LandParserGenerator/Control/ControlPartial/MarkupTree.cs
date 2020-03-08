@@ -1,22 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using Land.Markup;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-
-using Microsoft.Win32;
-
-using Land.Core;
-using Land.Core.Parsing;
-using Land.Core.Parsing.Tree;
-using Land.Core.Parsing.Preprocessing;
-using Land.Markup;
-using Land.Control.Helpers;
 
 namespace Land.Control
 {
@@ -55,22 +40,30 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			var item = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
-
-			if (item != null && e.ChangedButton == MouseButton.Left)
+			if(e.ChangedButton == MouseButton.Left)
 			{
-				/// При клике по точке переходим к ней
-				if (item.DataContext is ConcernPoint concernPoint)
-				{
-					if (EnsureLocationValid(concernPoint))
-					{
-						Editor.SetActiveDocumentAndOffset(
-							concernPoint.Context.FileName,
-							concernPoint.Location.Start
-						);
-					}
+				/// Двойной клик по элементы дерева всплывает до корня дерева
+				var processingItemData = (MarkupElement)((TreeViewItem)sender).DataContext;
 
-					e.Handled = true;
+				if (processingItemData.Parent == null)
+				{
+					var clickedItem = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
+
+					if (clickedItem != null && clickedItem.DataContext is ConcernPoint concernPoint)
+					{
+						/// При клике по точке переходим к ней
+						if (EnsureLocationValid(concernPoint))
+						{
+							Editor.SetActiveDocumentAndOffset(
+								concernPoint.Context.FileContext.Name,
+								concernPoint.Location.Start
+							);
+						}
+
+						clickedItem.InvalidateVisual();
+
+						e.Handled = true;
+					}
 				}
 			}
 		}
@@ -89,7 +82,7 @@ namespace Land.Control
 							if (EnsureLocationValid(concernPoint))
 							{
 								Editor.SetActiveDocumentAndOffset(
-									concernPoint.Context.FileName,
+									concernPoint.Context.FileContext.Name,
 									concernPoint.Location.Start
 								);
 							}

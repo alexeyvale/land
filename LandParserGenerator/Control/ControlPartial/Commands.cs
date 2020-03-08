@@ -81,9 +81,8 @@ namespace Land.Control
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = target,
-					DocumentName = fileName,
 					Command = LandExplorerCommand.Relink,
-					DocumentText = parsedFile.Text
+					Document = parsedFile
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
@@ -110,9 +109,8 @@ namespace Land.Control
 				State.PendingCommand = new PendingCommandInfo()
 				{
 					Target = State.SelectedItem_MarkupTreeView,
-					DocumentName = fileName,
-					Command = LandExplorerCommand.AddPoint,
-					DocumentText = parsedFile.Text
+					Document = parsedFile,
+					Command = LandExplorerCommand.AddPoint
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
@@ -131,7 +129,7 @@ namespace Land.Control
 			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
 			if (parsedFile != null)
-				MarkupManager.AddLand(parsedFile);
+				MarkupManager.AddLand(parsedFile, GetPointSearchArea(), GetParsed);
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
@@ -280,23 +278,14 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
-				/// В случае, если запросили перепривязку в пределах
-				/// рабочего множества файлов, а это множество не установлено,
-				/// проводим перепривязку в пределах файлов, на которые
-				/// ссылаются имеющиеся точки
-				var forest = (sender == ApplyLocalMapping
-					? MarkupManager.GetReferencedFiles()
-					: GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles()
-				)
-					.Select(f =>
-					{
-						var parsedFile = TryParse(f, out bool success);
-						return success ? parsedFile : null;
-					})
-					.Where(r => r != null).ToList();
-
 				ProcessAmbiguities(
-					MarkupManager.Remap(forest, sender == ApplyLocalMapping, true),
+					MarkupManager.Remap(
+						GetPointSearchArea(),
+						true,
+						sender == ApplyMappingLocal 
+							? ContextFinder.SearchType.Local 
+							: ContextFinder.SearchType.Global
+					),
 					true
 				);
 			}, true, false);

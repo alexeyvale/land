@@ -8,10 +8,8 @@ using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[DataContract]
 	public class Concern : MarkupElement
 	{
-		[DataMember]
 		public ObservableCollection<MarkupElement> Elements { get; set; }
 
 		public new event PropertyChangedEventHandler PropertyChanged;

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using AspectCore;
+﻿using Land.Core.Parsing.Tree;
 using Land.Markup;
-using Land.Markup.CoreExtension;
 using Land.Markup.Binding;
-using Land.Core.Parsing.Tree;
+using Land.Markup.CoreExtension;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Comparison
 {
@@ -15,7 +14,7 @@ namespace Comparison
 		const string MarkupFolder = @"D:\Repositories\_mapping\Roslyn\Common\base";
 		const string RelinkFolder = @"D:\Repositories\_mapping\Roslyn\Common\modified";
 		const int EntitiesPerFile = 3;
-		const int FilesTake = 4417;
+		const int FilesTake = 1000;
 		static readonly Random RandomGen = new Random(7);
 
 		public class GetNodeSequenceVisitor: BaseTreeVisitor
@@ -29,6 +28,53 @@ namespace Comparison
 			}
 		}
 
+		/// <summary>
+		/// Парсинг набора файлов и получение их АСТ в форматах LanD и Core
+		/// </summary>
+		static List<ParsedFile> GetSearchArea(
+			Land.Core.Parsing.BaseParser landParser,
+			List<string> files,
+			List<string> landErrors)
+		{
+			var landSearchArea = new List<ParsedFile>();
+
+			var counter = 0;
+			var start = DateTime.Now;
+
+			foreach (var file in files)
+			{
+				/// Читаем текст из файла
+				var text = File.ReadAllText(file);
+
+				/// Парсим при помощи LanD
+				var landRoot = landParser.Parse(text);
+				if (landParser.Log.Any(l => l.Type == Land.Core.MessageType.Error))
+					landErrors.Add(file);
+
+				var visitor = new NodeRetypingVisitor(null);
+				landRoot.Accept(visitor);
+				landRoot = visitor.Root;
+
+				var landParsed = new ParsedFile
+				{
+					BindingContext = PointContext.GetFileContext(Path.GetFileName(file), text),
+					MarkupSettings = new LanguageMarkupSettings(new Land.Core.Specification.SymbolOptionsManager()),
+					Root = landRoot,
+					Text = text
+				};
+
+				landSearchArea.Add(landParsed);
+
+				++counter;
+				if (counter % 600 == 0)
+					Console.WriteLine($"{counter} out of {files.Count}...");
+			}
+
+			Console.WriteLine($"LanD parsing done in {DateTime.Now - start}");
+
+			return landSearchArea;
+		}
+
 		static void Main(string[] args)
 		{
 			var entities = new Dictionary<string, MarkupManager>
@@ -36,23 +82,23 @@ namespace Comparison
 				{ "class_struct_interface", new MarkupManager(null) },
 				{ "method", new MarkupManager(null) },
 				{ "field", new MarkupManager(null) },
-				{ "property", new MarkupManager(null) }
+				{ "property", new MarkupManager(null) },
 			};
 
-			/// Создаём парсер C# и менеджер разметки из библиотеки LanD
-			var landParser = sharp.ParserProvider.GetParser();
+			/// Создаём парсер C# и менеджер разметки из библиотеки LanD	
+			var landParser = sharp.ParserProvider.GetParser(false);
+			var markupSettings = new LanguageMarkupSettings(landParser.GrammarObject.Options.GetOptions());
 			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
 			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
 
-			var markupSettings = new LanguageMarkupSettings(landParser.GrammarObject.Options.GetOptions());
-
-			var errors = new List<string>();
+			var landErrors = new List<string>();
 
 			/////////////////////////////////////////////// STAGE 1
 
 			var counter = 0;
 			var filesList = Directory.GetFiles(MarkupFolder, "*.cs").ToList();
 
+			/// Случайным образом отбираем заданное количество файлов
 			var files = new HashSet<string>();
 			if (filesList.Count > FilesTake)
 			{
@@ -70,19 +116,14 @@ namespace Comparison
 			foreach (var file in files)
 				File.Copy(file, $"./test/{Path.GetFileName(file)}");
 
-			foreach (var file in files)
-			{
-				/// Читаем текст из файла
-				var text = File.ReadAllText(file);
+			/// Парсим отобранные файлы
+			var searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
-				/// Парсим при помощи LanD
-				var landRoot = landParser.Parse(text);
-				if (landParser.Log.Any(l => l.Type == Land.Core.MessageType.Error))
-					errors.Add(file);
-
-				/// Привязываемся к сущностям
+			/// Привязываемся к сущностям, случайным образом выбирая нужное их количество в каждом файле
+			for(var j=0; j< searchArea.Count; ++j)
+			{		
 				var visitor = new GetNodeSequenceVisitor();
-				landRoot.Accept(visitor);
+				searchArea[j].Root.Accept(visitor);
 
 				foreach(var key in entities.Keys)
 				{
@@ -90,17 +131,14 @@ namespace Comparison
 
 					for (var i = 0; i < EntitiesPerFile; ++i)
 					{
-						if (subseq.Count == 0)
-							break;
-
+						if (subseq.Count == 0) break;
 						var index = RandomGen.Next(0, subseq.Count);
 
-						entities[key].AddConcernPoint(new ParsedFile
-						{
-							Name = Path.GetFileName(file),
-							Text = text,
-							Root = subseq[index]
-						});
+						entities[key].AddConcernPoint(
+							subseq[index], 
+							searchArea[j], 
+							searchArea, 
+							null);
 
 						subseq.RemoveAt(index);
 					}
@@ -118,23 +156,7 @@ namespace Comparison
 			counter = 0;
 			files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
 
-			var searchArea = new Dictionary<string, ParsedFile>();
-			foreach(var file in files)
-			{
-				var text = File.ReadAllText(file);
-
-				searchArea[file] = new ParsedFile
-				{
-					Name = Path.GetFileName(file),
-					Root = landParser.Parse(text),
-					Text = text,
-					MarkupSettings = markupSettings
-				};
-
-				++counter;
-				if (counter % 600 == 0)
-					Console.WriteLine($"{counter} out of {files.Count}...");
-			}
+			searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
 			Console.WriteLine("Remapping...");
 
@@ -144,47 +166,48 @@ namespace Comparison
 			{
 				List<Tuple<string, string>> sameAutoResult = new List<Tuple<string, string>>(),
 					differentAutoResult = new List<Tuple<string, string>>(),
-					basicOnlyAutoResult = new List<Tuple<string, string>>(),
 					modifiedOnlyAutoResult = new List<Tuple<string, string>>(),
+					basicOnlyAutoResult = new List<Tuple<string, string>>(),
 					sameFirstPos = new List<Tuple<string, string>>(),
 					differentFirstPos = new List<Tuple<string, string>>();
 
 				var similarities = new List<string>();
 				var start = DateTime.Now;
 
-				entities[key].ContextFinder = new BasicContextFinder();
-				var basicRemapResult = entities[key].Remap(searchArea.Values.ToList(), true, false);
-
-				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
-
-				start = DateTime.Now;
-
-				entities[key].ContextFinder = new ModifiedContextFinder();
-				var modifiedRemapResult = entities[key].Remap(searchArea.Values.ToList(), true, false);
+				var modifiedRemapResult = entities[key].Remap(searchArea, false, ContextFinder.SearchType.Local);
 
 				Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
-				foreach (var cp in basicRemapResult.Keys)
+				start = DateTime.Now;
+
+				var helper = new Helper();
+				var basicRemapResult = helper.Remap(entities[key].GetConcernPoints(), searchArea);
+
+				Console.WriteLine($"Basic remapping done in {DateTime.Now - start}");
+
+				foreach (var cp in modifiedRemapResult.Keys)
 				{
+					var isModifiedAuto = modifiedRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
 					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
-					var isModifiedAuto = modifiedRemapResult.ContainsKey(cp) && (modifiedRemapResult[cp].FirstOrDefault()?.IsAuto ?? false);
 
-					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0
-						|| basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0
-						&& String.Join("", modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value))
-							.StartsWith(String.Join("", basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
+					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0 ||
+						basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0 &&
+						modifiedRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)
+							.SequenceEqual(basicRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value));
 
-					var hasChanged = modifiedRemapResult[cp].Count == 0 || modifiedRemapResult[cp][0].HeaderSimilarity != 1 || 
-						modifiedRemapResult[cp][0].InnerSimilarity != 1 || modifiedRemapResult[cp][0].AncestorSimilarity != 1;
+					var hasChanged = modifiedRemapResult[cp].Count == 0 ||
+						modifiedRemapResult[cp][0].HeaderSimilarity != 1 ||
+						modifiedRemapResult[cp][0].InnerSimilarity != 1 ||
+						modifiedRemapResult[cp][0].AncestorSimilarity != 1;
 
-					if (hasChanged)
+					if (hasChanged || !isModifiedAuto || !isBasicAuto)
 					{
-						if (basicRemapResult[cp].Count == 1)
+						if (basicRemapResult[cp].Count == 1 && modifiedRemapResult[cp].Count == 1)
 							similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity }");
-						else if (basicRemapResult[cp].Count > 1)
+						else if (basicRemapResult[cp].Count > 1 && modifiedRemapResult[cp].Count > 1)
 							similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity };{ basicRemapResult[cp][1].Similarity };{ modifiedRemapResult[cp][1].Similarity }");
 
-						report.WriteLine(Path.GetFileName(cp.Context.FileName));
+						report.WriteLine(Path.GetFileName(cp.Context.FileContext.Name));
 						report.WriteLine("*");
 
 						report.WriteLine(String.Join(" ", cp.Context.HeaderContext.SelectMany(c => c.Value)));
@@ -193,8 +216,9 @@ namespace Comparison
 						foreach (var landCandidate in basicRemapResult[cp].Take(5))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
+							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.NameSimilarity}; {landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
 						}
+
 						report.WriteLine("*");
 
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
@@ -207,13 +231,13 @@ namespace Comparison
 						report.WriteLine();
 
 						var tuple = new Tuple<string, string>(
-								cp.Context.FileName,
+								cp.Context.FileContext.Name,
 								String.Join(" ", cp.Context.HeaderContext.SelectMany(h => h.Value))
 							);
 
-						if (isBasicAuto)
+						if (isModifiedAuto)
 						{
-							if (isModifiedAuto)
+							if (isBasicAuto)
 							{
 								if (sameFirst)
 									sameAutoResult.Add(tuple);
@@ -222,12 +246,12 @@ namespace Comparison
 							}
 							else
 							{
-								basicOnlyAutoResult.Add(tuple);
+								modifiedOnlyAutoResult.Add(tuple);
 							}
 						}
-						else if (isModifiedAuto)
+						else if (isBasicAuto)
 						{
-							modifiedOnlyAutoResult.Add(tuple);
+							basicOnlyAutoResult.Add(tuple);
 						}
 						else
 						{
@@ -239,21 +263,22 @@ namespace Comparison
 					}
 				}
 				File.WriteAllLines($"{key}_similarities.txt", similarities);
-				File.WriteAllLines($"{key}_modifiedOnlyAutoResult.txt",
-					modifiedOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 				File.WriteAllLines($"{key}_basicOnlyAutoResult.txt",
 					basicOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-				File.WriteAllLines($"{key}_sameAutoResult.txt", 
+				File.WriteAllLines($"{key}_modifiedOnlyAutoResult.txt",
+					modifiedOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+				File.WriteAllLines($"{key}_sameAutoResult.txt",
 					sameAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-				File.WriteAllLines($"{key}_differentAutoResult.txt", 
+				File.WriteAllLines($"{key}_differentAutoResult.txt",
 					differentAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-				File.WriteAllLines($"{key}_sameFirstPos.txt", 
+				File.WriteAllLines($"{key}_sameFirstPos.txt",
 					sameFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-				File.WriteAllLines($"{key}_differentFirstPos.txt", 
+				File.WriteAllLines($"{key}_differentFirstPos.txt",
 					differentFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
 
-				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
+				Console.WriteLine($"Total: {modifiedRemapResult.Count}");
 				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");
+				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
 				Console.WriteLine($"Same auto: {sameAutoResult.Count}");
 				Console.WriteLine($"Different auto: {differentAutoResult.Count}");
 				Console.WriteLine($"Same first: {sameFirstPos.Count}");
@@ -266,265 +291,283 @@ namespace Comparison
 			Console.WriteLine("Job's done!");
 			Console.ReadLine();
 		}
+	}
 
-		//static void Main(string[] args)
-		//{
-		//	var entities = new Dictionary<string, Tuple<MarkupManager, List<PointOfInterest>>>
-		//	{
-		//		{ "class_struct_interface", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(), new List<PointOfInterest>()) },
-		//		{ "method", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(), new List<PointOfInterest>()) },
-		//		{ "field", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(), new List<PointOfInterest>()) },
-		//		{ "property", new Tuple<MarkupManager, List<PointOfInterest>>(new MarkupManager(), new List<PointOfInterest>()) }
-		//	};
+	public class Helper
+	{
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
+		public const int INNER_CONTEXT_LENGTH = 10;
 
-		//	/// Создаём парсер C# и менеджер разметки из библиотеки LanD
-		//	var landParser = sharp.ParserProvider.GetParser();
-		//	landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
-		//	var landMarkupManager = new MarkupManager();
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
+			List<ConcernPoint> points,
+			List<ParsedFile> searchArea)
+		{
+			var groupedPoints = points
+				.GroupBy(p => new { p.Context.Type, FileName = p.Context.FileContext.Name })
+				.ToDictionary(e => e.Key, e => e.ToList());
 
-		//	var coreParser = new ParserWrapper("../../components/AspectCore");
+			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-		//	var landErrors = new List<string>();
-		//	var coreErrors = new List<string>();
+			foreach (var groupKey in groupedPoints.Keys)
+			{
+				var groupResult = DoSearch(groupedPoints[groupKey], searchArea);
 
-		//	/////////////////////////////////////////////// STAGE 1
+				foreach (var elem in groupResult)
+				{
+					overallResult[elem.Key] = elem.Value;
+				}
+			}
 
-		//	var counter = 0;
-		//	var filesList = Directory.GetFiles(MarkupFolder, "*.cs").ToList();
+			return overallResult;
+		}
 
-		//	var files = new HashSet<string>();
-		//	if (filesList.Count > FilesTake)
-		//	{
-		//		while (files.Count < FilesTake)
-		//			files.Add(filesList[RandomGen.Next(filesList.Count)]);
-		//	}
-		//	else
-		//	{
-		//		files.UnionWith(filesList);
-		//	}
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSearch(
+			List<ConcernPoint> points,
+			List<ParsedFile> searchArea)
+		{
+			var type = points[0].Context.Type;
+			var file = points[0].Context.FileContext;
 
-		//	if (Directory.Exists("./test"))
-		//		Directory.Delete("./test", true);
-		//	Directory.CreateDirectory("test");
-		//	foreach (var file in files)
-		//		File.Copy(file, $"./test/{Path.GetFileName(file)}");
+			var files = searchArea.Where(f => f.Name == file.Name).ToList();
 
-		//	foreach (var file in files)
-		//	{
-		//		/// Читаем текст из файла
-		//		var text = File.ReadAllText(file);
+			var candidates = new List<RemapCandidateInfo>();
 
-		//		/// Парсим при помощи LanD
-		//		var landRoot = landParser.Parse(text);
-		//		if (landParser.Log.Any(l => l.Type == Land.Core.MessageType.Error))
-		//			landErrors.Add(file);
+			/// Находим все сущности того же типа
+			foreach (var currentFile in files)
+			{
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { type });
+				currentFile.Root.Accept(visitor);
 
-		//		/// Парсим при помощи AspectCore
-		//		var coreRoot = coreParser.ParseText(text, file);
+				candidates.AddRange(visitor.Grouped[type]
+					.Select(n => new RemapCandidateInfo
+					{
+						Node = n,
+						File = currentFile,
+						Context = PointContext.GetCoreContext(n, currentFile)
+					})
+					.ToList()
+				);
+			}
 
-		//		/// Привязываемся к сущностям
-		//		var visitor = new GetNodeSequenceVisitor();
-		//		landRoot.Accept(visitor);
+			/// Запоминаем соответствие контекстов точкам привязки
+			var contextsToPoints = points.GroupBy(p => p.Context)
+				.ToDictionary(g => g.Key, g => g.ToList());
 
-		//		foreach (var key in entities.Keys)
-		//		{
-		//			var subseq = visitor.Sequence.Where(n => n.Type == key).ToList();
-		//			var usedIndices = new List<int>();
+			var contextsSet = new HashSet<PointContext>();
+			contextsSet.UnionWith(points.Select(p => p.Context));
 
-		//			for (var i = 0; i < Math.Min(EntitiesPerFile, subseq.Count); ++i)
-		//			{
-		//				var index = RandomGen.Next(0, subseq.Count);
+			var evaluationResults = contextsSet.ToDictionary(p => p,
+				p => candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList());
 
-		//				entities[key].Item1.AddConcernPoint(new TargetFileInfo
-		//				{
-		//					FileName = Path.GetFileName(file),
-		//					FileText = text,
-		//					TargetNode = subseq[index]
-		//				});
+			foreach (var key in evaluationResults.Keys.ToList())
+			{
+				evaluationResults[key] = EvalCandidates(key, evaluationResults[key], files.First().MarkupSettings,
+					CANDIDATE_SIMILARITY_THRESHOLD);
+			}
 
-		//				var corePoint = TreeSearchEngine.FindPointByLocation(
-		//					coreRoot,
-		//					subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Line,
-		//					subseq[index].Children.FirstOrDefault(c => c.Type == "name").Location.Start.Column
-		//				).FirstOrDefault();
-		//				//corePoint.ApplyInnerContext();
+			var result = contextsToPoints.SelectMany(e => e.Value).ToDictionary(e => e, e => evaluationResults[e.Context]);
 
-		//				entities[key].Item2.Add(corePoint);
+			return files.Count > 0 ? result : null;
+		}
 
-		//				subseq.RemoveAt(index);
-		//			}
-		//		}
+		public List<RemapCandidateInfo> EvalCandidates(
+			PointContext point,
+			List<RemapCandidateInfo> candidates,
+			LanguageMarkupSettings markupSettings,
+			double similarityThreshold)
+		{
+			foreach (var candidate in candidates)
+				ComputeCoreContextSimilarities(point, candidate);
 
-		//		++counter;
-		//		if (counter % 600 == 0)
-		//			Console.WriteLine($"{counter} out of {files.Count}...");
-		//	}
+			ComputeTotalSimilarity(point, candidates);
 
-		//	foreach (var key in entities.Keys)
-		//		Console.WriteLine($"{key}: land - {entities[key].Item1.GetConcernPoints().Count}; core - {entities[key].Item2.Count}");
+			candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
 
-		//	//Console.WriteLine("********** Ошибочные файлы **********");
+			var first = candidates.FirstOrDefault();
+			var second = candidates.Skip(1).FirstOrDefault();
 
-		//	//foreach (var file in landErrors)
-		//	//	Console.WriteLine(file);
+			if (first != null)
+			{
+				first.IsAuto = IsSimilarEnough(first, similarityThreshold)
+					&& AreDistantEnough(first, second);
+			}
 
-		//	//Console.WriteLine("*********************");
+			return candidates;
+		}
 
-		//	//foreach (var file in coreErrors)
-		//	//	Console.WriteLine(file);
+		private void ComputeCoreContextSimilarities(PointContext point, RemapCandidateInfo candidate)
+		{
+			candidate.NameSimilarity =
+				Levenshtein(point.Name, candidate.Context.Name);
+			candidate.HeaderSimilarity =
+				Levenshtein(point.HeaderContext, candidate.Context.HeaderContext);
+			candidate.AncestorSimilarity =
+				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
+			candidate.InnerSimilarity =
+				EvalSimilarity(point.InnerContext_old, candidate.Context.InnerContext_old);
+		}
 
-		//	/////////////////////////////////////////////// STAGE 2
+		/// Похожесть новой последовательности на старую 
+		/// при переходе от последовательности a к последовательности b
+		private double DispatchLevenshtein<T>(T a, T b)
+		{
+			if (a is IEnumerable<string>)
+				return Levenshtein((IEnumerable<string>)a, (IEnumerable<string>)b);
+			if (a is IEnumerable<HeaderContextElement>)
+				return Levenshtein((IEnumerable<HeaderContextElement>)a, (IEnumerable<HeaderContextElement>)b);
+			else if (a is string)
+				return Levenshtein(a as string, b as string);
+			else if (a is HeaderContextElement)
+				return EvalSimilarity(a as HeaderContextElement, b as HeaderContextElement);
+			else if (a is AncestorsContextElement)
+				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
+			else
+				return a.Equals(b) ? 1 : 0;
+		}
 
-		//	Console.WriteLine("Stage 2 started...");
+		#region EvalSimilarity
 
-		//	counter = 0;
-		//	files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
+		private double EvalSimilarity(List<ContextElement> a, List<ContextElement> b)
+		{
+			var source = a.Take(INNER_CONTEXT_LENGTH).ToList();
+			return source.Except(b.Take(INNER_CONTEXT_LENGTH)).Count() / (double)source.Count;
+		}
+		
+		public double EvalSimilarity(List<HeaderContextElement> a, List<HeaderContextElement> b) =>
+			Levenshtein(a, b);
 
-		//	var searchArea = new Dictionary<string, Tuple<string, Node, PointOfInterest>>();
-		//	foreach (var file in files)
-		//	{
-		//		var text = File.ReadAllText(file);
-		//		var landRoot = landParser.Parse(text);
-		//		var coreRoot = coreParser.ParseText(text, file);
-		//		searchArea[file] = new Tuple<string, Node, PointOfInterest>(text, landRoot, coreRoot);
+		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
+		{
+			return Levenshtein(String.Join("", a.Value), String.Join("", b.Value));
+		}
 
-		//		++counter;
-		//		if (counter % 600 == 0)
-		//			Console.WriteLine($"{counter} out of {files.Count}...");
-		//	}
+		public double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
+		{
+			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
+		}
 
-		//	Console.WriteLine("Remapping...");
+		#endregion
 
-		//	var report = new StreamWriter("report.txt");
+		#region Methods 
 
-		//	foreach (var key in entities.Keys)
-		//	{
-		//		List<Tuple<string, string>> sameAutoResult = new List<Tuple<string, string>>(),
-		//			differentAutoResult = new List<Tuple<string, string>>(),
-		//			landOnlyAutoResult = new List<Tuple<string, string>>(),
-		//			coreOnlyAutoResult = new List<Tuple<string, string>>(),
-		//			sameFirstPos = new List<Tuple<string, string>>(),
-		//			differentFirstPos = new List<Tuple<string, string>>();
+		///  Похожесть на основе расстояния Левенштейна
+		private double Levenshtein<T>(IEnumerable<T> a, IEnumerable<T> b)
+		{
+			if (a.Count() == 0 ^ b.Count() == 0)
+				return 0;
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
 
-		//		var landRemapResult = entities[key].Item1.Remap(searchArea.Select(e => new TargetFileInfo
-		//		{
-		//			FileName = Path.GetFileName(e.Key),
-		//			FileText = e.Value.Item1,
-		//			TargetNode = e.Value.Item2
-		//		}).ToList(), true);
+			var denominator  = Math.Max(a.Count(), b.Count());
 
-		//		Console.WriteLine($"LanD remapping done!");
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Count() && commonPrefixLength < b.Count()
+				&& a.ElementAt(commonPrefixLength).Equals(b.ElementAt(commonPrefixLength)))
+				++commonPrefixLength;
+			a = a.Skip(commonPrefixLength).ToList();
+			b = b.Skip(commonPrefixLength).ToList();
 
-		//		var coreRemapResult = new Dictionary<ConcernPoint, TreeSearchResult>();
-		//		var landPoints = entities[key].Item1.GetConcernPoints();
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Count() && commonSuffixLength < b.Count()
+				&& a.ElementAt(a.Count() - 1 - commonSuffixLength).Equals(b.ElementAt(b.Count() - 1 - commonSuffixLength)))
+				++commonSuffixLength;
+			a = a.Take(a.Count() - commonSuffixLength).ToList();
+			b = b.Take(b.Count() - commonSuffixLength).ToList();
 
-		//		for (var i = 0; i < entities[key].Item2.Count; ++i)
-		//		{
-		//			var poi = entities[key].Item2[i];
-		//			var parsed = searchArea
-		//				.Where(e => Path.GetFileNameWithoutExtension(e.Key) == Path.GetFileNameWithoutExtension(poi.FileName))
-		//				.FirstOrDefault();
+			if (a.Count() == 0 && b.Count() == 0)
+				return 1;
 
-		//			coreRemapResult[landPoints[i]] =
-		//				TreeSearchEngine.FindPointInTree2(parsed.Value.Item3, poi, parsed.Value.Item1);
-		//		}
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Count() + 1, b.Count() + 1];
+			distances[0, 0] = 0;
 
-		//		Console.WriteLine($"Core remapping done!");
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Count(); ++i)
+				distances[i, 0] = distances[i - 1, 0] + 1;
+			for (int j = 1; j <= b.Count(); ++j)
+				distances[0, j] = distances[0, j - 1] + 1;
 
-		//		foreach (var cp in landRemapResult.Keys)
-		//		{
-		//			report.WriteLine(Path.GetFileName(cp.Context.FileName));
-		//			report.WriteLine("*");
+			for (int i = 1; i <= a.Count(); i++)
+				for (int j = 1; j <= b.Count(); j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = 1 - DispatchLevenshtein(a.ElementAt(i - 1), b.ElementAt(j - 1));
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
 
-		//			report.WriteLine(String.Join(" ", cp.Context.HeaderContext.SelectMany(c => c.Value)));
-		//			report.WriteLine("*");
+			return 1 - distances[a.Count(), b.Count()] / denominator;
+		}
 
-		//			foreach (var landCandidate in landRemapResult[cp].Take(5))
-		//			{
-		//				report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-		//				report.WriteLine(landCandidate.Similarity);
-		//			}
-		//			report.WriteLine("*");
+		private double Levenshtein(string a, string b)
+		{
+			if (a.Length == 0 ^ b.Length == 0)
+				return 0;
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
 
-		//			for (var j = 0; j < coreRemapResult[cp].Count && j < 5; ++j)
-		//			{
-		//				var coreCandidate = coreRemapResult[cp][j];
-		//				report.WriteLine(String.Join(" ", coreCandidate.Context[0].Name));
-		//				report.WriteLine(coreRemapResult[cp].GetNodeSimilarity(j));
-		//			}
-		//			report.WriteLine();
-		//			report.WriteLine("**************************************************************");
-		//			report.WriteLine();
+			var denominator = (double)Math.Max(a.Length, b.Length);
 
-		//			var isLandAuto = landRemapResult[cp].FirstOrDefault()?.Similarity >= 0.6
-		//				&& (landRemapResult[cp].Count == 1
-		//					|| (1 - landRemapResult[cp][1].Similarity) >= (1 - landRemapResult[cp][0].Similarity) * 1.5);
+			/// Сразу отбрасываем общие префиксы и суффиксы
+			var commonPrefixLength = 0;
+			while (commonPrefixLength < a.Length && commonPrefixLength < b.Length
+				&& a[commonPrefixLength].Equals(b[commonPrefixLength]))
+				++commonPrefixLength;
+			a = a.Substring(commonPrefixLength);
+			b = b.Substring(commonPrefixLength);
 
-		//			var isCoreAuto = coreRemapResult[cp].GetNodeSimilarity(0) >= 0.6
-		//				&& (coreRemapResult[cp].Count == 1
-		//					|| (1 - coreRemapResult[cp].GetNodeSimilarity(1)) >= (1 - coreRemapResult[cp].GetNodeSimilarity(0)) * 2);
+			var commonSuffixLength = 0;
+			while (commonSuffixLength < a.Length && commonSuffixLength < b.Length
+				&& a[a.Length - 1 - commonSuffixLength].Equals(b[b.Length - 1 - commonSuffixLength]))
+				++commonSuffixLength;
+			a = a.Substring(0, a.Length - commonSuffixLength);
+			b = b.Substring(0, b.Length - commonSuffixLength);
 
-		//			var sameFirst = coreRemapResult[cp].Count > 0 && landRemapResult[cp].Count > 0
-		//				&& String.Join("", coreRemapResult[cp][0].Context[0].Name)
-		//					.StartsWith(String.Join("", landRemapResult[cp][0].Context.HeaderContext.SelectMany(h => h.Value)));
+			if (a.Length == 0 && b.Length == 0)
+				return 1;
 
-		//			var tuple = new Tuple<string, string>(
-		//					cp.Context.FileName,
-		//					String.Join(" ", cp.Context.HeaderContext.SelectMany(h => h.Value))
-		//				);
+			/// Согласно алгоритму Вагнера-Фишера, вычисляем матрицу расстояний
+			var distances = new double[a.Length + 1, b.Length + 1];
+			distances[0, 0] = 0;
 
-		//			if (isLandAuto)
-		//			{
-		//				if (isCoreAuto)
-		//				{
-		//					if (sameFirst)
-		//						sameAutoResult.Add(tuple);
-		//					else
-		//						differentAutoResult.Add(tuple);
-		//				}
-		//				else
-		//				{
-		//					landOnlyAutoResult.Add(tuple);
-		//				}
-		//			}
-		//			else if (isCoreAuto)
-		//			{
-		//				coreOnlyAutoResult.Add(tuple);
-		//			}
-		//			else
-		//			{
-		//				if (sameFirst)
-		//					sameFirstPos.Add(tuple);
-		//				else
-		//					differentFirstPos.Add(tuple);
-		//			}
-		//		}
-		//		File.WriteAllLines($"{key}_coreOnlyAutoResult.txt",
-		//			coreOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-		//		File.WriteAllLines($"{key}_landOnlyAutoResult.txt",
-		//			landOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-		//		File.WriteAllLines($"{key}_sameAutoResult.txt",
-		//			sameAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-		//		File.WriteAllLines($"{key}_differentAutoResult.txt",
-		//			differentAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-		//		File.WriteAllLines($"{key}_sameFirstPos.txt",
-		//			sameFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
-		//		File.WriteAllLines($"{key}_differentFirstPos.txt",
-		//			differentFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+			/// Заполняем первую строку и первый столбец
+			for (int i = 1; i <= a.Length; ++i)
+				distances[i, 0] = distances[i - 1, 0] + 1;
+			for (int j = 1; j <= b.Length; ++j)
+				distances[0, j] = distances[0, j - 1] + 1;
 
-		//		Console.WriteLine($"Land only auto: {landOnlyAutoResult.Count}");
-		//		Console.WriteLine($"Core only auto: {coreOnlyAutoResult.Count}");
-		//		Console.WriteLine($"Same auto: {sameAutoResult.Count}");
-		//		Console.WriteLine($"Different auto: {differentAutoResult.Count}");
-		//		Console.WriteLine($"Same first: {sameFirstPos.Count}");
-		//		Console.WriteLine($"Different first: {differentFirstPos.Count}");
-		//		Console.WriteLine($"'{key}' done!");
-		//	}
+			for (int i = 1; i <= a.Length; i++)
+				for (int j = 1; j <= b.Length; j++)
+				{
+					/// Если элементы - это тоже перечислимые наборы элементов, считаем для них расстояние
+					double cost = a[i - 1] == b[j - 1] ? 0 : 1;
+					distances[i, j] = Math.Min(Math.Min(
+						distances[i - 1, j] + 1,
+						distances[i, j - 1] + 1),
+						distances[i - 1, j - 1] + cost);
+				}
 
-		//	report.Close();
+			return 1 - distances[a.Length, b.Length] / denominator;
+		}
 
-		//	Console.WriteLine("Job's done!");
-		//	Console.ReadLine();
-		//}
+		private bool IsSimilarEnough(RemapCandidateInfo candidate, double threshold) =>
+			candidate.Similarity >= threshold;
+
+		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
+			second == null || second.Similarity != 1
+				&& 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+
+		private void ComputeTotalSimilarity(PointContext sourceContext,
+			List<RemapCandidateInfo> candidates)
+		{
+			candidates.ForEach(c => c.Similarity = c.Similarity ??
+				(2 * c.AncestorSimilarity + 1 * c.InnerSimilarity + 1 * c.HeaderSimilarity + 3 * c.NameSimilarity) / 7);
+		}
+
+		#endregion
 	}
 }

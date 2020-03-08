@@ -6,17 +6,6 @@ using System.Text;
 
 namespace Land.Markup.Binding
 {
-	public interface IWeightsHeuristic
-	{
-		long Priority { get; }
-
-		Dictionary<ContextType, double?> TuneWeights(
-			PointContext source,
-			List<RemapCandidateInfo> candidates,
-			Dictionary<ContextType, double?> weights
-		);
-	}
-
 	public class EmptyContextHeuristic : IWeightsHeuristic
 	{
 		public long Priority => 100;
@@ -26,8 +15,8 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates, Dictionary<ContextType, double?> weights)
 		{
 			/// Это можно сделать статическими проверками на этапе формирования грамматики
-			var useInner = candidates.Any(c => c.Context.InnerContextElement.Content.TextLength > 0)
-					|| source.InnerContextElement.Content.TextLength > 0;
+			var useInner = candidates.Any(c => c.Context.InnerContext.Content.TextLength > 0)
+					|| source.InnerContext.Content.TextLength > 0;
 			var useHeader = candidates.Any(c => c.Context.HeaderContext.Count > 0)
 				|| source.HeaderContext.Count > 0;
 			var useAncestors = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
@@ -39,6 +28,10 @@ namespace Land.Markup.Binding
 				weights[ContextType.Ancestors] = 0;
 			if (!useInner)
 				weights[ContextType.Inner] = 0;
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
 
 			return weights;
 		}
@@ -63,33 +56,40 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			var MAX_WEIGHT = weights.Count;
-			const double MIN_GAP = 0.04;
+			if (candidates.Count > 1)
+			{
+				var MAX_WEIGHT = weights.Count;
 
-			var features = new Dictionary<ContextType, ContextFeatures>
+				var features = new Dictionary<ContextType, ContextFeatures>
 			{
 				{ ContextType.Ancestors, GetFeatures(candidates, (c)=>c.AncestorSimilarity) },
 				{ ContextType.Header,  GetFeatures(candidates, (c)=>c.HeaderSimilarity) },
 				{ ContextType.Inner,  GetFeatures(candidates, (c)=>c.InnerSimilarity) }
 			};
 
-			/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
-			/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
-			var contextsToPrioritize = new List<ContextType>();
+				/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
+				/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
+				var contextsToPrioritize = new List<ContextType>();
 
-			foreach (var kvp in features)
-			{
-				if (kvp.Value.MedianGap <= MIN_GAP && kvp.Value.GapFromMax <= MIN_GAP)
-					weights[kvp.Key] = 1;
-				else
-					contextsToPrioritize.Add(kvp.Key);
+				foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
+				{
+					if (kvp.Value.MaxValue < ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD ||
+						(1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
+						weights[kvp.Key] = 1;
+					else
+						contextsToPrioritize.Add(kvp.Key);
+				}
+
+				contextsToPrioritize = contextsToPrioritize
+					.OrderByDescending(c => features[c].MedianGap).ToList();
+
+				for (var i = 0; i < contextsToPrioritize.Count; ++i)
+					weights[contextsToPrioritize[i]] = MAX_WEIGHT - i;
+
+				System.Diagnostics.Trace.WriteLine(
+					$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+				);
 			}
-
-			contextsToPrioritize = contextsToPrioritize
-				.OrderByDescending(c => features[c].MedianGap).ToList();
-
-			for (var i = 0; i < contextsToPrioritize.Count; ++i)
-				weights[contextsToPrioritize[i]] = MAX_WEIGHT - i;
 
 			return weights;
 		}
@@ -123,7 +123,7 @@ namespace Land.Markup.Binding
 	/// </summary>
 	public class LowerChangedInnerPriority : IWeightsHeuristic
 	{
-		const double GARBAGE_INNER_THRESHOLD = 0.65;
+		const double GARBAGE_INNER_THRESHOLD = 0.6;
 
 		public long Priority => 20;
 
@@ -133,7 +133,11 @@ namespace Land.Markup.Binding
 			Dictionary<ContextType, double?> weights)
 		{
 			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_INNER_THRESHOLD)
-				weights[ContextType.Inner] = 1;
+				weights[ContextType.Inner] = 0;
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
 
 			return weights;
 		}

@@ -197,25 +197,29 @@ namespace Land.VisualStudioExtension
 				return;
 			}
 
-			/// В открытом документе устанавливаем курсор в нужную позицию
-			frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out object docData);
-
-			var buffer = docData as VsTextBuffer;
-			if (buffer == null)
+			if (location != null)
 			{
-				if (docData is IVsTextBufferProvider bufferProvider)
-				{
-					ErrorHandler.ThrowOnFailure(bufferProvider.GetTextBuffer(out IVsTextLines lines));
-					buffer = lines as VsTextBuffer;
-					if (buffer == null)
-						return;
-				}
-			}
-			var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
+				/// В открытом документе устанавливаем курсор в нужную позицию
+				frame.GetProperty((int)__VSFPROPID.VSFPROPID_DocData, out object docData);
 
-			mgr.NavigateToLineAndColumn(buffer, ref logicalView, 
-				location.Line.Value - 1, location.Column.Value, 
-				location.Line.Value - 1, location.Column.Value);
+				var buffer = docData as VsTextBuffer;
+				if (buffer == null)
+				{
+					if (docData is IVsTextBufferProvider bufferProvider)
+					{
+						ErrorHandler.ThrowOnFailure(bufferProvider.GetTextBuffer(out IVsTextLines lines));
+						buffer = lines as VsTextBuffer;
+						if (buffer == null)
+							return;
+					}
+				}
+			
+				var mgr = LandExplorerPackage.GetGlobalService(typeof(VsTextManagerClass)) as IVsTextManager;
+
+				mgr.NavigateToLineAndColumn(buffer, ref logicalView,
+					location.Line.Value - 1, location.Column.Value,
+					location.Line.Value - 1, location.Column.Value);
+			}
 		}
 
 		public void SetSegments(List<DocumentSegment> segments, Color color)

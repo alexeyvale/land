@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -18,6 +19,8 @@ namespace Land.VisualStudioExtension.Listeners
 	{
 		public int OnShellPropertyChange(int propid, object var)
 		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
 			if (propid == (int)__VSSPROPID.VSSPROPID_Zombie)
 			{
 				var isZombie = (bool)var;

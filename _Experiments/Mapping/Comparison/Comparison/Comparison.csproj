@@ -33,16 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AspectCore">
-      <HintPath>components\AspectCore\AspectCore.dll</HintPath>
-    </Reference>
     <Reference Include="Land.Core">
       <HintPath>components\LanD\Land.Core.dll</HintPath>
     </Reference>
-    <Reference Include="LWParserCS2">
-      <HintPath>components\AspectCore\LWParserCS2.dll</HintPath>
-    </Reference>
-    <Reference Include="sharp">
+    <Reference Include="sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=95a72bebf843c5e1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>components\LanD\sharp.dll</HintPath>
     </Reference>
     <Reference Include="SharpPreprocessing.ConditionalCompilation">

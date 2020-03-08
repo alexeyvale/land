@@ -26,7 +26,11 @@ namespace Land.Core.Parsing.LL
 		private Dictionary<string, Tuple<SymbolArguments, Stack<string>>> RecoveryCache { get; set; }
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
 
-		public Parser(Grammar g, ILexer lexer, BaseNodeGenerator nodeGen = null) : base(g, lexer, nodeGen)
+		public Parser(
+			Grammar g, 
+			ILexer lexer, 
+			BaseNodeGenerator nodeGen = null, 
+			BaseNodeRetypingVisitor retypingVisitor = null) : base(g, lexer, nodeGen, retypingVisitor)
 		{
 			Table = new TableLL1(g);
 
@@ -37,7 +41,7 @@ namespace Land.Core.Parsing.LL
 			RecoveryCache = new Dictionary<string, Tuple<SymbolArguments, Stack<string>>>();
 
 			/// Для каждого из возможных символов для восстановления кешируем дополнительную информацию
-			foreach (var smb in GrammarObject.Options.GetSymbols(ParsingOption.RECOVERY))
+			foreach (var smb in GrammarObject.Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY))
 			{
 				var stack = new Stack<string>();
 				stack.Push(smb);
@@ -174,7 +178,7 @@ namespace Land.Core.Parsing.LL
 				else
 				{
 					/// Если встретился неожиданный токен, но он в списке пропускаемых
-					if (GrammarObject.Options.IsSet(ParsingOption.SKIP, token.Name))
+					if (GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.SKIP, token.Name))
 					{
 						token = LexingStream.GetNextToken();
 					}
@@ -431,7 +435,7 @@ namespace Land.Core.Parsing.LL
 			/// Ищем дальше, если
 			while (currentNode != null && (
 				/// текущий символ не входит в список тех, на которых можно восстановиться, или
-				!GrammarObject.Options.IsSet(ParsingOption.RECOVERY, currentNode.Symbol) ||
+				!GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.RECOVERY, currentNode.Symbol) ||
 				/// при разборе соответствующей сущности уже пошли по Any-ветке
 				ParsedStartsWithAny(currentNode) ||
 				/// ошибка произошла на таком же Any

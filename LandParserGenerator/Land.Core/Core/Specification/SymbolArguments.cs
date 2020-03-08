@@ -6,7 +6,8 @@ namespace Land.Core.Specification
 {
 	public enum AnyArgument { Include, Except, Avoid, IgnorePairs }
 
-	public class SymbolArguments : MarshalByRefObject
+	[Serializable]
+	public class SymbolArguments
 	{
 		#region Any
 
@@ -29,7 +30,5 @@ namespace Land.Core.Specification
 			{
 				AnyArguments = AnyArguments.ToDictionary(e => e.Key, e => new HashSet<string>(e.Value))
 			};
-
-		public override object InitializeLifetimeService() => null;
 	}
 }

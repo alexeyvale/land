@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using System.ComponentModel;
-using System.Runtime.Serialization;
 using Land.Markup.Tree;
 
 namespace Land.Markup
 {
-	[DataContract]
 	public abstract class MarkupElement: INotifyPropertyChanged
 	{
+		public Guid Id { get; set; } = Guid.NewGuid();
+
 		private string _name;
 		private string _comment;
 
-		[DataMember]
 		public string Name {
 			get => _name;
 			set
@@ -24,7 +24,6 @@ namespace Land.Markup
 			}
 		}
 
-		[DataMember]
 		public string Comment
 		{
 			get => _comment;
@@ -36,6 +35,7 @@ namespace Land.Markup
 			}
 		}
 
+		[JsonIgnore]
 		public Concern Parent { get; set; }
 
 		public event PropertyChangedEventHandler PropertyChanged;

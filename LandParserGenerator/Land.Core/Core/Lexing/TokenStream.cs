@@ -34,7 +34,9 @@ namespace Land.Core.Lexing
 				}
 			}
 			else
+			{
 				++CurrentIndex;
+			}
 
 			return Tokens[CurrentIndex];
 		}

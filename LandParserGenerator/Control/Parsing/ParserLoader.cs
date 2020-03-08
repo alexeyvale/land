@@ -29,7 +29,7 @@ namespace Land.Control
 			{
 				Parser = (BaseParser)Assembly.LoadFrom(parserCachedPath)
 					.GetTypes().FirstOrDefault(t => t.Name == PARSER_PROVIDER_CLASS)
-					?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, null);
+					?.GetMethod(GET_PARSER_METHOD)?.Invoke(null, new object[] { false });
 			}
 			catch (Exception e)
 			{

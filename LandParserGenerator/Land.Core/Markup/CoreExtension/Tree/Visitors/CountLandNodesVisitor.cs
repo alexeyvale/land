@@ -35,7 +35,7 @@ namespace Land.Markup.CoreExtension
 
 		public override void Visit(Node node)
 		{
-			if(node.Options.IsSet(MarkupOption.LAND))
+			if(node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 			{
 				Land.Add(new TypeValuePair()
 				{
