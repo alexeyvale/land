@@ -9,6 +9,8 @@ namespace Land.Markup
 {
 	public abstract class MarkupElement: INotifyPropertyChanged
 	{
+		public Guid Id { get; set; } = Guid.NewGuid();
+
 		private string _name;
 		private string _comment;
 

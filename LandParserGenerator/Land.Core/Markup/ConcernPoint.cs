@@ -14,8 +14,6 @@ namespace Land.Markup
 {
 	public class ConcernPoint: MarkupElement, INotifyPropertyChanged
 	{
-		public Guid Id { get; set; } = Guid.NewGuid();
-
 		private PointContext _context;
 
 		[JsonIgnore]
