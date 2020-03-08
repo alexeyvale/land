@@ -10,6 +10,9 @@ namespace Land.Core.Specification
 		public string Name { get; set; }
 		public HashSet<string> Left { get; set; }
 		public HashSet<string> Right { get; set; }
+		public HashSet<string> Inside { get; set; }
+
+		public bool IsTokenLike { get; set; }
 
 		public override bool Equals(object obj)
 		{

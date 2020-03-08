@@ -19,21 +19,25 @@ namespace Land.Core.Parsing.LL
 
 		public TableLL1(Grammar g): base(g)
 		{
-			Table = new List<Alternative>[g.Rules.Count, g.Tokens.Count];
+			var lookaheadSymbols = g.Tokens.Keys
+				.Concat(g.Pairs.Where(p => p.Value.IsTokenLike).Select(p => p.Key))
+				.ToList();
+
+			Table = new List<Alternative>[g.Rules.Count, lookaheadSymbols.Count];
 
 			NonterminalSymbols = g.Rules
 				.Zip(Enumerable.Range(0, g.Rules.Count), (a, b) => new { smb = a.Key, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
-			Lookaheads = g.Tokens.Keys
-				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a, idx = b })
+			Lookaheads = lookaheadSymbols
+				.Zip(Enumerable.Range(0, lookaheadSymbols.Count), (a, b) => new { smb = a, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
 
 			foreach (var nt in g.Rules.Keys)
 			{
-				foreach (var tk in g.Tokens)
+				foreach (var la in lookaheadSymbols)
 				{
 					/// Список, потому что могут быть неоднозначности
-					this[nt, tk.Key] = new List<Alternative>();
+					this[nt, la] = new List<Alternative>();
 				}
 
 				/// Проходим по всем продукциям

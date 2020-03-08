@@ -358,20 +358,31 @@ namespace Land.Core.Specification
 			DeclareTerminal(terminal);
 		}
 
-		public void DeclarePair(string name, HashSet<string> left, HashSet<string> right)
+		public void DeclarePair(string name, Dictionary<PairSectionType, HashSet<string>> sections)
 		{
-			ConstructionLog.Add($"grammar.DeclarePair(\"{name}\", new HashSet<string>(){{ {String.Join(", ", left.Select(l => $"\"{l}\""))} }}, new HashSet<string>(){{ {String.Join(", ", right.Select(r => $"\"{r}\""))} }});");
+			ConstructionLog.Add($"grammar.DeclarePair(\"{name}\", new Dictionary<PairSectionType, HashSet<string>>{{ {String.Join(", ", sections.Select(e => $"{{PairSectionType.{e.Key}, new HashSet<string>(){{{String.Join(", ", e.Value.Select(v => $"\"{v}\""))}}}}}"))} }});");
 
 			var checkingResult = AlreadyDeclaredCheck(name);
 
 			if (!String.IsNullOrEmpty(checkingResult))
+			{
 				throw new IncorrectGrammarException(checkingResult);
+			}
 			else
 			{
+				if(!sections.ContainsKey(PairSectionType.LEFT) 
+					|| !sections.ContainsKey(PairSectionType.RIGHT))
+				{
+					throw new IncorrectGrammarException("В определении пары пропущено описание одной из границ");
+				}
+
 				Pairs[name] = new PairSymbol()
 				{
-					Left = left,
-					Right = right,
+					Left = sections[PairSectionType.LEFT],
+					Right = sections[PairSectionType.RIGHT],
+					Inside = sections.ContainsKey(PairSectionType.INSIDE) 
+						? sections[PairSectionType.INSIDE] : new HashSet<string>(),
+
 					Name = name
 				};
 			}
@@ -427,11 +438,14 @@ namespace Land.Core.Specification
 			{
 				case NodeOption.GROUP_NAME:
 					errorSymbols = CheckIfNonterminals(symbols).Intersect(CheckIfAliases(symbols)).ToList();
+
 					if (errorSymbols.Count > 0)
+					{
 						throw new IncorrectGrammarException(
-							$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-								$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+							$"Следующие символы не определены как нетерминальные: '{String.Join("', '", errorSymbols)}' "
 						);
+					}
+
 					break;
 				case ParsingOption.GROUP_NAME:
 					switch (option)
@@ -443,20 +457,36 @@ namespace Land.Core.Specification
 								);
 							break;
 						case ParsingOption.SKIP:
-							errorSymbols = CheckIfTerminals(symbols);
+							errorSymbols = CheckIfTerminals(symbols).Intersect(CheckIfPairs(symbols)).ToList();
+
 							if (errorSymbols.Count > 0)
+							{
 								throw new IncorrectGrammarException(
-									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-										$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как терминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+									$"Следующие символы не определены как терминальные или пары: '{String.Join("', '", errorSymbols)}' "
 								);
+							}
+
+							break;
+						case ParsingOption.NESTING:
+							errorSymbols = CheckIfPairs(symbols);
+
+							if (errorSymbols.Count > 0)
+							{
+								throw new IncorrectGrammarException(
+									$"Следующие символы не определены как пары: '{String.Join("', '", errorSymbols)}' "
+								);
+							}
+
 							break;
 						case ParsingOption.RECOVERY:
 							errorSymbols = CheckIfNonterminals(symbols);
+
 							if (errorSymbols.Count > 0)
+							{
 								throw new IncorrectGrammarException(
-									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-										$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+									$"Следующие символы не определены как нетерминальные: '{String.Join("', '", errorSymbols)}' "
 								);
+							}
 
 							/// Находим множество нетерминалов, на которых возможно восстановление
 							var recoverySymbols = new HashSet<string>(
@@ -514,6 +544,11 @@ namespace Land.Core.Specification
 		private List<string> CheckIfTerminals(List<string> symbols)
 		{
 			return symbols.Where(s => !this.Tokens.ContainsKey(s)).ToList();
+		}
+
+		private List<string> CheckIfPairs(List<string> symbols)
+		{
+			return symbols.Where(s => !this.Pairs.ContainsKey(s)).ToList();
 		}
 
 		private List<string> CheckIfAliases(List<string> symbols)
@@ -622,6 +657,14 @@ namespace Land.Core.Specification
 					token.Pattern = newPattern.Append(token.Pattern.Substring(currentPosition)).ToString();
 				}
 			}
+
+			/// Если пара не предназначена для отслеживания вложенностей,
+			/// соответствующий ей символ может быть получен от лексера как обычный токен
+			foreach(var pair in Pairs.Values)
+			{
+				pair.IsTokenLike = 
+					!Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.NESTING, pair.Name);
+			}
 		}
 
 		#region Валидация
@@ -659,11 +702,35 @@ namespace Land.Core.Specification
 						foreach (var smb in alt)
 						{
 							if (this[smb] == null)
+							{
 								messages.Add(Message.Error(
 									$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
 									GetLocation(rule.Name),
 									"LanD"
 								));
+							}
+
+							if (Pairs.ContainsKey(smb)
+								&& Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.NESTING, smb))
+							{
+								messages.Add(Message.Error(
+									$"Символ {Userify(smb)} не может быть использован в правиле, так как используется для отслеживания вложенных конструкций",
+									GetLocation(rule.Name),
+									"LanD"
+								));
+							}
+
+							if (Tokens.ContainsKey(smb)
+								&& Pairs.Values.Any(p => p.IsTokenLike 
+									&& p.Left.Contains(smb) 
+									&& !Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT, p.Name)))
+							{
+								messages.Add(Message.Error(
+									$"Символ {Userify(smb)} не может быть использован в правиле, так как используется для сопоставления парной конструкции",
+									GetLocation(rule.Name),
+									"LanD"
+								));
+							}
 
 							if (smb == Grammar.ANY_TOKEN_NAME)
 							{

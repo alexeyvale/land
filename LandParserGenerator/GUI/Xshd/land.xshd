@@ -11,6 +11,9 @@
 				<Rule>\(.*\)</Rule>
 			</RuleSet>
 		</Span>
+		<Rule fontWeight="bold" foreground="DarkGreen">
+			%\S+
+		</Rule>
 		<!-- заголовок правила -->
 		<Rule fontWeight="bold" foreground="DarkRed">
 			^[a-zA-Z_][a-zA-Z_0-9]*[\ \t\n\r\f]*=

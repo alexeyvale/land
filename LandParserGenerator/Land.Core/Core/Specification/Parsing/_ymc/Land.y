@@ -27,6 +27,7 @@
 	public ArgumentGroup argGroupVal;
 	public dynamic dynamicVal;
 	public OptionDeclaration optDeclVal;
+	public PairSectionType pairSectionTypeVal;
 	
 	public List<dynamic> dynamicList;
 	public List<OptionDeclaration> optionsList;
@@ -35,6 +36,7 @@
 	
 	public HashSet<string> strSet;
 	
+	public Dictionary<PairSectionType, HashSet<string>> pairSectionsDict;
 	public Dictionary<string, Dictionary<string, List<dynamic>>> optionGroupsDict; 
 	public Dictionary<string, List<dynamic>> optionsDict;
 	public Tuple<string, List<dynamic>> optionTuple;
@@ -49,11 +51,12 @@
 %left OR
 
 %token ARGS_LROUND_BRACKET LROUND_BRACKET RROUND_BRACKET LCURVE_BRACKET RCURVE_BRACKET
-%token COLON COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT LINESTART
+%token COLON COMMA PROC EQUALS MINUS PLUS EXCLAMATION DOT ARROW LEFT RIGHT INSIDE LINESTART
 %token <strVal> REGEX NAMED STRING ID ENTITY_NAME OPTION_NAME CATEGORY_NAME
 %token <intVal> POSITION
 %token <doubleVal> RNUM
 %token <quantVal> OPTIONAL ZERO_OR_MORE ONE_OR_MORE
+%token <pairSectionTypeVal> PAIR_SECTION_TYPE
 %token IS_LIST_NODE PREC_NONEMPTY
 
 %type <optQuantVal> quantifier
@@ -66,6 +69,7 @@
 %type <dynamicVal> argument
 %type <altVal> alternative
 %type <optDeclVal> option
+%type <pairSectionsDict> pair_sections
 
 %type <dynamicList> opt_args args context_opt_args entry_args
 %type <optionGroupsDict> context_option_groups
@@ -73,7 +77,7 @@
 %type <optionsList> option_or_block options
 %type <optionTuple> context_option
 
-%type <strSet> pair_border_group_content pair_border
+%type <strSet> pair_section_element_group pair_section_element
 
 %%
 
@@ -113,18 +117,32 @@ opt_linestart
 	| { $$ = false; }
 	;
 	
-/******** ID = %left ID1 %right (ID2 | ID3) ***************/
+/******** ID = %left ID1 %right (ID2 | ID3) %inside ID4 ***************/
 pair
-	: ENTITY_NAME COLON LEFT pair_border RIGHT pair_border 
+	: ENTITY_NAME COLON pair_sections
 		{
 			SafeGrammarAction(() => { 
-				ConstructedGrammar.DeclarePair($1, $4, $6);
+				ConstructedGrammar.DeclarePair($1, $3);
 				ConstructedGrammar.AddLocation($1, @1.Start);
 			}, @1.Start);
 		}
 	;
 	
-pair_border
+pair_sections
+	: PAIR_SECTION_TYPE pair_section_element 
+		{ 
+			$$ = new Dictionary<PairSectionType, HashSet<string>>();
+			$$[$1] = $2;
+		}
+	| pair_sections PAIR_SECTION_TYPE pair_section_element
+		{ 
+			$$ = $1;
+			$$[$2] = $3;
+		}
+	;
+	
+	
+pair_section_element
 	: ID { $$ = new HashSet<string>() { $1 }; }
 	| REGEX 
 		{ 	
@@ -132,12 +150,12 @@ pair_border
 			ConstructedGrammar.AddLocation(generated, @1.Start);
 			$$ = new HashSet<string>() { generated };
 		}
-	| LROUND_BRACKET pair_border_group_content RROUND_BRACKET { $$ = $2; }
+	| LROUND_BRACKET pair_section_element_group RROUND_BRACKET { $$ = $2; }
 	;
 	
-pair_border_group_content
-	: pair_border { $$ = $1; }
-	| pair_border_group_content OR pair_border { $1.UnionWith($3); $$ = $1; }
+pair_section_element_group
+	: pair_section_element { $$ = $1; }
+	| pair_section_element_group OR pair_section_element { $1.UnionWith($3); $$ = $1; }
 	;	
 
 /******* ID = ID 'string' (group)[*|+|?]  ********/

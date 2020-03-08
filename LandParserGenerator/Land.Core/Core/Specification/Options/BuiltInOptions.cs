@@ -4,6 +4,8 @@ using System.Linq;
 
 namespace Land.Core.Specification
 {
+	public enum PairSectionType { LEFT, RIGHT, INSIDE }
+
 	/// <summary>
 	/// Опции, касающиеся процесса разбора
 	/// </summary>
@@ -12,6 +14,7 @@ namespace Land.Core.Specification
 		public const string GROUP_NAME = "parsing";
 
 		public const string START = "start";
+		public const string NESTING = "nesting";
 		public const string SKIP = "skip";
 		public const string IGNORECASE = "ignorecase";
 		public const string FRAGMENT = "fragment";

@@ -22,6 +22,8 @@ INUM {DIGIT}+
 RNUM {INUM}(\.{INUM})?
 ID {LETTER}({LETTER}|{DIGIT})*
 
+PAIR_SECTION_TYPE "%"(left|right|inside)
+
 LINE_COMMENT "//".*    
 MULTILINE_COMMENT "/*"([^*]|\*[^/])*"*/"
 LEXER_LITERAL \'([^'\\]*|(\\\\)+|\\[^\\])*\'
@@ -70,7 +72,10 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 
 // Для пар
 
-"%right" return (int)Tokens.RIGHT;
+{PAIR_SECTION_TYPE} {
+	Enum.TryParse(yytext.Substring(1).ToUpper(), out yylval.pairSectionTypeVal);
+	return (int)Tokens.PAIR_SECTION_TYPE;
+}
 
 // Символы, означающие нечто внутри правила
 
@@ -87,9 +92,10 @@ STRING \"([^"\\]*|(\\\\)+|\\[^\\])*\"
 
 <before_terminal_declaration_body> {
 	// Для пар
-	"%left" {
+	{PAIR_SECTION_TYPE} {
 		BEGIN(0);
-		return (int)Tokens.LEFT;
+		Enum.TryParse(yytext.Substring(1).ToUpper(), out yylval.pairSectionTypeVal);
+		return (int)Tokens.PAIR_SECTION_TYPE;
 	}
 	
 	// Для терминалов, начинающихся с начала строки

@@ -38,23 +38,61 @@ namespace Land.Core
 
 			foreach (var token in grammar.Tokens.Values.Where(t => t.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX)))
 			{
-				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} ;");
+				var pairBeingOpened = grammar.Pairs.Values
+					.Where(p => p.IsTokenLike && !grammar.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT, p.Name))
+					.FirstOrDefault(p => p.Left.Contains(token.Name));
+
+				grammarOutput.WriteLine($"{token.Name}: {token.Pattern} {(pairBeingOpened != null ? $"-> more, pushMode({pairBeingOpened.Name}_MODE)" : "")};");
 				tokensForLines[++linesCounter] = token.Name.StartsWith(Grammar.AUTO_TOKEN_PREFIX) ? token.Pattern : token.Name;
 			}
 
-			foreach (var token in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
+			foreach (var tokenName in grammar.TokenOrder.Where(t=>!String.IsNullOrEmpty(grammar.Tokens[t].Pattern)))
 			{
-				var fragment = grammar.Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
-				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern}{(grammar.Tokens[token].LineStart ? $" {{this.InputStream.LA(-1 - Text.Length) == 10 || this.InputStream.LA(-1 - Text.Length) == -1}}?" : "")} ;");
-				tokensForLines[++linesCounter] = grammar.Userify(token);
+				var fragment = grammar.Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT).Contains(tokenName) ? "fragment " : String.Empty;
+				var pairBeingOpened = grammar.Pairs.Values
+					.Where(p => p.IsTokenLike && !grammar.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT, p.Name))
+					.FirstOrDefault(p => p.Left.Contains(tokenName));
+
+				grammarOutput.WriteLine($"{fragment}{tokenName}: {grammar.Tokens[tokenName].Pattern}{(grammar.Tokens[tokenName].LineStart ? $" {{this.InputStream.LA(-1 - Text.Length) == 10 || this.InputStream.LA(-1 - Text.Length) == -1}}?" : "")} {(pairBeingOpened != null ? $"-> more, pushMode({pairBeingOpened.Name}_MODE)" : "")};");
+				tokensForLines[++linesCounter] = grammar.Userify(tokenName);
 			}
 
 			grammarOutput.WriteLine(@"WS: [ \n\r\t\u00A0] -> skip ;");
 
 			if (grammar.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.IGNOREUNDEFINED))
+			{
 				grammarOutput.WriteLine(@"UNDEFINED: . -> skip ;");
+			}
 			else
+			{
 				grammarOutput.WriteLine(@"UNDEFINED: . ;");
+			}
+
+			foreach(var pair in grammar.Pairs.Values)
+			{
+				grammarOutput.WriteLine($"mode {pair.Name}_MODE;");
+
+				foreach(var name in pair.Inside)
+				{
+					if(grammar.Tokens.ContainsKey(name))
+					{
+						grammarOutput.WriteLine($"{pair.Name}_{name}: {grammar.Tokens[name].Pattern} -> more;");
+					}
+					else
+					{
+						foreach(var tokenName in grammar.Pairs[name].Left)
+						{
+							grammarOutput.WriteLine($"{pair.Name}_{tokenName}: {grammar.Tokens[tokenName].Pattern} -> more, pushMode({grammar.Pairs[name].Name}_MODE);");
+						}
+					}
+				}
+
+				grammarOutput.WriteLine($"{pair.Name}: {String.Join("|", pair.Right.Select(tokenName => grammar.Tokens[tokenName].Pattern))} -> popMode;");
+
+				grammarOutput.WriteLine($@"{pair.Name}_WS: [ \n\r\t\u00A0] -> skip ;");
+
+				grammarOutput.WriteLine($"{pair.Name}_UNDEFINED: . -> more;");
+			}
 
 			grammarOutput.Close();
 

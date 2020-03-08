@@ -4,17 +4,17 @@ COMMENT		: COMMENT_L|COMMENT_ML
 COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
 
-STRING		: STRING_STD|STRING_VERB|STRING_INT
-STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
-STRING_VERB	: '@'('"' (~["]|'""')* '"')+
-STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|'{{'|STRING_INT_CODE|.)*? '"')+
-STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
-
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
+STRING_STD	: %left '"' %right '"' %inside ('\\"'|'\\\\')
+STRING_VERB	: %left '@"' %right '"' %inside '""'
+STRING_INT	: %left '$"' %right '"' %inside ('\\"'|'\\\\'|'{{'|STRING_INT_CODE)
+STRING_VERB_INT	: %left '$@"' %right '"' %inside ('""'|'{{'|STRING_INT_CODE)
+STRING_INT_CODE : %left '{' %right '}' %inside (STRING_STD|STRING_VERB|STRING_INT|STRING_VERB_INT|CHAR)
+
 CURVE_BRACKETED : %left '{' %right '}'
 ROUND_BRACKETED : %left '(' %right ')'
 SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
@@ -60,9 +60,10 @@ block				=	'{' Any '}'
 
 %parsing {
 	recovery entity init_part
-	fragment STRING_INT_CODE
 	start namespace_content
-	skip COMMENT STRING DIRECTIVE
+	skip COMMENT STRING_STD STRING_VERB STRING_INT STRING_VERB_INT DIRECTIVE
+	nesting CURVE_BRACKETED ROUND_BRACKETED SQUARE_BRACKETED
+	fragment STRING_INT_CODE
 }
 
 %nodes {
