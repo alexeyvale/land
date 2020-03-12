@@ -19,7 +19,9 @@ namespace Land.Markup.Binding
 		{
 			if (source.HeaderContext.Count > 0)
 			{
-				var bestMatch = candidates.Where(c => c.HeaderSimilarity == 1 && c.AncestorSimilarity == 1).ToList();
+				var bestMatch = candidates
+					.Where(c => c.HeaderSimilarity == 1 && c.AncestorSimilarity == 1)
+					.ToList();
 
 				if (bestMatch.Count == 1)
 					bestMatch.Single().Similarity = 1;

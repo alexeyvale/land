@@ -8,7 +8,7 @@ namespace Land.Markup.Binding
 {
 	public class EmptyContextHeuristic : IWeightsHeuristic
 	{
-		public long Priority => 100;
+		public long Priority => 10;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source, 
@@ -42,7 +42,7 @@ namespace Land.Markup.Binding
 	/// </summary>
 	public class PrioritizeByGapHeuristic : IWeightsHeuristic
 	{
-		public long Priority => 10;
+		public long Priority => 1000;
 
 		public class ContextFeatures
 		{
@@ -61,11 +61,11 @@ namespace Land.Markup.Binding
 				var MAX_WEIGHT = weights.Count;
 
 				var features = new Dictionary<ContextType, ContextFeatures>
-			{
-				{ ContextType.Ancestors, GetFeatures(candidates, (c)=>c.AncestorSimilarity) },
-				{ ContextType.Header,  GetFeatures(candidates, (c)=>c.HeaderSimilarity) },
-				{ ContextType.Inner,  GetFeatures(candidates, (c)=>c.InnerSimilarity) }
-			};
+				{
+					{ ContextType.Ancestors, GetFeatures(candidates, (c)=>c.AncestorSimilarity) },
+					{ ContextType.Header,  GetFeatures(candidates, (c)=>c.HeaderSimilarity) },
+					{ ContextType.Inner,  GetFeatures(candidates, (c)=>c.InnerSimilarity) }
+				};
 
 				/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
 				/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
@@ -125,7 +125,7 @@ namespace Land.Markup.Binding
 	{
 		const double GARBAGE_INNER_THRESHOLD = 0.6;
 
-		public long Priority => 20;
+		public long Priority => 100;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,

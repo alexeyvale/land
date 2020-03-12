@@ -12,6 +12,7 @@ STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
+CLASS_STRUCT_INTERFACE : 'class'|'struct'|'interface'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -27,7 +28,7 @@ namespace			=	'namespace' name '{' namespace_content '}'
 entity	=	enum | class_struct_interface | method | field | property | water_entity
 
 enum			=	common_beginning 'enum' name Any '{' Any '}' ';'?
-class_struct_interface	=	common_beginning ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?
+class_struct_interface	=	common_beginning CLASS_STRUCT_INTERFACE name Any '{' entity* '}' ';'?
 method			=	common_beginning type name arguments Any method_body
 method_body		=	init_expression? ';' | block
 field			=	common_beginning type name ('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'
@@ -77,11 +78,11 @@ block				=	'{' Any '}'
 
 %markup {
 	land namespace enum class_struct_interface method field property
-	priority(0.1) modifier
+	priority(0.05) modifier CLASS_STRUCT_INTERFACE
 	priority(0.8) name
 	priority(0.5) arguments
 	priority(0.3) type
 	priority(0.1) init_value
 	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
-	exactmatch modifier
+	exactmatch modifier CLASS_STRUCT_INTERFACE
 }

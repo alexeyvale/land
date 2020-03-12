@@ -431,7 +431,11 @@ namespace Comparison
 		private double EvalSimilarity(List<ContextElement> a, List<ContextElement> b)
 		{
 			var source = a.Take(INNER_CONTEXT_LENGTH).ToList();
-			return source.Except(b.Take(INNER_CONTEXT_LENGTH)).Count() / (double)source.Count;
+			var @new = b.Take(INNER_CONTEXT_LENGTH).ToList();
+
+			return source.Count > 0
+				? source.Intersect(@new).Count() / (double)source.Count 
+				: @new.Count == 0 ? 1 : 0;
 		}
 		
 		public double EvalSimilarity(List<HeaderContextElement> a, List<HeaderContextElement> b) =>

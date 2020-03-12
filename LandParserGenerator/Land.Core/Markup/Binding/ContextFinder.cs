@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
+using System.Threading.Tasks;
 
 namespace Land.Markup.Binding
 {
@@ -52,7 +53,7 @@ namespace Land.Markup.Binding
 
 		public void SetHeuristic(Type type)
 		{
-			void AddToList<T>(List<T> heuristics) where T: IHeuristic 
+			void AddToList<T>(ref List<T> heuristics) where T: IHeuristic 
 			{
 				if (typeof(T).IsAssignableFrom(type))
 				{
@@ -71,8 +72,13 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			AddToList(TuningHeuristics);
-			AddToList(ScoringHeuristics);
+			var tuningHeuristics = TuningHeuristics;
+			AddToList(ref tuningHeuristics);
+			TuningHeuristics = tuningHeuristics;
+
+			var scoringHeuristics = ScoringHeuristics;
+			AddToList(ref scoringHeuristics);
+			ScoringHeuristics = scoringHeuristics;
 		}
 
 		public void ResetHeuristic(Type type)
@@ -194,14 +200,12 @@ namespace Land.Markup.Binding
 
 			/// Сразу обрабатываем стопроцентные совпадения, 
 			/// уменьшая размерность задачи поиска паросочетания максимального веса
-			foreach (var src in evaluationResults.Keys.Where(k => contextsToPoints.ContainsKey(k)).ToList())
+			foreach (var src in evaluationResults.Keys.ToList())
 			{
 				var perfectMatch = evaluationResults[src].FirstOrDefault(e => e.Similarity == 1);
 
 				if(perfectMatch != null)
 				{
-					perfectMatch.IsAuto = true;
-
 					var allCandidates = evaluationResults[src];
 					evaluationResults.Remove(src);
 
@@ -210,10 +214,15 @@ namespace Land.Markup.Binding
 					foreach (var val in evaluationResults.Values)
 						val.RemoveAt(candidateIndex);
 
-					allCandidates = allCandidates.OrderByDescending(c => c.Similarity).ToList();
+					if(contextsToPoints.ContainsKey(src))
+					{
+						perfectMatch.IsAuto = true;
 
-					foreach (var point in contextsToPoints[src])
-						result[point] = allCandidates;
+						allCandidates = allCandidates.OrderByDescending(c => c.Similarity).ToList();
+
+						foreach (var point in contextsToPoints[src])
+							result[point] = allCandidates;
+					}
 				}
 			}
 
@@ -259,46 +268,59 @@ namespace Land.Markup.Binding
 					var bestMatchesFinder = new AssignmentProblem();
 					var bestMatches = bestMatchesFinder.Compute1(scores);
 
-					for (i = 0; i < bestMatches.Length; ++i)
+					var bestContextMatches = indicesToContexts
+						.Select((context, idx) => new { context, bestCandidateContext = 
+							bestMatches[idx] != -1 ? evaluationResults[context][bestMatches[idx]].Context : null })
+						.ToList();
+
+					Parallel.ForEach(
+						evaluationResults.Keys.ToList(),
+						key => evaluationResults[key] = evaluationResults[key].OrderByDescending(c => c.Similarity).ToList()
+					);
+
+					int oldCount;
+
+					do
 					{
-						/// Для результатов, соответствующих точкам привязки
-						if (contextsToPoints.ContainsKey(indicesToContexts[i]))
+						oldCount = bestContextMatches.Count;
+
+						for (i = 0; i < bestContextMatches.Count; ++i)
 						{
-							/// Если найдено наилучшее соответствие
-							if (bestMatches[i] != -1)
+							if (evaluationResults[bestContextMatches[i].context].Count > 0
+								&& bestContextMatches[i].bestCandidateContext == 
+									evaluationResults[bestContextMatches[i].context][0].Context)
 							{
-								/// Сортируем всех кандидатов по похожести
-								var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
-								/// Запоминаем наилучшее соответствие и его индекс в отсортированном списке
-								var bestMatch = evaluationResults[indicesToContexts[i]][bestMatches[i]];
-								var bestIndex = allCandidates.IndexOf(bestMatch);
-								/// Берём следующий за ним элемент
-								var second = allCandidates.Count > bestIndex + 1 ? allCandidates[bestIndex + 1] : null;
+								var first = evaluationResults[bestContextMatches[i].context][0];
+								var second = evaluationResults[bestContextMatches[i].context].Count > 1 
+									? evaluationResults[bestContextMatches[i].context][1] : null;
 
-								allCandidates.Remove(bestMatch);
-								allCandidates.Insert(0, bestMatch);
-
-								if (IsSimilarEnough(bestMatch)
-									&& (second == null || AreDistantEnough(bestMatch, second)))
+								if (IsSimilarEnough(first)
+									&& (second == null || AreDistantEnough(first, second)))
 								{
-									bestMatch.IsAuto = true;
-								}
+									first.IsAuto = true;
 
-								foreach (var point in contextsToPoints[indicesToContexts[i]])
-								{
-									result[point] = allCandidates;
+									foreach(var key in evaluationResults.Keys)
+									{
+										if(key != bestContextMatches[i].context)
+										{
+											var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
+											evaluationResults[key].Remove(itemToRemove);
+										}
+									}
+
+									bestContextMatches.RemoveAt(i);
+									--i;
 								}
 							}
-							else
-							{
-								foreach (var point in contextsToPoints[indicesToContexts[i]])
-								{
-									var allCandidates = evaluationResults[indicesToContexts[i]].OrderByDescending(c => c.Similarity).ToList();
-									allCandidates.ForEach(c => c.IsAuto = false);
+						}
+					}
+					while (bestContextMatches.Count != oldCount);
 
-									result[point] = allCandidates;
-								}
-							}
+					foreach(var kvp in evaluationResults.Where(kvp => contextsToPoints.ContainsKey(kvp.Key)))
+					{
+						foreach (var point in contextsToPoints[kvp.Key])
+						{
+							result[point] = kvp.Value;
 						}
 					}
 				}
@@ -379,8 +401,10 @@ namespace Land.Markup.Binding
 			LanguageMarkupSettings markupSettings,
 			bool orderAndSetAuto = true)
 		{
-			foreach (var candidate in candidates)
-				ComputeCoreContextSimilarities(point, candidate);
+			Parallel.ForEach(
+				candidates, 
+				c => ComputeCoreContextSimilarities(point, c)
+			);
 
 			ComputeTotalSimilarity(point, candidates);
 

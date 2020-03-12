@@ -54,6 +54,25 @@ namespace Land.Markup.Binding
 			return false;
 		}
 
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				var hashCode = 1685606927;
+				hashCode = hashCode * -1521134295 + ExactMatch.GetHashCode();
+				hashCode = hashCode * -1521134295 + Priority.GetHashCode();
+				hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
+
+				foreach (var elem in Value)
+				{
+					hashCode = hashCode * -1521134295 +
+						EqualityComparer<string>.Default.GetHashCode(elem);
+				}
+
+				return hashCode;
+			}
+		}
+
 		public static bool operator ==(HeaderContextElement a, HeaderContextElement b)
 		{
 			return a.Equals(b);
@@ -62,11 +81,6 @@ namespace Land.Markup.Binding
 		public static bool operator !=(HeaderContextElement a, HeaderContextElement b)
 		{
 			return !a.Equals(b);
-		}
-
-		public override int GetHashCode()
-		{
-			return base.GetHashCode();
 		}
 
 		public static explicit operator HeaderContextElement(Node node)
@@ -158,6 +172,23 @@ namespace Land.Markup.Binding
 			return false;
 		}
 
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				var hashCode = 1660800360;
+				hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
+
+				foreach(var elem in HeaderContext)
+				{
+					hashCode = hashCode * -1521134295 + 
+						EqualityComparer<HeaderContextElement>.Default.GetHashCode(elem);
+				}
+
+				return hashCode;
+			}
+		}
+
 		public static bool operator ==(ContextElement a, ContextElement b)
 		{
 			return a.Equals(b);
@@ -166,11 +197,6 @@ namespace Land.Markup.Binding
 		public static bool operator !=(ContextElement a, ContextElement b)
 		{
 			return !a.Equals(b);
-		}
-
-		public override int GetHashCode()
-		{
-			return base.GetHashCode();
 		}
 
 		public static explicit operator ContextElement(Node node)
@@ -583,7 +609,8 @@ namespace Land.Markup.Binding
 			Func<string, ParsedFile> getParsed,
 			ContextFinder contextFinder)
 		{
-			const double CLOSE_ELEMENT_THRESHOLD = 0.8;
+			const double CLOSE_ELEMENT_HEADER_THRESHOLD = 0.5;
+			const double CLOSE_ELEMENT_INNER_THRESHOLD = 0.8;
 			const int MAX_COUNT = 10;
 
 			foreach (var f in searchArea)
@@ -601,10 +628,15 @@ namespace Land.Markup.Binding
 				.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, file) })
 			);
 
-			candidates = contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null))
-				.Take(MAX_COUNT)
-				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
-				.ToList();
+			candidates = nodeContext.HeaderContext.Count > 0
+				? contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null))
+					.Take(MAX_COUNT)
+					.TakeWhile(c => c.HeaderSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
+					.ToList()
+				: contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null))
+					.Take(MAX_COUNT)
+					.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
+					.ToList();
 
 			return candidates.Select(c=>c.Context).ToList();
 		}
