@@ -314,7 +314,7 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public SiblingsContext SiblingsContext { get; set; }
 
-		private List<PointContext> _closestContext = new List<PointContext>();
+		private List<PointContext> _closestContext;
 
 		/// <summary>
 		/// Контекст наиболее похожих на помеченный элементов
@@ -333,17 +333,6 @@ namespace Land.Markup.Binding
 					ClosestContext[i].LinkedClosestPoints
 						.UnionWith(LinkedPoints.Select(id => new Tuple<Guid, int>(id, i)));
 				}
-			}
-		}
-
-		[JsonProperty]
-		private int ClosestContextCount
-		{
-			get { return ClosestContext.Count; }
-
-			set
-			{
-				ClosestContext = Enumerable.Repeat((PointContext)null, value).ToList();
 			}
 		}
 

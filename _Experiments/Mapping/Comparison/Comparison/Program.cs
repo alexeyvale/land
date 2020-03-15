@@ -224,7 +224,8 @@ namespace Comparison
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.SelectMany(c => c.Value)));
-							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
+							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}]  " +
+								$"[{landCandidate.Weights[ContextType.Header]}; {landCandidate.Weights[ContextType.Inner]}; {landCandidate.Weights[ContextType.Ancestors]}] {(landCandidate.IsAuto ? "*" : "")}");
 						}
 						report.WriteLine();
 						report.WriteLine("**************************************************************");
