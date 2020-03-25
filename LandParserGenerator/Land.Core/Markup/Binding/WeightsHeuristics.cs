@@ -133,7 +133,7 @@ namespace Land.Markup.Binding
 			Dictionary<ContextType, double?> weights)
 		{
 			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_INNER_THRESHOLD)
-				weights[ContextType.Inner] = 0;
+				weights[ContextType.Inner] = 1;
 
 			System.Diagnostics.Trace.WriteLine(
 				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
