@@ -66,7 +66,6 @@ namespace Land.Markup.Binding
 						if (constructor != null)
 						{
 							heuristics.Add((T)constructor.Invoke(null));
-							heuristics = heuristics.OrderByDescending(h => h.Priority).ToList();
 						}
 					}
 				}

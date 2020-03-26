@@ -8,8 +8,6 @@ namespace Land.Markup.Binding
 {
 	public class EmptyContextHeuristic : IWeightsHeuristic
 	{
-		public long Priority => 10;
-
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source, 
 			List<RemapCandidateInfo> candidates, Dictionary<ContextType, double?> weights)
@@ -42,8 +40,6 @@ namespace Land.Markup.Binding
 	/// </summary>
 	public class PrioritizeByGapHeuristic : IWeightsHeuristic
 	{
-		public long Priority => 1000;
-
 		public class ContextFeatures
 		{
 			public double MaxValue { get; set; }
@@ -104,7 +100,9 @@ namespace Land.Markup.Binding
 			/// Считаем разности между последовательно идущими отсортированными по похожести элементами
 			var gaps = new List<double>(ordered.Count - 1);
 			for (var i = 0; i < ordered.Count - 1; ++i)
+			{
 				gaps.Add(getSimilarity(ordered[i]) - getSimilarity(ordered[i + 1]));
+			}
 			gaps = gaps.OrderByDescending(e => e).ToList();
 
 			return new ContextFeatures
@@ -125,15 +123,35 @@ namespace Land.Markup.Binding
 	{
 		const double GARBAGE_INNER_THRESHOLD = 0.6;
 
-		public long Priority => 100;
-
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
 			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_INNER_THRESHOLD)
+			{
 				weights[ContextType.Inner] = 1;
+			}
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
+			);
+
+			return weights;
+		}
+	}
+
+	public class TuneInnerPriorityAccordingToLength : IWeightsHeuristic
+	{
+		const double INNER_LENGTH_THRESHOLD = 50;
+
+		public Dictionary<ContextType, double?> TuneWeights(
+			PointContext source,
+			List<RemapCandidateInfo> candidates,
+			Dictionary<ContextType, double?> weights)
+		{
+			weights[ContextType.Inner] *= source.InnerContext.Content.TextLength /
+				(source.InnerContext.Content.TextLength + INNER_LENGTH_THRESHOLD);
 
 			System.Diagnostics.Trace.WriteLine(
 				$"{this.GetType().Name} H: {weights[ContextType.Header]} I: {weights[ContextType.Inner]} A: {weights[ContextType.Ancestors]}"
@@ -145,8 +163,6 @@ namespace Land.Markup.Binding
 
 	public class DefaultWeightsHeuristic : IWeightsHeuristic
 	{
-		public long Priority => 0;
-
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,

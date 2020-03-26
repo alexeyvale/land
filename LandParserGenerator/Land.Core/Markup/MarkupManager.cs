@@ -26,6 +26,8 @@ namespace Land.Markup
 			ContextFinder.SetHeuristic(typeof(PrioritizeByGapHeuristic));
 			ContextFinder.SetHeuristic(typeof(LowerChangedInnerPriority));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
+			ContextFinder.SetHeuristic(typeof(TuneInnerPriorityAccordingToLength));
+
 			ContextFinder.SetHeuristic(typeof(SameHeaderAndAncestorsHeuristic));
 
 			#endregion

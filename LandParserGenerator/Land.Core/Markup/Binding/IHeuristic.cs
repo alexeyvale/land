@@ -6,10 +6,7 @@ using System.Text;
 
 namespace Land.Markup.Binding
 {
-	public interface IHeuristic
-	{
-		long Priority { get; }
-	}
+	public interface IHeuristic	{ }
 
 	public interface IWeightsHeuristic: IHeuristic
 	{

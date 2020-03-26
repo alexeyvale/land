@@ -11,8 +11,6 @@ namespace Land.Markup.Binding
 	/// </summary>
 	public class SameHeaderAndAncestorsHeuristic : ISimilarityHeuristic
 	{
-		public long Priority => 10;
-
 		public List<RemapCandidateInfo> PredictSimilarity(
 			PointContext source,
 			List<RemapCandidateInfo> candidates)
