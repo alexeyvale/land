@@ -51,10 +51,6 @@ namespace Comparison
 				if (landParser.Log.Any(l => l.Type == Land.Core.MessageType.Error))
 					landErrors.Add(file);
 
-				var visitor = new NodeRetypingVisitor(null);
-				landRoot.Accept(visitor);
-				landRoot = visitor.Root;
-
 				var landParsed = new ParsedFile
 				{
 					BindingContext = PointContext.GetFileContext(Path.GetFileName(file), text),

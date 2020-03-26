@@ -615,12 +615,12 @@ namespace Land.Markup.Binding
 
 			candidates = nodeContext.HeaderContext.Count > 0
 				? contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), false)
-					.OrderBy(c => c.HeaderSimilarity)
+					.OrderByDescending(c => c.HeaderSimilarity)
 					.Take(MAX_COUNT)
 					.TakeWhile(c => c.HeaderSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
 					.ToList()
 				: contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), false)
-					.OrderBy(c => c.InnerSimilarity)
+					.OrderByDescending(c => c.InnerSimilarity)
 					.Take(MAX_COUNT)
 					.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
 					.ToList();
