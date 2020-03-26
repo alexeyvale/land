@@ -414,17 +414,13 @@ namespace Land.Markup.Binding
 
 		public static List<HeaderContextElement> GetHeaderContext(Node node)
 		{
-			var cachingNode = (ContextCachingNode)node;
-
-			/// Если есть закешированный контекст, возвращаем его
-			//if (cachingNode.HeaderContext != null)
-			//return cachingNode.HeaderContext;
+			var result = new List<HeaderContextElement>();
 
 			/// Иначе вычисляем контекст заголовка
 			/// Листовой узел сам себе заголовок
 			if (node.Value.Count > 0)
 			{
-				cachingNode.HeaderContext = new List<HeaderContextElement>()
+				result = new List<HeaderContextElement>()
 				{
 					new HeaderContextElement()
 					{
@@ -437,7 +433,7 @@ namespace Land.Markup.Binding
 			/// Для нелистового ищем листовых непосредственных потомков
 			else
 			{
-				cachingNode.HeaderContext = new List<HeaderContextElement>();
+				result = new List<HeaderContextElement>();
 
 				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
@@ -449,7 +445,7 @@ namespace Land.Markup.Binding
 						current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) &&
 						current.Options.GetPriority() > 0)
 					{
-						cachingNode.HeaderContext.Add((HeaderContextElement)current);
+						result.Add((HeaderContextElement)current);
 					}
 					else
 					{
@@ -460,7 +456,7 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return cachingNode.HeaderContext;
+			return result;
 		}
 
 		public static List<AncestorsContextElement> GetAncestorsContext(Node node)

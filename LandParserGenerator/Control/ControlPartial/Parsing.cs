@@ -70,13 +70,6 @@ namespace Land.Control
 						root = Parsers[extension].Parse(text);
 						success = Parsers[extension].Log.All(l => l.Type != MessageType.Error);
 
-						if(root!=null)
-						{
-							var visitor = new NodeRetypingVisitor(null);
-							root.Accept(visitor);
-							root = visitor.Root;
-						}
-
 						Parsers[extension].Log.ForEach(l => l.FileName = fileName);
 						Log.AddRange(Parsers[extension].Log);
 					}
