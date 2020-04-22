@@ -141,12 +141,13 @@ namespace ManualRemappingTool
 		{
 			if (DatasetList.SelectedItem != null)
 			{
-				var selected = DatasetList.SelectedIndex;
+				var selected = (string)DatasetList.SelectedItem;
 
-				Settings.Default.RecentDatasets.RemoveAt(selected);
+				Settings.Default.RecentDatasets.Remove(selected);
 				Settings.Default.Save();
 
-				DatasetList.SelectedIndex = selected == DatasetList.Items.Count ? -1 : selected;
+				DatasetList.Items.Refresh();
+				DatasetList.SelectedIndex = -1;
 			}
 		}
 

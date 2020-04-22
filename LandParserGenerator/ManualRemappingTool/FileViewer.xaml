@@ -17,7 +17,6 @@
 			<Setter Property="FontSize" Value="14pt"/>
 			<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
 			<Setter Property="Foreground" Value="Black"/>
-			<Setter Property="IsEnabled" Value="True"/>
 			<Setter Property="Width" Value="35"/>
 			<Setter Property="Height" Value="35"/>
 			<Style.Triggers>
@@ -50,15 +49,17 @@
 							Content="&#xf07c;" 
 							Style="{StaticResource IconButtonStyle}"/>
 				<Button Name="OpenPrevFileButton" 
-							Click="OpenPrevFileButton_Click" 
-							ToolTip="Предыдущий" 
-							Content="&#xf04a;" 
-							Style="{StaticResource IconButtonStyle}"/>
+						Click="OpenPrevFileButton_Click" 
+						ToolTip="Предыдущий" 
+						Content="&#xf04a;" 
+						IsEnabled="{Binding ElementName=FileViewerObject, Path=AreNextPrevEnabled}"
+						Style="{StaticResource IconButtonStyle}"/>
 				<Button Name="OpenNextFileButton" 
-							Click="OpenNextFileButton_Click" 
-							ToolTip="Следующий" 
-							Content="&#xf04e;" 
-							Style="{StaticResource IconButtonStyle}"/>
+						Click="OpenNextFileButton_Click" 
+						ToolTip="Следующий" 
+						Content="&#xf04e;" 
+						IsEnabled="{Binding ElementName=FileViewerObject, Path=AreNextPrevEnabled}"
+						Style="{StaticResource IconButtonStyle}" Margin="0,-2,0,-2.6" VerticalAlignment="Bottom" Width="36"/>
 				<Label Padding="10,7,10,0" Name="FilePathLabel"
 					   Content="{Binding ElementName=FileViewerObject, Path=FilePath, Mode=OneWay}"></Label>
 			</ToolBar>
@@ -70,8 +71,7 @@
 					FontFamily="Consolas"
 					IsReadOnly="True"
 					Background="#e3e3e3"
-					FontSize="{Binding ElementName=FileViewerObject, Path=FontSize, Mode=OneWay}"
-					MouseDown="FileEditor_MouseDown">
+					PreviewMouseLeftButtonUp="FileEditor_PreviewMouseUp">
 			</avalonedit:TextEditor>
 		</Grid>
 

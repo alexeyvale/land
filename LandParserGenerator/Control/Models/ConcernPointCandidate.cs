@@ -22,6 +22,8 @@ namespace Land.Control
 	{
 		public Node Node { get; set; }
 
+		public ExistingConcernPointCandidate() { }
+
 		public ExistingConcernPointCandidate(Node node)
 		{
 			Node = node;

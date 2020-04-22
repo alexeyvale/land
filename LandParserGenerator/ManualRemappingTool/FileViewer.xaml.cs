@@ -2,6 +2,7 @@
 using Land.Control;
 using Land.Core;
 using Land.Core.Parsing.Tree;
+using Land.Markup.CoreExtension;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,8 @@ namespace ManualRemappingTool
 		/// </summary>
 		private Node TreeRoot { get; set; }
 
+		private List<ConcernPointCandidate> Entities { get; set; }
+
 		/// <summary>
 		/// Список файлов, содержащихся в каталоге, 
 		/// с которым ведётся работа в рамках данного экземпляра просмотрщика
@@ -65,7 +68,8 @@ namespace ManualRemappingTool
 			{
 				_workingDirectory = value;
 
-				if (WorkingExtensions != null && WorkingExtensions.Count > 0)
+				if (!String.IsNullOrEmpty(WorkingDirectory)
+					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
 				{
 					WorkingDirectoryFiles = Directory
 						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
@@ -91,7 +95,8 @@ namespace ManualRemappingTool
 			{
 				_workingExtensions = value;
 
-				if (!String.IsNullOrEmpty(WorkingDirectory))
+				if (!String.IsNullOrEmpty(WorkingDirectory)
+					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
 				{
 					WorkingDirectoryFiles = Directory
 						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
@@ -176,6 +181,19 @@ namespace ManualRemappingTool
 			}
 		}
 
+		public static readonly DependencyProperty AreNextPrevEnabledProperty = DependencyProperty.Register(
+			"AreNextPrevEnabled",
+			typeof(bool),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+
+		public bool AreNextPrevEnabled
+		{
+			get => (bool)GetValue(AreNextPrevEnabledProperty);
+			set { SetValue(AreNextPrevEnabledProperty, value); }
+		}
+
 		#endregion
 
 		#region Events
@@ -253,9 +271,16 @@ namespace ManualRemappingTool
 			}
 		}
 
-		private void FileEditor_MouseDown(object sender, MouseButtonEventArgs e)
+		private void FileEditor_PreviewMouseUp(object sender, MouseButtonEventArgs e)
 		{
+			if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+			{
+				var candidates = GetEntities(TreeRoot, new PointLocation(FileEditor.CaretOffset));
 
+				candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
+
+				FileElementsList.ItemsSource = candidates;
+			}
 		}
 
 		#region Helpers
@@ -318,6 +343,34 @@ namespace ManualRemappingTool
 			return Uri.UnescapeDataString(
 				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
 			);
+		}
+
+		public List<ConcernPointCandidate> GetEntities(Node root, PointLocation point)
+		{
+			var pseudoSegment = new SegmentLocation
+			{
+				End = point,
+				Start = point
+			};
+
+			var pointCandidates = new LinkedList<Node>();
+			var currentNode = root;
+
+			/// В качестве кандидатов на роль помечаемого участка рассматриваем узлы от корня,
+			/// содержащие текущую позицию каретки
+			while (currentNode != null)
+			{
+				if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+					pointCandidates.AddFirst(currentNode);
+
+				currentNode = currentNode.Children
+					.Where(c => c.Location != null && c.Location.Includes(pseudoSegment))
+					.FirstOrDefault();
+			}
+
+			return pointCandidates
+				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
+				.ToList();
 		}
 
 		#endregion

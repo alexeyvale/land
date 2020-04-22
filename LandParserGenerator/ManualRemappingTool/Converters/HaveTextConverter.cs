@@ -7,7 +7,7 @@ using System.Windows.Data;
 
 namespace ManualRemappingTool
 {
-	public class OkButtonIsEnabledConverter : IMultiValueConverter
+	public class HaveTextConverter : IMultiValueConverter
 	{
 		public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
 		{
@@ -17,7 +17,7 @@ namespace ManualRemappingTool
 
 		public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
 		{
-			return new object[] { };
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -76,7 +76,7 @@ namespace ManualRemappingTool
 		private SearchPanel GenerateSearchPanel(TextArea area)
 		{
 			var panel = SearchPanel.Install(area);
-			panel.MarkerBrush = new SolidColorBrush(Color.FromRgb(170, 240, 170));
+			panel.MarkerBrush = new SolidColorBrush(Color.FromRgb(240, 170, 170));
 
 			return panel;
 		}

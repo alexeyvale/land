@@ -19,7 +19,6 @@
 			<Setter Property="FontSize" Value="14pt"/>
 			<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
 			<Setter Property="Foreground" Value="Black"/>
-			<Setter Property="IsEnabled" Value="True"/>
 			<Setter Property="Width" Value="35"/>
 			<Setter Property="Height" Value="35"/>
 			<Style.Triggers>
@@ -44,10 +43,9 @@
 
 		<local:FileViewer Grid.Column="0" 
 						  x:Name="SourceFileView"
-						  PreviewMouseWheel="Control_PreviewMouseWheel"
+						  LabelText="ИСХ"
 						  FileOpened="SourceFileView_FileOpened"
-						  MessageSent="Control_MessageSent"
-						  LabelText="ИСХ">
+						  MessageSent="Control_MessageSent">
 		</local:FileViewer>
 
 		<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" 
@@ -55,10 +53,10 @@
 
 		<local:FileViewer Grid.Column="2" 
 						  x:Name="TargetFileView" 
-						  PreviewMouseWheel="Control_PreviewMouseWheel"
+						  LabelText="МОД"
+						  AreNextPrevEnabled="False"
 						  FileOpened="TargetFileView_FileOpened"
-						  MessageSent="Control_MessageSent"
-						  LabelText="МОД">
+						  MessageSent="Control_MessageSent">
 		</local:FileViewer>
 
 		<GridSplitter Grid.Column="4" ShowsPreview="False" Width="5" 
@@ -71,6 +69,8 @@
 					Click="RemoveFromDatasetButton_Click"></Button>
 			<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="HaveDoubtsButton_Click"></Button>
+			<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
+					Click="SyncViewsButton_Click"></Button>
 		</StackPanel>
 		
 		<Grid Grid.Column="5">

@@ -65,7 +65,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\InverseBooleanConverter.cs" />
-    <Compile Include="Converters\MissingListIconVisibilityConverter.cs" />
+    <Compile Include="Converters\HaveTextConverter.cs" />
     <Compile Include="StartWindow.xaml.cs">
       <DependentUpon>StartWindow.xaml</DependentUpon>
     </Compile>

@@ -10,7 +10,7 @@
 		WindowStartupLocation="CenterOwner">
 
 	<Window.Resources>
-		<local:OkButtonIsEnabledConverter x:Key="OkButtonIsEnabledConverter" />
+		<local:HaveTextConverter x:Key="HaveTextConverter" />
 		<local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
 		
 		<FontFamily x:Key="FontAwesomeRegular">Fonts/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
@@ -90,7 +90,7 @@
 					<Style TargetType="{x:Type Button}">
 						<Setter Property="IsEnabled">
 							<Setter.Value>
-								<MultiBinding Converter="{StaticResource OkButtonIsEnabledConverter}">
+								<MultiBinding Converter="{StaticResource HaveTextConverter}">
 									<Binding ElementName="SourceFolderPath" Path="Text" Mode="OneWay"/>
 									<Binding ElementName="TargetFolderPath" Path="Text" Mode="OneWay"/>
 									<Binding ElementName="Extensions" Path="Text" Mode="OneWay"/>

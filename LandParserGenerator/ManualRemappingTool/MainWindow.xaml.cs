@@ -42,7 +42,14 @@ namespace ManualRemappingTool
 			InitializeComponent();
 
 			SourceFileView.Parsers = Parsers;
+			SourceFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
+			SourceFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
+			SourceFileView.FileElementsList.PreviewMouseWheel += Control_PreviewMouseWheel;
+
 			TargetFileView.Parsers = Parsers;
+			TargetFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
+			TargetFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
+			TargetFileView.FileElementsList.PreviewMouseWheel += Control_PreviewMouseWheel;
 
 			Parsers.Load(LoadSettings(SETTINGS_DEFAULT_PATH), CACHE_DIRECTORY, new List<Message>());
 		}
@@ -50,6 +57,14 @@ namespace ManualRemappingTool
 		private void MainWindow_ContentRendered(object sender, EventArgs e)
 		{
 			StartWindowInteraction();
+		}
+
+		private void FileView_ScrollOffsetChanged(object sender, EventArgs e)
+		{
+			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Alt)
+			{
+				SyncViewsButton_Click(null, null);
+			}
 		}
 
 		private void Control_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -198,6 +213,16 @@ namespace ManualRemappingTool
 			this.Title = e;
 		}
 
+		private void SyncViewsButton_Click(object sender, RoutedEventArgs e)
+		{
+			var offset = SourceFileView.FileEditor.TextArea.TextView.ScrollOffset.Y;
+
+			if (TargetFileView.FileEditor.TextArea.TextView.DocumentHeight > offset)
+			{
+				TargetFileView.FileEditor.ScrollToVerticalOffset(offset);
+			}
+		}
+
 		#region Helpers
 
 		private LandExplorerSettings LoadSettings(string path)
@@ -244,6 +269,13 @@ namespace ManualRemappingTool
 
 				SourceFileView.WorkingExtensions = TargetFileView.WorkingExtensions =
 					Dataset.Extensions;
+			}
+			else
+			{
+				if(Dataset == null)
+				{
+					this.Close();
+				}
 			}
 		}
 
