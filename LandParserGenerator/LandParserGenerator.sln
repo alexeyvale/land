@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPostprocessor", "Prep
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownPostprocessor", "Preprocessors\Tree postprocessing\MarkdownPostprocessor\MarkdownPostprocessor.csproj", "{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualRemappingTool", "ManualRemappingTool\ManualRemappingTool.csproj", "{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

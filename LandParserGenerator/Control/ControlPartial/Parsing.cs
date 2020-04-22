@@ -23,8 +23,12 @@ namespace Land.Control
 			Log.Clear();
 
 			foreach (var ext in Parsers.Load(SettingsObject, CACHE_DIRECTORY, Log))
-				foreach(var file in ParsedFiles.Keys.Where(f=>Path.GetExtension(f) == ext).ToList())
+			{
+				foreach (var file in ParsedFiles.Keys.Where(f => Path.GetExtension(f) == ext).ToList())
+				{
 					DocumentChangedHandler(file);
+				}
+			}
 		}
 
 		private ParsedFile GetParsed(string documentName)
