@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 
@@ -136,56 +137,59 @@ namespace ManualRemappingTool
 			{
 				Dataset.SavingPath = saveFileDialog.FileName;
 				SaveDatasetButton_Click(sender, e);
+
+				Settings.Default.RecentDatasets.Insert(0, Dataset.SavingPath);
+				Settings.Default.Save();
 			}
 		}
 
 		private void AddToDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
 			Dataset.Add(
-					SourceFileView.FilePath,
-					TargetFileView.FilePath,
-					SourceFileView.EntityStartLine.Value,
-					TargetFileView.EntityStartLine.Value,
-					SourceFileView.EntityType
-				);
+				SourceFileView.FilePath,
+				TargetFileView.FilePath,
+				SourceFileView.EntityStartLine.Value,
+				TargetFileView.EntityStartLine.Value,
+				SourceFileView.EntityType
+			);
 		}
 
 		private void RemoveFromDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
 			Dataset.Remove(
-					SourceFileView.FilePath,
-					TargetFileView.FilePath,
-					SourceFileView.EntityStartLine.Value,
-					TargetFileView.EntityStartLine.Value,
-					SourceFileView.EntityType
-				);
+				SourceFileView.FilePath,
+				TargetFileView.FilePath,
+				SourceFileView.EntityStartLine.Value,
+				TargetFileView.EntityStartLine.Value,
+				SourceFileView.EntityType
+			);
 		}
 
 		private void HaveDoubtsButton_Click(object sender, RoutedEventArgs e)
 		{
 			Dataset.Add(
-					SourceFileView.FilePath,
-					TargetFileView.FilePath,
-					SourceFileView.EntityStartLine.Value,
-					TargetFileView.EntityStartLine.Value,
-					SourceFileView.EntityType,
-					true
-				);
+				SourceFileView.FilePath,
+				TargetFileView.FilePath,
+				SourceFileView.EntityStartLine.Value,
+				TargetFileView.EntityStartLine.Value,
+				SourceFileView.EntityType,
+				true
+			);
 		}
 
 		private void SourceFileView_FileOpened(object sender, string e)
 		{
-			lock(FileOpeningLock)
+			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				TargetFileView.OpenFile(e);
+				TargetFileView.OpenFile(Path.Combine(TargetFileView.WorkingDirectory, e));
 			}
 		}
 
 		private void TargetFileView_FileOpened(object sender, string e)
 		{
-			lock (FileOpeningLock)
+			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				SourceFileView.OpenFile(e);
+				SourceFileView.OpenFile(Path.Combine(SourceFileView.WorkingDirectory, e));
 			}
 		}
 
@@ -221,8 +225,8 @@ namespace ManualRemappingTool
 
 			startWindow.Owner = this;
 
-			startWindow.Dataset = this.Dataset ?? new Dataset();
-			startWindow.Dataset.New();
+			startWindow.DatasetObject = this.Dataset ?? new Dataset();
+			startWindow.DatasetObject.New();
 
 			return startWindow;
 		}
@@ -233,7 +237,7 @@ namespace ManualRemappingTool
 
 			if (startWindow.ShowDialog() ?? false)
 			{
-				Dataset = startWindow.Dataset;
+				Dataset = startWindow.DatasetObject;
 
 				SourceFileView.WorkingDirectory = Dataset.SourceDirectoryPath;
 				TargetFileView.WorkingDirectory = Dataset.TargetDirectoryPath;

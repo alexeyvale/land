@@ -5,6 +5,7 @@ using Land.Core.Parsing.Tree;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,8 @@ namespace ManualRemappingTool
 	/// </summary>
 	public partial class FileViewer : UserControl
 	{
+		public event PropertyChangedEventHandler PropertyChanged;
+
 		/// <summary>
 		/// Панель поиска по тексту
 		/// </summary>
@@ -52,67 +55,142 @@ namespace ManualRemappingTool
 		public ParserManager Parsers { get; set; }
 
 		/// <summary>
-		/// Метка с дополнительной информацией, отображаемая в заголовке панели
-		/// </summary>
-		public string LabelText { get; set; }
-
-		/// <summary>
 		/// Каталог, файлы в котором рассматриваем
 		/// </summary>
 		public string WorkingDirectory
 		{
-			get { return workingDirectory; }
+			get { return _workingDirectory; }
 
 			set
 			{
-				workingDirectory = value;
+				_workingDirectory = value;
 
-				WorkingDirectoryFiles = Directory
-					.GetFiles(WorkingDirectory, $"*.{WorkingExtensions}", SearchOption.AllDirectories)
-					.OrderBy(elem => elem)
-					.ToList();
+				if (WorkingExtensions != null && WorkingExtensions.Count > 0)
+				{
+					WorkingDirectoryFiles = Directory
+						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
+						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
+						.OrderBy(elem => elem)
+						.ToList();
+				}
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WorkingDirectory)));
 			}
 		}
 
-		private string workingDirectory;
+		private string _workingDirectory;
 
 		/// <summary>
 		///  Расширение файлов, которые рассматриваем
 		/// </summary>
-		public HashSet<string> WorkingExtensions { get; set; }
+		public HashSet<string> WorkingExtensions
+		{
+			get { return _workingExtensions; }
 
-		/// <summary>
-		///  Путь к текущему открытому файлу
-		/// </summary>
-		public string FilePath 
-		{ 
-			get { return filePath; }
-			
 			set
-			{ 
-				filePath = FilePath;
-				FileOpened?.Invoke(this, FilePath);
-			} 
+			{
+				_workingExtensions = value;
+
+				if (!String.IsNullOrEmpty(WorkingDirectory))
+				{
+					WorkingDirectoryFiles = Directory
+						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
+						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
+						.OrderBy(elem => elem)
+						.ToList();
+				}
+			}
 		}
 
-		private string filePath;
+		private HashSet<string> _workingExtensions;
 
-		public int? EntityStartLine => null;
+		#region Dependency properties
 
-		public string EntityType { get; set; }
+		public static readonly DependencyProperty EntityStartLineProperty = DependencyProperty.Register(
+			"EntityStartLine",
+			typeof(int?),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
 
-		public bool EntityTypeLocked { get; set; }
+		public int? EntityStartLine
+		{
+			get => (int?)GetValue(EntityStartLineProperty);
+			set { SetValue(EntityStartLineProperty, value); }
+		}
 
+		public static readonly DependencyProperty EntityTypeProperty = DependencyProperty.Register(
+			"EntityType",
+			typeof(string),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+
+		public string EntityType
+		{
+			get => (string)GetValue(EntityTypeProperty);
+			set { SetValue(EntityTypeProperty, value); }
+		}
+
+		public static readonly DependencyProperty EntityTypeLockedProperty = DependencyProperty.Register(
+			"EntityTypeLocked",
+			typeof(bool),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+
+		public bool EntityTypeLocked
+		{
+			get => (bool)GetValue(EntityTypeLockedProperty);
+			set { SetValue(EntityTypeLockedProperty, value); }
+		}
+
+		public static readonly DependencyProperty LabelTextProperty = DependencyProperty.Register(
+			"LabelText",
+			typeof(string),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+
+		public string LabelText
+		{
+			get => (string)GetValue(LabelTextProperty);
+			set { SetValue(LabelTextProperty, value); }
+		}
+
+		public static readonly DependencyProperty FilePathProperty = DependencyProperty.Register(
+			"FilePath",
+			typeof(string),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(null)
+		);
+
+		public string FilePath
+		{
+			get => (string)GetValue(FilePathProperty);
+
+			private set 
+			{
+				SetValue(FilePathProperty, 
+					GetRelativePath(value, WorkingDirectory)); 
+			}
+		}
+
+		#endregion
+
+		#region Events
 
 		public event EventHandler<string> FileOpened;
 
 		public event EventHandler<string> MessageSent;
 
+		#endregion
+
 		public FileViewer()
 		{
 			InitializeComponent();
 
-			FontSize = 12;
+			FontSize = 14;
 			QuickSearch = new EditorSearchHandler(FileEditor.TextArea);
 		}
 
@@ -133,6 +211,7 @@ namespace ManualRemappingTool
 				&& openFileDialog.FileName.StartsWith(WorkingDirectory))
 			{
 				OpenFile(openFileDialog.FileName);
+				FileOpened?.Invoke(this, FilePath);
 			}
 
 			TreeRoot = Parse(openFileDialog.FileName, FileEditor.Text);
@@ -140,11 +219,17 @@ namespace ManualRemappingTool
 
 		private void OpenPrevFileButton_Click(object sender, RoutedEventArgs e)
 		{
+			if (!CurrentFileIndex.HasValue && WorkingDirectoryFiles.Count > 0)
+			{
+				CurrentFileIndex = WorkingDirectoryFiles.Count - 1;
+			}
+
 			if (CurrentFileIndex.HasValue && CurrentFileIndex != 0)
 			{
 				--CurrentFileIndex;
 
 				OpenFile(WorkingDirectoryFiles[CurrentFileIndex.Value]);
+				FileOpened?.Invoke(this, FilePath);
 
 				TreeRoot = Parse(WorkingDirectoryFiles[CurrentFileIndex.Value], FileEditor.Text);
 			}
@@ -152,11 +237,17 @@ namespace ManualRemappingTool
 
 		private void OpenNextFileButton_Click(object sender, RoutedEventArgs e)
 		{
+			if(!CurrentFileIndex.HasValue && WorkingDirectoryFiles.Count > 0)
+			{
+				CurrentFileIndex = 0;
+			}
+
 			if(CurrentFileIndex.HasValue && CurrentFileIndex != WorkingDirectoryFiles.Count - 1)
 			{
 				++CurrentFileIndex;
 
 				OpenFile(WorkingDirectoryFiles[CurrentFileIndex.Value]);
+				FileOpened?.Invoke(this, FilePath);
 
 				TreeRoot = Parse(WorkingDirectoryFiles[CurrentFileIndex.Value], FileEditor.Text);
 			}
@@ -218,6 +309,15 @@ namespace ManualRemappingTool
 			}
 
 			return null;
+		}
+
+		private static string GetRelativePath(string filePath, string directoryPath)
+		{
+			var directoryUri = new Uri(directoryPath + "/");
+
+			return Uri.UnescapeDataString(
+				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
+			);
 		}
 
 		#endregion

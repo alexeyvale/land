@@ -21,7 +21,14 @@ namespace ManualRemappingTool
 	/// </summary>
 	public partial class StartWindow : Window
 	{
-		public Dataset Dataset { get; set; } = new Dataset();
+		public Dataset DatasetObject { get; set; } = new Dataset();
+
+		public static readonly DependencyProperty IsDatasetLocked = DependencyProperty.Register(
+			"IsDatasetLocked",
+			typeof(bool),
+			typeof(StartWindow),
+			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
 
 		public StartWindow()
 		{
@@ -46,10 +53,7 @@ namespace ManualRemappingTool
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				Dataset.Load(openFileDialog.FileName);
-
-				Settings.Default.RecentDatasets.Insert(0, openFileDialog.FileName);
-				Settings.Default.Save();
+				LoadDataset(openFileDialog.FileName);
 			}
 		}
 
@@ -57,13 +61,7 @@ namespace ManualRemappingTool
 		{
 			if (e.ChangedButton == MouseButton.Left && DatasetList.SelectedItem != null)
 			{
-				Dataset.Load((string)DatasetList.SelectedItem);
-
-				var selected = (string)DatasetList.SelectedItem;
-
-				Settings.Default.RecentDatasets.Remove(selected);
-				Settings.Default.RecentDatasets.Insert(0, selected);
-				Settings.Default.Save();
+				LoadDataset((string)DatasetList.SelectedItem);
 			}
 		}
 
@@ -75,20 +73,21 @@ namespace ManualRemappingTool
 			{
 				if(sender == SelectSourceFolderButton)
 				{
-					Dataset.SourceDirectoryPath = folderDialog.SelectedPath;
+					SourceFolderPath.Text = folderDialog.SelectedPath;
 				}
 				else
 				{
-					Dataset.TargetDirectoryPath = folderDialog.SelectedPath;
+					TargetFolderPath.Text = folderDialog.SelectedPath;
 				}
-
-				HandleDatasetUpdated();
 			}
 		}
 
 		private void OpenMenuItem_Click(object sender, RoutedEventArgs e)
 		{
-
+			if (DatasetList.SelectedItem != null)
+			{
+				LoadDataset((string)DatasetList.SelectedItem);
+			}
 		}
 
 		private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
@@ -112,6 +111,30 @@ namespace ManualRemappingTool
 			}
 		}
 
+		private void ResetButton_Click(object sender, RoutedEventArgs e)
+		{
+			SetValue(IsDatasetLocked, false);
+		}
+
+		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			DialogResult = false;
+		}
+
+		private void OkButton_Click(object sender, RoutedEventArgs e)
+		{
+			if (!(bool)GetValue(IsDatasetLocked))
+			{
+				DatasetObject.New();
+
+				DatasetObject.ExtensionsString = Extensions.Text;
+				DatasetObject.SourceDirectoryPath = SourceFolderPath.Text;
+				DatasetObject.TargetDirectoryPath = TargetFolderPath.Text;
+			}
+
+			DialogResult = true;
+		}
+
 		#region Helpers
 
 		private void DeleteSelectedRecent()
@@ -127,9 +150,20 @@ namespace ManualRemappingTool
 			}
 		}
 
-		private void HandleDatasetUpdated()
+		private void LoadDataset(string filePath)
 		{
+			DatasetObject = Dataset.Load(filePath);
+			SetValue(IsDatasetLocked, true);
 
+			SourceFolderPath.Text = DatasetObject.SourceDirectoryPath;
+			TargetFolderPath.Text = DatasetObject.TargetDirectoryPath;
+			Extensions.Text = DatasetObject.ExtensionsString;
+
+			Settings.Default.RecentDatasets.Remove(filePath);
+			Settings.Default.RecentDatasets.Insert(0, filePath);
+			Settings.Default.Save();
+
+			DatasetList.Items.Refresh();
 		}
 
 		#endregion

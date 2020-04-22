@@ -11,6 +11,7 @@
 
 	<Window.Resources>
 		<local:OkButtonIsEnabledConverter x:Key="OkButtonIsEnabledConverter" />
+		<local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
 		
 		<FontFamily x:Key="FontAwesomeRegular">Fonts/Font-Awesome-5-Regular-400.otf#Font Awesome 5 Free Regular</FontFamily>
 		<FontFamily x:Key="FontAwesomeSolid">Fonts/Font-Awesome-5-Solid-900.otf#Font Awesome 5 Free Solid</FontFamily>
@@ -41,23 +42,26 @@
 			<RowDefinition Height="25"></RowDefinition>
 		</Grid.RowDefinitions>
 		
-		<StackPanel Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center">
+		<StackPanel Orientation="Vertical" Grid.Row="0" HorizontalAlignment="Center" 
+					IsEnabled="{Binding ElementName=WindowObject, Path=IsDatasetLocked, Converter={StaticResource InverseBooleanConverter}}">
 			<Label Content="Каталог исх. файлов"></Label>
 			<StackPanel Orientation="Horizontal">
-				<TextBox Width="310" Name="SourceDirectoryPath"></TextBox>
+				<TextBox Width="310"  Name="SourceFolderPath"></TextBox>
 				<Button Width="25" Margin="5 0 0 0" Name="SelectSourceFolderButton" Click="SelectFolderButton_Click">...</Button>
 			</StackPanel>
 		</StackPanel>
 
-		<StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center">
+		<StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Center"
+					IsEnabled="{Binding ElementName=WindowObject, Path=IsDatasetLocked, Converter={StaticResource InverseBooleanConverter}}">
 			<Label Content="Каталог мод. файлов"></Label>
 			<StackPanel Orientation="Horizontal">
-				<TextBox Width="310" Name="TargetDirectoryPath"></TextBox>
+				<TextBox Width="310" Name="TargetFolderPath"></TextBox>
 				<Button Width="25" Margin="5 0 0 0" Name="SelectTargetFolderButton" Click="SelectFolderButton_Click">...</Button>
 			</StackPanel>
 		</StackPanel>
 
-		<StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center">
+		<StackPanel Orientation="Vertical" Grid.Row="2" HorizontalAlignment="Center"
+					IsEnabled="{Binding ElementName=WindowObject, Path=IsDatasetLocked, Converter={StaticResource InverseBooleanConverter}}">
 			<Label Content="Расширения файлов"></Label>
 			<TextBox Width="335" Name="Extensions"></TextBox>
 		</StackPanel>
@@ -67,7 +71,7 @@
 				<Button Name="LoadDatasetButton" Content="&#xf07c;" ToolTip="Загрузить датасет" Style="{StaticResource IconButtonStyle}"
 						Click="LoadDatasetButton_Click"></Button>
 			</ToolBar>
-			<Label Content="Недавние датасеты:"/>
+			<Label Content="Недавние датасеты"/>
 			<ListBox ToolTip="Двойной щелчок для выбора" Height="100" Name="DatasetList" Width="459" Background="White"
 					 MouseDoubleClick="DatasetList_MouseDoubleClick" 
 					 KeyUp="DatasetList_KeyUp">
@@ -81,22 +85,24 @@
 		</StackPanel>
 
 		<StackPanel Orientation="Horizontal" Grid.Row="4" HorizontalAlignment="Center">
-			<Button Content="OK" Margin="0 0 15 0" Width="70">
+			<Button Content="OK" Margin="0 0 15 0" Width="70" Name="OkButton" Click="OkButton_Click">
 				<Button.Style>
 					<Style TargetType="{x:Type Button}">
 						<Setter Property="IsEnabled">
 							<Setter.Value>
 								<MultiBinding Converter="{StaticResource OkButtonIsEnabledConverter}">
-									<Binding ElementName="WindowObject" Path="Extensions.Text" Mode="OneWay"/>
-									<Binding ElementName="WindowObject" Path="TargetDirectoryPath.Text" Mode="OneWay"/>
-									<Binding ElementName="WindowObject" Path="SourceDirectoryPath.Text" Mode="OneWay"/>
+									<Binding ElementName="SourceFolderPath" Path="Text" Mode="OneWay"/>
+									<Binding ElementName="TargetFolderPath" Path="Text" Mode="OneWay"/>
+									<Binding ElementName="Extensions" Path="Text" Mode="OneWay"/>
 								</MultiBinding>
 							</Setter.Value>
 						</Setter>
 					</Style>
 				</Button.Style>
 			</Button>
-			<Button Content="Отмена" Width="70"></Button>
+			<Button Content="Отмена" Width="70" Name="CancelButton" Click="CancelButton_Click"></Button>
+			<Button Content="Сбросить выбор" Width="120" Name="ResetButton" Click="ResetButton_Click" Margin="40 0 0 0"
+					IsEnabled="{Binding ElementName=WindowObject, Path=IsDatasetLocked, Mode=OneWay}"></Button>
 		</StackPanel>
 	</Grid>
 </Window>

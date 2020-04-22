@@ -1,55 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 
 namespace ManualRemappingTool
 {
 	public class Dataset
 	{
-		public new event PropertyChangedEventHandler PropertyChanged;
-
 		public string SavingPath { get; set; }
+
+		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
 		#region Serializable
 
-		private string _sourceDirectoryPath;
-		public string SourceDirectoryPath
-		{
-			get => _sourceDirectoryPath;
-
-			set 
-			{ 
-				_sourceDirectoryPath = value; 
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SourceDirectoryPath))); 
-			}
-		}
-
-		private string _targetDirectoryPath;
-		public string TargetDirectoryPath
-		{
-			get => _targetDirectoryPath;
-
-			set 
-			{
-				_targetDirectoryPath = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TargetDirectoryPath))); 
-			}
-		}
-
-		private string _entityType;
-		public string EntityType
-		{
-			get => _entityType;
-
-			set 
-			{
-				_entityType = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityType))); 
-			}
-		}
-
+		public string SourceDirectoryPath { get; set; }
+		public string TargetDirectoryPath { get; set; }
+		public string EntityType { get; set; }
 		public Dictionary<string, Dictionary<string, List<DatasetRecord>>> Records { get; set; }
 
 		public string ExtensionsString
@@ -63,14 +30,10 @@ namespace ManualRemappingTool
 					value.ToLower().Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
 						.Select(ext => ext.StartsWith(".") ? ext : '.' + ext)
 				);
-
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ExtensionsString)));
 			}
 		}
 
 		#endregion
-
-		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
 		public void Add(
 				string sourceFilePath,
@@ -81,9 +44,6 @@ namespace ManualRemappingTool
 				bool hasDoubts = false
 			)
 		{
-			sourceFilePath = GetRelativePath(sourceFilePath, SourceDirectoryPath);
-			targetFilePath = GetRelativePath(targetFilePath, TargetDirectoryPath);
-
 			if (!Records.ContainsKey(sourceFilePath))
 			{
 				Records[sourceFilePath] = 
@@ -223,15 +183,6 @@ namespace ManualRemappingTool
 			}
 
 			return ds;
-		}
-
-		private static string GetRelativePath(string filePath, string directoryPath)
-		{
-			var directoryUri = new Uri(directoryPath + "/");
-
-			return Uri.UnescapeDataString(
-				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
-			);
 		}
 	}
 

@@ -37,8 +37,8 @@
 			<ColumnDefinition Width="40*"></ColumnDefinition>
 			<ColumnDefinition Width="5"></ColumnDefinition>
 			<ColumnDefinition Width="40*"></ColumnDefinition>
-			<ColumnDefinition Width="5"></ColumnDefinition>
 			<ColumnDefinition Width="35"></ColumnDefinition>
+			<ColumnDefinition Width="5"></ColumnDefinition>
 			<ColumnDefinition Width="20*"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
 
@@ -61,10 +61,10 @@
 						  LabelText="МОД">
 		</local:FileViewer>
 
-		<GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" 
+		<GridSplitter Grid.Column="4" ShowsPreview="False" Width="5" 
 					  HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
-		<StackPanel Grid.Column="4" Orientation="Vertical" VerticalAlignment="Center">
+		<StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
 			<Button Name="AddToDatasetButton" Content="&#xf067;" ToolTip="Добавить в датасет" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="AddToDatasetButton_Click"></Button>
 			<Button Name="RemoveFromDatasetButton" Content="&#xf068;" ToolTip="Убрать из датасета" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
@@ -97,21 +97,15 @@
 			
 			<StackPanel Grid.Row="2" Orientation="Vertical">
 				<Label Content="Каталог исх. файлов"></Label>
-				<StackPanel Orientation="Horizontal">
-					<TextBox Width="110" Text="{Binding ElementName=MainWindowObject, Path=SourceFileView.WorkingDirectory, Mode=TwoWay}"></TextBox>
-					<Button Width="25" Margin="5 0 0 0">...</Button>
-				</StackPanel>
+				<Label Content="{Binding ElementName=SourceFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
 			</StackPanel>
 			
 			<StackPanel Grid.Row="3" Orientation="Vertical">
 				<Label Content="Каталог мод. файлов"></Label>
-				<StackPanel Orientation="Horizontal">
-					<TextBox Width="110" Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}, Path=TargetFileView.WorkingDirectory}"></TextBox>
-					<Button Width="25" Margin="5 0 0 0">...</Button>
-				</StackPanel>
+				<Label Content="{Binding ElementName=TargetFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
 			</StackPanel>
 
-			<CheckBox Grid.Row="4" Content="Автозагрузка пары" IsChecked="True"></CheckBox>
+			<CheckBox Grid.Row="4" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
 		</Grid>
 	</Grid>
 </Window>
