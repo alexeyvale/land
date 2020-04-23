@@ -12,6 +12,7 @@ namespace ManualRemappingTool
 
 		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
+
 		#region Serializable
 
 		public string SourceDirectoryPath { get; set; }
@@ -38,8 +39,8 @@ namespace ManualRemappingTool
 		public void Add(
 				string sourceFilePath,
 				string targetFilePath,
-				int sourceLine,
-				int targetLine,
+				int sourceOffset,
+				int targetOffset,
 				string entityType,
 				bool hasDoubts = false
 			)
@@ -57,7 +58,7 @@ namespace ManualRemappingTool
 			}
 
 			var existing = Records[sourceFilePath][targetFilePath]
-				.Where(r => r.EntityType == entityType && r.SourceLine == sourceLine)
+				.Where(r => r.EntityType == entityType && r.SourceOffset == sourceOffset)
 				.ToList();
 
 			if(existing.Count > 0
@@ -74,16 +75,16 @@ namespace ManualRemappingTool
 			{
 				HasDoubts = hasDoubts,
 				EntityType = entityType,
-				SourceLine = sourceLine,
-				TargetLine = targetLine
+				SourceOffset = sourceOffset,
+				TargetOffset = targetOffset
 			});
 		}
 
 		public void Remove(
 				string sourceFilePath,
 				string targetFilePath,
-				int sourceLine,
-				int targetLine,
+				int sourceOffset,
+				int targetOffset,
 				string entityType
 			)
 		{
@@ -91,8 +92,8 @@ namespace ManualRemappingTool
 				&& Records[sourceFilePath].ContainsKey(targetFilePath))
 			{
 				var elem = Records[sourceFilePath][targetFilePath]
-					.FirstOrDefault(r => r.EntityType == entityType && r.SourceLine == sourceLine
-						&& r.TargetLine == targetLine);
+					.FirstOrDefault(r => r.EntityType == entityType && r.SourceOffset == sourceOffset
+						&& r.TargetOffset == targetOffset);
 
 				if(elem != null)
 				{
@@ -175,8 +176,8 @@ namespace ManualRemappingTool
 				ds.Add(
 					currentSourceFile,
 					currentTargetFile,
-					record.SourceLine,
-					record.TargetLine,
+					record.SourceOffset,
+					record.TargetOffset,
 					record.EntityType,
 					record.HasDoubts
 				);
@@ -188,14 +189,14 @@ namespace ManualRemappingTool
 
 	public class DatasetRecord
 	{
-		public int SourceLine { get; set; }
-		public int TargetLine { get; set; }
+		public int SourceOffset { get; set; }
+		public int TargetOffset { get; set; }
 		public bool HasDoubts { get; set; }
 		public string EntityType { get; set; }
 
 		public override string ToString()
 		{
-			return $"{SourceLine};{TargetLine};{EntityType};{HasDoubts}";
+			return $"{SourceOffset};{TargetOffset};{EntityType};{HasDoubts}";
 		}
 
 		public static DatasetRecord FromString(string str)
@@ -204,8 +205,8 @@ namespace ManualRemappingTool
 
 			return new DatasetRecord
 			{
-				SourceLine = int.Parse(splitted[0]),
-				TargetLine = int.Parse(splitted[1]),
+				SourceOffset = int.Parse(splitted[0]),
+				TargetOffset = int.Parse(splitted[1]),
 				EntityType = splitted[2],
 				HasDoubts = bool.Parse(splitted[3])
 			};

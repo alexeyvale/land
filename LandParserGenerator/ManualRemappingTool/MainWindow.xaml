@@ -9,6 +9,7 @@
         Title="ManualMappingTool" Height="450" Width="800"
 		x:Name="MainWindowObject"
 		ContentRendered="MainWindow_ContentRendered"
+		Closing="MainWindow_Closing"
 		WindowStartupLocation="CenterScreen">
 
 	<Window.Resources>
@@ -98,15 +99,28 @@
 						Click="SaveDatasetAsButton_Click"></Button>
 				</ToolBar>
 
-				<TreeView Grid.Row="1" Name="DatasetTree">
-					<TreeView.Resources>
-						<HierarchicalDataTemplate x:Key="DictElemTemplate" ItemsSource="{Binding Value}">
-							<TextBlock Text="{Binding Key}"/>
+				<TreeView Grid.Row="1" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
+					<TreeView.ItemTemplate>
+						<HierarchicalDataTemplate  ItemsSource="{Binding Item2}">
+							<TextBlock Text="{Binding Item1}"/>
+							<HierarchicalDataTemplate.ItemTemplate>
+								<HierarchicalDataTemplate ItemsSource="{Binding Item2}">
+									<TextBlock Text="{Binding Item1}"/>
+									<HierarchicalDataTemplate.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding}"/>
+										</DataTemplate>
+									</HierarchicalDataTemplate.ItemTemplate>
+								</HierarchicalDataTemplate>
+							</HierarchicalDataTemplate.ItemTemplate>
 						</HierarchicalDataTemplate>
-						<DataTemplate DataType="{x:Type local:DatasetRecord}">
-							<TextBlock Text="{Binding}" />
-						</DataTemplate>
-					</TreeView.Resources>
+					</TreeView.ItemTemplate>
+					<TreeView.ItemContainerStyle>
+						<Style TargetType="{x:Type TreeViewItem}">
+							<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>
+							<Setter Property="IsExpanded" Value="True" />
+						</Style>
+					</TreeView.ItemContainerStyle>
 				</TreeView>
 
 				<StackPanel Grid.Row="2" Orientation="Vertical">

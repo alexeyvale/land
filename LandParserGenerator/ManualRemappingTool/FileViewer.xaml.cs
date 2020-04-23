@@ -79,6 +79,13 @@ namespace ManualRemappingTool
 
 		private HashSet<string> _workingExtensions;
 
+		public int? EntityStartOffset => (FileElementsList.SelectedItem as ExistingConcernPointCandidate)
+			?.Node?.Location?.Start.Offset ?? null;
+
+		public string EntityType => (FileElementsList.SelectedItem as ExistingConcernPointCandidate)
+			?.Node?.Type ?? null;
+
+		public bool EntityTypeLocked { get; set; }
 
 		#region Dependency properties
 
@@ -107,45 +114,6 @@ namespace ManualRemappingTool
 						.ToList();
 				}
 			}
-		}
-
-		public static readonly DependencyProperty EntityStartLineProperty = DependencyProperty.Register(
-			"EntityStartLine",
-			typeof(int?),
-			typeof(FileViewer),
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
-		);
-
-		public int? EntityStartLine
-		{
-			get => (int?)GetValue(EntityStartLineProperty);
-			set { SetValue(EntityStartLineProperty, value); }
-		}
-
-		public static readonly DependencyProperty EntityTypeProperty = DependencyProperty.Register(
-			"EntityType",
-			typeof(string),
-			typeof(FileViewer),
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
-		);
-
-		public string EntityType
-		{
-			get => (string)GetValue(EntityTypeProperty);
-			set { SetValue(EntityTypeProperty, value); }
-		}
-
-		public static readonly DependencyProperty EntityTypeLockedProperty = DependencyProperty.Register(
-			"EntityTypeLocked",
-			typeof(bool),
-			typeof(FileViewer),
-			new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
-		);
-
-		public bool EntityTypeLocked
-		{
-			get => (bool)GetValue(EntityTypeLockedProperty);
-			set { SetValue(EntityTypeLockedProperty, value); }
 		}
 
 		public static readonly DependencyProperty LabelTextProperty = DependencyProperty.Register(
@@ -230,8 +198,6 @@ namespace ManualRemappingTool
 				OpenFile(openFileDialog.FileName);
 				FileOpened?.Invoke(this, FilePath);
 			}
-
-			TreeRoot = Parse(openFileDialog.FileName, FileEditor.Text);
 		}
 
 		private void OpenPrevFileButton_Click(object sender, RoutedEventArgs e)
@@ -247,8 +213,6 @@ namespace ManualRemappingTool
 
 				OpenFile(WorkingDirectoryFiles[CurrentFileIndex.Value]);
 				FileOpened?.Invoke(this, FilePath);
-
-				TreeRoot = Parse(WorkingDirectoryFiles[CurrentFileIndex.Value], FileEditor.Text);
 			}
 		}
 
@@ -265,8 +229,6 @@ namespace ManualRemappingTool
 
 				OpenFile(WorkingDirectoryFiles[CurrentFileIndex.Value]);
 				FileOpened?.Invoke(this, FilePath);
-
-				TreeRoot = Parse(WorkingDirectoryFiles[CurrentFileIndex.Value], FileEditor.Text);
 			}
 		}
 
@@ -274,11 +236,8 @@ namespace ManualRemappingTool
 		{
 			if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
 			{
-				var candidates = GetEntities(TreeRoot, new PointLocation(FileEditor.CaretOffset));
+				FillElementsList(FileEditor.CaretOffset);
 
-				candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
-
-				FileElementsList.ItemsSource = candidates;
 				FileElementsList.SelectedIndex = 0;
 			}
 		}
@@ -299,7 +258,7 @@ namespace ManualRemappingTool
 			}
 		}
 
-		#region Helpers
+		#region API
 
 		public void OpenFile(string filePath)
 		{
@@ -312,7 +271,23 @@ namespace ManualRemappingTool
 				FileEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
 					.Instance.GetDefinitionByExtension(Path.GetExtension(filePath));
 			}
+
+			TreeRoot = Parse(filePath, FileEditor.Text);
 		}
+
+		public void FillElementsList(int offset)
+		{
+			var candidates = GetEntities(TreeRoot, new PointLocation(offset));
+
+			candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
+
+			FileElementsList.ItemsSource = candidates;
+		}
+
+		#endregion
+
+
+		#region Helpers
 
 		private Encoding GetEncoding(string filename)
 		{
@@ -361,7 +336,7 @@ namespace ManualRemappingTool
 			);
 		}
 
-		public List<ConcernPointCandidate> GetEntities(Node root, PointLocation point)
+		private List<ConcernPointCandidate> GetEntities(Node root, PointLocation point)
 		{
 			var pseudoSegment = new SegmentLocation
 			{
