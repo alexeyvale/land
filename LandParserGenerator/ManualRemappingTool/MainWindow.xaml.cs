@@ -107,6 +107,7 @@ namespace ManualRemappingTool
 			}
 
 			Dataset.New();
+			DatasetPathLabel.Content = String.Empty;
 			UpdateRecordsTree();
 		}
 
@@ -156,6 +157,7 @@ namespace ManualRemappingTool
 			if (saveFileDialog.ShowDialog() == true)
 			{
 				Dataset.SavingPath = saveFileDialog.FileName;
+				DatasetPathLabel.Content = Path.GetFileName(Dataset.SavingPath);
 				SaveDatasetButton_Click(sender, e);
 
 				Settings.Default.RecentDatasets.Insert(0, Dataset.SavingPath);
@@ -381,6 +383,7 @@ namespace ManualRemappingTool
 			if (startWindow.ShowDialog() ?? false)
 			{
 				Dataset = startWindow.DatasetObject;
+				DatasetPathLabel.Content = Path.GetFileName(Dataset.SavingPath);
 				UpdateRecordsTree();
 
 				SourceFileView.WorkingDirectory = Dataset.SourceDirectoryPath;

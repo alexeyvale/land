@@ -82,7 +82,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Dataset.cs" />
+    <Compile Include="Models\Dataset.cs" />
     <Compile Include="EditorSearchHandler.cs" />
     <Compile Include="FileViewer.xaml.cs">
       <DependentUpon>FileViewer.xaml</DependentUpon>

@@ -17,7 +17,7 @@ namespace ManualRemappingTool
 
 		public string SourceDirectoryPath { get; set; }
 		public string TargetDirectoryPath { get; set; }
-		public string EntityType { get; set; }
+
 		public Dictionary<string, Dictionary<string, List<DatasetRecord>>> Records { get; set; }
 
 		public string ExtensionsString

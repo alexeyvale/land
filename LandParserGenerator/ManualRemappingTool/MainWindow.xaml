@@ -97,6 +97,7 @@
 						Click="SaveDatasetButton_Click"></Button>
 					<Button Name="SaveDatasetAsButton" Content="&#xf14d;" ToolTip="Сохранить как..." Style="{StaticResource IconButtonStyle}"
 						Click="SaveDatasetAsButton_Click"></Button>
+					<Label Name="DatasetPathLabel" Width="200"></Label>
 				</ToolBar>
 
 				<TreeView Grid.Row="1" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
