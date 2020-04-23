@@ -36,9 +36,8 @@
 			<ColumnDefinition Width="40*"></ColumnDefinition>
 			<ColumnDefinition Width="5"></ColumnDefinition>
 			<ColumnDefinition Width="40*"></ColumnDefinition>
-			<ColumnDefinition Width="35"></ColumnDefinition>
 			<ColumnDefinition Width="5"></ColumnDefinition>
-			<ColumnDefinition Width="20*"></ColumnDefinition>
+			<ColumnDefinition Width="24*"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
 
 		<local:FileViewer Grid.Column="0" 
@@ -59,53 +58,69 @@
 						  MessageSent="Control_MessageSent">
 		</local:FileViewer>
 
-		<GridSplitter Grid.Column="4" ShowsPreview="False" Width="5" 
+		<GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" 
 					  HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
-		<StackPanel Grid.Column="3" Orientation="Vertical" VerticalAlignment="Center">
-			<Button Name="AddToDatasetButton" Content="&#xf067;" ToolTip="Добавить в датасет" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+		<Grid Grid.Column="4">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="40"></ColumnDefinition>
+				<ColumnDefinition Width="100*"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+			
+			<StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="2 0 2 0">
+				<Button Name="AddToDatasetButton" Content="&#xf067;" ToolTip="Добавить в датасет" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="AddToDatasetButton_Click"></Button>
-			<Button Name="RemoveFromDatasetButton" Content="&#xf068;" ToolTip="Убрать из датасета" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+				<Button Name="RemoveFromDatasetButton" Content="&#xf068;" ToolTip="Убрать из датасета" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="RemoveFromDatasetButton_Click"></Button>
-			<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+				<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="HaveDoubtsButton_Click"></Button>
-			<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
+				<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
 					Click="SyncViewsButton_Click"></Button>
-		</StackPanel>
-		
-		<Grid Grid.Column="5">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="35"></RowDefinition>
-				<RowDefinition Height="100*"></RowDefinition>
-				<RowDefinition Height="50"></RowDefinition>
-				<RowDefinition Height="50"></RowDefinition>
-				<RowDefinition Height="25"></RowDefinition>
-			</Grid.RowDefinitions>
-			
-			<ToolBar Grid.Row="0">
-				<Button Name="NewDatasetButton" Content="&#xf15b;" ToolTip="Новый датасет" Style="{StaticResource IconButtonStyle}"
-						Click="NewDatasetButton_Click"></Button>
-				<Button Name="LoadDatasetButton" Content="&#xf07c;" ToolTip="Загрузить датасет" Style="{StaticResource IconButtonStyle}"
-						Click="LoadDatasetButton_Click"></Button>
-				<Button Name="SaveDatasetButton" Content="&#xf0c7;" ToolTip="Сохранить датасет" Style="{StaticResource IconButtonStyle}"
-						Click="SaveDatasetButton_Click"></Button>
-				<Button Name="SaveDatasetAsButton" Content="&#xf14d;" ToolTip="Сохранить как..." Style="{StaticResource IconButtonStyle}"
-						Click="SaveDatasetAsButton_Click"></Button>
-			</ToolBar>
-			
-			<TreeView Grid.Row="1"></TreeView>
-			
-			<StackPanel Grid.Row="2" Orientation="Vertical">
-				<Label Content="Каталог исх. файлов"></Label>
-				<Label Content="{Binding ElementName=SourceFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
 			</StackPanel>
 			
-			<StackPanel Grid.Row="3" Orientation="Vertical">
-				<Label Content="Каталог мод. файлов"></Label>
-				<Label Content="{Binding ElementName=TargetFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
-			</StackPanel>
+			<Grid Grid.Column="1">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="35"></RowDefinition>
+					<RowDefinition Height="100*"></RowDefinition>
+					<RowDefinition Height="50"></RowDefinition>
+					<RowDefinition Height="50"></RowDefinition>
+					<RowDefinition Height="25"></RowDefinition>
+				</Grid.RowDefinitions>
 
-			<CheckBox Grid.Row="4" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
+				<ToolBar Grid.Row="0">
+					<Button Name="NewDatasetButton" Content="&#xf15b;" ToolTip="Новый датасет" Style="{StaticResource IconButtonStyle}"
+						Click="NewDatasetButton_Click"></Button>
+					<Button Name="LoadDatasetButton" Content="&#xf07c;" ToolTip="Загрузить датасет" Style="{StaticResource IconButtonStyle}"
+						Click="LoadDatasetButton_Click"></Button>
+					<Button Name="SaveDatasetButton" Content="&#xf0c7;" ToolTip="Сохранить датасет" Style="{StaticResource IconButtonStyle}"
+						Click="SaveDatasetButton_Click"></Button>
+					<Button Name="SaveDatasetAsButton" Content="&#xf14d;" ToolTip="Сохранить как..." Style="{StaticResource IconButtonStyle}"
+						Click="SaveDatasetAsButton_Click"></Button>
+				</ToolBar>
+
+				<TreeView Grid.Row="1" Name="DatasetTree">
+					<TreeView.Resources>
+						<HierarchicalDataTemplate x:Key="DictElemTemplate" ItemsSource="{Binding Value}">
+							<TextBlock Text="{Binding Key}"/>
+						</HierarchicalDataTemplate>
+						<DataTemplate DataType="{x:Type local:DatasetRecord}">
+							<TextBlock Text="{Binding}" />
+						</DataTemplate>
+					</TreeView.Resources>
+				</TreeView>
+
+				<StackPanel Grid.Row="2" Orientation="Vertical">
+					<Label Content="Каталог исх. файлов"></Label>
+					<Label Content="{Binding ElementName=SourceFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
+				</StackPanel>
+
+				<StackPanel Grid.Row="3" Orientation="Vertical">
+					<Label Content="Каталог мод. файлов"></Label>
+					<Label Content="{Binding ElementName=TargetFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
+				</StackPanel>
+
+				<CheckBox Grid.Row="4" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
+			</Grid>
 		</Grid>
 	</Grid>
 </Window>

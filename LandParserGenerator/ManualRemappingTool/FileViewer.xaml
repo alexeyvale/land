@@ -75,6 +75,8 @@
 			</avalonedit:TextEditor>
 		</Grid>
 
-		<ListBox Grid.Row="1" Name="FileElementsList"></ListBox>
+		<ListBox Grid.Row="1" 
+				 Name="FileElementsList" 
+				 SelectionChanged="FileElementsList_SelectionChanged"></ListBox>
 	</Grid>
 </UserControl>

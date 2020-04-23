@@ -27,7 +27,7 @@ namespace ManualRemappingTool
 	/// </summary>
 	public partial class FileViewer : UserControl
 	{
-		public event PropertyChangedEventHandler PropertyChanged;
+		private SegmentsBackgroundRenderer SegmentColorizer { get; set; }
 
 		/// <summary>
 		/// Панель поиска по тексту
@@ -57,36 +57,6 @@ namespace ManualRemappingTool
 		/// </summary>
 		public ParserManager Parsers { get; set; }
 
-		/// <summary>
-		/// Каталог, файлы в котором рассматриваем
-		/// </summary>
-		public string WorkingDirectory
-		{
-			get { return _workingDirectory; }
-
-			set
-			{
-				_workingDirectory = value;
-
-				if (!String.IsNullOrEmpty(WorkingDirectory)
-					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
-				{
-					WorkingDirectoryFiles = Directory
-						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
-						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
-						.OrderBy(elem => elem)
-						.ToList();
-				}
-
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WorkingDirectory)));
-			}
-		}
-
-		private string _workingDirectory;
-
-		/// <summary>
-		///  Расширение файлов, которые рассматриваем
-		/// </summary>
 		public HashSet<string> WorkingExtensions
 		{
 			get { return _workingExtensions; }
@@ -109,7 +79,35 @@ namespace ManualRemappingTool
 
 		private HashSet<string> _workingExtensions;
 
+
 		#region Dependency properties
+
+		public static readonly DependencyProperty WorkingDirectoryProperty = DependencyProperty.Register(
+			"WorkingDirectory",
+			typeof(string),
+			typeof(FileViewer),
+			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+
+		public string WorkingDirectory
+		{
+			get => (string)GetValue(WorkingDirectoryProperty);
+
+			set
+			{
+				SetValue(WorkingDirectoryProperty, value);
+
+				if (!String.IsNullOrEmpty(WorkingDirectory)
+					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
+				{
+					WorkingDirectoryFiles = Directory
+						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
+						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
+						.OrderBy(elem => elem)
+						.ToList();
+				}
+			}
+		}
 
 		public static readonly DependencyProperty EntityStartLineProperty = DependencyProperty.Register(
 			"EntityStartLine",
@@ -210,6 +208,7 @@ namespace ManualRemappingTool
 
 			FontSize = 14;
 			QuickSearch = new EditorSearchHandler(FileEditor.TextArea);
+			SegmentColorizer = new SegmentsBackgroundRenderer(FileEditor.TextArea);
 		}
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -280,6 +279,23 @@ namespace ManualRemappingTool
 				candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
 
 				FileElementsList.ItemsSource = candidates;
+				FileElementsList.SelectedIndex = 0;
+			}
+		}
+
+		private void FileElementsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			SegmentColorizer.ResetSegments();
+
+			if (FileElementsList.SelectedItem != null
+				&& FileElementsList.SelectedIndex != FileElementsList.Items.Count - 1)
+			{
+				var selected = (ExistingConcernPointCandidate)FileElementsList.SelectedItem;
+
+				SegmentColorizer.SetSegments(
+					new List<SegmentLocation> { selected.Node.Location }, 
+					Color.FromRgb(170, 210, 170)
+				);			
 			}
 		}
 

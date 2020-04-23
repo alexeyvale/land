@@ -103,6 +103,7 @@ namespace ManualRemappingTool
 			}
 
 			Dataset.New();
+			DatasetTree.ItemsSource = Dataset.Records;
 		}
 
 		private void LoadDatasetButton_Click(object sender, RoutedEventArgs e)
@@ -196,7 +197,16 @@ namespace ManualRemappingTool
 		{
 			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				TargetFileView.OpenFile(Path.Combine(TargetFileView.WorkingDirectory, e));
+				var targetPath = Path.Combine(TargetFileView.WorkingDirectory, e);
+
+				if (File.Exists(targetPath))
+				{
+					TargetFileView.OpenFile(targetPath);
+				}
+				else
+				{
+					Control_MessageSent(null, "Парный файл отсутствует");
+				}
 			}
 		}
 
@@ -204,13 +214,22 @@ namespace ManualRemappingTool
 		{
 			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				SourceFileView.OpenFile(Path.Combine(SourceFileView.WorkingDirectory, e));
+				var sourcePath = Path.Combine(SourceFileView.WorkingDirectory, e);
+
+				if (File.Exists(sourcePath))
+				{
+					SourceFileView.OpenFile(sourcePath);
+				}
+				else
+				{
+					Control_MessageSent(null, "Парный файл отсутствует");
+				}
 			}
 		}
 
 		private void Control_MessageSent(object sender, string e)
 		{
-			this.Title = e;
+			this.Title = $"{e} - {DateTime.Now}";
 		}
 
 		private void SyncViewsButton_Click(object sender, RoutedEventArgs e)
@@ -263,6 +282,7 @@ namespace ManualRemappingTool
 			if (startWindow.ShowDialog() ?? false)
 			{
 				Dataset = startWindow.DatasetObject;
+				DatasetTree.ItemsSource = Dataset.Records;
 
 				SourceFileView.WorkingDirectory = Dataset.SourceDirectoryPath;
 				TargetFileView.WorkingDirectory = Dataset.TargetDirectoryPath;

@@ -165,6 +165,7 @@ namespace ManualRemappingTool
 			Settings.Default.Save();
 
 			DatasetList.Items.Refresh();
+			DatasetList.SelectedIndex = 0;
 		}
 
 		#endregion
