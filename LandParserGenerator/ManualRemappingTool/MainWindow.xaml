@@ -10,6 +10,7 @@
 		x:Name="MainWindowObject"
 		ContentRendered="MainWindow_ContentRendered"
 		Closing="MainWindow_Closing"
+		KeyDown="MainWindow_KeyDown"
 		WindowStartupLocation="CenterScreen">
 
 	<Window.Resources>

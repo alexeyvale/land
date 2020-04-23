@@ -71,12 +71,13 @@
 					FontFamily="Consolas"
 					IsReadOnly="True"
 					Background="#e3e3e3"
-					PreviewMouseLeftButtonUp="FileEditor_PreviewMouseUp">
+					PreviewMouseLeftButtonUp="FileEditor_PreviewMouseUp"
+					KeyDown="FileEditor_KeyDown">
 			</avalonedit:TextEditor>
 		</Grid>
 
 		<ListBox Grid.Row="1" 
-				 Name="FileElementsList" 
-				 SelectionChanged="FileElementsList_SelectionChanged"></ListBox>
+				 Name="FileEntitiesList" 
+				 SelectionChanged="FileEntitiesList_SelectionChanged"></ListBox>
 	</Grid>
 </UserControl>

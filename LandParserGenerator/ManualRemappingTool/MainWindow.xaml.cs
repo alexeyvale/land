@@ -48,12 +48,12 @@ namespace ManualRemappingTool
 			SourceFileView.Parsers = Parsers;
 			SourceFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
 			SourceFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
-			SourceFileView.FileElementsList.PreviewMouseWheel += Control_PreviewMouseWheel;
+			SourceFileView.FileEntitiesList.PreviewMouseWheel += Control_PreviewMouseWheel;
 
 			TargetFileView.Parsers = Parsers;
 			TargetFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
 			TargetFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
-			TargetFileView.FileElementsList.PreviewMouseWheel += Control_PreviewMouseWheel;
+			TargetFileView.FileEntitiesList.PreviewMouseWheel += Control_PreviewMouseWheel;
 
 			Parsers.Load(LoadSettings(SETTINGS_DEFAULT_PATH), CACHE_DIRECTORY, new List<Message>());
 		}
@@ -286,25 +286,25 @@ namespace ManualRemappingTool
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
 
-					SourceFileView.FillElementsList(record.SourceOffset);
-					TargetFileView.FillElementsList(record.TargetOffset);
+					SourceFileView.FillEntitiesList(record.SourceOffset);
+					TargetFileView.FillEntitiesList(record.TargetOffset);
 
-					foreach(ExistingConcernPointCandidate item in SourceFileView.FileElementsList.Items)
+					foreach(ExistingConcernPointCandidate item in SourceFileView.FileEntitiesList.Items)
 					{
 						if(item.Node?.Location.Start.Offset == record.SourceOffset
 							&& item.Node?.Type == record.EntityType)
 						{
-							SourceFileView.FileElementsList.SelectedItem = item;
+							SourceFileView.FileEntitiesList.SelectedItem = item;
 							break;
 						}
 					}
 
-					foreach (ExistingConcernPointCandidate item in TargetFileView.FileElementsList.Items)
+					foreach (ExistingConcernPointCandidate item in TargetFileView.FileEntitiesList.Items)
 					{
 						if (item.Node?.Location.Start.Offset == record.TargetOffset
 							&& item.Node?.Type == record.EntityType)
 						{
-							TargetFileView.FileElementsList.SelectedItem = item;
+							TargetFileView.FileEntitiesList.SelectedItem = item;
 							break;
 						}
 					}
@@ -339,6 +339,47 @@ namespace ManualRemappingTool
 					case MessageBoxResult.Cancel:
 						e.Cancel = true;
 						break;
+				}
+			}
+		}
+
+		private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (Keyboard.Modifiers == ModifierKeys.Alt)
+			{
+				if (Keyboard.IsKeyDown(Key.S))
+				{
+					HaveDoubtsButton_Click(null, null);
+					e.Handled = true;
+				}
+				else if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.A))
+				{
+					if (SourceFileView.FileEditor.TextArea.IsFocused)
+					{
+						TargetFileView.FileEditor.TextArea.Focus();
+					}
+					else if (TargetFileView.FileEditor.TextArea.IsFocused)
+					{
+						SourceFileView.FileEditor.TextArea.Focus();
+					}
+
+					e.Handled = true;
+				}
+			}
+			else if (Keyboard.Modifiers == ModifierKeys.Control)
+			{
+				if (Keyboard.IsKeyDown(Key.S))
+				{
+					AddToDatasetButton_Click(null, null);
+					e.Handled = true;
+				}
+			}
+			else if ((Keyboard.Modifiers & ModifierKeys.Shift & ModifierKeys.Control) > 0)
+			{
+				if (Keyboard.IsKeyDown(Key.S))
+				{
+					SaveDatasetButton_Click(null, null);
+					e.Handled = true;
 				}
 			}
 		}
