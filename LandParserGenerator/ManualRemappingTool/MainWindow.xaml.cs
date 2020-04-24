@@ -1,5 +1,6 @@
 ﻿using Land.Control;
 using Land.Core;
+using Land.Core.Parsing.Tree;
 using ManualRemappingTool.Properties;
 using Microsoft.Win32;
 using System;
@@ -49,6 +50,7 @@ namespace ManualRemappingTool
 			SourceFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
 			SourceFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
 			SourceFileView.FileEntitiesList.PreviewMouseWheel += Control_PreviewMouseWheel;
+			SourceFileView.AvailableEntitiesFilter = IsSourceEntityAvailable;
 
 			TargetFileView.Parsers = Parsers;
 			TargetFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
@@ -135,7 +137,7 @@ namespace ManualRemappingTool
 
 		private void SaveDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
-			if(!String.IsNullOrEmpty(Dataset.SavingPath))
+			if (!String.IsNullOrEmpty(Dataset.SavingPath))
 			{
 				Dataset.Save();
 			}
@@ -170,14 +172,16 @@ namespace ManualRemappingTool
 			if (CanAddRecord)
 			{
 				Dataset.Add(
-					SourceFileView.FilePath,
-					TargetFileView.FilePath,
+					SourceFileView.RelativeFilePath,
+					TargetFileView.RelativeFilePath,
 					SourceFileView.EntityStartOffset.Value,
 					TargetFileView.EntityStartOffset.Value,
 					SourceFileView.EntityType
 				);
 
 				UpdateRecordsTree();
+
+				SourceFileView.MoveToNextAvailableEntity();
 			}
 			else
 			{
@@ -188,8 +192,8 @@ namespace ManualRemappingTool
 		private void RemoveFromDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
 			Dataset.Remove(
-				SourceFileView.FilePath,
-				TargetFileView.FilePath,
+				SourceFileView.RelativeFilePath,
+				TargetFileView.RelativeFilePath,
 				SourceFileView.EntityStartOffset.Value,
 				TargetFileView.EntityStartOffset.Value,
 				SourceFileView.EntityType
@@ -203,8 +207,8 @@ namespace ManualRemappingTool
 			if (CanAddRecord)
 			{
 				Dataset.Add(
-					SourceFileView.FilePath,
-					TargetFileView.FilePath,
+					SourceFileView.RelativeFilePath,
+					TargetFileView.RelativeFilePath,
 					SourceFileView.EntityStartOffset.Value,
 					TargetFileView.EntityStartOffset.Value,
 					SourceFileView.EntityType,
@@ -272,7 +276,7 @@ namespace ManualRemappingTool
 		{
 			var treeItem = (TreeViewItem)sender;
 
-			if(treeItem.DataContext is 
+			if (treeItem.DataContext is
 				Tuple<string, List<Tuple<string, List<DatasetRecord>>>> sourceFileData)
 			{
 				var clickedItem = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject);
@@ -280,18 +284,18 @@ namespace ManualRemappingTool
 				if (clickedItem != null && clickedItem.DataContext is DatasetRecord record)
 				{
 					var sourcePath = Path.Combine(Dataset.SourceDirectoryPath, sourceFileData.Item1);
-					var targetPath = Path.Combine(Dataset.TargetDirectoryPath, 
+					var targetPath = Path.Combine(Dataset.TargetDirectoryPath,
 						((Tuple<string, List<DatasetRecord>>)VisualUpwardSearch<TreeViewItem>(clickedItem).DataContext).Item1);
 
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
 
-					SourceFileView.FillEntitiesList(record.SourceOffset);
+					SourceFileView.FillEntitiesList(record.SourceOffset, true);
 					TargetFileView.FillEntitiesList(record.TargetOffset);
 
-					foreach(ExistingConcernPointCandidate item in SourceFileView.FileEntitiesList.Items)
+					foreach (ExistingConcernPointCandidate item in SourceFileView.FileEntitiesList.Items)
 					{
-						if(item.Node?.Location.Start.Offset == record.SourceOffset
+						if (item.Node?.Location.Start.Offset == record.SourceOffset
 							&& item.Node?.Type == record.EntityType)
 						{
 							SourceFileView.FileEntitiesList.SelectedItem = item;
@@ -352,7 +356,10 @@ namespace ManualRemappingTool
 					HaveDoubtsButton_Click(null, null);
 					e.Handled = true;
 				}
-				else if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.A))
+			}
+			else if (Keyboard.Modifiers == ModifierKeys.Shift)
+			{
+				if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.A))
 				{
 					if (SourceFileView.FileEditor.TextArea.IsFocused)
 					{
@@ -385,6 +392,14 @@ namespace ManualRemappingTool
 		}
 
 		#region Helpers
+
+		private bool IsSourceEntityAvailable(Node node) =>
+			!Dataset?[SourceFileView.RelativeFilePath]
+				.Any(t => t.Value.Any(r => 
+					r.SourceOffset == node.Location.Start.Offset 
+					&& r.EntityType == node.Type 
+					&& !r.HasDoubts)) 
+			?? true;
 
 		private LandExplorerSettings LoadSettings(string path)
 		{

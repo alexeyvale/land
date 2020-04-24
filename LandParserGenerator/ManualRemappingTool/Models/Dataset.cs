@@ -12,6 +12,13 @@ namespace ManualRemappingTool
 
 		public HashSet<string> Extensions { get; set; } = new HashSet<string>();
 
+		public List<DatasetRecord> this[string src, string trg] =>
+			Records.ContainsKey(src) && Records[src].ContainsKey(trg)
+				? Records[src][trg] : new List<DatasetRecord>();
+
+		public Dictionary<string, List<DatasetRecord>> this[string src] =>
+			Records.ContainsKey(src) 
+			? Records[src] : new Dictionary<string, List<DatasetRecord>>();
 
 		#region Serializable
 

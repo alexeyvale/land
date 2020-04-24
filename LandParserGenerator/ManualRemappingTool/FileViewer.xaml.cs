@@ -38,16 +38,16 @@ namespace ManualRemappingTool
 		/// Корень дерева, соответствующего открытому тексту
 		/// </summary>
 		private Node TreeRoot { get; set; }
+		
+		private List<Node> _availableEntities;
+
+		public Func<Node, bool> AvailableEntitiesFilter { get; set; } = (Node n) => true;
 
 		/// <summary>
 		/// Упорядоченный по смещению список сущностей, к которым возможна привязка
 		/// </summary>
-		public List<Node> EntitiesAvailable { get; private set; }
-
-		/// <summary>
-		/// Индекс текущей выделенной сущности в списке Entities
-		/// </summary>
-		private int SelectedEntityIdx { get; set; } = -1;
+		public List<Node> AvailableEntities =>
+			_availableEntities.Where(AvailableEntitiesFilter).ToList();
 
 		/// <summary>
 		/// Список файлов, содержащихся в каталоге, 
@@ -147,12 +147,11 @@ namespace ManualRemappingTool
 		{
 			get => (string)GetValue(FilePathProperty);
 
-			private set 
-			{
-				SetValue(FilePathProperty, 
-					GetRelativePath(value, WorkingDirectory)); 
-			}
+			private set { SetValue(FilePathProperty, value); }
 		}
+
+		public string RelativeFilePath =>
+			GetRelativePath(FilePath, WorkingDirectory);
 
 		public static readonly DependencyProperty AreNextPrevEnabledProperty = DependencyProperty.Register(
 			"AreNextPrevEnabled",
@@ -203,7 +202,7 @@ namespace ManualRemappingTool
 				&& openFileDialog.FileName.StartsWith(WorkingDirectory))
 			{
 				OpenFile(openFileDialog.FileName);
-				FileOpened?.Invoke(this, FilePath);
+				FileOpened?.Invoke(this, RelativeFilePath);
 			}
 		}
 
@@ -228,8 +227,6 @@ namespace ManualRemappingTool
 		private void FileEntitiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			var selected = (ExistingConcernPointCandidate)FileEntitiesList.SelectedItem;
-
-			SelectedEntityIdx = EntitiesAvailable.IndexOf(selected?.Node);
 
 			SegmentColorizer.ResetSegments();
 
@@ -295,12 +292,12 @@ namespace ManualRemappingTool
 
 			var visitor = new LandExplorerVisitor();
 			TreeRoot.Accept(visitor);
-			EntitiesAvailable = visitor.Land;
+			_availableEntities = visitor.Land;
 		}
 
-		public void FillEntitiesList(int offset)
+		public void FillEntitiesList(int offset, bool ignoreAvailability = false)
 		{
-			var candidates = GetEntities(TreeRoot, new PointLocation(offset));
+			var candidates = GetEntities(TreeRoot, new PointLocation(offset), true, ignoreAvailability);
 
 			candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
 
@@ -330,21 +327,37 @@ namespace ManualRemappingTool
 
 		public void MoveToNextAvailableEntity()
 		{
-			if (EntitiesAvailable.Count > 0)
+			if (AvailableEntities.Count > 0)
 			{
-				ShiftToEntityCore(
-					(SelectedEntityIdx + 1) % EntitiesAvailable.Count
-				);
+				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
+
+				if (selectedEntity != null)
+				{
+					var nextEntity = AvailableEntities
+						.SkipWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
+							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset >= selectedEntity.Location.End.Offset)
+						.FirstOrDefault() ?? AvailableEntities.First();
+
+					ShiftToEntityCore(nextEntity);
+				}
 			}
 		}
 
 		public void MoveToPrevAvailableEntity()
 		{
-			if (EntitiesAvailable.Count > 0)
+			if (AvailableEntities.Count > 0)
 			{
-				ShiftToEntityCore(
-					(EntitiesAvailable.Count + (SelectedEntityIdx - 1)) % EntitiesAvailable.Count
-				);
+				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
+
+				if (selectedEntity != null)
+				{
+					var prevEntity = AvailableEntities
+						.TakeWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
+							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset > selectedEntity.Location.End.Offset)
+						.LastOrDefault() ?? AvailableEntities.Last();
+
+					ShiftToEntityCore(prevEntity);
+				}
 			}
 		}
 
@@ -357,16 +370,14 @@ namespace ManualRemappingTool
 			CurrentFileIndex = index;
 
 			OpenFile(WorkingDirectoryFiles[CurrentFileIndex]);
-			FileOpened?.Invoke(this, FilePath);
+			FileOpened?.Invoke(this, RelativeFilePath);
 		}
 
-		private void ShiftToEntityCore(int index)
+		private void ShiftToEntityCore(Node entityNode)
 		{
-			SelectedEntityIdx = index;
-
 			var candidates = GetEntities(
-				EntitiesAvailable[SelectedEntityIdx],
-				new PointLocation(EntitiesAvailable[SelectedEntityIdx].Location.Start.Offset),
+				entityNode,
+				new PointLocation(entityNode.Location.Start.Offset),
 				false
 			);
 			candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
@@ -426,7 +437,11 @@ namespace ManualRemappingTool
 			);
 		}
 
-		private List<ConcernPointCandidate> GetEntities(Node root, PointLocation point, bool exploreInDepth = true)
+		private List<ConcernPointCandidate> GetEntities(
+			Node root, 
+			PointLocation point, 
+			bool exploreInDepth = true,
+			bool ignoreAvailability = false)
 		{
 			var pseudoSegment = new SegmentLocation
 			{
@@ -450,7 +465,7 @@ namespace ManualRemappingTool
 			}
 
 			return pointCandidates
-				.Where(c=>EntitiesAvailable.Contains(c))
+				.Where(c=> ignoreAvailability || AvailableEntities.Contains(c))
 				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
 				.ToList();
 		}
