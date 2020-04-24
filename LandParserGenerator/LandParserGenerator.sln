@@ -27,7 +27,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalPostprocessor", "Prep
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownPostprocessor", "Preprocessors\Tree postprocessing\MarkdownPostprocessor\MarkdownPostprocessor.csproj", "{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualRemappingTool", "ManualRemappingTool\ManualRemappingTool.csproj", "{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualRemappingTool", "ML\ManualRemappingTool\ManualRemappingTool.csproj", "{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ML", "ML", "{3DF5493E-FD14-4628-9911-4E08E7AEBE27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatasetToTrainConverter", "ML\DatasetToTrainConverter\DatasetToTrainConverter.csproj", "{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +79,10 @@ Global
 		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +94,8 @@ Global
 		{2BBDC627-AFB5-44D0-BB15-F48D5FA699EF} = {373EC8C3-5355-4019-B833-E46A111B2E41}
 		{5BB7C445-36C4-4686-B17A-A163385848A5} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
 		{7B9581CB-9CCE-4DB4-B82C-4AF1EC4BAACE} = {2BBDC627-AFB5-44D0-BB15-F48D5FA699EF}
+		{80FFBD27-0FD1-4C5E-B99C-7D403F735CDD} = {3DF5493E-FD14-4628-9911-4E08E7AEBE27}
+		{A3C109FF-C152-4EB3-8EE4-12BFBFF426C3} = {3DF5493E-FD14-4628-9911-4E08E7AEBE27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CD7950FE-7FC3-4DA2-9B6B-4B3E76CBD3C2}
