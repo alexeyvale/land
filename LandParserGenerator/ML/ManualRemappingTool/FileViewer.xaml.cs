@@ -27,6 +27,14 @@ namespace ManualRemappingTool
 	/// </summary>
 	public partial class FileViewer : UserControl
 	{
+		public enum ShiftDirection { Next, Prev }
+
+		public class FileOpenedEventArgs
+		{
+			public string FileRelativePath { get; set; }
+			public ShiftDirection? Direction { get; set; }
+		}
+
 		private SegmentsBackgroundRenderer SegmentColorizer { get; set; }
 
 		/// <summary>
@@ -150,7 +158,7 @@ namespace ManualRemappingTool
 			private set { SetValue(FilePathProperty, value); }
 		}
 
-		public string RelativeFilePath =>
+		public string FileRelativePath =>
 			GetRelativePath(FilePath, WorkingDirectory);
 
 		public static readonly DependencyProperty AreNextPrevEnabledProperty = DependencyProperty.Register(
@@ -170,7 +178,7 @@ namespace ManualRemappingTool
 
 		#region Events
 
-		public event EventHandler<string> FileOpened;
+		public event EventHandler<FileOpenedEventArgs> FileOpened;
 
 		public event EventHandler<string> MessageSent;
 
@@ -202,19 +210,16 @@ namespace ManualRemappingTool
 				&& openFileDialog.FileName.StartsWith(WorkingDirectory))
 			{
 				OpenFile(openFileDialog.FileName);
-				FileOpened?.Invoke(this, RelativeFilePath);
+				FileOpened?.Invoke(this, 
+					new FileOpenedEventArgs { FileRelativePath = FileRelativePath });
 			}
 		}
 
-		private void OpenPrevFileButton_Click(object sender, RoutedEventArgs e)
-		{
-			OpenPrevFile();
-		}
+		private void OpenPrevFileButton_Click(object sender, RoutedEventArgs e) =>
+			ShiftToFile(ShiftDirection.Prev);
 
-		private void OpenNextFileButton_Click(object sender, RoutedEventArgs e)
-		{
-			OpenNextFile();
-		}
+		private void OpenNextFileButton_Click(object sender, RoutedEventArgs e) =>
+			ShiftToFile(ShiftDirection.Next);
 
 		private void FileEditor_PreviewMouseUp(object sender, MouseButtonEventArgs e)
 		{
@@ -249,22 +254,22 @@ namespace ManualRemappingTool
 			{
 				if (Keyboard.IsKeyDown(Key.S))
 				{
-					MoveToNextAvailableEntity();
+					ShiftToNextAvailableEntity();
 					e.Handled = true;
 				}
 				else if (Keyboard.IsKeyDown(Key.W))
 				{
-					MoveToPrevAvailableEntity();
+					ShiftToPrevAvailableEntity();
 					e.Handled = true;
 				}
 				else if (Keyboard.IsKeyDown(Key.D))
 				{
-					OpenNextFile();
+					ShiftToFile(ShiftDirection.Next);
 					e.Handled = true;
 				}
 				else if (Keyboard.IsKeyDown(Key.A))
 				{
-					OpenPrevFile();
+					ShiftToFile(ShiftDirection.Prev);
 					e.Handled = true;
 				}
 			}
@@ -305,73 +310,69 @@ namespace ManualRemappingTool
 			FileEntitiesList.SelectedIndex = 0;
 		}
 
-		public void OpenPrevFile()
+		public void ShiftToFile(ShiftDirection direction)
 		{
 			if (WorkingDirectoryFiles.Count > 0)
 			{
-				ShiftToFileCore(
-					(WorkingDirectoryFiles.Count + (CurrentFileIndex - 1)) % WorkingDirectoryFiles.Count
-				);
+				switch (direction)
+				{
+					case ShiftDirection.Next:
+						CurrentFileIndex = (CurrentFileIndex + 1)
+							% WorkingDirectoryFiles.Count;
+						break;
+					case ShiftDirection.Prev:
+						CurrentFileIndex = (WorkingDirectoryFiles.Count + (CurrentFileIndex - 1))
+							% WorkingDirectoryFiles.Count;
+						break;
+				}
+
+				OpenFile(WorkingDirectoryFiles[CurrentFileIndex]);
+
+				FileOpened?.Invoke(this, new FileOpenedEventArgs
+				{
+					FileRelativePath = FileRelativePath,
+					Direction = direction
+				});
 			}
 		}
 
-		public void OpenNextFile()
-		{
-			if (WorkingDirectoryFiles.Count > 0)
-			{
-				ShiftToFileCore(
-					(CurrentFileIndex + 1) % WorkingDirectoryFiles.Count
-				);
-			}
-		}
-
-		public void MoveToNextAvailableEntity()
+		public void ShiftToNextAvailableEntity()
 		{
 			if (AvailableEntities.Count > 0)
 			{
 				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
 
-				if (selectedEntity != null)
-				{
-					var nextEntity = AvailableEntities
+				var nextEntity = selectedEntity != null
+					? AvailableEntities
 						.SkipWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
 							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset >= selectedEntity.Location.End.Offset)
-						.FirstOrDefault() ?? AvailableEntities.First();
+						.FirstOrDefault() ?? AvailableEntities.First()
+					: AvailableEntities.First();
 
-					ShiftToEntityCore(nextEntity);
-				}
+				ShiftToEntityCore(nextEntity);
 			}
 		}
 
-		public void MoveToPrevAvailableEntity()
+		public void ShiftToPrevAvailableEntity()
 		{
 			if (AvailableEntities.Count > 0)
 			{
 				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
 
-				if (selectedEntity != null)
-				{
-					var prevEntity = AvailableEntities
+				var prevEntity = selectedEntity != null
+					? AvailableEntities
 						.TakeWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
 							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset > selectedEntity.Location.End.Offset)
-						.LastOrDefault() ?? AvailableEntities.Last();
+						.LastOrDefault() ?? AvailableEntities.Last()
+					: AvailableEntities.Last();
 
-					ShiftToEntityCore(prevEntity);
-				}
+				ShiftToEntityCore(prevEntity);
 			}
 		}
 
 		#endregion
 
 		#region Cores
-
-		private void ShiftToFileCore(int index)
-		{
-			CurrentFileIndex = index;
-
-			OpenFile(WorkingDirectoryFiles[CurrentFileIndex]);
-			FileOpened?.Invoke(this, RelativeFilePath);
-		}
 
 		private void ShiftToEntityCore(Node entityNode)
 		{

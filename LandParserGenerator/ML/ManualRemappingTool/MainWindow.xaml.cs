@@ -1,6 +1,7 @@
 ﻿using Land.Control;
 using Land.Core;
 using Land.Core.Parsing.Tree;
+using Land.Markup.Binding;
 using ManualRemappingTool.Properties;
 using Microsoft.Win32;
 using System;
@@ -172,8 +173,8 @@ namespace ManualRemappingTool
 			if (CanAddRecord)
 			{
 				Dataset.Add(
-					SourceFileView.RelativeFilePath,
-					TargetFileView.RelativeFilePath,
+					SourceFileView.FileRelativePath,
+					TargetFileView.FileRelativePath,
 					SourceFileView.EntityStartOffset.Value,
 					TargetFileView.EntityStartOffset.Value,
 					SourceFileView.EntityType
@@ -181,7 +182,7 @@ namespace ManualRemappingTool
 
 				UpdateRecordsTree();
 
-				SourceFileView.MoveToNextAvailableEntity();
+				SourceFileView.ShiftToNextAvailableEntity();
 			}
 			else
 			{
@@ -192,8 +193,8 @@ namespace ManualRemappingTool
 		private void RemoveFromDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
 			Dataset.Remove(
-				SourceFileView.RelativeFilePath,
-				TargetFileView.RelativeFilePath,
+				SourceFileView.FileRelativePath,
+				TargetFileView.FileRelativePath,
 				SourceFileView.EntityStartOffset.Value,
 				TargetFileView.EntityStartOffset.Value,
 				SourceFileView.EntityType
@@ -207,8 +208,8 @@ namespace ManualRemappingTool
 			if (CanAddRecord)
 			{
 				Dataset.Add(
-					SourceFileView.RelativeFilePath,
-					TargetFileView.RelativeFilePath,
+					SourceFileView.FileRelativePath,
+					TargetFileView.FileRelativePath,
 					SourceFileView.EntityStartOffset.Value,
 					TargetFileView.EntityStartOffset.Value,
 					SourceFileView.EntityType,
@@ -223,28 +224,65 @@ namespace ManualRemappingTool
 			}
 		}
 
-		private void SourceFileView_FileOpened(object sender, string e)
+		private void SourceFileView_FileOpened(object sender, FileViewer.FileOpenedEventArgs e)
 		{
 			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				var targetPath = Path.Combine(TargetFileView.WorkingDirectory, e);
+				var initialSourceFilePath = e.FileRelativePath;
 
-				if (File.Exists(targetPath))
+				do
 				{
-					TargetFileView.OpenFile(targetPath);
+					var targetPath = Path.Combine(TargetFileView.WorkingDirectory, e.FileRelativePath);
+
+					if (File.Exists(targetPath))
+					{
+						TargetFileView.OpenFile(targetPath);
+					}
+					else
+					{
+						Control_MessageSent(null, "Парный файл отсутствует");
+					}
+
+					DoAutoMapping();
+
+					/// Если после автопоиска соответствия не осталось несопоставленных сущностей
+					/// и открытие исходного файла было направленным
+					if (e.Direction.HasValue && SourceFileView.AvailableEntities.Count == 0)
+					{
+						/// Открываем новый исходный файл в том же направлении
+						switch (e.Direction)
+						{
+							case FileViewer.ShiftDirection.Next:
+								SourceFileView.ShiftToFile(FileViewer.ShiftDirection.Next);
+								break;
+							case FileViewer.ShiftDirection.Prev:
+								SourceFileView.ShiftToFile(FileViewer.ShiftDirection.Prev);
+								break;
+						}
+
+						if (SourceFileView.FileRelativePath == initialSourceFilePath)
+						{
+							break;
+						}
+					}
+					else
+					{
+						break;
+					}
 				}
-				else
-				{
-					Control_MessageSent(null, "Парный файл отсутствует");
-				}
+				while (true);
+			}
+			else
+			{
+				DoAutoMapping();
 			}
 		}
 
-		private void TargetFileView_FileOpened(object sender, string e)
+		private void TargetFileView_FileOpened(object sender, FileViewer.FileOpenedEventArgs e)
 		{
 			if (OpenPairCheckBox.IsChecked ?? false)
 			{
-				var sourcePath = Path.Combine(SourceFileView.WorkingDirectory, e);
+				var sourcePath = Path.Combine(SourceFileView.WorkingDirectory, e.FileRelativePath);
 
 				if (File.Exists(sourcePath))
 				{
@@ -255,6 +293,8 @@ namespace ManualRemappingTool
 					Control_MessageSent(null, "Парный файл отсутствует");
 				}
 			}
+
+			DoAutoMapping();
 		}
 
 		private void Control_MessageSent(object sender, string e)
@@ -289,6 +329,8 @@ namespace ManualRemappingTool
 
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
+
+					DoAutoMapping();
 
 					SourceFileView.FillEntitiesList(record.SourceOffset, true);
 					TargetFileView.FillEntitiesList(record.TargetOffset);
@@ -393,8 +435,54 @@ namespace ManualRemappingTool
 
 		#region Helpers
 
+		private void DoAutoMapping()
+		{
+			var candidates = TargetFileView.AvailableEntities
+				.GroupBy(n => n.Type)
+				.ToDictionary(g => g.Key, g => g.Select(e => new
+				{
+					Node = e,
+					Header = PointContext.GetHeaderContext(e),
+					Ancestors = PointContext.GetAncestorsContext(e),
+				}).ToList());
+
+			var unmapped = SourceFileView.AvailableEntities
+				.Select(e => new
+				{
+					Node = e,
+					Header = PointContext.GetHeaderContext(e),
+					Ancestors = PointContext.GetAncestorsContext(e),
+				})
+				.Where(e => e.Header.Count > 0 
+					&& candidates.ContainsKey(e.Node.Type))
+				.ToList();
+
+			foreach (var elem in unmapped)
+			{
+				var candidateForElem = candidates[elem.Node.Type]
+					.FirstOrDefault(c => c.Header.SequenceEqual(elem.Header)
+						&& c.Ancestors.SequenceEqual(elem.Ancestors));
+
+				if(candidateForElem != null)
+				{
+					Dataset.Add(
+						SourceFileView.FileRelativePath,
+						TargetFileView.FileRelativePath,
+						elem.Node.Location.Start.Offset,
+						candidateForElem.Node.Location.Start.Offset,
+						elem.Node.Type
+					);
+
+					candidates[elem.Node.Type].Remove(candidateForElem);
+				}
+			}
+
+			Control_MessageSent(null, $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия");
+			UpdateRecordsTree();
+		}
+
 		private bool IsSourceEntityAvailable(Node node) =>
-			!Dataset?[SourceFileView.RelativeFilePath]
+			!Dataset?[SourceFileView.FileRelativePath]
 				.Any(t => t.Value.Any(r => 
 					r.SourceOffset == node.Location.Start.Offset 
 					&& r.EntityType == node.Type 
