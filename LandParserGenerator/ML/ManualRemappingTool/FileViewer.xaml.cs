@@ -95,11 +95,14 @@ namespace ManualRemappingTool
 
 		private HashSet<string> _workingExtensions;
 
-		public int? EntityStartOffset => (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)
-			?.Node?.Location?.Start.Offset ?? null;
+		public Node EntityNode => (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)
+			?.Node;
+
+		public SegmentLocation EntityLocation => (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)
+			?.Node?.Location;
 
 		public string EntityType => (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)
-			?.Node?.Type ?? null;
+			?.Node?.Type;
 
 
 		#region Dependency properties
@@ -231,20 +234,22 @@ namespace ManualRemappingTool
 
 		private void FileEntitiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			var selected = (ExistingConcernPointCandidate)FileEntitiesList.SelectedItem;
-
 			SegmentColorizer.ResetSegments();
 
-			if (selected != null 
+			if (EntityNode != null 
 				&& FileEntitiesList.SelectedIndex != FileEntitiesList.Items.Count - 1)
 			{
 				SegmentColorizer.SetSegments(
-					new List<SegmentLocation> { selected.Node.Location }, 
+					new List<SegmentLocation> { EntityNode.Location }, 
 					Color.FromRgb(170, 210, 170)
 				);
-				FileEditor.ScrollToLine(
-					FileEditor.Document.GetLineByOffset(selected.Node.Location.Start.Offset).LineNumber
-				);
+
+				if (!IsInView(EntityNode.Location.Start.Offset))
+				{
+					FileEditor.ScrollToLine(
+						FileEditor.Document.GetLineByOffset(EntityNode.Location.Start.Offset).LineNumber
+					);
+				}
 			}
 		}
 
@@ -340,16 +345,18 @@ namespace ManualRemappingTool
 		{
 			if (AvailableEntities.Count > 0)
 			{
-				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
-
-				var nextEntity = selectedEntity != null
+				var nextEntity = EntityNode != null
 					? AvailableEntities
-						.SkipWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
-							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset >= selectedEntity.Location.End.Offset)
+						.SkipWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
+							|| e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset >= EntityNode.Location.End.Offset)
 						.FirstOrDefault() ?? AvailableEntities.First()
 					: AvailableEntities.First();
 
 				ShiftToEntityCore(nextEntity);
+			}
+			else
+			{
+				ResetEntity();
 			}
 		}
 
@@ -357,17 +364,24 @@ namespace ManualRemappingTool
 		{
 			if (AvailableEntities.Count > 0)
 			{
-				var selectedEntity = (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)?.Node;
-
-				var prevEntity = selectedEntity != null
+				var prevEntity = EntityNode != null
 					? AvailableEntities
-						.TakeWhile(e => e.Location.Start.Offset < selectedEntity.Location.Start.Offset
-							|| e.Location.Start.Offset == selectedEntity.Location.Start.Offset && e.Location.End.Offset > selectedEntity.Location.End.Offset)
+						.TakeWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
+							|| e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset > EntityNode.Location.End.Offset)
 						.LastOrDefault() ?? AvailableEntities.Last()
 					: AvailableEntities.Last();
 
 				ShiftToEntityCore(prevEntity);
 			}
+			else
+			{
+				ResetEntity();
+			}
+		}
+
+		public void ResetEntity()
+		{
+			FileEntitiesList.ItemsSource = null;
 		}
 
 		#endregion
@@ -469,6 +483,25 @@ namespace ManualRemappingTool
 				.Where(c=> ignoreAvailability || AvailableEntities.Contains(c))
 				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
 				.ToList();
+		}
+
+		private bool IsInView(int offset)
+		{
+			var textView = FileEditor.TextArea.TextView;
+
+			var start = textView
+				.GetPosition(new Point(0, 0) + textView.ScrollOffset);
+			var end = textView
+				.GetPosition(new Point(textView.ActualWidth, textView.ActualHeight) + textView.ScrollOffset);
+
+			var startOffset = start != null 
+				? FileEditor.Document.GetOffset(start.Value.Location) 
+				: FileEditor.Document.TextLength;
+			var endOffset = end != null 
+				? FileEditor.Document.GetOffset(end.Value.Location) 
+				: FileEditor.Document.TextLength;
+
+			return startOffset <= offset && endOffset >= offset;
 		}
 
 		#endregion

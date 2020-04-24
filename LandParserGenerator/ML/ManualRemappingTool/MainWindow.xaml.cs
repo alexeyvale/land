@@ -170,19 +170,36 @@ namespace ManualRemappingTool
 
 		private void AddToDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (CanAddRecord)
+			if (ConfigurationIsRecord)
 			{
 				Dataset.Add(
 					SourceFileView.FileRelativePath,
 					TargetFileView.FileRelativePath,
-					SourceFileView.EntityStartOffset.Value,
-					TargetFileView.EntityStartOffset.Value,
+					SourceFileView.EntityLocation.Start.Offset,
+					TargetFileView.EntityLocation.Start.Offset,
 					SourceFileView.EntityType
+				);
+
+				var nestedInSourceEntity = SourceFileView.AvailableEntities
+					.Where(el => SourceFileView.EntityLocation.Includes(el.Location)
+						&& SourceFileView.EntityLocation != el.Location)
+					.ToList();
+				var nestedInTargetEntity = TargetFileView.AvailableEntities
+					.Where(el => TargetFileView.EntityLocation.Includes(el.Location)
+						&& TargetFileView.EntityLocation != el.Location)
+					.ToList();
+
+				DoAutoMapping(
+					nestedInSourceEntity, 
+					nestedInTargetEntity,
+					SourceFileView.EntityNode, 
+					TargetFileView.EntityNode
 				);
 
 				UpdateRecordsTree();
 
 				SourceFileView.ShiftToNextAvailableEntity();
+				TargetFileView.ResetEntity();
 			}
 			else
 			{
@@ -192,26 +209,29 @@ namespace ManualRemappingTool
 
 		private void RemoveFromDatasetButton_Click(object sender, RoutedEventArgs e)
 		{
-			Dataset.Remove(
-				SourceFileView.FileRelativePath,
-				TargetFileView.FileRelativePath,
-				SourceFileView.EntityStartOffset.Value,
-				TargetFileView.EntityStartOffset.Value,
-				SourceFileView.EntityType
-			);
+			if (ConfigurationIsRecord)
+			{
+				Dataset.Remove(
+					SourceFileView.FileRelativePath,
+					TargetFileView.FileRelativePath,
+					SourceFileView.EntityLocation.Start.Offset,
+					TargetFileView.EntityLocation.Start.Offset,
+					SourceFileView.EntityType
+				);
 
-			UpdateRecordsTree();
+				UpdateRecordsTree();
+			}
 		}
 
 		private void HaveDoubtsButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (CanAddRecord)
+			if (ConfigurationIsRecord)
 			{
 				Dataset.Add(
 					SourceFileView.FileRelativePath,
 					TargetFileView.FileRelativePath,
-					SourceFileView.EntityStartOffset.Value,
-					TargetFileView.EntityStartOffset.Value,
+					SourceFileView.EntityLocation.Start.Offset,
+					TargetFileView.EntityLocation.Start.Offset,
 					SourceFileView.EntityType,
 					true
 				);
@@ -243,7 +263,7 @@ namespace ManualRemappingTool
 						Control_MessageSent(null, "Парный файл отсутствует");
 					}
 
-					DoAutoMapping();
+					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 
 					/// Если после автопоиска соответствия не осталось несопоставленных сущностей
 					/// и открытие исходного файла было направленным
@@ -274,7 +294,7 @@ namespace ManualRemappingTool
 			}
 			else
 			{
-				DoAutoMapping();
+				DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 			}
 		}
 
@@ -294,7 +314,7 @@ namespace ManualRemappingTool
 				}
 			}
 
-			DoAutoMapping();
+			DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 		}
 
 		private void Control_MessageSent(object sender, string e)
@@ -330,7 +350,7 @@ namespace ManualRemappingTool
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
 
-					DoAutoMapping();
+					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 
 					SourceFileView.FillEntitiesList(record.SourceOffset, true);
 					TargetFileView.FillEntitiesList(record.TargetOffset);
@@ -435,23 +455,34 @@ namespace ManualRemappingTool
 
 		#region Helpers
 
-		private void DoAutoMapping()
+		private void DoAutoMapping(
+			List<Node> sourceEntities, 
+			List<Node> targetEntities,
+			Node sourceParentRestrictor = null,
+			Node targetParentRestrictor = null)
 		{
-			var candidates = TargetFileView.AvailableEntities
+			var sourceAncestorRestrictor = sourceParentRestrictor != null
+				? (AncestorsContextElement)sourceParentRestrictor : null;
+			var targetAncestorRestrictor = targetParentRestrictor != null
+				? (AncestorsContextElement)targetParentRestrictor : null;
+
+			var candidates = targetEntities
 				.GroupBy(n => n.Type)
 				.ToDictionary(g => g.Key, g => g.Select(e => new
 				{
 					Node = e,
-					Header = PointContext.GetHeaderContext(e),
-					Ancestors = PointContext.GetAncestorsContext(e),
+					Header = PointContext.GetHeaderContext(e),		
+					Ancestors = PointContext.GetAncestorsContext(e)
+						.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList()
 				}).ToList());
 
-			var unmapped = SourceFileView.AvailableEntities
+			var unmapped = sourceEntities
 				.Select(e => new
 				{
 					Node = e,
 					Header = PointContext.GetHeaderContext(e),
-					Ancestors = PointContext.GetAncestorsContext(e),
+					Ancestors = PointContext.GetAncestorsContext(e)
+						.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList()
 				})
 				.Where(e => e.Header.Count > 0 
 					&& candidates.ContainsKey(e.Node.Type))
@@ -556,9 +587,8 @@ namespace ManualRemappingTool
 			return element as T;
 		}
 
-		private bool CanAddRecord =>
-			SourceFileView.EntityStartOffset.HasValue
-			&& TargetFileView.EntityStartOffset.HasValue
+		private bool ConfigurationIsRecord => SourceFileView.EntityLocation != null
+			&& TargetFileView.EntityLocation != null
 			&& SourceFileView.EntityType == TargetFileView.EntityType;
 
 		private void UpdateRecordsTree()
