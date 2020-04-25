@@ -48,12 +48,14 @@ namespace ManualRemappingTool
 			InitializeComponent();
 
 			SourceFileView.Parsers = Parsers;
+			SourceFileView.FileEditor.MouseDown += FileView_MouseDown;
 			SourceFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
 			SourceFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
 			SourceFileView.FileEntitiesList.PreviewMouseWheel += Control_PreviewMouseWheel;
 			SourceFileView.AvailableEntitiesFilter = IsSourceEntityAvailable;
 
 			TargetFileView.Parsers = Parsers;
+			TargetFileView.FileEditor.MouseDown += FileView_MouseDown;
 			TargetFileView.FileEditor.PreviewMouseWheel += Control_PreviewMouseWheel;
 			TargetFileView.FileEditor.TextArea.TextView.ScrollOffsetChanged += FileView_ScrollOffsetChanged;
 			TargetFileView.FileEntitiesList.PreviewMouseWheel += Control_PreviewMouseWheel;
@@ -64,6 +66,14 @@ namespace ManualRemappingTool
 		private void MainWindow_ContentRendered(object sender, EventArgs e)
 		{
 			StartWindowInteraction();
+		}
+
+		private void FileView_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if(e.ChangedButton == MouseButton.Middle)
+			{
+				SyncViewsButton_Click(sender, null);
+			}
 		}
 
 		private void FileView_ScrollOffsetChanged(object sender, EventArgs e)
@@ -324,11 +334,15 @@ namespace ManualRemappingTool
 
 		private void SyncViewsButton_Click(object sender, RoutedEventArgs e)
 		{
-			var offset = SourceFileView.FileEditor.TextArea.TextView.ScrollOffset.Y;
+			var sourceView = (sender as ICSharpCode.AvalonEdit.TextEditor) ?? SourceFileView.FileEditor;
+			var targetView = sourceView == SourceFileView.FileEditor
+				? TargetFileView.FileEditor : SourceFileView.FileEditor;
 
-			if (TargetFileView.FileEditor.TextArea.TextView.DocumentHeight > offset)
+			var offset = sourceView.TextArea.TextView.ScrollOffset.Y;
+
+			if (targetView.TextArea.TextView.DocumentHeight > offset)
 			{
-				TargetFileView.FileEditor.ScrollToVerticalOffset(offset);
+				targetView.ScrollToVerticalOffset(offset);
 			}
 		}
 
@@ -392,22 +406,6 @@ namespace ManualRemappingTool
 					e.Handled = true;
 				}
 			}
-			else if (Keyboard.Modifiers == ModifierKeys.Shift)
-			{
-				if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.A))
-				{
-					if (SourceFileView.FileEditor.TextArea.IsFocused)
-					{
-						TargetFileView.FileEditor.TextArea.Focus();
-					}
-					else if (TargetFileView.FileEditor.TextArea.IsFocused)
-					{
-						SourceFileView.FileEditor.TextArea.Focus();
-					}
-
-					e.Handled = true;
-				}
-			}
 			else if (Keyboard.Modifiers == ModifierKeys.Control)
 			{
 				if (Keyboard.IsKeyDown(Key.S))
@@ -421,6 +419,22 @@ namespace ManualRemappingTool
 				if (Keyboard.IsKeyDown(Key.S))
 				{
 					SaveDatasetButton_Click(null, null);
+					e.Handled = true;
+				}
+			}
+			else if (Keyboard.Modifiers == ModifierKeys.Shift)
+			{
+				if (Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.A))
+				{
+					if (SourceFileView.FileEditor.TextArea.IsFocused)
+					{
+						TargetFileView.FileEditor.TextArea.Focus();
+					}
+					else if (TargetFileView.FileEditor.TextArea.IsFocused)
+					{
+						SourceFileView.FileEditor.TextArea.Focus();
+					}
+
 					e.Handled = true;
 				}
 			}
