@@ -455,6 +455,11 @@ namespace ManualRemappingTool
 			}
 		}
 
+		private void ShowDoubtsOnlyCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+		{
+			UpdateRecordsTree();
+		}
+
 		#region Helpers
 
 		private void SyncEntitiesListAndEditor(FileViewer fileViewer, int pffset, string type)
@@ -615,8 +620,20 @@ namespace ManualRemappingTool
 		private void UpdateRecordsTree()
 		{
 			RecordsToView = Dataset.Records
-				.Select(e => new Tuple<string, List<Tuple<string, List<DatasetRecord>>>>(e.Key,
-					e.Value.Select(el => new Tuple<string, List<DatasetRecord>>(el.Key, el.Value.OrderBy(e2 => e2.SourceOffset).ToList())).ToList()))
+				.Select(e => new Tuple<string, List<Tuple<string, List<DatasetRecord>>>>(
+					e.Key,
+					e.Value
+						.Select(e1 => new Tuple<string, List<DatasetRecord>>(
+							e1.Key, 
+							e1.Value
+								.Where(e2=>!(ShowDoubtsOnlyCheckBox.IsChecked ?? false) || e2.HasDoubts)
+								.OrderBy(e2 => e2.SourceOffset)
+								.ToList()
+						))
+						.Where(e1=>e1.Item2.Count > 0)
+						.ToList()
+				))
+				.Where(e=>e.Item2.Count > 0)
 				.ToList();
 
 			DatasetTree.ItemsSource = RecordsToView;
