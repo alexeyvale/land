@@ -33,6 +33,13 @@ namespace ManualRemappingTool
 		{
 			public string FileRelativePath { get; set; }
 			public ShiftDirection? Direction { get; set; }
+			public bool AvailableOnly { get; set; }
+		}
+
+		public class EntitySelectedArgs
+		{
+			public Node EntityNode { get; set; }
+			public ShiftDirection? Direction { get; set; }
 		}
 
 		private SegmentsBackgroundRenderer SegmentColorizer { get; set; }
@@ -46,8 +53,8 @@ namespace ManualRemappingTool
 		/// Корень дерева, соответствующего открытому тексту
 		/// </summary>
 		private Node TreeRoot { get; set; }
-		
-		private List<Node> _availableEntities;
+
+		private List<Node> ExistingEntities { get; set; }
 
 		public Func<Node, bool> AvailableEntitiesFilter { get; set; } = (Node n) => true;
 
@@ -55,7 +62,7 @@ namespace ManualRemappingTool
 		/// Упорядоченный по смещению список сущностей, к которым возможна привязка
 		/// </summary>
 		public List<Node> AvailableEntities =>
-			_availableEntities.Where(AvailableEntitiesFilter).ToList();
+			ExistingEntities.Where(AvailableEntitiesFilter).ToList();
 
 		/// <summary>
 		/// Список файлов, содержащихся в каталоге, 
@@ -183,6 +190,8 @@ namespace ManualRemappingTool
 
 		public event EventHandler<FileOpenedEventArgs> FileOpened;
 
+		public event EventHandler<EntitySelectedArgs> EntitySelected;
+
 		public event EventHandler<string> MessageSent;
 
 		#endregion
@@ -198,7 +207,7 @@ namespace ManualRemappingTool
 
 		private void OpenFileButton_Click(object sender, RoutedEventArgs e)
 		{
-			if(String.IsNullOrEmpty(WorkingDirectory))
+			if (String.IsNullOrEmpty(WorkingDirectory))
 			{
 				MessageSent?.Invoke(this,
 					$"Необходимо указать рабочий каталог для файлов {LabelText}");
@@ -209,11 +218,11 @@ namespace ManualRemappingTool
 			var openFileDialog = new OpenFileDialog();
 			openFileDialog.InitialDirectory = WorkingDirectory;
 
-			if (openFileDialog.ShowDialog() == true 
+			if (openFileDialog.ShowDialog() == true
 				&& openFileDialog.FileName.StartsWith(WorkingDirectory))
 			{
 				OpenFile(openFileDialog.FileName);
-				FileOpened?.Invoke(this, 
+				FileOpened?.Invoke(this,
 					new FileOpenedEventArgs { FileRelativePath = FileRelativePath });
 			}
 		}
@@ -226,9 +235,9 @@ namespace ManualRemappingTool
 
 		private void FileEditor_PreviewMouseUp(object sender, MouseButtonEventArgs e)
 		{
-			if(Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+			if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
 			{
-				FillEntitiesList(FileEditor.CaretOffset);
+				FillEntitiesListAndSelect(FileEditor.CaretOffset, false);
 			}
 		}
 
@@ -236,11 +245,11 @@ namespace ManualRemappingTool
 		{
 			SegmentColorizer.ResetSegments();
 
-			if (EntityNode != null 
+			if (EntityNode != null
 				&& FileEntitiesList.SelectedIndex != FileEntitiesList.Items.Count - 1)
 			{
 				SegmentColorizer.SetSegments(
-					new List<SegmentLocation> { EntityNode.Location }, 
+					new List<SegmentLocation> { EntityNode.Location },
 					Color.FromRgb(170, 210, 170)
 				);
 
@@ -251,6 +260,11 @@ namespace ManualRemappingTool
 					);
 				}
 			}
+
+			EntitySelected?.Invoke(this, new EntitySelectedArgs
+			{
+				EntityNode = EntityNode
+			});
 		}
 
 		private void FileEditor_KeyDown(object sender, KeyEventArgs e)
@@ -259,12 +273,12 @@ namespace ManualRemappingTool
 			{
 				if (Keyboard.IsKeyDown(Key.S))
 				{
-					ShiftToNextAvailableEntity();
+					ShiftToEntity(ShiftDirection.Next);
 					e.Handled = true;
 				}
 				else if (Keyboard.IsKeyDown(Key.W))
 				{
-					ShiftToPrevAvailableEntity();
+					ShiftToEntity(ShiftDirection.Prev);
 					e.Handled = true;
 				}
 				else if (Keyboard.IsKeyDown(Key.D))
@@ -275,6 +289,29 @@ namespace ManualRemappingTool
 				else if (Keyboard.IsKeyDown(Key.A))
 				{
 					ShiftToFile(ShiftDirection.Prev);
+					e.Handled = true;
+				}
+			}
+			else if (Keyboard.Modifiers == ModifierKeys.Alt)
+			{
+				if (Keyboard.IsKeyDown(Key.S))
+				{
+					ShiftToEntity(ShiftDirection.Next, false);
+					e.Handled = true;
+				}
+				else if (Keyboard.IsKeyDown(Key.W))
+				{
+					ShiftToEntity(ShiftDirection.Prev, false);
+					e.Handled = true;
+				}
+				else if (Keyboard.IsKeyDown(Key.D))
+				{
+					ShiftToFile(ShiftDirection.Next, false);
+					e.Handled = true;
+				}
+				else if (Keyboard.IsKeyDown(Key.A))
+				{
+					ShiftToFile(ShiftDirection.Prev, false);
 					e.Handled = true;
 				}
 			}
@@ -302,20 +339,25 @@ namespace ManualRemappingTool
 
 			var visitor = new LandExplorerVisitor();
 			TreeRoot.Accept(visitor);
-			_availableEntities = visitor.Land;
+			ExistingEntities = visitor.Land;
 		}
 
-		public void FillEntitiesList(int offset, bool ignoreAvailability = false)
+		public void FillEntitiesListAndSelect(int offset, bool availableOnly = true)
 		{
-			var candidates = GetEntities(TreeRoot, new PointLocation(offset), true, ignoreAvailability);
+			var candidates = GetEntities(TreeRoot, new PointLocation(offset), true, availableOnly);
 
 			candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
 
 			FileEntitiesList.ItemsSource = candidates;
 			FileEntitiesList.SelectedIndex = 0;
+
+			EntitySelected?.Invoke(this, new EntitySelectedArgs
+			{
+				EntityNode = EntityNode
+			});
 		}
 
-		public void ShiftToFile(ShiftDirection direction)
+		public void ShiftToFile(ShiftDirection direction, bool availableOnly = true)
 		{
 			if (WorkingDirectoryFiles.Count > 0)
 			{
@@ -336,42 +378,56 @@ namespace ManualRemappingTool
 				FileOpened?.Invoke(this, new FileOpenedEventArgs
 				{
 					FileRelativePath = FileRelativePath,
-					Direction = direction
+					Direction = direction,
+					AvailableOnly = availableOnly
 				});
 			}
 		}
 
-		public void ShiftToNextAvailableEntity()
+		public void ShiftToEntity(ShiftDirection direction, bool availableOnly = true)
 		{
-			if (AvailableEntities.Count > 0)
-			{
-				var nextEntity = EntityNode != null
-					? AvailableEntities
-						.SkipWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
-							|| e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset >= EntityNode.Location.End.Offset)
-						.FirstOrDefault() ?? AvailableEntities.First()
-					: AvailableEntities.First();
+			var entities = availableOnly ? AvailableEntities : ExistingEntities;
 
-				ShiftToEntityCore(nextEntity);
-			}
-			else
+			if (entities.Count > 0)
 			{
-				ResetEntity();
-			}
-		}
+				Node entityNode = null;
 
-		public void ShiftToPrevAvailableEntity()
-		{
-			if (AvailableEntities.Count > 0)
-			{
-				var prevEntity = EntityNode != null
-					? AvailableEntities
-						.TakeWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
-							|| e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset > EntityNode.Location.End.Offset)
-						.LastOrDefault() ?? AvailableEntities.Last()
-					: AvailableEntities.Last();
+				switch (direction)
+				{
+					case ShiftDirection.Next:
+						entityNode = EntityNode != null
+							? entities
+								.SkipWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
+									|| e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset >= EntityNode.Location.End.Offset)
+								.FirstOrDefault() ?? entities.First()
+							: entities.First();
+						break;
+					case ShiftDirection.Prev:
+						entityNode = EntityNode != null
+						   ? entities
+							   .TakeWhile(e => e.Location.Start.Offset < EntityNode.Location.Start.Offset
+								   || e.Location.Start.Offset == EntityNode.Location.Start.Offset && e.Location.End.Offset > EntityNode.Location.End.Offset)
+							   .LastOrDefault() ?? entities.Last()
+						   : entities.Last();
+						break;
+				}
 
-				ShiftToEntityCore(prevEntity);
+				var candidates = GetEntities(
+					entityNode,
+					new PointLocation(entityNode.Location.Start.Offset),
+					true,
+					availableOnly
+				);
+				candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
+
+				FileEntitiesList.ItemsSource = candidates;
+				FileEntitiesList.SelectedIndex = 0;
+
+				EntitySelected?.Invoke(this, new EntitySelectedArgs
+				{
+					Direction = direction,
+					EntityNode = EntityNode
+				});
 			}
 			else
 			{
@@ -382,23 +438,6 @@ namespace ManualRemappingTool
 		public void ResetEntity()
 		{
 			FileEntitiesList.ItemsSource = null;
-		}
-
-		#endregion
-
-		#region Cores
-
-		private void ShiftToEntityCore(Node entityNode)
-		{
-			var candidates = GetEntities(
-				entityNode,
-				new PointLocation(entityNode.Location.Start.Offset),
-				false
-			);
-			candidates.Add(new ExistingConcernPointCandidate() { ViewHeader = "[сбросить выделение]" });
-
-			FileEntitiesList.ItemsSource = candidates;
-			FileEntitiesList.SelectedIndex = 0;
 		}
 
 		#endregion
@@ -456,7 +495,7 @@ namespace ManualRemappingTool
 			Node root, 
 			PointLocation point, 
 			bool exploreInDepth = true,
-			bool ignoreAvailability = false)
+			bool availableOnly = true)
 		{
 			var pseudoSegment = new SegmentLocation
 			{
@@ -480,7 +519,7 @@ namespace ManualRemappingTool
 			}
 
 			return pointCandidates
-				.Where(c=> ignoreAvailability || AvailableEntities.Contains(c))
+				.Where(c=> !availableOnly || AvailableEntities.Contains(c))
 				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
 				.ToList();
 		}

@@ -68,7 +68,7 @@ namespace ManualRemappingTool
 
 		private void FileView_ScrollOffsetChanged(object sender, EventArgs e)
 		{
-			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Alt)
+			if ((Keyboard.Modifiers & ModifierKeys.Shift & ModifierKeys.Control) > 0)
 			{
 				SyncViewsButton_Click(null, null);
 			}
@@ -198,7 +198,7 @@ namespace ManualRemappingTool
 
 				UpdateRecordsTree();
 
-				SourceFileView.ShiftToNextAvailableEntity();
+				SourceFileView.ShiftToEntity(FileViewer.ShiftDirection.Next);
 				TargetFileView.ResetEntity();
 			}
 			else
@@ -267,7 +267,7 @@ namespace ManualRemappingTool
 
 					/// Если после автопоиска соответствия не осталось несопоставленных сущностей
 					/// и открытие исходного файла было направленным
-					if (e.Direction.HasValue && SourceFileView.AvailableEntities.Count == 0)
+					if (e.AvailableOnly && e.Direction.HasValue && SourceFileView.AvailableEntities.Count == 0)
 					{
 						/// Открываем новый исходный файл в том же направлении
 						switch (e.Direction)
@@ -352,35 +352,8 @@ namespace ManualRemappingTool
 
 					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 
-					SourceFileView.FillEntitiesList(record.SourceOffset, true);
-					TargetFileView.FillEntitiesList(record.TargetOffset);
-
-					foreach (ExistingConcernPointCandidate item in SourceFileView.FileEntitiesList.Items)
-					{
-						if (item.Node?.Location.Start.Offset == record.SourceOffset
-							&& item.Node?.Type == record.EntityType)
-						{
-							SourceFileView.FileEntitiesList.SelectedItem = item;
-							break;
-						}
-					}
-
-					foreach (ExistingConcernPointCandidate item in TargetFileView.FileEntitiesList.Items)
-					{
-						if (item.Node?.Location.Start.Offset == record.TargetOffset
-							&& item.Node?.Type == record.EntityType)
-						{
-							TargetFileView.FileEntitiesList.SelectedItem = item;
-							break;
-						}
-					}
-
-					SourceFileView.FileEditor.ScrollToLine(
-						SourceFileView.FileEditor.Document.GetLineByOffset(record.SourceOffset).LineNumber
-					);
-					TargetFileView.FileEditor.ScrollToLine(
-						TargetFileView.FileEditor.Document.GetLineByOffset(record.TargetOffset).LineNumber
-					);
+					SyncEntitiesListAndEditor(SourceFileView, record.SourceOffset, record.EntityType);
+					SyncEntitiesListAndEditor(TargetFileView, record.TargetOffset, record.EntityType);
 
 					e.Handled = true;
 				}
@@ -453,7 +426,41 @@ namespace ManualRemappingTool
 			}
 		}
 
+		private void SourceFileView_EntitySelected(object sender, FileViewer.EntitySelectedArgs e)
+		{
+			if(e.EntityNode != null)
+			{
+				var pair = Dataset[SourceFileView.FileRelativePath, TargetFileView.FileRelativePath]
+					.FirstOrDefault(el => el.SourceOffset == e.EntityNode.Location.Start.Offset
+						&& el.EntityType == e.EntityNode.Type);
+
+				if(pair != null)
+				{
+					SyncEntitiesListAndEditor(TargetFileView, pair.TargetOffset, pair.EntityType);
+				}
+			}
+		}
+
 		#region Helpers
+
+		private void SyncEntitiesListAndEditor(FileViewer fileViewer, int pffset, string type)
+		{
+			fileViewer.FillEntitiesListAndSelect(pffset, false);
+
+			foreach (ExistingConcernPointCandidate item in fileViewer.FileEntitiesList.Items)
+			{
+				if (item.Node?.Location.Start.Offset == pffset
+					&& item.Node?.Type == type)
+				{
+					fileViewer.FileEntitiesList.SelectedItem = item;
+					break;
+				}
+			}
+
+			fileViewer.FileEditor.ScrollToLine(
+				SourceFileView.FileEditor.Document.GetLineByOffset(pffset).LineNumber
+			);
+		}
 
 		private void DoAutoMapping(
 			List<Node> sourceEntities, 

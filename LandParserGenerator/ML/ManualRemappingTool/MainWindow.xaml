@@ -46,6 +46,7 @@
 						  x:Name="SourceFileView"
 						  LabelText="ИСХ"
 						  FileOpened="SourceFileView_FileOpened"
+						  EntitySelected="SourceFileView_EntitySelected"
 						  MessageSent="Control_MessageSent">
 		</local:FileViewer>
 
