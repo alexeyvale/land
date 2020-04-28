@@ -120,8 +120,7 @@ namespace Land.Control
 							point,
 							selectedCandidate.Node,
 							State.PendingCommand.Document,
-							GetPointSearchArea(),
-							GetParsed
+							GetPointSearchArea()
 						);
 
 						point.Name = ConcernPointNameText.Text;
@@ -133,7 +132,6 @@ namespace Land.Control
 							selectedCandidate.Node,
 							State.PendingCommand.Document,
 							GetPointSearchArea(),
-							GetParsed,
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,
 							State.PendingCommand.Target?.DataContext as Concern
