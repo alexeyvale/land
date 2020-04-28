@@ -139,7 +139,6 @@ namespace Land.Markup
 			Node node, 
 			ParsedFile file, 
 			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed,
 			string name = null, 
 			string comment = null, 
 			Concern parent = null)
@@ -147,7 +146,7 @@ namespace Land.Markup
 			Remap(node.Type, file.Name, searchArea);
 
 			var point = new ConcernPoint(
-				node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), getParsed, ContextFinder), parent
+				node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), parent
 			);
 
 			if (!String.IsNullOrEmpty(name))
@@ -165,8 +164,7 @@ namespace Land.Markup
 		/// </summary>
 		public void AddLand(
 			ParsedFile file,
-			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed)
+			List<ParsedFile> searchArea)
 		{
 			var visitor = new LandExplorerVisitor();
 			file.Root.Accept(visitor);
@@ -190,7 +188,7 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), getParsed, ContextFinder), subconcern)
+							node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), subconcern)
 						);
 					}
 				}
@@ -202,7 +200,7 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), getParsed, ContextFinder), concern)
+						node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), concern)
 					);
 				}
 			}
@@ -241,10 +239,9 @@ namespace Land.Markup
 			ConcernPoint point, 
 			Node node, 
 			ParsedFile file,
-			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed)
+			List<ParsedFile> searchArea)
 		{
-			point.Relink(node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), getParsed, ContextFinder));
+			point.Relink(node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder));
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -480,7 +477,7 @@ namespace Land.Markup
 					.Take(AmbiguityTopCount).ToList();
 
 				if (!allowAutoDecisions || 
-					!ApplyCandidate(kvp.Key, candidates, searchArea, ContextFinder.GetParsed))
+					!ApplyCandidate(kvp.Key, candidates, searchArea))
 					ambiguous[kvp.Key] = candidates;
 			}
 
@@ -514,7 +511,7 @@ namespace Land.Markup
 					.Take(AmbiguityTopCount)
 					.ToList();
 
-				if (!ApplyCandidate(key, result[key], searchArea, ContextFinder.GetParsed))
+				if (!ApplyCandidate(key, result[key], searchArea))
 					ambiguous[key] = result[key];
 			}
 
@@ -526,15 +523,14 @@ namespace Land.Markup
 		private bool ApplyCandidate(
 			ConcernPoint point, 
 			IEnumerable<RemapCandidateInfo> candidates,
-			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed)
+			List<ParsedFile> searchArea)
 		{
 			var first = candidates.FirstOrDefault();
 
 			if (first?.IsAuto ?? false)
 			{
 				point.Context = ContextFinder.ContextManager.GetContext(
-					first.Node, first.File, GetSimilarOnly(first.File, searchArea), getParsed, ContextFinder
+					first.Node, first.File, GetSimilarOnly(first.File, searchArea), ContextFinder.GetParsed, ContextFinder
 				);
 
 				point.AstNode = first.Node;
@@ -590,7 +586,7 @@ namespace Land.Markup
 			}
 		}
 
-		private List<ParsedFile> GetSimilarOnly(ParsedFile source, List<ParsedFile> searchArea)
-			=> searchArea.Where(f => ContextFinder.AreFilesSimilarEnough(source.BindingContext, f.BindingContext)).ToList();
+		private List<ParsedFile> GetSimilarOnly(ParsedFile source, List<ParsedFile> searchArea) => 
+			searchArea.Where(f => ContextFinder.AreFilesSimilarEnough(source.BindingContext, f.BindingContext)).ToList();
 	}
 }
