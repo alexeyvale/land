@@ -25,6 +25,8 @@ namespace ManualRemappingTool
 		public string SourceDirectoryPath { get; set; }
 		public string TargetDirectoryPath { get; set; }
 
+		public HashSet<string> FinalizedFiles { get; set; }
+
 		public Dictionary<string, Dictionary<string, List<DatasetRecord>>> Records { get; set; }
 
 		public string ExtensionsString
@@ -112,6 +114,7 @@ namespace ManualRemappingTool
 		public void New()
 		{
 			Records = new Dictionary<string, Dictionary<string, List<DatasetRecord>>>();
+			FinalizedFiles = new HashSet<string>();
 			SavingPath = null;
 		}
 
@@ -139,11 +142,18 @@ namespace ManualRemappingTool
 
 						fs.WriteLine(targetFile.Key);
 
-						foreach(var record in targetFile.Value)
+						foreach (var record in targetFile.Value)
 						{
 							fs.WriteLine(record.ToString());
 						}
 					}
+				}
+
+				fs.WriteLine("***");
+
+				foreach (var sourceFilePath in FinalizedFiles)
+				{
+					fs.WriteLine(sourceFilePath);
 				}
 			}
 		}
@@ -153,7 +163,8 @@ namespace ManualRemappingTool
 			var ds = new Dataset
 			{
 				SavingPath = path,
-				Records = new Dictionary<string, Dictionary<string, List<DatasetRecord>>>()
+				Records = new Dictionary<string, Dictionary<string, List<DatasetRecord>>>(),
+				FinalizedFiles = new HashSet<string>()
 			};
 
 			var lines = File.ReadAllLines(path);
@@ -176,6 +187,16 @@ namespace ManualRemappingTool
 				{
 					currentTargetFile = lines[++i];
 					continue;
+				}
+
+				if (lines[i] == "****")
+				{
+					for (var j = i + 1; j < lines.Length; ++j)
+					{
+						ds.FinalizedFiles.Add(lines[j]);
+					}
+
+					break;
 				}
 
 				var record = DatasetRecord.FromString(lines[i]);
@@ -217,6 +238,20 @@ namespace ManualRemappingTool
 				EntityType = splitted[2],
 				HasDoubts = bool.Parse(splitted[3])
 			};
+		}
+	}
+
+	public class ExtendedDatasetRecord: DatasetRecord
+	{
+		public string SourceFilePath { get; set; }
+		public string TargetFilePath { get; set; }
+
+		public ExtendedDatasetRecord(DatasetRecord record):base()
+		{
+			SourceOffset = record.SourceOffset;
+			TargetOffset = record.TargetOffset;
+			HasDoubts = record.HasDoubts;
+			EntityType = record.EntityType;
 		}
 	}
 }

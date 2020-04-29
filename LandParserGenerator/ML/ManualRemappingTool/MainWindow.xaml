@@ -30,7 +30,7 @@
 			</Style.Triggers>
 		</Style>
 
-		<Style x:Key="IconButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource IconStyle}"></Style>
+		<Style x:Key="IconButtonStyle" TargetType="{x:Type Control}" BasedOn="{StaticResource IconStyle}"></Style>
 	</Window.Resources>
 
 	<Grid>
@@ -77,6 +77,9 @@
 					Click="RemoveFromDatasetButton_Click"></Button>
 				<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="HaveDoubtsButton_Click"></Button>
+				<ToggleButton Name="FinalizeFileButton" Content="&#xf00c;" Margin="0 20 0 5" Style="{StaticResource IconButtonStyle}"
+							  ToolTip="Пометить исходный файл как окончательно обработанный"
+							  Checked="FinalizeFileButton_CheckedChanged" Unchecked="FinalizeFileButton_CheckedChanged"/>
 				<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
 					Click="SyncViewsButton_Click"></Button>
 			</StackPanel>

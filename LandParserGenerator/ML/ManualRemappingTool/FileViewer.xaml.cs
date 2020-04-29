@@ -219,9 +219,8 @@ namespace ManualRemappingTool
 			openFileDialog.InitialDirectory = WorkingDirectory;
 
 			if (openFileDialog.ShowDialog() == true
-				&& openFileDialog.FileName.StartsWith(WorkingDirectory))
+				&& OpenFile(openFileDialog.FileName))
 			{
-				OpenFile(openFileDialog.FileName);
 				FileOpened?.Invoke(this,
 					new FileOpenedEventArgs { FileRelativePath = FileRelativePath });
 			}
@@ -319,8 +318,21 @@ namespace ManualRemappingTool
 
 		#region API
 
-		public void OpenFile(string filePath)
+		public bool OpenFile(string filePath)
 		{
+			if(!filePath.StartsWith(WorkingDirectory))
+			{
+				MessageSent?.Invoke(this, "Попытка открыть файл не из рабочего каталога");
+				return false;
+			}
+
+			if(!File.Exists(filePath))
+			{
+				MessageSent?.Invoke(this, "Попытка открыть несуществующий файл");
+				return false;
+			}
+
+			CurrentFileIndex = WorkingDirectoryFiles.IndexOf(filePath);
 			FilePath = filePath;
 
 			using (var stream = new StreamReader(filePath, GetEncoding(filePath)))
@@ -340,6 +352,8 @@ namespace ManualRemappingTool
 			var visitor = new LandExplorerVisitor();
 			TreeRoot.Accept(visitor);
 			ExistingEntities = visitor.Land;
+
+			return true;
 		}
 
 		public void FillEntitiesListAndSelect(int offset, bool availableOnly = true)

@@ -206,8 +206,6 @@ namespace ManualRemappingTool
 					TargetFileView.EntityNode
 				);
 
-				UpdateRecordsTree();
-
 				SourceFileView.ShiftToEntity(FileViewer.ShiftDirection.Next);
 				TargetFileView.ResetEntity();
 			}
@@ -460,6 +458,21 @@ namespace ManualRemappingTool
 			UpdateRecordsTree();
 		}
 
+		private void FinalizeFileButton_CheckedChanged(object sender, RoutedEventArgs e)
+		{
+			if (!String.IsNullOrEmpty(SourceFileView.FileRelativePath))
+			{
+				if (FinalizeFileButton.IsChecked ?? false)
+				{
+					Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
+				}
+				else
+				{
+					Dataset.FinalizedFiles.Remove(SourceFileView.FileRelativePath);
+				}
+			}
+		}
+
 		#region Helpers
 
 		private void SyncEntitiesListAndEditor(FileViewer fileViewer, int pffset, string type)
@@ -535,6 +548,13 @@ namespace ManualRemappingTool
 			}
 
 			Control_MessageSent(null, $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия");
+
+			if (SourceFileView.AvailableEntities.Count == 0)
+			{
+				Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
+			}
+			UpdateIsFinalizedCheckBox();
+
 			UpdateRecordsTree();
 		}
 
@@ -637,6 +657,12 @@ namespace ManualRemappingTool
 				.ToList();
 
 			DatasetTree.ItemsSource = RecordsToView;
+		}
+
+		private void UpdateIsFinalizedCheckBox()
+		{
+			FinalizeFileButton.IsChecked =
+				Dataset?.FinalizedFiles?.Contains(SourceFileView.FileRelativePath) ?? false;
 		}
 
 		#endregion
