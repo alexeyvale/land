@@ -64,6 +64,8 @@ namespace ManualRemappingTool
 		public List<Node> AvailableEntities =>
 			ExistingEntities.Where(AvailableEntitiesFilter).ToList();
 
+		public HashSet<string> WorkingExtensions { get; private set; }
+
 		/// <summary>
 		/// Список файлов, содержащихся в каталоге, 
 		/// с которым ведётся работа в рамках данного экземпляра просмотрщика
@@ -71,36 +73,9 @@ namespace ManualRemappingTool
 		private List<string> WorkingDirectoryFiles { get; set; }
 
 		/// <summary>
-		/// Индекс текущего открытого файла в общем списке файлов каталога
-		/// </summary>
-		private int CurrentFileIndex { get; set; } = -1;
-
-		/// <summary>
 		/// Менеджер, предоставляющий парсеры для разбора
 		/// </summary>
 		public ParserManager Parsers { get; set; }
-
-		public HashSet<string> WorkingExtensions
-		{
-			get { return _workingExtensions; }
-
-			set
-			{
-				_workingExtensions = value;
-
-				if (!String.IsNullOrEmpty(WorkingDirectory)
-					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
-				{
-					WorkingDirectoryFiles = Directory
-						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
-						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
-						.OrderBy(elem => elem)
-						.ToList();
-				}
-			}
-		}
-
-		private HashSet<string> _workingExtensions;
 
 		public Node EntityNode => (FileEntitiesList.SelectedItem as ExistingConcernPointCandidate)
 			?.Node;
@@ -125,20 +100,7 @@ namespace ManualRemappingTool
 		{
 			get => (string)GetValue(WorkingDirectoryProperty);
 
-			set
-			{
-				SetValue(WorkingDirectoryProperty, value);
-
-				if (!String.IsNullOrEmpty(WorkingDirectory)
-					&& WorkingExtensions != null && WorkingExtensions.Count > 0)
-				{
-					WorkingDirectoryFiles = Directory
-						.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
-						.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
-						.OrderBy(elem => elem)
-						.ToList();
-				}
-			}
+			private set { SetValue(WorkingDirectoryProperty, value); }
 		}
 
 		public static readonly DependencyProperty LabelTextProperty = DependencyProperty.Register(
@@ -210,7 +172,7 @@ namespace ManualRemappingTool
 			if (String.IsNullOrEmpty(WorkingDirectory))
 			{
 				MessageSent?.Invoke(this,
-					$"Необходимо указать рабочий каталог для файлов {LabelText}");
+					$"Необходимо сконфигурировать редактор {LabelText}");
 
 				return;
 			}
@@ -237,6 +199,11 @@ namespace ManualRemappingTool
 			if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
 			{
 				FillEntitiesListAndSelect(FileEditor.CaretOffset, false);
+
+				EntitySelected?.Invoke(this, new EntitySelectedArgs
+				{
+					EntityNode = EntityNode
+				});
 			}
 		}
 
@@ -332,7 +299,6 @@ namespace ManualRemappingTool
 				return false;
 			}
 
-			CurrentFileIndex = WorkingDirectoryFiles.IndexOf(filePath);
 			FilePath = filePath;
 
 			using (var stream = new StreamReader(filePath, GetEncoding(filePath)))
@@ -364,41 +330,41 @@ namespace ManualRemappingTool
 
 			FileEntitiesList.ItemsSource = candidates;
 			FileEntitiesList.SelectedIndex = 0;
-
-			EntitySelected?.Invoke(this, new EntitySelectedArgs
-			{
-				EntityNode = EntityNode
-			});
 		}
 
-		public void ShiftToFile(ShiftDirection direction, bool availableOnly = true)
+		public void ShiftToFile(ShiftDirection direction, bool availableOnly = true, bool raiseEvent = true)
 		{
 			if (WorkingDirectoryFiles.Count > 0)
 			{
+				var currentFileIndex = WorkingDirectoryFiles.IndexOf(FilePath);
+
 				switch (direction)
 				{
 					case ShiftDirection.Next:
-						CurrentFileIndex = (CurrentFileIndex + 1)
+						currentFileIndex = (currentFileIndex + 1)
 							% WorkingDirectoryFiles.Count;
 						break;
 					case ShiftDirection.Prev:
-						CurrentFileIndex = (WorkingDirectoryFiles.Count + (CurrentFileIndex - 1))
+						currentFileIndex = (WorkingDirectoryFiles.Count + (currentFileIndex - 1))
 							% WorkingDirectoryFiles.Count;
 						break;
 				}
 
-				OpenFile(WorkingDirectoryFiles[CurrentFileIndex]);
+				OpenFile(WorkingDirectoryFiles[currentFileIndex]);
 
-				FileOpened?.Invoke(this, new FileOpenedEventArgs
+				if (raiseEvent)
 				{
-					FileRelativePath = FileRelativePath,
-					Direction = direction,
-					AvailableOnly = availableOnly
-				});
+					FileOpened?.Invoke(this, new FileOpenedEventArgs
+					{
+						FileRelativePath = FileRelativePath,
+						Direction = direction,
+						AvailableOnly = availableOnly
+					});
+				}
 			}
 		}
 
-		public void ShiftToEntity(ShiftDirection direction, bool availableOnly = true)
+		public void ShiftToEntity(ShiftDirection direction, bool availableOnly = true, bool raiseEvent = true)
 		{
 			var entities = availableOnly ? AvailableEntities : ExistingEntities;
 
@@ -437,11 +403,14 @@ namespace ManualRemappingTool
 				FileEntitiesList.ItemsSource = candidates;
 				FileEntitiesList.SelectedIndex = 0;
 
-				EntitySelected?.Invoke(this, new EntitySelectedArgs
+				if (raiseEvent)
 				{
-					Direction = direction,
-					EntityNode = EntityNode
-				});
+					EntitySelected?.Invoke(this, new EntitySelectedArgs
+					{
+						Direction = direction,
+						EntityNode = EntityNode
+					});
+				}
 			}
 			else
 			{
@@ -452,6 +421,30 @@ namespace ManualRemappingTool
 		public void ResetEntity()
 		{
 			FileEntitiesList.ItemsSource = null;
+		}
+
+		public void Configure(string workingDirectory, HashSet<string> workingExtensions)
+		{
+			if(!Directory.Exists(workingDirectory))
+			{
+				MessageSent?.Invoke(this, $"Директория {workingDirectory} не существует");
+				return;
+			}
+
+			if (workingExtensions == null || workingExtensions.Count == 0)
+			{
+				MessageSent?.Invoke(this, $"Необходимо указать расширения файлов, с которыми ведётся работа");
+				return;
+			}
+
+			WorkingExtensions = workingExtensions;
+			WorkingDirectory = workingDirectory;
+
+			WorkingDirectoryFiles = Directory
+				.GetFiles(WorkingDirectory, "*", SearchOption.AllDirectories)
+				.Where(elem => WorkingExtensions.Contains(Path.GetExtension(elem)))
+				.OrderBy(elem => elem)
+				.ToList();
 		}
 
 		#endregion

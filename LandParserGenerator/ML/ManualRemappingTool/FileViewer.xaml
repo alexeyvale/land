@@ -60,7 +60,7 @@
 						Content="&#xf04e;" 
 						IsEnabled="{Binding ElementName=FileViewerObject, Path=AreNextPrevEnabled}"
 						Style="{StaticResource IconButtonStyle}" Margin="0,-2,0,-2.6" VerticalAlignment="Bottom" Width="36"/>
-				<Label Padding="10,7,10,0" Name="FilePathLabel"
+				<Label Padding="10,7,10,0" Name="FilePathLabel" FontSize="12"
 					   Content="{Binding ElementName=FileViewerObject, Path=FilePath, Mode=OneWay}"></Label>
 			</ToolBar>
 			
@@ -70,7 +70,7 @@
 					ShowLineNumbers="True"
 					FontFamily="Consolas"
 					IsReadOnly="True"
-					Background="#e3e3e3"
+					Background="#cacaca"
 					PreviewMouseLeftButtonUp="FileEditor_PreviewMouseUp"
 					KeyDown="FileEditor_KeyDown">
 			</avalonedit:TextEditor>

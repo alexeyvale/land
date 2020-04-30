@@ -206,7 +206,7 @@ namespace ManualRemappingTool
 					TargetFileView.EntityNode
 				);
 
-				SourceFileView.ShiftToEntity(FileViewer.ShiftDirection.Next);
+				SourceFileView.ShiftToEntity(FileViewer.ShiftDirection.Next, true, false);
 				TargetFileView.ResetEntity();
 			}
 			else
@@ -260,7 +260,10 @@ namespace ManualRemappingTool
 
 				do
 				{
-					var targetPath = Path.Combine(TargetFileView.WorkingDirectory, e.FileRelativePath);
+					var targetPath = Path.Combine(
+						TargetFileView.WorkingDirectory, 
+						SourceFileView.FileRelativePath
+					);
 
 					if (File.Exists(targetPath))
 					{
@@ -278,15 +281,7 @@ namespace ManualRemappingTool
 					if (e.AvailableOnly && e.Direction.HasValue && SourceFileView.AvailableEntities.Count == 0)
 					{
 						/// Открываем новый исходный файл в том же направлении
-						switch (e.Direction)
-						{
-							case FileViewer.ShiftDirection.Next:
-								SourceFileView.ShiftToFile(FileViewer.ShiftDirection.Next);
-								break;
-							case FileViewer.ShiftDirection.Prev:
-								SourceFileView.ShiftToFile(FileViewer.ShiftDirection.Prev);
-								break;
-						}
+						SourceFileView.ShiftToFile(e.Direction.Value, true, false);
 
 						if (SourceFileView.FileRelativePath == initialSourceFilePath)
 						{
@@ -607,11 +602,11 @@ namespace ManualRemappingTool
 				DatasetPathLabel.Content = Path.GetFileName(Dataset.SavingPath);
 				UpdateRecordsTree();
 
-				SourceFileView.WorkingDirectory = Dataset.SourceDirectoryPath;
-				TargetFileView.WorkingDirectory = Dataset.TargetDirectoryPath;
+				SourceFileView.Configure(Dataset.SourceDirectoryPath, Dataset.Extensions);
+				TargetFileView.Configure(Dataset.TargetDirectoryPath, Dataset.Extensions);
 
-				SourceFileView.WorkingExtensions = TargetFileView.WorkingExtensions =
-					Dataset.Extensions;
+				SourceWorkingDirectory.Content = Dataset.SourceDirectoryPath;
+				TargetWorkingDirectory.Content = Dataset.TargetDirectoryPath;
 			}
 			else
 			{

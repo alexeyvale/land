@@ -189,7 +189,7 @@ namespace ManualRemappingTool
 					continue;
 				}
 
-				if (lines[i] == "****")
+				if (lines[i] == "***")
 				{
 					for (var j = i + 1; j < lines.Length; ++j)
 					{

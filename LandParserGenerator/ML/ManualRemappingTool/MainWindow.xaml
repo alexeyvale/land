@@ -140,12 +140,12 @@
 
 				<StackPanel Grid.Row="3" Orientation="Vertical">
 					<Label Content="Каталог исх. файлов"></Label>
-					<Label Content="{Binding ElementName=SourceFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
+					<Label Name="SourceWorkingDirectory"></Label>
 				</StackPanel>
 
 				<StackPanel Grid.Row="4" Orientation="Vertical">
 					<Label Content="Каталог мод. файлов"></Label>
-					<Label Content="{Binding ElementName=TargetFileView, Path=WorkingDirectory, Mode=OneWay}"></Label>
+					<Label Name="TargetWorkingDirectory"></Label>
 				</StackPanel>
 
 				<CheckBox Grid.Row="5" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
