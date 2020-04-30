@@ -485,7 +485,7 @@ namespace ManualRemappingTool
 			}
 
 			fileViewer.FileEditor.ScrollToLine(
-				SourceFileView.FileEditor.Document.GetLineByOffset(pffset).LineNumber
+				fileViewer.FileEditor.Document.GetLineByOffset(pffset).LineNumber
 			);
 		}
 
