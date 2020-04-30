@@ -70,7 +70,7 @@
 					ShowLineNumbers="True"
 					FontFamily="Consolas"
 					IsReadOnly="True"
-					Background="#cacaca"
+					Background="#cccccc"
 					PreviewMouseLeftButtonUp="FileEditor_PreviewMouseUp"
 					KeyDown="FileEditor_KeyDown">
 			</avalonedit:TextEditor>

@@ -276,17 +276,17 @@ namespace ManualRemappingTool
 
 					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 
-					/// Если после автопоиска соответствия не осталось несопоставленных сущностей
+					/// Если после автопоиска соответствия не осталось несопоставленных сущностей или файл финализован
 					/// и открытие исходного файла было направленным
-					if (e.AvailableOnly && e.Direction.HasValue && SourceFileView.AvailableEntities.Count == 0)
+					if (e.AvailableOnly
+						&& e.Direction.HasValue
+						&& (SourceFileView.AvailableEntities.Count == 0 
+							|| Dataset.FinalizedFiles.Contains(SourceFileView.FileRelativePath)))
 					{
 						/// Открываем новый исходный файл в том же направлении
 						SourceFileView.ShiftToFile(e.Direction.Value, true, false);
 
-						if (SourceFileView.FileRelativePath == initialSourceFilePath)
-						{
-							break;
-						}
+						if (SourceFileView.FileRelativePath == initialSourceFilePath) { break; }
 					}
 					else
 					{
