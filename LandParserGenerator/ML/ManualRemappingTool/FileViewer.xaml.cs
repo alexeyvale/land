@@ -154,7 +154,7 @@ namespace ManualRemappingTool
 
 		public event EventHandler<EntitySelectedArgs> EntitySelected;
 
-		public event EventHandler<string> MessageSent;
+		public event EventHandler<MessageSentEventArgs> MessageSent;
 
 		#endregion
 
@@ -171,8 +171,11 @@ namespace ManualRemappingTool
 		{
 			if (String.IsNullOrEmpty(WorkingDirectory))
 			{
-				MessageSent?.Invoke(this,
-					$"Необходимо сконфигурировать редактор {LabelText}");
+				MessageSent?.Invoke(this, new MessageSentEventArgs
+				{
+					Message = $"Необходимо сконфигурировать редактор {LabelText}",
+					Type = MessageType.Error
+				});
 
 				return;
 			}
@@ -216,7 +219,7 @@ namespace ManualRemappingTool
 			{
 				SegmentColorizer.SetSegments(
 					new List<SegmentLocation> { EntityNode.Location },
-					Color.FromRgb(75, 75, 75)
+					Color.FromRgb(72, 72, 72)
 				);
 
 				if (!IsInView(EntityNode.Location.Start.Offset))
@@ -289,13 +292,23 @@ namespace ManualRemappingTool
 		{
 			if(!filePath.StartsWith(WorkingDirectory))
 			{
-				MessageSent?.Invoke(this, "Попытка открыть файл не из рабочего каталога");
+				MessageSent?.Invoke(this, new MessageSentEventArgs
+				{
+					Message = "Попытка открыть файл не из рабочего каталога",
+					Type = MessageType.Error
+				});
+
 				return false;
 			}
 
 			if(!File.Exists(filePath))
 			{
-				MessageSent?.Invoke(this, "Попытка открыть несуществующий файл");
+				MessageSent?.Invoke(this, new MessageSentEventArgs
+				{
+					Message = "Попытка открыть несуществующий файл",
+					Type = MessageType.Error
+				});
+
 				return false;
 			}
 
@@ -436,13 +449,23 @@ namespace ManualRemappingTool
 		{
 			if(!Directory.Exists(workingDirectory))
 			{
-				MessageSent?.Invoke(this, $"Директория {workingDirectory} не существует");
+				MessageSent?.Invoke(this, new MessageSentEventArgs
+				{
+					Message = $"Директория {workingDirectory} не существует",
+					Type = MessageType.Error
+				});
+
 				return;
 			}
 
 			if (workingExtensions == null || workingExtensions.Count == 0)
 			{
-				MessageSent?.Invoke(this, $"Необходимо указать расширения файлов, с которыми ведётся работа");
+				MessageSent?.Invoke(this, new MessageSentEventArgs
+				{
+					Message = $"Необходимо указать расширения файлов, с которыми ведётся работа",
+					Type = MessageType.Error
+				});
+
 				return;
 			}
 
@@ -489,7 +512,7 @@ namespace ManualRemappingTool
 					Node root = null;
 
 					root = Parsers[extension].Parse(text);
-					var success = Parsers[extension].Log.All(l => l.Type != MessageType.Error);
+					var success = Parsers[extension].Log.All(l => l.Type != Land.Core.MessageType.Error);
 
 					return success ? root : null;
 				}

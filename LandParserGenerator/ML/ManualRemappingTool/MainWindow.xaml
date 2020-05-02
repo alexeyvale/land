@@ -34,134 +34,146 @@
 	</Window.Resources>
 
 	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="40*"></ColumnDefinition>
-			<ColumnDefinition Width="5"></ColumnDefinition>
-			<ColumnDefinition Width="40*"></ColumnDefinition>
-			<ColumnDefinition Width="5"></ColumnDefinition>
-			<ColumnDefinition Width="24*"></ColumnDefinition>
-		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="100*"></RowDefinition>
+			<RowDefinition Height="35"></RowDefinition>
+		</Grid.RowDefinitions>
 
-		<local:FileViewer Grid.Column="0" 
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="40*"></ColumnDefinition>
+				<ColumnDefinition Width="5"></ColumnDefinition>
+				<ColumnDefinition Width="40*"></ColumnDefinition>
+				<ColumnDefinition Width="5"></ColumnDefinition>
+				<ColumnDefinition Width="24*"></ColumnDefinition>
+			</Grid.ColumnDefinitions>
+
+			<local:FileViewer Grid.Column="0" 
 						  x:Name="SourceFileView"
 						  LabelText="ИСХ"
 						  FileOpened="SourceFileView_FileOpened"
 						  EntitySelected="SourceFileView_EntitySelected"
 						  MessageSent="Control_MessageSent">
-		</local:FileViewer>
+			</local:FileViewer>
 
-		<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" 
+			<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" 
 					  HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
-		<local:FileViewer Grid.Column="2" 
+			<local:FileViewer Grid.Column="2" 
 						  x:Name="TargetFileView" 
 						  LabelText="МОД"
 						  AreNextPrevEnabled="False"
 						  FileOpened="TargetFileView_FileOpened"
 						  MessageSent="Control_MessageSent">
-		</local:FileViewer>
+			</local:FileViewer>
 
-		<GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" 
+			<GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" 
 					  HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
-		<Grid Grid.Column="4">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="40"></ColumnDefinition>
-				<ColumnDefinition Width="100*"></ColumnDefinition>
-			</Grid.ColumnDefinitions>
-			
-			<StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="2 0 2 0">
-				<Button Name="AddToDatasetButton" Content="&#xf067;" ToolTip="Добавить в датасет" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+			<Grid Grid.Column="4">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="40"></ColumnDefinition>
+					<ColumnDefinition Width="100*"></ColumnDefinition>
+				</Grid.ColumnDefinitions>
+
+				<StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="2 0 2 0">
+					<Button Name="AddToDatasetButton" Content="&#xf067;" ToolTip="Добавить в датасет" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="AddToDatasetButton_Click"></Button>
-				<Button Name="RemoveFromDatasetButton" Content="&#xf068;" ToolTip="Убрать из датасета" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+					<Button Name="RemoveFromDatasetButton" Content="&#xf068;" ToolTip="Убрать из датасета" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="RemoveFromDatasetButton_Click"></Button>
-				<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
+					<Button Name="HaveDoubtsButton" Content="&#xf128;" ToolTip="Добавить под вопросом" Margin="0 5 0 5" Style="{StaticResource IconButtonStyle}"
 					Click="HaveDoubtsButton_Click"></Button>
-				<ToggleButton Name="FinalizeFileButton" Content="&#xf00c;" Margin="0 20 0 5" Style="{StaticResource IconButtonStyle}"
+					<ToggleButton Name="FinalizeFileButton" Content="&#xf00c;" Margin="0 20 0 5" Style="{StaticResource IconButtonStyle}"
 							  ToolTip="Пометить исходный файл как окончательно обработанный"
 							  Checked="FinalizeFileButton_CheckedChanged" Unchecked="FinalizeFileButton_CheckedChanged"/>
-				<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
+					<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
 					Click="SyncViewsButton_Click"></Button>
-			</StackPanel>
-			
-			<Grid Grid.Column="1">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="35"></RowDefinition>
-					<RowDefinition Height="35"></RowDefinition>
-					<RowDefinition Height="100*"></RowDefinition>
-					<RowDefinition Height="50"></RowDefinition>
-					<RowDefinition Height="50"></RowDefinition>
-					<RowDefinition Height="50"></RowDefinition>
-					<RowDefinition Height="25"></RowDefinition>
-				</Grid.RowDefinitions>
+				</StackPanel>
 
-				<ToolBar Grid.Row="0">
-					<Button Name="NewDatasetButton" Content="&#xf15b;" ToolTip="Новый датасет" Style="{StaticResource IconButtonStyle}"
+				<Grid Grid.Column="1">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="35"></RowDefinition>
+						<RowDefinition Height="35"></RowDefinition>
+						<RowDefinition Height="100*"></RowDefinition>
+						<RowDefinition Height="50"></RowDefinition>
+						<RowDefinition Height="50"></RowDefinition>
+						<RowDefinition Height="50"></RowDefinition>
+						<RowDefinition Height="25"></RowDefinition>
+					</Grid.RowDefinitions>
+
+					<ToolBar Grid.Row="0">
+						<Button Name="NewDatasetButton" Content="&#xf15b;" ToolTip="Новый датасет" Style="{StaticResource IconButtonStyle}"
 						Click="NewDatasetButton_Click"></Button>
-					<Button Name="LoadDatasetButton" Content="&#xf07c;" ToolTip="Загрузить датасет" Style="{StaticResource IconButtonStyle}"
+						<Button Name="LoadDatasetButton" Content="&#xf07c;" ToolTip="Загрузить датасет" Style="{StaticResource IconButtonStyle}"
 						Click="LoadDatasetButton_Click"></Button>
-					<Button Name="SaveDatasetButton" Content="&#xf0c7;" ToolTip="Сохранить датасет" Style="{StaticResource IconButtonStyle}"
+						<Button Name="SaveDatasetButton" Content="&#xf0c7;" ToolTip="Сохранить датасет" Style="{StaticResource IconButtonStyle}"
 						Click="SaveDatasetButton_Click"></Button>
-					<Button Name="SaveDatasetAsButton" Content="&#xf14d;" ToolTip="Сохранить как..." Style="{StaticResource IconButtonStyle}"
+						<Button Name="SaveDatasetAsButton" Content="&#xf14d;" ToolTip="Сохранить как..." Style="{StaticResource IconButtonStyle}"
 						Click="SaveDatasetAsButton_Click"></Button>
-					<Label Name="DatasetPathLabel" Width="200"></Label>
-				</ToolBar>
+						<Label Name="DatasetPathLabel" Width="200"></Label>
+					</ToolBar>
 
-				<TextBox Grid.Row="1" Margin="5 5 5 5" Name="FileNameFilter" TextChanged="TreeFilters_Changed"></TextBox>
-				
-				<TreeView Grid.Row="2" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
-					<TreeView.ItemTemplate>
-						<HierarchicalDataTemplate  ItemsSource="{Binding Item2}">
-							<TextBlock Text="{Binding Item1}"/>
-							<HierarchicalDataTemplate.ItemTemplate>
-								<HierarchicalDataTemplate ItemsSource="{Binding Item2}">
-									<TextBlock Text="{Binding Item1}"/>
-									<HierarchicalDataTemplate.ItemTemplate>
-										<DataTemplate>
-											<TextBlock Text="{Binding}"/>
-										</DataTemplate>
-									</HierarchicalDataTemplate.ItemTemplate>
-								</HierarchicalDataTemplate>
-							</HierarchicalDataTemplate.ItemTemplate>
-						</HierarchicalDataTemplate>
-					</TreeView.ItemTemplate>
-					<TreeView.ItemContainerStyle>
-						<Style TargetType="{x:Type TreeViewItem}">
-							<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>
-							<Setter Property="IsExpanded" Value="True" />
-						</Style>
-					</TreeView.ItemContainerStyle>
-				</TreeView>
+					<TextBox Grid.Row="1" Margin="5 5 5 5" Name="FileNameFilter" TextChanged="TreeFilters_Changed"></TextBox>
 
-				<StackPanel Orientation="Vertical" Grid.Row="3" >
-					<CheckBox Content="Сомнительные" 
+					<TreeView Grid.Row="2" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
+						<TreeView.ItemTemplate>
+							<HierarchicalDataTemplate  ItemsSource="{Binding Item2}">
+								<TextBlock Text="{Binding Item1}"/>
+								<HierarchicalDataTemplate.ItemTemplate>
+									<HierarchicalDataTemplate ItemsSource="{Binding Item2}">
+										<TextBlock Text="{Binding Item1}"/>
+										<HierarchicalDataTemplate.ItemTemplate>
+											<DataTemplate>
+												<TextBlock Text="{Binding}"/>
+											</DataTemplate>
+										</HierarchicalDataTemplate.ItemTemplate>
+									</HierarchicalDataTemplate>
+								</HierarchicalDataTemplate.ItemTemplate>
+							</HierarchicalDataTemplate>
+						</TreeView.ItemTemplate>
+						<TreeView.ItemContainerStyle>
+							<Style TargetType="{x:Type TreeViewItem}">
+								<EventSetter Event="MouseDoubleClick" Handler="TreeViewItem_MouseDoubleClick"/>
+								<Setter Property="IsExpanded" Value="True" />
+							</Style>
+						</TreeView.ItemContainerStyle>
+					</TreeView>
+
+					<StackPanel Orientation="Vertical" Grid.Row="3" >
+						<CheckBox Content="Сомнительные" 
 						  ToolTip="Оставить только сомнительные соответствия"
 						  Name="ShowDoubtsOnlyCheckBox"  
 						  IsChecked="False" 
 						  Margin="0 5 0 0"
 						  Checked="TreeFilters_Changed"
 						  Unchecked="TreeFilters_Changed"></CheckBox>
-					<CheckBox Content="Не финализированные" 
+						<CheckBox Content="Не финализированные" 
 						  ToolTip="Оставить только не финализированные файлы"
 						  Name="ShowNotFinalizedOnlyCheckBox"  
 						  IsChecked="True" 
 						  Margin="0 5 0 0"
 						  Checked="TreeFilters_Changed"
 						  Unchecked="TreeFilters_Changed"></CheckBox>
-				</StackPanel>
+					</StackPanel>
 
-				<StackPanel Grid.Row="4" Orientation="Vertical">
-					<Label Content="Каталог исх. файлов"></Label>
-					<Label Name="SourceWorkingDirectory"></Label>
-				</StackPanel>
+					<StackPanel Grid.Row="4" Orientation="Vertical">
+						<Label Content="Каталог исх. файлов"></Label>
+						<Label Name="SourceWorkingDirectory"></Label>
+					</StackPanel>
 
-				<StackPanel Grid.Row="5" Orientation="Vertical">
-					<Label Content="Каталог мод. файлов"></Label>
-					<Label Name="TargetWorkingDirectory"></Label>
-				</StackPanel>
+					<StackPanel Grid.Row="5" Orientation="Vertical">
+						<Label Content="Каталог мод. файлов"></Label>
+						<Label Name="TargetWorkingDirectory"></Label>
+					</StackPanel>
 
-				<CheckBox Grid.Row="6" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
+					<CheckBox Grid.Row="6" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
+				</Grid>
 			</Grid>
 		</Grid>
+
+		<StatusBar Grid.Row="1" Name="AppStatus">
+			<Label Name="AppStatusText" FontSize="16"></Label>
+		</StatusBar>
+
 	</Grid>
 </Window>

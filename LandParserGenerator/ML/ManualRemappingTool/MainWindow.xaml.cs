@@ -211,7 +211,11 @@ namespace ManualRemappingTool
 			}
 			else
 			{
-				Control_MessageSent(null, "Невозможно сохранить текущее соответствие в датасет");
+				Control_MessageSent(null, new MessageSentEventArgs
+				{
+					Message = "Невозможно сохранить текущее соответствие в датасет",
+					Type = MessageType.Error
+				});
 			}
 		}
 
@@ -248,7 +252,11 @@ namespace ManualRemappingTool
 			}
 			else
 			{
-				Control_MessageSent(null, "Невозможно сохранить текущее соответствие в датасет");
+				Control_MessageSent(null, new MessageSentEventArgs
+				{
+					Message = "Невозможно сохранить текущее соответствие в датасет",
+					Type = MessageType.Error
+				});
 			}
 		}
 
@@ -271,7 +279,11 @@ namespace ManualRemappingTool
 					}
 					else
 					{
-						Control_MessageSent(null, "Парный файл отсутствует");
+						Control_MessageSent(null, new MessageSentEventArgs
+						{
+							Message = "Парный файл отсутствует",
+							Type = MessageType.Error
+						});
 					}
 
 					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
@@ -313,16 +325,33 @@ namespace ManualRemappingTool
 				}
 				else
 				{
-					Control_MessageSent(null, "Парный файл отсутствует");
+					Control_MessageSent(null, new MessageSentEventArgs
+					{
+						Message = "Парный файл отсутствует",
+						Type = MessageType.Error
+					});
 				}
 			}
 
 			DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
 		}
 
-		private void Control_MessageSent(object sender, string e)
+		private void Control_MessageSent(object sender, MessageSentEventArgs e)
 		{
-			this.Title = $"{e} - {DateTime.Now}";
+			this.AppStatusText.Content = $"{e.Message} - {e.Stamp}";
+
+			switch(e.Type)
+			{
+				case MessageType.Error:
+					this.AppStatus.Background = Brushes.LightPink;
+					break;
+				case MessageType.Info:
+					this.AppStatus.Background = Brushes.LightBlue;
+					break;
+				case MessageType.Success:
+					this.AppStatus.Background = Brushes.LightGreen;
+					break;
+			}
 		}
 
 		private void SyncViewsButton_Click(object sender, RoutedEventArgs e)
@@ -459,6 +488,18 @@ namespace ManualRemappingTool
 			{
 				if (FinalizeFileButton.IsChecked ?? false)
 				{
+					if(Dataset[SourceFileView.FileRelativePath].Any(f=>f.Value.Any(r=>r.HasDoubts)))
+					{
+						Control_MessageSent(null, new MessageSentEventArgs
+						{
+							Message = "Чтобы финализировать файл, необходимо убрать сомнительные привязки",
+							Type = MessageType.Error
+						});
+
+						FinalizeFileButton.IsChecked = false;
+						return;
+					}
+
 					Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
 				}
 				else
@@ -542,7 +583,11 @@ namespace ManualRemappingTool
 				}
 			}
 
-			Control_MessageSent(null, $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия");
+			Control_MessageSent(null, new MessageSentEventArgs
+			{
+				Message = $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия",
+				Type = MessageType.Info
+			});
 
 			if (SourceFileView.AvailableEntities.Count == 0)
 			{
