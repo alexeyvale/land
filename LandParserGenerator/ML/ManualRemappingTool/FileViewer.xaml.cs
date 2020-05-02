@@ -216,7 +216,7 @@ namespace ManualRemappingTool
 			{
 				SegmentColorizer.SetSegments(
 					new List<SegmentLocation> { EntityNode.Location },
-					Color.FromRgb(170, 210, 170)
+					Color.FromRgb(75, 75, 75)
 				);
 
 				if (!IsInView(EntityNode.Location.Start.Offset))
@@ -307,10 +307,19 @@ namespace ManualRemappingTool
 				FileEditor.Encoding = stream.CurrentEncoding;
 				FileEditor.ScrollToLine(0);
 
-				SegmentColorizer.ResetSegments();
+				if (Path.GetExtension(filePath) == ".cs")
+				{
+					FileEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(
+						new System.Xml.XmlTextReader(new StringReader(Properties.Resources.CSharp)),
+						ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance
+					);
+				}
+				else
+				{
+					FileEditor.SyntaxHighlighting = null;
+				}
 
-				FileEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
-					.Instance.GetDefinitionByExtension(Path.GetExtension(filePath));
+				SegmentColorizer.ResetSegments();
 			}
 
 			TreeRoot = Parse(filePath, FileEditor.Text);
