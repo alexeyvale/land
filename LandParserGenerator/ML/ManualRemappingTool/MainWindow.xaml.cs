@@ -40,6 +40,7 @@ namespace ManualRemappingTool
 
 		private ParserManager Parsers { get; set; } = new ParserManager();
 		private Dataset Dataset { get; set; }
+		private MappingHelper Mapper { get; set; } = new MappingHelper();
 
 		public List<Tuple<string, List<Tuple<string, List<DatasetRecord>>>>> RecordsToView { get; private set; }
 
@@ -200,6 +201,7 @@ namespace ManualRemappingTool
 					.ToList();
 
 				DoAutoMapping(
+					Path.GetExtension(SourceFileView.FilePath),
 					nestedInSourceEntity, 
 					nestedInTargetEntity,
 					SourceFileView.EntityNode, 
@@ -286,7 +288,11 @@ namespace ManualRemappingTool
 						});
 					}
 
-					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
+					DoAutoMapping(
+						Path.GetExtension(SourceFileView.FilePath), 
+						SourceFileView.AvailableEntities, 
+						TargetFileView.AvailableEntities
+					);
 
 					/// Если после автопоиска соответствия не осталось несопоставленных сущностей или файл финализован
 					/// и открытие исходного файла было направленным
@@ -309,7 +315,11 @@ namespace ManualRemappingTool
 			}
 			else
 			{
-				DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
+				DoAutoMapping(
+					Path.GetExtension(SourceFileView.FilePath),
+					SourceFileView.AvailableEntities, 
+					TargetFileView.AvailableEntities
+				);
 			}
 		}
 
@@ -333,7 +343,11 @@ namespace ManualRemappingTool
 				}
 			}
 
-			DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
+			DoAutoMapping(
+				Path.GetExtension(SourceFileView.FilePath),
+				SourceFileView.AvailableEntities, 
+				TargetFileView.AvailableEntities
+			);
 		}
 
 		private void Control_MessageSent(object sender, MessageSentEventArgs e)
@@ -386,7 +400,11 @@ namespace ManualRemappingTool
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
 
-					DoAutoMapping(SourceFileView.AvailableEntities, TargetFileView.AvailableEntities);
+					DoAutoMapping(
+						Path.GetExtension(SourceFileView.FilePath),
+						SourceFileView.AvailableEntities, 
+						TargetFileView.AvailableEntities
+					);
 
 					SyncEntitiesListAndEditor(SourceFileView, record.SourceOffset, record.EntityType);
 					SyncEntitiesListAndEditor(TargetFileView, record.TargetOffset, record.EntityType);
@@ -531,6 +549,7 @@ namespace ManualRemappingTool
 		}
 
 		private void DoAutoMapping(
+			string extension,
 			List<Node> sourceEntities, 
 			List<Node> targetEntities,
 			Node sourceParentRestrictor = null,
@@ -543,7 +562,7 @@ namespace ManualRemappingTool
 
 			var candidates = targetEntities
 				.GroupBy(n => n.Type)
-				.ToDictionary(g => g.Key, g => g.Select(e => new
+				.ToDictionary(g => g.Key, g => g.Select(e => new MappingElement
 				{
 					Node = e,
 					Header = PointContext.GetHeaderContext(e),		
@@ -552,7 +571,7 @@ namespace ManualRemappingTool
 				}).ToList());
 
 			var unmapped = sourceEntities
-				.Select(e => new
+				.Select(e => new MappingElement
 				{
 					Node = e,
 					Header = PointContext.GetHeaderContext(e),
@@ -565,21 +584,19 @@ namespace ManualRemappingTool
 
 			foreach (var elem in unmapped)
 			{
-				var candidateForElem = candidates[elem.Node.Type]
-					.FirstOrDefault(c => c.Header.SequenceEqual(elem.Header)
-						&& c.Ancestors.SequenceEqual(elem.Ancestors));
+				var targetElement = Mapper[extension].GetSameElement(elem, candidates[elem.Node.Type]);
 
-				if(candidateForElem != null)
+				if(targetElement != null)
 				{
 					Dataset.Add(
 						SourceFileView.FileRelativePath,
 						TargetFileView.FileRelativePath,
 						elem.Node.Location.Start.Offset,
-						candidateForElem.Node.Location.Start.Offset,
+						targetElement.Node.Location.Start.Offset,
 						elem.Node.Type
 					);
 
-					candidates[elem.Node.Type].Remove(candidateForElem);
+					candidates[elem.Node.Type].Remove(targetElement);
 				}
 			}
 

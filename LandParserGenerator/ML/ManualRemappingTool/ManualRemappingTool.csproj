@@ -67,7 +67,9 @@
     </ApplicationDefinition>
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\HaveTextConverter.cs" />
+    <Compile Include="CustomRules.cs" />
     <Compile Include="MessageSentEventArgs.cs" />
+    <Compile Include="Models\MappingElement.cs" />
     <Compile Include="SegmentsBackgroundRenderer.cs" />
     <Compile Include="StartWindow.xaml.cs">
       <DependentUpon>StartWindow.xaml</DependentUpon>
