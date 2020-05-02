@@ -448,7 +448,7 @@ namespace ManualRemappingTool
 			}
 		}
 
-		private void ShowDoubtsOnlyCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+		private void TreeFilters_Changed(object sender, RoutedEventArgs e)
 		{
 			UpdateRecordsTree();
 		}
@@ -634,7 +634,9 @@ namespace ManualRemappingTool
 
 		private void UpdateRecordsTree()
 		{
-			RecordsToView = Dataset.Records
+			RecordsToView = Dataset?.Records
+				.Where(e => (!(ShowNotFinalizedOnlyCheckBox.IsChecked ?? false) || !Dataset.FinalizedFiles.Contains(e.Key))
+					&& (String.IsNullOrEmpty(FileNameFilter.Text) || e.Key.ToLower().Contains(FileNameFilter.Text.ToLower())))
 				.Select(e => new Tuple<string, List<Tuple<string, List<DatasetRecord>>>>(
 					e.Key,
 					e.Value

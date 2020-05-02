@@ -87,8 +87,9 @@
 			<Grid Grid.Column="1">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="35"></RowDefinition>
+					<RowDefinition Height="35"></RowDefinition>
 					<RowDefinition Height="100*"></RowDefinition>
-					<RowDefinition Height="25"></RowDefinition>
+					<RowDefinition Height="50"></RowDefinition>
 					<RowDefinition Height="50"></RowDefinition>
 					<RowDefinition Height="50"></RowDefinition>
 					<RowDefinition Height="25"></RowDefinition>
@@ -106,7 +107,9 @@
 					<Label Name="DatasetPathLabel" Width="200"></Label>
 				</ToolBar>
 
-				<TreeView Grid.Row="1" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
+				<TextBox Grid.Row="1" Margin="5 5 5 5" Name="FileNameFilter" TextChanged="TreeFilters_Changed"></TextBox>
+				
+				<TreeView Grid.Row="2" Name="DatasetTree" FontSize="16" PreviewMouseWheel="Control_PreviewMouseWheel">
 					<TreeView.ItemTemplate>
 						<HierarchicalDataTemplate  ItemsSource="{Binding Item2}">
 							<TextBlock Text="{Binding Item1}"/>
@@ -130,25 +133,34 @@
 					</TreeView.ItemContainerStyle>
 				</TreeView>
 
-				<CheckBox Grid.Row="2" 
-						  Content="Только сомнительные" 
+				<StackPanel Orientation="Vertical" Grid.Row="3" >
+					<CheckBox Content="Сомнительные" 
+						  ToolTip="Оставить только сомнительные соответствия"
 						  Name="ShowDoubtsOnlyCheckBox"  
 						  IsChecked="False" 
 						  Margin="0 5 0 0"
-						  Checked="ShowDoubtsOnlyCheckBox_CheckedChanged"
-						  Unchecked="ShowDoubtsOnlyCheckBox_CheckedChanged"></CheckBox>
+						  Checked="TreeFilters_Changed"
+						  Unchecked="TreeFilters_Changed"></CheckBox>
+					<CheckBox Content="Не финализированные" 
+						  ToolTip="Оставить только не финализированные файлы"
+						  Name="ShowNotFinalizedOnlyCheckBox"  
+						  IsChecked="True" 
+						  Margin="0 5 0 0"
+						  Checked="TreeFilters_Changed"
+						  Unchecked="TreeFilters_Changed"></CheckBox>
+				</StackPanel>
 
-				<StackPanel Grid.Row="3" Orientation="Vertical">
+				<StackPanel Grid.Row="4" Orientation="Vertical">
 					<Label Content="Каталог исх. файлов"></Label>
 					<Label Name="SourceWorkingDirectory"></Label>
 				</StackPanel>
 
-				<StackPanel Grid.Row="4" Orientation="Vertical">
+				<StackPanel Grid.Row="5" Orientation="Vertical">
 					<Label Content="Каталог мод. файлов"></Label>
 					<Label Name="TargetWorkingDirectory"></Label>
 				</StackPanel>
 
-				<CheckBox Grid.Row="5" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
+				<CheckBox Grid.Row="6" Content="Автозагрузка пары" Name="OpenPairCheckBox"  IsChecked="True"></CheckBox>
 			</Grid>
 		</Grid>
 	</Grid>
