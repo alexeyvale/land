@@ -148,27 +148,8 @@ namespace Land.Markup
 		public FileContext BindingContext { get; set; }
 
 		/// <summary>
-		/// Специфичные для языка настройки перепривязки
-		/// </summary>
-		public LanguageMarkupSettings MarkupSettings { get; set; }
-
-		/// <summary>
 		/// Имя файла
 		/// </summary>
 		public string Name => BindingContext?.Name;
-	}
-
-	[Serializable]
-	public class LanguageMarkupSettings
-	{
-		public bool UseSiblingsContext { get; private set; } = false;
-
-		public LanguageMarkupSettings(SymbolOptionsManager opts)
-		{
-			if (opts != null)
-			{
-				UseSiblingsContext = opts.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS);
-			}
-		}
 	}
 }

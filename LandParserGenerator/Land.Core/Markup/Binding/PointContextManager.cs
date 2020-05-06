@@ -25,19 +25,19 @@ namespace Land.Markup.Binding
 		public PointContext GetContext(
 			Node node,
 			ParsedFile file,
-			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed,
-			ContextFinder contextFinder)
+			SiblingsConstructionArgs siblingsArgs,
+			ClosestConstructionArgs closestArgs)
 		{
 			if (!Cache.ContainsKey(node))
 			{
 				return Cache[node] = PointContext
-					.GetFullContext(node, file, searchArea, getParsed, contextFinder);
+					.GetExtendedContext(node, file, siblingsArgs, closestArgs);
 			}
 			else
 			{
-				return PointContext
-					.GetFullContext(node, file, searchArea, getParsed, contextFinder, Cache[node]);
+				return PointContext.GetExtendedContext(
+					node, file, siblingsArgs, closestArgs, Cache[node]
+				);
 			}
 		}
 

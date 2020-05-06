@@ -214,7 +214,6 @@ namespace Land.Markup.Binding
 	public class SiblingsContext
 	{
 		public TextOrHash Before { get; set; }
-
 		public TextOrHash After { get; set; }
 	}
 
@@ -359,33 +358,32 @@ namespace Land.Markup.Binding
 				AncestorsContext = GetAncestorsContext(node),
 				#region Old
 				InnerContext_old = GetInnerContext_old(node, file)
-				#endregion			
+				#endregion
 			};
 		}
 
-		public static PointContext GetFullContext(
+		public static PointContext GetExtendedContext(
 			Node node, 
 			ParsedFile file, 
-			List<ParsedFile> searchArea, 
-			Func<string, ParsedFile> getParsed,
-			ContextFinder contextFinder,
+			SiblingsConstructionArgs siblingsArgs,
+			ClosestConstructionArgs closestArgs,
 			PointContext core = null)
 		{
-			if (core == null || core.SiblingsContext == null && core.ClosestContext == null)
+			if (core == null)
 			{
-				if (core == null)
-					core = PointContext.GetCoreContext(node, file);
+				core = PointContext.GetCoreContext(node, file);
+			}
 
-				if (file.MarkupSettings.UseSiblingsContext)
-				{
-					core.SiblingsContext = GetSiblingsContext(node, file);
-				}
-				else
-				{
-					core.ClosestContext = GetClosestContext(
-						node, file, core, searchArea, getParsed, contextFinder
-					);
-				}
+			if (siblingsArgs !=null && core.SiblingsContext == null)
+			{
+				core.SiblingsContext = GetSiblingsContext(node, file);
+			}
+			if (closestArgs != null && core.SiblingsContext == null)
+			{
+				core.ClosestContext = GetClosestContext(
+					node, file, core, 
+					closestArgs.SearchArea, closestArgs.GetParsed, closestArgs.ContextFinder
+				);
 			}
 
 			return core;
@@ -542,7 +540,9 @@ namespace Land.Markup.Binding
 			};
 		}
 
-		public static SiblingsContext GetSiblingsContext(Node node, ParsedFile file)
+		public static SiblingsContext GetSiblingsContext(
+			Node node, 
+			ParsedFile file)
 		{
 			/// Находим островного родителя
 			var parentNode = node.Parent;
@@ -581,6 +581,11 @@ namespace Land.Markup.Binding
 					.Where(n => n.Location != null)
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
 				)),
+
+				//EntityBefore = markedElementIndex > 0
+				//	? contextFinder.ContextManager.GetContext(siblings[markedElementIndex - 1], file) : null,
+				//EntityAfter = markedElementIndex < siblings.Count
+				//	? contextFinder.ContextManager.GetContext(siblings[markedElementIndex], file) : null,
 			};
 
 			return context;
@@ -598,28 +603,35 @@ namespace Land.Markup.Binding
 			const double CLOSE_ELEMENT_INNER_THRESHOLD = 0.8;
 			const int MAX_COUNT = 10;
 
+			var candidates = new List<RemapCandidateInfo>();
+
 			foreach (var f in searchArea)
 			{
 				if (f.Root == null)
+				{
 					f.Root = getParsed(f.Name)?.Root;
+				}
+
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
+				file.Root.Accept(visitor);
+
+				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
+					.Select(n => new RemapCandidateInfo
+					{
+						Context = contextFinder.ContextManager.GetContext(n, file)
+					})
+				);
 			};
 
-			var candidates = new List<RemapCandidateInfo>();
-
-			var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
-			file.Root.Accept(visitor);
-
-			candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
-				.Select(n => new RemapCandidateInfo { Context = contextFinder.ContextManager.GetContext(n, file) })
-			);
+			contextFinder.ComputeCoreSimilarities(nodeContext, candidates);
 
 			candidates = nodeContext.HeaderContext.Count > 0
-				? contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), false)
+				? candidates
 					.OrderByDescending(c => c.HeaderSimilarity)
 					.Take(MAX_COUNT)
 					.TakeWhile(c => c.HeaderSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
 					.ToList()
-				: contextFinder.EvalCandidates(nodeContext, candidates, new LanguageMarkupSettings(null), false)
+				: candidates
 					.OrderByDescending(c => c.InnerSimilarity)
 					.Take(MAX_COUNT)
 					.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
@@ -667,5 +679,14 @@ namespace Land.Markup.Binding
 
 		public int GetHashCode(IEqualsIgnoreValue e)
 			=> e.GetHashCode();
+	}
+
+	public class SiblingsConstructionArgs { }
+
+	public class ClosestConstructionArgs
+	{
+		public List<ParsedFile> SearchArea { get; set; }
+		public Func<string, ParsedFile> GetParsed { get; set; }
+		public ContextFinder ContextFinder { get; set; }
 	}
 }

@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,11 +44,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ManualRemappingTool\Models\Dataset.cs">
+      <Link>Dataset.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Control\Control.csproj">
+      <Project>{2bfdcbe8-7eb3-4b9f-afeb-5ef2b2495aa7}</Project>
+      <Name>Control</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Land.Core\Land.Core.csproj">
+      <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
+      <Name>Land.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

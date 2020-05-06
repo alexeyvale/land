@@ -11,7 +11,6 @@ namespace Land.Control
 	public class ParserInfo
 	{
 		public AppDomain Domain { get; set; }
-		public LanguageMarkupSettings MarkupSettings { get; set; }
 		public BaseParser Parser { get; set; }
 	}
 }

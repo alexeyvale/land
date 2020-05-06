@@ -11,9 +11,8 @@ namespace Land.Markup.Binding
 		public ParsedFile File { get; set; }
 		public PointContext Context { get; set; }
 
-		public Dictionary<ContextType, double> Weights { get; set; }
-
 		#region Old
+		public Dictionary<ContextType, double> Weights { get; set; }
 		public double NameSimilarity { get; set; }
 		#endregion
 

@@ -16,8 +16,6 @@ namespace Land.Control
 
 		public BaseParser this[string ext] => Parsers.ContainsKey(ext) ? Parsers[ext].Parser : null;
 
-		public LanguageMarkupSettings GetMarkupSettings(string ext) => Parsers.ContainsKey(ext) ? Parsers[ext].MarkupSettings : null;
-
 		public HashSet<string> Load(LandExplorerSettings settingsObject, string cacheDirectoryPath, List<Message> log)
 		{
 			/// Получаем имя каталога, соответствующего текущим настройкам, и создаём его, если он не существует
@@ -66,8 +64,6 @@ namespace Land.Control
 								{
 									Domain = libraryDomain,
 									Parser = loader.Parser,
-									MarkupSettings = new LanguageMarkupSettings(
-										loader.Parser.GrammarObject.Options.GetOptions())
 								};
 
 						invalidatedExtensions.UnionWith(parserItem.Extensions);

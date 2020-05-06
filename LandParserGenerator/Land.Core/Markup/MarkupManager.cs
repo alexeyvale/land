@@ -19,18 +19,6 @@ namespace Land.Markup
 		{
 			ContextFinder.GetParsed = getParsed;
 			OnMarkupChanged += InvalidateRelations;
-
-			#region Подключение эвристик
-
-			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
-			ContextFinder.SetHeuristic(typeof(PrioritizeByGapHeuristic));
-			ContextFinder.SetHeuristic(typeof(LowerChangedInnerPriority));
-			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
-			ContextFinder.SetHeuristic(typeof(TuneInnerPriorityAccordingToLength));
-
-			ContextFinder.SetHeuristic(typeof(SameHeaderAndAncestorsHeuristic));
-
-			#endregion
 		}
 
 		private RelationsManager Relations { get; set; } = new RelationsManager();
@@ -146,11 +134,23 @@ namespace Land.Markup
 			Remap(node.Type, file.Name, searchArea);
 
 			var point = new ConcernPoint(
-				node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), parent
-			);
+				node, 
+				ContextFinder.ContextManager.GetContext(
+					node, 
+					file, 
+					new SiblingsConstructionArgs(),
+					new ClosestConstructionArgs
+					{
+						SearchArea = GetSimilarOnly(file, searchArea),
+						GetParsed = ContextFinder.GetParsed,
+						ContextFinder = ContextFinder
+					}), 
+				parent);
 
 			if (!String.IsNullOrEmpty(name))
+			{
 				point.Name = name;
+			}
 			point.Comment = comment;
 
 			AddElement(point);
@@ -188,8 +188,18 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), subconcern)
-						);
+							node, 
+							ContextFinder.ContextManager.GetContext(
+								node, 
+								file,
+								new SiblingsConstructionArgs(),
+								new ClosestConstructionArgs
+								{
+									SearchArea = GetSimilarOnly(file, searchArea),
+									GetParsed = ContextFinder.GetParsed,
+									ContextFinder = ContextFinder
+								}), 
+							subconcern));
 					}
 				}
 
@@ -200,7 +210,17 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder), concern)
+						node, ContextFinder.ContextManager.GetContext(
+							node, 
+							file,
+							new SiblingsConstructionArgs(),
+							new ClosestConstructionArgs
+							{
+								SearchArea = GetSimilarOnly(file, searchArea),
+								GetParsed = ContextFinder.GetParsed,
+								ContextFinder = ContextFinder
+							}), 
+						concern)
 					);
 				}
 			}
@@ -241,7 +261,17 @@ namespace Land.Markup
 			ParsedFile file,
 			List<ParsedFile> searchArea)
 		{
-			point.Relink(node, ContextFinder.ContextManager.GetContext(node, file, GetSimilarOnly(file, searchArea), ContextFinder.GetParsed, ContextFinder));
+			point.Relink(node, ContextFinder.ContextManager.GetContext(
+				node, 
+				file,
+				new SiblingsConstructionArgs(),
+				new ClosestConstructionArgs
+				{
+					SearchArea = GetSimilarOnly(file, searchArea),
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder
+				})
+			);
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -530,7 +560,15 @@ namespace Land.Markup
 			if (first?.IsAuto ?? false)
 			{
 				point.Context = ContextFinder.ContextManager.GetContext(
-					first.Node, first.File, GetSimilarOnly(first.File, searchArea), ContextFinder.GetParsed, ContextFinder
+					first.Node, 
+					first.File, 
+					new SiblingsConstructionArgs(),
+					new ClosestConstructionArgs
+					{
+						SearchArea = GetSimilarOnly(first.File, searchArea),
+						GetParsed = ContextFinder.GetParsed,
+						ContextFinder = ContextFinder
+					}
 				);
 
 				point.AstNode = first.Node;

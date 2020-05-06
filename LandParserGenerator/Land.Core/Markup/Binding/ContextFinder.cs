@@ -38,65 +38,57 @@ namespace Land.Markup.Binding
 
 		public enum SearchType { Local, Global }
 
-		public const double FILE_SIMILARITY_THRESHOLD = 0.6;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
+		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.65;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
 		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
 
-		public List<IWeightsHeuristic> TuningHeuristics { get; private set; } = 
-			new List<IWeightsHeuristic>();
-		public List<ISimilarityHeuristic> ScoringHeuristics { get; private set; } = 
-			new List<ISimilarityHeuristic>();
-
-		public void SetHeuristic(Type type)
+		public static List<CandidateFeatures> GetFeatures(List<RemapCandidateInfo> candidates)
 		{
-			void AddToList<T>(ref List<T> heuristics) where T: IHeuristic 
+			if (candidates.Count > 0)
 			{
-				if (typeof(T).IsAssignableFrom(type))
+				var maxHeaderSim = candidates.Max(c => c.HeaderSimilarity);
+				var maxInnerSim = candidates.Max(c => c.InnerSimilarity);
+				var maxAncestorsSim = candidates.Max(c => c.AncestorSimilarity);
+
+				return candidates.Select(c =>
 				{
-					var element = heuristics.FirstOrDefault(e => e.GetType().Equals(type));
+					var sameAncestorsCandidates = candidates.Where(cd => cd.AncestorSimilarity == c.AncestorSimilarity).ToList();
+					var sameAncestorsMaxHeaderSim = sameAncestorsCandidates.Max(cd => cd.HeaderSimilarity);
+					var sameAncestorsMaxInnerSim = sameAncestorsCandidates.Max(cd => cd.InnerSimilarity);
 
-					if (element == null)
+					sameAncestorsCandidates.Remove(c);
+
+					return new CandidateFeatures
 					{
-						var constructor = type.GetConstructor(Type.EmptyTypes);
+						HeaderSim = c.HeaderSimilarity,
+						InnerSim = c.InnerSimilarity,
+						AncestorsSim = c.AncestorSimilarity,
 
-						if (constructor != null)
-						{
-							heuristics.Add((T)constructor.Invoke(null));
-						}
-					}
-				}
+						MaxAncestorsSim = maxAncestorsSim,
+						MaxHeaderSimGlobal = maxHeaderSim,
+						MaxInnerSimGlobal = maxInnerSim,
+						MaxHeaderSimSameAncestors = sameAncestorsMaxHeaderSim,
+						MaxInnerSimSameAncestors = sameAncestorsMaxInnerSim,
+
+						MoreSimilarAncestorsRatio = candidates.Count() > 1
+							? candidates.Where(cd => cd.AncestorSimilarity > c.AncestorSimilarity).Count() / (double)(candidates.Count() - 1) : 0,
+						SameAncestorsRatio = candidates.Count() > 1
+							? sameAncestorsCandidates.Count() / (double)(candidates.Count() - 1) : 0,
+						MoreSimilarHeaderSameAncestorsRatio = sameAncestorsCandidates.Count() > 0
+							? sameAncestorsCandidates.Where(cd => cd.HeaderSimilarity > c.HeaderSimilarity).Count() / (double)sameAncestorsCandidates.Count() : 0,
+						MoreSimilarInnerSameAncestorsRatio = sameAncestorsCandidates.Count() > 0
+							? sameAncestorsCandidates.Where(cd => cd.InnerSimilarity > c.InnerSimilarity).Count() / (double)sameAncestorsCandidates.Count() : 0,
+
+						IsAuto = c.IsAuto ? 1 : 0,
+					};
+				}).ToList();
 			}
 
-			var tuningHeuristics = TuningHeuristics;
-			AddToList(ref tuningHeuristics);
-			TuningHeuristics = tuningHeuristics;
-
-			var scoringHeuristics = ScoringHeuristics;
-			AddToList(ref scoringHeuristics);
-			ScoringHeuristics = scoringHeuristics;
-		}
-
-		public void ResetHeuristic(Type type)
-		{
-			void RemoveFromList<T>(List<T> heuristics)
-			{
-				if (typeof(T).IsAssignableFrom(type))
-				{
-					var element = heuristics.FirstOrDefault(e => e.GetType().Equals(type));
-
-					if (element != null)
-					{
-						heuristics.Remove(element);
-					}
-				}
-			}
-
-			RemoveFromList(TuningHeuristics);
-			RemoveFromList(ScoringHeuristics);
+			return new List<CandidateFeatures>();
 		}
 
 		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSearch(
@@ -130,6 +122,7 @@ namespace Land.Markup.Binding
 			}
 
 			var candidates = new List<RemapCandidateInfo>();
+			var siblingsArgs = searchType == SearchType.Local ? new SiblingsConstructionArgs() : null;
 
 			/// Находим все сущности того же типа
 			foreach (var currentFile in files)
@@ -145,7 +138,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = currentFile,
-						Context = ContextManager.GetContext(n, currentFile)
+						Context = ContextManager.GetContext(n, currentFile, siblingsArgs, null)
 					})
 					.ToList()
 				);		
@@ -166,12 +159,7 @@ namespace Land.Markup.Binding
 					.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context })
 					.ToList();
 
-				EvalCandidates(
-					pointContext, 
-					currentCandidates, 
-					files.First().MarkupSettings,
-					searchType == SearchType.Global
-				);
+				ComputeSimilarities(pointContext, currentCandidates, searchType == SearchType.Local);
 
 				var bestMatch = currentCandidates.FirstOrDefault(c=>c.Similarity == 1);
 
@@ -204,8 +192,7 @@ namespace Land.Markup.Binding
 			}
 
 			/// Признак того, что не нужно искать оптимальное паросочетание
-			var ignoreClosest = files.First().MarkupSettings.UseSiblingsContext
-				|| searchType == SearchType.Global;
+			var ignoreClosest = searchType == SearchType.Global;
 
 			if (!ignoreClosest)
 			{
@@ -217,11 +204,10 @@ namespace Land.Markup.Binding
 					.Except(result.Select(e=>e.Key.Context))
 					.ToList())
 				{
-					evaluated[pointContext] = EvalCandidates(
+					evaluated[pointContext] = ComputeSimilarities(
 						pointContext,
-						candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(), 
-						files.First().MarkupSettings,
-						false
+						candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
+						searchType == SearchType.Local
 					);
 				}
 
@@ -398,96 +384,7 @@ namespace Land.Markup.Binding
 			return result;
 		}
 
-		private void CheckHorizontalContext(
-			PointContext point, 
-			List<RemapCandidateInfo> candidates)
-		{
-			var first = candidates.FirstOrDefault();
-			var second = candidates.Skip(1).FirstOrDefault();
-
-			/// Проверку горизонтального контекста выполняем только если
-			/// есть несколько кандидатов с одинаковыми оценками похожести
-			if (first != null && !first.IsAuto &&
-				IsSimilarEnough(first) && second != null)
-			{
-				var identicalCandidates = candidates.TakeWhile(c =>
-					c.HeaderSimilarity == first.HeaderSimilarity &&
-					c.InnerSimilarity == first.InnerSimilarity &&
-					c.AncestorSimilarity == first.AncestorSimilarity).ToList();
-
-				if (identicalCandidates.Count > 1)
-				{
-					var nextClosestCandidate = candidates.Skip(identicalCandidates.Count).FirstOrDefault();
-
-					if (nextClosestCandidate == null || AreDistantEnough(first, nextClosestCandidate))
-					{
-						foreach (var candidate in identicalCandidates)
-						{
-							candidate.Context.SiblingsContext =
-								PointContext.GetSiblingsContext(candidate.Node, candidate.File);
-						}
-
-						var writer = System.IO.File.AppendText("log.txt");
-						writer.WriteLine(point.FileContext.Name);
-						writer.WriteLine(String.Join(" ", point.HeaderContext.Select(e => String.Join("", e.Value))));
-						writer.Close();
-
-						var siblingsSimilarities = identicalCandidates.Select(c => new
-						{
-							BeforeSimilarity = EvalSimilarity(point.SiblingsContext.Before, c.Context.SiblingsContext.Before),
-							AfterSimilarity = EvalSimilarity(point.SiblingsContext.After, c.Context.SiblingsContext.After),
-							Candidate = c
-						}).ToList();
-
-						var bestBefore = siblingsSimilarities.OrderByDescending(e => e.BeforeSimilarity).First();
-						var bestAfter = siblingsSimilarities.OrderByDescending(e => e.AfterSimilarity).First();
-
-						if (bestBefore == bestAfter)
-						{
-							bestBefore.Candidate.IsAuto = true;
-							candidates.Remove(bestBefore.Candidate);
-							candidates.Insert(0, bestBefore.Candidate);
-						}
-					}
-				}
-			}
-		}
-
-		public List<RemapCandidateInfo> EvalCandidates(
-			PointContext point,
-			List<RemapCandidateInfo> candidates,
-			LanguageMarkupSettings markupSettings,
-			bool orderAndSetAuto = true)
-		{
-			Parallel.ForEach(
-				candidates, 
-				c => ComputeCoreContextSimilarities(point, c)
-			);
-
-			ComputeTotalSimilarity(point, candidates);
-
-			if(orderAndSetAuto)
-			{
-				candidates = candidates.OrderByDescending(c => c.Similarity).ToList();
-
-				var first = candidates.FirstOrDefault();
-				var second = candidates.Skip(1).FirstOrDefault();
-
-				if (first != null)
-				{
-					first.IsAuto = IsSimilarEnough(first)
-						&& AreDistantEnough(first, second);
-				}
-
-				/// Отсеиваем очень похожих кандидатов с непохожими соседями
-				if (markupSettings.UseSiblingsContext)
-					CheckHorizontalContext(point, candidates);
-			}
-
-			return candidates;
-		}
-
-		private void ComputeCoreContextSimilarities(PointContext point, RemapCandidateInfo candidate)
+		public void ComputeCoreSimilarities(PointContext point, RemapCandidateInfo candidate)
 		{
 			candidate.HeaderSimilarity =
 				Levenshtein(point.HeaderContext, candidate.Context.HeaderContext);
@@ -495,6 +392,38 @@ namespace Land.Markup.Binding
 				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
 			candidate.InnerSimilarity =
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
+		}
+
+		public List<RemapCandidateInfo> ComputeCoreSimilarities(PointContext point, List<RemapCandidateInfo> candidates)
+		{
+			Parallel.ForEach(
+				candidates,
+				c => ComputeCoreSimilarities(point, c)
+			);
+
+			return candidates;
+		}
+
+		public List<RemapCandidateInfo> ComputeSimilarities(
+			PointContext point, 
+			List<RemapCandidateInfo> candidates,
+			bool checkSiblings)
+		{
+			Parallel.ForEach(
+				candidates,
+				c => {
+					ComputeCoreSimilarities(point, c);
+
+					if(checkSiblings)
+					{
+						c.SiblingsSimilarity = EvalSimilarity(
+							point.SiblingsContext, 
+							c.Context.SiblingsContext);
+					}
+				}
+			);
+
+			return candidates;
 		}
 
 		/// <summary>
@@ -583,6 +512,20 @@ namespace Land.Markup.Binding
 
 			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)TextOrHash.MAX_TEXT_LENGTH
 				? 0 : score;
+		}
+
+		public double EvalSimilarity(SiblingsContext a, SiblingsContext b)
+		{
+			if(a.Before.TextLength == 0 && a.After.TextLength == 0)
+			{
+				return b.Before.TextLength == 0 && b.After.TextLength == 0 ? 1 : 0;
+			}
+
+			var beforeSimilarity = EvalSimilarity(a.Before, b.Before);
+			var afterSimilarity = EvalSimilarity(a.After, b.After);
+
+			return (beforeSimilarity * a.Before.TextLength + afterSimilarity * a.After.TextLength) /
+				(double)(a.Before.TextLength + a.After.TextLength);
 		}
 
 		#endregion
@@ -745,36 +688,6 @@ namespace Land.Markup.Binding
 		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
 			second == null || first.Similarity == 1 && second.Similarity != 1
 				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
-
-		private void ComputeTotalSimilarity(PointContext sourceContext,
-			List<RemapCandidateInfo> candidates)
-		{
-			if (candidates.Count == 0)
-				return;
-
-			/// Проверяем, какие контексты не задействованы, их вес равен 0
-			var weights = new Dictionary<ContextType, double?> {
-				{ ContextType.Ancestors, null },
-				{ ContextType.Header, null },
-				{ ContextType.Inner, null }
-			};
-
-			foreach (var h in TuningHeuristics)
-				h.TuneWeights(sourceContext, candidates, weights);
-
-			foreach (var h in ScoringHeuristics)
-				h.PredictSimilarity(sourceContext, candidates);
-
-			var finalWeights = weights.ToDictionary(e => e.Key, e => e.Value ?? 0);
-
-			candidates.ForEach(c =>
-			{
-				c.Similarity = c.Similarity ??
-					(finalWeights[ContextType.Ancestors] * c.AncestorSimilarity + finalWeights[ContextType.Inner] * c.InnerSimilarity + finalWeights[ContextType.Header] * c.HeaderSimilarity)
-					/ finalWeights.Values.Sum();
-				c.Weights = finalWeights;
-			});
-		}
 
 		#endregion
 	}
