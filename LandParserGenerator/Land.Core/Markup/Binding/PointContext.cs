@@ -251,7 +251,7 @@ namespace Land.Markup.Binding
 
 			/// Проверки на != null нужны для десериализации
 
-			for (var i = 0; i < this.ClosestContext.Count; ++i)
+			for (var i = 0; i < this.ClosestContext?.Count; ++i)
 			{
 				if (this.ClosestContext[i] != null)
 				{
@@ -551,7 +551,13 @@ namespace Land.Markup.Binding
 
 			/// Если это корень, горизонтального контекста нет
 			if (parentNode == null)
-				return null;
+			{
+				return new SiblingsContext
+				{
+					Before = new TextOrHash(),
+					After = new TextOrHash()
+				};
+			}
 
 			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
 			var siblings = new List<Node>(parentNode.Children);
@@ -562,6 +568,8 @@ namespace Land.Markup.Binding
 					var current = siblings[i];
 					siblings.RemoveAt(i);
 					siblings.InsertRange(i, current.Children);
+
+					--i;
 				}
 			}
 

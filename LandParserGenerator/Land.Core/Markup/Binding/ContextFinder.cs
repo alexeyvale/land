@@ -50,38 +50,66 @@ namespace Land.Markup.Binding
 		{
 			if (candidates.Count > 0)
 			{
-				var maxHeaderSim = candidates.Max(c => c.HeaderSimilarity);
-				var maxInnerSim = candidates.Max(c => c.InnerSimilarity);
-				var maxAncestorsSim = candidates.Max(c => c.AncestorSimilarity);
+				var existsH = candidates.Any(c => c.Context.HeaderContext?.Count > 0);
+				var existsA = candidates.Any(c => c.Context.AncestorsContext?.Count > 0);
+				var existsI = candidates.Any(c => c.Context.InnerContext?.Content.TextLength > 0);
+				var existsS = candidates.Any(c => c.Context.SiblingsContext?.Before.TextLength > 0 
+					|| c.Context.SiblingsContext?.After.TextLength > 0);
+
+				var maxSimH = candidates.Max(c => c.HeaderSimilarity);
+				var maxSimI = candidates.Max(c => c.InnerSimilarity);
+				var maxSimA = candidates.Max(c => c.AncestorSimilarity);
+				var maxSimS = candidates.Max(c => c.SiblingsSimilarity);
 
 				return candidates.Select(c =>
 				{
 					var sameAncestorsCandidates = candidates.Where(cd => cd.AncestorSimilarity == c.AncestorSimilarity).ToList();
 					var sameAncestorsMaxHeaderSim = sameAncestorsCandidates.Max(cd => cd.HeaderSimilarity);
 					var sameAncestorsMaxInnerSim = sameAncestorsCandidates.Max(cd => cd.InnerSimilarity);
+					var sameAncestorsMaxSiblingsSim = sameAncestorsCandidates.Max(cd => cd.SiblingsSimilarity);
 
 					sameAncestorsCandidates.Remove(c);
 
 					return new CandidateFeatures
 					{
-						HeaderSim = c.HeaderSimilarity,
-						InnerSim = c.InnerSimilarity,
-						AncestorsSim = c.AncestorSimilarity,
+						ExistsA = existsA ? 1 : 0,
+						ExistsH = existsH ? 1 : 0,
+						ExistsI = existsI ? 1 : 0,
+						ExistsS = existsS ? 1 : 0,
 
-						MaxAncestorsSim = maxAncestorsSim,
-						MaxHeaderSimGlobal = maxHeaderSim,
-						MaxInnerSimGlobal = maxInnerSim,
-						MaxHeaderSimSameAncestors = sameAncestorsMaxHeaderSim,
-						MaxInnerSimSameAncestors = sameAncestorsMaxInnerSim,
+						SimH = c.HeaderSimilarity,
+						SimI = c.InnerSimilarity,
+						SimA = c.AncestorSimilarity,
+						SimS = c.SiblingsSimilarity,
 
-						MoreSimilarAncestorsRatio = candidates.Count() > 1
+						MaxSimA = maxSimA,
+						MaxSimH = maxSimH,
+						MaxSimI = maxSimI,
+						MaxSimS = maxSimS,
+
+						MaxSimH_SameA = sameAncestorsMaxHeaderSim,
+						MaxSimI_SameA = sameAncestorsMaxInnerSim,
+						MaxSimS_SameA = sameAncestorsMaxSiblingsSim,
+
+						RatioBetterSimA = candidates.Count() > 1
 							? candidates.Where(cd => cd.AncestorSimilarity > c.AncestorSimilarity).Count() / (double)(candidates.Count() - 1) : 0,
-						SameAncestorsRatio = candidates.Count() > 1
-							? sameAncestorsCandidates.Count() / (double)(candidates.Count() - 1) : 0,
-						MoreSimilarHeaderSameAncestorsRatio = sameAncestorsCandidates.Count() > 0
-							? sameAncestorsCandidates.Where(cd => cd.HeaderSimilarity > c.HeaderSimilarity).Count() / (double)sameAncestorsCandidates.Count() : 0,
-						MoreSimilarInnerSameAncestorsRatio = sameAncestorsCandidates.Count() > 0
-							? sameAncestorsCandidates.Where(cd => cd.InnerSimilarity > c.InnerSimilarity).Count() / (double)sameAncestorsCandidates.Count() : 0,
+						RatioBetterSimI = candidates.Count() > 1
+							? candidates.Where(cd => cd.InnerSimilarity > c.InnerSimilarity).Count() / (double)(candidates.Count() - 1) : 0,
+						RatioBetterSimH = candidates.Count() > 1
+							? candidates.Where(cd => cd.HeaderSimilarity > c.HeaderSimilarity).Count() / (double)(candidates.Count() - 1) : 0,
+						RatioBetterSimS = candidates.Count() > 1
+							? candidates.Where(cd => cd.SiblingsSimilarity > c.SiblingsSimilarity).Count() / (double)(candidates.Count() - 1) : 0,
+
+						RatioSameAncestor = sameAncestorsCandidates.Count > 0 ? sameAncestorsCandidates.Count / (double)candidates.Count : 0,
+
+						RatioBetterSimI_SameA = sameAncestorsCandidates.Count() > 1
+							? sameAncestorsCandidates.Where(cd => cd.InnerSimilarity > c.InnerSimilarity).Count() / (double)(sameAncestorsCandidates.Count() - 1) : 0,
+						RatioBetterSimH_SameA = sameAncestorsCandidates.Count() > 1
+							? sameAncestorsCandidates.Where(cd => cd.HeaderSimilarity > c.HeaderSimilarity).Count() / (double)(sameAncestorsCandidates.Count() - 1) : 0,
+						RatioBetterSimS_SameA = sameAncestorsCandidates.Count() > 1
+							? sameAncestorsCandidates.Where(cd => cd.SiblingsSimilarity > c.SiblingsSimilarity).Count() / (double)(sameAncestorsCandidates.Count() - 1) : 0,
+
+
 
 						IsAuto = c.IsAuto ? 1 : 0,
 					};
