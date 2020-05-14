@@ -15,7 +15,7 @@ namespace Land.Markup.CoreExtension
 		public const string PRIORITY = "priority";
 		public const string LAND = "land";
 		public const string EXACTMATCH = "exactmatch";
-		public const string USESIBLINGS = "usesiblings";
+		public const string CORE = "core";
 	}
 
 	public static class OptionsExtension
@@ -31,6 +31,17 @@ namespace Land.Markup.CoreExtension
 		public static void SetPriority(this SymbolOptionsManager manager, double value)
 		{
 			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, new List<dynamic>() { value });
+		}
+
+		public static string GetCore(this SymbolOptionsManager manager)
+		{
+			var parameters = manager.GetParams(MarkupOption.GROUP_NAME, MarkupOption.CORE);
+			return parameters?.Count > 0 ? parameters[0] : null;
+		}
+
+		public static void SetCore(this SymbolOptionsManager manager, string value)
+		{
+			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.CORE, new List<dynamic>() { value });
 		}
 	}
 }

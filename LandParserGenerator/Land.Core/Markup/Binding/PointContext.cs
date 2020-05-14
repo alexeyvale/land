@@ -7,6 +7,7 @@ using Land.Core;
 using Land.Core.Specification;
 using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
+using System.Text.RegularExpressions;
 
 namespace Land.Markup.Binding
 {
@@ -26,7 +27,7 @@ namespace Land.Markup.Binding
 	{
 		public bool ExactMatch { get; set; }
 
-		public List<string> Value { get; set; }
+		public string Value { get; set; }
 
 		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
 		public bool EqualsIgnoreValue(object obj)
@@ -48,7 +49,7 @@ namespace Land.Markup.Binding
 				return ReferenceEquals(this, elem) || Priority == elem.Priority 
 					&& Type == elem.Type
 					&& ExactMatch == elem.ExactMatch
-					&& Value.SequenceEqual(elem.Value);
+					&& Value == elem.Value;
 			}
 
 			return false;
@@ -62,12 +63,7 @@ namespace Land.Markup.Binding
 				hashCode = hashCode * -1521134295 + ExactMatch.GetHashCode();
 				hashCode = hashCode * -1521134295 + Priority.GetHashCode();
 				hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
-
-				foreach (var elem in Value)
-				{
-					hashCode = hashCode * -1521134295 +
-						EqualityComparer<string>.Default.GetHashCode(elem);
-				}
+				hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Value);
 
 				return hashCode;
 			}
@@ -88,26 +84,10 @@ namespace Land.Markup.Binding
 			return new HeaderContextElement()
 			{
 				Type = node.Type,
-				Value = node.Value,
+				Value = String.Join("", node.Value),
 				Priority = node.Options.GetPriority().Value,
 				ExactMatch = node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH)
 			};
-		}
-	}
-
-	public class InnerContext
-	{
-		public TextOrHash Content { get; set; }
-
-		public InnerContext() { }
-
-		public InnerContext(List<SegmentLocation> locations, string fileText)
-		{
-			var text = String.Join(" ", locations.Select(l => 
-				fileText.Substring(l.Start.Offset, l.Length.Value)
-			));
-
-			Content = new TextOrHash(text);
 		}
 	}
 
@@ -148,9 +128,32 @@ namespace Land.Markup.Binding
 			return new AncestorsContextElement()
 			{
 				Type = node.Type,
-				HeaderContext = PointContext.GetHeaderContext(node)
+				HeaderContext = PointContext.GetHeaderContext(node).Sequence
 			};
 		}
+	}
+
+	public class InnerContext
+	{
+		public TextOrHash Content { get; set; }
+
+		public InnerContext() { }
+
+		public InnerContext(List<SegmentLocation> locations, string fileText)
+		{
+			var text = String.Join(" ", locations.Select(l => 
+				fileText.Substring(l.Start.Offset, l.Length.Value)
+			));
+
+			Content = new TextOrHash(text);
+		}
+	}
+
+	public class HeaderContext
+	{
+		public List<HeaderContextElement> Sequence { get; set; }
+		public List<string> Core { get; set; }
+		public List<string> Words { get; set; }
 	}
 
 	#region Old
@@ -204,7 +207,7 @@ namespace Land.Markup.Binding
 			return new ContextElement()
 			{
 				Type = node.Type,
-				HeaderContext = PointContext.GetHeaderContext(node)
+				HeaderContext = PointContext.GetHeaderContext(node).Sequence
 			};
 		}
 	}
@@ -213,8 +216,18 @@ namespace Land.Markup.Binding
 
 	public class SiblingsContext
 	{
-		public TextOrHash Before { get; set; }
-		public TextOrHash After { get; set; }
+		public SiblingsContextPart Before { get; set; }
+		public SiblingsContextPart After { get; set; }
+	}
+
+	public class SiblingsContextPart
+	{
+		public TextOrHash Global { get; set; }
+		public byte[] EntityHash { get; set; }
+		public string EntityType { get; set; }
+
+		[JsonIgnore]
+		public bool IsNotEmpty => Global.TextLength > 0;
 	}
 
 	public class FileContext
@@ -296,7 +309,7 @@ namespace Land.Markup.Binding
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
 		/// </summary>
-		public List<HeaderContextElement> HeaderContext { get; set; }
+		public HeaderContext HeaderContext { get; set; }
 
 		/// <summary>
 		/// Внутренний контекст в виде одной сущности
@@ -338,7 +351,8 @@ namespace Land.Markup.Binding
 		#region Old
 
 		public string Name =>
-			String.Join("", this.HeaderContext.Where(e => e.Type == "name").SelectMany(e => e.Value));
+			String.Join("", this.HeaderContext.Sequence
+				.Where(e => e.Type == "name").Select(e => e.Value));
 
 		public List<ContextElement> InnerContext_old { get; set; }
 
@@ -378,7 +392,7 @@ namespace Land.Markup.Binding
 			{
 				core.SiblingsContext = GetSiblingsContext(node, file);
 			}
-			if (closestArgs != null && core.SiblingsContext == null)
+			if (closestArgs != null && core.ClosestContext == null)
 			{
 				core.ClosestContext = GetClosestContext(
 					node, file, core, 
@@ -410,28 +424,43 @@ namespace Land.Markup.Binding
 			}
 		}
 
-		public static List<HeaderContextElement> GetHeaderContext(Node node)
+		public static List<string> GetWords(string str)
 		{
-			var result = new List<HeaderContextElement>();
+			var result = new List<string>();
+			var splitted = str.Split(
+				new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries
+			);
 
-			/// Иначе вычисляем контекст заголовка
-			/// Листовой узел сам себе заголовок
+			foreach (var part in splitted)
+			{
+				var firstIdx = 0;
+
+				for (var i = 1; i < part.Length; ++i)
+				{
+					if (char.IsUpper(part[i]))
+					{
+						result.Add(part.Substring(firstIdx, i - firstIdx));
+						firstIdx = i;
+					}
+				}
+
+				result.Add(part.Substring(firstIdx));
+			}
+
+			return result;
+		}
+
+		public static HeaderContext GetHeaderContext(Node node)
+		{
+			List<Node> sequence;
+
 			if (node.Value.Count > 0)
 			{
-				result = new List<HeaderContextElement>()
-				{
-					new HeaderContextElement()
-					{
-						 Type = node.Type,
-						 Priority = 1,
-						 Value = node.Value
-					}
-				};
+				sequence = new List<Node>() { node };
 			}
-			/// Для нелистового ищем листовых непосредственных потомков
 			else
 			{
-				result = new List<HeaderContextElement>();
+				sequence = new List<Node>();
 
 				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
@@ -443,18 +472,38 @@ namespace Land.Markup.Binding
 						current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)) &&
 						current.Options.GetPriority() > 0)
 					{
-						result.Add((HeaderContextElement)current);
+						sequence.Add(current);
 					}
 					else
 					{
 						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
+						{
 							for (var i = current.Children.Count - 2; i >= 1; --i)
+							{
 								stack.Push(current.Children[i]);
+							}
+						}
 					}
 				}
 			}
 
-			return result;
+			var headerSequence = sequence.Select(e => (HeaderContextElement)e).ToList();
+			var core = new List<string>();
+
+			for(var i=0; i<sequence.Count; ++i)
+			{
+				if(sequence[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CORE))
+				{
+					core.Add(Regex.Match(headerSequence[i].Value, sequence[i].Options.GetCore()).Value);
+				}
+			}
+
+			return new HeaderContext
+			{
+				Sequence = sequence.Select(e => (HeaderContextElement)e).ToList(),
+				Core = core,
+				Words = core.SelectMany(e=> GetWords(e)).ToList()
+			};
 		}
 
 		public static List<AncestorsContextElement> GetAncestorsContext(Node node)
@@ -547,15 +596,24 @@ namespace Land.Markup.Binding
 			/// Находим островного родителя
 			var parentNode = node.Parent;
 			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+			{
 				parentNode = parentNode.Parent;
+			}
 
 			/// Если это корень, горизонтального контекста нет
 			if (parentNode == null)
 			{
 				return new SiblingsContext
 				{
-					Before = new TextOrHash(),
-					After = new TextOrHash()
+					Before = new SiblingsContextPart
+					{
+						Global = new TextOrHash()
+					},
+
+					After = new SiblingsContextPart
+					{
+						Global = new TextOrHash()
+					},
 				};
 			}
 
@@ -577,23 +635,42 @@ namespace Land.Markup.Binding
 			var markedElementIndex = siblings.IndexOf(node);
 			siblings.RemoveAt(markedElementIndex);
 
-			var context = new SiblingsContext
-			{
-				Before = new TextOrHash(String.Join(" ", siblings
+			var md5 = System.Security.Cryptography.MD5.Create();
+
+			var beforeBuilder = new StringBuilder();
+			foreach(var part in siblings
 					.Take(markedElementIndex)
 					.Where(n => n.Location != null)
-					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
-				)),
-				After = new TextOrHash(String.Join(" ", siblings
+					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
+			{
+				beforeBuilder.Append(part);
+			}
+			
+			var afterBuilder = new StringBuilder();
+			foreach (var part in siblings
 					.Skip(markedElementIndex)
 					.Where(n => n.Location != null)
-					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value))
-				)),
+					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
+			{
+				afterBuilder.Append(part);
+			}
 
-				//EntityBefore = markedElementIndex > 0
-				//	? contextFinder.ContextManager.GetContext(siblings[markedElementIndex - 1], file) : null,
-				//EntityAfter = markedElementIndex < siblings.Count
-				//	? contextFinder.ContextManager.GetContext(siblings[markedElementIndex], file) : null,
+			var context = new SiblingsContext
+			{
+				Before = new SiblingsContextPart {
+					Global = new TextOrHash(beforeBuilder.ToString()),
+					EntityHash = markedElementIndex > 0 ? GetHash(siblings[markedElementIndex - 1], file) : null,
+					EntityType = markedElementIndex > 0 ? siblings[markedElementIndex - 1].Type : null
+				},
+
+				After = new SiblingsContextPart
+				{
+					Global = new TextOrHash(afterBuilder.ToString()),
+					EntityHash = markedElementIndex < siblings.Count 
+						? GetHash(siblings[markedElementIndex], file) : null,
+					EntityType = markedElementIndex < siblings.Count 
+						? siblings[markedElementIndex].Type : null
+				}
 			};
 
 			return context;
@@ -633,11 +710,11 @@ namespace Land.Markup.Binding
 
 			contextFinder.ComputeCoreSimilarities(nodeContext, candidates);
 
-			candidates = nodeContext.HeaderContext.Count > 0
+			candidates = nodeContext.HeaderContext.Sequence.Count > 0
 				? candidates
-					.OrderByDescending(c => c.HeaderSimilarity)
+					.OrderByDescending(c => c.HeaderSequenceSimilarity)
 					.Take(MAX_COUNT)
-					.TakeWhile(c => c.HeaderSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
+					.TakeWhile(c => c.HeaderSequenceSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
 					.ToList()
 				: candidates
 					.OrderByDescending(c => c.InnerSimilarity)

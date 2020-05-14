@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Land.Markup.Binding
 {
@@ -17,21 +14,35 @@ namespace Land.Markup.Binding
 		#endregion
 
 		#region Похожести текущего кандидата
-		public double SimH { get; set; }
+		public double SimHSeq { get; set; }
+		public double SimHCore { get; set; }
 		public double SimI { get; set; }
 		public double SimA { get; set; }
 		public double SimS { get; set; }
+		public double SimF { get; set; }
+		#endregion
+
+		#region Дополнительные проверки
+		public int FileHasSameName { get; set; }
+		public int FileHasBeforeSibling { get; set; }
+		public int FileHasAfterSibling { get; set; }
+		public int CorrectBefore { get; set; }
+		public int CorrectAfter { get; set; }
+		public double LineShiftRatio { get; set; }
 		#endregion
 
 		#region Максимальные похожести каждого из контекстов
-		public double MaxSimH { get; set; }
+		public double MaxSimHSeq { get; set; }
+		public double MaxSimHCore { get; set; }
 		public double MaxSimI { get; set; }
 		public double MaxSimA { get; set; }
 		public double MaxSimS { get; set; }
+		public double MaxSimF { get; set; }
 		#endregion
 
 		#region Максимальные похожести в рамках того же контекста предков, что и у рассматриваемого кандидата
-		public double MaxSimH_SameA { get; set; }
+		public double MaxSimHSeq_SameA { get; set; }
+		public double MaxSimHCore_SameA { get; set; }
 		public double MaxSimI_SameA { get; set; }
 		public double MaxSimS_SameA { get; set; }
 		#endregion
@@ -59,6 +70,18 @@ namespace Land.Markup.Binding
 		public double RatioBetterSimH_SameA { get; set; }
 		public double RatioBetterSimI_SameA { get; set; }
 		public double RatioBetterSimS_SameA { get; set; }
+		#endregion
+
+		#region Разные соотношения длин
+		public int IsCandidateInnerContextLonger { get; set; }
+
+		public int IsCandidateHeaderCoreLonger { get; set; }
+
+		public double InnerLengthRatio { get; set; }
+
+		public double InnerLengthRatio1000 { get; set; }
+
+		public double HeaderCoreLengthRatio { get; set; }
 		#endregion
 
 		public int IsAuto { get; set; }

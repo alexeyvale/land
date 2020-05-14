@@ -94,10 +94,8 @@
     <Compile Include="Markup\Binding\CandidateFeatures.cs" />
     <Compile Include="Markup\Binding\ContextFinder.cs" />
     <Compile Include="Markup\Binding\Munkres.cs" />
-    <Compile Include="Markup\Binding\IHeuristic.cs" />
     <Compile Include="Markup\Binding\PointContextManager.cs" />
-    <Compile Include="Markup\Binding\WeightsHeuristics.cs" />
-    <Compile Include="Markup\Binding\SimilarityHeuristics.cs" />
+    <Compile Include="Markup\Binding\FileComparisonResult.cs" />
     <Compile Include="Markup\Binding\RemapCandidateInfo.cs" />
     <Compile Include="Markup\Binding\FuzzyHashing.cs" />
     <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />

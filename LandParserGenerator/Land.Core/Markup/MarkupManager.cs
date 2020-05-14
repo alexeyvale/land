@@ -498,7 +498,32 @@ namespace Land.Markup
 			ContextFinder.SearchType searchType)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var result = ContextFinder.Find(GetConcernPoints(), searchArea, searchType);
+			var points = GetConcernPoints();
+
+			/// Локальный поиск имеет смысл проводить, если только его провести и нужно,
+			/// или если нужен глобальный поиск, но разрешена автоперепривязка
+			var result = allowAutoDecisions || searchType == ContextFinder.SearchType.Local
+				? ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Local)
+				: new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			/// Если требуется глобальный поиск, 
+			/// выполняем его для того, что не нашли локально, 
+			/// потом мёржим результаты
+			if(searchType == ContextFinder.SearchType.Global)
+			{
+				points = points.Except(result
+					.Where(e => e.Value.FirstOrDefault()?.IsAuto ?? false)
+					.Select(e => e.Key)
+				).ToList();
+
+				var globalResult = ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Global);
+
+				foreach(var key in globalResult.Keys)
+				{
+					result[key] = globalResult[key];
+				}
+			}
+
 
 			foreach (var kvp in result)
 			{

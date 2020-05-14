@@ -85,4 +85,5 @@ block				=	'{' Any '}'
 	priority(0.1) init_value
 	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
 	exactmatch modifier CLASS_STRUCT_INTERFACE
+	core("\\w+(?=($|<[^<]+>$))") name
 }

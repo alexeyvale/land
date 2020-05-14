@@ -11,7 +11,7 @@ namespace ManualRemappingTool
 	public class MappingElement
 	{
 		public Node Node { get; set; }
-		public List<HeaderContextElement> Header { get; set; }
+		public HeaderContext Header { get; set; }
 		public List<AncestorsContextElement> Ancestors { get; set; }
 	}
 }

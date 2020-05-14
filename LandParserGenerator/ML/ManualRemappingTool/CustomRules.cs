@@ -42,7 +42,7 @@ namespace ManualRemappingTool
 		public override MappingElement GetSameElement(
 			MappingElement sourceElement, 
 			List<MappingElement> candidates) =>
-			candidates.FirstOrDefault(c => c.Header.SequenceEqual(sourceElement.Header)
+			candidates.FirstOrDefault(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors));
 	}
 
@@ -67,8 +67,8 @@ namespace ManualRemappingTool
 
 		public override MappingElement GetSameElement(MappingElement sourceElement, List<MappingElement> candidates)
 		{
-			var sourceElementName = CSharpAncestorsEqualityComparer.GetName(sourceElement.Header);
-			var sameName = candidates.Where(c => CSharpAncestorsEqualityComparer.GetName(c.Header) == sourceElementName
+			var sourceElementName = sourceElement.Header.Core;
+			var sameName = candidates.Where(c => c.Header.Core == sourceElementName
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).ToList();
 
 			return sameName.Count == 1 

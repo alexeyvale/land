@@ -578,7 +578,7 @@ namespace ManualRemappingTool
 					Ancestors = PointContext.GetAncestorsContext(e)
 						.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList()
 				})
-				.Where(e => e.Header.Count > 0 
+				.Where(e => e.Header.Sequence.Count > 0 
 					&& candidates.ContainsKey(e.Node.Type))
 				.ToList();
 

@@ -176,7 +176,8 @@ namespace DatasetToTrainConverter
 								}
 							}
 
-							foreach(var line in ContextFinder.GetFeatures(candidates).Select(f => f.ToString(";")))
+							foreach(var line in ContextFinder.GetFeatures(point.Context, candidates)
+								.Select(f => f.ToString(";")))
 							{
 								trainFile.WriteLine(line);
 							}

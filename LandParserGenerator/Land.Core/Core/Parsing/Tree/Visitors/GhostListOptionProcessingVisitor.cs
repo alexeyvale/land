@@ -51,6 +51,7 @@ namespace Land.Core.Parsing.Tree
 						var smbToRemove = node.Children[i];
 						node.Children.RemoveAt(i);
 
+						/// TODO убрать использование расширения в ядре
 						if (smbToRemove.Options.GetPriority().HasValue)
 							smbToRemove.Children.ForEach(c => c.Options.SetPriority(
 								(c.Options.GetPriority() ?? 1) * smbToRemove.Options.GetPriority().Value
