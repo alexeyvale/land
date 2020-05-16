@@ -325,7 +325,7 @@ namespace ManualRemappingTool
 
 		private void TargetFileView_FileOpened(object sender, FileViewer.FileOpenedEventArgs e)
 		{
-			if (OpenPairCheckBox.IsChecked ?? false)
+			if (OpenPairCheckBox.IsChecked ?? false && e.Direction.HasValue)
 			{
 				var sourcePath = Path.Combine(SourceFileView.WorkingDirectory, e.FileRelativePath);
 

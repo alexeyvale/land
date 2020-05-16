@@ -67,8 +67,7 @@ namespace ManualRemappingTool
 
 		public override MappingElement GetSameElement(MappingElement sourceElement, List<MappingElement> candidates)
 		{
-			var sourceElementName = sourceElement.Header.Core;
-			var sameName = candidates.Where(c => c.Header.Core == sourceElementName
+			var sameName = candidates.Where(c => c.Header.Core.SequenceEqual(sourceElement.Header.Core)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).ToList();
 
 			return sameName.Count == 1 
