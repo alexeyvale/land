@@ -47,6 +47,7 @@
     <Compile Include="..\ManualRemappingTool\Models\Dataset.cs">
       <Link>Dataset.cs</Link>
     </Compile>
+    <Compile Include="ContextFinder.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

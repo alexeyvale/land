@@ -49,15 +49,7 @@ namespace DatasetToTrainConverter
 					var records = new List<ExtendedDatasetRecord>();
 					var finalized = d.Records.Where(r => d.FinalizedFiles.Contains(r.Key));
 
-					foreach(var unsupported in finalized.Where(r=>r.Value.Count > 1))
-					{
-						Console.WriteLine(
-							$"Mapping to multiple files for {GetAbsolutePath(d.SourceDirectoryPath, unsupported.Key)} is unsupported"
-						);
-					}
-
-					/// Рассматриваем только записи, касающиеся файлов, элементы которых были сопоставлены элементам в одном файле
-					foreach (var sorceFile in d.Records.Keys.Where(sf => d[sf].Count == 1))
+					foreach (var sorceFile in d.Records.Keys)
 					{
 						var absSourcePath =
 							GetAbsolutePath(d.SourceDirectoryPath, sorceFile);
@@ -78,11 +70,11 @@ namespace DatasetToTrainConverter
 					}
 					return records;
 				})
-				.ToDictionary(g => g.Key, g => g.SelectMany(r => r).ToLookup(r=>r.SourceFilePath, r => r));
+				.ToDictionary(g => g.Key, g => g.SelectMany(r => r).ToLookup(r => r.SourceFilePath, r => r));
 
 			foreach (var ext in groupedRecords.Keys)
 			{
-				// TODO Если важна перепривязка не только в рамках исх. файла и модиф., надо парсить все файлы в исходном каталоге и целевом
+				Console.WriteLine($"Current extension: {ext}");
 
 				/// Парсим все исходные и целевые файлы
 				var sourceFiles = groupedRecords[ext].Select(r => r.Key).Distinct()
@@ -99,7 +91,9 @@ namespace DatasetToTrainConverter
 						 };
 					 });
 
-				var targetFiles = groupedRecords[ext].SelectMany(r => r.Select(e=>e.TargetFilePath)).Distinct()
+				Console.WriteLine($"Source files parsed...");
+
+				var targetFiles = groupedRecords[ext].SelectMany(r => r.Select(e => e.TargetFilePath)).Distinct()
 					.Select(e =>
 					{
 						var extension = Path.GetExtension(e);
@@ -112,71 +106,88 @@ namespace DatasetToTrainConverter
 							BindingContext = PointContext.GetFileContext(e, text)
 						};
 					})
-					.ToDictionary(e => e.BindingContext.Name, e =>
-					{
-						var visitor = new LandExplorerVisitor();
-						e.Root.Accept(visitor);
+					.ToDictionary(e => e.BindingContext.Name, e => e);
 
-						return new
-						{
-							Parsed = e,
-							Nodes = visitor.Land.ToLookup(n => n.Type)
-						};
-					});
+				Console.WriteLine($"Target files parsed...");
 
 				foreach (var sourceFilePair in sourceFiles)
 				{
-					Console.WriteLine(sourceFilePair.Key);
+					Console.WriteLine($"Current source file: {sourceFilePair.Key}");
 
 					/// Привязываемся ко всему в исходном файле
 					var markupManager = new MarkupManager(name => sourceFiles.ContainsKey(name)
-						? sourceFiles[name] : targetFiles[name].Parsed);
+						? sourceFiles[name] : targetFiles[name]);
+
+					var customContextFinder = new CopyPaste.ContextFinder();
+					customContextFinder.GetParsed = markupManager.ContextFinder.GetParsed;
 
 					markupManager.AddLand(
 						sourceFilePair.Value,
 						sourceFiles.Values.ToList()
 					);
 
-					var points = markupManager.GetConcernPoints()
-						.GroupBy(p => p.Context.Type)
-						.ToDictionary(g=>g.Key, g=>g.ToList());
+					var allPoints = markupManager.GetConcernPoints();
+					var allFiles = groupedRecords[ext][sourceFilePair.Key]
+						.Select(e => e.TargetFilePath)
+						.Distinct()
+						.Select(e => targetFiles[e])
+						.ToList();
 
-					var targetFilePath = groupedRecords[ext][sourceFilePair.Key].FirstOrDefault()?.TargetFilePath;
+					var similarFiles = allFiles
+						.Where(f => markupManager.ContextFinder.AreFilesSimilarEnough(f.BindingContext, sourceFilePair.Value.BindingContext))
+						.ToList();
+					var similarFilesNames = new HashSet<string>(similarFiles.Select(f=>f.Name));
 
-					/// Для точек каждого типа оцениваем кандидатов
-					foreach (var type in points.Keys)
+					var pointsInSimilarFiles = allPoints.Where(p => similarFilesNames.Contains(
+						groupedRecords[ext][sourceFilePair.Key].SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset)?.TargetFilePath
+					)).ToList();
+
+					var localSearchResult = customContextFinder.Find(pointsInSimilarFiles, similarFiles, 
+						CopyPaste.ContextFinder.SearchType.Local);
+					var globalSearchResult = customContextFinder.Find(allPoints.Except(pointsInSimilarFiles).ToList(), allFiles, 
+						CopyPaste.ContextFinder.SearchType.Global);
+
+					foreach(var kvp in localSearchResult)
 					{
-						var trainFileName = Path.Combine(args[0], $"{ext.Replace(",",".").Trim('.')}.{type}.csv");
-						var trainFile = new StreamWriter(trainFileName);
+						globalSearchResult[kvp.Key] = kvp.Value;
+					}
 
-						trainFile.WriteLine(CandidateFeatures.ToHeaderString(";"));
+					var result = globalSearchResult.ToLookup(e => e.Key.Context.Type, e => e);
 
-						var candidates = targetFiles[targetFilePath].Nodes[type].Select(n => new RemapCandidateInfo
+					foreach(var typePointsPair in result)
+					{
+						Console.WriteLine($"Current type: {typePointsPair.Key}");
+
+						/// Будем дописывать строчки в train-файл 
+						var trainFileName = Path.Combine(args[1], $"{ext.Replace(",", ".").Trim('.')}.{typePointsPair.Key}.csv");
+						var trainFile = new StreamWriter(trainFileName, true);
+
+						/// Если файл только что создан, записываем туда заголовок
+						if (trainFile.BaseStream.Position == 0)
 						{
-							Node = n,
-							File = targetFiles[targetFilePath].Parsed,
-							Context = markupManager.ContextFinder.ContextManager
-								.GetContext(n, targetFiles[targetFilePath].Parsed, new SiblingsConstructionArgs(), null)
-						}).ToList();
+							trainFile.WriteLine(CandidateFeatures.ToHeaderString(";"));
+						}
 
-						foreach(var point in points[type])
+						foreach(var pointCandidatesPair in typePointsPair)
 						{
-							markupManager.ContextFinder.ComputeSimilarities(point.Context, candidates, true);
-
+							/// находим запись в датасете о корректном сопоставлении
 							var record = groupedRecords[ext][sourceFilePair.Key]
-								.SingleOrDefault(e => e.SourceOffset == point.AstNode.Location.Start.Offset);
+									.SingleOrDefault(e => e.SourceOffset == pointCandidatesPair.Key.AstNode.Location.Start.Offset);
 
-							if(record != null)
+							/// если запись нашли и корректное сопоставление есть в одном из анализируемых файлов
+							if (record != null)
 							{
-								var correctCandidate = candidates.SingleOrDefault(e => e.Node.Location.Start.Offset == record.TargetOffset);
+								var correctCandidate = pointCandidatesPair.Value.SingleOrDefault(e =>
+									e.Node.Location.Start.Offset == record.TargetOffset);
 
-								if(correctCandidate != null)
+								if (correctCandidate != null)
 								{
 									correctCandidate.IsAuto = true;
 								}
 							}
 
-							foreach(var line in ContextFinder.GetFeatures(point.Context, candidates)
+							/// записываем информацию о кандидатах в выходной файл
+							foreach (var line in ContextFinder.GetFeatures(pointCandidatesPair.Key.Context, pointCandidatesPair.Value)
 								.Select(f => f.ToString(";")))
 							{
 								trainFile.WriteLine(line);
