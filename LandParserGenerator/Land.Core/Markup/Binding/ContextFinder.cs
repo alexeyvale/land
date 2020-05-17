@@ -133,7 +133,7 @@ namespace Land.Markup.Binding
 			return new List<CandidateFeatures>();
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoGroupSearch(
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoMultiTypeSearch(
 			Dictionary<string, List<ConcernPoint>> points,
 			List<ParsedFile> searchArea,
 			SearchType searchType)
@@ -144,6 +144,12 @@ namespace Land.Markup.Binding
 
 			/// Анализируем контекст соседей только при локальном поиске
 			var checkSiblings = searchType == SearchType.Local;
+
+			/// Инициализируем коллекции кандидатов для каждого типа
+			foreach (var type in points.Keys)
+			{
+				candidates[type] = new List<RemapCandidateInfo>();
+			}
 
 			/// В каждом файле находим кандидатов нужного типа
 			foreach (var currentFile in searchArea)
@@ -156,8 +162,6 @@ namespace Land.Markup.Binding
 
 				foreach (var type in points.Keys)
 				{
-					candidates[type] = new List<RemapCandidateInfo>();
-
 					candidates[type].AddRange(visitor.Grouped[type]
 						.Select(n =>
 						{
@@ -217,7 +221,7 @@ namespace Land.Markup.Binding
 
 			foreach (var type in points.Keys)
 			{
-				var currentResult = DoSingleSearch(points[type], candidates[type], 
+				var currentResult = DoSingleTypeSearch(points[type], candidates[type], 
 					searchType, ancestorsCache, candidateAncestor);
 
 				foreach(var kvp in currentResult)
@@ -229,7 +233,7 @@ namespace Land.Markup.Binding
 			return result;
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSingleSearch(
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSingleTypeSearch(
 			List<ConcernPoint> points, 
 			List<RemapCandidateInfo> candidates,
 			SearchType searchType,
@@ -564,7 +568,7 @@ namespace Land.Markup.Binding
 						.ToDictionary(e => e.Key, e => e.ToList());
 					files = searchArea;
 
-					var globalResult = DoGroupSearch(groupedByType, files, searchType);
+					var globalResult = DoMultiTypeSearch(groupedByType, files, searchType);
 
 					foreach (var elem in globalResult)
 					{
@@ -592,7 +596,7 @@ namespace Land.Markup.Binding
 								.ToList();
 						}
 
-						var localResult = DoGroupSearch(groupedPoints[file], files, searchType);
+						var localResult = DoMultiTypeSearch(groupedPoints[file], files, searchType);
 
 						foreach (var elem in localResult)
 						{
