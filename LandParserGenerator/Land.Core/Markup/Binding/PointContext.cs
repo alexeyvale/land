@@ -230,6 +230,12 @@ namespace Land.Markup.Binding
 		public bool IsNotEmpty => Global.TextLength > 0;
 	}
 
+	public class AncestorSiblingsPair
+	{
+		public Node Ancestor { get; set; }
+		public List<Node> Siblings { get; set; }
+	}
+
 	public class FileContext
 	{
 		public HashSet<Guid> LinkedPoints { get; set; } = new HashSet<Guid>();
@@ -450,6 +456,22 @@ namespace Land.Markup.Binding
 			return result;
 		}
 
+		public static Node GetAncestor(Node node)
+		{
+			var currentNode = node.Parent;
+
+			while (currentNode != null)
+			{
+				if (currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME
+					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+					return currentNode;
+
+				currentNode = currentNode.Parent;
+			}
+
+			return currentNode;
+		}
+
 		public static HeaderContext GetHeaderContext(Node node)
 		{
 			List<Node> sequence;
@@ -591,34 +613,55 @@ namespace Land.Markup.Binding
 
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
-			ParsedFile file)
+			ParsedFile file,
+			AncestorSiblingsPair pair = null)
 		{
+			Node parentNode = null;
+			List<Node> siblings = null;
+
+			if (pair?.Ancestor != null)
+			{
+				parentNode = pair.Ancestor;
+				goto SkipParentSearch;
+			}
+				
 			/// Находим островного родителя
-			var parentNode = node.Parent;
+			parentNode = node.Parent;
 			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 			{
 				parentNode = parentNode.Parent;
 			}
 
-			/// Если это корень, горизонтального контекста нет
-			if (parentNode == null)
+			/// Если при подъёме дошли до неостровного корня, 
+			/// и сам элемент не является этим корнем
+			if (parentNode == null && node != file.Root)
+			{
+				parentNode = file.Root;
+			}
+			else
 			{
 				return new SiblingsContext
 				{
-					Before = new SiblingsContextPart
-					{
-						Global = new TextOrHash()
-					},
-
-					After = new SiblingsContextPart
-					{
-						Global = new TextOrHash()
-					},
+					After = new SiblingsContextPart { Global = new TextOrHash() },
+					Before = new SiblingsContextPart { Global = new TextOrHash() }
 				};
 			}
 
+			if (pair != null)
+			{
+				pair.Ancestor = parentNode;
+			}
+
+		SkipParentSearch:
+
+			if(pair?.Siblings != null)
+			{
+				siblings = pair.Siblings.ToList();
+				goto SkipSiblingsSearch;
+			}
+
 			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
-			var siblings = new List<Node>(parentNode.Children);
+			siblings = new List<Node>(parentNode.Children);
 			for (var i = 0; i < siblings.Count; ++i)
 			{
 				if (!siblings[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
@@ -631,11 +674,16 @@ namespace Land.Markup.Binding
 				}
 			}
 
+			if(pair != null)
+			{
+				pair.Siblings = siblings.ToList();
+			}
+
+		SkipSiblingsSearch:
+
 			/// Индекс помечаемого элемента
 			var markedElementIndex = siblings.IndexOf(node);
 			siblings.RemoveAt(markedElementIndex);
-
-			var md5 = System.Security.Cryptography.MD5.Create();
 
 			var beforeBuilder = new StringBuilder();
 			foreach(var part in siblings

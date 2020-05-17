@@ -16,7 +16,7 @@ namespace Land.Markup.Binding
 		public double NameSimilarity { get; set; }
 		#endregion
 
-		public FileComparisonResult FileComparisonResult { get; set; }
+		public SiblingsSearchResult SiblingsSearchResult { get; set; }
 
 		public double HeaderSequenceSimilarity { get; set; }
 		public double HeaderCoreSimilarity { get; set; }

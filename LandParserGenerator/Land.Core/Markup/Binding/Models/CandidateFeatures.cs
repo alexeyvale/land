@@ -19,16 +19,13 @@ namespace Land.Markup.Binding
 		public double SimI { get; set; }
 		public double SimA { get; set; }
 		public double SimS { get; set; }
-		public double SimF { get; set; }
 		#endregion
 
 		#region Дополнительные проверки
-		public int FileHasSameName { get; set; }
-		public int FileHasBeforeSibling { get; set; }
-		public int FileHasAfterSibling { get; set; }
+		public int AncestorHasBeforeSibling { get; set; }
+		public int AncestorHasAfterSibling { get; set; }
 		public int CorrectBefore { get; set; }
 		public int CorrectAfter { get; set; }
-		public double LineShiftRatio { get; set; }
 		#endregion
 
 		#region Максимальные похожести каждого из контекстов
@@ -37,7 +34,6 @@ namespace Land.Markup.Binding
 		public double MaxSimI { get; set; }
 		public double MaxSimA { get; set; }
 		public double MaxSimS { get; set; }
-		public double MaxSimF { get; set; }
 		#endregion
 
 		#region Максимальные похожести в рамках того же контекста предков, что и у рассматриваемого кандидата

@@ -47,23 +47,23 @@ namespace Land.Markup.Binding
 		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
 
 		public static List<CandidateFeatures> GetFeatures(
-			PointContext point, 
+			PointContext point,
 			List<RemapCandidateInfo> candidates)
 		{
 			if (candidates.Count > 0)
 			{
-				double CountRatio<T1, T2>(List<T1> num, List<T2> denom) => 
+				double CountRatio<T1, T2>(List<T1> num, List<T2> denom) =>
 					denom.Count > 1 ? (num.Count - 1) / (double)(denom.Count - 1) : 0;
 
 				double CountRatioConditional<T>(List<T> list, Func<T, bool> checkFunction, bool exclusive = true) =>
-					list.Count > 1 ? (list.Where(e=>checkFunction(e)).Count() - (exclusive ? 0 : 1)) / (double)(list.Count - 1) : 0;
+					list.Count > 1 ? (list.Where(e => checkFunction(e)).Count() - (exclusive ? 0 : 1)) / (double)(list.Count - 1) : 0;
 
 				int BoolToInt(bool val) => val ? 1 : 0;
 
 				var existsH = candidates.Any(c => c.Context.HeaderContext?.Sequence?.Count > 0);
 				var existsA = candidates.Any(c => c.Context.AncestorsContext?.Count > 0);
 				var existsI = candidates.Any(c => c.Context.InnerContext?.Content.TextLength > 0);
-				var existsS = candidates.Any(c => c.Context.SiblingsContext?.Before.Global.TextLength > 0 
+				var existsS = candidates.Any(c => c.Context.SiblingsContext?.Before.Global.TextLength > 0
 					|| c.Context.SiblingsContext?.After.Global.TextLength > 0);
 
 				var maxSimHSeq = candidates.Max(c => c.HeaderSequenceSimilarity);
@@ -71,7 +71,6 @@ namespace Land.Markup.Binding
 				var maxSimI = candidates.Max(c => c.InnerSimilarity);
 				var maxSimA = candidates.Max(c => c.AncestorSimilarity);
 				var maxSimS = candidates.Max(c => c.SiblingsSimilarity);
-				var maxSimF = candidates.Max(c => c.FileComparisonResult.Similarity);
 
 				return candidates.Select(c =>
 				{
@@ -94,14 +93,11 @@ namespace Land.Markup.Binding
 						SimI = c.InnerSimilarity,
 						SimA = c.AncestorSimilarity,
 						SimS = c.SiblingsSimilarity,
-						SimF = c.FileComparisonResult.Similarity,
 
-						FileHasSameName = BoolToInt(c.FileComparisonResult.HasSameName),
-						FileHasBeforeSibling = BoolToInt(c.FileComparisonResult.BeforeSiblingOffset.HasValue),
-						FileHasAfterSibling = BoolToInt(c.FileComparisonResult.AfterSiblingOffset.HasValue),
-						CorrectBefore = BoolToInt(c.FileComparisonResult.BeforeSiblingOffset < c.Node.Location.Start.Offset),
-						CorrectAfter = BoolToInt(c.FileComparisonResult.AfterSiblingOffset > c.Node.Location.Start.Offset),
-						LineShiftRatio = Math.Abs(point.Line - c.Context.Line) / (double)point.FileContext.LineCount,
+						AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult.BeforeSiblingOffset.HasValue),
+						AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult.AfterSiblingOffset.HasValue),
+						CorrectBefore = BoolToInt(c.SiblingsSearchResult.BeforeSiblingOffset < c.Node.Location.Start.Offset),
+						CorrectAfter = BoolToInt(c.SiblingsSearchResult.AfterSiblingOffset > c.Node.Location.Start.Offset),
 
 						MaxSimA = maxSimA,
 						MaxSimHSeq = maxSimHSeq,
@@ -137,76 +133,115 @@ namespace Land.Markup.Binding
 			return new List<CandidateFeatures>();
 		}
 
-		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSearch(
-			List<ConcernPoint> points, 
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoGroupSearch(
+			Dictionary<string, List<ConcernPoint>> points,
 			List<ParsedFile> searchArea,
 			SearchType searchType)
 		{
-			var type = points[0].Context.Type;
-			var file = points[0].Context.FileContext;
-
-			List<ParsedFile> files = null;
-
-			switch(searchType)
-			{
-				/// При поиске в том же файле ищем тот же файл по полному совпадению пути,
-				/// если не находим - берём файлы, похожие по содержимому
-				case SearchType.Local:
-					files = searchArea.Where(f => f.Name == file.Name).ToList();
-
-					if (files.Count == 0)
-					{
-						files = searchArea
-							.Where(f => AreFilesSimilarEnough(f.BindingContext, file))
-							.ToList();
-					}
-					break;
-				/// В противном случае проводим поиск по всей области
-				default:
-					files = searchArea;
-					break;
-			}
-
-			var candidates = new List<RemapCandidateInfo>();
-			
-			var commonFileComparisonResults = new Dictionary<string, Tuple<FileComparisonResult, Dictionary<string, List<Tuple<int, byte[]>>>>>();
+			var candidates = new Dictionary<string, List<RemapCandidateInfo>>();
+			var ancestorsCache = new Dictionary<Node, AncestorCacheElement>();
+			var candidateAncestor = new Dictionary<RemapCandidateInfo, Node>();
 
 			/// Анализируем контекст соседей только при локальном поиске
 			var checkSiblings = searchType == SearchType.Local;
-			var siblingsArgs = checkSiblings ? new SiblingsConstructionArgs() : null;
 
-			/// Находим все сущности того же типа
-			foreach (var currentFile in files)
+			/// В каждом файле находим кандидатов нужного типа
+			foreach (var currentFile in searchArea)
 			{
 				if (!EnsureRootExists(currentFile))
 					continue;
 
-				var visitor = new GroupNodesByTypeVisitor(new List<string> { type });
+				var visitor = new GroupNodesByTypeVisitor(points.Keys.ToList());
 				currentFile.Root.Accept(visitor);
 
-				commonFileComparisonResults[currentFile.Name] = new Tuple<FileComparisonResult, Dictionary<string, List<Tuple<int, byte[]>>>>(
-					new FileComparisonResult
-					{
-						Similarity = EvalSimilarity(currentFile.BindingContext.Content, file.Content),
-						HasSameName = Path.GetFileName(currentFile.BindingContext.Name) == Path.GetFileName(file.Name)
-					},
-					visitor.Grouped.ToDictionary(kvp=>kvp.Key, kvp=>kvp.Value.Select(e=>new Tuple<int, byte[]>(e.Location.Start.Offset, PointContext.GetHash(e, currentFile))).ToList())
-				);
+				foreach (var type in points.Keys)
+				{
+					candidates[type] = new List<RemapCandidateInfo>();
 
-				candidates.AddRange(visitor.Grouped[type]
-					.Select(n => new RemapCandidateInfo
-					{
-						Node = n,
-						File = currentFile,
-						Context = ContextManager.GetContext(n, currentFile, siblingsArgs, null)
-					})
-					.ToList()
-				);		
+					candidates[type].AddRange(visitor.Grouped[type]
+						.Select(n =>
+						{
+							var candidate = new RemapCandidateInfo
+							{
+								Node = n,
+								File = currentFile,
+								Context = ContextManager.GetContext(n, currentFile)
+							};
+
+							AncestorSiblingsPair pair = null;
+
+							/// Если нужно проверить соседей, проверяем, не закешировали ли их
+							if (checkSiblings)
+							{
+								/// Ищем предка, относительно которого нужно искать соседей
+								var ancestor = PointContext.GetAncestor(n) 
+									?? (n != currentFile.Root ? currentFile.Root : null);
+
+								/// Если таковой есть, пытаемся найти инфу о нём в кеше
+								if (ancestor != null)
+								{
+									pair = ancestorsCache.ContainsKey(ancestor)
+										? new AncestorSiblingsPair
+										{
+											Ancestor = ancestor,
+											Siblings = ancestorsCache[ancestor].Children
+										}
+										: new AncestorSiblingsPair
+										{
+											Ancestor = ancestor
+										};
+								}
+
+								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(n, currentFile, pair);
+								candidateAncestor[candidate] = ancestor;
+
+								if (ancestor != null && !ancestorsCache.ContainsKey(ancestor))
+								{
+									ancestorsCache[ancestor] = new AncestorCacheElement
+									{
+										Children = pair.Siblings,
+										PreprocessedChildren = pair.Siblings.ToLookup(e => e.Type, e =>
+											  new Tuple<int, byte[]>(e.Location.Start.Offset, PointContext.GetHash(e, currentFile)))
+									};
+								}
+							}
+
+							return candidate;
+						})
+						.ToList()
+					);
+				}
 			}
+
+			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			foreach (var type in points.Keys)
+			{
+				var currentResult = DoSingleSearch(points[type], candidates[type], 
+					searchType, ancestorsCache, candidateAncestor);
+
+				foreach(var kvp in currentResult)
+				{
+					result[kvp.Key] = kvp.Value;
+				}
+			}
+
+			return result;
+		}
+
+		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSingleSearch(
+			List<ConcernPoint> points, 
+			List<RemapCandidateInfo> candidates,
+			SearchType searchType,
+			Dictionary<Node, AncestorCacheElement> ancestorsCache,
+			Dictionary<RemapCandidateInfo, Node> candidateAncestor)
+		{
+			var checkSiblings = searchType == SearchType.Local;
+			var checkClosest = searchType == SearchType.Local;
 
 			/// Запоминаем соответствие контекстов точкам привязки
 			var contextsToPoints = points.GroupBy(p => p.Context)
-				.ToDictionary(g=>g.Key, g=>g.ToList());
+				.ToDictionary(g => g.Key, g => g.ToList());
 
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 			var evaluated = new Dictionary<PointContext, List<RemapCandidateInfo>>();
@@ -215,34 +250,35 @@ namespace Land.Markup.Binding
 			/// если находим 100% соответствие, исключаем кандидата из списка
 			foreach (var pointContext in contextsToPoints.Keys)
 			{
-				var fileComparisonResults = checkSiblings
-					? commonFileComparisonResults.ToDictionary(e=>e.Key, e=>new FileComparisonResult
-					{
-						Similarity = e.Value.Item1.Similarity,
-						HasSameName = e.Value.Item1.HasSameName,
-						BeforeSiblingOffset = pointContext.SiblingsContext.Before.IsNotEmpty 
-							? e.Value.Item2[pointContext.SiblingsContext.Before.EntityType]
-								.FirstOrDefault(t=>t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityHash))?.Item1
-							: null,
-						AfterSiblingOffset = pointContext.SiblingsContext.After.IsNotEmpty
-							? e.Value.Item2[pointContext.SiblingsContext.After.EntityType]
-								.FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityHash))?.Item1
-							: null
-					})
-					: commonFileComparisonResults.ToDictionary(e=>e.Key, e=>e.Value.Item1);
-
 				var currentCandidates = candidates
-					.Select(c => new RemapCandidateInfo { 
-						Node = c.Node, 
-						File = c.File, 
-						Context = c.Context, 
-						FileComparisonResult = fileComparisonResults[c.File.Name]
+					.Select(c => new RemapCandidateInfo
+					{
+						Node = c.Node,
+						File = c.File,
+						Context = c.Context,
+						SiblingsSearchResult = checkSiblings ? new SiblingsSearchResult
+						{
+							BeforeSiblingOffset = pointContext.SiblingsContext.Before.IsNotEmpty && candidateAncestor[c] != null
+							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.Before.EntityType]
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityHash))?.Item1
+							  : null,
+							AfterSiblingOffset = pointContext.SiblingsContext.After.IsNotEmpty && candidateAncestor[c] != null
+							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.After.EntityType]
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityHash))?.Item1
+							  : null
+						} : null
 					})
 					.ToList();
 
-				ComputeSimilarities(pointContext, currentCandidates, checkSiblings);
+				ComputeSimilarities(
+					pointContext,
+					currentCandidates,
+					checkSiblings
+				);
 
-				var bestMatch = currentCandidates.FirstOrDefault(c=>c.Similarity == 1);
+				/// TODO Подсчёт конечной похожести при помощи нейросетки
+
+				var bestMatch = currentCandidates.FirstOrDefault(c => c.Similarity == 1);
 
 				if (bestMatch?.Similarity == 1)
 				{
@@ -253,9 +289,9 @@ namespace Land.Markup.Binding
 					{
 						list.RemoveAt(bestMatchIdx);
 					}
-					foreach(var list in result.Values.Distinct())
+					foreach (var list in result.Values.Distinct())
 					{
-						list.RemoveAll(e=>e.Context == bestMatch.Context);
+						list.RemoveAll(e => e.Context == bestMatch.Context);
 					}
 
 					currentCandidates = currentCandidates.OrderByDescending(c => c.Similarity).ToList();
@@ -272,31 +308,28 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			/// Признак того, что не нужно искать оптимальное паросочетание
-			var ignoreClosest = searchType == SearchType.Global;
-
-			if (!ignoreClosest)
+			if (checkClosest)
 			{
 				/// Для точек, 100% соответствие которым не найдено, 
 				/// считаем похожести ближайших на кандидатов
 				foreach (var pointContext in evaluated.Keys
-					.SelectMany(p=>p.ClosestContext).Distinct()
+					.SelectMany(p => p.ClosestContext).Distinct()
 					.Except(evaluated.Keys)
-					.Except(result.Select(e=>e.Key.Context))
+					.Except(result.Select(e => e.Key.Context))
 					.ToList())
 				{
 					evaluated[pointContext] = ComputeSimilarities(
 						pointContext,
 						candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
-						searchType == SearchType.Local
+						false
 					);
 				}
 
 				var resultsForEvaluated = OptimizeEvaluationResults(evaluated, contextsToPoints);
 
-				foreach(var elem in resultsForEvaluated)
+				foreach (var elem in resultsForEvaluated)
 				{
-					result[elem.Key] = elem.Value; 
+					result[elem.Key] = elem.Value;
 				}
 			}
 			else
@@ -319,7 +352,7 @@ namespace Land.Markup.Binding
 		{
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			if(evaluationResults.Count == 0)
+			if (evaluationResults.Count == 0)
 			{
 				return result;
 			}
@@ -332,7 +365,7 @@ namespace Land.Markup.Binding
 			{
 				var perfectMatch = evaluationResults[src].FirstOrDefault(e => e.Similarity == 1);
 
-				if(perfectMatch != null)
+				if (perfectMatch != null)
 				{
 					var candidateIndex = evaluationResults[src].IndexOf(perfectMatch);
 					evaluationResults.Remove(src);
@@ -489,18 +522,19 @@ namespace Land.Markup.Binding
 		}
 
 		public List<RemapCandidateInfo> ComputeSimilarities(
-			PointContext point, 
+			PointContext point,
 			List<RemapCandidateInfo> candidates,
 			bool checkSiblings)
 		{
 			Parallel.ForEach(
 				candidates,
-				c => {
+				c =>
+				{
 					ComputeCoreSimilarities(point, c);
 
-					if(checkSiblings)
+					if (checkSiblings)
 					{
-						c.SiblingsSimilarity = 
+						c.SiblingsSimilarity =
 							EvalSimilarity(point.SiblingsContext, c.Context.SiblingsContext);
 					}
 				}
@@ -517,20 +551,56 @@ namespace Land.Markup.Binding
 			List<ParsedFile> searchArea,
 			SearchType searchType)
 		{
-			var groupedPoints = points
-				.GroupBy(p => new { p.Context.Type, FileName = p.Context.FileContext.Name })
-				.ToDictionary(e=>e.Key, e=>e.ToList());
+			List<ParsedFile> files = null;
+			Dictionary<string, List<ConcernPoint>> groupedByType = null;
 
 			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			foreach (var groupKey in groupedPoints.Keys)
+			switch (searchType)
 			{
-				var groupResult = DoSearch(groupedPoints[groupKey], searchArea, searchType);
+				case SearchType.Global:
+					groupedByType = points
+						.GroupBy(p => p.Context.Type)
+						.ToDictionary(e => e.Key, e => e.ToList());
+					files = searchArea;
 
-				foreach(var elem in groupResult)
-				{
-					overallResult[elem.Key] = elem.Value;
-				}
+					var globalResult = DoGroupSearch(groupedByType, files, searchType);
+
+					foreach (var elem in globalResult)
+					{
+						overallResult[elem.Key] = elem.Value;
+					}
+
+					break;
+				case SearchType.Local:
+					var groupedPoints = points
+						.GroupBy(p => p.Context.FileContext)
+						.ToDictionary(e => e.Key, e =>
+							e.GroupBy(p => p.Context.Type).ToDictionary(el => el.Key, el => el.ToList())
+						);
+
+					foreach (var file in groupedPoints.Keys)
+					{
+						/// При поиске в том же файле ищем тот же файл по полному совпадению пути,
+						/// если не находим - берём файлы, похожие по содержимому
+						files = searchArea.Where(f => f.Name == file.Name).ToList();
+
+						if (files.Count == 0)
+						{
+							files = searchArea
+								.Where(f => AreFilesSimilarEnough(f.BindingContext, file))
+								.ToList();
+						}
+
+						var localResult = DoGroupSearch(groupedPoints[file], files, searchType);
+
+						foreach (var elem in localResult)
+						{
+							overallResult[elem.Key] = elem.Value;
+						}
+					}
+
+					break;
 			}
 
 			return overallResult;
@@ -596,7 +666,7 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(SiblingsContext a, SiblingsContext b)
 		{
-			if(a.Before.Global.TextLength == 0 && a.After.Global.TextLength == 0)
+			if (a.Before.Global.TextLength == 0 && a.After.Global.TextLength == 0)
 			{
 				return b.Before.Global.TextLength == 0 && b.After.Global.TextLength == 0 ? 1 : 0;
 			}

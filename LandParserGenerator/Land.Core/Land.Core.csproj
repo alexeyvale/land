@@ -91,12 +91,13 @@
     <Compile Include="Core\Lexing\ILexer.cs" />
     <Compile Include="Core\Lexing\ComplexTokenStream.cs" />
     <Compile Include="Core\Lexing\TokenStream.cs" />
-    <Compile Include="Markup\Binding\CandidateFeatures.cs" />
+    <Compile Include="Markup\Binding\Models\CandidateFeatures.cs" />
     <Compile Include="Markup\Binding\ContextFinder.cs" />
     <Compile Include="Markup\Binding\Munkres.cs" />
     <Compile Include="Markup\Binding\PointContextManager.cs" />
-    <Compile Include="Markup\Binding\FileComparisonResult.cs" />
-    <Compile Include="Markup\Binding\RemapCandidateInfo.cs" />
+    <Compile Include="Markup\Binding\Models\AncestorCacheElement.cs" />
+    <Compile Include="Markup\Binding\Models\SiblingsSearchResult.cs" />
+    <Compile Include="Markup\Binding\Models\RemapCandidateInfo.cs" />
     <Compile Include="Markup\Binding\FuzzyHashing.cs" />
     <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
