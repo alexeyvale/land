@@ -7,10 +7,17 @@ namespace Land.Markup.Binding
 	public struct CandidateFeatures
 	{
 		#region Флаги существования контекстов
-		public int ExistsH { get; set; }
-		public int ExistsI { get; set; }
-		public int ExistsA { get; set; }
-		public int ExistsS { get; set; }
+		public int ExistsHSeq_Point { get; set; }
+		public int ExistsHCore_Point { get; set; }
+		public int ExistsI_Point { get; set; }
+		public int ExistsA_Point { get; set; }
+		public int ExistsS_Point { get; set; }
+
+		public int ExistsHSeq_Candidate { get; set; }
+		public int ExistsHCore_Candidate { get; set; }
+		public int ExistsI_Candidate { get; set; }
+		public int ExistsA_Candidate { get; set; }
+		public int ExistsS_Candidate { get; set; }
 		#endregion
 
 		#region Похожести текущего кандидата
@@ -45,11 +52,11 @@ namespace Land.Markup.Binding
 
 		#region Максимальные похожести других контекстов у элементов с максимальной похожестью указанного
 		public double MaxSimH_MaxSimI { get; set; }
-		public double MaxSimH_MaxSimA { get; set; }
-		public double MaxSimI_MaxSimH { get; set; }
+		public double MaxSimA_MaxSimI { get; set; }
+		public double MaxSimH_MaxSimA { get; set; }	
 		public double MaxSimI_MaxSimA { get; set; }
 		public double MaxSimA_MaxSimH { get; set; }
-		public double MaxSimA_MaxSimI { get; set; }
+		public double MaxSimI_MaxSimH { get; set; }
 		#endregion
 
 		#region Доля элементов с лучшими похожестями контекстов 
@@ -70,12 +77,11 @@ namespace Land.Markup.Binding
 
 		#region Разные соотношения длин
 		public int IsCandidateInnerContextLonger { get; set; }
-
 		public int IsCandidateHeaderCoreLonger { get; set; }
 
 		public double InnerLengthRatio { get; set; }
-
-		public double InnerLengthRatio1000 { get; set; }
+		public double InnerLengthRatio1000_Point { get; set; }
+		public double InnerLengthRatio1000_Candidate { get; set; }
 
 		public double HeaderCoreLengthRatio { get; set; }
 		#endregion

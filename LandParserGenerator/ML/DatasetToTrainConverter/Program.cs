@@ -199,6 +199,8 @@ namespace DatasetToTrainConverter
 				}
 			}
 
+			Console.WriteLine("Process finished!");
+
 			Console.ReadLine();
 		}
 
