@@ -180,6 +180,13 @@ namespace DatasetToTrainConverter
 								var correctCandidate = pointCandidatesPair.Value.SingleOrDefault(e =>
 									e.Node.Location.Start.Offset == record.TargetOffset);
 
+								if(correctCandidate.HeaderCoreSimilarity == 1 
+									&& correctCandidate.AncestorSimilarity == 1 
+									&& correctCandidate.InnerSimilarity == 1)
+								{
+									continue;
+								}
+
 								if (correctCandidate != null)
 								{
 									correctCandidate.IsAuto = true;
