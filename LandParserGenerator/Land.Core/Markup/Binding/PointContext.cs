@@ -258,17 +258,22 @@ namespace Land.Markup.Binding
 
 	public class PointContext
 	{
+		/// <summary>
+		/// Идентификаторы связанных точек привязки
+		/// </summary>
 		public HashSet<Guid> LinkedPoints { get; private set; } = 
 			new HashSet<Guid>();
 
+		/// <summary>
+		/// Идентификаторы точек привязки, 
+		/// для которых данный контекст описывает ближайшую сущность
+		/// </summary>
 		public HashSet<Tuple<Guid, int>> LinkedClosestPoints { get; private set; } = 
 			new HashSet<Tuple<Guid, int>>();
 
 		public void LinkPoint(Guid pointId)
 		{
 			this.LinkedPoints.Add(pointId);
-
-			/// Проверки на != null нужны для десериализации
 
 			for (var i = 0; i < this.ClosestContext?.Count; ++i)
 			{
@@ -346,7 +351,7 @@ namespace Land.Markup.Binding
 			{
 				_closestContext = value;
 
-				for (var i = 0; i < this.ClosestContext.Count; ++i)
+				for (var i = 0; i < this.ClosestContext?.Count; ++i)
 				{
 					ClosestContext[i].LinkedClosestPoints
 						.UnionWith(LinkedPoints.Select(id => new Tuple<Guid, int>(id, i)));
