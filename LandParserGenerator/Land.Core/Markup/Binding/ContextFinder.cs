@@ -128,7 +128,7 @@ namespace Land.Markup.Binding
 							|| c.Context.InnerContext.Content.TextLength > point.InnerContext.Content.TextLength)),
 						InnerLengthRatio = existsI_Candidate && existsI_Point
 							? Math.Min(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
-								/ Math.Max(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
+								/ (double)Math.Max(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
 							: 0,
 						InnerLengthRatio1000_Point = Math.Min(point.InnerContext.Content.TextLength / (double)1000, 1),
 						InnerLengthRatio1000_Candidate = Math.Min(c.Context.InnerContext.Content.TextLength / (double)1000, 1),
@@ -137,7 +137,7 @@ namespace Land.Markup.Binding
 							|| c.Context.HeaderContext.Words.Count > point.HeaderContext.Words.Count)),
 						HeaderCoreLengthRatio = existsHCore_Point && existsHCore_Candidate
 							? Math.Min(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
-								/ Math.Max(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
+								/ (double)Math.Max(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
 							: 0,
 
 						IsAuto = BoolToInt(c.IsAuto),
