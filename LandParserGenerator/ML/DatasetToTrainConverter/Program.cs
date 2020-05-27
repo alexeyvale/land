@@ -76,22 +76,8 @@ namespace DatasetToTrainConverter
 			{
 				Console.WriteLine($"Current extension: {ext}");
 
-				/// Парсим все исходные и целевые файлы
-				var sourceFiles = groupedRecords[ext].Select(r => r.Key).Distinct()
-					.ToDictionary(e => e, e =>
-					 {
-						 var extension = Path.GetExtension(e);
-						 var text = File.ReadAllText(e);
-
-						 return new ParsedFile
-						 {
-							 Root = parsers[extension].Parse(text),
-							 Text = text,
-							 BindingContext = PointContext.GetFileContext(e, text)
-						 };
-					 });
-
-				Console.WriteLine($"Source files parsed...");
+				var sourceFiles = groupedRecords[ext]
+					.Select(r => r.Key).Distinct().ToList();
 
 				var targetFiles = groupedRecords[ext].SelectMany(r => r.Select(e => e.TargetFilePath)).Distinct()
 					.Select(e =>
@@ -110,36 +96,49 @@ namespace DatasetToTrainConverter
 
 				Console.WriteLine($"Target files parsed...");
 
-				foreach (var sourceFilePair in sourceFiles)
+				foreach (var sourceFilePath in sourceFiles)
 				{
-					Console.WriteLine($"Current source file: {sourceFilePair.Key}");
+					Console.WriteLine($"Current source file: {sourceFilePath}");
+
+					var extension = Path.GetExtension(sourceFilePath);
+					var text = File.ReadAllText(sourceFilePath);
+
+					var sourceParsed =  new ParsedFile
+					{
+						Root = parsers[extension].Parse(text),
+						Text = text,
+						BindingContext = PointContext.GetFileContext(sourceFilePath, text)
+					};
+
+					Console.WriteLine($"Source file parsed...");
 
 					/// Привязываемся ко всему в исходном файле
-					var markupManager = new MarkupManager(name => sourceFiles.ContainsKey(name)
-						? sourceFiles[name] : targetFiles[name]);
+					var markupManager = new MarkupManager(name => sourceParsed.Name == name
+						? sourceParsed : targetFiles[name]);
 
 					var customContextFinder = new CopyPaste.ContextFinder();
 					customContextFinder.GetParsed = markupManager.ContextFinder.GetParsed;
 
 					markupManager.AddLand(
-						sourceFilePair.Value,
-						sourceFiles.Values.ToList()
+						sourceParsed,
+						/// Если в train будем учитывать контекст ближайших, придётся расширить searchArea
+						new List<ParsedFile> { sourceParsed }
 					);
 
 					var allPoints = markupManager.GetConcernPoints();
-					var allFiles = groupedRecords[ext][sourceFilePair.Key]
+					var allFiles = groupedRecords[ext][sourceFilePath]
 						.Select(e => e.TargetFilePath)
 						.Distinct()
 						.Select(e => targetFiles[e])
 						.ToList();
 
 					var similarFiles = allFiles
-						.Where(f => markupManager.ContextFinder.AreFilesSimilarEnough(f.BindingContext, sourceFilePair.Value.BindingContext))
+						.Where(f => markupManager.ContextFinder.AreFilesSimilarEnough(f.BindingContext, sourceParsed.BindingContext))
 						.ToList();
 					var similarFilesNames = new HashSet<string>(similarFiles.Select(f=>f.Name));
 
 					var pointsInSimilarFiles = allPoints.Where(p => similarFilesNames.Contains(
-						groupedRecords[ext][sourceFilePair.Key].SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset)?.TargetFilePath
+						groupedRecords[ext][sourceFilePath].SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset)?.TargetFilePath
 					)).ToList();
 
 					var localSearchResult = customContextFinder.Find(pointsInSimilarFiles, similarFiles, 
@@ -171,7 +170,7 @@ namespace DatasetToTrainConverter
 						foreach(var pointCandidatesPair in typePointsPair)
 						{
 							/// находим запись в датасете о корректном сопоставлении
-							var record = groupedRecords[ext][sourceFilePair.Key]
+							var record = groupedRecords[ext][sourceFilePath]
 									.SingleOrDefault(e => e.SourceOffset == pointCandidatesPair.Key.AstNode.Location.Start.Offset);
 
 							/// если запись нашли и корректное сопоставление есть в одном из анализируемых файлов
@@ -213,15 +212,6 @@ namespace DatasetToTrainConverter
 
 		private static string GetAbsolutePath(string directryPath, string filePath) =>
 			Path.Combine(directryPath, filePath);
-
-		private static string GetRelativePath(string directoryPath, string filePath)
-		{
-			var directoryUri = new Uri(directoryPath + "/");
-
-			return Uri.UnescapeDataString(
-				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
-			);
-		}
 
 		private static LandExplorerSettings LoadSettings(string path)
 		{
