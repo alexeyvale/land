@@ -2,11 +2,11 @@
 using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Markup.Binding;
+using Land.Markup.CoreExtension;
 using ManualRemappingTool.Properties;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -24,6 +24,7 @@ namespace ManualRemappingTool
 	{
 		#region Consts
 
+		private const int RECORDS_TREE_PAGE_SIZE = 10;
 		private const int MIN_FONT_SIZE = 8;
 		private const int MAX_FONT_SIZE = 40;
 
@@ -43,6 +44,18 @@ namespace ManualRemappingTool
 		private MappingHelper Mapper { get; set; } = new MappingHelper();
 
 		public List<Tuple<string, List<Tuple<string, List<DatasetRecord>>>>> RecordsToView { get; private set; }
+
+		public static readonly DependencyProperty RecordsPageIdxProperty = DependencyProperty.Register(
+			"RecordsPageIdx",
+			typeof(int),
+			typeof(MainWindow),
+			new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault)
+		);
+		public int RecordsPageIdx
+		{
+			get => (int)GetValue(RecordsPageIdxProperty);
+			set { SetValue(RecordsPageIdxProperty, value); }
+		}
 
 		public MainWindow()
 		{
@@ -191,22 +204,26 @@ namespace ManualRemappingTool
 					SourceFileView.EntityType
 				);
 
-				var nestedInSourceEntity = SourceFileView.AvailableEntities
-					.Where(el => SourceFileView.EntityLocation.Includes(el.Location)
-						&& SourceFileView.EntityLocation != el.Location)
-					.ToList();
-				var nestedInTargetEntity = TargetFileView.AvailableEntities
-					.Where(el => TargetFileView.EntityLocation.Includes(el.Location)
-						&& TargetFileView.EntityLocation != el.Location)
-					.ToList();
-
 				DoAutoMapping(
-					Path.GetExtension(SourceFileView.FilePath),
-					nestedInSourceEntity, 
-					nestedInTargetEntity,
+					Path.GetExtension(SourceFileView.FilePath),				
 					SourceFileView.EntityNode, 
-					TargetFileView.EntityNode
+					TargetFileView.EntityNode,
+					null, null, false
 				);
+
+				if (SourceFileView.AvailableEntities.Count == 0)
+				{
+					Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
+				}
+
+				Control_MessageSent(null, new MessageSentEventArgs
+				{
+					Message = $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия",
+					Type = MessageType.Info
+				});
+
+				UpdateIsFinalizedCheckBox();
+				UpdateRecordsTree();
 
 				SourceFileView.ShiftToEntity(FileViewer.ShiftDirection.Next, true, false);
 				TargetFileView.ResetEntity();
@@ -270,58 +287,46 @@ namespace ManualRemappingTool
 
 				do
 				{
-					var targetPath = Path.Combine(
-						TargetFileView.WorkingDirectory, 
-						SourceFileView.FileRelativePath
-					);
-
-					if (File.Exists(targetPath))
+					if (e.AvailableOnly
+						&& e.Direction.HasValue
+						&& (SourceFileView.AvailableEntities.Count == 0
+							|| Dataset.FinalizedFiles.Contains(SourceFileView.FileRelativePath)))
 					{
-						TargetFileView.OpenFile(targetPath);
+						/// Открываем новый исходный файл в том же направлении
+						SourceFileView.ShiftToFile(e.Direction.Value, true, false);
 
-						DoAutoMapping(
-							Path.GetExtension(SourceFileView.FilePath),
-							SourceFileView.AvailableEntities,
-							TargetFileView.AvailableEntities
-						);
-
-						/// Если после автопоиска соответствия не осталось несопоставленных сущностей или файл финализован
-						/// и открытие исходного файла было направленным
-						if (e.AvailableOnly
-							&& e.Direction.HasValue
-							&& (SourceFileView.AvailableEntities.Count == 0
-								|| Dataset.FinalizedFiles.Contains(SourceFileView.FileRelativePath)))
-						{
-							/// Открываем новый исходный файл в том же направлении
-							SourceFileView.ShiftToFile(e.Direction.Value, true, false);
-
-							if (SourceFileView.FileRelativePath == initialSourceFilePath) { break; }
-						}
-						else
-						{
-							break;
-						}
+						/// Если прошли полный круг, открываем файл, парный изначальному
+						if (SourceFileView.FileRelativePath == initialSourceFilePath) { break; }
 					}
-					else
-					{
-						Control_MessageSent(null, new MessageSentEventArgs
-						{
-							Message = "Парный файл отсутствует",
-							Type = MessageType.Error
-						});
-
-						break;
-					}
+					else { break; }
 				}
 				while (true);
 			}
+
+			Control_MessageSent(null, new MessageSentEventArgs
+			{
+				Message = $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия",
+				Type = MessageType.Info
+			});
+
+			UpdateIsFinalizedCheckBox();
+
+			var targetPath = Path.Combine(
+				TargetFileView.WorkingDirectory,
+				SourceFileView.FileRelativePath
+			);
+
+			if (File.Exists(targetPath))
+			{
+				TargetFileView.OpenFile(targetPath);
+			}
 			else
 			{
-				DoAutoMapping(
-					Path.GetExtension(SourceFileView.FilePath),
-					SourceFileView.AvailableEntities, 
-					TargetFileView.AvailableEntities
-				);
+				Control_MessageSent(null, new MessageSentEventArgs
+				{
+					Message = "Парный файл отсутствует",
+					Type = MessageType.Error
+				});
 			}
 		}
 
@@ -344,12 +349,6 @@ namespace ManualRemappingTool
 					});
 				}
 			}
-
-			DoAutoMapping(
-				Path.GetExtension(SourceFileView.FilePath),
-				SourceFileView.AvailableEntities, 
-				TargetFileView.AvailableEntities
-			);
 		}
 
 		private void Control_MessageSent(object sender, MessageSentEventArgs e)
@@ -384,6 +383,70 @@ namespace ManualRemappingTool
 			}
 		}
 
+		private void RunAutoRemapForPair_Click(object sender, RoutedEventArgs e)
+		{
+			DoAutoMapping(
+				Path.GetExtension(SourceFileView.FilePath),
+				SourceFileView.TreeRoot,
+				TargetFileView.TreeRoot,
+				null, null, true
+			);
+
+			if (SourceFileView.AvailableEntities.Count == 0)
+			{
+				Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
+			}
+
+			Control_MessageSent(null, new MessageSentEventArgs
+			{
+				Message = $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия",
+				Type = MessageType.Info
+			});
+
+			UpdateIsFinalizedCheckBox();
+
+			UpdateRecordsTree();
+		}
+
+		private void RunAutoRemapForAll_Click(object sender, RoutedEventArgs e)
+		{
+			for(var i=0; i<SourceFileView.WorkingDirectoryFiles.Count; ++i)
+			{
+				SourceFileView.OpenFile(SourceFileView.WorkingDirectoryFiles[i]);
+
+				var targetPath = Path.Combine(
+					TargetFileView.WorkingDirectory,
+					SourceFileView.FileRelativePath
+				);
+
+				TargetFileView.OpenFile(targetPath);
+
+				if (File.Exists(targetPath))
+				{
+					DoAutoMapping(
+						Path.GetExtension(SourceFileView.FilePath),
+						SourceFileView.TreeRoot,
+						TargetFileView.TreeRoot,
+						null, null, true
+					);
+
+					if (SourceFileView.AvailableEntities.Count == 0)
+					{
+						Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
+					}
+				}
+			}
+
+			Control_MessageSent(null, new MessageSentEventArgs
+			{
+				Type = MessageType.Info,
+				Message = $"Проверено {SourceFileView.WorkingDirectoryFiles.Count} файлов, требуют ручной проверки {SourceFileView.WorkingDirectoryFiles.Count - Dataset.FinalizedFiles.Count}"
+			});
+
+			UpdateIsFinalizedCheckBox();
+			UpdateRecordsTree();
+		}
+
 		private void TreeViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			var treeItem = (TreeViewItem)sender;
@@ -401,12 +464,6 @@ namespace ManualRemappingTool
 
 					SourceFileView.OpenFile(sourcePath);
 					TargetFileView.OpenFile(targetPath);
-
-					DoAutoMapping(
-						Path.GetExtension(SourceFileView.FilePath),
-						SourceFileView.AvailableEntities, 
-						TargetFileView.AvailableEntities
-					);
 
 					SyncEntitiesListAndEditor(SourceFileView, record.SourceOffset, record.EntityType);
 					SyncEntitiesListAndEditor(TargetFileView, record.TargetOffset, record.EntityType);
@@ -499,6 +556,7 @@ namespace ManualRemappingTool
 
 		private void TreeFilters_Changed(object sender, RoutedEventArgs e)
 		{
+			RecordsPageIdx = 0;
 			UpdateRecordsTree();
 		}
 
@@ -529,6 +587,28 @@ namespace ManualRemappingTool
 			}
 		}
 
+		private void PrevTreePageButton_Click(object sender, RoutedEventArgs e)
+		{
+			var oldIdx = RecordsPageIdx;
+			RecordsPageIdx = Math.Max(0, RecordsPageIdx - 1);
+
+			if (RecordsPageIdx != oldIdx)
+			{
+				UpdateRecordsTree();
+			}
+		}
+
+		private void NextTreePageButton_Click(object sender, RoutedEventArgs e)
+		{
+			var oldIdx = RecordsPageIdx;
+			RecordsPageIdx = Math.Min(RecordsPageIdx + 1,(int)Math.Floor(GetRecordsTreeCount() / (double)RECORDS_TREE_PAGE_SIZE));
+
+			if (RecordsPageIdx != oldIdx)
+			{
+				UpdateRecordsTree();
+			}
+		}
+
 		#region Helpers
 
 		private void SyncEntitiesListAndEditor(FileViewer fileViewer, int pffset, string type)
@@ -550,71 +630,123 @@ namespace ManualRemappingTool
 			);
 		}
 
+		/// <summary>
+		/// Автоматическое сопоставление всего, что можно автоматически сопоставить
+		/// </summary>
+		/// <param name="extension">Расширение файла, элементы из которого сопоставляются</param>
+		/// <param name="sourceRoot">Корень поддерева, которое рассматриваем в исходном файле</param>
+		/// <param name="targetRoot">Корень поддерева, которое рассматриваем в модифицированном файле</param>
+		/// <param name="sourceCandidates">Островные элементы из исходного файла</param>
+		/// <param name="targetCandidates">Островные элементы из целевого файла</param>
+		/// <param name="checkRoot"></param>
+		/// <param name="visualUpdate"></param>
 		private void DoAutoMapping(
 			string extension,
-			List<Node> sourceEntities, 
-			List<Node> targetEntities,
-			Node sourceParentRestrictor = null,
-			Node targetParentRestrictor = null)
+			Node sourceRoot,
+			Node targetRoot,
+			List<MappingElement> sourceCandidates = null,
+			List<MappingElement> targetCandidates = null,
+			bool checkRoot = true)
 		{
-			var sourceAncestorRestrictor = sourceParentRestrictor != null
-				? (AncestorsContextElement)sourceParentRestrictor : null;
-			var targetAncestorRestrictor = targetParentRestrictor != null
-				? (AncestorsContextElement)targetParentRestrictor : null;
+			var sourceAncestorRestrictor = (AncestorsContextElement)sourceRoot;
+			var targetAncestorRestrictor = (AncestorsContextElement)targetRoot;
 
-			var candidates = targetEntities
-				.GroupBy(n => n.Type)
-				.ToDictionary(g => g.Key, g => g.Select(e => new MappingElement
-				{
-					Node = e,
-					Header = PointContext.GetHeaderContext(e),		
-					Ancestors = PointContext.GetAncestorsContext(e)
-						.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList()
-				}).ToList());
-
-			var unmapped = sourceEntities
-				.Select(e => new MappingElement
-				{
-					Node = e,
-					Header = PointContext.GetHeaderContext(e),
-					Ancestors = PointContext.GetAncestorsContext(e)
-						.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList()
-				})
-				.Where(e => e.Header.Sequence.Count > 0 
-					&& candidates.ContainsKey(e.Node.Type))
-				.ToList();
-
-			foreach (var elem in unmapped)
+			if (sourceCandidates == null)
 			{
-				var targetElement = Mapper[extension].GetSameElement(elem, candidates[elem.Node.Type]);
+				var visitor = new LandExplorerVisitor();
+				sourceRoot.Accept(visitor);
+				var sourceLand = visitor.Land;
 
-				if(targetElement != null)
+				/// В качестве элементов, которые нужно смаппить, рассматриваем ещё не смапленные элементы
+				sourceCandidates = sourceLand
+					.Select(e => new MappingElement
+					{
+						Node = e,
+						Header = PointContext.GetHeaderContext(e),
+						Ancestors = PointContext.GetAncestorsContext(e)
+							.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList()
+					})
+					.ToList();
+			}
+			else
+			{
+				foreach(var elem in sourceCandidates)
+				{
+					elem.Ancestors = elem.Ancestors
+						.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList();
+				}
+			}
+
+			if (!checkRoot)
+			{
+				var rootElement = sourceCandidates.FirstOrDefault(c => c.Node == sourceRoot);
+				sourceCandidates.Remove(rootElement);
+			}
+
+			if (targetCandidates == null)
+			{
+				var visitor = new LandExplorerVisitor();
+				targetRoot.Accept(visitor);
+				var targetLand = visitor.Land;
+
+				targetCandidates = targetLand
+					.Select(e => new MappingElement
+					{
+						Node = e,
+						Header = PointContext.GetHeaderContext(e),
+						Ancestors = PointContext.GetAncestorsContext(e)
+							.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList()
+					})
+					.ToList();
+			}
+			else
+			{
+				foreach (var elem in targetCandidates)
+				{
+					elem.Ancestors = elem.Ancestors
+						.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList();
+				}
+			}
+
+			for (var i = 0; i < sourceCandidates.Count; ++i)
+			{
+				var targetElement = Mapper[extension].GetSameElement(
+					sourceCandidates[i], 
+					sourceCandidates, 
+					targetCandidates, 
+					out bool hasDoubts
+				);
+
+				if (targetElement != null)
 				{
 					Dataset.Add(
 						SourceFileView.FileRelativePath,
 						TargetFileView.FileRelativePath,
-						elem.Node.Location.Start.Offset,
+						sourceCandidates[i].Node.Location.Start.Offset,
 						targetElement.Node.Location.Start.Offset,
-						elem.Node.Type
+						sourceCandidates[i].Node.Type,
+						hasDoubts
 					);
 
-					candidates[elem.Node.Type].Remove(targetElement);
+					if (!hasDoubts)
+					{
+						var inner = sourceCandidates.Skip(i + 1)
+							.TakeWhile(c => sourceCandidates[i].Node.Location.Includes(c.Node.Location)).ToList();						
+
+						DoAutoMapping(
+							extension,
+							sourceCandidates[i].Node,
+							targetElement.Node,
+							inner,
+							targetCandidates.SkipWhile(e=>e != targetElement).Skip(1)
+								.TakeWhile(c => targetElement.Node.Location.Includes(c.Node.Location)).ToList(),
+							false
+						);
+
+						i += inner.Count;
+					}
 				}
 			}
-
-			Control_MessageSent(null, new MessageSentEventArgs
-			{
-				Message = $"Осталось {SourceFileView.AvailableEntities.Count} сущностей без соответствия",
-				Type = MessageType.Info
-			});
-
-			if (SourceFileView.AvailableEntities.Count == 0)
-			{
-				Dataset.FinalizedFiles.Add(SourceFileView.FileRelativePath);
-			}
-			UpdateIsFinalizedCheckBox();
-
-			UpdateRecordsTree();
 		}
 
 		private bool IsSourceEntityAvailable(Node node) =>
@@ -701,23 +833,34 @@ namespace ManualRemappingTool
 			RecordsToView = Dataset?.Records
 				.Where(e => (!(ShowNotFinalizedOnlyCheckBox.IsChecked ?? false) || !Dataset.FinalizedFiles.Contains(e.Key))
 					&& (String.IsNullOrEmpty(FileNameFilter.Text) || e.Key.ToLower().Contains(FileNameFilter.Text.ToLower())))
+				.Skip(RECORDS_TREE_PAGE_SIZE * RecordsPageIdx)
+				.Take(RECORDS_TREE_PAGE_SIZE)
 				.Select(e => new Tuple<string, List<Tuple<string, List<DatasetRecord>>>>(
 					e.Key,
 					e.Value
 						.Select(e1 => new Tuple<string, List<DatasetRecord>>(
-							e1.Key, 
+							e1.Key,
 							e1.Value
-								.Where(e2=>!(ShowDoubtsOnlyCheckBox.IsChecked ?? false) || e2.HasDoubts)
+								.Where(e2 => !(ShowDoubtsOnlyCheckBox.IsChecked ?? false) || e2.HasDoubts)
 								.OrderBy(e2 => e2.SourceOffset)
 								.ToList()
 						))
-						.Where(e1=>e1.Item2.Count > 0)
+						.Where(e1 => e1.Item2.Count > 0)
 						.ToList()
 				))
-				.Where(e=>e.Item2.Count > 0)
+				.Where(e => e.Item2.Count > 0)
 				.ToList();
 
 			DatasetTree.ItemsSource = RecordsToView;
+		}
+
+		private int GetRecordsTreeCount()
+		{
+			return Dataset?.Records
+				.Where(e => (!(ShowNotFinalizedOnlyCheckBox.IsChecked ?? false) || !Dataset.FinalizedFiles.Contains(e.Key))
+					&& (String.IsNullOrEmpty(FileNameFilter.Text) || e.Key.ToLower().Contains(FileNameFilter.Text.ToLower()))
+					&& (!(ShowDoubtsOnlyCheckBox.IsChecked ?? false) || e.Value.Any(tf => tf.Value.Any(r => r.HasDoubts))))
+				.Count() ?? 0;
 		}
 
 		private void UpdateIsFinalizedCheckBox()

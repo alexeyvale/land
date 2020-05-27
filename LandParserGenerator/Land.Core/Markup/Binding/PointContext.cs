@@ -503,6 +503,7 @@ namespace Land.Markup.Binding
 					}
 					else
 					{
+						/// TODO Вспомнить, почему тут так написано, и написать комментарий
 						if (current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
 						{
 							for (var i = current.Children.Count - 2; i >= 1; --i)

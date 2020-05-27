@@ -1,4 +1,5 @@
-﻿using Land.Markup.Binding;
+﻿using Land.Core.Parsing.Tree;
+using Land.Markup.Binding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,17 +34,25 @@ namespace ManualRemappingTool
 	public abstract  class MappingRule
 	{
 		public abstract MappingElement GetSameElement(
-			MappingElement sourceElement, 
-			List<MappingElement> candidates);
+			MappingElement sourceElement,
+			List<MappingElement> allSourceElements,
+			List<MappingElement> candidates,
+			out bool hasDoubts);
 	}
 
 	public class DefaultRule: MappingRule
 	{
 		public override MappingElement GetSameElement(
-			MappingElement sourceElement, 
-			List<MappingElement> candidates) =>
-			candidates.FirstOrDefault(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
+			MappingElement sourceElement,
+			List<MappingElement> allSourceElements,
+			List<MappingElement> candidates,
+			out bool hasDoubts)
+		{
+			hasDoubts = false;
+
+			return candidates.FirstOrDefault(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors));
+		}
 	}
 
 	public class CSharpRule : MappingRule
@@ -65,13 +74,34 @@ namespace ManualRemappingTool
 			}
 		}
 
-		public override MappingElement GetSameElement(MappingElement sourceElement, List<MappingElement> candidates)
+		public override MappingElement GetSameElement(
+			MappingElement sourceElement, 
+			List<MappingElement> allSourceElements,
+			List<MappingElement> candidates,
+			out bool hasDoubts)
 		{
-			var sameName = candidates.Where(c => c.Header.Core.SequenceEqual(sourceElement.Header.Core)
+			/// Если анализируемый элемент не единственный с таким же именем, есть сомнения
+			hasDoubts = allSourceElements.Where(c => sourceElement.Node.Type == c.Node.Type 
+				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
+				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).Count() > 1;
+
+			/// Ищем кандидатов с таким же именем, как у сопоставляемого элемента
+			var sameNameCandidates = candidates.Where(c => sourceElement.Node.Type == c.Node.Type 
+				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).ToList();
 
-			return sameName.Count == 1 
-				? sameName[0] : (new DefaultRule()).GetSameElement(sourceElement, sameName);
+			if(sameNameCandidates.Count > 1)
+			{
+				var defaultMatch = (new DefaultRule())
+					.GetSameElement(sourceElement, allSourceElements, sameNameCandidates, out bool defaultHasDoubts);
+
+				hasDoubts &= defaultHasDoubts;
+				return defaultMatch ?? sameNameCandidates[0];
+			}
+			else
+			{
+				return sameNameCandidates.FirstOrDefault();
+			}
 		}
 	}
 }

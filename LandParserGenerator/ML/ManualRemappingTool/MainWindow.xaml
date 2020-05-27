@@ -87,7 +87,11 @@
 							  ToolTip="Пометить исходный файл как окончательно обработанный"
 							  Checked="FinalizeFileButton_CheckedChanged" Unchecked="FinalizeFileButton_CheckedChanged"/>
 					<Button Name="SyncViewsButton" Content="&#xf24e;" Margin="0 20 0 5" ToolTip="Синхронизировать вертикальное смещение" Style="{StaticResource IconButtonStyle}"
-					Click="SyncViewsButton_Click"></Button>
+						Click="SyncViewsButton_Click"></Button>
+					<Button Name="RunAutoRemapForPair" Content="AP" Margin="0 20 0 5" ToolTip="Выполнить автоматическое сопоставление для текущей пары" Style="{StaticResource IconButtonStyle}"
+						Click="RunAutoRemapForPair_Click"></Button>
+					<Button Name="RunAutoRemapForAll" Content="AA" ToolTip="Выполнить автоматическое сопоставление для всех файлов" Style="{StaticResource IconButtonStyle}"
+						Click="RunAutoRemapForAll_Click"></Button>
 				</StackPanel>
 
 				<Grid Grid.Column="1">
@@ -95,7 +99,7 @@
 						<RowDefinition Height="35"></RowDefinition>
 						<RowDefinition Height="35"></RowDefinition>
 						<RowDefinition Height="100*"></RowDefinition>
-						<RowDefinition Height="50"></RowDefinition>
+						<RowDefinition Height="70"></RowDefinition>
 						<RowDefinition Height="50"></RowDefinition>
 						<RowDefinition Height="50"></RowDefinition>
 						<RowDefinition Height="25"></RowDefinition>
@@ -154,6 +158,11 @@
 						  Margin="0 5 0 0"
 						  Checked="TreeFilters_Changed"
 						  Unchecked="TreeFilters_Changed"></CheckBox>
+						<StackPanel Margin="0 5 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+							<Button Name="PrevTreePageButton" Style="{StaticResource IconButtonStyle}" Height="24" Background="White" Content="&#xf053;" Click="PrevTreePageButton_Click"></Button>
+							<Label Content="{Binding ElementName=MainWindowObject, Path=RecordsPageIdx}"></Label>
+							<Button Name="NextTreePageButton" Style="{StaticResource IconButtonStyle}" Height="24" Background="White" Content="&#xf054;" Click="NextTreePageButton_Click"></Button>
+						</StackPanel>
 					</StackPanel>
 
 					<StackPanel Grid.Row="4" Orientation="Vertical">

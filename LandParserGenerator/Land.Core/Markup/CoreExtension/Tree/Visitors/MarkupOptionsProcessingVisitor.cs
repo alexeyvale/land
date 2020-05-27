@@ -31,7 +31,7 @@ namespace Land.Markup.CoreExtension
 				node.Children.Last().Options.Set(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH, null);
 				node.Children.Last().Options.SetPriority(OptionsExtension.DEFAULT_PRIORITY);
 
-				/// TODO ядро
+				/// TODO Возможно, тут надо как-то обработать опцию core
 			}
 
 			if (Land.Contains(node.Symbol) || Land.Contains(node.Alias))

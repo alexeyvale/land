@@ -52,9 +52,9 @@ namespace ManualRemappingTool
 		/// <summary>
 		/// Корень дерева, соответствующего открытому тексту
 		/// </summary>
-		private Node TreeRoot { get; set; }
+		public Node TreeRoot { get; private set; }
 
-		private List<Node> ExistingEntities { get; set; }
+		public List<Node> ExistingEntities { get; private set; }
 
 		public Func<Node, bool> AvailableEntitiesFilter { get; set; } = (Node n) => true;
 
@@ -70,7 +70,7 @@ namespace ManualRemappingTool
 		/// Список файлов, содержащихся в каталоге, 
 		/// с которым ведётся работа в рамках данного экземпляра просмотрщика
 		/// </summary>
-		private List<string> WorkingDirectoryFiles { get; set; }
+		public List<string> WorkingDirectoryFiles { get; private set; }
 
 		/// <summary>
 		/// Менеджер, предоставляющий парсеры для разбора
@@ -130,8 +130,8 @@ namespace ManualRemappingTool
 			private set { SetValue(FilePathProperty, value); }
 		}
 
-		public string FileRelativePath =>
-			GetRelativePath(FilePath, WorkingDirectory);
+		public string FileRelativePath => !String.IsNullOrEmpty(FilePath) 
+			? GetRelativePath(FilePath, WorkingDirectory) : null;
 
 		public static readonly DependencyProperty AreNextPrevEnabledProperty = DependencyProperty.Register(
 			"AreNextPrevEnabled",
