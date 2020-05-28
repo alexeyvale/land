@@ -281,26 +281,28 @@ namespace ManualRemappingTool
 
 		private void SourceFileView_FileOpened(object sender, FileViewer.FileOpenedEventArgs e)
 		{
-			if (OpenPairCheckBox.IsChecked ?? false)
+			/// Если известно, в каком направлении открываем, и нужно открывать только файлы, 
+			/// в которых осталось что-то не перепривязанное, ищем ближайший не финализированный файл
+			if (e.AvailableOnly && e.Direction.HasValue
+				&& Dataset.FinalizedFiles.Contains(SourceFileView.FileRelativePath))
 			{
-				var initialSourceFilePath = e.FileRelativePath;
+				var currentFileIdx = SourceFileView.WorkingDirectoryFiles.IndexOf(SourceFileView.FilePath)
+					+ SourceFileView.WorkingDirectoryFiles.Count;
+				var directionCoeff = e.Direction == FileViewer.ShiftDirection.Next ? 1 : -1;
 
-				do
+				for (var i = 0; i < SourceFileView.WorkingDirectoryFiles.Count; ++i)
 				{
-					if (e.AvailableOnly
-						&& e.Direction.HasValue
-						&& (SourceFileView.AvailableEntities.Count == 0
-							|| Dataset.FinalizedFiles.Contains(SourceFileView.FileRelativePath)))
-					{
-						/// Открываем новый исходный файл в том же направлении
-						SourceFileView.ShiftToFile(e.Direction.Value, true, false);
+					var nextFilePath = SourceFileView.WorkingDirectoryFiles[
+						(currentFileIdx + (directionCoeff * i)) % SourceFileView.WorkingDirectoryFiles.Count
+					];
 
-						/// Если прошли полный круг, открываем файл, парный изначальному
-						if (SourceFileView.FileRelativePath == initialSourceFilePath) { break; }
+					if (!Dataset.FinalizedFiles.Contains(
+						FileViewer.GetRelativePath(nextFilePath, SourceFileView.WorkingDirectory)))
+					{
+						SourceFileView.OpenFile(nextFilePath);
+						break;
 					}
-					else { break; }
 				}
-				while (true);
 			}
 
 			Control_MessageSent(null, new MessageSentEventArgs
@@ -311,22 +313,25 @@ namespace ManualRemappingTool
 
 			UpdateIsFinalizedCheckBox();
 
-			var targetPath = Path.Combine(
-				TargetFileView.WorkingDirectory,
-				SourceFileView.FileRelativePath
-			);
+			if (OpenPairCheckBox.IsChecked ?? false)
+			{
+				var targetPath = Path.Combine(
+					TargetFileView.WorkingDirectory,
+					SourceFileView.FileRelativePath
+				);
 
-			if (File.Exists(targetPath))
-			{
-				TargetFileView.OpenFile(targetPath);
-			}
-			else
-			{
-				Control_MessageSent(null, new MessageSentEventArgs
+				if (File.Exists(targetPath))
 				{
-					Message = "Парный файл отсутствует",
-					Type = MessageType.Error
-				});
+					TargetFileView.OpenFile(targetPath);
+				}
+				else
+				{
+					Control_MessageSent(null, new MessageSentEventArgs
+					{
+						Message = "Парный файл отсутствует",
+						Type = MessageType.Error
+					});
+				}
 			}
 		}
 

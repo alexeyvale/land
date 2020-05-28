@@ -46,13 +46,13 @@ namespace ManualRemappingTool
 		#endregion
 
 		public void Add(
-				string sourceFilePath,
-				string targetFilePath,
-				int sourceOffset,
-				int targetOffset,
-				string entityType,
-				bool hasDoubts = false
-			)
+			string sourceFilePath,
+			string targetFilePath,
+			int sourceOffset,
+			int targetOffset,
+			string entityType,
+			bool hasDoubts = false
+		)
 		{
 			if (!Records.ContainsKey(sourceFilePath))
 			{

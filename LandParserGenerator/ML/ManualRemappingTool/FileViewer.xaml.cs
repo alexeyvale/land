@@ -479,11 +479,16 @@ namespace ManualRemappingTool
 				.ToList();
 		}
 
+		private void FilePathLabel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			Clipboard.SetText((string)FilePathLabel.Content);
+		}
+
 		#endregion
 
 		#region Helpers
 
-		private Encoding GetEncoding(string filename)
+		public static Encoding GetEncoding(string filename)
 		{
 			using (FileStream fs = File.OpenRead(filename))
 			{
@@ -499,6 +504,15 @@ namespace ManualRemappingTool
 					return Encoding.Default;
 				}
 			}
+		}
+
+		public static string GetRelativePath(string filePath, string directoryPath)
+		{
+			var directoryUri = new Uri(directoryPath + "/");
+
+			return Uri.UnescapeDataString(
+				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
+			);
 		}
 
 		private Node Parse(string fileName, string text)
@@ -519,15 +533,6 @@ namespace ManualRemappingTool
 			}
 
 			return null;
-		}
-
-		private static string GetRelativePath(string filePath, string directoryPath)
-		{
-			var directoryUri = new Uri(directoryPath + "/");
-
-			return Uri.UnescapeDataString(
-				directoryUri.MakeRelativeUri(new Uri(filePath)).ToString()
-			);
 		}
 
 		private List<ConcernPointCandidate> GetEntities(
