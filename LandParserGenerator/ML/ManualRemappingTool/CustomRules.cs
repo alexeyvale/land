@@ -36,8 +36,7 @@ namespace ManualRemappingTool
 		public abstract MappingElement GetSameElement(
 			MappingElement sourceElement,
 			List<MappingElement> allSourceElements,
-			List<MappingElement> candidates,
-			out bool hasDoubts);
+			List<MappingElement> candidates);
 	}
 
 	public class DefaultRule: MappingRule
@@ -45,11 +44,8 @@ namespace ManualRemappingTool
 		public override MappingElement GetSameElement(
 			MappingElement sourceElement,
 			List<MappingElement> allSourceElements,
-			List<MappingElement> candidates,
-			out bool hasDoubts)
+			List<MappingElement> candidates)
 		{
-			hasDoubts = false;
-
 			return candidates.FirstOrDefault(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors));
 		}
@@ -77,11 +73,10 @@ namespace ManualRemappingTool
 		public override MappingElement GetSameElement(
 			MappingElement sourceElement, 
 			List<MappingElement> allSourceElements,
-			List<MappingElement> candidates,
-			out bool hasDoubts)
+			List<MappingElement> candidates)
 		{
 			/// Если анализируемый элемент не единственный с таким же именем, есть сомнения
-			hasDoubts = allSourceElements.Where(c => sourceElement.Node.Type == c.Node.Type 
+			var hasSameNameSources = allSourceElements.Where(c => sourceElement.Node.Type == c.Node.Type 
 				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).Count() > 1;
 
@@ -90,13 +85,9 @@ namespace ManualRemappingTool
 				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
 				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).ToList();
 
-			if(sameNameCandidates.Count > 1)
+			if(hasSameNameSources || sameNameCandidates.Count > 1)
 			{
-				var defaultMatch = (new DefaultRule())
-					.GetSameElement(sourceElement, allSourceElements, sameNameCandidates, out bool defaultHasDoubts);
-
-				hasDoubts &= defaultHasDoubts;
-				return defaultMatch ?? sameNameCandidates[0];
+				return (new DefaultRule()).GetSameElement(sourceElement, allSourceElements, sameNameCandidates);
 			}
 			else
 			{

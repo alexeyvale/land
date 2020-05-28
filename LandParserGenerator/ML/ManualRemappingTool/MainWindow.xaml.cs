@@ -718,8 +718,7 @@ namespace ManualRemappingTool
 				var targetElement = Mapper[extension].GetSameElement(
 					sourceCandidates[i], 
 					sourceCandidates, 
-					targetCandidates, 
-					out bool hasDoubts
+					targetCandidates
 				);
 
 				if (targetElement != null)
@@ -729,27 +728,23 @@ namespace ManualRemappingTool
 						TargetFileView.FileRelativePath,
 						sourceCandidates[i].Node.Location.Start.Offset,
 						targetElement.Node.Location.Start.Offset,
-						sourceCandidates[i].Node.Type,
-						hasDoubts
+						sourceCandidates[i].Node.Type
 					);
 
-					if (!hasDoubts)
-					{
-						var inner = sourceCandidates.Skip(i + 1)
-							.TakeWhile(c => sourceCandidates[i].Node.Location.Includes(c.Node.Location)).ToList();						
+					var inner = sourceCandidates.Skip(i + 1)
+						.TakeWhile(c => sourceCandidates[i].Node.Location.Includes(c.Node.Location)).ToList();						
 
-						DoAutoMapping(
-							extension,
-							sourceCandidates[i].Node,
-							targetElement.Node,
-							inner,
-							targetCandidates.SkipWhile(e=>e != targetElement).Skip(1)
-								.TakeWhile(c => targetElement.Node.Location.Includes(c.Node.Location)).ToList(),
-							false
-						);
+					DoAutoMapping(
+						extension,
+						sourceCandidates[i].Node,
+						targetElement.Node,
+						inner,
+						targetCandidates.SkipWhile(e=>e != targetElement).Skip(1)
+							.TakeWhile(c => targetElement.Node.Location.Includes(c.Node.Location)).ToList(),
+						false
+					);
 
-						i += inner.Count;
-					}
+					i += inner.Count;
 				}
 			}
 		}
