@@ -46,8 +46,10 @@ namespace ManualRemappingTool
 			List<MappingElement> allSourceElements,
 			List<MappingElement> candidates)
 		{
-			return candidates.FirstOrDefault(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
-				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors));
+			var correctCandidates = candidates.Where(c => c.Header.Sequence.SequenceEqual(sourceElement.Header.Sequence)
+				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors)).ToList();
+
+			return correctCandidates.Count == 1 ? correctCandidates[0] : null;
 		}
 	}
 
