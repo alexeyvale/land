@@ -391,6 +391,7 @@ namespace Land.Markup
 				/// восстанавливаем связи с контекстами
 				var concernPoints = GetConcernPoints().ToDictionary(e=>e.Id, e=>e);
 
+				/// Связываем контексты с точками привязки в разметке
 				foreach (var context in unit.PointContexts)
 				{
 					foreach(var id in context.LinkedPoints)
@@ -399,7 +400,8 @@ namespace Land.Markup
 					}
 				}
 
-				foreach(var fileContext in unit.FileContexts)
+				/// Связываем файловые контексты с контекстами точек
+				foreach (var fileContext in unit.FileContexts)
 				{
 					foreach (var id in fileContext.LinkedPoints)
 					{
@@ -407,6 +409,7 @@ namespace Land.Markup
 					}
 				}
 
+				/// Связываем контексты-описания ближайших с контекстами точек
 				foreach (var context in unit.PointContexts)
 				{
 					foreach (var pair in context.LinkedClosestPoints)
@@ -424,6 +427,15 @@ namespace Land.Markup
 						}
 
 						concernPoints[pair.Item1].Context.ClosestContext[pair.Item2] = context;
+					}
+				}
+
+				/// Если у каких-то точек нет ближайших, присваиваем пустой массив
+				foreach(var point in concernPoints.Values)
+				{
+					if(point.Context.ClosestContext == null)
+					{
+						point.Context.ClosestContext = new List<PointContext>();
 					}
 				}
 
