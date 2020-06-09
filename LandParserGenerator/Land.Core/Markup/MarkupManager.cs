@@ -15,9 +15,11 @@ namespace Land.Markup
 {
 	public class MarkupManager
 	{
-		public MarkupManager(Func<string, ParsedFile> getParsed)
+		public MarkupManager(Func<string, ParsedFile> getParsed, IHeuristic remappingHeuristic)
 		{
 			ContextFinder.GetParsed = getParsed;
+			ContextFinder.Heuristic = remappingHeuristic;
+
 			OnMarkupChanged += InvalidateRelations;
 		}
 
@@ -330,12 +332,11 @@ namespace Land.Markup
 
 		public void Serialize(string fileName, bool useRelativePaths)
 		{
-			List<FileContext> fileContexts = null;
+			var pointContexts = GetPointContexts();
+			var fileContexts = new HashSet<FileContext>(pointContexts.Select(e => e.FileContext));
 			
 			if (useRelativePaths)
 			{
-				fileContexts = ContextFinder.ContextManager.GetFileContexts();
-
 				/// Превращаем указанные в точках привязки абсолютные пути в пути относительно файла разметки
 				var directoryUri = new Uri(Path.GetDirectoryName(fileName) + "/");
 
@@ -347,15 +348,13 @@ namespace Land.Markup
 				}
 			}
 
-			using (StreamWriter fs = new StreamWriter(fileName, false))
+			using (StreamWriter fs = new StreamWriter(fileName, false, System.Text.Encoding.UTF8))
 			{
-				var pointContexts = GetPointContexts();
-
 				var unit = new SerializationUnit()
 				{
 					Markup = Markup,
 					PointContexts = pointContexts,
-					FileContexts = new HashSet<FileContext>(pointContexts.Select(e=>e.FileContext)),
+					FileContexts = fileContexts,
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
@@ -390,13 +389,13 @@ namespace Land.Markup
 
 				/// Восстанавливаем обратные связи между потомками и предками,
 				/// восстанавливаем связи с контекстами
-				var points = GetConcernPoints().ToDictionary(e=>e.Id, e=>e);
+				var concernPoints = GetConcernPoints().ToDictionary(e=>e.Id, e=>e);
 
 				foreach (var context in unit.PointContexts)
 				{
 					foreach(var id in context.LinkedPoints)
 					{
-						points[id].Context = context;
+						concernPoints[id].Context = context;
 					}
 				}
 
@@ -404,7 +403,7 @@ namespace Land.Markup
 				{
 					foreach (var id in fileContext.LinkedPoints)
 					{
-						points[id].Context.FileContext = fileContext;
+						concernPoints[id].Context.FileContext = fileContext;
 					}
 				}
 
@@ -412,7 +411,19 @@ namespace Land.Markup
 				{
 					foreach (var pair in context.LinkedClosestPoints)
 					{
-						points[pair.Item1].Context.ClosestContext[pair.Item2] = context;
+						if(concernPoints[pair.Item1].Context.ClosestContext == null)
+						{
+							concernPoints[pair.Item1].Context.ClosestContext = new List<PointContext>();
+						}
+
+						if(concernPoints[pair.Item1].Context.ClosestContext.Count <= pair.Item2)
+						{
+							concernPoints[pair.Item1].Context.ClosestContext.AddRange(Enumerable.Repeat<PointContext>(
+								null, pair.Item2 - concernPoints[pair.Item1].Context.ClosestContext.Count + 1)
+							);
+						}
+
+						concernPoints[pair.Item1].Context.ClosestContext[pair.Item2] = context;
 					}
 				}
 

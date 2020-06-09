@@ -79,12 +79,15 @@ block				=	'{' Any '}'
 
 %markup {
 	land namespace enum class_struct_interface method field property
+	
 	priority(0.1) modifier CLASS_STRUCT_INTERFACE
 	priority(0.8) name
 	priority(0.5) arguments
 	priority(0.3) type
 	priority(0.1) init_value
-	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'	
+	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
+	
 	exactmatch modifier CLASS_STRUCT_INTERFACE
-	core("\\w+(?=($|<[^<]+>$))") name
+	
+	headercore("\\w+(?=($|<[^<]+>$))") name
 }

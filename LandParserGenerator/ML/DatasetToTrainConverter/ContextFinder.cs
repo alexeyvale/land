@@ -334,7 +334,7 @@ namespace DatasetToTrainConverter.CopyPaste
 
 		public double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
 		{
-			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
+			return a.Type == b.Type ? Levenshtein(a.HeaderContext.Sequence, b.HeaderContext.Sequence) : 0;
 		}
 
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)

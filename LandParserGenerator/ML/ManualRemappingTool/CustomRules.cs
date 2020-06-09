@@ -15,8 +15,16 @@ namespace ManualRemappingTool
 			{
 				{
 					"cs",
-					new CSharpRule()
-				}
+					new ProgrammingLanguageMappingRule()
+				},
+				{
+					"java",
+					new ProgrammingLanguageMappingRule()
+				},
+				{
+					"pas",
+					new ProgrammingLanguageMappingRule()
+				},
 			};
 
 		private MappingRule DefaultRule { get; set; } = new DefaultRule();
@@ -53,48 +61,30 @@ namespace ManualRemappingTool
 		}
 	}
 
-	public class CSharpRule : MappingRule
+	public class ProgrammingLanguageMappingRule : MappingRule
 	{
-		private class CSharpAncestorsEqualityComparer : IEqualityComparer<AncestorsContextElement>
-		{
-			public static string GetName(List<HeaderContextElement> e) =>
-				String.Join("", e.Where(he => he.Type == "name").SelectMany(he=>he.Value));
-
-			public bool Equals(AncestorsContextElement x, AncestorsContextElement y)
-			{
-				return x.Type == y.Type 
-					&& GetName(x.HeaderContext) == GetName(y.HeaderContext);
-			}
-
-			public int GetHashCode(AncestorsContextElement obj)
-			{
-				throw new NotImplementedException();
-			}
-		}
-
 		public override MappingElement GetSameElement(
-			MappingElement sourceElement, 
+			MappingElement sourceElement,
 			List<MappingElement> allSourceElements,
 			List<MappingElement> candidates)
 		{
-			/// Если анализируемый элемент не единственный с таким же именем, есть сомнения
-			var hasSameNameSources = allSourceElements.Where(c => sourceElement.Node.Type == c.Node.Type 
-				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
-				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).Count() > 1;
+			var heuristic = new ProgrammingLanguageHeuristic();
+			var element = heuristic.GetSameElement(
+				new PointContext
+				{
+					HeaderContext = sourceElement.Header,
+					AncestorsContext = sourceElement.Ancestors,
+					ClosestContext = allSourceElements.Select(e=>(PointContext)e).ToList()
+				},
+				candidates.Select(e => (RemapCandidateInfo)e).ToList()
+			);
 
-			/// Ищем кандидатов с таким же именем, как у сопоставляемого элемента
-			var sameNameCandidates = candidates.Where(c => sourceElement.Node.Type == c.Node.Type 
-				&& c.Header.Core.SequenceEqual(sourceElement.Header.Core)
-				&& c.Ancestors.SequenceEqual(sourceElement.Ancestors, new CSharpAncestorsEqualityComparer())).ToList();
-
-			if(hasSameNameSources || sameNameCandidates.Count > 1)
+			return new MappingElement
 			{
-				return (new DefaultRule()).GetSameElement(sourceElement, allSourceElements, sameNameCandidates);
-			}
-			else
-			{
-				return sameNameCandidates.FirstOrDefault();
-			}
+				Node = element.Node,
+				Header = element.Context.HeaderContext,
+				Ancestors = element.Context.AncestorsContext
+			};
 		}
 	}
 }

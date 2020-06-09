@@ -95,14 +95,14 @@ namespace Land.Markup.Binding
 	{
 		public string Type { get; set; }
 
-		public List<HeaderContextElement> HeaderContext { get; set; }
+		public HeaderContext HeaderContext { get; set; }
 
 		public override bool Equals(object obj)
 		{
 			if (obj is AncestorsContextElement elem)
 			{
 				return ReferenceEquals(this, elem) || Type == elem.Type
-					&& HeaderContext.SequenceEqual(elem.HeaderContext);
+					&& HeaderContext.Equals(elem.HeaderContext);
 			}
 
 			return false;
@@ -128,7 +128,7 @@ namespace Land.Markup.Binding
 			return new AncestorsContextElement()
 			{
 				Type = node.Type,
-				HeaderContext = PointContext.GetHeaderContext(node).Sequence
+				HeaderContext = PointContext.GetHeaderContext(node)
 			};
 		}
 	}
@@ -154,6 +154,28 @@ namespace Land.Markup.Binding
 		public List<HeaderContextElement> Sequence { get; set; }
 		public List<string> Core { get; set; }
 		public List<string> Words { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			if (obj is HeaderContext elem)
+			{
+				return ReferenceEquals(this, elem) ||
+					Sequence.SequenceEqual(elem.Sequence);
+			}
+
+			return false;
+		}
+
+		public bool EqualsByCore(object obj)
+		{
+			if (obj is HeaderContext elem)
+			{
+				return ReferenceEquals(this, elem) ||
+					Core.SequenceEqual(elem.Core);
+			}
+
+			return false;
+		}
 	}
 
 	#region Old
@@ -313,7 +335,7 @@ namespace Land.Markup.Binding
 			set
 			{
 				_fileContext = value;
-				_fileContext.LinkedPoints.UnionWith(LinkedPoints);
+				_fileContext?.LinkedPoints.UnionWith(LinkedPoints);
 			}
 		}
 
@@ -520,9 +542,9 @@ namespace Land.Markup.Binding
 
 			for(var i=0; i<sequence.Count; ++i)
 			{
-				if(sequence[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CORE))
+				if(sequence[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE))
 				{
-					core.Add(Regex.Match(headerSequence[i].Value, sequence[i].Options.GetCore()).Value);
+					core.Add(Regex.Match(headerSequence[i].Value, sequence[i].Options.GetHeaderCore()).Value);
 				}
 			}
 
@@ -640,17 +662,20 @@ namespace Land.Markup.Binding
 
 			/// Если при подъёме дошли до неостровного корня, 
 			/// и сам элемент не является этим корнем
-			if (parentNode == null && node != file.Root)
-			{
-				parentNode = file.Root;
-			}
-			else
-			{
-				return new SiblingsContext
+			if (parentNode == null)
+			{ 
+				if (node != file.Root)
 				{
-					After = new SiblingsContextPart { Global = new TextOrHash() },
-					Before = new SiblingsContextPart { Global = new TextOrHash() }
-				};
+					parentNode = file.Root;
+				}
+				else
+				{
+					return new SiblingsContext
+					{
+						After = new SiblingsContextPart { Global = new TextOrHash() },
+						Before = new SiblingsContextPart { Global = new TextOrHash() }
+					};
+				}
 			}
 
 			if (pair != null)
@@ -764,17 +789,26 @@ namespace Land.Markup.Binding
 
 			contextFinder.ComputeCoreSimilarities(nodeContext, candidates);
 
-			candidates = nodeContext.HeaderContext.Sequence.Count > 0
+			candidates = nodeContext.HeaderContext.Core.Count > 0
 				? candidates
-					.OrderByDescending(c => c.HeaderSequenceSimilarity)
+					.OrderByDescending(c => c.HeaderCoreSimilarity)
+					.ThenByDescending(c => c.AncestorSimilarity)
 					.Take(MAX_COUNT)
-					.TakeWhile(c => c.HeaderSequenceSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
+					.TakeWhile(c => c.HeaderCoreSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
 					.ToList()
-				: candidates
-					.OrderByDescending(c => c.InnerSimilarity)
-					.Take(MAX_COUNT)
-					.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
-					.ToList();
+				: nodeContext.HeaderContext.Sequence.Count > 0
+					? candidates
+						.OrderByDescending(c => c.HeaderSequenceSimilarity)
+						.ThenByDescending(c => c.AncestorSimilarity)
+						.Take(MAX_COUNT)
+						.TakeWhile(c => c.HeaderSequenceSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
+						.ToList()
+					: candidates
+						.OrderByDescending(c => c.InnerSimilarity)
+						.ThenByDescending(c => c.AncestorSimilarity)
+						.Take(MAX_COUNT)
+						.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
+						.ToList();
 
 			return candidates.Select(c=>c.Context).ToList();
 		}

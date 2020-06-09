@@ -5,6 +5,7 @@ using System.IO;
 using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Land.Markup.Binding
 {
@@ -21,6 +22,8 @@ namespace Land.Markup.Binding
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
 		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
+
+		public IHeuristic Heuristic { get; set; }
 
 		public static List<CandidateFeatures> GetFeatures(
 			PointContext point,
@@ -269,6 +272,25 @@ namespace Land.Markup.Binding
 			/// если находим 100% соответствие, исключаем кандидата из списка
 			foreach (var pointContext in contextsToPoints.Keys)
 			{
+				if(Heuristic != null)
+				{
+					var perfectMatch = Heuristic.GetSameElement(pointContext, candidates);
+
+					if(perfectMatch != null)
+					{
+						candidates.Remove(perfectMatch);
+						perfectMatch.IsAuto = true;
+						perfectMatch.Similarity = 1;
+
+						foreach (var point in contextsToPoints[pointContext])
+						{
+							result[point] = new List<RemapCandidateInfo> { perfectMatch };
+						}
+
+						continue;
+					}
+				}
+
 				var currentCandidates = candidates
 					.Select(c => new RemapCandidateInfo
 					{
@@ -295,36 +317,9 @@ namespace Land.Markup.Binding
 					checkSiblings
 				);
 
-				/// TODO Подсчёт конечной похожести при помощи нейросетки
+				RunML(pointContext, currentCandidates);
 
-				var bestMatch = currentCandidates.FirstOrDefault(c => c.Similarity == 1);
-
-				if (bestMatch?.Similarity == 1)
-				{
-					var bestMatchIdx = currentCandidates.IndexOf(bestMatch);
-
-					candidates.RemoveAt(bestMatchIdx);
-					foreach (var list in evaluated.Values)
-					{
-						list.RemoveAt(bestMatchIdx);
-					}
-					foreach (var list in result.Values.Distinct())
-					{
-						list.RemoveAll(e => e.Context == bestMatch.Context);
-					}
-
-					currentCandidates = currentCandidates.OrderByDescending(c => c.Similarity).ToList();
-					currentCandidates[0].IsAuto = true;
-
-					foreach (var point in contextsToPoints[pointContext])
-					{
-						result[point] = currentCandidates;
-					}
-				}
-				else
-				{
-					evaluated[pointContext] = currentCandidates;
-				}
+				evaluated[pointContext] = currentCandidates;
 			}
 
 			if (checkClosest)
@@ -562,6 +557,35 @@ namespace Land.Markup.Binding
 			return candidates;
 		}
 
+		public void RunML(PointContext point, List<RemapCandidateInfo> candidates)
+		{
+			/// Создаём временный файл с данными о кандидатах для текущей перепривязываемой точки
+			var featuresFilePath = Path.GetTempFileName();
+			File.WriteAllLines(featuresFilePath, new List<string> { CandidateFeatures.ToHeaderString(";") }
+				.Concat(GetFeatures(point, candidates).Select(e => e.ToString())));
+
+			/// Ищем подходящую модель для предсказания
+			var availableModels = Directory.GetFiles("Resources/models").Select(m=>m.ToLower()).ToList();
+			/// Сначала ищем модель для типа файла и типа сущности
+			var modelPath = availableModels.FirstOrDefault(m => 
+				m.Contains(Path.GetExtension(point.FileContext.Name)) && m.Contains(point.Type));
+
+			/// Запускаем питоновский скрипт
+			var process = new Process();
+			ProcessStartInfo startInfo = new ProcessStartInfo()
+			{
+				FileName = "cmd.exe",
+				Arguments = $"\"Resources/sn.exe\" \"{modelPath}\" \"{featuresFilePath}\"",
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				UseShellExecute = false
+			};
+			process.StartInfo = startInfo;
+			process.Start();
+
+			process.WaitForExit();
+		}
+
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
@@ -669,7 +693,7 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
 		{
-			return a.Type == b.Type ? Levenshtein(a.HeaderContext, b.HeaderContext) : 0;
+			return a.Type == b.Type ? Levenshtein(a.HeaderContext.Sequence, b.HeaderContext.Sequence) : 0;
 		}
 
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)

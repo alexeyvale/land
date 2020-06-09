@@ -113,8 +113,10 @@ namespace DatasetToTrainConverter
 					Console.WriteLine($"Source file parsed...");
 
 					/// Привязываемся ко всему в исходном файле
-					var markupManager = new MarkupManager(name => sourceParsed.Name == name
-						? sourceParsed : targetFiles[name]);
+					var markupManager = new MarkupManager(
+						name => sourceParsed.Name == name? sourceParsed : targetFiles[name],
+						new ProgrammingLanguageHeuristic()
+					);
 
 					var customContextFinder = new CopyPaste.ContextFinder();
 					customContextFinder.GetParsed = markupManager.ContextFinder.GetParsed;

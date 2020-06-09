@@ -91,6 +91,7 @@
     <Compile Include="Core\Lexing\ILexer.cs" />
     <Compile Include="Core\Lexing\ComplexTokenStream.cs" />
     <Compile Include="Core\Lexing\TokenStream.cs" />
+    <Compile Include="Markup\Binding\Heuristic.cs" />
     <Compile Include="Markup\Binding\Models\CandidateFeatures.cs" />
     <Compile Include="Markup\Binding\ContextFinder.cs" />
     <Compile Include="Markup\Binding\Munkres.cs" />
@@ -152,6 +153,7 @@
     <None Include="Core\Specification\Parsing\_ymc\Land.lex" />
     <None Include="Core\Specification\Parsing\_ymc\Land.y" />
     <None Include="keys.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\antlr-4.7-complete.jar">

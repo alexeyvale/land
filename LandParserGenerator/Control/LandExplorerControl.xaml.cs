@@ -123,7 +123,7 @@ namespace Land.Control
         {
 			InitializeComponent();
 
-			MarkupManager = new MarkupManager(GetParsed);
+			MarkupManager = new MarkupManager(GetParsed, new ProgrammingLanguageHeuristic());
 			FrontendUpdateDispatcher = Dispatcher.CurrentDispatcher;
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }

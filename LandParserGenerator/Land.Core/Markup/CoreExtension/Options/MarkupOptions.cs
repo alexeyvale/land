@@ -15,7 +15,7 @@ namespace Land.Markup.CoreExtension
 		public const string PRIORITY = "priority";
 		public const string LAND = "land";
 		public const string EXACTMATCH = "exactmatch";
-		public const string CORE = "core";
+		public const string HEADERCORE = "headercore";
 	}
 
 	public static class OptionsExtension
@@ -33,15 +33,15 @@ namespace Land.Markup.CoreExtension
 			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, new List<dynamic>() { value });
 		}
 
-		public static string GetCore(this SymbolOptionsManager manager)
+		public static string GetHeaderCore(this SymbolOptionsManager manager)
 		{
-			var parameters = manager.GetParams(MarkupOption.GROUP_NAME, MarkupOption.CORE);
+			var parameters = manager.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE);
 			return parameters?.Count > 0 ? parameters[0] : null;
 		}
 
-		public static void SetCore(this SymbolOptionsManager manager, string value)
+		public static void SetHeaderCore(this SymbolOptionsManager manager, string value)
 		{
-			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.CORE, new List<dynamic>() { value });
+			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, new List<dynamic>() { value });
 		}
 	}
 }

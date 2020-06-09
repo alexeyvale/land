@@ -56,9 +56,9 @@ namespace Land.Markup.CoreExtension
 				);
 			}
 
-			if(GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CORE, node.Symbol))
+			if(GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Symbol))
 			{
-				node.Options.SetCore((string)GrammarObject.Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.CORE, node.Symbol)[0]);
+				node.Options.SetHeaderCore((string)GrammarObject.Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Symbol)[0]);
 			}
 
 			base.Visit(node);
