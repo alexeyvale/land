@@ -137,7 +137,10 @@ namespace Land.Markup.Binding
 	{
 		public TextOrHash Content { get; set; }
 
-		public InnerContext() { }
+		public InnerContext() 
+		{ 
+			Content = new TextOrHash(); 
+		}
 
 		public InnerContext(List<SegmentLocation> locations, string fileText)
 		{
@@ -550,7 +553,7 @@ namespace Land.Markup.Binding
 
 			return new HeaderContext
 			{
-				Sequence = sequence.Select(e => (HeaderContextElement)e).ToList(),
+				Sequence = headerSequence,
 				Core = core,
 				Words = core.SelectMany(e=> GetWords(e)).ToList()
 			};

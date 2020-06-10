@@ -74,17 +74,15 @@ namespace ManualRemappingTool
 				{
 					HeaderContext = sourceElement.Header,
 					AncestorsContext = sourceElement.Ancestors,
-					ClosestContext = allSourceElements.Select(e=>(PointContext)e).ToList()
+					InnerContext = new InnerContext(),
+					ClosestContext = allSourceElements
+						.Where(e => e != sourceElement).Select(e => (PointContext)e).ToList()
 				},
 				candidates.Select(e => (RemapCandidateInfo)e).ToList()
-			);
+			) ;
 
-			return new MappingElement
-			{
-				Node = element.Node,
-				Header = element.Context.HeaderContext,
-				Ancestors = element.Context.AncestorsContext
-			};
+			return element != null 
+				? candidates.FirstOrDefault(C=>C.Node == element.Node) : null;
 		}
 	}
 }

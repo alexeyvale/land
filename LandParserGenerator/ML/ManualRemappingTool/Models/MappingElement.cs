@@ -22,16 +22,26 @@ namespace ManualRemappingTool
 				{
 					Type = element.Node.Type,
 					AncestorsContext = element.Ancestors,
-					HeaderContext = element.Header
+					HeaderContext = element.Header,
+					InnerContext = new InnerContext()
 				}
 			};
 
 		public static explicit operator PointContext(MappingElement element) =>
-			new PointContext
+			element != null ? new PointContext
 			{
 				Type = element.Node.Type,
 				AncestorsContext = element.Ancestors,
-				HeaderContext = element.Header
-			};
+				HeaderContext = element.Header,
+				InnerContext = new InnerContext()
+			} : null;
+
+		public static explicit operator MappingElement(RemapCandidateInfo element) =>
+			element != null ? new MappingElement
+			{
+				Node = element.Node,
+				Header = element.Context.HeaderContext,
+				Ancestors = element.Context.AncestorsContext
+			} : null;
 	}
 }

@@ -21,7 +21,7 @@ namespace Land.Markup.Binding
 			a.HeaderContext.Equals(b.HeaderContext);
 		private static readonly Func<PointContext, PointContext, bool> InnerPredicate = (a, b) =>
 			a.InnerContext.Content.Text == b.InnerContext.Content.Text
-				&& a.InnerContext.Content.Hash.SequenceEqual(b.InnerContext.Content.Hash);
+				&& (a.InnerContext.Content.Hash?.SequenceEqual(b.InnerContext.Content.Hash) ?? true);
 		private static readonly Func<PointContext, PointContext, bool> AncestorsCorePredicate = (a, b) =>
 			a.AncestorsContext.SequenceEqual(b.AncestorsContext, AncestorsCoreComparer);
 		private static readonly Func<PointContext, PointContext, bool> AncestorsSequencePredicate = (a, b) =>

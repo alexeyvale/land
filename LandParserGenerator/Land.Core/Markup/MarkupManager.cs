@@ -439,6 +439,7 @@ namespace Land.Markup
 					}
 				}
 
+				/// Восстанавливаем обратные связи между элементами разметки
 				DoWithMarkup(e =>
 				{
 					if (e is Concern c)
