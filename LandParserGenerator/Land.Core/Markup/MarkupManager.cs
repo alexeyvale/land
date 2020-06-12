@@ -333,18 +333,26 @@ namespace Land.Markup
 		public void Serialize(string fileName, bool useRelativePaths)
 		{
 			var pointContexts = GetPointContexts();
-			var fileContexts = new HashSet<FileContext>(pointContexts.Select(e => e.FileContext));
-			
+			var fileGroups = pointContexts.GroupBy(e => e.FileName);
+
+			/// Если нужно сохранить в файле разметки относиельные пути
 			if (useRelativePaths)
 			{
 				/// Превращаем указанные в точках привязки абсолютные пути в пути относительно файла разметки
 				var directoryUri = new Uri(Path.GetDirectoryName(fileName) + "/");
 
-				foreach (var file in fileContexts)
+				foreach (var group in fileGroups)
 				{
-					file.Name = Uri.UnescapeDataString(
-						directoryUri.MakeRelativeUri(new Uri(file.Name)).ToString()
+					var relatileName = Uri.UnescapeDataString(
+						directoryUri.MakeRelativeUri(new Uri(group.Key)).ToString()
 					);
+
+					group.First().FileContext.Name = relatileName;
+
+					foreach(var e in group)
+					{
+						e.FileName = relatileName;
+					}
 				}
 			}
 
@@ -354,7 +362,7 @@ namespace Land.Markup
 				{
 					Markup = Markup,
 					PointContexts = pointContexts,
-					FileContexts = fileContexts,
+					FileContexts = new HashSet<FileContext>(pointContexts.Select(e => e.FileContext)),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
@@ -363,11 +371,18 @@ namespace Land.Markup
 
 			if (useRelativePaths)
 			{
-				foreach (var file in fileContexts)
+				foreach (var group in fileGroups)
 				{
-					file.Name = Path.GetFullPath(
-						Path.Combine(Path.GetDirectoryName(fileName), file.Name)
+					var fullName = Path.GetFullPath(
+						Path.Combine(Path.GetDirectoryName(fileName), group.Key)
 					);
+
+					group.First().FileContext.Name = fullName;
+
+					foreach (var e in group)
+					{
+						e.FileName = fullName;
+					}
 				}
 			}
 		}
@@ -389,7 +404,19 @@ namespace Land.Markup
 
 				/// Восстанавливаем обратные связи между потомками и предками,
 				/// восстанавливаем связи с контекстами
-				var concernPoints = GetConcernPoints().ToDictionary(e=>e.Id, e=>e);
+				var concernPoints = GetConcernPoints().ToDictionary(e => e.Id, e => e);
+				
+				foreach(var fc in unit.FileContexts)
+				{
+					if (!Path.IsPathRooted(fc.Name))
+					{
+						fc.Name = Path.GetFullPath(
+							Path.Combine(Path.GetDirectoryName(fileName), fc.Name)
+						);
+					}
+				}
+
+				var fileContexts = unit.FileContexts.ToDictionary(e => e.Name, e => e);
 
 				/// Связываем контексты с точками привязки в разметке
 				foreach (var context in unit.PointContexts)
@@ -400,18 +427,12 @@ namespace Land.Markup
 					}
 				}
 
-				/// Связываем файловые контексты с контекстами точек
-				foreach (var fileContext in unit.FileContexts)
-				{
-					foreach (var id in fileContext.LinkedPoints)
-					{
-						concernPoints[id].Context.FileContext = fileContext;
-					}
-				}
-
+				/// Связываем файловые контексты с основными контекстами
 				/// Связываем контексты-описания ближайших с контекстами точек
 				foreach (var context in unit.PointContexts)
 				{
+					context.FileContext = fileContexts[context.FileName];
+
 					foreach (var pair in context.LinkedClosestPoints)
 					{
 						if(concernPoints[pair.Item1].Context.ClosestContext == null)
@@ -457,16 +478,6 @@ namespace Land.Markup
 				foreach (var pair in unit.ExternalRelatons)
 					Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);
 			}
-
-			DoWithMarkup((MarkupElement elem) =>
-			{
-				if (elem is ConcernPoint p && !Path.IsPathRooted(p.Context.FileContext.Name))
-				{
-					p.Context.FileContext.Name = Path.GetFullPath(
-						Path.Combine(Path.GetDirectoryName(fileName), p.Context.FileContext.Name)
-					);
-				}
-			});
 		}
 
 		/// <summary>

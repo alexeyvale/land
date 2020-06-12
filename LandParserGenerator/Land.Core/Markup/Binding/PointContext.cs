@@ -263,8 +263,6 @@ namespace Land.Markup.Binding
 
 	public class FileContext
 	{
-		public HashSet<Guid> LinkedPoints { get; set; } = new HashSet<Guid>();
-
 		/// <summary>
 		/// Имя файла
 		/// </summary>
@@ -308,11 +306,6 @@ namespace Land.Markup.Binding
 						.Add(new Tuple<Guid, int>(pointId, i));
 				}
 			}
-
-			if (this.FileContext != null)
-			{
-				this.FileContext.LinkedPoints.Add(pointId);
-			}
 		}
 
 		/// <summary>
@@ -338,9 +331,11 @@ namespace Land.Markup.Binding
 			set
 			{
 				_fileContext = value;
-				_fileContext?.LinkedPoints.UnionWith(LinkedPoints);
+				FileName = _fileContext?.Name;
 			}
 		}
+
+		public string FileName { get; set; }
 
 		/// <summary>
 		/// Контекст заголовка узла, к которому привязана точка разметки
