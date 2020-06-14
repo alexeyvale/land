@@ -653,11 +653,9 @@ namespace ManualRemappingTool
 			List<MappingElement> targetCandidates = null,
 			bool checkRoot = true)
 		{
-			var sourceAncestorRestrictor = (AncestorsContextElement)sourceRoot;
-			var targetAncestorRestrictor = (AncestorsContextElement)targetRoot;
-
 			if (sourceCandidates == null)
 			{
+				var sourceAncestorRestrictor = (AncestorsContextElement)sourceRoot;
 				var visitor = new LandExplorerVisitor();
 				sourceRoot.Accept(visitor);
 				var sourceLand = visitor.Land;
@@ -673,14 +671,6 @@ namespace ManualRemappingTool
 					})
 					.ToList();
 			}
-			else
-			{
-				foreach(var elem in sourceCandidates)
-				{
-					elem.Ancestors = elem.Ancestors
-						.TakeWhile(el => !el.Equals(sourceAncestorRestrictor)).ToList();
-				}
-			}
 
 			if (!checkRoot)
 			{
@@ -690,6 +680,7 @@ namespace ManualRemappingTool
 
 			if (targetCandidates == null)
 			{
+				var targetAncestorRestrictor = (AncestorsContextElement)targetRoot;
 				var visitor = new LandExplorerVisitor();
 				targetRoot.Accept(visitor);
 				var targetLand = visitor.Land;
@@ -703,14 +694,6 @@ namespace ManualRemappingTool
 							.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList()
 					})
 					.ToList();
-			}
-			else
-			{
-				foreach (var elem in targetCandidates)
-				{
-					elem.Ancestors = elem.Ancestors
-						.TakeWhile(el => !el.Equals(targetAncestorRestrictor)).ToList();
-				}
 			}
 
 			for (var i = 0; i < sourceCandidates.Count; ++i)
