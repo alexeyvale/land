@@ -71,6 +71,7 @@
     </ApplicationDefinition>
     <Compile Include="ConsoleWriter.cs" />
     <Compile Include="EditorAdapter.cs" />
+    <Compile Include="EditorSearchHandler.cs" />
     <Compile Include="LibrarySettingsWindow.xaml.cs">
       <DependentUpon>LibrarySettingsWindow.xaml</DependentUpon>
     </Compile>

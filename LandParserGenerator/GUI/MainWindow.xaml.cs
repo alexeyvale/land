@@ -1100,11 +1100,36 @@ namespace Land.GUI
 
 		public class DocumentTab
 		{
-			public TextEditor Editor { get; set; }
+			#region Editor
+
+			private TextEditor _editor;
+
+			private EditorSearchHandler QuickSearch { get; set; }
+
+			public TextEditor Editor
+			{
+				get { return _editor; }
+
+				set
+				{
+					_editor = value;
+
+					if (_editor != null)
+					{
+						QuickSearch = new EditorSearchHandler(_editor.TextArea);
+					}
+					else
+					{
+						QuickSearch = null;
+					}
+				}
+			}
+
+			#endregion
 
 			public string DocumentName { get; set; }
 
-			public SegmentsBackgroundRenderer SegmentsColorizer { get; set; }
+			public SegmentsBackgroundRenderer SegmentsColorizer { get; set; }	
 		}
 
 		public EditorAdapter EditorAdapter { get; set; }
