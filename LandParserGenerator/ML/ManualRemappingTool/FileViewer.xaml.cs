@@ -238,6 +238,11 @@ namespace ManualRemappingTool
 
 		private void FileEditor_KeyDown(object sender, KeyEventArgs e)
 		{
+			if(QuickSearch.IsSearchPanelOpened)
+			{
+				return;
+			}
+
 			if (Keyboard.Modifiers == ModifierKeys.None)
 			{
 				if (Keyboard.IsKeyDown(Key.S))

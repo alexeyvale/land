@@ -14,7 +14,10 @@ namespace ManualRemappingTool
 {
     public class EditorSearchHandler : TextAreaInputHandler
     {
-        public EditorSearchHandler(TextArea textArea) : base(textArea)
+		public bool IsSearchPanelOpened => 
+			!(QuickSearchPanel?.IsClosed ?? true);
+
+		public EditorSearchHandler(TextArea textArea) : base(textArea)
         {
             RegisterCommands(this.CommandBindings);
             this.Attach();
