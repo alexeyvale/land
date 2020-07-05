@@ -6,7 +6,7 @@ from pandas.plotting import scatter_matrix
 
 plt.style.use('ggplot')
 
-data = pd.read_csv('train_data/method_train.txt', delimiter=';', decimal=",")
+data = pd.read_csv('train_data/cs.method.csv', delimiter=';', decimal=",")
 y = data['IsAuto']
 
 data = data.drop(['IsAuto'], axis=1)

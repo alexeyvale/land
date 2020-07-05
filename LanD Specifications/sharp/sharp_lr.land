@@ -67,7 +67,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list common_beginning entity
-	leaf name type modifier arguments init_value
+	leaf name type modifier arguments
 }
 
 %customblock {

@@ -179,6 +179,10 @@ namespace Land.Markup.Binding
 
 			return false;
 		}
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
+		}
 	}
 
 	#region Old

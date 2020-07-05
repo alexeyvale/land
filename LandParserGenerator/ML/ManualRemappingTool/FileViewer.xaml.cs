@@ -187,7 +187,9 @@ namespace ManualRemappingTool
 				&& OpenFile(openFileDialog.FileName))
 			{
 				FileOpened?.Invoke(this,
-					new FileOpenedEventArgs { FileRelativePath = FileRelativePath });
+					new FileOpenedEventArgs { 
+						FileRelativePath = FileRelativePath
+				});
 			}
 		}
 

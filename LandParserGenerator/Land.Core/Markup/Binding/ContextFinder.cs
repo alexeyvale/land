@@ -267,30 +267,35 @@ namespace Land.Markup.Binding
 
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 			var evaluated = new Dictionary<PointContext, List<RemapCandidateInfo>>();
+			var perfectlyMatched = new HashSet<PointContext>();
 
 			/// Для каждой точки оцениваем похожесть кандидатов, 
 			/// если находим 100% соответствие, исключаем кандидата из списка
 			foreach (var pointContext in contextsToPoints.Keys)
 			{
-				if(Heuristic != null)
+				if (Heuristic != null)
 				{
 					var perfectMatch = Heuristic.GetSameElement(pointContext, candidates);
 
-					if(perfectMatch != null)
+					if (perfectMatch != null)
 					{
 						candidates.Remove(perfectMatch);
 						perfectMatch.IsAuto = true;
 						perfectMatch.Similarity = 1;
 
+						perfectlyMatched.Add(pointContext);
+
 						foreach (var point in contextsToPoints[pointContext])
 						{
 							result[point] = new List<RemapCandidateInfo> { perfectMatch };
 						}
-
-						continue;
 					}
 				}
+			}
 
+			/// Для оставшихся точек генерируем списки кандидатов и предварительно считаем похожести
+			foreach (var pointContext in contextsToPoints.Keys.Except(perfectlyMatched))
+			{
 				var currentCandidates = candidates
 					.Select(c => new RemapCandidateInfo
 					{
@@ -317,10 +322,17 @@ namespace Land.Markup.Binding
 					checkSiblings
 				);
 
-				RunML(pointContext, currentCandidates);
-
 				evaluated[pointContext] = currentCandidates;
 			}
+
+			/// Если всё перепривязали эвристикой, можно вернуть результат
+			if(evaluated.Count == 0)
+			{
+				return result;
+			}
+
+			/// Запускаем ML для вычисления итоговой похожести
+			RunML(evaluated);
 
 			if (checkClosest)
 			{
@@ -557,25 +569,44 @@ namespace Land.Markup.Binding
 			return candidates;
 		}
 
-		public void RunML(PointContext point, List<RemapCandidateInfo> candidates)
+		public void RunML(Dictionary<PointContext, List<RemapCandidateInfo>> elements)
 		{
-			/// Создаём временный файл с данными о кандидатах для текущей перепривязываемой точки
+			/// Создаём временный файл с данными о кандидатах для перепривязываемых точек
 			var featuresFilePath = Path.GetTempFileName();
-			File.WriteAllLines(featuresFilePath, new List<string> { CandidateFeatures.ToHeaderString(";") }
-				.Concat(GetFeatures(point, candidates).Select(e => e.ToString())));
+
+			/// Записываем информацию обо всех кандидатах
+			using (var fileWriter = new StreamWriter(featuresFilePath))
+			{
+				fileWriter.WriteLine(CandidateFeatures.ToHeaderString(";"));
+
+				foreach(var kvp in elements)
+				{
+					foreach(var str in GetFeatures(kvp.Key, kvp.Value).Select(e => e.ToString(";")))
+					{
+						fileWriter.WriteLine(str);
+					}
+				}
+			}
+
+			var predictionsFilePath = Path.GetTempFileName();
 
 			/// Ищем подходящую модель для предсказания
-			var availableModels = Directory.GetFiles("Resources/models").Select(m=>m.ToLower()).ToList();
+			var availableModels = Directory.GetFiles("Resources/Models")
+				.Select(m => Path.GetFullPath(m).ToLower())
+				.ToList();
 			/// Сначала ищем модель для типа файла и типа сущности
 			var modelPath = availableModels.FirstOrDefault(m => 
-				m.Contains(Path.GetExtension(point.FileContext.Name)) && m.Contains(point.Type));
+				m.Contains(Path.GetExtension(elements.Keys.First().FileContext.Name).Trim('.'))
+			);
+
+			/// TODO если не нашли, нужно подгружать общую модель
 
 			/// Запускаем питоновский скрипт
 			var process = new Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo()
 			{
-				FileName = "cmd.exe",
-				Arguments = $"\"Resources/sn.exe\" \"{modelPath}\" \"{featuresFilePath}\"",
+				FileName = "python",
+				Arguments = $"\"{Path.GetFullPath("Resources/apply_ml.py")}\" \"{modelPath}\" \"{featuresFilePath}\" \"{predictionsFilePath}\"",
 				CreateNoWindow = true,
 				RedirectStandardOutput = true,
 				UseShellExecute = false
@@ -584,6 +615,20 @@ namespace Land.Markup.Binding
 			process.Start();
 
 			process.WaitForExit();
+
+			var predictions = File.ReadAllText(predictionsFilePath.Trim())
+				.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+				.Select(l => double.Parse(l))
+				.ToList();
+
+			var idx = 0;
+			foreach (var kvp in elements)
+			{
+				foreach (var candidate in kvp.Value)
+				{
+					candidate.Similarity = predictions[idx++];
+				}
+			}
 		}
 
 		/// <summary>

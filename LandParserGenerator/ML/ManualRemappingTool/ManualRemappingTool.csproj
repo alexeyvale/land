@@ -54,7 +54,7 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="Ude">
-      <HintPath>..\components\UDE.CSharp.1.1.0\lib\Ude.dll</HintPath>
+      <HintPath>..\..\components\UDE.CSharp.1.1.0\lib\Ude.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
