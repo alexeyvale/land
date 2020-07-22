@@ -47,6 +47,11 @@ namespace Land.Markup.Binding
 			PointContext point,
 			List<RemapCandidateInfo> candidates)
 		{
+			if(point.ClosestContext == null)
+			{
+				return null;
+			}
+
 			var basePredicates = new Func<PointContext, PointContext, bool>[] 
 			{ 
 				HeaderCorePredicate, HeaderSequencePredicate, InnerPredicate 
@@ -64,7 +69,7 @@ namespace Land.Markup.Binding
 					? 1 : point.InnerContext.Content?.TextLength > 0
 						? 2 : (int?)null;
 
-			if(!baseIdx.HasValue)
+			if (!baseIdx.HasValue)
 			{
 				return null;
 			}

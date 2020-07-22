@@ -153,19 +153,22 @@ namespace ManualRemappingTool
 
 		private void LoadDataset(string filePath)
 		{
-			DatasetObject = Dataset.Load(filePath);
-			SetValue(IsDatasetLocked, true);
+			if (System.IO.File.Exists(filePath))
+			{
+				DatasetObject = Dataset.Load(filePath);
+				SetValue(IsDatasetLocked, true);
 
-			SourceFolderPath.Text = DatasetObject.SourceDirectoryPath;
-			TargetFolderPath.Text = DatasetObject.TargetDirectoryPath;
-			Extensions.Text = DatasetObject.ExtensionsString;
+				SourceFolderPath.Text = DatasetObject.SourceDirectoryPath;
+				TargetFolderPath.Text = DatasetObject.TargetDirectoryPath;
+				Extensions.Text = DatasetObject.ExtensionsString;
 
-			Settings.Default.RecentDatasets.Remove(filePath);
-			Settings.Default.RecentDatasets.Insert(0, filePath);
-			Settings.Default.Save();
+				Settings.Default.RecentDatasets.Remove(filePath);
+				Settings.Default.RecentDatasets.Insert(0, filePath);
+				Settings.Default.Save();
 
-			DatasetList.Items.Refresh();
-			DatasetList.SelectedIndex = 0;
+				DatasetList.Items.Refresh();
+				DatasetList.SelectedIndex = 0;
+			}
 		}
 
 		#endregion

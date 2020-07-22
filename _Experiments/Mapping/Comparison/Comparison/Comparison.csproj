@@ -60,4 +60,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Core\bin\Debug\*" "$(ProjectDir)components\land\" /Y /I /S
+xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Core\bin\Debug\*" "$(ProjectDir)bin\debug\" /Y /I /S</PreBuildEvent>
+  </PropertyGroup>
 </Project>

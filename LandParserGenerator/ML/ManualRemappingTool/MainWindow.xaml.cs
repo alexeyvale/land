@@ -281,6 +281,8 @@ namespace ManualRemappingTool
 
 		private void SourceFileView_FileOpened(object sender, FileViewer.FileOpenedEventArgs e)
 		{
+			Dataset.IntroduceSource(SourceFileView.FileRelativePath, SourceFileView.ExistingEntities.Count);
+
 			/// Если известно, в каком направлении открываем, и нужно открывать только файлы, 
 			/// в которых осталось что-то не перепривязанное, ищем ближайший не финализированный файл
 			if (e.AvailableOnly && e.Direction.HasValue
@@ -300,6 +302,8 @@ namespace ManualRemappingTool
 						FileViewer.GetRelativePath(nextFilePath, SourceFileView.WorkingDirectory)))
 					{
 						SourceFileView.OpenFile(nextFilePath);
+						Dataset.IntroduceSource(SourceFileView.FileRelativePath, SourceFileView.ExistingEntities.Count);
+
 						break;
 					}
 				}
@@ -344,6 +348,7 @@ namespace ManualRemappingTool
 				if (File.Exists(sourcePath))
 				{
 					SourceFileView.OpenFile(sourcePath);
+					Dataset.IntroduceSource(SourceFileView.FileRelativePath, SourceFileView.ExistingEntities.Count);
 				}
 				else
 				{
@@ -418,6 +423,7 @@ namespace ManualRemappingTool
 			for(var i=0; i<SourceFileView.WorkingDirectoryFiles.Count; ++i)
 			{
 				SourceFileView.OpenFile(SourceFileView.WorkingDirectoryFiles[i]);
+				Dataset.IntroduceSource(SourceFileView.FileRelativePath, SourceFileView.ExistingEntities.Count);
 
 				var targetPath = Path.Combine(
 					TargetFileView.WorkingDirectory,
@@ -468,6 +474,8 @@ namespace ManualRemappingTool
 						((Tuple<string, List<DatasetRecord>>)VisualUpwardSearch<TreeViewItem>(clickedItem).DataContext).Item1);
 
 					SourceFileView.OpenFile(sourcePath);
+					Dataset.IntroduceSource(SourceFileView.FileRelativePath, SourceFileView.ExistingEntities.Count);
+
 					TargetFileView.OpenFile(targetPath);
 
 					SyncEntitiesListAndEditor(SourceFileView, record.SourceOffset, record.EntityType);
@@ -711,7 +719,9 @@ namespace ManualRemappingTool
 						TargetFileView.FileRelativePath,
 						sourceCandidates[i].Node.Location.Start.Offset,
 						targetElement.Node.Location.Start.Offset,
-						sourceCandidates[i].Node.Type
+						sourceCandidates[i].Node.Type,
+						false,
+						true
 					);
 
 					var inner = sourceCandidates.Skip(i + 1)

@@ -385,10 +385,6 @@ namespace Land.Markup.Binding
 
 		#region Old
 
-		public string Name =>
-			String.Join("", this.HeaderContext.Sequence
-				.Where(e => e.Type == "name").Select(e => e.Value));
-
 		public List<ContextElement> InnerContext_old { get; set; }
 
 		#endregion

@@ -31,6 +31,37 @@ namespace DatasetToTrainConverter
 
 		#endregion
 
+		private static ILookup<string, ExtendedDatasetRecord> GetRecords(Dataset d)
+		{
+			var records = new List<ExtendedDatasetRecord>();
+			var finalized = d.Records.Where(r => d.FinalizedFiles.Contains(r.Key)).ToList();
+
+			foreach (var sourcePathRecordsPair in finalized)
+			{
+				var absSourcePath =
+					GetAbsolutePath(d.SourceDirectoryPath, sourcePathRecordsPair.Key);
+
+				/// Побочный эффект
+				d.LandEntitiesCount[absSourcePath] = d.LandEntitiesCount[sourcePathRecordsPair.Key];
+
+				foreach (var targetRelativePath in sourcePathRecordsPair.Value.Keys)
+				{
+					var absTargetPath =
+						GetAbsolutePath(d.TargetDirectoryPath, targetRelativePath);
+
+					records.AddRange(sourcePathRecordsPair.Value[targetRelativePath]
+						.Select(e => new ExtendedDatasetRecord(e)
+						{
+							SourceFilePath = absSourcePath,
+							TargetFilePath = absTargetPath
+						})
+					);
+				}
+			}
+
+			return records.ToLookup(r => r.SourceFilePath, r => r);
+		}
+
 		static void Main(string[] args)
 		{
 			if (args.Length != 2)
@@ -38,176 +69,193 @@ namespace DatasetToTrainConverter
 				return;
 			}
 
+			var totalPositive = 0;
+			var totalNegative = 0;
+
+			var contextFinder = new ContextFinder();
+
 			var parsers = new ParserManager();
 			parsers.Load(LoadSettings(SETTINGS_DEFAULT_PATH), CACHE_DIRECTORY, new List<Message>());
 
-			/// Превращаем набор датасетов в группы записей, записи сгруппированы по расширению файлов
-			var groupedRecords = Directory.GetFiles(args[0], $"*{DATASET_FILE_EXT}", SearchOption.TopDirectoryOnly)
+			var processedSources = new HashSet<string>();
+
+			var groupedDatasets = Directory.GetFiles(args[0], $"*{DATASET_FILE_EXT}", SearchOption.TopDirectoryOnly)
 				.Select(f => Dataset.Load(f))
-				.GroupBy(d => d.ExtensionsString, d =>
-				{
-					var records = new List<ExtendedDatasetRecord>();
-					var finalized = d.Records.Where(r => d.FinalizedFiles.Contains(r.Key));
+				.ToLookup(d => d.ExtensionsString, d => d);
 
-					foreach (var sorceFile in d.Records.Keys)
-					{
-						var absSourcePath =
-							GetAbsolutePath(d.SourceDirectoryPath, sorceFile);
+			/// Контрольная эвристика, всё, что находит она, не помещаем в датасет
+			var heuristic = new ProgrammingLanguageHeuristic();
 
-						foreach (var targetFile in d[sorceFile].Keys)
-						{
-							var absTargetPath =
-								GetAbsolutePath(d.TargetDirectoryPath, targetFile);
-
-							records.AddRange(d[sorceFile][targetFile]
-								.Select(e => new ExtendedDatasetRecord(e)
-								{
-									SourceFilePath = absSourcePath,
-									TargetFilePath = absTargetPath
-								})
-							);
-						}
-					}
-					return records;
-				})
-				.ToDictionary(g => g.Key, g => g.SelectMany(r => r).ToLookup(r => r.SourceFilePath, r => r));
-
-			foreach (var ext in groupedRecords.Keys)
+			foreach (var extGroup in groupedDatasets)
 			{
-				Console.WriteLine($"Current extension: {ext}");
+				Console.WriteLine($"Current extension: {extGroup.Key}");
 
-				var sourceFiles = groupedRecords[ext]
-					.Select(r => r.Key).Distinct().ToList();
+				/// Каждый датасет рассматриваем в отдельности, чтобы не держать в памяти
+				/// слишком большое количество деревьев
+				foreach (var dataset in extGroup)
+				{
+					Console.WriteLine($"Processing new dataset...");
 
-				var targetFiles = groupedRecords[ext].SelectMany(r => r.Select(e => e.TargetFilePath)).Distinct()
-					.Select(e =>
+					var records = GetRecords(dataset);
+					var sourceFiles = records.Select(e => e.Key).ToList();
+					var targetFiles = records.SelectMany(e => e.Select(el => el.TargetFilePath)).Distinct()
+						.Select(e =>
+						{
+							var extension = Path.GetExtension(e);
+							var text = File.ReadAllText(e);
+
+							return new ParsedFile
+							{
+								Text = text,
+								BindingContext = PointContext.GetFileContext(e, text)
+							};
+						})
+						.ToDictionary(e => e.BindingContext.Name, e => e);
+
+					Console.WriteLine($"Target files parsed...");
+
+					foreach (var sourceFilePath in sourceFiles)
 					{
-						var extension = Path.GetExtension(e);
-						var text = File.ReadAllText(e);
+						if(processedSources.Contains(sourceFilePath))
+						{
+							continue;
+						}
 
-						return new ParsedFile
+						Console.WriteLine($"Current source file: {sourceFilePath}");
+						processedSources.Add(sourceFilePath);
+
+						/// Если в рассматриваемом исходном файле столько же островных сущностей,
+						/// сколько было произведено автоперепривязок, он нам не нужен
+						if(dataset.LandEntitiesCount[sourceFilePath] 
+							== records[sourceFilePath].Where(r=>r.IsAuto).Count())
+						{
+							continue;
+						}
+
+						var extension = Path.GetExtension(sourceFilePath);
+						var text = File.ReadAllText(sourceFilePath);
+
+						var sourceParsed = new ParsedFile
 						{
 							Root = parsers[extension].Parse(text),
 							Text = text,
-							BindingContext = PointContext.GetFileContext(e, text)
+							BindingContext = PointContext.GetFileContext(sourceFilePath, text)
 						};
-					})
-					.ToDictionary(e => e.BindingContext.Name, e => e);
 
-				Console.WriteLine($"Target files parsed...");
+						Console.WriteLine($"Source file parsed...");
 
-				foreach (var sourceFilePath in sourceFiles)
-				{
-					Console.WriteLine($"Current source file: {sourceFilePath}");
+						/// Привязываемся ко всему в исходном файле
+						var markupManager = new MarkupManager(
+							name => sourceParsed.Name == name ? sourceParsed : targetFiles[name],
+							new ProgrammingLanguageHeuristic()
+						);
 
-					var extension = Path.GetExtension(sourceFilePath);
-					var text = File.ReadAllText(sourceFilePath);
+						var customContextFinder = new CopyPaste.ContextFinder();
+						customContextFinder.GetParsed = markupManager.ContextFinder.GetParsed;
 
-					var sourceParsed =  new ParsedFile
-					{
-						Root = parsers[extension].Parse(text),
-						Text = text,
-						BindingContext = PointContext.GetFileContext(sourceFilePath, text)
-					};
+						markupManager.AddLand(
+							sourceParsed,
+							/// TODO Если в train будем учитывать контекст ближайших, придётся расширить searchArea
+							new List<ParsedFile> { sourceParsed }
+						);
 
-					Console.WriteLine($"Source file parsed...");
+						/// Сразу отсеиваем точки, которые находятся эвристикой
+						var allPoints = markupManager.GetConcernPoints()
+							.Where(p =>
+							{
+								/// Находим запись о корректном сопоставлении
+								var record = records[sourceFilePath]
+									.SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset);
 
-					/// Привязываемся ко всему в исходном файле
-					var markupManager = new MarkupManager(
-						name => sourceParsed.Name == name? sourceParsed : targetFiles[name],
-						new ProgrammingLanguageHeuristic()
-					);
+								return !(record?.IsAuto ?? false);
+							})
+							.ToList();
 
-					var customContextFinder = new CopyPaste.ContextFinder();
-					customContextFinder.GetParsed = markupManager.ContextFinder.GetParsed;
+						//var similarFiles = targetFiles.Values
+						//	.Where(f => markupManager.ContextFinder.AreFilesSimilarEnough(f.BindingContext, sourceParsed.BindingContext))
+						//	.ToList();
+						var similarFiles = targetFiles.Values
+							.Where(f => Path.GetFileName(f.BindingContext.Name) == Path.GetFileName(sourceParsed.BindingContext.Name))
+							.ToList();
+						var similarFilesNames = new HashSet<string>(similarFiles.Select(f => f.Name));
 
-					markupManager.AddLand(
-						sourceParsed,
-						/// Если в train будем учитывать контекст ближайших, придётся расширить searchArea
-						new List<ParsedFile> { sourceParsed }
-					);
-
-					var allPoints = markupManager.GetConcernPoints();
-					var allFiles = groupedRecords[ext][sourceFilePath]
-						.Select(e => e.TargetFilePath)
-						.Distinct()
-						.Select(e => targetFiles[e])
-						.ToList();
-
-					var similarFiles = allFiles
-						.Where(f => markupManager.ContextFinder.AreFilesSimilarEnough(f.BindingContext, sourceParsed.BindingContext))
-						.ToList();
-					var similarFilesNames = new HashSet<string>(similarFiles.Select(f=>f.Name));
-
-					var pointsInSimilarFiles = allPoints.Where(p => similarFilesNames.Contains(
-						groupedRecords[ext][sourceFilePath].SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset)?.TargetFilePath
-					)).ToList();
-
-					var localSearchResult = customContextFinder.Find(pointsInSimilarFiles, similarFiles, 
-						CopyPaste.ContextFinder.SearchType.Local);
-					var globalSearchResult = customContextFinder.Find(allPoints.Except(pointsInSimilarFiles).ToList(), allFiles, 
-						CopyPaste.ContextFinder.SearchType.Global);
-
-					foreach(var kvp in localSearchResult)
-					{
-						globalSearchResult[kvp.Key] = kvp.Value;
-					}
-
-					var result = globalSearchResult.ToLookup(e => e.Key.Context.Type, e => e);
-
-					foreach(var typePointsPair in result)
-					{
-						Console.WriteLine($"Current type: {typePointsPair.Key}");
-
-						/// Будем дописывать строчки в train-файл 
-						var trainFileName = Path.Combine(args[1], $"{ext.Replace(",", ".").Trim('.')}.{typePointsPair.Key}.csv");
-						var trainFile = new StreamWriter(trainFileName, true);
-
-						/// Если файл только что создан, записываем туда заголовок
-						if (trainFile.BaseStream.Position == 0)
+						foreach(var file in similarFiles)
 						{
-							trainFile.WriteLine(CandidateFeatures.ToHeaderString(";"));
+							if(file.Root == null)
+							{
+								file.Root = parsers[extension].Parse(file.Text);
+							}
 						}
 
-						foreach(var pointCandidatesPair in typePointsPair)
+						//var pointsInSimilarFiles = allPoints.Where(p => similarFilesNames.Contains(
+						//	records[sourceFilePath].SingleOrDefault(e => e.SourceOffset == p.AstNode.Location.Start.Offset)?.TargetFilePath
+						//)).ToList();
+
+						var localSearchResult = customContextFinder.Find(allPoints, similarFiles,
+							CopyPaste.ContextFinder.SearchType.Local);
+
+						//var globalSearchResult = customContextFinder.Find(allPoints.Except(pointsInSimilarFiles).ToList(), targetFiles.Values,
+						//	CopyPaste.ContextFinder.SearchType.Global);
+
+						//foreach (var kvp in localSearchResult)
+						//{
+						//	globalSearchResult[kvp.Key] = kvp.Value;
+						//}
+
+						var result = localSearchResult.ToLookup(e => e.Key.Context.Type, e => e);
+
+						foreach (var typePointsPair in result)
 						{
-							/// находим запись в датасете о корректном сопоставлении
-							var record = groupedRecords[ext][sourceFilePath]
+							Console.WriteLine($"Current type: {typePointsPair.Key}");
+
+							/// Будем дописывать строчки в train-файл 
+							var trainFileName = Path.Combine(args[1], $"{extGroup.Key.Replace(",", ".").Trim('.')}.{typePointsPair.Key}.csv");
+							var trainFile = new StreamWriter(trainFileName, true);
+
+							/// Если файл только что создан, записываем туда заголовок
+							if (trainFile.BaseStream.Position == 0)
+							{
+								trainFile.WriteLine(CandidateFeatures.ToHeaderString(";"));
+							}
+
+							foreach (var pointCandidatesPair in typePointsPair)
+							{
+								totalNegative += pointCandidatesPair.Value.Count;
+
+								/// находим запись в датасете о корректном сопоставлении
+								var record = records[sourceFilePath]
 									.SingleOrDefault(e => e.SourceOffset == pointCandidatesPair.Key.AstNode.Location.Start.Offset);
 
-							/// если запись нашли и корректное сопоставление есть в одном из анализируемых файлов
-							if (record != null)
-							{
-								var correctCandidate = pointCandidatesPair.Value.SingleOrDefault(e =>
-									e.Node.Location.Start.Offset == record.TargetOffset);
-
-								if(correctCandidate.HeaderCoreSimilarity == 1 
-									&& correctCandidate.AncestorSimilarity == 1 
-									&& correctCandidate.InnerSimilarity == 1)
+								/// если запись нашли и корректное сопоставление есть в одном из анализируемых файлов
+								if (record != null)
 								{
-									continue;
+									var correctCandidate = pointCandidatesPair.Value.SingleOrDefault(e =>
+										e.Node.Location.Start.Offset == record.TargetOffset);
+
+									if (correctCandidate != null)
+									{
+										correctCandidate.IsAuto = true;
+
+										++totalPositive;
+										--totalNegative;
+									}
 								}
 
-								if (correctCandidate != null)
+								/// записываем информацию о кандидатах в выходной файл
+								foreach (var line in contextFinder.GetFeatures(pointCandidatesPair.Key.Context, pointCandidatesPair.Value)
+									.Select(f => f.ToString(";")))
 								{
-									correctCandidate.IsAuto = true;
+									trainFile.WriteLine(line);
 								}
 							}
 
-							/// записываем информацию о кандидатах в выходной файл
-							foreach (var line in ContextFinder.GetFeatures(pointCandidatesPair.Key.Context, pointCandidatesPair.Value)
-								.Select(f => f.ToString(";")))
-							{
-								trainFile.WriteLine(line);
-							}
+							trainFile.Close();
 						}
-
-						trainFile.Close();
 					}
 				}
 			}
 
-			Console.WriteLine("Process finished!");
+			Console.WriteLine($"Total results: {totalNegative} wrong candidates; {totalPositive} good candidates");
 
 			Console.ReadLine();
 		}

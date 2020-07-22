@@ -27,7 +27,9 @@ namespace ManualRemappingTool
 
 		public HashSet<string> FinalizedFiles { get; set; }
 
-		public Dictionary<string, Dictionary<string, List<DatasetRecord>>> Records { get; set; }
+		public Dictionary<string, Dictionary<string, List<DatasetRecord>>> Records { get; private set; }
+
+		public Dictionary<string, int> LandEntitiesCount { get; private set; }
 
 		public string ExtensionsString
 		{
@@ -45,21 +47,26 @@ namespace ManualRemappingTool
 
 		#endregion
 
+		public void IntroduceSource(string sourceFinePath, int landCount)
+		{
+			LandEntitiesCount[sourceFinePath] = landCount;
+
+			if(!Records.ContainsKey(sourceFinePath))
+			{
+				Records[sourceFinePath] = new Dictionary<string, List<DatasetRecord>>();
+			}
+		}
+
 		public void Add(
 			string sourceFilePath,
 			string targetFilePath,
 			int sourceOffset,
 			int targetOffset,
 			string entityType,
-			bool hasDoubts = false
+			bool hasDoubts = false,
+			bool isAuto = false
 		)
 		{
-			if (!Records.ContainsKey(sourceFilePath))
-			{
-				Records[sourceFilePath] = 
-					new Dictionary<string, List<DatasetRecord>>();
-			}
-
 			if (!Records[sourceFilePath].ContainsKey(targetFilePath))
 			{
 				Records[sourceFilePath][targetFilePath] = 
@@ -85,17 +92,18 @@ namespace ManualRemappingTool
 				HasDoubts = hasDoubts,
 				EntityType = entityType,
 				SourceOffset = sourceOffset,
-				TargetOffset = targetOffset
+				TargetOffset = targetOffset,
+				IsAuto = isAuto
 			});
 		}
 
 		public void Remove(
-				string sourceFilePath,
-				string targetFilePath,
-				int sourceOffset,
-				int targetOffset,
-				string entityType
-			)
+			string sourceFilePath,
+			string targetFilePath,
+			int sourceOffset,
+			int targetOffset,
+			string entityType
+		)
 		{
 			if(Records.ContainsKey(sourceFilePath) 
 				&& Records[sourceFilePath].ContainsKey(targetFilePath))
@@ -114,6 +122,7 @@ namespace ManualRemappingTool
 		public void New()
 		{
 			Records = new Dictionary<string, Dictionary<string, List<DatasetRecord>>>();
+			LandEntitiesCount = new Dictionary<string, int>();
 			FinalizedFiles = new HashSet<string>();
 			SavingPath = null;
 		}
@@ -135,6 +144,7 @@ namespace ManualRemappingTool
 				{
 					fs.WriteLine("*");
 					fs.WriteLine(sourceFile.Key);
+					fs.WriteLine(LandEntitiesCount[sourceFile.Key]);
 
 					foreach (var targetFile in sourceFile.Value)
 					{
@@ -164,6 +174,7 @@ namespace ManualRemappingTool
 			{
 				SavingPath = path,
 				Records = new Dictionary<string, Dictionary<string, List<DatasetRecord>>>(),
+				LandEntitiesCount = new Dictionary<string, int>(),
 				FinalizedFiles = new HashSet<string>()
 			};
 
@@ -180,6 +191,8 @@ namespace ManualRemappingTool
 				if(lines[i] == "*")
 				{
 					currentSourceFile = lines[++i];
+					ds.IntroduceSource(currentSourceFile, int.Parse(lines[++i]));
+
 					continue;
 				}
 
@@ -207,7 +220,8 @@ namespace ManualRemappingTool
 					record.SourceOffset,
 					record.TargetOffset,
 					record.EntityType,
-					record.HasDoubts
+					record.HasDoubts,
+					record.IsAuto
 				);
 			}
 
@@ -221,10 +235,11 @@ namespace ManualRemappingTool
 		public int TargetOffset { get; set; }
 		public bool HasDoubts { get; set; }
 		public string EntityType { get; set; }
+		public bool IsAuto { get; set; }
 
 		public override string ToString()
 		{
-			return $"{SourceOffset};{TargetOffset};{EntityType};{HasDoubts}";
+			return $"{SourceOffset};{TargetOffset};{EntityType};{HasDoubts};{IsAuto}";
 		}
 
 		public static DatasetRecord FromString(string str)
@@ -236,7 +251,8 @@ namespace ManualRemappingTool
 				SourceOffset = int.Parse(splitted[0]),
 				TargetOffset = int.Parse(splitted[1]),
 				EntityType = splitted[2],
-				HasDoubts = bool.Parse(splitted[3])
+				HasDoubts = bool.Parse(splitted[3]),
+				IsAuto = splitted.Length > 4 ? bool.Parse(splitted[4]) : false
 			};
 		}
 	}
@@ -252,6 +268,7 @@ namespace ManualRemappingTool
 			TargetOffset = record.TargetOffset;
 			HasDoubts = record.HasDoubts;
 			EntityType = record.EntityType;
+			IsAuto = record.IsAuto;
 		}
 	}
 }
