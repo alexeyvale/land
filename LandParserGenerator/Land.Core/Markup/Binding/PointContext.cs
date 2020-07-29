@@ -252,6 +252,7 @@ namespace Land.Markup.Binding
 	public class SiblingsContextPart
 	{
 		public TextOrHash Global { get; set; }
+		public TextOrHash EntityFuzzyHash { get; set; }
 		public byte[] EntityHash { get; set; }
 		public string EntityType { get; set; }
 
@@ -653,7 +654,8 @@ namespace Land.Markup.Binding
 				
 			/// Находим островного родителя
 			parentNode = node.Parent;
-			while (parentNode != null && !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+			while (parentNode != null 
+				&& !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 			{
 				parentNode = parentNode.Parent;
 			}
@@ -715,18 +717,24 @@ namespace Land.Markup.Binding
 			siblings.RemoveAt(markedElementIndex);
 
 			var beforeBuilder = new StringBuilder();
-			foreach(var part in siblings
-					.Take(markedElementIndex)
-					.Where(n => n.Location != null)
+			var beforeSiblings = siblings
+				.Take(markedElementIndex)
+				.Where(n => n.Location != null)
+				.ToList();
+
+			foreach (var part in beforeSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
 			{
 				beforeBuilder.Append(part);
 			}
 			
 			var afterBuilder = new StringBuilder();
-			foreach (var part in siblings
-					.Skip(markedElementIndex)
-					.Where(n => n.Location != null)
+			var afterSiblings = siblings
+				.Skip(markedElementIndex)
+				.Where(n => n.Location != null)
+				.ToList();
+
+			foreach (var part in afterSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
 			{
 				afterBuilder.Append(part);
@@ -736,13 +744,25 @@ namespace Land.Markup.Binding
 			{
 				Before = new SiblingsContextPart {
 					Global = new TextOrHash(beforeBuilder.ToString()),
-					EntityHash = markedElementIndex > 0 ? GetHash(siblings[markedElementIndex - 1], file) : null,
-					EntityType = markedElementIndex > 0 ? siblings[markedElementIndex - 1].Type : null
+					EntityFuzzyHash = beforeSiblings.Count > 0 
+						? new TextOrHash(file.Text.Substring(
+							beforeSiblings.Last().Location.Start.Offset, 
+							beforeSiblings.Last().Location.Length.Value))
+						: new TextOrHash(),
+					EntityHash = markedElementIndex > 0 
+						? GetHash(siblings[markedElementIndex - 1], file) : null,
+					EntityType = markedElementIndex > 0 
+						? siblings[markedElementIndex - 1].Type : null
 				},
 
 				After = new SiblingsContextPart
 				{
 					Global = new TextOrHash(afterBuilder.ToString()),
+					EntityFuzzyHash = afterSiblings.Count > 0
+						? new TextOrHash(file.Text.Substring(
+							afterSiblings.First().Location.Start.Offset,
+							afterSiblings.First().Location.Length.Value))
+						: new TextOrHash(),
 					EntityHash = markedElementIndex < siblings.Count 
 						? GetHash(siblings[markedElementIndex], file) : null,
 					EntityType = markedElementIndex < siblings.Count 

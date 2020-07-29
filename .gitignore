@@ -16,3 +16,4 @@ _Experiments/Plots/venv/
 _Experiments/Plots/.idea/workspace.xml
 _Experiments/ML/__pycache__/
 _Experiments/ML/.idea/
+_Experiments/ML/train_data/*.csv

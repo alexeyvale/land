@@ -91,6 +91,8 @@ namespace Land.Markup.Binding
 						ExistsHCore_Point = BoolToInt(existsHCore_Point),
 						ExistsI_Point = BoolToInt(existsI_Point),
 						ExistsS_Point = BoolToInt(existsS_Point),
+						ExistsSBefore_Point = BoolToInt(point.SiblingsContext?.Before.EntityFuzzyHash.TextLength > 0),
+						ExistsSAfter_Point = BoolToInt(point.SiblingsContext?.After.EntityFuzzyHash.TextLength > 0),
 
 						ExistsA_Candidate = BoolToInt(existsA_Candidate),
 						ExistsHSeq_Candidate = BoolToInt(existsHSeq_Candidate),
@@ -103,6 +105,8 @@ namespace Land.Markup.Binding
 						SimI = c.InnerSimilarity,
 						SimA = c.AncestorSimilarity,
 						SimS = c.SiblingsSimilarity,
+						SimSBefore = c.SiblingsBeforeSimilarity,
+						SimSAfter = c.SiblingsAftertSimilarity,
 						
 						AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset.HasValue ?? false),
 						AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset.HasValue ?? false),
@@ -521,8 +525,18 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings)
 					{
-						c.SiblingsSimilarity =
-							EvalSimilarity(point.SiblingsContext, c.Context.SiblingsContext);
+						c.SiblingsSimilarity = EvalSimilarity(
+							point.SiblingsContext, 
+							c.Context.SiblingsContext
+						);
+						c.SiblingsBeforeSimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.EntityFuzzyHash, 
+							c.Context.SiblingsContext.Before.EntityFuzzyHash
+						);
+						c.SiblingsAftertSimilarity = EvalSimilarity(
+							point.SiblingsContext.After.EntityFuzzyHash, 
+							c.Context.SiblingsContext.After.EntityFuzzyHash
+						);
 					}
 				}
 			);

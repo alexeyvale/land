@@ -12,7 +12,8 @@ namespace Land.Markup.Binding
 		public int ExistsI_Point { get; set; }
 		public int ExistsA_Point { get; set; }
 		public int ExistsS_Point { get; set; }
-
+		public int ExistsSBefore_Point { get; set; }
+		public int ExistsSAfter_Point { get; set; }
 		public int ExistsHSeq_Candidate { get; set; }
 		public int ExistsHCore_Candidate { get; set; }
 		public int ExistsI_Candidate { get; set; }
@@ -26,6 +27,8 @@ namespace Land.Markup.Binding
 		public double SimI { get; set; }
 		public double SimA { get; set; }
 		public double SimS { get; set; }
+		public double SimSBefore {get;set;}
+		public double SimSAfter { get; set; }
 		#endregion
 
 		#region Дополнительные проверки

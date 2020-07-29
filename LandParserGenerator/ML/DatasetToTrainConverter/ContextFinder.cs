@@ -218,8 +218,18 @@ namespace DatasetToTrainConverter.CopyPaste
 
 					if (checkSiblings)
 					{
-						c.SiblingsSimilarity =
-							EvalSimilarity(point.SiblingsContext, c.Context.SiblingsContext);
+						c.SiblingsSimilarity = EvalSimilarity(
+							point.SiblingsContext,
+							c.Context.SiblingsContext
+						);
+						c.SiblingsBeforeSimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.EntityFuzzyHash,
+							c.Context.SiblingsContext.Before.EntityFuzzyHash
+						);
+						c.SiblingsAftertSimilarity = EvalSimilarity(
+							point.SiblingsContext.After.EntityFuzzyHash,
+							c.Context.SiblingsContext.After.EntityFuzzyHash
+						);
 					}
 				}
 			);
@@ -515,13 +525,6 @@ namespace DatasetToTrainConverter.CopyPaste
 
 			return file.Root != null;
 		}
-
-		private bool IsSimilarEnough(RemapCandidateInfo candidate) =>
-			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
-
-		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
-			second == null || first.Similarity == 1 && second.Similarity != 1
-				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
 		#endregion
 	}
