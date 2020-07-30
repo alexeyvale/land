@@ -53,6 +53,15 @@ namespace Land.Markup.Binding
 
 				int BoolToInt(bool val) => val ? 1 : 0;
 
+				var existsA_Point = point.AncestorsContext?.Count > 0;
+				var existsHSeq_Point = point.HeaderContext?.Sequence?.Count > 0;
+				var existsHCore_Point = point.HeaderContext?.Core?.Count > 0;
+				var existsI_Point = point.InnerContext?.Content.TextLength > 0;
+				var existsSBeforeGlobal_Point = point.SiblingsContext?.Before.GlobalHash.TextLength > 0;
+				var existsSAfterGlobal_Point = point.SiblingsContext?.After.GlobalHash.TextLength > 0;
+				var existsSBeforeEntity_Point = point.SiblingsContext?.Before.EntityHash.TextLength > 0;
+				var existsSAfterEntity_Point = point.SiblingsContext?.After.EntityHash.TextLength > 0;
+
 				return candidates.Select(c =>
 				{
 					var sameAncestorsCandidates = candidates.Where(cd => cd.AncestorSimilarity == c.AncestorSimilarity).ToList();
@@ -60,29 +69,26 @@ namespace Land.Markup.Binding
 
 					var candidatesExceptCurrent = candidates.Except(new List<RemapCandidateInfo> { c }).ToList();
 
-					var existsA_Point = point.AncestorsContext?.Count > 0;
-					var existsHSeq_Point = point.HeaderContext?.Sequence?.Count > 0;
-					var existsHCore_Point = point.HeaderContext?.Core?.Count > 0;
-					var existsI_Point = point.InnerContext?.Content.TextLength > 0;
-					var existsS_Point = point.SiblingsContext?.Before.Global.TextLength > 0 
-						|| point.SiblingsContext?.After.Global.TextLength > 0;
-
-					var existsA_Candidate = c.Context.AncestorsContext?.Count > 0;
-					var existsHSeq_Candidate = c.Context.HeaderContext?.Sequence?.Count > 0;
 					var existsHCore_Candidate = c.Context.HeaderContext?.Core?.Count > 0;
 					var existsI_Candidate = c.Context.InnerContext?.Content.TextLength > 0;
-					var existsS_Candidate = c.Context.SiblingsContext?.Before.Global.TextLength > 0 
-						|| point.SiblingsContext?.After.Global.TextLength > 0;
 
 					var maxSimA = MaxIfAny(candidatesExceptCurrent, cd => cd.AncestorSimilarity);
 					var maxSimHSeq = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderSequenceSimilarity);
 					var maxSimHCore = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderCoreSimilarity);
 					var maxSimI = MaxIfAny(candidatesExceptCurrent, cd => cd.InnerSimilarity);
-					var maxSimS = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsSimilarity);
+					var maxSimSBeforeGlobal = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsBeforeGlobalSimilarity);
+					var maxSimSAfterGlobal = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsAfterGlobalSimilarity);
+					var maxSimSBeforeEntity = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsBeforeEntitySimilarity);
+					var maxSimSAfterEntity = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsAfterEntitySimilarity);
 
 					var candidatesWithMaxSimA = candidatesExceptCurrent.Where(cd => cd.AncestorSimilarity == maxSimA).ToList();
-					var candidatesWithMaxSimH = candidatesExceptCurrent.Where(cd => cd.HeaderSequenceSimilarity == maxSimHSeq).ToList();
+					var candidatesWithMaxSimHSeq = candidatesExceptCurrent.Where(cd => cd.HeaderSequenceSimilarity == maxSimHSeq).ToList();
+					var candidatesWithMaxSimHCore = candidatesExceptCurrent.Where(cd => cd.HeaderCoreSimilarity == maxSimHSeq).ToList();
 					var candidatesWithMaxSimI = candidatesExceptCurrent.Where(cd => cd.InnerSimilarity == maxSimI).ToList();
+					var candidatesWithMaxSimSBeforeGlobal = candidatesExceptCurrent.Where(cd => cd.SiblingsBeforeGlobalSimilarity == maxSimI).ToList();
+					var candidatesWithMaxSimSAfterGlobal = candidatesExceptCurrent.Where(cd => cd.SiblingsAfterGlobalSimilarity == maxSimI).ToList();
+					var candidatesWithMaxSimSBeforeEntity = candidatesExceptCurrent.Where(cd => cd.SiblingsBeforeEntitySimilarity == maxSimI).ToList();
+					var candidatesWithMaxSimSAfterEntity= candidatesExceptCurrent.Where(cd => cd.SiblingsAfterEntitySimilarity == maxSimI).ToList();
 
 					return new CandidateFeatures
 					{
@@ -90,23 +96,22 @@ namespace Land.Markup.Binding
 						ExistsHSeq_Point = BoolToInt(existsHSeq_Point),
 						ExistsHCore_Point = BoolToInt(existsHCore_Point),
 						ExistsI_Point = BoolToInt(existsI_Point),
-						ExistsS_Point = BoolToInt(existsS_Point),
-						ExistsSBefore_Point = BoolToInt(point.SiblingsContext?.Before.EntityFuzzyHash.TextLength > 0),
-						ExistsSAfter_Point = BoolToInt(point.SiblingsContext?.After.EntityFuzzyHash.TextLength > 0),
+						ExistsSBeforeGlobal_Point = BoolToInt(existsSBeforeGlobal_Point),
+						ExistsSAfterGlobal_Point = BoolToInt(existsSAfterGlobal_Point),
+						ExistsSBeforeEntity_Point = BoolToInt(existsSBeforeEntity_Point),
+						ExistsSAfterEntity_Point = BoolToInt(existsSAfterEntity_Point),
 
-						ExistsA_Candidate = BoolToInt(existsA_Candidate),
-						ExistsHSeq_Candidate = BoolToInt(existsHSeq_Candidate),
 						ExistsHCore_Candidate = BoolToInt(existsHCore_Candidate),
 						ExistsI_Candidate = BoolToInt(existsI_Candidate),
-						ExistsS_Candidate = BoolToInt(existsS_Candidate),
 
 						SimHSeq = c.HeaderSequenceSimilarity,
 						SimHCore = c.HeaderCoreSimilarity,
 						SimI = c.InnerSimilarity,
 						SimA = c.AncestorSimilarity,
-						SimS = c.SiblingsSimilarity,
-						SimSBefore = c.SiblingsBeforeSimilarity,
-						SimSAfter = c.SiblingsAftertSimilarity,
+						SimSBeforeGlobal = c.SiblingsBeforeGlobalSimilarity,
+						SimSAfterGlobal = c.SiblingsAfterGlobalSimilarity,
+						SimSBeforeEntity = c.SiblingsBeforeEntitySimilarity,
+						SimSAfterEntity = c.SiblingsAfterEntitySimilarity,
 						
 						AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset.HasValue ?? false),
 						AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset.HasValue ?? false),
@@ -117,30 +122,80 @@ namespace Land.Markup.Binding
 						MaxSimHSeq = maxSimHSeq,
 						MaxSimHCore = maxSimHCore,
 						MaxSimI = maxSimI,
-						MaxSimS = maxSimS,
+						MaxSimSBeforeGlobal = maxSimSBeforeGlobal,
+						MaxSimSAfterGlobal = maxSimSAfterGlobal,
+						MaxSimSBeforeEntity = maxSimSBeforeEntity,
+						MaxSimSAfterEntity = maxSimSAfterEntity,
 
-						MaxSimA_MaxSimH = MaxIfAny(candidatesWithMaxSimH, cd => cd.AncestorSimilarity),
-						MaxSimI_MaxSimH = MaxIfAny(candidatesWithMaxSimH, cd => cd.InnerSimilarity),
+
+						MaxSimA_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.AncestorSimilarity),
+						MaxSimI_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.InnerSimilarity),
+						MaxSimHCore_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.HeaderCoreSimilarity),
+						MaxSimSBeforeGlobal_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsBeforeGlobalSimilarity),
+						MaxSimSAfterGlobal_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsAfterEntitySimilarity),
+
+						MaxSimA_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.AncestorSimilarity),
+						MaxSimI_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.InnerSimilarity),
+						MaxSimHSeq_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.HeaderSequenceSimilarity),
+						MaxSimSBeforeGlobal_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsBeforeGlobalSimilarity),
+						MaxSimSAfterGlobal_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsAfterEntitySimilarity),
+
 						MaxSimA_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.AncestorSimilarity),
-						MaxSimH_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.HeaderSequenceSimilarity),
-						MaxSimH_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.HeaderSequenceSimilarity),
+						MaxSimHSeq_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.HeaderSequenceSimilarity),
+						MaxSimHCore_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.HeaderCoreSimilarity),
+						MaxSimSBeforeGlobal_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsBeforeGlobalSimilarity),
+						MaxSimSAfterGlobal_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsAfterEntitySimilarity),
+
+						MaxSimHSeq_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.HeaderSequenceSimilarity),
+						MaxSimHCore_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.HeaderCoreSimilarity),
 						MaxSimI_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.InnerSimilarity),
+						MaxSimSBeforeGlobal_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsBeforeGlobalSimilarity),
+						MaxSimSAfterGlobal_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsAfterEntitySimilarity),
+
+						MaxSimHSeq_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.HeaderSequenceSimilarity),
+						MaxSimHCore_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.HeaderCoreSimilarity),
+						MaxSimI_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.InnerSimilarity),
+						MaxSimA_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.AncestorSimilarity),
+						MaxSimSAfterGlobal_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsAfterEntitySimilarity),
+
+						MaxSimHSeq_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.HeaderSequenceSimilarity),
+						MaxSimHCore_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.HeaderCoreSimilarity),
+						MaxSimI_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.InnerSimilarity),
+						MaxSimA_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.AncestorSimilarity),
+						MaxSimSBeforeGlobal_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsAfterEntitySimilarity),
 
 						MaxSimHSeq_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderSequenceSimilarity),
 						MaxSimHCore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderCoreSimilarity),
 						MaxSimI_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.InnerSimilarity),
-						MaxSimS_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsSimilarity),
+						MaxSimSBeforeGlobal_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeGlobalSimilarity),
+						MaxSimSAfterGlobal_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity),
+						MaxSimSBeforeEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeEntitySimilarity),
+						MaxSimSAfterEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity),
 
 						RatioBetterSimA = CountRatioConditional(candidatesExceptCurrent, cd => cd.AncestorSimilarity > c.AncestorSimilarity),
 						RatioBetterSimI = CountRatioConditional(candidatesExceptCurrent, cd => cd.InnerSimilarity > c.InnerSimilarity),
 						RatioBetterSimH = CountRatioConditional(candidatesExceptCurrent, cd => cd.HeaderSequenceSimilarity > c.HeaderSequenceSimilarity),
-						RatioBetterSimS = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsSimilarity > c.SiblingsSimilarity),
+						RatioBetterSimSBeforeGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
+						RatioBetterSimSAfterGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
 
 						RatioSameAncestor = CountRatio(sameAncestorsCandidates, candidates),
 
 						RatioBetterSimI_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.InnerSimilarity > c.InnerSimilarity),
 						RatioBetterSimH_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.HeaderSequenceSimilarity > c.HeaderSequenceSimilarity),
-						RatioBetterSimS_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsSimilarity > c.SiblingsSimilarity),
+						RatioBetterSimSBeforeGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
+						RatioBetterSimSAfterGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
 
 						IsCandidateInnerContextLonger = BoolToInt(existsI_Candidate && (!existsI_Point
 							|| c.Context.InnerContext.Content.TextLength > point.InnerContext.Content.TextLength)),
@@ -350,11 +405,11 @@ namespace Land.Markup.Binding
 						{
 							BeforeSiblingOffset = pointContext.SiblingsContext.Before.IsNotEmpty && candidateAncestor[c] != null
 							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.Before.EntityType]
-								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityHash))?.Item1
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityMd5))?.Item1
 							  : null,
 							AfterSiblingOffset = pointContext.SiblingsContext.After.IsNotEmpty && candidateAncestor[c] != null
 							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.After.EntityType]
-								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityHash))?.Item1
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityMd5))?.Item1
 							  : null
 						} : null
 					})
@@ -525,17 +580,21 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings)
 					{
-						c.SiblingsSimilarity = EvalSimilarity(
-							point.SiblingsContext, 
-							c.Context.SiblingsContext
+						c.SiblingsBeforeGlobalSimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.GlobalHash, 
+							c.Context.SiblingsContext.Before.GlobalHash
 						);
-						c.SiblingsBeforeSimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.EntityFuzzyHash, 
-							c.Context.SiblingsContext.Before.EntityFuzzyHash
+						c.SiblingsAfterGlobalSimilarity = EvalSimilarity(
+							point.SiblingsContext.After.GlobalHash,
+							c.Context.SiblingsContext.After.GlobalHash
 						);
-						c.SiblingsAftertSimilarity = EvalSimilarity(
-							point.SiblingsContext.After.EntityFuzzyHash, 
-							c.Context.SiblingsContext.After.EntityFuzzyHash
+						c.SiblingsBeforeEntitySimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.EntityHash, 
+							c.Context.SiblingsContext.Before.EntityHash
+						);
+						c.SiblingsAfterEntitySimilarity = EvalSimilarity(
+							point.SiblingsContext.After.EntityHash, 
+							c.Context.SiblingsContext.After.EntityHash
 						);
 					}
 				}

@@ -184,7 +184,11 @@ namespace Comparison
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.Select(c => c.Value)));
-							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderCoreSimilarity}; {landCandidate.HeaderSequenceSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}; {landCandidate.SiblingsSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
+							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderSequenceSimilarity}; " +
+								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
+								$"SimSBG={landCandidate.SiblingsBeforeGlobalSimilarity}; SimSAG={landCandidate.SiblingsAfterGlobalSimilarity}; " +
+								$"SimSBE={landCandidate.SiblingsBeforeEntitySimilarity}; SimSAE={landCandidate.SiblingsAfterEntitySimilarity}] " +
+								$"{(landCandidate.IsAuto ? "*" : "")}");
 						}
 						report.WriteLine();
 						report.WriteLine("**************************************************************");

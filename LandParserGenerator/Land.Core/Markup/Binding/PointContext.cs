@@ -251,13 +251,13 @@ namespace Land.Markup.Binding
 
 	public class SiblingsContextPart
 	{
-		public TextOrHash Global { get; set; }
-		public TextOrHash EntityFuzzyHash { get; set; }
-		public byte[] EntityHash { get; set; }
+		public TextOrHash GlobalHash { get; set; }
+		public TextOrHash EntityHash { get; set; }
+		public byte[] EntityMd5 { get; set; }
 		public string EntityType { get; set; }
 
 		[JsonIgnore]
-		public bool IsNotEmpty => Global.TextLength > 0;
+		public bool IsNotEmpty => GlobalHash.TextLength > 0;
 	}
 
 	public class AncestorSiblingsPair
@@ -672,8 +672,8 @@ namespace Land.Markup.Binding
 				{
 					return new SiblingsContext
 					{
-						After = new SiblingsContextPart { Global = new TextOrHash() },
-						Before = new SiblingsContextPart { Global = new TextOrHash() }
+						After = new SiblingsContextPart { GlobalHash = new TextOrHash() },
+						Before = new SiblingsContextPart { GlobalHash = new TextOrHash() }
 					};
 				}
 			}
@@ -743,13 +743,13 @@ namespace Land.Markup.Binding
 			var context = new SiblingsContext
 			{
 				Before = new SiblingsContextPart {
-					Global = new TextOrHash(beforeBuilder.ToString()),
-					EntityFuzzyHash = beforeSiblings.Count > 0 
+					GlobalHash = new TextOrHash(beforeBuilder.ToString()),
+					EntityHash = beforeSiblings.Count > 0 
 						? new TextOrHash(file.Text.Substring(
 							beforeSiblings.Last().Location.Start.Offset, 
 							beforeSiblings.Last().Location.Length.Value))
 						: new TextOrHash(),
-					EntityHash = markedElementIndex > 0 
+					EntityMd5 = markedElementIndex > 0 
 						? GetHash(siblings[markedElementIndex - 1], file) : null,
 					EntityType = markedElementIndex > 0 
 						? siblings[markedElementIndex - 1].Type : null
@@ -757,13 +757,13 @@ namespace Land.Markup.Binding
 
 				After = new SiblingsContextPart
 				{
-					Global = new TextOrHash(afterBuilder.ToString()),
-					EntityFuzzyHash = afterSiblings.Count > 0
+					GlobalHash = new TextOrHash(afterBuilder.ToString()),
+					EntityHash = afterSiblings.Count > 0
 						? new TextOrHash(file.Text.Substring(
 							afterSiblings.First().Location.Start.Offset,
 							afterSiblings.First().Location.Length.Value))
 						: new TextOrHash(),
-					EntityHash = markedElementIndex < siblings.Count 
+					EntityMd5 = markedElementIndex < siblings.Count 
 						? GetHash(siblings[markedElementIndex], file) : null,
 					EntityType = markedElementIndex < siblings.Count 
 						? siblings[markedElementIndex].Type : null

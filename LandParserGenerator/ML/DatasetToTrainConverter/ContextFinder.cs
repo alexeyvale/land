@@ -154,11 +154,11 @@ namespace DatasetToTrainConverter.CopyPaste
 						{
 							BeforeSiblingOffset = pointContext.SiblingsContext.Before.IsNotEmpty && candidateAncestor[c] != null
 							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.Before.EntityType]
-								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityHash))?.Item1
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.Before.EntityMd5))?.Item1
 							  : null,
 							AfterSiblingOffset = pointContext.SiblingsContext.After.IsNotEmpty && candidateAncestor[c] != null
 							  ? ancestorsCache[candidateAncestor[c]].PreprocessedChildren[pointContext.SiblingsContext.After.EntityType]
-								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityHash))?.Item1
+								  .FirstOrDefault(t => t.Item2.SequenceEqual(pointContext.SiblingsContext.After.EntityMd5))?.Item1
 							  : null
 						} : null
 					})
@@ -218,17 +218,17 @@ namespace DatasetToTrainConverter.CopyPaste
 
 					if (checkSiblings)
 					{
-						c.SiblingsSimilarity = EvalSimilarity(
+						c.SiblingsBeforeGlobalSimilarity = EvalSimilarity(
 							point.SiblingsContext,
 							c.Context.SiblingsContext
 						);
-						c.SiblingsBeforeSimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.EntityFuzzyHash,
-							c.Context.SiblingsContext.Before.EntityFuzzyHash
+						c.SiblingsBeforeEntitySimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.EntityHash,
+							c.Context.SiblingsContext.Before.EntityHash
 						);
-						c.SiblingsAftertSimilarity = EvalSimilarity(
-							point.SiblingsContext.After.EntityFuzzyHash,
-							c.Context.SiblingsContext.After.EntityFuzzyHash
+						c.SiblingsAfterEntitySimilarity = EvalSimilarity(
+							point.SiblingsContext.After.EntityHash,
+							c.Context.SiblingsContext.After.EntityHash
 						);
 					}
 				}
@@ -360,16 +360,16 @@ namespace DatasetToTrainConverter.CopyPaste
 
 		public double EvalSimilarity(SiblingsContext a, SiblingsContext b)
 		{
-			if (a.Before.Global.TextLength == 0 && a.After.Global.TextLength == 0)
+			if (a.Before.GlobalHash.TextLength == 0 && a.After.GlobalHash.TextLength == 0)
 			{
-				return b.Before.Global.TextLength == 0 && b.After.Global.TextLength == 0 ? 1 : 0;
+				return b.Before.GlobalHash.TextLength == 0 && b.After.GlobalHash.TextLength == 0 ? 1 : 0;
 			}
 
-			var beforeSimilarity = EvalSimilarity(a.Before.Global, b.Before.Global);
-			var afterSimilarity = EvalSimilarity(a.After.Global, b.After.Global);
+			var beforeSimilarity = EvalSimilarity(a.Before.GlobalHash, b.Before.GlobalHash);
+			var afterSimilarity = EvalSimilarity(a.After.GlobalHash, b.After.GlobalHash);
 
-			return (beforeSimilarity * a.Before.Global.TextLength + afterSimilarity * a.After.Global.TextLength) /
-				(double)(a.Before.Global.TextLength + a.After.Global.TextLength);
+			return (beforeSimilarity * a.Before.GlobalHash.TextLength + afterSimilarity * a.After.GlobalHash.TextLength) /
+				(double)(a.Before.GlobalHash.TextLength + a.After.GlobalHash.TextLength);
 		}
 
 		#endregion
