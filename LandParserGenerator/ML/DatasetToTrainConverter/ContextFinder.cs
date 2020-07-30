@@ -218,9 +218,17 @@ namespace DatasetToTrainConverter.CopyPaste
 
 					if (checkSiblings)
 					{
-						c.SiblingsBeforeGlobalSimilarity = EvalSimilarity(
+						c.SiblingsSimilarity = EvalSimilarity(
 							point.SiblingsContext,
 							c.Context.SiblingsContext
+						);
+						c.SiblingsBeforeGlobalSimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.EntityHash,
+							c.Context.SiblingsContext.Before.EntityHash
+						);
+						c.SiblingsAfterGlobalSimilarity = EvalSimilarity(
+							point.SiblingsContext.After.EntityHash,
+							c.Context.SiblingsContext.After.EntityHash
 						);
 						c.SiblingsBeforeEntitySimilarity = EvalSimilarity(
 							point.SiblingsContext.Before.EntityHash,

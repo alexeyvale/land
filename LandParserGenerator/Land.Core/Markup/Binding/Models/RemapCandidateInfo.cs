@@ -20,6 +20,7 @@ namespace Land.Markup.Binding
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
 
+		public double SiblingsSimilarity { get; set; }
 		public double SiblingsBeforeGlobalSimilarity { get; set; }
 		public double SiblingsAfterGlobalSimilarity { get; set; }
 		public double SiblingsBeforeEntitySimilarity { get; set; }

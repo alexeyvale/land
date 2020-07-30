@@ -110,7 +110,7 @@ namespace Land.Markup.Binding
 		#endregion
 
 		#region Доля элементов с лучшими похожестями контекстов 
-		public double RatioBetterSimH { get; set; }
+		public double RatioBetterSimHSeq { get; set; }
 		public double RatioBetterSimI { get; set; }
 		public double RatioBetterSimA { get; set; }
 		public double RatioBetterSimSBeforeGlobal { get; set; }
@@ -121,7 +121,7 @@ namespace Land.Markup.Binding
 		public double RatioSameAncestor { get; set; }
 
 		#region Доля элементов с лучшими похожестями контекстов в пределах того же контекста предков
-		public double RatioBetterSimH_SameA { get; set; }
+		public double RatioBetterSimHSeq_SameA { get; set; }
 		public double RatioBetterSimI_SameA { get; set; }
 		public double RatioBetterSimSBeforeGlobal_SameA { get; set; }
 		public double RatioBetterSimSAfterGlobal_SameA { get; set; }
