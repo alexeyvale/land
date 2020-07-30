@@ -14,7 +14,7 @@ import sklearn as sk
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV, RandomizedSearchCV
 
-RANDOM_STATE = 11
+RANDOM_STATE_SEED = 11
 
 def eval_model(model, x_test, y_test):
     y_val = model.predict(x_test)
@@ -59,16 +59,19 @@ def fit_grid_lgbm(x, y, verbose):
 
 def fit_grid_rf(x, y, verbose):
     # pipeline = sk.pipeline.Pipeline([
-       # ('poly', sk.preprocessing.PolynomialFeatures(2, True))])
+        # ('nmf', sk.decomposition.NMF(n_components=10, init='random', random_state=RANDOM_STATE_SEED))
+        # ('pca', sk.decomposition.PCA(n_components=10, random_state=RANDOM_STATE_SEED))
+        # ('poly', sk.preprocessing.PolynomialFeatures(2, True))])
+    # ])
     # x = pipeline.fit_transform(x, y)
 
     model = sk.ensemble.RandomForestClassifier()
     parameters_dict = {
-        'max_depth': np.arange(9, 10),
-        'n_estimators': np.arange(110, 111)
+        'max_depth': np.arange(7, 10),
+        'n_estimators': [80, 90, 100]
     }
 
-    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=RANDOM_STATE)
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=RANDOM_STATE_SEED)
     clf = GridSearchCV(model, parameters_dict, cv=cv, scoring='roc_auc', verbose=3)
     clf.fit(x, y)
 

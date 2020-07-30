@@ -855,10 +855,14 @@ namespace Land.Markup.Binding
 			/// Хэш от строки можем посчитать, только если длина строки
 			/// больше заданной константы
 			if (text.Length > FuzzyHashing.MIN_TEXT_LENGTH)
+			{
 				Hash = FuzzyHashing.GetFuzzyHash(text);
+			}
 
 			if (text.Length <= MAX_TEXT_LENGTH)
+			{
 				Text = text;
+			}
 		}
 	}
 
