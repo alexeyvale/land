@@ -11,6 +11,7 @@ import torch
 import shap
 import lightgbm as lgbm
 import sklearn as sk
+from sklearn.feature_selection import SelectKBest
 from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split, StratifiedKFold, GridSearchCV, RandomizedSearchCV
 
@@ -58,12 +59,18 @@ def fit_grid_lgbm(x, y, verbose):
 
 
 def fit_grid_rf(x, y, verbose):
-    # pipeline = sk.pipeline.Pipeline([
+    union = sk.pipeline.FeatureUnion([
+        ('kbest', SelectKBest(k=20)),
+        ('nmf', sk.decomposition.NMF(n_components=10, init='random', random_state=RANDOM_STATE_SEED)),
         # ('nmf', sk.decomposition.NMF(n_components=10, init='random', random_state=RANDOM_STATE_SEED))
-        # ('pca', sk.decomposition.PCA(n_components=10, random_state=RANDOM_STATE_SEED))
+        # ('pca', sk.decomposition.KernelPCA(n_components=10, kernel='rbf', random_state=RANDOM_STATE_SEED))
         # ('poly', sk.preprocessing.PolynomialFeatures(2, True))])
-    # ])
-    # x = pipeline.fit_transform(x, y)
+    ])
+
+    pipeline = sk.pipeline.Pipeline([
+        ('union', union)
+    ])
+    x = pipeline.fit_transform(x, y)
 
     model = sk.ensemble.RandomForestClassifier()
     parameters_dict = {
@@ -75,7 +82,7 @@ def fit_grid_rf(x, y, verbose):
     clf = GridSearchCV(model, parameters_dict, cv=cv, scoring='roc_auc', verbose=3)
     clf.fit(x, y)
 
-    # pipeline.steps.append(['step model', clf])
+    pipeline.steps.append(['step model', clf])
 
     if verbose:
         print(clf.best_params_)
@@ -105,7 +112,7 @@ def fit_grid_rf(x, y, verbose):
         plt.xlim([-1, x.shape[1]])
         plt.show()
 
-    return clf
+    return pipeline
 
 
 def fit_lgbm(x, y, verbose):

@@ -16,7 +16,7 @@ namespace DatasetToTrainConverter.CopyPaste
 		public enum SearchType { Local, Global }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.65;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.5;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }

@@ -59,56 +59,6 @@ namespace Land.Markup.Binding
 		public double MaxSimSAfterEntity_SameA { get; set; }
 		#endregion
 
-		#region Максимальные похожести других контекстов у элементов с максимальной похожестью указанного
-		public double MaxSimHCore_MaxSimI { get; set; }
-		public double MaxSimHSeq_MaxSimI { get; set; }
-		public double MaxSimA_MaxSimI { get; set; }
-		public double MaxSimSBeforeGlobal_MaxSimI { get; set; }
-		public double MaxSimSAfterGlobal_MaxSimI { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimI { get; set; }
-		public double MaxSimSAfterEntity_MaxSimI { get; set; }
-
-		public double MaxSimHCore_MaxSimA { get; set; }
-		public double MaxSimHSeq_MaxSimA { get; set; }
-		public double MaxSimI_MaxSimA { get; set; }
-		public double MaxSimSBeforeGlobal_MaxSimA { get; set; }
-		public double MaxSimSAfterGlobal_MaxSimA { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimA { get; set; }
-		public double MaxSimSAfterEntity_MaxSimA { get; set; }
-
-		public double MaxSimA_MaxSimHSeq { get; set; }
-		public double MaxSimI_MaxSimHSeq { get; set; }
-		public double MaxSimHCore_MaxSimHSeq { get; set; }
-		public double MaxSimSBeforeGlobal_MaxSimHSeq { get; set; }
-		public double MaxSimSAfterGlobal_MaxSimHSeq { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimHSeq { get; set; }
-		public double MaxSimSAfterEntity_MaxSimHSeq { get; set; }
-
-		public double MaxSimA_MaxSimHCore { get; set; }
-		public double MaxSimI_MaxSimHCore { get; set; }
-		public double MaxSimHSeq_MaxSimHCore { get; set; }
-		public double MaxSimSBeforeGlobal_MaxSimHCore { get; set; }
-		public double MaxSimSAfterGlobal_MaxSimHCore { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimHCore { get; set; }
-		public double MaxSimSAfterEntity_MaxSimHCore { get; set; }
-
-		public double MaxSimA_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimI_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimHCore_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimHSeq_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimSAfterGlobal_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimSBeforeGlobal { get; set; }
-		public double MaxSimSAfterEntity_MaxSimSBeforeGlobal { get; set; }
-
-		public double MaxSimA_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimI_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimHCore_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimHSeq_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimSBeforeGlobal_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimSBeforeEntity_MaxSimSAfterGlobal { get; set; }
-		public double MaxSimSAfterEntity_MaxSimSAfterGlobal { get; set; }
-		#endregion
-
 		#region Доля элементов с лучшими похожестями контекстов 
 		public double RatioBetterSimHSeq { get; set; }
 		public double RatioBetterSimI { get; set; }
@@ -117,10 +67,9 @@ namespace Land.Markup.Binding
 		public double RatioBetterSimSAfterGlobal { get; set; }
 		#endregion
 
-		// Доля кандидатов с тем же контекстом предков
+		#region Доля элементов с лучшими похожестями контекстов в пределах того же контекста предков
 		public double RatioSameAncestor { get; set; }
 
-		#region Доля элементов с лучшими похожестями контекстов в пределах того же контекста предков
 		public double RatioBetterSimHSeq_SameA { get; set; }
 		public double RatioBetterSimI_SameA { get; set; }
 		public double RatioBetterSimSBeforeGlobal_SameA { get; set; }

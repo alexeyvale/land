@@ -16,7 +16,7 @@ namespace Land.Markup.Binding
 		public enum SearchType { Local, Global }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.65;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.5;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
@@ -126,55 +126,6 @@ namespace Land.Markup.Binding
 						MaxSimSAfterGlobal = maxSimSAfterGlobal,
 						MaxSimSBeforeEntity = maxSimSBeforeEntity,
 						MaxSimSAfterEntity = maxSimSAfterEntity,
-
-
-						MaxSimA_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.AncestorSimilarity),
-						MaxSimI_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.InnerSimilarity),
-						MaxSimHCore_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.HeaderCoreSimilarity),
-						MaxSimSBeforeGlobal_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsBeforeGlobalSimilarity),
-						MaxSimSAfterGlobal_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimHSeq = MaxIfAny(candidatesWithMaxSimHSeq, cd => cd.SiblingsAfterEntitySimilarity),
-
-						MaxSimA_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.AncestorSimilarity),
-						MaxSimI_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.InnerSimilarity),
-						MaxSimHSeq_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.HeaderSequenceSimilarity),
-						MaxSimSBeforeGlobal_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsBeforeGlobalSimilarity),
-						MaxSimSAfterGlobal_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimHCore = MaxIfAny(candidatesWithMaxSimHCore, cd => cd.SiblingsAfterEntitySimilarity),
-
-						MaxSimA_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.AncestorSimilarity),
-						MaxSimHSeq_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.HeaderSequenceSimilarity),
-						MaxSimHCore_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.HeaderCoreSimilarity),
-						MaxSimSBeforeGlobal_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsBeforeGlobalSimilarity),
-						MaxSimSAfterGlobal_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimI = MaxIfAny(candidatesWithMaxSimI, cd => cd.SiblingsAfterEntitySimilarity),
-
-						MaxSimHSeq_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.HeaderSequenceSimilarity),
-						MaxSimHCore_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.HeaderCoreSimilarity),
-						MaxSimI_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.InnerSimilarity),
-						MaxSimSBeforeGlobal_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsBeforeGlobalSimilarity),
-						MaxSimSAfterGlobal_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimA = MaxIfAny(candidatesWithMaxSimA, cd => cd.SiblingsAfterEntitySimilarity),
-
-						MaxSimHSeq_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.HeaderSequenceSimilarity),
-						MaxSimHCore_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.HeaderCoreSimilarity),
-						MaxSimI_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.InnerSimilarity),
-						MaxSimA_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.AncestorSimilarity),
-						MaxSimSAfterGlobal_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimSBeforeGlobal = MaxIfAny(candidatesWithMaxSimSBeforeGlobal, cd => cd.SiblingsAfterEntitySimilarity),
-
-						MaxSimHSeq_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.HeaderSequenceSimilarity),
-						MaxSimHCore_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.HeaderCoreSimilarity),
-						MaxSimI_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.InnerSimilarity),
-						MaxSimA_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.AncestorSimilarity),
-						MaxSimSBeforeGlobal_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsBeforeGlobalSimilarity),
-						MaxSimSBeforeEntity_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_MaxSimSAfterGlobal = MaxIfAny(candidatesWithMaxSimSAfterGlobal, cd => cd.SiblingsAfterEntitySimilarity),
 
 						MaxSimHSeq_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderSequenceSimilarity),
 						MaxSimHCore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderCoreSimilarity),
