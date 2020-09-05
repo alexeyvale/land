@@ -27,6 +27,7 @@ namespace Land.Markup.Binding
 		public double SiblingsAfterEntitySimilarity { get; set; }
 
 		public double? Similarity { get; set; }
+		public Dictionary<ContextType, double> Weights { get; set; }
 
 		public bool IsAuto { get; set; }
 

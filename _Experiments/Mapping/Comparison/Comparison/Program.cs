@@ -158,7 +158,7 @@ namespace Comparison
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
 					var hasNotChanged = modifiedRemapResult[cp].Count == 1 
-						&& modifiedRemapResult[cp][0].Similarity == 1;
+						&& modifiedRemapResult[cp][0].Weights == null;
 
 					if (!hasNotChanged)
 					{
@@ -189,6 +189,8 @@ namespace Comparison
 								$"SimSBG={landCandidate.SiblingsBeforeGlobalSimilarity}; SimSAG={landCandidate.SiblingsAfterGlobalSimilarity}; " +
 								$"SimSBE={landCandidate.SiblingsBeforeEntitySimilarity}; SimSAE={landCandidate.SiblingsAfterEntitySimilarity}] " +
 								$"{(landCandidate.IsAuto ? "*" : "")}");
+							report.WriteLine($"WHCore={landCandidate.Weights[ContextType.HeaderCore]}; WHSeq={landCandidate.Weights[ContextType.HeaderSequence]}; " +
+								$"WI={landCandidate.Weights[ContextType.Inner]}; WA={landCandidate.Weights[ContextType.Ancestors]}; WS={landCandidate.Weights[ContextType.Siblings]}");
 						}
 						report.WriteLine();
 						report.WriteLine("**************************************************************");

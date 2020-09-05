@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Land.Markup.Binding
 {
-	public interface IHeuristic
+	public interface IPreHeuristic
 	{
 		RemapCandidateInfo GetSameElement(
 			PointContext point,
 			List<RemapCandidateInfo> candidates);
 	}
 
-	public class ProgrammingLanguageHeuristic: IHeuristic
+	public class ProgrammingLanguageHeuristic: IPreHeuristic
 	{
 		private static readonly Func<PointContext, PointContext, bool> HeaderCorePredicate = (a, b) =>
 			a.HeaderContext.Core.SequenceEqual(b.HeaderContext.Core);

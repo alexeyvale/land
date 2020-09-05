@@ -9,32 +9,80 @@ using System.Diagnostics;
 
 namespace Land.Markup.Binding
 {
-	public enum ContextType { HeaderCore, HeaderSequence, Ancestors, Inner, Siblings }
+	public enum ContextType 
+	{ 
+		HeaderCore, 
+		HeaderSequence, 
+		Ancestors, 
+		Inner, 
+		Siblings 
+	}
 
 	public class ContextFinder
 	{
 		public enum SearchType { Local, Global }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.5;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
 		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
 
-		public IHeuristic Heuristic { get; set; }
+		public IPreHeuristic PreHeuristic { get; set; }
+		public List<IWeightsHeuristic> TuningHeuristics { get; private set; } = new List<IWeightsHeuristic>();
+		public List<ISimilarityHeuristic> ScoringHeuristics { get; private set; } = new List<ISimilarityHeuristic>();
 
 		public bool UseNaiveAlgorithm { get; set; }
 
-		public Dictionary<ContextType, double> NaiveWeights { get; private set; } = new Dictionary<ContextType, double>
+		public void SetHeuristic(Type type)
 		{
-			{ContextType.HeaderCore,  3},
-			{ContextType.HeaderSequence,  1},
-			{ContextType.Inner, 1},
-			{ContextType.Ancestors, 2},
-			{ContextType.Siblings, 0.5},
-		};
+			void AddToList<T>(ref List<T> heuristics) where T : IPostHeuristic
+			{
+				if (typeof(T).IsAssignableFrom(type))
+				{
+					var element = heuristics.FirstOrDefault(e => e.GetType().Equals(type));
+
+					if (element == null)
+					{
+						var constructor = type.GetConstructor(Type.EmptyTypes);
+
+						if (constructor != null)
+						{
+							heuristics.Add((T)constructor.Invoke(null));
+						}
+					}
+				}
+			}
+
+			var tuningHeuristics = TuningHeuristics;
+			AddToList(ref tuningHeuristics);
+			TuningHeuristics = tuningHeuristics;
+
+			var scoringHeuristics = ScoringHeuristics;
+			AddToList(ref scoringHeuristics);
+			ScoringHeuristics = scoringHeuristics;
+		}
+
+		public void ResetHeuristic(Type type)
+		{
+			void RemoveFromList<T>(List<T> heuristics)
+			{
+				if (typeof(T).IsAssignableFrom(type))
+				{
+					var element = heuristics.FirstOrDefault(e => e.GetType().Equals(type));
+
+					if (element != null)
+					{
+						heuristics.Remove(element);
+					}
+				}
+			}
+
+			RemoveFromList(TuningHeuristics);
+			RemoveFromList(ScoringHeuristics);
+		}
 
 		public List<CandidateFeatures> GetFeatures(
 			PointContext point,
@@ -300,13 +348,13 @@ namespace Land.Markup.Binding
 			/// Контексты, которые нашлись на первом этапе (эвристикой)
 			var heuristicallyMatched = new HashSet<PointContext>();
 
-			if (Heuristic != null)
+			if (PreHeuristic != null)
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
 				foreach (var pointContext in contextsToPoints.Keys)
 				{
-					var perfectMatch = Heuristic.GetSameElement(pointContext, candidates);
+					var perfectMatch = PreHeuristic.GetSameElement(pointContext, candidates);
 
 					if (perfectMatch != null)
 					{
@@ -316,7 +364,7 @@ namespace Land.Markup.Binding
 						perfectMatch.IsAuto = true;
 						perfectMatch.Similarity = 1;
 
-						ComputeSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings);			
+						ComputeContextSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings);			
 
 						foreach (var point in contextsToPoints[pointContext])
 						{
@@ -337,7 +385,7 @@ namespace Land.Markup.Binding
 
 			foreach (var closestContext in closestContexts)
 			{
-				evaluated[closestContext] = ComputeSimilarities(
+				evaluated[closestContext] = ComputeContextSimilarities(
 					closestContext,
 					candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
 					false
@@ -366,7 +414,7 @@ namespace Land.Markup.Binding
 					})
 					.ToList();
 
-				evaluated[pointContext] = ComputeSimilarities(
+				evaluated[pointContext] = ComputeContextSimilarities(
 					pointContext,
 					currentCandidates,
 					checkSiblings
@@ -386,8 +434,10 @@ namespace Land.Markup.Binding
 			}
 			else
 			{
-				/// Запускаем ML для подсчёта итоговой похожести
-				RunML(evaluated);
+				foreach (var context in evaluated.Keys)
+				{
+					ComputeTotalSimilarities(context, evaluated[context]);
+				}
 			}
 
 			if (searchType == SearchType.Local)
@@ -508,7 +558,9 @@ namespace Land.Markup.Binding
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
 		}
 
-		public List<RemapCandidateInfo> ComputeCoreSimilarities(PointContext point, List<RemapCandidateInfo> candidates)
+		public List<RemapCandidateInfo> ComputeCoreContextSimilarities(
+			PointContext point, 
+			List<RemapCandidateInfo> candidates)
 		{
 			Parallel.ForEach(
 				candidates,
@@ -518,7 +570,7 @@ namespace Land.Markup.Binding
 			return candidates;
 		}
 
-		public List<RemapCandidateInfo> ComputeSimilarities(
+		public List<RemapCandidateInfo> ComputeContextSimilarities(
 			PointContext point,
 			List<RemapCandidateInfo> candidates,
 			bool checkSiblings)
@@ -559,12 +611,52 @@ namespace Land.Markup.Binding
 		}
 
 		public double ComputeNaiveTotalSimilarity(RemapCandidateInfo candidate) =>
-			(NaiveWeights[ContextType.HeaderCore] * candidate.HeaderCoreSimilarity
-			+ NaiveWeights[ContextType.HeaderSequence] * candidate.HeaderSequenceSimilarity
-			+ NaiveWeights[ContextType.Ancestors] * candidate.AncestorSimilarity
-			+ NaiveWeights[ContextType.Inner] * candidate.InnerSimilarity
-			+ NaiveWeights[ContextType.Siblings] * candidate.SiblingsSimilarity)
-			/ NaiveWeights.Values.Sum();
+			(DefaultWeightsProvider.Get(ContextType.HeaderCore) * candidate.HeaderCoreSimilarity
+			+ DefaultWeightsProvider.Get(ContextType.HeaderSequence) * candidate.HeaderSequenceSimilarity
+			+ DefaultWeightsProvider.Get(ContextType.Ancestors) * candidate.AncestorSimilarity
+			+ DefaultWeightsProvider.Get(ContextType.Inner) * candidate.InnerSimilarity
+			+ DefaultWeightsProvider.Get(ContextType.Siblings) * candidate.SiblingsSimilarity)
+			/ DefaultWeightsProvider.SumWeights();
+
+		public void ComputeTotalSimilarities(
+			PointContext sourceContext, 
+			List<RemapCandidateInfo> candidates)
+		{
+			if (candidates.Count == 0)
+			{
+				return;
+			}
+
+			var weights = new Dictionary<ContextType, double?>();
+			
+			foreach (var val in Enum.GetValues(typeof(ContextType)).Cast<ContextType>())
+			{
+				weights[val] = null;
+			};
+
+			foreach (var h in TuningHeuristics)
+			{
+				h.TuneWeights(sourceContext, candidates, weights);
+			}
+
+			foreach (var h in ScoringHeuristics)
+			{
+				h.PredictSimilarity(sourceContext, candidates);
+			}
+
+			var finalWeights = weights.ToDictionary(e => e.Key, e => e.Value ?? 0);
+
+			candidates.ForEach(c =>
+			{
+				c.Similarity = c.Similarity ??
+					(finalWeights[ContextType.Ancestors] * c.AncestorSimilarity 
+						+ finalWeights[ContextType.Inner] * c.InnerSimilarity 
+						+ finalWeights[ContextType.HeaderSequence] * c.HeaderSequenceSimilarity
+						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity)
+					/ finalWeights.Values.Sum();
+				c.Weights = finalWeights;
+			});
+		}
 
 		public void RunML(Dictionary<PointContext, List<RemapCandidateInfo>> elements)
 		{

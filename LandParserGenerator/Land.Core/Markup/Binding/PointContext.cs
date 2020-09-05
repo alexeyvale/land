@@ -805,7 +805,7 @@ namespace Land.Markup.Binding
 				);
 			};
 
-			contextFinder.ComputeCoreSimilarities(nodeContext, candidates);
+			contextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
 
 			candidates = nodeContext.HeaderContext.Core.Count > 0
 				? candidates
