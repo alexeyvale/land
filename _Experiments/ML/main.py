@@ -4,9 +4,11 @@
 
 import os
 import cloudpickle as cpickle
+import mlxtend.classifier
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import skorch
 import torch
 import shap
 import lightgbm as lgbm
@@ -60,10 +62,10 @@ def fit_grid_lgbm(x, y, verbose):
 
 def fit_grid_rf(x, y, verbose):
     union = sk.pipeline.FeatureUnion([
-        ('kbest', SelectKBest(k=20)),
+        # ('kbest', SelectKBest(k=20)),
         ('nmf', sk.decomposition.NMF(n_components=10, init='random', random_state=RANDOM_STATE_SEED)),
-        # ('nmf', sk.decomposition.NMF(n_components=10, init='random', random_state=RANDOM_STATE_SEED))
         # ('pca', sk.decomposition.KernelPCA(n_components=10, kernel='rbf', random_state=RANDOM_STATE_SEED))
+        # ('pca', sk.decomposition.PCA(n_components=10, random_state=RANDOM_STATE_SEED))
         # ('poly', sk.preprocessing.PolynomialFeatures(2, True))])
     ])
 
@@ -75,6 +77,7 @@ def fit_grid_rf(x, y, verbose):
     model = sk.ensemble.RandomForestClassifier()
     parameters_dict = {
         'max_depth': np.arange(7, 10),
+        'max_features': [1, 2, 3, 4, 'log2', 'auto'],
         'n_estimators': [80, 90, 100]
     }
 
@@ -115,25 +118,97 @@ def fit_grid_rf(x, y, verbose):
     return pipeline
 
 
-def fit_lgbm(x, y, verbose):
+def fit_grid_rf2(x, y, verbose):
 
-    model = lgbm.LGBMClassifier(max_depth=3, n_estimators=50, learning_rate=0.3, boosting_type='gbdt')
-    model.fit(x, y)
+    model = sk.ensemble.RandomForestClassifier(class_weight={0: 1, 1: 3})
+    parameters_dict = {
+        'max_depth': np.arange(2, 11),
+        'max_features': [1, 3, 5, 7, 'log2', 'auto'],
+        'n_estimators': [300, 500, 700]
+    }
 
-    # shap_test = shap.TreeExplainer(model).shap_values(X_test)
-    # shap.summary_plot(shap_test, X_test, show=True, feature_names=data.columns[:-1])
+    cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=RANDOM_STATE_SEED)
+    clf = GridSearchCV(model, parameters_dict, cv=cv, scoring='roc_auc', verbose=3)
+    clf.fit(x, y)
 
-    return model
+    if verbose:
+        print(clf.best_params_)
+        print(clf.best_score_)
+
+        importances = clf.best_estimator_.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in clf.best_estimator_.estimators_],
+                     axis=0)
+        indices = np.argsort(importances)[::-1]
+
+        # Print the feature ranking
+        print("Feature ranking:")
+
+        for f in range(x.shape[1]):
+            print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+        # Plot the impurity-based feature importances of the forest
+        plt.figure()
+        plt.title("Feature importances")
+        plt.bar(range(x.shape[1]), importances[indices],
+                color="r", yerr=std[indices], align="center")
+        plt.xticks(range(x.shape[1]), indices)
+        plt.xlim([-1, x.shape[1]])
+        plt.show()
+
+    return clf
 
 
 def fit_rf(x, y, verbose):
-    model = model = sk.ensemble.RandomForestClassifier(n_estimators=500, max_depth=5)
-    model.fit(x, y)
+    clf = sk.ensemble.RandomForestClassifier(n_estimators=700, max_depth=10)
+    clf.fit(x, y)
 
     # shap_test = shap.TreeExplainer(model).shap_values(X_test)
     # shap.summary_plot(shap_test[1], X_test, show=True, feature_names=data.columns[:-1])
     # shap.dependence_plot(11, shap_test[1], X_test, feature_names=data.columns[:-1])
 
+    """result = permutation_importance(clf, x, y, n_repeats=10, random_state=RANDOM_STATE)
+    print(result.importances_mean)
+    print(result.importances_std)"""
+
+    importances = clf.feature_importances_
+    std = np.std([tree.feature_importances_ for tree in clf.estimators_], axis=0)
+    indices = np.argsort(importances)[::-1]
+
+    plt.figure()
+    plt.title("Feature importances")
+    plt.bar(range(x.shape[1]), importances[indices],
+            color="r", yerr=std[indices], align="center")
+    plt.xticks(range(x.shape[1]), indices)
+    plt.xlim([-1, x.shape[1]])
+    plt.show()
+
+    return clf
+
+
+def fit_ensemble(x, y, verbose):
+    torch.set_default_dtype(torch.double)
+    y = torch.tensor(y.values).flatten()
+    x = torch.tensor(x.values, dtype=torch.double)
+
+    model = mlxtend.classifier.StackingClassifier(
+        [
+            sk.ensemble.RandomForestClassifier(
+                n_estimators=100, max_depth=9, random_state=RANDOM_STATE_SEED
+             ),
+            lgbm.LGBMClassifier(
+                boosting_type='gbdt', n_estimators=86, max_depth=7, learning_rate=0.1, random_state=RANDOM_STATE_SEED
+            )
+        ],
+        skorch.NeuralNetClassifier(
+            NeuralModel,
+            criterion=torch.nn.CrossEntropyLoss,
+            max_epochs=200,  lr=0.001, iterator_train__shuffle=True,
+            module__input_size=x.shape[1] + 4, module__output_size=2, module__layers=[100, 50, 25]
+        ),
+        True, verbose=3, use_features_in_secondary=True
+    )
+
+    model.fit(x, y)
     return model
 
 
@@ -143,10 +218,10 @@ class NeuralModel(torch.nn.Module):
     # В конструктор передаём количество признаков, количество возможных исходов,
     # список количеств нейронов для слоёв и dropout - долю нейронов, исключаемых
     # из обучения на различных итерациях
-    def __init__(self, input_size, output_size, layers, p=0.4):
+    def __init__(self, input_size, output_size, layers, p=0.1):
         super().__init__()
 
-        self.batch_norm_num = torch.nn.BatchNorm1d(input_size)
+        # self.batch_norm_num = torch.nn.BatchNorm1d(input_size)
 
         all_layers = []
 
@@ -167,26 +242,24 @@ class NeuralModel(torch.nn.Module):
         self.layers = torch.nn.Sequential(*all_layers)
 
     def forward(self, x):
-        x = self.batch_norm_num(x)
+        # x = self.batch_norm_num(x)
         x = self.layers(x)
         return x
 
 
 def fit_neural(x, y, verbose):
-
     # Разделяем выборку на тренировочную и тестовую
     y_train = torch.tensor(y.values).flatten()
     X_train = torch.tensor(x.values, dtype=torch.float)
 
-
     # в первом слое X_train.shape[1] нейронов, в последующих скрытых - задано массивом,
     # в выходном слое 2 нейрона
-    model = NeuralModel(X_train.shape[1], 2, [200, 100, 50], p=0.4)
+    model = NeuralModel(X_train.shape[1], 2, [100, 50, 25], p=0.1)
     loss_function = torch.nn.CrossEntropyLoss()
     # adaptive learning rate optimization algorithm
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-    epochs = 250
+    epochs = 700
     aggregated_losses = []
 
     # датасет прогоняется через нейросеть epochs раз
@@ -239,7 +312,7 @@ for ext, files_list in dataset_files_dict.items():
     x = data.drop(['IsAuto'], axis=1)
     # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.1, random_state=RANDOM_STATE, stratify=y)
 
-    trained_model = fit_grid_rf(x, y, True)
+    trained_model = fit_neural(x, y, True)
     # eval_model(trained_model, x_test, y_test)
 
     # shap_test = shap.DeepExplainer(trained_model, x_train).shap_values(x_test)

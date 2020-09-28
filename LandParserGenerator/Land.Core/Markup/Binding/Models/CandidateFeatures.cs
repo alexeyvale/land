@@ -6,6 +6,8 @@ namespace Land.Markup.Binding
 {
 	public struct CandidateFeatures
 	{
+		public int IsSingleCandidate { get; set; }
+
 		#region Флаги существования контекстов
 		public int ExistsHSeq_Point { get; set; }
 		public int ExistsHCore_Point { get; set; }
@@ -45,8 +47,8 @@ namespace Land.Markup.Binding
 		public double MaxSimA { get; set; }
 		public double MaxSimSBeforeGlobal { get; set; }
 		public double MaxSimSAfterGlobal { get; set; }
-		public double MaxSimSBeforeEntity { get; set; }
-		public double MaxSimSAfterEntity { get; set; }
+		//public double MaxSimSBeforeEntity { get; set; }
+		//public double MaxSimSAfterEntity { get; set; }
 		#endregion
 
 		#region Максимальные похожести в рамках того же контекста предков, что и у рассматриваемого кандидата
@@ -55,16 +57,16 @@ namespace Land.Markup.Binding
 		public double MaxSimI_SameA { get; set; }
 		public double MaxSimSBeforeGlobal_SameA { get; set; }
 		public double MaxSimSAfterGlobal_SameA { get; set; }
-		public double MaxSimSBeforeEntity_SameA { get; set; }
-		public double MaxSimSAfterEntity_SameA { get; set; }
+		//public double MaxSimSBeforeEntity_SameA { get; set; }
+		//public double MaxSimSAfterEntity_SameA { get; set; }
 		#endregion
 
 		#region Доля элементов с лучшими похожестями контекстов 
 		public double RatioBetterSimHSeq { get; set; }
 		public double RatioBetterSimI { get; set; }
 		public double RatioBetterSimA { get; set; }
-		public double RatioBetterSimSBeforeGlobal { get; set; }
-		public double RatioBetterSimSAfterGlobal { get; set; }
+		//public double RatioBetterSimSBeforeGlobal { get; set; }
+		//public double RatioBetterSimSAfterGlobal { get; set; }
 		#endregion
 
 		#region Доля элементов с лучшими похожестями контекстов в пределах того же контекста предков
@@ -72,19 +74,25 @@ namespace Land.Markup.Binding
 
 		public double RatioBetterSimHSeq_SameA { get; set; }
 		public double RatioBetterSimI_SameA { get; set; }
-		public double RatioBetterSimSBeforeGlobal_SameA { get; set; }
-		public double RatioBetterSimSAfterGlobal_SameA { get; set; }
+		//public double RatioBetterSimSBeforeGlobal_SameA { get; set; }
+		//public double RatioBetterSimSAfterGlobal_SameA { get; set; }
 		#endregion
 
 		#region Разные соотношения длин
 		public int IsCandidateInnerContextLonger { get; set; }
 		public int IsCandidateHeaderCoreLonger { get; set; }
-
+		
 		public double InnerLengthRatio { get; set; }
 		public double InnerLengthRatio1000_Point { get; set; }
 		public double InnerLengthRatio1000_Candidate { get; set; }
 
 		public double HeaderCoreLengthRatio { get; set; }
+
+		//public double WordsRatio { get; set; }
+		//public double WordsRatio10_Point { get; set; }
+		//public double WordsRatio10_Candidate { get; set; }
+		public double WordsMatchRatioFromBeginning { get; set; }
+		public double WordsMatchRatioFromEnd { get; set; }
 		#endregion
 
 		public int IsAuto { get; set; }

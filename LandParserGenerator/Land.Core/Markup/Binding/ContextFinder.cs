@@ -103,6 +103,7 @@ namespace Land.Markup.Binding
 
 						ExistsHCore_Candidate = BoolToInt(existsHCore_Candidate),
 						ExistsI_Candidate = BoolToInt(existsI_Candidate),
+						IsSingleCandidate = BoolToInt(candidates.Count == 1),
 
 						SimHSeq = c.HeaderSequenceSimilarity,
 						SimHCore = c.HeaderCoreSimilarity,
@@ -124,29 +125,29 @@ namespace Land.Markup.Binding
 						MaxSimI = maxSimI,
 						MaxSimSBeforeGlobal = maxSimSBeforeGlobal,
 						MaxSimSAfterGlobal = maxSimSAfterGlobal,
-						MaxSimSBeforeEntity = maxSimSBeforeEntity,
-						MaxSimSAfterEntity = maxSimSAfterEntity,
+						//MaxSimSBeforeEntity = maxSimSBeforeEntity,
+						//MaxSimSAfterEntity = maxSimSAfterEntity,
 
 						MaxSimHSeq_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderSequenceSimilarity),
 						MaxSimHCore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderCoreSimilarity),
 						MaxSimI_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.InnerSimilarity),
 						MaxSimSBeforeGlobal_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeGlobalSimilarity),
 						MaxSimSAfterGlobal_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity),
-						MaxSimSBeforeEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeEntitySimilarity),
-						MaxSimSAfterEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterEntitySimilarity),
+						//MaxSimSBeforeEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeEntitySimilarity),
+						//MaxSimSAfterEntity_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterEntitySimilarity),
 
 						RatioBetterSimA = CountRatioConditional(candidatesExceptCurrent, cd => cd.AncestorSimilarity > c.AncestorSimilarity),
 						RatioBetterSimI = CountRatioConditional(candidatesExceptCurrent, cd => cd.InnerSimilarity > c.InnerSimilarity),
 						RatioBetterSimHSeq = CountRatioConditional(candidatesExceptCurrent, cd => cd.HeaderSequenceSimilarity > c.HeaderSequenceSimilarity),
-						RatioBetterSimSBeforeGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
-						RatioBetterSimSAfterGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
+						//RatioBetterSimSBeforeGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
+						//RatioBetterSimSAfterGlobal = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
 
 						RatioSameAncestor = CountRatio(sameAncestorsCandidates, candidates),
 
 						RatioBetterSimI_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.InnerSimilarity > c.InnerSimilarity),
 						RatioBetterSimHSeq_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.HeaderSequenceSimilarity > c.HeaderSequenceSimilarity),
-						RatioBetterSimSBeforeGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
-						RatioBetterSimSAfterGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
+						//RatioBetterSimSBeforeGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsBeforeGlobalSimilarity > c.SiblingsBeforeGlobalSimilarity),
+						//RatioBetterSimSAfterGlobal_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsAfterGlobalSimilarity > c.SiblingsAfterGlobalSimilarity),
 
 						IsCandidateInnerContextLonger = BoolToInt(existsI_Candidate && (!existsI_Point
 							|| c.Context.InnerContext.Content.TextLength > point.InnerContext.Content.TextLength)),
@@ -162,6 +163,21 @@ namespace Land.Markup.Binding
 						HeaderCoreLengthRatio = existsHCore_Point && existsHCore_Candidate
 							? Math.Min(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
 								/ (double)Math.Max(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
+							: 0,
+
+						//WordsRatio = existsHCore_Point
+						//	? Math.Min(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
+						//		/ (double)Math.Max(c.Context.HeaderContext.Words.Count, point.HeaderContext.Words.Count)
+						//	: 0,
+						//WordsRatio10_Point = Math.Min(point.HeaderContext.Words.Count / (double)10, 1),
+						//WordsRatio10_Candidate = Math.Min(c.Context.HeaderContext.Words.Count / (double)10, 1),
+						WordsMatchRatioFromBeginning = existsHCore_Point
+							? point.HeaderContext.Words.TakeWhile((str, i) => c.Context.HeaderContext.Words.Count > i 
+								&& str == c.Context.HeaderContext.Words[i]).Count() / (double)point.HeaderContext.Words.Count
+							: 0,
+						WordsMatchRatioFromEnd = existsHCore_Point
+							? point.HeaderContext.Words.Reverse<string>().TakeWhile((str, i) => c.Context.HeaderContext.Words.Count > i
+								&& str == c.Context.HeaderContext.Words[c.Context.HeaderContext.Words.Count - 1 - i]).Count() / (double)point.HeaderContext.Words.Count
 							: 0,
 
 						IsAuto = BoolToInt(c.IsAuto),
