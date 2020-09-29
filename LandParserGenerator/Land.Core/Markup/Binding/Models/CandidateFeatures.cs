@@ -29,8 +29,8 @@ namespace Land.Markup.Binding
 		public double SimA { get; set; }
 		public double SimSBeforeGlobal { get; set; }
 		public double SimSAfterGlobal { get; set; }
-		public double SimSBeforeEntity {get;set;}
-		public double SimSAfterEntity { get; set; }
+		//public double SimSBeforeEntity {get;set;}
+		//public double SimSAfterEntity { get; set; }
 		#endregion
 
 		#region Дополнительные проверки

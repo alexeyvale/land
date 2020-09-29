@@ -111,8 +111,8 @@ namespace Land.Markup.Binding
 						SimA = c.AncestorSimilarity,
 						SimSBeforeGlobal = c.SiblingsBeforeGlobalSimilarity,
 						SimSAfterGlobal = c.SiblingsAfterGlobalSimilarity,
-						SimSBeforeEntity = c.SiblingsBeforeEntitySimilarity,
-						SimSAfterEntity = c.SiblingsAfterEntitySimilarity,
+						//SimSBeforeEntity = c.SiblingsBeforeEntitySimilarity,
+						//SimSAfterEntity = c.SiblingsAfterEntitySimilarity,
 						
 						AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset.HasValue ?? false),
 						AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset.HasValue ?? false),
