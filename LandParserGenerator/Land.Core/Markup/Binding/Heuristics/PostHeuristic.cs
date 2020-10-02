@@ -8,11 +8,11 @@ namespace Land.Markup.Binding
 	{
 		private static Dictionary<ContextType, double> NaiveWeights { get; set; } = new Dictionary<ContextType, double>
 		{
-			{ContextType.HeaderCore,  3},
+			{ContextType.HeaderCore,  2},
 			{ContextType.HeaderSequence,  1},
-			{ContextType.Inner, 1},
-			{ContextType.Ancestors, 2},
-			{ContextType.Siblings, 0.5},
+			{ContextType.Inner, 2},
+			{ContextType.Ancestors, 1},
+			{ContextType.Siblings, 1},
 		};
 
 		public static double Get(ContextType contextType) =>
@@ -80,89 +80,36 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	/// <summary>
-	/// Приоитезирует контексты в зависимости от того, наколько их оценки различны между кандидатами
-	/// </summary>
-	public class PrioritizeByGapHeuristic : IWeightsHeuristic
+	public class TuneHeaderPriorityIfSimilar : IWeightsHeuristic
 	{
-		public class ContextFeatures
-		{
-			public double MaxValue { get; set; }
-			public double GapFromMax { get; set; }
-			public double MedianGap { get; set; }
-		}
-
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (candidates.Count > 1)
+			var maxSimilarityCandidates = candidates.Where(c => c.HeaderCoreSimilarity == 1).ToList();
+
+			if(maxSimilarityCandidates.Count > 0)
 			{
-				var features = new Dictionary<ContextType, ContextFeatures>
-				{
-					{ ContextType.HeaderCore,  GetFeatures(candidates, (c)=>c.HeaderCoreSimilarity) },
-					{ ContextType.HeaderSequence,  GetFeatures(candidates, (c)=>c.HeaderSequenceSimilarity) },
-					{ ContextType.Ancestors, GetFeatures(candidates, (c)=>c.AncestorSimilarity) },
-					{ ContextType.Inner,  GetFeatures(candidates, (c)=>c.InnerSimilarity) }
-				};
-
-				/// Контексты с почти одинаковыми значениями похожести имеют минимальный вес,
-				/// остальные сортируем в зависимости от того, насколько по ним различаются кандидаты
-				var contextsToPrioritize = new List<ContextType>();
-
-				foreach (var kvp in features.Where(f => !weights[f.Key].HasValue))
-				{
-					if (kvp.Value.MaxValue < ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD 
-						|| (1 - kvp.Value.MaxValue) * ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT > kvp.Value.GapFromMax)
-					{
-						weights[kvp.Key] = 1;
-					}
-					else
-					{
-						weights[kvp.Key] = DefaultWeightsProvider.Get(kvp.Key);
-					}
-				}
-
-				System.Diagnostics.Trace.WriteLine(
-					$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
-				);
+				weights[ContextType.HeaderSequence] = DefaultWeightsProvider.Get(ContextType.HeaderSequence) * 4;
 			}
+
+			if (maxSimilarityCandidates.Count == 1)
+			{
+				weights[ContextType.HeaderCore] = DefaultWeightsProvider.Get(ContextType.HeaderCore) * 2;
+			}
+
+			System.Diagnostics.Trace.WriteLine(
+				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			);
 
 			return weights;
 		}
-
-		private ContextFeatures GetFeatures(
-			List<RemapCandidateInfo> candidates,
-			Func<RemapCandidateInfo, double> getSimilarity)
-		{
-			/// Сортируем кандидатов по похожести каждого из контекстов
-			var ordered = candidates.OrderByDescending(c => getSimilarity(c)).ToList();
-
-			/// Считаем разности между последовательно идущими отсортированными по похожести элементами
-			var gaps = new List<double>(ordered.Count - 1);
-			for (var i = 0; i < ordered.Count - 1; ++i)
-			{
-				gaps.Add(getSimilarity(ordered[i]) - getSimilarity(ordered[i + 1]));
-			}
-			gaps = gaps.OrderByDescending(e => e).ToList();
-
-			return new ContextFeatures
-			{
-				MaxValue = getSimilarity(ordered.First()),
-				GapFromMax = getSimilarity(ordered[0]) - getSimilarity(ordered[1]),
-				MedianGap = gaps.Count % 2 == 0
-							? (gaps[gaps.Count / 2] + gaps[gaps.Count / 2 - 1]) / 2
-							: gaps[gaps.Count / 2]
-			};
-		}
 	}
 
-	/// <summary>
-	/// Понижает приоритет внутреннего контекста, если нет сильно похожего элемента
-	/// </summary>
-	public class LowerFrequentlyChangingPriority : IWeightsHeuristic
+	public class TuneInnerPriorityAsFrequentlyChanging : IWeightsHeuristic
 	{
+		const double EXCELLENT_THRESHOLD = 0.9;
 		const double GARBAGE_THRESHOLD = 0.6;
 
 		public Dictionary<ContextType, double?> TuneWeights(
@@ -170,15 +117,59 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (candidates.Max(c => c.InnerSimilarity) <= GARBAGE_THRESHOLD)
-			{
-				weights[ContextType.Inner] = 0;
-			}
+			var maxInnerSimilarity = candidates.Max(c => c.InnerSimilarity);
 
-			if (candidates.Max(c => (c.SiblingsBeforeGlobalSimilarity + c.SiblingsAfterGlobalSimilarity) / 2.0) <= GARBAGE_THRESHOLD)
-			{
-				weights[ContextType.Siblings] = 0;
-			}
+			var coeff = maxInnerSimilarity < EXCELLENT_THRESHOLD
+				 ? (Math.Max(maxInnerSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (1 - GARBAGE_THRESHOLD)
+				 : 2;
+
+			weights[ContextType.Inner] = coeff * DefaultWeightsProvider.Get(ContextType.Inner);
+
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
+
+			return weights;
+		}
+	}
+
+	public class TuneSiblingsPriorityAsFrequentlyChanging : IWeightsHeuristic
+	{
+		const double EXCELLENT_THRESHOLD = 0.95;
+		const double GARBAGE_THRESHOLD = 0.8;
+
+		public Dictionary<ContextType, double?> TuneWeights(
+			PointContext source,
+			List<RemapCandidateInfo> candidates,
+			Dictionary<ContextType, double?> weights)
+		{
+			var maxInnerSimilarity = candidates.Max(c => c.SiblingsSimilarity);
+
+			var coeff = maxInnerSimilarity < EXCELLENT_THRESHOLD
+				 ? (Math.Max(maxInnerSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (1 - GARBAGE_THRESHOLD)
+				 : 2;
+
+			weights[ContextType.Siblings] = coeff * DefaultWeightsProvider.Get(ContextType.Siblings);
+
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
+
+			return weights;
+		}
+	}
+
+	public class TuneInnerPriorityAccordingToLength : IWeightsHeuristic
+	{
+		const double THRESHOLD = 20;
+
+		public Dictionary<ContextType, double?> TuneWeights(
+			PointContext source,
+			List<RemapCandidateInfo> candidates,
+			Dictionary<ContextType, double?> weights)
+		{
+			weights[ContextType.Inner] *= source.InnerContext.Content.TextLength /
+				Math.Max(source.InnerContext.Content.TextLength, THRESHOLD);
 
 			System.Diagnostics.Trace.WriteLine(
 				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
@@ -188,21 +179,22 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneInnerPriorityAccordingToLength : IWeightsHeuristic
+	public class TuneSiblingsPriorityAccordingToLength : IWeightsHeuristic
 	{
-		const double INNER_LENGTH_THRESHOLD = 50;
+		const double THRESHOLD = 500;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			weights[ContextType.Inner] *= source.InnerContext.Content.TextLength /
-				(source.InnerContext.Content.TextLength + INNER_LENGTH_THRESHOLD);
+			var maxLength = Math.Max(source.SiblingsContext.Before.GlobalHash.TextLength, source.SiblingsContext.After.GlobalHash.TextLength);
 
-			System.Diagnostics.Trace.WriteLine(
-				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
-			);
+			weights[ContextType.Siblings] *= maxLength / Math.Max(maxLength, THRESHOLD);
+
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
 
 			return weights;
 		}
@@ -215,16 +207,13 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (weights[ContextType.HeaderCore] == null)
-				weights[ContextType.HeaderCore] = 3;
-			if (weights[ContextType.HeaderSequence] == null)
-				weights[ContextType.HeaderSequence] = 1;
-			if (weights[ContextType.Ancestors] == null)
-				weights[ContextType.Ancestors] = 2;
-			if (weights[ContextType.Inner] == null)
-				weights[ContextType.Inner] = 1;
-			if (weights[ContextType.Siblings] == null)
-				weights[ContextType.Siblings] = 0.5;
+			foreach(var val in Enum.GetValues(typeof(ContextType)).Cast<ContextType>())
+			{
+				if(weights[val] == null)
+				{
+					weights[val] = DefaultWeightsProvider.Get(val);
+				}
+			}
 
 			return weights;
 		}

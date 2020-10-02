@@ -21,10 +21,8 @@ namespace Land.Markup.Binding
 		public double InnerSimilarity { get; set; }
 
 		public double SiblingsSimilarity { get; set; }
-		public double SiblingsBeforeGlobalSimilarity { get; set; }
-		public double SiblingsAfterGlobalSimilarity { get; set; }
-		public double SiblingsBeforeEntitySimilarity { get; set; }
-		public double SiblingsAfterEntitySimilarity { get; set; }
+		public double SiblingsBeforeSimilarity { get; set; }
+		public double SiblingsAfterSimilarity { get; set; }
 
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }

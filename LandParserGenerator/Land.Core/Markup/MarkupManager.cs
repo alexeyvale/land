@@ -26,10 +26,12 @@ namespace Land.Markup
 			#region Подключение эвристик
 
 			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
-			ContextFinder.SetHeuristic(typeof(PrioritizeByGapHeuristic));
-			ContextFinder.SetHeuristic(typeof(LowerFrequentlyChangingPriority));
+			ContextFinder.SetHeuristic(typeof(TuneHeaderPriorityIfSimilar));
+			ContextFinder.SetHeuristic(typeof(TuneInnerPriorityAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsPriorityAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneInnerPriorityAccordingToLength));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsPriorityAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
-			/// ContextFinder.SetHeuristic(typeof(TuneInnerPriorityAccordingToLength));
 
 			#endregion
 		}
