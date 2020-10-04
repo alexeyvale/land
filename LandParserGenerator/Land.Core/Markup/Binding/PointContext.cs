@@ -189,15 +189,19 @@ namespace Land.Markup.Binding
 
 	public class HeaderContext
 	{
+		[JsonIgnore]
+		public string Raw { get; set; }
+
 		public List<HeaderContextElement> Sequence { get; set; }
-		public List<string> Core { get; set; }
+		public List<HeaderContextElement> Core { get; set; }
 
 		public override bool Equals(object obj)
 		{
 			if (obj is HeaderContext elem)
 			{
-				return ReferenceEquals(this, elem) ||
-					Sequence.SequenceEqual(elem.Sequence);
+				return ReferenceEquals(this, elem) 
+					|| Sequence.SequenceEqual(elem.Sequence)
+						&& Core.SequenceEqual(elem.Core);
 			}
 
 			return false;
@@ -560,8 +564,9 @@ namespace Land.Markup.Binding
 
 			return new HeaderContext
 			{
-				Sequence = headerSequence,
-				Core = headerSequence.Where(e=>e.Priority == maxPriority).SelectMany(e=>e.Value).ToList()
+				Raw = String.Join(" ", sequence.SelectMany(e => e.Value)),
+				Sequence = headerSequence.Where(e => e.Priority < maxPriority).ToList(),
+				Core = headerSequence.Where(e=>e.Priority == maxPriority).ToList()
 			};
 		}
 

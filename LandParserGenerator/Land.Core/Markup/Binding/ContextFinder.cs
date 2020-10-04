@@ -1031,12 +1031,14 @@ namespace Land.Markup.Binding
 		public void ComputeCoreSimilarities_old(PointContext point, RemapCandidateInfo candidate)
 		{
 			candidate.HeaderSequenceSimilarity = Levenshtein_old(
-				point.HeaderContext.Sequence.SelectMany(e=>e.Value).ToList(), 
-				candidate.Context.HeaderContext.Sequence.SelectMany(e => e.Value).ToList()
+				point.HeaderContext.Sequence.SelectMany(e=>e.Value)
+					.Concat(point.HeaderContext.Core.SelectMany(e => e.Value)).ToList(), 
+				candidate.Context.HeaderContext.Sequence.SelectMany(e => e.Value)
+					.Concat(candidate.Context.HeaderContext.Core.SelectMany(e => e.Value)).ToList()
 			);
 			candidate.HeaderCoreSimilarity = Levenshtein_old(
-				point.HeaderContext.Core, 
-				candidate.Context.HeaderContext.Core
+				point.HeaderContext.Core.SelectMany(e => e.Value).ToList(), 
+				candidate.Context.HeaderContext.Core.SelectMany(e => e.Value).ToList()
 			);
 			candidate.AncestorSimilarity = Levenshtein_old(
 				point.AncestorsContext, 

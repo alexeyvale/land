@@ -72,15 +72,15 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			System.Diagnostics.Trace.WriteLine(
-				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
-			);
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
 
 			return weights;
 		}
 	}
 
-	public class TuneHeaderPriorityIfSimilar : IWeightsHeuristic
+	public class TuneHeaderWeightIfSimilar : IWeightsHeuristic
 	{
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
@@ -89,25 +89,36 @@ namespace Land.Markup.Binding
 		{
 			var maxSimilarityCandidates = candidates.Where(c => c.HeaderCoreSimilarity == 1).ToList();
 
-			if(maxSimilarityCandidates.Count > 0)
+			InitWithDefault(weights, ContextType.HeaderSequence);
+			InitWithDefault(weights, ContextType.HeaderCore);
+
+			if (maxSimilarityCandidates.Count > 0)
 			{
-				weights[ContextType.HeaderSequence] = DefaultWeightsProvider.Get(ContextType.HeaderSequence) * 4;
+				weights[ContextType.HeaderSequence] *= 4;
 			}
 
 			if (maxSimilarityCandidates.Count == 1)
 			{
-				weights[ContextType.HeaderCore] = DefaultWeightsProvider.Get(ContextType.HeaderCore) * 2;
+				weights[ContextType.HeaderCore] *= 2;
 			}
 
-			System.Diagnostics.Trace.WriteLine(
-				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
-			);
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
 
 			return weights;
 		}
+
+		private void InitWithDefault(Dictionary<ContextType, double?> weights, ContextType type)
+		{
+			if(!weights[type].HasValue)
+			{
+				weights[type] = DefaultWeightsProvider.Get(type);
+			}
+		}
 	}
 
-	public class TuneInnerPriorityAsFrequentlyChanging : IWeightsHeuristic
+	public class TuneInnerWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
 		const double EXCELLENT_THRESHOLD = 0.9;
 		const double GARBAGE_THRESHOLD = 0.6;
@@ -133,7 +144,7 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneSiblingsPriorityAsFrequentlyChanging : IWeightsHeuristic
+	public class TuneSiblingsWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
 		const double EXCELLENT_THRESHOLD = 0.95;
 		const double GARBAGE_THRESHOLD = 0.8;
@@ -159,7 +170,7 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneInnerPriorityAccordingToLength : IWeightsHeuristic
+	public class TuneInnerWeightAccordingToLength : IWeightsHeuristic
 	{
 		const double THRESHOLD = 20;
 
@@ -171,15 +182,15 @@ namespace Land.Markup.Binding
 			weights[ContextType.Inner] *= source.InnerContext.Content.TextLength /
 				Math.Max(source.InnerContext.Content.TextLength, THRESHOLD);
 
-			System.Diagnostics.Trace.WriteLine(
-				$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
-			);
+			//System.Diagnostics.Trace.WriteLine(
+			//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+			//);
 
 			return weights;
 		}
 	}
 
-	public class TuneSiblingsPriorityAccordingToLength : IWeightsHeuristic
+	public class TuneSiblingsWeightAccordingToLength : IWeightsHeuristic
 	{
 		const double THRESHOLD = 500;
 

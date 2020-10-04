@@ -147,8 +147,7 @@ namespace Comparison
 
 					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0 ||
 						basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0 &&
-						modifiedRemapResult[cp][0].Context.HeaderContext.Sequence.SelectMany(h => h.Value)
-							.SequenceEqual(basicRemapResult[cp][0].Context.HeaderContext.Sequence.SelectMany(h => h.Value));
+						modifiedRemapResult[cp][0].Context.HeaderContext.Raw == basicRemapResult[cp][0].Context.HeaderContext.Raw;
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
 					var hasNotChanged = modifiedRemapResult[cp].Count == 1 
@@ -164,12 +163,12 @@ namespace Comparison
 						report.WriteLine(Path.GetFileName(cp.Context.FileContext.Name));
 						report.WriteLine("*");
 
-						report.WriteLine(String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(c => c.Value)));
+						report.WriteLine(cp.Context.HeaderContext.Raw);
 						report.WriteLine("*");
 
 						foreach (var landCandidate in basicRemapResult[cp].Take(5))
 						{
-							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value)));
+							report.WriteLine(landCandidate.Context.HeaderContext.Raw);
 							report.WriteLine($"{landCandidate.Similarity}  [{landCandidate.HeaderCoreSimilarity}; {landCandidate.HeaderSequenceSimilarity}; {landCandidate.InnerSimilarity}; {landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
 						}
 
@@ -186,7 +185,7 @@ namespace Comparison
 
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
 						{
-							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value)));
+							report.WriteLine($"{landCandidate.Context.HeaderContext.Raw}");
 							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderSequenceSimilarity}; " +
 								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
 								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}] " +
@@ -198,7 +197,7 @@ namespace Comparison
 
 						var tuple = new Tuple<string, string>(
 								cp.Context.FileContext.Name,
-								String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(h => h.Value))
+								cp.Context.HeaderContext.Raw
 							);
 
 						if (isModifiedAuto)
