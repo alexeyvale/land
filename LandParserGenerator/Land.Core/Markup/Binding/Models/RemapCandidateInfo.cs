@@ -13,7 +13,7 @@ namespace Land.Markup.Binding
 
 		public SiblingsSearchResult SiblingsSearchResult { get; set; }
 
-		public double HeaderSequenceSimilarity { get; set; }
+		public double HeaderNonCoreSimilarity { get; set; }
 		public double HeaderCoreSimilarity { get; set; }
 		public double HeaderWordsSimilarity { get; set; }
 
@@ -33,7 +33,7 @@ namespace Land.Markup.Binding
 
 		public override string ToString()
 		{
-			return $"{String.Format("{0:f4}", Similarity)} [H: {String.Format("{0:f2}", HeaderSequenceSimilarity)}; A: {String.Format("{0:f2}", AncestorSimilarity)}; I: {String.Format("{0:f2}", InnerSimilarity)}]";
+			return $"{String.Format("{0:f4}", Similarity)} [H: {String.Format("{0:f2}", HeaderNonCoreSimilarity)}; A: {String.Format("{0:f2}", AncestorSimilarity)}; I: {String.Format("{0:f2}", InnerSimilarity)}]";
 		}
 	}
 }

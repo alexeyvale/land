@@ -1,19 +1,47 @@
-﻿using System;
+﻿using Land.Core;
+using Land.Core.Parsing.Tree;
+using Land.Core.Specification;
+using Land.Markup.CoreExtension;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using Land.Core;
-using Land.Core.Specification;
-using Land.Core.Parsing.Tree;
-using Land.Markup.CoreExtension;
-using System.Text.RegularExpressions;
 
 namespace Land.Markup.Binding
 {
 	public interface IEqualsIgnoreValue
 	{
 		bool EqualsIgnoreValue(object obj);
+	}
+
+	public class PrioritizedWord
+	{
+		public double Priority { get; set; }
+		public string Text { get; set; }
+
+		public override bool Equals(object obj)
+		{
+			if (obj is PrioritizedWord elem)
+			{
+				return ReferenceEquals(this, elem) || Priority == elem.Priority
+					&& Text == elem.Text;
+			}
+
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				var hashCode = 1685606927;
+				hashCode = hashCode * -1521134295 + Priority.GetHashCode();
+				hashCode = hashCode * -1521134295 + Text.GetHashCode();
+
+				return hashCode;
+			}
+		}
 	}
 
 	public abstract class TypedPrioritizedContextElement
@@ -27,7 +55,7 @@ namespace Land.Markup.Binding
 	{
 		public bool ExactMatch { get; set; }
 
-		public List<string> Value { get; set; }
+		public List<PrioritizedWord> Value { get; set; }
 
 		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
 		public bool EqualsIgnoreValue(object obj)
@@ -67,7 +95,7 @@ namespace Land.Markup.Binding
 				foreach (var elem in Value)
 				{
 					hashCode = hashCode * -1521134295 
-						+ EqualityComparer<string>.Default.GetHashCode(elem);
+						+ EqualityComparer<PrioritizedWord>.Default.GetHashCode(elem);
 				}
 
 				return hashCode;
@@ -92,16 +120,16 @@ namespace Land.Markup.Binding
 			{
 				Type = node.Type,
 				Value = isExactMatch
-					? new List<string> { String.Join("", node.Value) }
+					? new List<PrioritizedWord> { new PrioritizedWord { Text = String.Join("", node.Value), Priority = 1 } }
 					: node.Value.SelectMany(e=>GetWords(e)).ToList(),
 				Priority = node.Options.GetPriority().Value,
 				ExactMatch = isExactMatch
 			};
 		}
 
-		public static List<string> GetWords(string str)
+		public static List<PrioritizedWord> GetWords(string str)
 		{
-			var result = new List<string>();
+			var result = new List<PrioritizedWord>();
 			var splitted = str.Split(
 				new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries
 			);
@@ -114,12 +142,23 @@ namespace Land.Markup.Binding
 				{
 					if (char.IsUpper(part[i]))
 					{
-						result.Add(part.Substring(firstIdx, i - firstIdx));
+						var word = part.Substring(firstIdx, i - firstIdx);
+						result.Add(new PrioritizedWord
+						{
+							Text = word,
+							Priority = word.All(c => char.IsLetterOrDigit(c)) ? 1 : 0.1
+						});
+
 						firstIdx = i;
 					}
 				}
 
-				result.Add(part.Substring(firstIdx));
+				var lastWord = part.Substring(firstIdx);
+				result.Add(new PrioritizedWord
+				{
+					Text = lastWord,
+					Priority = lastWord.All(c=>char.IsLetterOrDigit(c)) ? 1 : 0.1
+				});
 			}
 
 			return result;
@@ -189,19 +228,24 @@ namespace Land.Markup.Binding
 
 	public class HeaderContext
 	{
-		[JsonIgnore]
-		public string Raw { get; set; }
-
 		public List<HeaderContextElement> Sequence { get; set; }
-		public List<HeaderContextElement> Core { get; set; }
+		public List<int> NonCoreIndices { get; set; }
+		public List<int> CoreIndices { get; set; }
+
+		[JsonIgnore]
+		public List<HeaderContextElement> NonCore =>
+			NonCoreIndices.Select(i => Sequence[i]).ToList();
+
+		[JsonIgnore]
+		public List<HeaderContextElement> Core =>
+			CoreIndices.Select(i => Sequence[i]).ToList();
 
 		public override bool Equals(object obj)
 		{
 			if (obj is HeaderContext elem)
 			{
 				return ReferenceEquals(this, elem) 
-					|| Sequence.SequenceEqual(elem.Sequence)
-						&& Core.SequenceEqual(elem.Core);
+					|| Sequence.SequenceEqual(elem.Sequence);
 			}
 
 			return false;
@@ -217,6 +261,7 @@ namespace Land.Markup.Binding
 
 			return false;
 		}
+
 		public override int GetHashCode()
 		{
 			return base.GetHashCode();
@@ -274,7 +319,7 @@ namespace Land.Markup.Binding
 			return new ContextElement()
 			{
 				Type = node.Type,
-				HeaderContext = PointContext.GetHeaderContext(node).Sequence.SelectMany(e=>e.Value).ToList()
+				HeaderContext = PointContext.GetHeaderContext(node).Sequence.SelectMany(e=>e.Value.Select(valElem => valElem.Text)).ToList()
 			};
 		}
 	}
@@ -564,9 +609,17 @@ namespace Land.Markup.Binding
 
 			return new HeaderContext
 			{
-				Raw = String.Join(" ", sequence.SelectMany(e => e.Value)),
-				Sequence = headerSequence.Where(e => e.Priority < maxPriority).ToList(),
-				Core = headerSequence.Where(e=>e.Priority == maxPriority).ToList()
+				Sequence = headerSequence,
+				NonCoreIndices = headerSequence
+					.Select((e, i) => new { elem = e, idx = i })
+					.Where((e, i) => e.elem.Priority < maxPriority)
+					.Select(e => e.idx)
+					.ToList(),
+				CoreIndices = headerSequence
+					.Select((e, i) => new { elem = e, idx = i })
+					.Where((e, i) => e.elem.Priority == maxPriority)
+					.Select(e => e.idx)
+					.ToList(),
 			};
 		}
 
@@ -628,7 +681,10 @@ namespace Land.Markup.Binding
 				{
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
-						result.Add((ContextElement)current);
+						if (current.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+						{
+							result.Add((ContextElement)current);
+						}
 					}
 					else
 					{
@@ -731,12 +787,14 @@ namespace Land.Markup.Binding
 					beforeSiblings.Select(e => new ContextElement
 					{
 						Type = e.Type,
-						HeaderContext = PointContext.GetHeaderContext(e).Sequence.SelectMany(el => el.Value).ToList()
+						HeaderContext = PointContext.GetHeaderContext(e).Sequence
+							.SelectMany(el => el.Value.Select(valElem => valElem.Text)).ToList()
 					}).ToList(),
 					afterSiblings.Select(e => new ContextElement
 					{
 						Type = e.Type,
-						HeaderContext = PointContext.GetHeaderContext(e).Sequence.SelectMany(el => el.Value).ToList()
+						HeaderContext = PointContext.GetHeaderContext(e).Sequence
+							.SelectMany(el => el.Value.Select(valElem => valElem.Text)).ToList()
 					}).ToList()
 				);
 		}
@@ -919,12 +977,12 @@ namespace Land.Markup.Binding
 					.Take(MAX_COUNT)
 					.TakeWhile(c => c.HeaderCoreSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
 					.ToList()
-				: nodeContext.HeaderContext.Sequence.Count > 0
+				: nodeContext.HeaderContext.NonCore.Count > 0
 					? candidates
-						.OrderByDescending(c => c.HeaderSequenceSimilarity)
+						.OrderByDescending(c => c.HeaderNonCoreSimilarity)
 						.ThenByDescending(c => c.AncestorSimilarity)
 						.Take(MAX_COUNT)
-						.TakeWhile(c => c.HeaderSequenceSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
+						.TakeWhile(c => c.HeaderNonCoreSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
 						.ToList()
 					: candidates
 						.OrderByDescending(c => c.InnerSimilarity)

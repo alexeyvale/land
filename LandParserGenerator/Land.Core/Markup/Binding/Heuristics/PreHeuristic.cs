@@ -18,7 +18,7 @@ namespace Land.Markup.Binding
 		private static readonly Func<PointContext, PointContext, bool> HeaderCorePredicate = (a, b) =>
 			a.HeaderContext.Core.SequenceEqual(b.HeaderContext.Core);
 		private static readonly Func<PointContext, PointContext, bool> HeaderSequencePredicate = (a, b) =>
-			a.HeaderContext.Equals(b.HeaderContext);
+			a.HeaderContext.Sequence.SequenceEqual(b.HeaderContext.Sequence);
 		private static readonly Func<PointContext, PointContext, bool> InnerPredicate = (a, b) =>
 			a.InnerContext.Content.Text == b.InnerContext.Content.Text
 				&& (a.InnerContext.Content.Hash?.SequenceEqual(b.InnerContext.Content.Hash) ?? true);
@@ -65,7 +65,7 @@ namespace Land.Markup.Binding
 			/// Базовый предикат, которому должны удовлетворять похожие элементы,
 			/// выбираем, основываясь на том, как вычисляли контекст ближайших
 			var baseIdx = point.HeaderContext.Core.Count > 0
-				? 0 : point.HeaderContext.Sequence.Count > 0
+				? 0 : point.HeaderContext.NonCore.Count > 0
 					? 1 : point.InnerContext.Content?.TextLength > 0
 						? 2 : (int?)null;
 

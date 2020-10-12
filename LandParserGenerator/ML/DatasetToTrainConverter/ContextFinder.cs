@@ -184,8 +184,8 @@ namespace DatasetToTrainConverter.CopyPaste
 
 		public void ComputeCoreSimilarities(PointContext point, RemapCandidateInfo candidate)
 		{
-			candidate.HeaderSequenceSimilarity =
-				Levenshtein(point.HeaderContext.Sequence, candidate.Context.HeaderContext.Sequence);
+			candidate.HeaderNonCoreSimilarity =
+				Levenshtein(point.HeaderContext.NonCore, candidate.Context.HeaderContext.NonCore);
 			candidate.HeaderCoreSimilarity =
 				Levenshtein(point.HeaderContext.Core, candidate.Context.HeaderContext.Core);
 
