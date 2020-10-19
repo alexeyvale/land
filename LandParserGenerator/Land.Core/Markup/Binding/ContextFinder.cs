@@ -418,11 +418,7 @@ namespace Land.Markup.Binding
 					}
 				);
 
-				if (searchType == SearchType.Local)
-				{
-					/// Ищем оптимальное сопоставление кандидатов точкам и ближайшим
-					OptimizeEvaluationResults(evaluated);
-				}
+				
 			}
 			else
 			{
@@ -433,6 +429,32 @@ namespace Land.Markup.Binding
 						ComputeTotalSimilarities_old(evaluated[key]);
 						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
 
+						if (evaluated[key].Count > 0)
+						{
+							var first = evaluated[key][0];
+							var second = evaluated[key].Count > 1 ? evaluated[key][1] : null;
+
+							if (IsSimilarEnough(first)
+								&& (second == null || AreDistantEnough(first, second)))
+							{
+								first.IsAuto = true;
+							}
+						}
+					}
+				);
+			}
+
+			if (searchType == SearchType.Local)
+			{
+				/// Ищем оптимальное сопоставление кандидатов точкам и ближайшим
+				OptimizeEvaluationResults(evaluated);
+			}
+			else
+			{
+				Parallel.ForEach(
+					evaluated.Keys.ToList(),
+					key =>
+					{
 						if (evaluated[key].Count > 0)
 						{
 							var first = evaluated[key][0];
@@ -509,7 +531,7 @@ namespace Land.Markup.Binding
 				Levenshtein(point.HeaderContext.Core, candidate.Context.HeaderContext.Core);
 
 			candidate.AncestorSimilarity =
-				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
+				Math.Pow(Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext), 2);
 			candidate.InnerSimilarity =
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
 		}
@@ -993,12 +1015,12 @@ namespace Land.Markup.Binding
 		public void ComputeCoreSimilarities_old(PointContext point, RemapCandidateInfo candidate)
 		{
 			candidate.HeaderNonCoreSimilarity = Levenshtein_old(
-				point.HeaderContext.Sequence.SelectMany(e => e.Value).ToList(),
-				candidate.Context.HeaderContext.Sequence.SelectMany(e => e.Value).ToList()
+				point.HeaderContext.Sequence_old,
+				candidate.Context.HeaderContext.Sequence_old
 			);
 			candidate.HeaderCoreSimilarity = Levenshtein_old(
-				point.HeaderContext.Core.SelectMany(e => e.Value).ToList(),
-				candidate.Context.HeaderContext.Core.SelectMany(e => e.Value).ToList()
+				point.HeaderContext.Core_old,
+				candidate.Context.HeaderContext.Core_old
 			);
 			candidate.AncestorSimilarity = Levenshtein_old(
 				point.AncestorsContext,
@@ -1090,20 +1112,21 @@ namespace Land.Markup.Binding
 		private double DispatchLevenshtein_old<T>(T a, T b)
 		{
 			if (a is string)
+			{
 				return Levenshtein(a as string, b as string);
+			}
 			else if (a is AncestorsContextElement)
 			{
 				var aElem = a as AncestorsContextElement;
 				var bElem = b as AncestorsContextElement;
 
 				return aElem.Type == bElem.Type
-					? Levenshtein(
-						aElem.HeaderContext.Sequence.SelectMany(e => e.Value).ToList(),
-						bElem.HeaderContext.Sequence.SelectMany(e => e.Value).ToList()
-					) : 0;
+					? Levenshtein_old(aElem.HeaderContext.Sequence_old, bElem.HeaderContext.Sequence_old) : 0;
 			}
 			else
+			{
 				return a.Equals(b) ? 1 : 0;
+			}
 		}
 
 		#endregion

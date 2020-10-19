@@ -131,7 +131,7 @@ namespace Land.Markup.Binding
 		{
 			var result = new List<PrioritizedWord>();
 			var splitted = str.Split(
-				new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries
+				new char[] { '_', ' ' }, StringSplitOptions.RemoveEmptyEntries
 			);
 
 			foreach (var part in splitted)
@@ -239,6 +239,15 @@ namespace Land.Markup.Binding
 		[JsonIgnore]
 		public List<HeaderContextElement> Core =>
 			CoreIndices.Select(i => Sequence[i]).ToList();
+
+		#region Old
+
+		public List<string> Sequence_old =>
+			Sequence.Select(e => String.Join("", e.Value.Select(word => word.Text))).ToList();
+		public string Core_old =>
+			String.Join("", Core.Select(e => String.Join("", e.Value.Select(word => word.Text))).ToList());
+
+		#endregion
 
 		public override bool Equals(object obj)
 		{
