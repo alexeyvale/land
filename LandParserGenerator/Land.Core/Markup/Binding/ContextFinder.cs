@@ -861,6 +861,26 @@ namespace Land.Markup.Binding
 			//{
 			//	denominator = Math.Max(((List<string>)a).Sum(e => e.Length), ((List<string>)b).Sum(e => e.Length));
 			//}
+			else if (a is IEnumerable<PrioritizedWord>)
+			{
+				var aSockets = (a as IEnumerable<PrioritizedWord>)
+					.GroupBy(e => e.Priority).ToDictionary(g => g.Key, g => g.Count());
+				var bSockets = (b as IEnumerable<PrioritizedWord>)
+					.GroupBy(e => e.Priority).ToDictionary(g => g.Key, g => g.Count());
+
+				denominator += aSockets.Sum(kvp => kvp.Key * kvp.Value);
+
+				foreach (var kvp in aSockets)
+				{
+					if (bSockets.ContainsKey(kvp.Key))
+					{
+						bSockets[kvp.Key] -= kvp.Value;
+					}
+				}
+
+				denominator += bSockets.Where(kvp => kvp.Value > 0)
+					.Sum(kvp => kvp.Key * kvp.Value);
+			}
 			else
 			{
 				denominator = Math.Max(a.Count(), b.Count());
