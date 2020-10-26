@@ -776,14 +776,16 @@ namespace Land.Markup.Binding
 			var otherElements = new List<RemapCandidateInfo>(candidates);
 			candidates.Add(changedElement);
 
-			var step = 0.05;
+			var headerCoreStep = point.Context.HeaderContext.Core.Count > 0 ? 0.05 : 1.0;
+			var headerNonCoreStep = point.Context.HeaderContext.NonCore.Count > 0 ? 0.05 : 1.0;
+			var innerStep = point.Context.InnerContext.Content.TextLength > 0 ? 0.05 : 1.0;
 			var successCount = 0;
 
-			for (var headerCoreSimilarity = 1.0; headerCoreSimilarity >= 0; headerCoreSimilarity -= step)
+			for (var headerCoreSimilarity = 1.0; headerCoreSimilarity >= 0; headerCoreSimilarity -= headerCoreStep)
 			{
-				for (var headerNonCoreSimilarity = 1.0; headerNonCoreSimilarity >= 0; headerNonCoreSimilarity -= step)
+				for (var headerNonCoreSimilarity = 1.0; headerNonCoreSimilarity >= 0; headerNonCoreSimilarity -= headerNonCoreStep)
 				{
-					for (var innerSimilarity = 1.0; innerSimilarity >= 0; innerSimilarity -= step)
+					for (var innerSimilarity = 1.0; innerSimilarity >= 0; innerSimilarity -= innerStep)
 					{
 						foreach(var c in candidates)
 						{
@@ -845,7 +847,7 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return successCount / 80.0;
+			return successCount / (1 / (headerCoreStep * headerNonCoreStep * innerStep)) * 100;
 		}
 
 		#region EvalSimilarity
