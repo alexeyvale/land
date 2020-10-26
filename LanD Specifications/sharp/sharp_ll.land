@@ -68,7 +68,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list
-	leaf name type modifier arguments
+	leaf name type modifier arguments entity_attribute
 }
 
 %customblock {
@@ -80,6 +80,7 @@ block				=	'{' Any '}'
 %markup {
 	land namespace enum class_struct_interface method field property
 	
+	priority(0.1) entity_attribute
 	priority(0.1) modifier CLASS_STRUCT_INTERFACE
 	priority(0.8) name
 	priority(0.5) arguments

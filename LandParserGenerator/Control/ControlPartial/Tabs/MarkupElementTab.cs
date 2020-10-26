@@ -111,6 +111,8 @@ namespace Land.Control
 
 				if (selectedCandidate != null)
 				{
+					double qualityScore;
+
 					if (State.PendingCommand.Command == LandExplorerCommand.Relink)
 					{
 						var point = State.PendingCommand.Target.DataContext is ConcernPoint cPoint
@@ -123,12 +125,17 @@ namespace Land.Control
 							GetPointSearchArea()
 						);
 
+						qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
+							point,
+							State.PendingCommand.Document
+						);
+
 						point.Name = ConcernPointNameText.Text;
 						point.Comment = ConcernPointCommentText.Text;
 					}
 					else
 					{
-						MarkupManager.AddConcernPoint(
+						var point = MarkupManager.AddConcernPoint(
 							selectedCandidate.Node,
 							State.PendingCommand.Document,
 							GetPointSearchArea(),
@@ -137,11 +144,16 @@ namespace Land.Control
 							State.PendingCommand.Target?.DataContext as Concern
 						);
 
+						qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
+							point,
+							State.PendingCommand.Document
+						);
+
 						if (State.PendingCommand.Target != null)
 							State.PendingCommand.Target.IsExpanded = true;
 					}
 
-					SetStatus("Привязка завершена", ControlStatus.Success);
+					SetStatus($"Привязка завершена, устойчивость = {qualityScore}%", ControlStatus.Success);
 				}
 				else
 				{

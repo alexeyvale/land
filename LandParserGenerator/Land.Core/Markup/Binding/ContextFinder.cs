@@ -749,6 +749,105 @@ namespace Land.Markup.Binding
 		public bool AreFilesSimilarEnough(FileContext a, FileContext b) =>
 			EvalSimilarity(a.Content, b.Content) > FILE_SIMILARITY_THRESHOLD;
 
+		public double GetBindingQualityScore(ConcernPoint point, ParsedFile file)
+		{
+			var siblingsArgs = new SiblingsConstructionArgs();
+			var heuristic = new ProgrammingLanguageHeuristic();
+			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.Type });
+			file.Root.Accept(visitor);
+
+			var candidates = visitor.Grouped[point.Context.Type]
+				.Except(new List<Node> { point.AstNode })
+				.Select(n => new RemapCandidateInfo
+				{
+					Context = ContextManager.GetContext(n, file, siblingsArgs, null)
+				})
+				.ToList();
+
+			var closest = point.Context.ClosestContext
+				.Select(c => heuristic.GetSameElement(c, candidates))
+				.ToList();
+
+			candidates = candidates.Except(closest).ToList();
+
+			ComputeContextSimilarities(point.Context, candidates, true);
+
+			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsSimilarity = 1 };
+			var otherElements = new List<RemapCandidateInfo>(candidates);
+			candidates.Add(changedElement);
+
+			var step = 0.05;
+			var successCount = 0;
+
+			for (var headerCoreSimilarity = 1.0; headerCoreSimilarity >= 0; headerCoreSimilarity -= step)
+			{
+				for (var headerNonCoreSimilarity = 1.0; headerNonCoreSimilarity >= 0; headerNonCoreSimilarity -= step)
+				{
+					for (var innerSimilarity = 1.0; innerSimilarity >= 0; innerSimilarity -= step)
+					{
+						foreach(var c in candidates)
+						{
+							c.Similarity = null;
+						}
+
+						changedElement.HeaderCoreSimilarity = headerCoreSimilarity;
+						changedElement.HeaderNonCoreSimilarity = headerNonCoreSimilarity;
+						changedElement.InnerSimilarity = innerSimilarity;
+
+						/// Эмуляция базового правила перепривязки
+						if(changedElement.HeaderCoreSimilarity == 1)
+						{
+							if(otherElements.All(c=>c.HeaderCoreSimilarity < 1))
+							{
+								++successCount;
+								continue;
+							}
+							else
+							{
+								if (changedElement.HeaderNonCoreSimilarity == 1)
+								{
+									if (otherElements.All(c => c.HeaderNonCoreSimilarity < 1))
+									{
+										++successCount;
+										continue;
+									}
+									else
+									{
+										if (changedElement.InnerSimilarity == 1)
+										{
+											if (otherElements.All(c => c.InnerSimilarity < 1))
+											{
+												++successCount;
+												continue;
+											}
+										}
+									}
+								}
+							}
+						}
+
+						ComputeTotalSimilarities(point.Context, candidates);
+						var ordered = candidates.OrderByDescending(c => c.Similarity).ToList();
+
+						if (ordered.Count > 0)
+						{
+							var first = ordered[0];
+							var second = ordered.Count > 1 ? ordered[1] : null;
+
+							if (first == changedElement
+								&& IsSimilarEnough(first)
+								&& (second == null || AreDistantEnough(first, second)))
+							{
+								++successCount;
+							}
+						}
+					}
+				}
+			}
+
+			return successCount / 80.0;
+		}
+
 		#region EvalSimilarity
 
 		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
