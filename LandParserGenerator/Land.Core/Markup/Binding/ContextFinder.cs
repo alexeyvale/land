@@ -428,18 +428,6 @@ namespace Land.Markup.Binding
 					{
 						ComputeTotalSimilarities_old(evaluated[key]);
 						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
-
-						if (evaluated[key].Count > 0)
-						{
-							var first = evaluated[key][0];
-							var second = evaluated[key].Count > 1 ? evaluated[key][1] : null;
-
-							if (IsSimilarEnough(first)
-								&& (second == null || AreDistantEnough(first, second)))
-							{
-								first.IsAuto = true;
-							}
-						}
 					}
 				);
 			}

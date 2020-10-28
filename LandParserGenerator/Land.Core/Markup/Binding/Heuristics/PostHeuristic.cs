@@ -111,8 +111,8 @@ namespace Land.Markup.Binding
 				{
 					weights[ContextType.HeaderCore] *= 2;
 				}
-				/// Если их несколько, разобраться поможет остальная часть заголовка
-				else
+				/// Если их несколько и остальная часть заголовка различается, она нам поможет
+				else if(maxSimilarityCandidates.Select(c=>c.HeaderNonCoreSimilarity).Distinct().Count() > 1)
 				{
 					weights[ContextType.HeaderNonCore] = weights[ContextType.HeaderCore] * 2;
 				}

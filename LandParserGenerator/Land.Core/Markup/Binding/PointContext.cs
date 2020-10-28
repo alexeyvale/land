@@ -140,7 +140,10 @@ namespace Land.Markup.Binding
 
 				for (var i = 1; i < part.Length; ++i)
 				{
-					if (char.IsUpper(part[i]))
+					if (Char.IsLower(part[i - 1]) && Char.IsUpper(part[i])
+						|| Char.IsUpper(part[i - 1]) && Char.IsUpper(part[i]) && i < part.Length - 1 && Char.IsLower(part[i + 1])
+						|| Char.IsLetterOrDigit(part[i - 1]) != Char.IsLetterOrDigit(part[i])
+						|| Char.IsDigit(part[i - 1]) != Char.IsDigit(part[i]))
 					{
 						var word = part.Substring(firstIdx, i - firstIdx);
 						result.Add(new PrioritizedWord
