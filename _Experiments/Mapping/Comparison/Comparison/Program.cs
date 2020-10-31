@@ -142,13 +142,16 @@ namespace Comparison
 
 				foreach (var cp in pointsOfType)
 				{
-					var isModifiedAuto = modifiedRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
-					var isBasicAuto = basicRemapResult[cp].FirstOrDefault()?.IsAuto ?? false;
+					var modifiedResult = modifiedRemapResult[cp].Where(e => !e.Deleted).ToList();
+					var basicResult = basicRemapResult[cp].Where(e => !e.Deleted).ToList();
 
-					var sameFirst = basicRemapResult[cp].Count == 0 && modifiedRemapResult[cp].Count == 0 ||
-						basicRemapResult[cp].Count > 0 && modifiedRemapResult[cp].Count > 0 &&
-						modifiedRemapResult[cp][0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text))
-							.SequenceEqual(basicRemapResult[cp][0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text)));
+					var isModifiedAuto = modifiedResult.FirstOrDefault()?.IsAuto ?? false;
+					var isBasicAuto = basicResult.FirstOrDefault()?.IsAuto ?? false;
+
+					var sameFirst = basicResult.Count == 0 && modifiedResult.Count == 0 ||
+						basicResult.Count > 0 && modifiedResult.Count > 0 &&
+						modifiedResult[0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text))
+							.SequenceEqual(basicResult[0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text)));
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
 					var hasNotChanged = modifiedRemapResult[cp].Count == 1 
@@ -167,10 +170,10 @@ namespace Comparison
 						report.WriteLine(String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
 						report.WriteLine("*");
 
-						foreach (var landCandidate in basicRemapResult[cp].Take(5))
+						foreach (var landCandidate in basicRemapResult[cp].Take(7))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
-							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderNonCoreSimilarity}; SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : "")}");
+							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderNonCoreSimilarity}; SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 
 						report.WriteLine("*");
@@ -184,13 +187,13 @@ namespace Comparison
 								$"WS={modifiedRemapResult[cp][0].Weights[ContextType.Siblings]}");
 						}
 
-						foreach (var landCandidate in modifiedRemapResult[cp].Take(5))
+						foreach (var landCandidate in modifiedRemapResult[cp].Take(7))
 						{
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
 							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimHNCore={landCandidate.HeaderNonCoreSimilarity}; " +
 								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
 								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}] " +
-								$"{(landCandidate.IsAuto ? "*" : "")}");
+								$"{(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 						report.WriteLine();
 						report.WriteLine("**************************************************************");

@@ -414,11 +414,8 @@ namespace Land.Markup.Binding
 					key =>
 					{
 						ComputeTotalSimilarities(key, evaluated[key]);
-						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
 					}
-				);
-
-				
+				);		
 			}
 			else
 			{
@@ -427,7 +424,6 @@ namespace Land.Markup.Binding
 					key =>
 					{
 						ComputeTotalSimilarities_old(evaluated[key]);
-						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
 					}
 				);
 			}
@@ -443,6 +439,8 @@ namespace Land.Markup.Binding
 					evaluated.Keys.ToList(),
 					key =>
 					{
+						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
+
 						if (evaluated[key].Count > 0)
 						{
 							var first = evaluated[key][0];
@@ -472,6 +470,144 @@ namespace Land.Markup.Binding
 		private void OptimizeEvaluationResults(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
+			if (evaluationResults.Count > 0 && evaluationResults.First().Value.Count > 0)
+			{
+				var scores = new int[
+					evaluationResults.Count,
+					evaluationResults.First().Value.Count
+				];
+				var indicesToContexts = new PointContext[evaluationResults.Count];
+
+				var i = 0;
+				foreach (var from in evaluationResults)
+				{
+					indicesToContexts[i] = from.Key;
+
+					for (var j = 0; j < from.Value.Count; ++j)
+					{
+						scores[i, j] = (int)(10000 * (1 - (from.Value[j].Similarity ?? 0)));
+					}
+					++i;
+				}
+
+				/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
+				var bestMatchesFinder = new AssignmentProblem();
+				var bestMatches = bestMatchesFinder.Compute1(scores);
+
+				var bestContextMatches = indicesToContexts
+					.Select((context, idx) => new
+					{
+						Context = context,
+						Candidate = bestMatches[idx] != -1 
+							? evaluationResults[context][bestMatches[idx]] : null
+					})
+					.ToList();
+
+				Parallel.ForEach(
+					evaluationResults.Keys.ToList(),
+					key => evaluationResults[key] = evaluationResults[key].OrderByDescending(c => c.Similarity).ToList()
+				);
+
+				int oldCount;
+
+				do
+				{
+					oldCount = bestContextMatches.Count;
+
+					/// Проходим по найденным наилучшим соответствиям
+					for (i = 0; i < bestContextMatches.Count; ++i)
+					{
+						var actualList = evaluationResults[bestContextMatches[i].Context]
+							.Where(e => !e.Deleted)
+							.OrderByDescending(e => e.Similarity)
+							.ToList();
+
+						if (bestContextMatches[i].Candidate != null)
+						{
+							/// проверяем для него условие автоматического принятия решения.
+							var first = bestContextMatches[i].Candidate;
+							var second = actualList.SkipWhile(c => c != bestContextMatches[i].Candidate).Skip(1).FirstOrDefault();
+
+							/// Если оно выполняется, удаляем наилучшего кандидата 
+							/// из списков кандидатов для остальных элементов
+							if (IsSimilarEnough(first) && (second == null || AreDistantEnough(first, second)))
+							{
+								evaluationResults[bestContextMatches[i].Context] = 
+									evaluationResults[bestContextMatches[i].Context].OrderByDescending(e => e.Similarity).ToList();
+
+								if (evaluationResults[bestContextMatches[i].Context][0] != first)
+								{
+									evaluationResults[bestContextMatches[i].Context].Remove(first);
+									evaluationResults[bestContextMatches[i].Context].Insert(0, first);
+								}
+
+								first.IsAuto = true;
+
+								foreach (var key in evaluationResults.Keys)
+								{
+									if (key != bestContextMatches[i].Context)
+									{
+										var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
+										itemToRemove.Deleted = true;
+									}
+								}
+
+								/// Автоматически приняли решение для данного соответствия.
+								bestContextMatches.RemoveAt(i);
+								--i;
+							}
+						}
+					}
+				}
+				while (bestContextMatches.Count != oldCount);
+
+				foreach(var context in bestContextMatches.Select(m=>m.Context))
+				{
+					evaluationResults[context] =
+						evaluationResults[context].OrderByDescending(e => e.Similarity).ToList();
+
+					var actualList = evaluationResults[context]
+						.Where(e => !e.Deleted)
+						.ToList();
+
+					var first = actualList.FirstOrDefault();
+					var second = actualList.Count > 1 ? actualList[1] : null;
+
+					if (first != null && IsSimilarEnough(first) && (second == null || AreDistantEnough(first, second)))
+					{
+						if (evaluationResults[context][0] != first)
+						{
+							evaluationResults[context].Remove(first);
+							evaluationResults[context].Insert(0, first);
+						}
+
+						first.IsAuto = true;
+
+						foreach (var key in evaluationResults.Keys)
+						{
+							if (key != bestContextMatches[i].Context)
+							{
+								var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
+								itemToRemove.Deleted = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		private void OptimizeEvaluationResultsSimple(
+			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
+		{
+			Parallel.ForEach(
+				evaluationResults.Keys.ToList(),
+				key =>
+				{
+					evaluationResults[key] =
+						evaluationResults[key].OrderByDescending(c => c.Similarity).ToList();
+				}
+			);
+
 			var matchedKeys = new HashSet<PointContext>();
 			var oldMatchedCount = 0;
 
@@ -481,12 +617,14 @@ namespace Land.Markup.Binding
 
 				foreach (var context in evaluationResults.Keys.Except(matchedKeys).ToList())
 				{
-					if (evaluationResults[context].Count > 0)
+					var actualList = evaluationResults[context].Where(e => !e.Deleted).ToList();
+
+					if (actualList.Count > 0)
 					{
 						/// проверяем для него условие автоматического принятия решения.
-						var first = evaluationResults[context][0];
-						var second = evaluationResults[context].Count > 1
-							? evaluationResults[context][1] : null;
+						var first = actualList[0];
+						var second = actualList.Count > 1
+							? actualList[1] : null;
 
 						/// Если оно выполняется, удаляем наилучшего кандидата 
 						/// из списков кандидатов для остальных элементов
@@ -494,6 +632,10 @@ namespace Land.Markup.Binding
 							&& (second == null || AreDistantEnough(first, second)))
 						{
 							first.IsAuto = true;
+
+							evaluationResults[context].Remove(first);
+							evaluationResults[context].Insert(0, first);
+
 							matchedKeys.Add(context);
 
 							foreach (var key in evaluationResults.Keys)
@@ -501,7 +643,9 @@ namespace Land.Markup.Binding
 								if (key != context)
 								{
 									var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
-									evaluationResults[key].Remove(itemToRemove);
+									itemToRemove.Deleted = true;
+
+									//evaluationResults[key].Remove(itemToRemove);
 								}
 							}
 						}

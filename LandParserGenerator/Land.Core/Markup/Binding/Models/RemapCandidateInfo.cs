@@ -28,7 +28,8 @@ namespace Land.Markup.Binding
 		public Dictionary<ContextType, double> Weights { get; set; }
 
 		public bool IsAuto { get; set; }
-
+		
+		public bool Deleted { get; set; }
 		public string DebugInfo { get; set; }
 
 		public override string ToString()
