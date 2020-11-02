@@ -21,12 +21,14 @@ namespace Land.Markup.Binding
 	public class ContextFinder
 	{
 		public enum SearchType { Local, Global }
+		public enum OptimizationType { None, LocalBest, GlobalBest }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
 
-		public bool UseNaiveAlgorithm { get; set; }
+		public bool UseNaiveAlgorithm { get; set; } = false;
+		public OptimizationType Optimization { get; set; } = OptimizationType.GlobalBest;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
@@ -367,6 +369,7 @@ namespace Land.Markup.Binding
 			/// Контексты, для которых первично посчитаны похожести кандидатов
 			var evaluated = new Dictionary<PointContext, List<RemapCandidateInfo>>();
 
+			/// Наивный алгоритм не учитывает ближайших
 			if (!UseNaiveAlgorithm)
 			{
 				foreach (var closestContext in closestContexts)
@@ -411,49 +414,35 @@ namespace Land.Markup.Binding
 			{
 				Parallel.ForEach(
 					evaluated.Keys.ToList(),
-					key =>
-					{
-						ComputeTotalSimilarities(key, evaluated[key]);
-					}
+					key => ComputeTotalSimilarities(key, evaluated[key])
 				);		
 			}
 			else
 			{
 				Parallel.ForEach(
 					evaluated.Keys.ToList(),
-					key =>
-					{
-						ComputeTotalSimilarities_old(evaluated[key]);
-					}
+					key => ComputeTotalSimilarities_old(evaluated[key])
 				);
 			}
 
 			if (searchType == SearchType.Local)
 			{
-				/// Ищем оптимальное сопоставление кандидатов точкам и ближайшим
-				OptimizeEvaluationResults(evaluated);
+				switch(Optimization)
+				{
+					case OptimizationType.LocalBest:
+						SelectLocalBests(evaluated);
+						break;
+					case OptimizationType.GlobalBest:
+						SelectGlobalBests(evaluated);
+						break;
+					default:
+						SelectBests(evaluated);
+						break;
+				}
 			}
 			else
 			{
-				Parallel.ForEach(
-					evaluated.Keys.ToList(),
-					key =>
-					{
-						evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
-
-						if (evaluated[key].Count > 0)
-						{
-							var first = evaluated[key][0];
-							var second = evaluated[key].Count > 1 ? evaluated[key][1] : null;
-
-							if (IsSimilarEnough(first)
-								&& (second == null || AreDistantEnough(first, second)))
-							{
-								first.IsAuto = true;
-							}
-						}
-					}
-				);
+				SelectBests(evaluated);
 			}
 
 			foreach (var kvp in evaluated.Where(kvp => contextsToPoints.ContainsKey(kvp.Key)))
@@ -467,7 +456,9 @@ namespace Land.Markup.Binding
 			return result;
 		}
 
-		private void OptimizeEvaluationResults(
+		#region Auto Result Selection
+
+		private void SelectGlobalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
 			if (evaluationResults.Count > 0 && evaluationResults.First().Value.Count > 0)
@@ -596,47 +587,53 @@ namespace Land.Markup.Binding
 			}
 		}
 
-		private void OptimizeEvaluationResultsSimple(
+		private void SelectLocalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
+			var resultsWithoutDeleted = new Dictionary<PointContext, List<RemapCandidateInfo>>();
+
 			Parallel.ForEach(
 				evaluationResults.Keys.ToList(),
 				key =>
 				{
-					evaluationResults[key] =
-						evaluationResults[key].OrderByDescending(c => c.Similarity).ToList();
+					evaluationResults[key] = evaluationResults[key].OrderByDescending(c => c.Similarity).ToList();
 				}
 			);
 
-			var matchedKeys = new HashSet<PointContext>();
-			var oldMatchedCount = 0;
+			foreach(var key in evaluationResults.Keys)
+			{
+				resultsWithoutDeleted[key] = new List<RemapCandidateInfo>(evaluationResults[key]);
+			}
+
+			var oldCount = 0;
 
 			do
 			{
-				oldMatchedCount = matchedKeys.Count;
+				oldCount = resultsWithoutDeleted.Count;
 
-				foreach (var context in evaluationResults.Keys.Except(matchedKeys).ToList())
+				foreach (var context in resultsWithoutDeleted.Keys.ToList())
 				{
-					var actualList = evaluationResults[context].Where(e => !e.Deleted).ToList();
-
-					if (actualList.Count > 0)
+					if (resultsWithoutDeleted[context].Count > 0)
 					{
 						/// проверяем для него условие автоматического принятия решения.
-						var first = actualList[0];
-						var second = actualList.Count > 1
-							? actualList[1] : null;
+						var first = resultsWithoutDeleted[context][0];
+						var second = resultsWithoutDeleted[context].Count > 1 ? resultsWithoutDeleted[context][1] : null;
 
-						/// Если оно выполняется, удаляем наилучшего кандидата 
-						/// из списков кандидатов для остальных элементов
-						if (IsSimilarEnough(first)
-							&& (second == null || AreDistantEnough(first, second)))
+						/// Автоматически перепривязываемся, если выполняются локальные условия
+						/// и этот элемент не похож в большей степени на что-то другое
+						if (IsSimilarEnough(first) 
+							&& (second == null || AreDistantEnough(first, second))
+							&& first.Similarity >= resultsWithoutDeleted.Values
+								.Select(v=>v.FirstOrDefault())
+								.Where(e=>e.Context == first.Context)
+								.Max(e=>e.Similarity))
 						{
 							first.IsAuto = true;
 
 							evaluationResults[context].Remove(first);
 							evaluationResults[context].Insert(0, first);
 
-							matchedKeys.Add(context);
+							resultsWithoutDeleted.Remove(context);
 
 							foreach (var key in evaluationResults.Keys)
 							{
@@ -645,6 +642,11 @@ namespace Land.Markup.Binding
 									var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
 									itemToRemove.Deleted = true;
 
+									if (resultsWithoutDeleted.ContainsKey(key))
+									{
+										resultsWithoutDeleted[key].Remove(itemToRemove);
+									}
+
 									//evaluationResults[key].Remove(itemToRemove);
 								}
 							}
@@ -652,8 +654,33 @@ namespace Land.Markup.Binding
 					}
 				}
 			}
-			while (matchedKeys.Count != oldMatchedCount);
+			while (oldCount != resultsWithoutDeleted.Count);
 		}
+
+		private void SelectBests(Dictionary<PointContext, List<RemapCandidateInfo>> evaluated)
+		{
+			Parallel.ForEach(
+				evaluated.Keys.ToList(),
+				key =>
+				{
+					evaluated[key] = evaluated[key].OrderByDescending(c => c.Similarity).ToList();
+
+					if (evaluated[key].Count > 0)
+					{
+						var first = evaluated[key][0];
+						var second = evaluated[key].Count > 1 ? evaluated[key][1] : null;
+
+						if (IsSimilarEnough(first)
+							&& (second == null || AreDistantEnough(first, second)))
+						{
+							first.IsAuto = true;
+						}
+					}
+				}
+			);
+		}
+
+		#endregion
 
 		public void ComputeCoreSimilarities(PointContext point, RemapCandidateInfo candidate)
 		{

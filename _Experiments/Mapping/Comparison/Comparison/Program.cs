@@ -71,7 +71,10 @@ namespace Comparison
 		static void Main(string[] args)
 		{
 			var heuristic = new ProgrammingLanguageHeuristic();
+
 			var markupManager = new MarkupManager(null, heuristic);
+			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.GlobalBest;
+
 			var entityTypes = new string[] { "class_struct_interface", "method", "field", "property" };
 
 			/// Создаём парсер C# и менеджер разметки из библиотеки LanD	
