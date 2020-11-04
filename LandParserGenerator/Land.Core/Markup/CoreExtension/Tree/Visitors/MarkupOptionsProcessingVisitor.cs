@@ -58,11 +58,10 @@ namespace Land.Markup.CoreExtension
 
 			if(GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Symbol))
 			{
-				node.Options.SetHeaderCore(
-					GrammarObject.Options
-						.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Symbol)
-						.Select(e=>(string)e)
-						.ToArray()
+				node.Options.Set(
+					MarkupOption.GROUP_NAME,
+					MarkupOption.HEADERCORE,
+					GrammarObject.Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Symbol)
 				);
 			}
 
