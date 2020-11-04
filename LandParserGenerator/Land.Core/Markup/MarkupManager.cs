@@ -15,12 +15,26 @@ namespace Land.Markup
 {
 	public class MarkupManager
 	{
-		public MarkupManager(Func<string, ParsedFile> getParsed, IHeuristic remappingHeuristic)
+		public MarkupManager(Func<string, ParsedFile> getParsed, IPreHeuristic remappingHeuristic)
 		{
 			ContextFinder.GetParsed = getParsed;
-			ContextFinder.Heuristic = remappingHeuristic;
+			ContextFinder.PreHeuristic = remappingHeuristic;
 
 			OnMarkupChanged += InvalidateRelations;
+
+
+			#region Подключение эвристик
+
+			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
+			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAccordingToLength));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAccordingToLength));
+			ContextFinder.SetHeuristic(typeof(TuneAncestorsWeight));
+			ContextFinder.SetHeuristic(typeof(TuneHeaderWeightIfSimilar));
+			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
+
+			#endregion
 		}
 
 		private RelationsManager Relations { get; set; } = new RelationsManager();

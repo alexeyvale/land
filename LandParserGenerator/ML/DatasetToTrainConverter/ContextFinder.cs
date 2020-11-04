@@ -184,8 +184,8 @@ namespace DatasetToTrainConverter.CopyPaste
 
 		public void ComputeCoreSimilarities(PointContext point, RemapCandidateInfo candidate)
 		{
-			candidate.HeaderSequenceSimilarity =
-				Levenshtein(point.HeaderContext.Sequence, candidate.Context.HeaderContext.Sequence);
+			candidate.HeaderNonCoreSimilarity =
+				Levenshtein(point.HeaderContext.NonCore, candidate.Context.HeaderContext.NonCore);
 			candidate.HeaderCoreSimilarity =
 				Levenshtein(point.HeaderContext.Core, candidate.Context.HeaderContext.Core);
 
@@ -222,21 +222,13 @@ namespace DatasetToTrainConverter.CopyPaste
 							point.SiblingsContext,
 							c.Context.SiblingsContext
 						);
-						c.SiblingsBeforeGlobalSimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.EntityHash,
-							c.Context.SiblingsContext.Before.EntityHash
+						c.SiblingsBeforeSimilarity = EvalSimilarity(
+							point.SiblingsContext.Before.GlobalHash,
+							c.Context.SiblingsContext.Before.GlobalHash
 						);
-						c.SiblingsAfterGlobalSimilarity = EvalSimilarity(
-							point.SiblingsContext.After.EntityHash,
-							c.Context.SiblingsContext.After.EntityHash
-						);
-						c.SiblingsBeforeEntitySimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.EntityHash,
-							c.Context.SiblingsContext.Before.EntityHash
-						);
-						c.SiblingsAfterEntitySimilarity = EvalSimilarity(
-							point.SiblingsContext.After.EntityHash,
-							c.Context.SiblingsContext.After.EntityHash
+						c.SiblingsAfterSimilarity = EvalSimilarity(
+							point.SiblingsContext.After.GlobalHash,
+							c.Context.SiblingsContext.After.GlobalHash
 						);
 					}
 				}
@@ -512,7 +504,9 @@ namespace DatasetToTrainConverter.CopyPaste
 						distances[i - 1, j - 1] + cost);
 				}
 
-			return 1 - distances[a.Length, b.Length] / denominator;
+			var similarity = 1 - distances[a.Length, b.Length] / denominator;
+
+			return similarity >= 0.75 ? similarity : 0;
 		}
 
 		private static double PriorityCoefficient(object elem)

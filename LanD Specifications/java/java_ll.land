@@ -47,7 +47,7 @@ block		=	'{' Any '}'
 }
 
 %nodes {
-	leaf name type type_parameter
+	leaf name type type_parameter annotation
 }
 
 %markup {

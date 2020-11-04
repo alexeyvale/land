@@ -12,7 +12,7 @@ STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
-CLASS_STRUCT_INTERFACE : 'class'|'struct'|'interface'
+CLASS_STRUCT_INTERFACE : 'class'|'struct'|'record'|'interface'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
 GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
@@ -67,7 +67,7 @@ block				=	'{' Any '}'
 
 %nodes {
 	ghost names_list common_beginning entity
-	leaf name type modifier arguments
+	leaf name type modifier arguments entity_attribute
 }
 
 %customblock {
@@ -84,9 +84,7 @@ block				=	'{' Any '}'
 	priority(0.5) arguments
 	priority(0.3) type
 	priority(0.1) init_value
-	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace'
+	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace' entity_attribute
 	
 	exactmatch modifier CLASS_STRUCT_INTERFACE
-	
-	headercore("\\w+(?=($|<[^<]+>$))") name
 }

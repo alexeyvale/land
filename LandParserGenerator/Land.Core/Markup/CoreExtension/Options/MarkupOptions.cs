@@ -33,15 +33,16 @@ namespace Land.Markup.CoreExtension
 			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, new List<dynamic>() { value });
 		}
 
-		public static string GetHeaderCore(this SymbolOptionsManager manager)
+		public static List<string> GetHeaderCore(this SymbolOptionsManager manager)
 		{
-			var parameters = manager.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE);
-			return parameters?.Count > 0 ? parameters[0] : null;
+			return manager.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE)
+				.Select(e => (string)e)
+				.ToList();
 		}
 
-		public static void SetHeaderCore(this SymbolOptionsManager manager, string value)
+		public static void SetHeaderCore(this SymbolOptionsManager manager, params string[] value)
 		{
-			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, new List<dynamic>() { value });
+			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, new List<dynamic>(value));
 		}
 	}
 }
