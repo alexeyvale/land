@@ -87,5 +87,6 @@ block				=	'{' Any '}'
 	priority(0.1) init_value
 	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace' entity_attribute
 	
-	exactmatch modifier CLASS_STRUCT_INTERFACE
+	exactmatch modifier CLASS_STRUCT_INTERFACE	
+	headercore(name) namespace enum class_struct_interface method field property
 }
