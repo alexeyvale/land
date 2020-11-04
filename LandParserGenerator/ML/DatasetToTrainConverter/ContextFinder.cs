@@ -59,7 +59,7 @@ namespace DatasetToTrainConverter.CopyPaste
 							{
 								Node = n,
 								File = currentFile,
-								Context = ContextManager.GetContext(n, currentFile)
+								Context = ContextManager.GetContext(n, currentFile, null)
 							};
 
 							AncestorSiblingsPair pair = null;

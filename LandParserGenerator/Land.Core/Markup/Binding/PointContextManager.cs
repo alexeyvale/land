@@ -12,11 +12,12 @@ namespace Land.Markup.Binding
 
 		public PointContext GetContext(
 			Node node,
-			ParsedFile file)
+			ParsedFile file,
+			Dictionary<string, List<ushort>> structureCodes)
 		{
 			if (!Cache.ContainsKey(node))
 			{
-				Cache[node] = PointContext.GetCoreContext(node, file);
+				Cache[node] = PointContext.GetCoreContext(node, file, structureCodes);
 			}
 
 			return Cache[node];
@@ -25,18 +26,19 @@ namespace Land.Markup.Binding
 		public PointContext GetContext(
 			Node node,
 			ParsedFile file,
+			Dictionary<string, List<ushort>> structureCodes,
 			SiblingsConstructionArgs siblingsArgs,
 			ClosestConstructionArgs closestArgs)
 		{
 			if (!Cache.ContainsKey(node))
 			{
 				return Cache[node] = PointContext
-					.GetExtendedContext(node, file, siblingsArgs, closestArgs);
+					.GetExtendedContext(node, file, structureCodes, siblingsArgs, closestArgs);
 			}
 			else
 			{
 				return PointContext.GetExtendedContext(
-					node, file, siblingsArgs, closestArgs, Cache[node]
+					node, file, structureCodes, siblingsArgs, closestArgs, Cache[node]
 				);
 			}
 		}

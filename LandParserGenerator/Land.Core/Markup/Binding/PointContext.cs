@@ -42,6 +42,11 @@ namespace Land.Markup.Binding
 				return hashCode;
 			}
 		}
+
+		public override string ToString()
+		{
+			return Text;
+		}
 	}
 
 	public abstract class TypedPrioritizedContextElement
@@ -213,6 +218,8 @@ namespace Land.Markup.Binding
 	public class InnerContext
 	{
 		public TextOrHash Content { get; set; }
+
+		public string ContentStructure { get; set; }
 
 		public InnerContext() 
 		{ 
@@ -490,7 +497,8 @@ namespace Land.Markup.Binding
 
 		public static PointContext GetCoreContext(
 			Node node,
-			ParsedFile file)
+			ParsedFile file,
+			Dictionary<string, List<ushort>> structureCodes)
 		{
 			return new PointContext
 			{
@@ -498,7 +506,7 @@ namespace Land.Markup.Binding
 				Line = node.Location.Start.Line.Value,
 				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
-				InnerContext = GetInnerContext(node, file),
+				InnerContext = GetInnerContext(node, file, structureCodes),
 				AncestorsContext = GetAncestorsContext(node),
 
 				#region Old
@@ -509,14 +517,15 @@ namespace Land.Markup.Binding
 
 		public static PointContext GetExtendedContext(
 			Node node, 
-			ParsedFile file, 
+			ParsedFile file,
+			Dictionary<string, List<ushort>> structureCodes,
 			SiblingsConstructionArgs siblingsArgs,
 			ClosestConstructionArgs closestArgs,
 			PointContext core = null)
 		{
 			if (core == null)
 			{
-				core = PointContext.GetCoreContext(node, file);
+				core = PointContext.GetCoreContext(node, file, structureCodes);
 			}
 
 			if (siblingsArgs !=null && core.SiblingsContext == null)
@@ -533,7 +542,7 @@ namespace Land.Markup.Binding
 			if (closestArgs != null && core.ClosestContext == null)
 			{
 				core.ClosestContext = GetClosestContext(
-					node, file, core, 
+					node, file, structureCodes, core, 
 					closestArgs.SearchArea, closestArgs.GetParsed, closestArgs.ContextFinder
 				);
 			}
@@ -617,19 +626,19 @@ namespace Land.Markup.Binding
 			}
 
 			var headerSequence = sequence.Select(e => (HeaderContextElement)e).ToList();
-			var maxPriority = headerSequence.Count > 0 ? headerSequence.Max(e => e.Priority) : 0;
+			var nodeHeaderCore = node.Options.GetHeaderCore();
 
 			return new HeaderContext
 			{
 				Sequence = headerSequence,
 				NonCoreIndices = headerSequence
 					.Select((e, i) => new { elem = e, idx = i })
-					.Where((e, i) => e.elem.Priority < maxPriority)
+					.Where(e => !nodeHeaderCore.Contains(e.elem.Type))
 					.Select(e => e.idx)
 					.ToList(),
 				CoreIndices = headerSequence
 					.Select((e, i) => new { elem = e, idx = i })
-					.Where((e, i) => e.elem.Priority == maxPriority)
+					.Where(e => nodeHeaderCore.Contains(e.elem.Type))
 					.Select(e => e.idx)
 					.ToList(),
 			};
@@ -652,9 +661,9 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static InnerContext GetInnerContext(Node node, ParsedFile file)
+		public static InnerContext GetInnerContext(Node node, ParsedFile file, Dictionary<string, List<ushort>> codes)
 		{
-			var locations = new List<SegmentLocation>();
+			var innerNodes = new List<Node>();
 			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
 			while (stack.Any())
@@ -665,7 +674,7 @@ namespace Land.Markup.Binding
 				{
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
-						locations.Add(current.Location);
+						innerNodes.Add(current);
 					}
 					else
 					{
@@ -675,7 +684,28 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return new InnerContext(locations, file.Text);
+			var context = new InnerContext(innerNodes.Select(n=>n.Location).ToList(), file.Text);
+
+			//if(node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.SAVESTRUCTURE))
+			//{
+				context.ContentStructure = GetStructureHash(innerNodes, codes);
+			//}
+
+			return context;
+		}
+
+		private static string GetStructureHash(List<Node> innerNodes, Dictionary<string, List<ushort>> codes)
+		{
+			var sequence = new List<ushort>();
+
+			foreach(var node in innerNodes)
+			{
+				var visitor = new ExtractStructureVisitor(codes);
+				node.Accept(visitor);
+				sequence.AddRange(visitor.Sequence);
+			}
+
+			return String.Join("", sequence.Select(e => Convert.ToChar(e)));
 		}
 
 		#region Old
@@ -951,6 +981,7 @@ namespace Land.Markup.Binding
 		public static List<PointContext> GetClosestContext(
 			Node node,
 			ParsedFile file,
+			Dictionary<string, List<ushort>> structureCodes,
 			PointContext nodeContext,
 			List<ParsedFile> searchArea,
 			Func<string, ParsedFile> getParsed,
@@ -975,7 +1006,7 @@ namespace Land.Markup.Binding
 				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
 					.Select(n => new RemapCandidateInfo
 					{
-						Context = contextFinder.ContextManager.GetContext(n, file)
+						Context = contextFinder.ContextManager.GetContext(n, file, structureCodes)
 					})
 				);
 			};

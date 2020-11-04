@@ -153,7 +153,8 @@ namespace Land.Markup
 				node, 
 				ContextFinder.ContextManager.GetContext(
 					node, 
-					file, 
+					file,
+					ContextFinder.GetStructureCodes(file.Name),
 					new SiblingsConstructionArgs(),
 					new ClosestConstructionArgs
 					{
@@ -208,6 +209,7 @@ namespace Land.Markup
 							ContextFinder.ContextManager.GetContext(
 								node, 
 								file,
+								ContextFinder.GetStructureCodes(file.Name),
 								new SiblingsConstructionArgs(),
 								new ClosestConstructionArgs
 								{
@@ -229,6 +231,7 @@ namespace Land.Markup
 						node, ContextFinder.ContextManager.GetContext(
 							node, 
 							file,
+							ContextFinder.GetStructureCodes(file.Name),
 							new SiblingsConstructionArgs(),
 							new ClosestConstructionArgs
 							{
@@ -280,6 +283,7 @@ namespace Land.Markup
 			point.Relink(node, ContextFinder.ContextManager.GetContext(
 				node, 
 				file,
+				ContextFinder.GetStructureCodes(file.Name),
 				new SiblingsConstructionArgs(),
 				new ClosestConstructionArgs
 				{
@@ -635,7 +639,8 @@ namespace Land.Markup
 			{
 				point.Context = ContextFinder.ContextManager.GetContext(
 					first.Node, 
-					first.File, 
+					first.File,
+					ContextFinder.GetStructureCodes(first.File.Name),
 					new SiblingsConstructionArgs(),
 					new ClosestConstructionArgs
 					{

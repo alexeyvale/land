@@ -6,6 +6,7 @@ using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Land.Core.Specification;
 
 namespace Land.Markup.Binding
 {
@@ -31,6 +32,7 @@ namespace Land.Markup.Binding
 		public OptimizationType Optimization { get; set; } = OptimizationType.GlobalBest;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
+		public Dictionary<string, Dictionary<string, List<ushort>>> StructureCodes { get; set; }
 
 		public PointContextManager ContextManager { get; private set; } = new PointContextManager();
 
@@ -84,6 +86,34 @@ namespace Land.Markup.Binding
 
 			RemoveFromList(TuningHeuristics);
 			RemoveFromList(ScoringHeuristics);
+		}
+
+		public Dictionary<string, List<ushort>> GetStructureCodes(string fileName) =>
+			StructureCodes[Path.GetExtension(fileName)];
+
+		public void BuildStructureCodes(Grammar grammarObject, string extension)
+		{
+			if(StructureCodes == null)
+			{
+				StructureCodes = new Dictionary<string, Dictionary<string, List<ushort>>>();
+			}
+
+			StructureCodes[extension] = new Dictionary<string, List<ushort>>();
+			ushort counter = 0;
+
+			foreach(var token in grammarObject.Options
+				.GetSymbols(MarkupOption.GROUP_NAME, MarkupOption.STRUCTURETOKEN))
+			{
+				StructureCodes[extension][token] = 
+					new List<ushort> { ++counter };
+			}
+
+			foreach (var rule in grammarObject.Rules.Keys
+				.Where(k => !k.StartsWith(Grammar.AUTO_RULE_PREFIX)))
+			{
+				StructureCodes[extension][rule] = 
+					new List<ushort> { ++counter, ++counter };
+			}
 		}
 
 		public List<CandidateFeatures> GetFeatures(
@@ -237,7 +267,7 @@ namespace Land.Markup.Binding
 							{
 								Node = n,
 								File = currentFile,
-								Context = ContextManager.GetContext(n, currentFile)
+								Context = ContextManager.GetContext(n, currentFile, StructureCodes[Path.GetExtension(currentFile.Name)])
 							};
 
 							AncestorSiblingsPair pair = null;
@@ -691,8 +721,11 @@ namespace Land.Markup.Binding
 
 			candidate.AncestorSimilarity =
 				Math.Pow(Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext), 2);
+
 			candidate.InnerSimilarity =
-				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
+				EvalSimilarity(point.InnerContext.Content, candidate.Context.InnerContext.Content);
+			candidate.InnerStructuralSimilarity =
+				Levenshtein(point.InnerContext.ContentStructure, candidate.Context.InnerContext.ContentStructure);
 		}
 
 		public List<RemapCandidateInfo> ComputeCoreContextSimilarities(
@@ -919,7 +952,7 @@ namespace Land.Markup.Binding
 				.Except(new List<Node> { point.AstNode })
 				.Select(n => new RemapCandidateInfo
 				{
-					Context = ContextManager.GetContext(n, file, siblingsArgs, null)
+					Context = ContextManager.GetContext(n, file, StructureCodes[Path.GetExtension(file.Name)], siblingsArgs, null)
 				})
 				.ToList();
 

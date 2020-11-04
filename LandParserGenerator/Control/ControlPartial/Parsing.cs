@@ -24,6 +24,8 @@ namespace Land.Control
 
 			foreach (var ext in Parsers.Load(SettingsObject, CACHE_DIRECTORY, Log))
 			{
+				MarkupManager.ContextFinder.BuildStructureCodes(Parsers[ext].GrammarObject, ext);
+
 				foreach (var file in ParsedFiles.Keys.Where(f => Path.GetExtension(f) == ext).ToList())
 				{
 					DocumentChangedHandler(file);

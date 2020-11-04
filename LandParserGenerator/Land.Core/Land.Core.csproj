@@ -102,6 +102,7 @@
     <Compile Include="Markup\Binding\Models\RemapCandidateInfo.cs" />
     <Compile Include="Markup\Binding\FuzzyHashing.cs" />
     <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />
+    <Compile Include="Markup\CoreExtension\Tree\Visitors\ExtractStructureVisitor.cs" />
     <Compile Include="Markup\Relations\RelationType.cs" />
     <Compile Include="Markup\Relations\RelationsCache.cs" />
     <Compile Include="Markup\MarkupElementConverter.cs" />

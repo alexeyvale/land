@@ -10,11 +10,19 @@ STRING_VERB	: '@'('"' (~["]|'""')* '"')+
 STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|'{{'|STRING_INT_CODE|.)*? '"')+
 STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
 
+GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
+
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
 CLASS_STRUCT_INTERFACE : 'class'|'struct'|'record'|'interface'
+IF: 'if'
+ELSE: 'else'
+WHILE: 'while'
+DO: 'do'
+SWITCH: 'switch'
+CASE: 'case'
+RETURN: 'return'
 ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
-GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
  
 CURVE_BRACKETED : %left '{' %right '}'
 ROUND_BRACKETED : %left '(' %right ')'
@@ -55,7 +63,7 @@ type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
 entity_attribute	=	'[' Any ']'
 general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
 arguments			=	'(' Any ')'
-block				=	'{' Any '}'
+block				=	'{' (Any|IF|ELSE|WHILE|DO|SWITCH|CASE|RETURN|block)* '}'
 
 %%
 
@@ -89,4 +97,6 @@ block				=	'{' Any '}'
 	
 	exactmatch modifier CLASS_STRUCT_INTERFACE	
 	headercore(name) namespace enum class_struct_interface method field property
+	savestructure method
+	structuretoken IF ELSE WHILE DO SWITCH CASE RETURN
 }
