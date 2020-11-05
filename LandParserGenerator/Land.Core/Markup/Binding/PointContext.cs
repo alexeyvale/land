@@ -956,8 +956,7 @@ namespace Land.Markup.Binding
 			Func<string, ParsedFile> getParsed,
 			ContextFinder contextFinder)
 		{
-			const double CLOSE_ELEMENT_HEADER_THRESHOLD = 0.5;
-			const double CLOSE_ELEMENT_INNER_THRESHOLD = 0.8;
+			const double CLOSE_ELEMENT_THRESHOLD = 0.6;
 			const int MAX_COUNT = 10;
 
 			var candidates = new List<RemapCandidateInfo>();
@@ -981,27 +980,14 @@ namespace Land.Markup.Binding
 			};
 
 			contextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
+			contextFinder.ComputeTotalSimilarities(nodeContext, candidates);
 
-			candidates = nodeContext.HeaderContext.Core.Count > 0
-				? candidates
-					.OrderByDescending(c => c.HeaderCoreSimilarity)
-					.ThenByDescending(c => c.AncestorSimilarity)
-					.Take(MAX_COUNT)
-					.TakeWhile(c => c.HeaderCoreSimilarity >= CLOSE_ELEMENT_HEADER_THRESHOLD)
-					.ToList()
-				: nodeContext.HeaderContext.NonCore.Count > 0
-					? candidates
-						.OrderByDescending(c => c.HeaderNonCoreSimilarity)
-						.ThenByDescending(c => c.AncestorSimilarity)
-						.Take(MAX_COUNT)
-						.TakeWhile(c => c.HeaderNonCoreSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
-						.ToList()
-					: candidates
-						.OrderByDescending(c => c.InnerSimilarity)
-						.ThenByDescending(c => c.AncestorSimilarity)
-						.Take(MAX_COUNT)
-						.TakeWhile(c => c.InnerSimilarity >= CLOSE_ELEMENT_INNER_THRESHOLD)
-						.ToList();
+			candidates = candidates
+				.OrderByDescending(c => c.Similarity)
+				.ThenByDescending(c => c.AncestorSimilarity)
+				.Take(MAX_COUNT)
+				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
+				.ToList();
 
 			return candidates.Select(c=>c.Context).ToList();
 		}
