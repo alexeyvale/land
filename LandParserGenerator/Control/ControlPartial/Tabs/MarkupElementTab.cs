@@ -125,10 +125,10 @@ namespace Land.Control
 							GetPointSearchArea()
 						);
 
-						qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
-							point,
-							State.PendingCommand.Document
-						);
+						//qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
+						//	point,
+						//	State.PendingCommand.Document
+						//);
 
 						point.Name = ConcernPointNameText.Text;
 						point.Comment = ConcernPointCommentText.Text;
@@ -144,16 +144,16 @@ namespace Land.Control
 							State.PendingCommand.Target?.DataContext as Concern
 						);
 
-						qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
-							point,
-							State.PendingCommand.Document
-						);
+						//qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
+						//	point,
+						//	State.PendingCommand.Document
+						//);
 
 						if (State.PendingCommand.Target != null)
 							State.PendingCommand.Target.IsExpanded = true;
 					}
 
-					SetStatus($"Привязка завершена, устойчивость = {qualityScore}%", ControlStatus.Success);
+					SetStatus($"Привязка завершена", ControlStatus.Success);
 				}
 				else
 				{

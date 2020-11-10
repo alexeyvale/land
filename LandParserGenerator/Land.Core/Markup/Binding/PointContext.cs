@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Land.Markup.Binding
 {
@@ -478,6 +479,8 @@ namespace Land.Markup.Binding
 			}
 		}
 
+		public List<PointContext> ReferencesContext { get; set; }
+
 		#region Old
 
 		public List<ContextElement> InnerContext_old { get; set; }
@@ -530,11 +533,19 @@ namespace Land.Markup.Binding
 				core.SiblingsRightContext_old = oldSiblingsContext.Item2;
 				#endregion old
 			}
+
 			if (closestArgs != null && core.ClosestContext == null)
 			{
 				core.ClosestContext = GetClosestContext(
 					node, file, core, 
 					closestArgs.SearchArea, closestArgs.GetParsed, closestArgs.ContextFinder
+				);
+			}
+
+			if(closestArgs != null)
+			{
+				core.ReferencesContext = GetReferencesContext(
+					node, file, closestArgs.ContextFinder
 				);
 			}
 
@@ -990,6 +1001,79 @@ namespace Land.Markup.Binding
 				.ToList();
 
 			return candidates.Select(c=>c.Context).ToList();
+		}
+
+		public static List<PointContext> GetReferencesContext(
+			Node node,
+			ParsedFile file,
+			ContextFinder contextFinder)
+		{
+			var labelType = (string)node.Options
+				.GetParams(MarkupOption.GROUP_NAME, MarkupOption.REFERENCELABEL)
+				.FirstOrDefault();
+
+			if (labelType != null)
+			{
+				var labelNode = node.Children.FirstOrDefault(n => n.Type == labelType);
+
+				if (labelNode != null)
+				{
+					var referenceNodes = new List<Node>();
+					var labelText = file.Text.Substring(labelNode.Location.Start.Offset, labelNode.Location.Length.Value);
+					var referenceOffsets = Regex.Matches(file.Text, $@"(?<=\W){labelText}(?=\W)").Cast<Match>().Select(m => m.Index);
+
+					/// Ищем наименьшие объемлющие сущности, в которых расположена ссылка на искомую сущность
+					foreach(var offset in referenceOffsets)
+					{
+						var segment = new SegmentLocation { Start = new PointLocation(offset), End = new PointLocation(offset + 1) };
+
+						Node referencingEntityNode = null;
+						string referencingEntityLabelType = null;
+
+						var currentNode = file.Root;
+
+						while (currentNode != null)
+						{
+							if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+							{
+								referencingEntityNode = currentNode;
+								referencingEntityLabelType = (string)currentNode.Options
+									.GetParams(MarkupOption.GROUP_NAME, MarkupOption.REFERENCELABEL)
+									.FirstOrDefault();
+
+								currentNode = currentNode.Children
+									.Where(c => c.Location != null && c.Location.Includes(segment))
+									.FirstOrDefault();
+
+								if (currentNode != null && currentNode.Type == referencingEntityLabelType)
+								{
+									referencingEntityNode = null;
+									break;
+								}
+							}
+							else
+							{
+								currentNode = currentNode.Children
+									.Where(c => c.Location != null && c.Location.Includes(segment))
+									.FirstOrDefault();
+							}
+						}
+
+						if(referencingEntityNode != null)
+						{
+							referenceNodes.Add(referencingEntityNode);
+						}
+					}
+
+					/// Вычисляем контексты для сущностей, ссылающихся на помечаемую
+					return referenceNodes
+						.Distinct()
+						.Select(n => contextFinder.ContextManager.GetContext(n, file))
+						.ToList();
+				}
+			}
+
+			return new List<PointContext>();
 		}
 	}
 

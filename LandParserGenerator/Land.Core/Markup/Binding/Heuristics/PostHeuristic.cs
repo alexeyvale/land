@@ -13,6 +13,7 @@ namespace Land.Markup.Binding
 			{ContextType.Inner, 1},
 			{ContextType.Ancestors, 2},
 			{ContextType.Siblings, 1},
+			{ContextType.References, 0.5},
 		};
 
 		public static double Get(ContextType contextType) =>
@@ -69,7 +70,8 @@ namespace Land.Markup.Binding
 				[ContextType.Ancestors] = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
 					|| source.AncestorsContext.Count > 0),
 				[ContextType.Siblings] = source.SiblingsContext?.Before.GlobalHash.TextLength > 0
-					|| source.SiblingsContext?.After.GlobalHash.TextLength > 0
+					|| source.SiblingsContext?.After.GlobalHash.TextLength > 0,
+				[ContextType.References] = source.ReferencesContext?.Count > 0,
 			};
 
 			foreach (var kvp in existenceFlags)

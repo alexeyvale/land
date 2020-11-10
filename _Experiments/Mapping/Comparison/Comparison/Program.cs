@@ -195,7 +195,7 @@ namespace Comparison
 							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
 							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimHNCore={landCandidate.HeaderNonCoreSimilarity}; " +
 								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
-								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}] " +
+								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}; SimR={landCandidate.ReferencesSimilarity}] " +
 								$"{(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 						report.WriteLine();

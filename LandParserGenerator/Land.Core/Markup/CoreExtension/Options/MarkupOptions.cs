@@ -16,6 +16,7 @@ namespace Land.Markup.CoreExtension
 		public const string LAND = "land";
 		public const string EXACTMATCH = "exactmatch";
 		public const string HEADERCORE = "headercore";
+		public const string REFERENCELABEL = "referencelabel";
 	}
 
 	public static class OptionsExtension

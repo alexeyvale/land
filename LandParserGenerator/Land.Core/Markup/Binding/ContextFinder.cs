@@ -15,7 +15,8 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings
+		Siblings,
+		References
 	}
 
 	public class ContextFinder
@@ -266,6 +267,7 @@ namespace Land.Markup.Binding
 								}
 
 								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(n, currentFile, pair);
+								candidate.Context.ReferencesContext = PointContext.GetReferencesContext(n, currentFile, this);
 
 								var oldSiblingsContext = PointContext.GetSiblingsContext_old(n, currentFile, pair);
 								candidate.Context.SiblingsLeftContext_old = oldSiblingsContext.Item1;
@@ -694,16 +696,24 @@ namespace Land.Markup.Binding
 				Math.Pow(Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext), 2);
 			candidate.InnerSimilarity =
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
+
+			candidate.ReferencesSimilarity =
+				CompareReferences(point.ReferencesContext, candidate.Context.ReferencesContext);
 		}
 
 		public List<RemapCandidateInfo> ComputeCoreContextSimilarities(
 			PointContext point,
 			List<RemapCandidateInfo> candidates)
 		{
-			Parallel.ForEach(
-				candidates,
-				c => ComputeCoreSimilarities(point, c)
-			);
+			foreach(var c in candidates)
+			{
+				ComputeCoreSimilarities(point, c);
+			}
+
+			//Parallel.ForEach(
+			//	candidates,
+			//	c => ComputeCoreSimilarities(point, c)
+			//);
 
 			return candidates;
 		}
@@ -713,29 +723,26 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			bool checkSiblings)
 		{
-			Parallel.ForEach(
-				candidates,
-				c =>
-				{
-					ComputeCoreSimilarities(point, c);
+			foreach(var c in candidates)
+			{
+				ComputeCoreSimilarities(point, c);
 
-					if (checkSiblings)
-					{
-						c.SiblingsSimilarity = EvalSimilarity(
-							point.SiblingsContext,
-							c.Context.SiblingsContext
-						);
-						c.SiblingsBeforeSimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.GlobalHash,
-							c.Context.SiblingsContext.Before.GlobalHash
-						);
-						c.SiblingsAfterSimilarity = EvalSimilarity(
-							point.SiblingsContext.After.GlobalHash,
-							c.Context.SiblingsContext.After.GlobalHash
-						);
-					}
+				if (checkSiblings)
+				{
+					c.SiblingsSimilarity = EvalSimilarity(
+						point.SiblingsContext,
+						c.Context.SiblingsContext
+					);
+					c.SiblingsBeforeSimilarity = EvalSimilarity(
+						point.SiblingsContext.Before.GlobalHash,
+						c.Context.SiblingsContext.Before.GlobalHash
+					);
+					c.SiblingsAfterSimilarity = EvalSimilarity(
+						point.SiblingsContext.After.GlobalHash,
+						c.Context.SiblingsContext.After.GlobalHash
+					);
 				}
-			);
+			}
 
 			return candidates;
 		}
@@ -1011,6 +1018,31 @@ namespace Land.Markup.Binding
 		}
 
 		#region EvalSimilarity
+
+		public double CompareReferences(
+			List<PointContext> pointReferences,
+			List<PointContext> candidateReferences)
+		{
+			if (pointReferences?.Count > 0 && candidateReferences != null && PreHeuristic != null)
+			{
+				var counter = 0;
+
+				foreach (var point in pointReferences)
+				{
+					var sameReference = PreHeuristic.GetSameElement(point,
+						candidateReferences.Select(e => new RemapCandidateInfo { Context = e }).ToList());
+
+					if (sameReference != null)
+					{
+						++counter;
+					}
+				}
+
+				return counter / (double)Math.Max(pointReferences.Count, candidateReferences.Count);
+			}
+
+			return 0;
+		}
 
 		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
 		{

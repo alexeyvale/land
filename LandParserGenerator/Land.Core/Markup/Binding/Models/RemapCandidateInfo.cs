@@ -23,6 +23,8 @@ namespace Land.Markup.Binding
 		public double SiblingsBeforeSimilarity { get; set; }
 		public double SiblingsAfterSimilarity { get; set; }
 
+		public double ReferencesSimilarity { get; set; }
+
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }
 
