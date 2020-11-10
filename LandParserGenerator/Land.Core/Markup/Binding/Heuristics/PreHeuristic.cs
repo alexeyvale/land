@@ -47,11 +47,6 @@ namespace Land.Markup.Binding
 			PointContext point,
 			List<RemapCandidateInfo> candidates)
 		{
-			if(point.ClosestContext == null)
-			{
-				return null;
-			}
-
 			var basePredicates = new Func<PointContext, PointContext, bool>[] 
 			{ 
 				HeaderCorePredicate, HeaderSequencePredicate, InnerPredicate 
@@ -76,9 +71,9 @@ namespace Land.Markup.Binding
 
 			/// Проверяем, были ли в исходном файле элементы,
 			/// совпадающие с искомым при легковесном сравнении
-			var wereAlmostSame = point.ClosestContext
-				.Where(e => ancestorsPredicates[0](e, point))
-				.ToList();
+			var wereAlmostSame = point.ClosestContext != null
+				? point.ClosestContext.Where(e => ancestorsPredicates[0](e, point)).ToList()
+				: new List<PointContext>();
 
 			/// Если были совпадающие для более простого базового предиката,
 			/// используем более сложный

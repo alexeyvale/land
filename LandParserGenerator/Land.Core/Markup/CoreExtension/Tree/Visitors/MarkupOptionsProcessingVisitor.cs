@@ -65,6 +65,15 @@ namespace Land.Markup.CoreExtension
 				);
 			}
 
+			if (GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Alias))
+			{
+				node.Options.Set(
+					MarkupOption.GROUP_NAME,
+					MarkupOption.HEADERCORE,
+					GrammarObject.Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, node.Alias)
+				);
+			}
+
 			base.Visit(node);
 		}
 	}

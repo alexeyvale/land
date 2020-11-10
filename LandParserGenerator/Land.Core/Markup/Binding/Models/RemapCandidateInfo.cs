@@ -15,7 +15,6 @@ namespace Land.Markup.Binding
 
 		public double HeaderNonCoreSimilarity { get; set; }
 		public double HeaderCoreSimilarity { get; set; }
-		public double HeaderWordsSimilarity { get; set; }
 
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
