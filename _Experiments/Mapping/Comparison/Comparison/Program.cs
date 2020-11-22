@@ -71,10 +71,7 @@ namespace Comparison
 		static void Main(string[] args)
 		{
 			var heuristic = new ProgrammingLanguageHeuristic();
-
 			var markupManager = new MarkupManager(null, heuristic);
-			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.GlobalBest;
-
 			var entityTypes = new string[] { "class_struct_interface", "method", "field", "property" };
 
 			/// Создаём парсер C# и менеджер разметки из библиотеки LanD	
@@ -121,11 +118,13 @@ namespace Comparison
 
 			start = DateTime.Now;
 			markupManager.ContextFinder.UseNaiveAlgorithm = false;
+			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.GlobalBest;
 			var modifiedRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
 			start = DateTime.Now;
 			markupManager.ContextFinder.UseNaiveAlgorithm = true;
+			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.None;
 			var basicRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Base remapping done in {DateTime.Now - start}");
 

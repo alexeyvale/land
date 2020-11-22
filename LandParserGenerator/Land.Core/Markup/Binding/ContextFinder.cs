@@ -462,6 +462,7 @@ namespace Land.Markup.Binding
 		private void SelectGlobalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
+			/// Проверяем, есть ли что перепривязывать и к чему
 			if (evaluationResults.Count > 0 && evaluationResults.First().Value.Count > 0)
 			{
 				var scores = new int[
@@ -486,6 +487,7 @@ namespace Land.Markup.Binding
 				var bestMatchesFinder = new AssignmentProblem();
 				var bestMatches = bestMatchesFinder.Compute1(scores);
 
+				/// По индексам находим соответствие "исходный контекст" - "наилучший кандидат"
 				var bestContextMatches = indicesToContexts
 					.Select((context, idx) => new
 					{
@@ -494,11 +496,6 @@ namespace Land.Markup.Binding
 							? evaluationResults[context][bestMatches[idx]] : null
 					})
 					.ToList();
-
-				Parallel.ForEach(
-					evaluationResults.Keys.ToList(),
-					key => evaluationResults[key] = evaluationResults[key].OrderByDescending(c => c.Similarity).ToList()
-				);
 
 				int oldCount;
 
