@@ -1,0 +1,42 @@
+DIRECTIVE	: '#' ~[\n\r]*
+DIRECTIVE_ELSE	: '#else' (DIRECTIVE_ELSE|.)*? '#endif'
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' ~["]* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? ["\n\r]
+STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
+
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
+
+
+program 	=	program_element*
+program_element	=	island | block | Any
+island		=	if | switch
+if			=	'if' '(' Any ')' content ('else' content)?!
+switch		=	'switch' '(' Any ')' '{' case+ '}'
+case		=	('case' Any |'default') ':' content*
+content		=	Any ';'| block | island
+block		=	'{'	program_element* '}'
+
+%%
+
+%parsing {
+	recovery program_element
+	fragment STRING_INT_CODE
+	skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+	start program
+}
+
+%nodes {
+	ghost island
+}
