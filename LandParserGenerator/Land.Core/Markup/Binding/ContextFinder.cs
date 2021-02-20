@@ -670,7 +670,7 @@ namespace Land.Markup.Binding
 			var candidateLineDiff = Math.Abs(point.Line - candidate.Context.Line);
 			candidate.LocationSimilarity = fileLinesDiff == 0
 				? candidateLineDiff == 0 ? 1 : 0
-				: 1 - Math.Min(1, Math.Abs(fileLinesDiff - candidateLineDiff) / (double)fileLinesDiff);
+				: 1 - Math.Min(1, candidateLineDiff / (double)fileLinesDiff);
 		}
 
 		public List<RemapCandidateInfo> ComputeCoreContextSimilarities(
