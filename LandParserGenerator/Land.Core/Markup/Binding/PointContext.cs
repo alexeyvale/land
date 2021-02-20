@@ -104,6 +104,19 @@ namespace Land.Markup.Binding
 			}
 		}
 
+		public int GetHashCodeIgnoreValue()
+		{
+			unchecked
+			{
+				var hashCode = 1685606927;
+				hashCode = hashCode * -1521134295 + ExactMatch.GetHashCode();
+				hashCode = hashCode * -1521134295 + Priority.GetHashCode();
+				hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
+
+				return hashCode;
+			}
+		}
+
 		public static bool operator ==(HeaderContextElement a, HeaderContextElement b)
 		{
 			return a.Equals(b);
