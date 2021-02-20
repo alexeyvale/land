@@ -34,6 +34,8 @@ method_body		=	init_expression? ';' | block
 field			=	common_beginning type name ('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'
 property		=	common_beginning type name property_body
 property_body	=	(block (init_value ';')? | init_expression ';')
+control_operator	=	'if' operator_tail  ('else' operator_tail)? | 'switch' operator_tail
+	| 'for' operator_tail | 'while' operator_tail | 'do' operator_tail 
 water_entity	=	AnyInclude('delegate', 'operator', 'this') (block | ';')+
 
 common_beginning	=	entity_attribute* modifier* 
@@ -41,6 +43,7 @@ modifier			=	MODIFIER | 'extern'
 init_expression		=	'=>' Any
 init_value			=	'=' init_part+
 init_part			=	Any | type
+operator_tail		=	Any (block|';')
 
 name_atom	=	ID type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
@@ -54,7 +57,7 @@ type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
 entity_attribute	=	'[' Any ']'
 general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
 arguments			=	'(' Any ')'
-block				=	'{' Any '}'
+block				=	'{' (Any|control_operator)* '}'
 
 %%
 
@@ -77,11 +80,12 @@ block				=	'{' Any '}'
 }
 
 %markup {
-	land namespace enum class_struct_interface method field property
+	land namespace enum class_struct_interface method field property control_operator
+	anchor(method) control_operator
 	
 	priority(0.1) modifier CLASS_STRUCT_INTERFACE
 	priority(0.8) name
-	priority(1) arguments
+	priority(0.5) arguments
 	priority(0.3) type
 	priority(0.1) init_value
 	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace' entity_attribute

@@ -118,7 +118,7 @@ namespace Comparison
 
 			start = DateTime.Now;
 			markupManager.ContextFinder.UseNaiveAlgorithm = false;
-			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.GlobalBest;
+			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
 			var modifiedRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
 
@@ -133,12 +133,12 @@ namespace Comparison
 				var pointsOfType = modifiedRemapResult.Keys
 					.Where(e => e.Context.Type == key).ToList();
 
-				List<Tuple<string, string>> sameAutoResult = new List<Tuple<string, string>>(),
-					differentAutoResult = new List<Tuple<string, string>>(),
-					modifiedOnlyAutoResult = new List<Tuple<string, string>>(),
-					basicOnlyAutoResult = new List<Tuple<string, string>>(),
-					sameFirstPos = new List<Tuple<string, string>>(),
-					differentFirstPos = new List<Tuple<string, string>>();
+				List<List<string>> sameAutoResult = new List<List<string>>(),
+					differentAutoResult = new List<List<string>>(),
+					modifiedOnlyAutoResult = new List<List<string>>(),
+					basicOnlyAutoResult = new List<List<string>>(),
+					sameFirstPos = new List<List<string>>(),
+					differentFirstPos = new List<List<string>>();
 
 				var similarities = new List<string>();
 
@@ -166,86 +166,90 @@ namespace Comparison
 						else if (basicRemapResult[cp].Count > 1 && modifiedRemapResult[cp].Count > 1)
 							similarities.Add($"{ basicRemapResult[cp][0].Similarity };{ modifiedRemapResult[cp][0].Similarity };{ basicRemapResult[cp][1].Similarity };{ modifiedRemapResult[cp][1].Similarity }");
 
-						report.WriteLine(Path.GetFileName(cp.Context.FileContext.Name));
-						report.WriteLine("*");
+						var reportLines = new List<string>();
 
-						report.WriteLine(String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
-						report.WriteLine("*");
+						reportLines.Add(Path.GetFileName(cp.Context.FileContext.Name));
+						reportLines.Add("*");
+
+						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {cp.Context.Line}");
+						reportLines.Add("*");
 
 						foreach (var landCandidate in basicRemapResult[cp].Take(7))
 						{
-							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
-							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderNonCoreSimilarity}; SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
+							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {landCandidate.Context.Line}");
+							reportLines.Add($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderNonCoreSimilarity}; SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 
-						report.WriteLine("*");
+						reportLines.Add("*");
 
 						if(modifiedRemapResult[cp].Count > 0)
 						{
-							report.WriteLine($"WHCore={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]}; " +
+							reportLines.Add($"WHCore={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]}; " +
 								$"WHNCore={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]}; " +
 								$"WI={modifiedRemapResult[cp][0].Weights[ContextType.Inner]}; " +
 								$"WA={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]}; " +
-								$"WS={modifiedRemapResult[cp][0].Weights[ContextType.Siblings]}");
+								$"WS={modifiedRemapResult[cp][0].Weights[ContextType.Siblings]}; " +
+								$"WL={modifiedRemapResult[cp][0].Weights[ContextType.Location]}");
 						}
 
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(7))
 						{
-							report.WriteLine(String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text))));
-							report.WriteLine($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimHNCore={landCandidate.HeaderNonCoreSimilarity}; " +
+							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {landCandidate.Context.Line}");
+							reportLines.Add($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimHNCore={landCandidate.HeaderNonCoreSimilarity}; " +
 								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
-								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}] " +
+								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}; " +
+								$"SimL={landCandidate.LocationSimilarity}] " +
 								$"{(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
-						report.WriteLine();
-						report.WriteLine("**************************************************************");
-						report.WriteLine();
+						reportLines.Add("");
+						reportLines.Add("**************************************************************");
+						reportLines.Add("");
 
-						var tuple = new Tuple<string, string>(
-								cp.Context.FileContext.Name,
-								String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text)))
-							);
+						foreach (var line in reportLines)
+						{
+							report.WriteLine(line);
+						}
+
+						List<List<string>> customReport = null;
 
 						if (isModifiedAuto)
 						{
 							if (isBasicAuto)
 							{
-								if (sameFirst)
-									sameAutoResult.Add(tuple);
-								else
-									differentAutoResult.Add(tuple);
+								customReport = sameFirst
+									? sameAutoResult : differentAutoResult;
 							}
 							else
 							{
-								modifiedOnlyAutoResult.Add(tuple);
+								customReport = modifiedOnlyAutoResult;
 							}
 						}
 						else if (isBasicAuto)
 						{
-							basicOnlyAutoResult.Add(tuple);
+							customReport = basicOnlyAutoResult;
 						}
 						else
 						{
-							if (sameFirst)
-								sameFirstPos.Add(tuple);
-							else
-								differentFirstPos.Add(tuple);
+							customReport = sameFirst
+								? sameFirstPos : differentFirstPos;
 						}
+
+						customReport.Add(reportLines);
 					}
 				}
 				File.WriteAllLines($"{key}_similarities.txt", similarities);
 				File.WriteAllLines($"{key}_basicOnlyAutoResult.txt",
-					basicOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					basicOnlyAutoResult.SelectMany(r => r));
 				File.WriteAllLines($"{key}_modifiedOnlyAutoResult.txt",
-					modifiedOnlyAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					modifiedOnlyAutoResult.SelectMany(r => r));
 				File.WriteAllLines($"{key}_sameAutoResult.txt",
-					sameAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					sameAutoResult.SelectMany(r => r));
 				File.WriteAllLines($"{key}_differentAutoResult.txt",
-					differentAutoResult.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					differentAutoResult.SelectMany(r => r));
 				File.WriteAllLines($"{key}_sameFirstPos.txt",
-					sameFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					sameFirstPos.SelectMany(r => r));
 				File.WriteAllLines($"{key}_differentFirstPos.txt",
-					differentFirstPos.SelectMany(r => new string[] { r.Item1, r.Item2, "" }));
+					differentFirstPos.SelectMany(r => r));
 
 				Console.WriteLine($"Total: {pointsOfType.Count}");
 				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");

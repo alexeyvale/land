@@ -15,7 +15,8 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings
+		Siblings,
+		Location
 	}
 
 	public class ContextFinder
@@ -24,8 +25,8 @@ namespace Land.Markup.Binding
 		public enum OptimizationType { None, LocalBest, GlobalBest }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
-		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 1.5;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.7;
+		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 2;
 
 		public bool UseNaiveAlgorithm { get; set; } = false;
 		public OptimizationType Optimization { get; set; } = OptimizationType.GlobalBest;
@@ -211,9 +212,6 @@ namespace Land.Markup.Binding
 			var ancestorsCache = new Dictionary<Node, AncestorCacheElement>();
 			var candidateAncestor = new Dictionary<RemapCandidateInfo, Node>();
 
-			/// Анализируем контекст соседей только при локальном поиске
-			var checkSiblings = searchType == SearchType.Local;
-
 			/// Инициализируем коллекции кандидатов для каждого типа
 			foreach (var type in points.Keys)
 			{
@@ -231,6 +229,9 @@ namespace Land.Markup.Binding
 
 				foreach (var type in points.Keys)
 				{
+					/// Анализируем контекст соседей только при локальном поиске
+					var checkSiblings = searchType == SearchType.Local;
+
 					candidates[type].AddRange(visitor.Grouped[type]
 						.Select(n =>
 						{
@@ -246,6 +247,13 @@ namespace Land.Markup.Binding
 							/// Если нужно проверить соседей, проверяем, не закешировали ли их
 							if (checkSiblings)
 							{
+								var siblingsArgs = new SiblingsConstructionArgs
+								{
+									Range = (visitor.Grouped[type].FirstOrDefault()?.Options.GetUseSiblings() ?? false)
+										? SiblingsConstructionArgs.SiblingsRange.All
+										: SiblingsConstructionArgs.SiblingsRange.Nearest
+								};
+
 								/// Ищем предка, относительно которого нужно искать соседей
 								var ancestor = PointContext.GetAncestor(n)
 									?? (n != currentFile.Root ? currentFile.Root : null);
@@ -265,7 +273,7 @@ namespace Land.Markup.Binding
 										};
 								}
 
-								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(n, currentFile, pair);
+								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(n, currentFile, siblingsArgs.Range, pair);
 
 								var oldSiblingsContext = PointContext.GetSiblingsContext_old(n, currentFile, pair);
 								candidate.Context.SiblingsLeftContext_old = oldSiblingsContext.Item1;
@@ -339,7 +347,7 @@ namespace Land.Markup.Binding
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
-				foreach (var pointContext in contextsToPoints.Keys)
+				foreach (var pointContext in contextsToPoints.Keys.Concat(closestContexts))
 				{
 					var perfectMatch = PreHeuristic.GetSameElement(pointContext, candidates);
 
@@ -351,11 +359,14 @@ namespace Land.Markup.Binding
 						perfectMatch.IsAuto = true;
 						perfectMatch.Similarity = 1;
 
-						ComputeContextSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings);
-
-						foreach (var point in contextsToPoints[pointContext])
+						if (contextsToPoints.ContainsKey(pointContext))
 						{
-							result[point] = new List<RemapCandidateInfo> { perfectMatch };
+							ComputeContextSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings);
+
+							foreach (var point in contextsToPoints[pointContext])
+							{
+								result[point] = new List<RemapCandidateInfo> { perfectMatch };
+							}
 						}
 					}
 				}
@@ -373,7 +384,7 @@ namespace Land.Markup.Binding
 			/// Наивный алгоритм не учитывает ближайших
 			if (!UseNaiveAlgorithm)
 			{
-				foreach (var closestContext in closestContexts)
+				foreach (var closestContext in closestContexts.Except(heuristicallyMatched))
 				{
 					evaluated[closestContext] = ComputeContextSimilarities(
 						closestContext,
@@ -556,8 +567,6 @@ namespace Land.Markup.Binding
 		private void SelectLocalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
-			var resultsWithoutDeleted = new Dictionary<PointContext, List<RemapCandidateInfo>>();
-
 			Parallel.ForEach(
 				evaluationResults.Keys.ToList(),
 				key =>
@@ -566,62 +575,58 @@ namespace Land.Markup.Binding
 				}
 			);
 
-			foreach(var key in evaluationResults.Keys)
-			{
-				resultsWithoutDeleted[key] = new List<RemapCandidateInfo>(evaluationResults[key]);
-			}
-
-			var oldCount = 0;
+			var unmapped = new HashSet<PointContext>(evaluationResults.Keys);
+			var oldCount = unmapped.Count;
 
 			do
 			{
-				oldCount = resultsWithoutDeleted.Count;
+				oldCount = unmapped.Count;
 
-				foreach (var context in resultsWithoutDeleted.Keys.ToList())
+				foreach (var context in unmapped.ToList())
 				{
-					if (resultsWithoutDeleted[context].Count > 0)
+					var actualCandidates = evaluationResults[context]
+						.Where(c=>!c.Deleted)
+						.ToList();
+
+					if (actualCandidates.Count > 0)
 					{
-						/// проверяем для него условие автоматического принятия решения.
-						var first = resultsWithoutDeleted[context][0];
-						var second = resultsWithoutDeleted[context].Count > 1 ? resultsWithoutDeleted[context][1] : null;
+						/// Берём самый похожий элемент и следующий за ним
+						var first = actualCandidates[0];
+						var second = actualCandidates.Count > 1 ? actualCandidates[1] : null;
+
+						/// Берём наилучшее соответствие текущего кандидата другому исходному элементу
+						var otherBestMatch = evaluationResults.Keys.Intersect(unmapped)
+							.Where(e => e != context && evaluationResults[e][0].Context == first.Context)
+							.Select(e => evaluationResults[e][0])
+							.OrderByDescending(e => e.Similarity)
+							.FirstOrDefault();
 
 						/// Автоматически перепривязываемся, если выполняются локальные условия
 						/// и этот элемент не похож в большей степени на что-то другое
 						if (IsSimilarEnough(first) 
-							&& (second == null || AreDistantEnough(first, second))
-							&& first.Similarity >= resultsWithoutDeleted.Values
-								.Select(v=>v.FirstOrDefault())
-								.Where(e=>e.Context == first.Context)
-								.Max(e=>e.Similarity))
+							&& AreDistantEnough(first, second)
+							&& AreDistantEnough(first, otherBestMatch))
 						{
 							first.IsAuto = true;
 
 							evaluationResults[context].Remove(first);
 							evaluationResults[context].Insert(0, first);
-
-							resultsWithoutDeleted.Remove(context);
+							unmapped.Remove(context);
 
 							foreach (var key in evaluationResults.Keys)
 							{
 								if (key != context)
 								{
 									var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
+									///evaluationResults[key].Remove(itemToRemove);
 									itemToRemove.Deleted = true;
-									evaluationResults[key].Remove(itemToRemove);
-
-									if (resultsWithoutDeleted.ContainsKey(key))
-									{
-										resultsWithoutDeleted[key].Remove(itemToRemove);
-									}
-
-									//evaluationResults[key].Remove(itemToRemove);
 								}
 							}
 						}
 					}
 				}
 			}
-			while (oldCount != resultsWithoutDeleted.Count);
+			while (oldCount != unmapped.Count);
 		}
 
 		private void SelectBests(Dictionary<PointContext, List<RemapCandidateInfo>> evaluated)
@@ -660,6 +665,12 @@ namespace Land.Markup.Binding
 				Math.Pow(Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext), 2);
 			candidate.InnerSimilarity =
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
+
+			var fileLinesDiff = Math.Abs(point.FileContext.LineCount - candidate.Context.FileContext.LineCount);
+			var candidateLineDiff = Math.Abs(point.Line - candidate.Context.Line);
+			candidate.LocationSimilarity = fileLinesDiff == 0
+				? candidateLineDiff == 0 ? 1 : 0
+				: 1 - Math.Min(1, Math.Abs(fileLinesDiff - candidateLineDiff) / (double)fileLinesDiff);
 		}
 
 		public List<RemapCandidateInfo> ComputeCoreContextSimilarities(
@@ -734,11 +745,6 @@ namespace Land.Markup.Binding
 				h.TuneWeights(sourceContext, actualCandidates, weights);
 			}
 
-			foreach (var h in ScoringHeuristics)
-			{
-				h.PredictSimilarity(sourceContext, actualCandidates);
-			}
-
 			var finalWeights = weights.ToDictionary(e => e.Key, e => e.Value ?? 0);
 
 			actualCandidates.ForEach(c =>
@@ -748,10 +754,16 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
+						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity
+						+ finalWeights[ContextType.Location] * c.LocationSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
+
+			foreach (var h in ScoringHeuristics)
+			{
+				 h.PredictSimilarity(sourceContext, actualCandidates);
+			}
 		}
 
 		public void RunML(Dictionary<PointContext, List<RemapCandidateInfo>> elements)
@@ -1238,10 +1250,10 @@ namespace Land.Markup.Binding
 			return file.Root != null;
 		}
 
-		private bool IsSimilarEnough(RemapCandidateInfo candidate) =>
+		public static bool IsSimilarEnough(RemapCandidateInfo candidate) =>
 			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
-		private bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
+		public static bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
 			second == null || first.Similarity == 1 && second.Similarity != 1
 				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 

@@ -34,6 +34,8 @@ namespace Land.Markup
 			ContextFinder.SetHeuristic(typeof(TuneHeaderWeightIfSimilar));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
 
+			ContextFinder.SetHeuristic(typeof(LocationHeuristic));
+
 			#endregion
 		}
 
@@ -149,12 +151,19 @@ namespace Land.Markup
 		{
 			Remap(node.Type, file.Name, searchArea);
 
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				Range = node.Options.GetUseSiblings()
+					? SiblingsConstructionArgs.SiblingsRange.All
+					: SiblingsConstructionArgs.SiblingsRange.Nearest
+			};
+
 			var point = new ConcernPoint(
 				node, 
 				ContextFinder.ContextManager.GetContext(
 					node, 
-					file, 
-					new SiblingsConstructionArgs(),
+					file,
+					siblingsArgs,
 					new ClosestConstructionArgs
 					{
 						SearchArea = GetSimilarOnly(file, searchArea),
@@ -191,7 +200,6 @@ namespace Land.Markup
 				Remap(group.Key, file.Name, searchArea);
 
 				var concern = AddConcern(group.Key);
-
 				/// В пределах символа группируем по псевдониму
 				var subgroups = group.GroupBy(g => g.Alias);
 
@@ -201,6 +209,13 @@ namespace Land.Markup
 					/// создаём подфункциональность
 					var subconcern = AddConcern(subgroup.Key, null, concern);
 
+					var subconcernSiblingsArgs = new SiblingsConstructionArgs
+					{
+						Range = subgroup.First().Options.GetUseSiblings()
+							? SiblingsConstructionArgs.SiblingsRange.All
+							: SiblingsConstructionArgs.SiblingsRange.Nearest
+					};
+
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
@@ -208,7 +223,7 @@ namespace Land.Markup
 							ContextFinder.ContextManager.GetContext(
 								node, 
 								file,
-								new SiblingsConstructionArgs(),
+								subconcernSiblingsArgs,
 								new ClosestConstructionArgs
 								{
 									SearchArea = GetSimilarOnly(file, searchArea),
@@ -223,13 +238,20 @@ namespace Land.Markup
 				var nodes = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
 					.SelectMany(s => s).ToList();
 
+				var siblingsArgs = new SiblingsConstructionArgs
+				{
+					Range = (nodes.FirstOrDefault()?.Options.GetUseSiblings() ?? false)
+						? SiblingsConstructionArgs.SiblingsRange.All
+						: SiblingsConstructionArgs.SiblingsRange.Nearest
+				};
+
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
 						node, ContextFinder.ContextManager.GetContext(
 							node, 
 							file,
-							new SiblingsConstructionArgs(),
+							siblingsArgs,
 							new ClosestConstructionArgs
 							{
 								SearchArea = GetSimilarOnly(file, searchArea),
@@ -277,10 +299,17 @@ namespace Land.Markup
 			ParsedFile file,
 			List<ParsedFile> searchArea)
 		{
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				Range = node.Options.GetUseSiblings()
+					? SiblingsConstructionArgs.SiblingsRange.All
+					: SiblingsConstructionArgs.SiblingsRange.Nearest
+			};
+
 			point.Relink(node, ContextFinder.ContextManager.GetContext(
 				node, 
 				file,
-				new SiblingsConstructionArgs(),
+				siblingsArgs,
 				new ClosestConstructionArgs
 				{
 					SearchArea = GetSimilarOnly(file, searchArea),
@@ -633,10 +662,17 @@ namespace Land.Markup
 
 			if (first?.IsAuto ?? false)
 			{
+				var siblingsArgs = new SiblingsConstructionArgs
+				{
+					Range = first.Node.Options.GetUseSiblings()
+						? SiblingsConstructionArgs.SiblingsRange.All
+						: SiblingsConstructionArgs.SiblingsRange.Nearest
+				};
+
 				point.Context = ContextFinder.ContextManager.GetContext(
 					first.Node, 
-					first.File, 
-					new SiblingsConstructionArgs(),
+					first.File,
+					siblingsArgs,
 					new ClosestConstructionArgs
 					{
 						SearchArea = GetSimilarOnly(first.File, searchArea),

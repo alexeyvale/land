@@ -13,6 +13,8 @@ namespace Land.Markup.Binding
 	public interface IEqualsIgnoreValue
 	{
 		bool EqualsIgnoreValue(object obj);
+
+		int GetHashCodeIgnoreValue();
 	}
 
 	public class PrioritizedWord
@@ -245,8 +247,8 @@ namespace Land.Markup.Binding
 
 		#region Old
 
-		public List<string> Sequence_old =>
-			Sequence.Select(e => String.Join("", e.Value.Select(word => word.Text))).ToList();
+		public List<string> Sequence_old { get; set; }
+
 		public string Core_old =>
 			String.Join("", Core.Select(e => String.Join("", e.Value.Select(word => word.Text))).ToList());
 
@@ -521,7 +523,7 @@ namespace Land.Markup.Binding
 
 			if (siblingsArgs !=null && core.SiblingsContext == null)
 			{
-				core.SiblingsContext = GetSiblingsContext(node, file);
+				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.Range);
 
 				#region Old
 				var oldSiblingsContext = GetSiblingsContext_old(node, file);
@@ -580,6 +582,7 @@ namespace Land.Markup.Binding
 
 		public static HeaderContext GetHeaderContext(Node node)
 		{
+			var headerCoreTypes = new HashSet<string>(node.Options.GetHeaderCore());
 			List<Node> sequence;
 
 			if (node.Value.Count > 0)
@@ -617,21 +620,21 @@ namespace Land.Markup.Binding
 			}
 
 			var headerSequence = sequence.Select(e => (HeaderContextElement)e).ToList();
-			var maxPriority = headerSequence.Count > 0 ? headerSequence.Max(e => e.Priority) : 0;
+			var grouped = sequence
+				.Select((e, i) => new { elem = e, idx = i })
+				.GroupBy(e => headerCoreTypes.Contains(e.elem.Symbol) || headerCoreTypes.Contains(e.elem.Alias))
+				.ToDictionary(g => g.Key, g => g.ToList());
 
 			return new HeaderContext
 			{
 				Sequence = headerSequence,
-				NonCoreIndices = headerSequence
-					.Select((e, i) => new { elem = e, idx = i })
-					.Where((e, i) => e.elem.Priority < maxPriority)
-					.Select(e => e.idx)
-					.ToList(),
-				CoreIndices = headerSequence
-					.Select((e, i) => new { elem = e, idx = i })
-					.Where((e, i) => e.elem.Priority == maxPriority)
-					.Select(e => e.idx)
-					.ToList(),
+				NonCoreIndices = grouped.ContainsKey(false)
+					? grouped[false].Select(e => e.idx).ToList()
+					: new List<int>(),
+				CoreIndices = grouped.ContainsKey(true)
+					? grouped[true].Select(e => e.idx).ToList()
+					: new List<int>(),
+				Sequence_old = sequence.SelectMany(e=>e.Value).ToList(),
 			};
 		}
 
@@ -826,6 +829,7 @@ namespace Land.Markup.Binding
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
 			ParsedFile file,
+			SiblingsConstructionArgs.SiblingsRange range,
 			AncestorSiblingsPair pair = null)
 		{
 			Node parentNode = null;
@@ -902,10 +906,14 @@ namespace Land.Markup.Binding
 			siblings.RemoveAt(markedElementIndex);
 
 			var beforeBuilder = new StringBuilder();
-			var beforeSiblings = siblings
-				.Take(markedElementIndex)
-				.Where(n => n.Location != null)
-				.ToList();
+			var beforeSiblings = range == SiblingsConstructionArgs.SiblingsRange.All
+				? siblings
+					.Take(markedElementIndex)
+					.Where(n => n.Location != null)
+					.ToList()
+				: markedElementIndex > 0 
+					? new List<Node> { siblings[markedElementIndex - 1] }
+					: new List<Node>();
 
 			foreach (var part in beforeSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
@@ -914,10 +922,14 @@ namespace Land.Markup.Binding
 			}
 			
 			var afterBuilder = new StringBuilder();
-			var afterSiblings = siblings
-				.Skip(markedElementIndex)
-				.Where(n => n.Location != null)
-				.ToList();
+			var afterSiblings = range == SiblingsConstructionArgs.SiblingsRange.All
+				? siblings
+					.Skip(markedElementIndex)
+					.Where(n => n.Location != null)
+					.ToList()
+				: markedElementIndex < siblings.Count
+					? new List<Node> { siblings[markedElementIndex] }
+					: new List<Node>();
 
 			foreach (var part in afterSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
@@ -1034,10 +1046,19 @@ namespace Land.Markup.Binding
 			IEqualsIgnoreValue e2) => e1.EqualsIgnoreValue(e2);
 
 		public int GetHashCode(IEqualsIgnoreValue e)
-			=> e.GetHashCode();
+			=> e.GetHashCodeIgnoreValue();
 	}
 
-	public class SiblingsConstructionArgs { }
+	public class SiblingsConstructionArgs 
+	{ 
+		public enum SiblingsRange
+		{
+			All,
+			Nearest
+		}
+
+		public SiblingsRange Range { get; set; }
+	}
 
 	public class ClosestConstructionArgs
 	{

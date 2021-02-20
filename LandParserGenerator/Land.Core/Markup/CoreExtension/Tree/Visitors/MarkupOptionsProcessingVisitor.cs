@@ -74,6 +74,12 @@ namespace Land.Markup.CoreExtension
 				);
 			}
 
+			if (GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, node.Symbol)
+				|| !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, node.Alias))
+			{
+				node.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, null);
+			}
+
 			base.Visit(node);
 		}
 	}
