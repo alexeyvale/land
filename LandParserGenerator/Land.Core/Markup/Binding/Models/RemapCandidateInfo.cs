@@ -11,8 +11,6 @@ namespace Land.Markup.Binding
 		public ParsedFile File { get; set; }
 		public PointContext Context { get; set; }
 
-		public SiblingsSearchResult SiblingsSearchResult { get; set; }
-
 		public double HeaderNonCoreSimilarity { get; set; }
 		public double HeaderCoreSimilarity { get; set; }
 

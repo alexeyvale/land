@@ -34,8 +34,6 @@ namespace Land.Markup
 			ContextFinder.SetHeuristic(typeof(TuneHeaderWeightIfSimilar));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
 
-			ContextFinder.SetHeuristic(typeof(LocationHeuristic));
-
 			#endregion
 		}
 

@@ -124,7 +124,7 @@ namespace Comparison
 
 			start = DateTime.Now;
 			markupManager.ContextFinder.UseNaiveAlgorithm = true;
-			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.None;
+			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
 			var basicRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Base remapping done in {DateTime.Now - start}");
 
@@ -168,37 +168,38 @@ namespace Comparison
 
 						var reportLines = new List<string>();
 
-						reportLines.Add(Path.GetFileName(cp.Context.FileContext.Name));
+						reportLines.Add($"file:///{MarkupFolder}\\{cp.Context.FileContext.Name}");
+						reportLines.Add($"file:///{RelinkFolder}\\{cp.Context.FileContext.Name}");
 						reportLines.Add("*");
 
-						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {cp.Context.Line}");
+						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence_old)}     {cp.Context.Line}");
 						reportLines.Add("*");
 
 						foreach (var landCandidate in basicRemapResult[cp].Take(7))
 						{
-							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {landCandidate.Context.Line}");
-							reportLines.Add($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimH={landCandidate.HeaderNonCoreSimilarity}; SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
+							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence_old)}     {landCandidate.Context.Line}");
+							reportLines.Add($"\t{landCandidate.Similarity:0.000}  [HC={landCandidate.HeaderCoreSimilarity:0.00};  H={landCandidate.HeaderNonCoreSimilarity:0.00};  I={landCandidate.InnerSimilarity:0.00};  SimA={landCandidate.AncestorSimilarity:0.00}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 
 						reportLines.Add("*");
 
 						if(modifiedRemapResult[cp].Count > 0)
 						{
-							reportLines.Add($"WHCore={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]}; " +
-								$"WHNCore={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]}; " +
-								$"WI={modifiedRemapResult[cp][0].Weights[ContextType.Inner]}; " +
-								$"WA={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]}; " +
-								$"WS={modifiedRemapResult[cp][0].Weights[ContextType.Siblings]}; " +
-								$"WL={modifiedRemapResult[cp][0].Weights[ContextType.Location]}");
+							reportLines.Add($"HC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]};  " +
+								$"HNC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]:0.00};  " +
+								$"I={modifiedRemapResult[cp][0].Weights[ContextType.Inner]:0.00};  " +
+								$"A={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]:0.00};  " +
+								$"S={modifiedRemapResult[cp][0].Weights[ContextType.Siblings]:0.00};  " +
+								$"L={modifiedRemapResult[cp][0].Weights[ContextType.Location]:0.00}");
 						}
 
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(7))
 						{
-							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence.SelectMany(c => c.Value.Select(valElem => valElem.Text)))}     {landCandidate.Context.Line}");
-							reportLines.Add($"{landCandidate.Similarity}  [SimHCore={landCandidate.HeaderCoreSimilarity}; SimHNCore={landCandidate.HeaderNonCoreSimilarity}; " +
-								$"SimI={landCandidate.InnerSimilarity}; SimA={landCandidate.AncestorSimilarity}; " +
-								$"SimSB={landCandidate.SiblingsBeforeSimilarity}; SimSA={landCandidate.SiblingsAfterSimilarity}; SimS={landCandidate.SiblingsSimilarity}; " +
-								$"SimL={landCandidate.LocationSimilarity}] " +
+							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence_old)}     {landCandidate.Context.Line}");
+							reportLines.Add($"\t{landCandidate.Similarity:0.000}  [HC={landCandidate.HeaderCoreSimilarity:0.00};  HNC={landCandidate.HeaderNonCoreSimilarity:0.00};  " +
+								$"I={landCandidate.InnerSimilarity:0.00};  A={landCandidate.AncestorSimilarity:0.00};  " +
+								$"SB={landCandidate.SiblingsBeforeSimilarity:0.00};  SA={landCandidate.SiblingsAfterSimilarity:0.00};  SimS={landCandidate.SiblingsSimilarity:0.00};  " +
+								$"L={landCandidate.LocationSimilarity:0.00}] " +
 								$"{(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 						reportLines.Add("");
@@ -237,6 +238,7 @@ namespace Comparison
 						customReport.Add(reportLines);
 					}
 				}
+
 				File.WriteAllLines($"{key}_similarities.txt", similarities);
 				File.WriteAllLines($"{key}_basicOnlyAutoResult.txt",
 					basicOnlyAutoResult.SelectMany(r => r));
@@ -250,6 +252,20 @@ namespace Comparison
 					sameFirstPos.SelectMany(r => r));
 				File.WriteAllLines($"{key}_differentFirstPos.txt",
 					differentFirstPos.SelectMany(r => r));
+
+				if (sameAutoResult.Count > 50) {
+
+					var randomAutoIdx = new HashSet<int>();
+					var random = new Random(7);
+
+					while(randomAutoIdx.Count < 50)
+					{
+						randomAutoIdx.Add(random.Next(sameAutoResult.Count));
+					}
+
+					File.WriteAllLines($"{key}_sameAutoResult_toCheck.txt",
+						randomAutoIdx.SelectMany(idx => sameAutoResult[idx]));
+				}
 
 				Console.WriteLine($"Total: {pointsOfType.Count}");
 				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");

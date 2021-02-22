@@ -116,7 +116,7 @@ namespace Land.Markup.Binding
 				/// Если их несколько и остальная часть заголовка различается, она нам поможет
 				else if(maxSimilarityCandidates.Select(c=>c.HeaderNonCoreSimilarity).Distinct().Count() > 1)
 				{
-					weights[ContextType.HeaderNonCore] = weights[ContextType.HeaderCore] * 4;
+					weights[ContextType.HeaderNonCore] = weights[ContextType.HeaderCore] * 2;
 				}
 			}
 			/// Если у всех кандидатов похожесть ядра небольшая, остальная часть заголовка нас только запутает
@@ -327,48 +327,6 @@ namespace Land.Markup.Binding
 			}
 
 			return weights;
-		}
-	}
-
-	public class LocationHeuristic : ISimilarityHeuristic
-	{
-		const double EXCELLENT_THRESHOLD = 0.8;
-
-		public List<RemapCandidateInfo> PredictSimilarity(PointContext source, List<RemapCandidateInfo> candidates)
-		{
-			var ordered = candidates.OrderByDescending(c => c.Similarity).ToList();
-
-			/// Если в отсортированном по похожести списке первый и второй кандидат недостаточно разделены
-			if(ordered.Count > 1
-				&& 1 - ordered[1].Similarity < ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - ordered[0].Similarity)
-				&& (ordered[0].LocationSimilarity >= EXCELLENT_THRESHOLD || ordered[1].LocationSimilarity >= EXCELLENT_THRESHOLD))
-			{
-				var newOrdered0 = (ordered[0].Similarity * ordered[0].Weights.Values.Sum() + ordered[0].LocationSimilarity)
-					/ (ordered[0].Weights.Values.Sum() + 1);
-
-				var newOrdered1 = (ordered[1].Similarity * ordered[1].Weights.Values.Sum() + ordered[1].LocationSimilarity)
-					/ (ordered[1].Weights.Values.Sum() + 1);
-
-				/// и учёт расположения поможет отодвинуть их на достаточное расстояние
-				if(1 - newOrdered1 >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - newOrdered0)
-					|| 1 - newOrdered0 >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - newOrdered1))
-				{
-					foreach (var candidate in ordered)
-					{
-						var similarity = candidate.Similarity * candidate.Weights.Values.Sum()
-							+ candidate.LocationSimilarity;
-
-						candidate.Similarity = similarity / (candidate.Weights.Values.Sum() + 1);
-					}
-
-					foreach (var candidate in ordered)
-					{
-						candidate.Weights[ContextType.Location] = 1;
-					}
-				}
-			}
-
-			return candidates;
 		}
 	}
 }

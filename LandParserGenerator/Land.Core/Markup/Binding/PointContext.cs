@@ -385,7 +385,7 @@ namespace Land.Markup.Binding
 		/// <summary>
 		/// Количество строк
 		/// </summary>
-		public int LineCount { get; set; }
+		public int Length { get; set; }
 
 		/// <summary>
 		/// Нечёткий хеш содержимого файла
@@ -431,6 +431,10 @@ namespace Land.Markup.Binding
 		/// Номер строки в файле, на которой начинается сущность
 		/// </summary>
 		public int Line { get; set; }
+
+		public int StartOffset { get; set; }
+
+		public int EndOffset { get; set; }
 
 		private FileContext _fileContext;
 
@@ -510,7 +514,11 @@ namespace Land.Markup.Binding
 			return new PointContext
 			{
 				Type = node.Type,
+
 				Line = node.Location.Start.Line.Value,
+				StartOffset = node.Location.Start.Offset,
+				EndOffset = node.Location.End.Offset,
+
 				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
 				InnerContext = GetInnerContext(node, file),
@@ -834,7 +842,7 @@ namespace Land.Markup.Binding
 			return new FileContext
 			{
 				Name = name,
-				LineCount = text.Count(c => c == '\n') + 1,
+				Length = text.Length,
 				Content = new TextOrHash(text)
 			};
 		}

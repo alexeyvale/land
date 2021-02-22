@@ -91,6 +91,7 @@
     <Compile Include="Core\Lexing\ILexer.cs" />
     <Compile Include="Core\Lexing\ComplexTokenStream.cs" />
     <Compile Include="Core\Lexing\TokenStream.cs" />
+    <Compile Include="Markup\Binding\LocationManager.cs" />
     <Compile Include="Markup\Binding\Heuristics\PostHeuristic.cs" />
     <Compile Include="Markup\Binding\Heuristics\PreHeuristic.cs" />
     <Compile Include="Markup\Binding\Models\CandidateFeatures.cs" />
