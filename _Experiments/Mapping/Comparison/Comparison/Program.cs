@@ -152,8 +152,8 @@ namespace Comparison
 
 					var sameFirst = basicResult.Count == 0 && modifiedResult.Count == 0 ||
 						basicResult.Count > 0 && modifiedResult.Count > 0 &&
-						modifiedResult[0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text))
-							.SequenceEqual(basicResult[0].Context.HeaderContext.Sequence.SelectMany(h => h.Value.Select(valElem => valElem.Text)));
+						modifiedResult[0].Context.HeaderContext.Sequence_old
+							.SequenceEqual(basicResult[0].Context.HeaderContext.Sequence_old);
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
 					var hasNotChanged = modifiedRemapResult[cp].Count == 1 

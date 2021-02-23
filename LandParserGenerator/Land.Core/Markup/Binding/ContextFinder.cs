@@ -25,7 +25,7 @@ namespace Land.Markup.Binding
 		public enum OptimizationType { None, LocalBest, GlobalBest }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
-		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.7;
+		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 2;
 
 		public bool UseNaiveAlgorithm { get; set; } = false;
@@ -635,7 +635,6 @@ namespace Land.Markup.Binding
 										.ToList();
 								}
 							}
-
 
 							foreach (var key in evaluationResults.Keys)
 							{

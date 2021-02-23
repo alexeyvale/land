@@ -9,10 +9,11 @@ namespace Land.Markup.Binding
 		public class LineInfo
 		{
 			public int Index { get; set; }
-			public int? OffsetBefore { get; set; }
-			public int? OffsetAfter { get; set; }
+			public int? LineBefore { get; set; }
+			public int? LineAfter { get; set; }
 			public int? Shift { get; set; }
 			public double LocationWeight { get; set; }
+			public bool Permutation { get; set; }
 		}
 
 		private List<PointContext> ContextsOrderedByLine { get; set; }
@@ -28,7 +29,7 @@ namespace Land.Markup.Binding
 				.ToList();
 			ContextToLineInfo = ContextsOrderedByLine
 				.Select((e, i) => new { e, i })
-				.ToDictionary(e => e.e, e => new LineInfo { Index = e.i, OffsetBefore = null, OffsetAfter = null });
+				.ToDictionary(e => e.e, e => new LineInfo { Index = e.i, LineBefore = null, LineAfter = null });
 		}
 
 		/// <summary>
@@ -41,10 +42,17 @@ namespace Land.Markup.Binding
 			{
 				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
 
-				if (!currentContext.OffsetAfter.HasValue || currentContext.OffsetAfter > target.StartOffset)
+				if (!currentContext.LineAfter.HasValue || currentContext.LineAfter > target.Line)
 				{
-					currentContext.OffsetAfter = target.StartOffset;
-					UpdateWeight(ContextsOrderedByLine[i]);
+					if (currentContext.LineBefore > target.Line)
+					{
+						currentContext.Permutation = true;
+					}
+					else
+					{
+						currentContext.LineAfter = target.Line;
+						UpdateWeight(ContextsOrderedByLine[i]);
+					}
 				}
 			}
 
@@ -52,45 +60,55 @@ namespace Land.Markup.Binding
 			{
 				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
 
-				if (!currentContext.OffsetBefore.HasValue || currentContext.OffsetBefore < target.EndOffset)
+				if (!currentContext.LineBefore.HasValue || currentContext.LineBefore < target.Line)
 				{
-					currentContext.OffsetBefore = target.EndOffset;
-					currentContext.Shift = target.EndOffset - source.EndOffset;
-					UpdateWeight(ContextsOrderedByLine[i]);
+					if (currentContext.LineAfter < target.Line)
+					{
+						currentContext.Permutation = true;
+					}
+					else
+					{
+						currentContext.LineBefore = target.Line;
+						currentContext.Shift = target.Line - source.Line;
+						UpdateWeight(ContextsOrderedByLine[i]);
+					}
 				}
 			}
 		}
 
 		public int GetFrom(PointContext source) =>
-			ContextToLineInfo[source].OffsetBefore ?? 0;
+			ContextToLineInfo[source].LineBefore ?? 0;
 
 		public int GetTo(PointContext source) =>
-			ContextToLineInfo[source].OffsetAfter ?? TargetFileLength;
+			ContextToLineInfo[source].LineAfter ?? TargetFileLength;
 
 		public int GetShift(PointContext source) =>
 			ContextToLineInfo[source].Shift ?? 0;
 
 		public bool InRange(PointContext source, PointContext target) =>
-			GetFrom(source) <= target.StartOffset
-			&& GetTo(source) >= target.EndOffset;
+			GetFrom(source) <= target.Line
+			&& GetTo(source) >= target.Line;
 
 		public double GetWeight(PointContext source) =>
 			ContextToLineInfo[source].LocationWeight;
 
 		public double GetSimilarity(PointContext source, PointContext target)
 		{
-			var expectedStartOffset = source.StartOffset + GetShift(source);
-			var expectedToOffset = GetTo(source) - (target.EndOffset - target.StartOffset);
+			if(ContextToLineInfo[source].Permutation)
+			{
+				return 0;
+			}
+
+			var expectedTargetLine = source.Line + GetShift(source);
 
 			return InRange(source, target)
-				? 1 - Math.Abs(target.StartOffset - expectedStartOffset)
-					/ (double)Math.Max(expectedStartOffset - GetFrom(source), expectedToOffset - expectedStartOffset)
+				? 1 - Math.Abs(target.Line - expectedTargetLine)
+					/ (double)Math.Max(expectedTargetLine - GetFrom(source), GetTo(source) - expectedTargetLine)
 				: 0;
 		}
 
 		private double UpdateWeight(PointContext source) =>
-			ContextToLineInfo[source].LocationWeight = 
-				1 - Math.Max(0, (GetTo(source) - GetFrom(source) - (source.EndOffset - source.StartOffset))
-					/ (double)(TargetFileLength - (source.EndOffset - source.StartOffset)));
+			ContextToLineInfo[source].LocationWeight = ContextToLineInfo[source].Permutation ? 0
+				: 1 - Math.Max(0, (GetTo(source) - GetFrom(source)) / (double)TargetFileLength);
 	}
 }

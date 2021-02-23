@@ -842,7 +842,7 @@ namespace Land.Markup.Binding
 			return new FileContext
 			{
 				Name = name,
-				Length = text.Length,
+				Length = text.Count(c => c == '\n') + 1,
 				Content = new TextOrHash(text)
 			};
 		}
