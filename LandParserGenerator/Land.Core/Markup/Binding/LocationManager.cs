@@ -9,10 +9,10 @@ namespace Land.Markup.Binding
 		public class LineInfo
 		{
 			public int Index { get; set; }
-			public int? LineBefore { get; set; }
-			public int? LineAfter { get; set; }
+			public int? OffsetBefore { get; set; }
+			public int? OffsetAfter { get; set; }
 			public int? Shift { get; set; }
-			public double LocationWeight { get; set; }
+			public double LocationSimilarity { get; set; }
 			public bool Permutation { get; set; }
 		}
 
@@ -29,7 +29,7 @@ namespace Land.Markup.Binding
 				.ToList();
 			ContextToLineInfo = ContextsOrderedByLine
 				.Select((e, i) => new { e, i })
-				.ToDictionary(e => e.e, e => new LineInfo { Index = e.i, LineBefore = null, LineAfter = null });
+				.ToDictionary(e => e.e, e => new LineInfo { Index = e.i, OffsetBefore = null, OffsetAfter = null });
 		}
 
 		/// <summary>
@@ -42,16 +42,16 @@ namespace Land.Markup.Binding
 			{
 				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
 
-				if (!currentContext.LineAfter.HasValue || currentContext.LineAfter > target.Line)
+				if (!currentContext.OffsetAfter.HasValue || currentContext.OffsetAfter > target.StartOffset)
 				{
-					if (currentContext.LineBefore > target.Line)
+					if (currentContext.OffsetBefore > target.StartOffset)
 					{
 						currentContext.Permutation = true;
 					}
 					else
 					{
-						currentContext.LineAfter = target.Line;
-						UpdateWeight(ContextsOrderedByLine[i]);
+						currentContext.OffsetAfter = target.StartOffset;
+						UpdateSimilarity(ContextsOrderedByLine[i]);
 					}
 				}
 			}
@@ -60,37 +60,37 @@ namespace Land.Markup.Binding
 			{
 				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
 
-				if (!currentContext.LineBefore.HasValue || currentContext.LineBefore < target.Line)
+				if (!currentContext.OffsetBefore.HasValue || currentContext.OffsetBefore < target.EndOffset)
 				{
-					if (currentContext.LineAfter < target.Line)
+					if (currentContext.OffsetAfter < target.EndOffset)
 					{
 						currentContext.Permutation = true;
 					}
 					else
 					{
-						currentContext.LineBefore = target.Line;
-						currentContext.Shift = target.Line - source.Line;
-						UpdateWeight(ContextsOrderedByLine[i]);
+						currentContext.OffsetBefore = target.EndOffset;
+						currentContext.Shift = target.EndOffset - source.EndOffset;
+						UpdateSimilarity(ContextsOrderedByLine[i]);
 					}
 				}
 			}
 		}
 
 		public int GetFrom(PointContext source) =>
-			ContextToLineInfo[source].LineBefore ?? 0;
+			ContextToLineInfo[source].OffsetBefore ?? 0;
 
 		public int GetTo(PointContext source) =>
-			ContextToLineInfo[source].LineAfter ?? TargetFileLength;
+			ContextToLineInfo[source].OffsetAfter ?? TargetFileLength;
 
 		public int GetShift(PointContext source) =>
 			ContextToLineInfo[source].Shift ?? 0;
 
 		public bool InRange(PointContext source, PointContext target) =>
-			GetFrom(source) <= target.Line
-			&& GetTo(source) >= target.Line;
+			GetFrom(source) <= target.StartOffset
+			&& GetTo(source) >= target.EndOffset;
 
-		public double GetWeight(PointContext source) =>
-			ContextToLineInfo[source].LocationWeight;
+		public double GetLocationSimilarity(PointContext source) =>
+			ContextToLineInfo[source].LocationSimilarity;
 
 		public double GetSimilarity(PointContext source, PointContext target)
 		{
@@ -99,16 +99,13 @@ namespace Land.Markup.Binding
 				return 0;
 			}
 
-			var expectedTargetLine = source.Line + GetShift(source);
-
 			return InRange(source, target)
-				? 1 - Math.Abs(target.Line - expectedTargetLine)
-					/ (double)Math.Max(expectedTargetLine - GetFrom(source), GetTo(source) - expectedTargetLine)
+				? ContextToLineInfo[source].LocationSimilarity
 				: 0;
 		}
 
-		private double UpdateWeight(PointContext source) =>
-			ContextToLineInfo[source].LocationWeight = ContextToLineInfo[source].Permutation ? 0
+		private double UpdateSimilarity(PointContext source) =>
+			ContextToLineInfo[source].LocationSimilarity = ContextToLineInfo[source].Permutation ? 0
 				: 1 - Math.Max(0, (GetTo(source) - GetFrom(source)) / (double)TargetFileLength);
 	}
 }

@@ -627,8 +627,7 @@ namespace Land.Markup.Binding
 
 								foreach (var unmappedContext in unmapped)
 								{
-									ComputeLocationSimilarities(unmappedContext, evaluationResults[unmappedContext]);
-									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
+									TuneSimilaritiesByLocation(unmappedContext, evaluationResults[unmappedContext]);
 
 									evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
 										.OrderByDescending(c => c.Similarity)
@@ -733,25 +732,7 @@ namespace Land.Markup.Binding
 				}
 			);
 
-			if (checkLocation)
-			{
-				ComputeLocationSimilarities(point, candidates);
-			}
-
 			return candidates;
-		}
-
-		public void ComputeLocationSimilarities(
-			PointContext point,
-			List<RemapCandidateInfo> candidates)
-		{
-			Parallel.ForEach(
-				candidates,
-				c =>
-				{
-					c.LocationSimilarity = LocationManager.GetSimilarity(point, c.Context);
-				}
-			);
 		}
 
 		public void ComputeTotalSimilarities(
@@ -777,8 +758,6 @@ namespace Land.Markup.Binding
 				weights[val] = null;
 			};
 
-			weights[ContextType.Location] = LocationManager?.GetWeight(sourceContext);
-
 			foreach (var h in TuningHeuristics)
 			{
 				h.TuneWeights(sourceContext, actualCandidates, weights);
@@ -793,15 +772,61 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity
-						+ finalWeights[ContextType.Location] * c.LocationSimilarity)
+						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
 
+			if (LocationManager != null)
+			{
+				TuneSimilaritiesByLocation(sourceContext, candidates);
+			}
+
 			foreach (var h in ScoringHeuristics)
 			{
 				 h.PredictSimilarity(sourceContext, actualCandidates);
+			}
+		}
+
+		public void TuneSimilaritiesByLocation(
+			PointContext sourceContext,
+			List<RemapCandidateInfo> candidates)
+		{
+			if (LocationManager != null)
+			{
+				Parallel.ForEach(
+					candidates,
+					c =>
+					{
+						c.LocationSimilarity = 0;
+
+						if(c.SimilarityBackup.HasValue)
+						{
+							c.Similarity = c.SimilarityBackup;
+						}
+					}
+				);
+
+				var candidatesInRange = candidates
+					.Where(c => LocationManager.InRange(sourceContext, c.Context))
+					.OrderByDescending(c => c.Similarity)
+					.ToList();
+
+				if (candidatesInRange.Count > 0)
+				{
+					var similarity = LocationManager.GetLocationSimilarity(sourceContext);
+					var boost = (1 - candidatesInRange[0].Similarity) * similarity;
+
+					Parallel.ForEach(
+						candidatesInRange,
+						c =>
+						{
+							c.SimilarityBackup = c.Similarity;
+							c.LocationSimilarity = similarity;
+							c.Similarity += c.Similarity * boost;
+						}
+					);
+				}
 			}
 		}
 
