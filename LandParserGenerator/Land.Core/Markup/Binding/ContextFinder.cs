@@ -22,7 +22,7 @@ namespace Land.Markup.Binding
 	public class ContextFinder
 	{
 		public enum SearchType { Local, Global }
-		public enum OptimizationType { None, LocalBest, GlobalBest }
+		public enum OptimizationType { None, LocalBest }
 
 		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
@@ -451,9 +451,6 @@ namespace Land.Markup.Binding
 					case OptimizationType.LocalBest:
 						SelectLocalBests(evaluated);
 						break;
-					case OptimizationType.GlobalBest:
-						SelectGlobalBests(evaluated);
-						break;
 					default:
 						SelectBests(evaluated);
 						break;
@@ -812,10 +809,11 @@ namespace Land.Markup.Binding
 					.OrderByDescending(c => c.Similarity)
 					.ToList();
 
-				if (candidatesInRange.Count > 0)
+				if (candidatesInRange.Count > 0 
+					&& candidatesInRange[0].Similarity > CANDIDATE_SIMILARITY_THRESHOLD)
 				{
 					var similarity = LocationManager.GetLocationSimilarity(sourceContext);
-					var boost = (1 - candidatesInRange[0].Similarity) * similarity;
+					var boost = (1 - candidatesInRange[0].Similarity) * 0.5 * similarity;
 
 					Parallel.ForEach(
 						candidatesInRange,
