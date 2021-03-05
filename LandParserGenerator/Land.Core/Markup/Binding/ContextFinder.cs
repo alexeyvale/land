@@ -572,6 +572,8 @@ namespace Land.Markup.Binding
 		private void SelectLocalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
+			var unordered = evaluationResults.ToDictionary(e => e.Key, e => e.Value);
+
 			Parallel.ForEach(
 				evaluationResults.Keys.ToList(),
 				key =>
@@ -612,40 +614,118 @@ namespace Land.Markup.Binding
 							&& AreDistantEnough(first, second) 
 							&& AreDistantEnough(first, otherBestMatch?.Best))
 						{
-							first.IsAuto = true;
-
-							evaluationResults[context].Remove(first);
-							evaluationResults[context].Insert(0, first);
-							unmapped.Remove(context);
-
-							if (!UseNaiveAlgorithm && LocationManager != null)
-							{
-								LocationManager?.Mapped(context, first.Context);
-
-								foreach (var unmappedContext in unmapped)
-								{
-									TuneSimilaritiesByLocation(unmappedContext, evaluationResults[unmappedContext]);
-
-									evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
-										.OrderByDescending(c => c.Similarity)
-										.ToList();
-								}
-							}
-
-							foreach (var key in evaluationResults.Keys)
-							{
-								if (key != context)
-								{
-									var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
-									///evaluationResults[key].Remove(itemToRemove);
-									itemToRemove.Deleted = true;
-								}
-							}
+							OnApprovedAsBest(first, context, evaluationResults, unmapped);
 						}
 					}
 				}
 			}
 			while (oldCount != unmapped.Count);
+
+			/// Если осталось несколько несопоставленных элементов
+			if (unmapped.Count > 1 && !UseNaiveAlgorithm)
+			{
+				/// Проходим по каждому несопоставленному
+				foreach(var source in unmapped.ToList())
+				{
+					var unmappedWithCandidates = unmapped.ToDictionary(e => e,
+						e => unordered[e].Where(c => !c.Deleted).ToList());
+
+					/// Если остался последний несопоставленный элемент или не осталось кандидатов, выходим из цикла
+					if(unmappedWithCandidates[source].Count == 0 || unmapped.Count == 1)
+					{
+						break;
+					}
+
+					var finalScores = unmappedWithCandidates[source]
+						.Select(c=>c.Similarity)
+						.ToList();
+
+					/// Ищем оптимальное решение для случая, если этот несопоставленный перепривязан к j-тому кандидату
+					for (var candidateIdx = 0; candidateIdx < unmappedWithCandidates[source].Count; ++candidateIdx)
+					{
+						var fromCount = unmapped.Count - 1;
+						var toCount = unmappedWithCandidates.First().Value.Count - 1;
+						var scores = new int[fromCount, toCount];
+						var indicesToContexts = new PointContext[fromCount];
+
+						/// Конструируем матрицу, в которой будет на 1 исходный элемент и на 1 кандидата меньше
+						var fromIdx = 0;
+						foreach (var from in unmapped.Except(new HashSet<PointContext> { source }))
+						{
+							indicesToContexts[fromIdx] = from;
+
+							var toIdx = 0;
+							for(var toRawIdx = 0; toRawIdx < unmappedWithCandidates[from].Count; ++ toRawIdx)
+							{
+								if (toRawIdx != candidateIdx)
+								{
+									scores[fromIdx, toIdx] = (int)(10000 * (1 - (unmappedWithCandidates[from][toRawIdx].Similarity >= CANDIDATE_SIMILARITY_THRESHOLD ? unmappedWithCandidates[from][toRawIdx].Similarity : 0)));
+									++toIdx;
+								}
+							}
+
+							++fromIdx;
+						}
+
+						/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
+						var bestMatchesFinder = new AssignmentProblem();
+						var bestMatches = bestMatchesFinder.Compute1(scores);
+
+						/// Прибавляем похожести этого сопоставления к похожести зафиксированного ранее соответствия
+						for(var matchIdx = 0; matchIdx < bestMatches.Length; ++matchIdx)
+						{
+							finalScores[candidateIdx] += bestMatches[matchIdx] != -1
+								? unmappedWithCandidates[indicesToContexts[matchIdx]]
+									[bestMatches[matchIdx] < candidateIdx ? bestMatches[matchIdx] : bestMatches[matchIdx] + 1].Similarity
+								: 0;
+						}
+					}
+
+					/// Проверяем, нет ли сопоставления, дающего резко лучшую оценку, чем остальные
+					var orderedFinalScores = finalScores
+						.Select((e, i) => new { score = e, idx = i })
+						.OrderByDescending(e => e.score)
+						.ToList();
+
+					System.Diagnostics.Trace.WriteLine($"{String.Join(" ", source.HeaderContext.Sequence_old)}     {source.Line}");
+					System.Diagnostics.Trace.WriteLine($"{String.Join(" ", finalScores)}");
+
+					if (AreDistantEnough(orderedFinalScores[0].score.Value, orderedFinalScores.ElementAtOrDefault(1)?.score, unmapped.Count)
+						&& IsSimilarEnough(unmappedWithCandidates[source][orderedFinalScores[0].idx]))
+					{
+						OnApprovedAsBest(
+							unmappedWithCandidates[source][orderedFinalScores[0].idx], 
+							source, 
+							evaluationResults, 
+							unmapped
+						);
+
+						//System.Diagnostics.Trace.WriteLine($"{orderedFinalScores[0].score.Value} {orderedFinalScores.ElementAtOrDefault(1)?.score} {unmapped.Count + 1}");
+						//System.Diagnostics.Trace.WriteLine($"{String.Join(" ", source.HeaderContext.Sequence_old)}     {source.Line}");
+					}
+				}
+
+				if(unmapped.Count == 1)
+				{
+					var source = unmapped.First();
+					var candidates = evaluationResults[source].Where(e => !e.Deleted).ToList();
+
+					var first = candidates.ElementAtOrDefault(0);
+					var second = candidates.ElementAtOrDefault(1);
+
+					if (IsSimilarEnough(first) && AreDistantEnough(first, second))
+					{
+						OnApprovedAsBest(
+							first,
+							source,
+							evaluationResults,
+							unmapped
+						);
+
+						System.Diagnostics.Trace.WriteLine(String.Join(" ", source.HeaderContext.Sequence_old));
+					}
+				}
+			}
 		}
 
 		private void SelectBests(Dictionary<PointContext, List<RemapCandidateInfo>> evaluated)
@@ -670,6 +750,43 @@ namespace Land.Markup.Binding
 					}
 				}
 			);
+		}
+
+		private void OnApprovedAsBest(
+			RemapCandidateInfo best, 
+			PointContext context, 
+			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults,
+			HashSet<PointContext> unmapped)
+		{
+			best.IsAuto = true;
+
+			evaluationResults[context].Remove(best);
+			evaluationResults[context].Insert(0, best);
+			unmapped.Remove(context);
+
+			if (!UseNaiveAlgorithm && LocationManager != null)
+			{
+				LocationManager?.Mapped(context, best.Context);
+
+				foreach (var unmappedContext in unmapped)
+				{
+					TuneSimilaritiesByLocation(unmappedContext, evaluationResults[unmappedContext]);
+
+					evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
+						.OrderByDescending(c => c.Similarity)
+						.ToList();
+				}
+			}
+
+			foreach (var key in evaluationResults.Keys)
+			{
+				if (key != context)
+				{
+					var itemToRemove = evaluationResults[key].Single(e => e.Context == best.Context);
+					///evaluationResults[key].Remove(itemToRemove);
+					itemToRemove.Deleted = true;
+				}
+			}
 		}
 
 		#endregion
@@ -1313,11 +1430,14 @@ namespace Land.Markup.Binding
 		}
 
 		public static bool IsSimilarEnough(RemapCandidateInfo candidate) =>
-			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
+			candidate?.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
 		public static bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
-			second == null || first.Similarity == 1 && second.Similarity != 1
-				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+			AreDistantEnough(first.Similarity.Value, second?.Similarity, 1);
+
+		public static bool AreDistantEnough(double first, double? second, double maxValue) =>
+			second == null || first == maxValue && second != maxValue
+				|| maxValue - second >= (maxValue - first) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
 		#endregion
 
