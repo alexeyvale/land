@@ -21,9 +21,6 @@ namespace Land.Markup.Binding
 		public double SiblingsBeforeSimilarity { get; set; }
 		public double SiblingsAfterSimilarity { get; set; }
 
-		public double LocationSimilarity { get; set; }
-		public double? SimilarityBackup { get; set; }
-
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }
 

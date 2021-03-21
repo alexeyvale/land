@@ -15,8 +15,7 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings,
-		Location
+		Siblings
 	}
 
 	public class ContextFinder
@@ -253,7 +252,8 @@ namespace Land.Markup.Binding
 								{
 									Range = (visitor.Grouped[type].FirstOrDefault()?.Options.GetUseSiblings() ?? false)
 										? SiblingsConstructionArgs.SiblingsRange.All
-										: SiblingsConstructionArgs.SiblingsRange.Nearest
+										: SiblingsConstructionArgs.SiblingsRange.Nearest,
+									ContextFinder = this
 								};
 
 								/// Ищем предка, относительно которого нужно искать соседей
@@ -275,7 +275,13 @@ namespace Land.Markup.Binding
 										};
 								}
 
-								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(n, currentFile, siblingsArgs.Range, pair);
+								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
+									n, 
+									currentFile, 
+									siblingsArgs.Range, 
+									siblingsArgs.ContextFinder,
+									pair
+								);
 
 								var oldSiblingsContext = PointContext.GetSiblingsContext_old(n, currentFile, pair);
 								candidate.Context.SiblingsLeftContext_old = oldSiblingsContext.Item1;
@@ -305,8 +311,7 @@ namespace Land.Markup.Binding
 
 			foreach (var type in points.Keys)
 			{
-				var currentResult = DoSingleTypeSearch(points[type], candidates[type],
-					searchType, ancestorsCache, candidateAncestor);
+				var currentResult = DoSingleTypeSearch(points[type], candidates[type], searchType);
 
 				foreach (var kvp in currentResult)
 				{
@@ -320,9 +325,7 @@ namespace Land.Markup.Binding
 		private Dictionary<ConcernPoint, List<RemapCandidateInfo>> DoSingleTypeSearch(
 			List<ConcernPoint> points,
 			List<RemapCandidateInfo> candidates,
-			SearchType searchType,
-			Dictionary<Node, AncestorCacheElement> ancestorsCache,
-			Dictionary<RemapCandidateInfo, Node> candidateAncestor)
+			SearchType searchType)
 		{
 			if(candidates.Count == 0)
 			{

@@ -153,7 +153,8 @@ namespace Land.Markup
 			{
 				Range = node.Options.GetUseSiblings()
 					? SiblingsConstructionArgs.SiblingsRange.All
-					: SiblingsConstructionArgs.SiblingsRange.Nearest
+					: SiblingsConstructionArgs.SiblingsRange.Nearest,
+				ContextFinder = ContextFinder
 			};
 
 			var point = new ConcernPoint(
@@ -211,7 +212,8 @@ namespace Land.Markup
 					{
 						Range = subgroup.First().Options.GetUseSiblings()
 							? SiblingsConstructionArgs.SiblingsRange.All
-							: SiblingsConstructionArgs.SiblingsRange.Nearest
+							: SiblingsConstructionArgs.SiblingsRange.Nearest,
+						ContextFinder = ContextFinder
 					};
 
 					foreach (var node in subgroup)
@@ -240,7 +242,8 @@ namespace Land.Markup
 				{
 					Range = (nodes.FirstOrDefault()?.Options.GetUseSiblings() ?? false)
 						? SiblingsConstructionArgs.SiblingsRange.All
-						: SiblingsConstructionArgs.SiblingsRange.Nearest
+						: SiblingsConstructionArgs.SiblingsRange.Nearest,
+					ContextFinder = ContextFinder
 				};
 
 				foreach (var node in nodes)
@@ -301,7 +304,8 @@ namespace Land.Markup
 			{
 				Range = node.Options.GetUseSiblings()
 					? SiblingsConstructionArgs.SiblingsRange.All
-					: SiblingsConstructionArgs.SiblingsRange.Nearest
+					: SiblingsConstructionArgs.SiblingsRange.Nearest,
+				ContextFinder = ContextFinder
 			};
 
 			point.Relink(node, ContextFinder.ContextManager.GetContext(
@@ -664,7 +668,8 @@ namespace Land.Markup
 				{
 					Range = first.Node.Options.GetUseSiblings()
 						? SiblingsConstructionArgs.SiblingsRange.All
-						: SiblingsConstructionArgs.SiblingsRange.Nearest
+						: SiblingsConstructionArgs.SiblingsRange.Nearest,
+					ContextFinder = ContextFinder
 				};
 
 				point.Context = ContextFinder.ContextManager.GetContext(

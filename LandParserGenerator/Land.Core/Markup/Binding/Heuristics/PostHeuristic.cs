@@ -12,8 +12,7 @@ namespace Land.Markup.Binding
 			{ContextType.HeaderNonCore,  1},
 			{ContextType.Inner, 1},
 			{ContextType.Ancestors, 2},
-			{ContextType.Siblings, 1},
-			{ContextType.Location, 0}
+			{ContextType.Siblings, 0.5}
 		};
 
 		public static double Get(ContextType contextType) =>
@@ -71,7 +70,6 @@ namespace Land.Markup.Binding
 					|| source.AncestorsContext.Count > 0),
 				[ContextType.Siblings] = source.SiblingsContext?.Before.GlobalHash.TextLength > 0
 					|| source.SiblingsContext?.After.GlobalHash.TextLength > 0,
-				[ContextType.Location] = candidates.Any(c => c.LocationSimilarity > 0)
 			};
 
 			foreach (var kvp in existenceFlags)
@@ -184,7 +182,7 @@ namespace Land.Markup.Binding
 				var maxSimilarity = ordered.Select(c => c.InnerSimilarity).First();
 
 				/// Если у всех кандидатов хорошая похожесть, внутренний контекст нам ничего не даст
-				if (excellentCandidatesCount == candidates.Count)
+				if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
 				{
 					weights[ContextType.Inner] = 0.5;
 				}
@@ -214,16 +212,15 @@ namespace Land.Markup.Binding
 
 	public class TuneSiblingsWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
-		const double EXCELLENT_THRESHOLD = 0.95;
-		const double GARBAGE_THRESHOLD = 0.9;
+		const double EXCELLENT_THRESHOLD = 0.9;
+		const double GARBAGE_THRESHOLD = 0.8;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (source.SiblingsContext != null
-				&& candidates.Count > 0)
+			if (source.SiblingsContext != null && candidates.Count > 0)
 			{
 				var ordered = candidates.OrderByDescending(c => c.SiblingsSimilarity).ToList();
 
@@ -233,14 +230,13 @@ namespace Land.Markup.Binding
 				var maxSimilarity = ordered.Select(c => c.SiblingsSimilarity).First();
 
 				/// Если все кандидаты сильно похожи соседями на исходный элемент
-				if (excellentCandidatesCount == candidates.Count)
+				if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
 				{
 					weights[ContextType.Siblings] = 0;
 				}
 				/// Если максимальная похожесть - единица, или самый похожий достаточно отстоит от следующего
-				else if (maxSimilarity == 1
-					|| (maxSimilarity >= EXCELLENT_THRESHOLD
-						&& (ordered.Count == 1 || 1 - ordered[1].SiblingsSimilarity >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - maxSimilarity))))
+				else if (maxSimilarity == 1 || (maxSimilarity >= EXCELLENT_THRESHOLD
+					&& (ordered.Count == 1 || 1 - ordered[1].SiblingsSimilarity >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - maxSimilarity))))
 				{
 					weights[ContextType.Siblings] = 2;
 				}
@@ -248,7 +244,7 @@ namespace Land.Markup.Binding
 				{
 					weights[ContextType.Siblings] = maxSimilarity < GARBAGE_THRESHOLD ? 0
 						: maxSimilarity > EXCELLENT_THRESHOLD ? 1
-						: 0.5 + 0.5 * (Math.Max(maxSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (EXCELLENT_THRESHOLD - GARBAGE_THRESHOLD);
+						: (Math.Max(maxSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (EXCELLENT_THRESHOLD - GARBAGE_THRESHOLD);
 				}
 
 				//System.Diagnostics.Trace.WriteLine(
@@ -291,7 +287,9 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (source.SiblingsContext != null)
+			if (source.SiblingsContext != null
+				&& source.SiblingsContext.Before.Entity == null
+				&& source.SiblingsContext.After.Entity == null)
 			{
 				var maxLength = Math.Max(
 					source.SiblingsContext.Before.GlobalHash.TextLength,

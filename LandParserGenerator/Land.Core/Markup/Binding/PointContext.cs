@@ -362,8 +362,7 @@ namespace Land.Markup.Binding
 	public class SiblingsContextPart
 	{
 		public TextOrHash GlobalHash { get; set; }
-		public byte[] EntityMd5 { get; set; }
-		public string EntityType { get; set; }
+		public PointContext Entity { get; set; }
 
 		[JsonIgnore]
 		public bool IsNotEmpty => GlobalHash.TextLength > 0;
@@ -544,7 +543,7 @@ namespace Land.Markup.Binding
 
 			if (siblingsArgs !=null && core.SiblingsContext == null)
 			{
-				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.Range);
+				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.Range, siblingsArgs.ContextFinder);
 
 				#region Old
 				var oldSiblingsContext = GetSiblingsContext_old(node, file);
@@ -851,6 +850,7 @@ namespace Land.Markup.Binding
 			Node node, 
 			ParsedFile file,
 			SiblingsConstructionArgs.SiblingsRange range,
+			ContextFinder contextFinder,
 			AncestorSiblingsPair pair = null)
 		{
 			Node parentNode = null;
@@ -962,19 +962,17 @@ namespace Land.Markup.Binding
 			{
 				Before = new SiblingsContextPart {
 					GlobalHash = new TextOrHash(beforeBuilder.ToString()),
-					EntityMd5 = markedElementIndex > 0 
-						? GetHash(siblings[markedElementIndex - 1], file) : null,
-					EntityType = markedElementIndex > 0 
-						? siblings[markedElementIndex - 1].Type : null
+					Entity = markedElementIndex > 0
+						? contextFinder.ContextManager.GetContext(siblings[markedElementIndex - 1], file)
+						: null
 				},
 
 				After = new SiblingsContextPart
 				{
 					GlobalHash = new TextOrHash(afterBuilder.ToString()),
-					EntityMd5 = markedElementIndex < siblings.Count 
-						? GetHash(siblings[markedElementIndex], file) : null,
-					EntityType = markedElementIndex < siblings.Count 
-						? siblings[markedElementIndex].Type : null
+					Entity = markedElementIndex < siblings.Count
+						? contextFinder.ContextManager.GetContext(siblings[markedElementIndex], file)
+						: null
 				}
 			};
 
@@ -1079,6 +1077,7 @@ namespace Land.Markup.Binding
 		}
 
 		public SiblingsRange Range { get; set; }
+		public ContextFinder ContextFinder { get; set; }
 	}
 
 	public class ClosestConstructionArgs
