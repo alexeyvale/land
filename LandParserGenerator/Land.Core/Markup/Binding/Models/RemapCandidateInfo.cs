@@ -17,9 +17,8 @@ namespace Land.Markup.Binding
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
 
-		public double SiblingsSimilarity { get; set; }
-		public double SiblingsBeforeSimilarity { get; set; }
-		public double SiblingsAfterSimilarity { get; set; }
+		public double SiblingsGlobalSimilarity { get; set; }
+		public double SiblingsRangeSimilarity { get; set; }
 
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }

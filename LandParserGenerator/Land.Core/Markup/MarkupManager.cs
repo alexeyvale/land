@@ -27,7 +27,8 @@ namespace Land.Markup
 
 			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAsFrequentlyChanging));
-			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsGlobalWeightAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsRangeWeightAsFrequentlyChanging));
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneAncestorsWeight));
@@ -151,9 +152,7 @@ namespace Land.Markup
 
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
-				Range = node.Options.GetUseSiblings()
-					? SiblingsConstructionArgs.SiblingsRange.All
-					: SiblingsConstructionArgs.SiblingsRange.Nearest,
+				CheckAllSiblings = node.Options.GetCheckAllSiblings(),
 				ContextFinder = ContextFinder
 			};
 
@@ -210,9 +209,7 @@ namespace Land.Markup
 
 					var subconcernSiblingsArgs = new SiblingsConstructionArgs
 					{
-						Range = subgroup.First().Options.GetUseSiblings()
-							? SiblingsConstructionArgs.SiblingsRange.All
-							: SiblingsConstructionArgs.SiblingsRange.Nearest,
+						CheckAllSiblings = subgroup.First().Options.GetCheckAllSiblings(),
 						ContextFinder = ContextFinder
 					};
 
@@ -240,9 +237,7 @@ namespace Land.Markup
 
 				var siblingsArgs = new SiblingsConstructionArgs
 				{
-					Range = (nodes.FirstOrDefault()?.Options.GetUseSiblings() ?? false)
-						? SiblingsConstructionArgs.SiblingsRange.All
-						: SiblingsConstructionArgs.SiblingsRange.Nearest,
+					CheckAllSiblings = (nodes.FirstOrDefault()?.Options.GetCheckAllSiblings() ?? false),
 					ContextFinder = ContextFinder
 				};
 
@@ -302,9 +297,7 @@ namespace Land.Markup
 		{
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
-				Range = node.Options.GetUseSiblings()
-					? SiblingsConstructionArgs.SiblingsRange.All
-					: SiblingsConstructionArgs.SiblingsRange.Nearest,
+				CheckAllSiblings = node.Options.GetCheckAllSiblings(),
 				ContextFinder = ContextFinder
 			};
 
@@ -666,9 +659,7 @@ namespace Land.Markup
 			{
 				var siblingsArgs = new SiblingsConstructionArgs
 				{
-					Range = first.Node.Options.GetUseSiblings()
-						? SiblingsConstructionArgs.SiblingsRange.All
-						: SiblingsConstructionArgs.SiblingsRange.Nearest,
+					CheckAllSiblings = first.Node.Options.GetCheckAllSiblings(),
 					ContextFinder = ContextFinder
 				};
 

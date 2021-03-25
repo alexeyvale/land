@@ -74,10 +74,10 @@ namespace Land.Markup.CoreExtension
 				);
 			}
 
-			if (GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, node.Symbol)
-				|| !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, node.Alias))
+			if (GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS, node.Symbol)
+				|| !String.IsNullOrEmpty(node.Alias) && GrammarObject.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS, node.Alias))
 			{
-				node.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.USESIBLINGS, null);
+				node.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS, null);
 			}
 
 			base.Visit(node);

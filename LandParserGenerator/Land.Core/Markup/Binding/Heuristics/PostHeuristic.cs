@@ -12,7 +12,8 @@ namespace Land.Markup.Binding
 			{ContextType.HeaderNonCore,  1},
 			{ContextType.Inner, 1},
 			{ContextType.Ancestors, 2},
-			{ContextType.Siblings, 0.5}
+			{ContextType.SiblingsGlobal, 0.5},
+			{ContextType.SiblingsRange, 0.5}
 		};
 
 		public static double Get(ContextType contextType) =>
@@ -68,8 +69,10 @@ namespace Land.Markup.Binding
 					|| source.HeaderContext.NonCore.Count > 0,
 				[ContextType.Ancestors] = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
 					|| source.AncestorsContext.Count > 0),
-				[ContextType.Siblings] = source.SiblingsContext?.Before.GlobalHash.TextLength > 0
+				[ContextType.SiblingsGlobal] = source.SiblingsContext?.Before.GlobalHash.TextLength > 0
 					|| source.SiblingsContext?.After.GlobalHash.TextLength > 0,
+				[ContextType.SiblingsRange] = source.SiblingsContext?.Before.Entity != null
+					|| source.SiblingsContext?.Before.Entity != null,
 			};
 
 			foreach (var kvp in existenceFlags)
@@ -210,7 +213,7 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneSiblingsWeightAsFrequentlyChanging : IWeightsHeuristic
+	public class TuneSiblingsGlobalWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
 		const double EXCELLENT_THRESHOLD = 0.9;
 		const double GARBAGE_THRESHOLD = 0.8;
@@ -222,27 +225,73 @@ namespace Land.Markup.Binding
 		{
 			if (source.SiblingsContext != null && candidates.Count > 0)
 			{
-				var ordered = candidates.OrderByDescending(c => c.SiblingsSimilarity).ToList();
+				var ordered = candidates.OrderByDescending(c => c.SiblingsGlobalSimilarity).ToList();
 
 				/// Количество кандидатов с хорошей похожестью соседей
-				var excellentCandidatesCount = ordered.TakeWhile(c => c.SiblingsSimilarity >= EXCELLENT_THRESHOLD).Count();
+				var excellentCandidatesCount = ordered.TakeWhile(c => c.SiblingsGlobalSimilarity >= EXCELLENT_THRESHOLD).Count();
 				/// Максимальная похожесть
-				var maxSimilarity = ordered.Select(c => c.SiblingsSimilarity).First();
+				var maxSimilarity = ordered.Select(c => c.SiblingsGlobalSimilarity).First();
 
 				/// Если все кандидаты сильно похожи соседями на исходный элемент
 				if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
 				{
-					weights[ContextType.Siblings] = 0;
+					weights[ContextType.SiblingsGlobal] = 0;
 				}
 				/// Если максимальная похожесть - единица, или самый похожий достаточно отстоит от следующего
 				else if (maxSimilarity == 1 || (maxSimilarity >= EXCELLENT_THRESHOLD
-					&& (ordered.Count == 1 || 1 - ordered[1].SiblingsSimilarity >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - maxSimilarity))))
+					&& (ordered.Count == 1 || 1 - ordered[1].SiblingsGlobalSimilarity >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - maxSimilarity))))
 				{
-					weights[ContextType.Siblings] = 2;
+					weights[ContextType.SiblingsGlobal] = 2;
 				}
 				else
 				{
-					weights[ContextType.Siblings] = maxSimilarity < GARBAGE_THRESHOLD ? 0
+					weights[ContextType.SiblingsGlobal] = maxSimilarity < GARBAGE_THRESHOLD ? 0
+						: maxSimilarity > EXCELLENT_THRESHOLD ? 1
+						: (Math.Max(maxSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (EXCELLENT_THRESHOLD - GARBAGE_THRESHOLD);
+				}
+
+				//System.Diagnostics.Trace.WriteLine(
+				//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"
+				//);
+			}
+
+			return weights;
+		}
+	}
+
+	public class TuneSiblingsRangeWeightAsFrequentlyChanging : IWeightsHeuristic
+	{
+		const double EXCELLENT_THRESHOLD = 0.9;
+		const double GARBAGE_THRESHOLD = 0.8;
+
+		public Dictionary<ContextType, double?> TuneWeights(
+			PointContext source,
+			List<RemapCandidateInfo> candidates,
+			Dictionary<ContextType, double?> weights)
+		{
+			if (source.SiblingsContext != null && candidates.Count > 0)
+			{
+				var ordered = candidates.OrderByDescending(c => c.SiblingsRangeSimilarity).ToList();
+
+				/// Количество кандидатов с хорошей похожестью соседей
+				var excellentCandidatesCount = ordered.TakeWhile(c => c.SiblingsRangeSimilarity >= EXCELLENT_THRESHOLD).Count();
+				/// Максимальная похожесть
+				var maxSimilarity = ordered.Select(c => c.SiblingsRangeSimilarity).First();
+
+				/// Если все кандидаты сильно похожи соседями на исходный элемент
+				if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
+				{
+					weights[ContextType.SiblingsRange] = 0;
+				}
+				/// Если максимальная похожесть - единица, или самый похожий достаточно отстоит от следующего
+				else if (maxSimilarity == 1 || (maxSimilarity >= EXCELLENT_THRESHOLD
+					&& (ordered.Count == 1 || 1 - ordered[1].SiblingsRangeSimilarity >= ContextFinder.SECOND_DISTANCE_GAP_COEFFICIENT * (1 - maxSimilarity))))
+				{
+					weights[ContextType.SiblingsRange] = 2;
+				}
+				else
+				{
+					weights[ContextType.SiblingsRange] = maxSimilarity < GARBAGE_THRESHOLD ? 0
 						: maxSimilarity > EXCELLENT_THRESHOLD ? 1
 						: (Math.Max(maxSimilarity, GARBAGE_THRESHOLD) - GARBAGE_THRESHOLD) / (EXCELLENT_THRESHOLD - GARBAGE_THRESHOLD);
 				}
@@ -296,9 +345,9 @@ namespace Land.Markup.Binding
 					source.SiblingsContext.After.GlobalHash.TextLength
 				);
 
-				DefaultWeightsProvider.Init(weights, ContextType.Siblings);
+				DefaultWeightsProvider.Init(weights, ContextType.SiblingsGlobal);
 
-				weights[ContextType.Siblings] *= maxLength / Math.Max(maxLength, LENGTH_THRESHOLD);
+				weights[ContextType.SiblingsGlobal] *= maxLength / Math.Max(maxLength, LENGTH_THRESHOLD);
 
 				//System.Diagnostics.Trace.WriteLine(
 				//	$"{this.GetType().Name} HCore: {weights[ContextType.HeaderCore]}; HSeq: {weights[ContextType.HeaderSequence]}; I: {weights[ContextType.Inner]}; A: {weights[ContextType.Ancestors]}"

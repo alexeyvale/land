@@ -15,7 +15,8 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings
+		SiblingsGlobal,
+		SiblingsRange
 	}
 
 	public class ContextFinder
@@ -92,114 +93,114 @@ namespace Land.Markup.Binding
 			PointContext point,
 			List<RemapCandidateInfo> candidates)
 		{
-			if (candidates.Count > 0)
-			{
-				double CountRatio<T1, T2>(List<T1> num, List<T2> denom) =>
-					denom.Count > 1 ? num.Count / (double)denom.Count : 0;
+			//if (candidates.Count > 0)
+			//{
+			//	double CountRatio<T1, T2>(List<T1> num, List<T2> denom) =>
+			//		denom.Count > 1 ? num.Count / (double)denom.Count : 0;
 
-				double CountRatioConditional<T>(List<T> list, Func<T, bool> checkFunction) =>
-					list.Count > 1 ? list.Where(e => checkFunction(e)).Count() / (double)list.Count : 0;
+			//	double CountRatioConditional<T>(List<T> list, Func<T, bool> checkFunction) =>
+			//		list.Count > 1 ? list.Where(e => checkFunction(e)).Count() / (double)list.Count : 0;
 
-				double MaxIfAny(List<RemapCandidateInfo> list, Func<RemapCandidateInfo, double> getValue) =>
-					list.Count > 0 ? list.Max(getValue) : 0;
+			//	double MaxIfAny(List<RemapCandidateInfo> list, Func<RemapCandidateInfo, double> getValue) =>
+			//		list.Count > 0 ? list.Max(getValue) : 0;
 
-				int BoolToInt(bool val) => val ? 1 : 0;
+			//	int BoolToInt(bool val) => val ? 1 : 0;
 
-				var existsA_Point = point.AncestorsContext?.Count > 0;
-				var existsHSeq_Point = point.HeaderContext?.NonCore?.Count > 0;
-				var existsHCore_Point = point.HeaderContext?.Core?.Count > 0;
-				var existsI_Point = point.InnerContext?.Content.TextLength > 0;
-				var existsSBefore_Point = point.SiblingsContext?.Before.GlobalHash.TextLength > 0;
-				var existsSAfter_Point = point.SiblingsContext?.After.GlobalHash.TextLength > 0;
+			//	var existsA_Point = point.AncestorsContext?.Count > 0;
+			//	var existsHSeq_Point = point.HeaderContext?.NonCore?.Count > 0;
+			//	var existsHCore_Point = point.HeaderContext?.Core?.Count > 0;
+			//	var existsI_Point = point.InnerContext?.Content.TextLength > 0;
+			//	var existsSBefore_Point = point.SiblingsContext?.Before.GlobalHash.TextLength > 0;
+			//	var existsSAfter_Point = point.SiblingsContext?.After.GlobalHash.TextLength > 0;
 
-				return candidates.Select(c =>
-				{
-					var sameAncestorsCandidates = candidates.Where(cd => cd.AncestorSimilarity == c.AncestorSimilarity).ToList();
-					sameAncestorsCandidates.Remove(c);
+			//	return candidates.Select(c =>
+			//	{
+			//		var sameAncestorsCandidates = candidates.Where(cd => cd.AncestorSimilarity == c.AncestorSimilarity).ToList();
+			//		sameAncestorsCandidates.Remove(c);
 
-					var candidatesExceptCurrent = candidates.Except(new List<RemapCandidateInfo> { c }).ToList();
+			//		var candidatesExceptCurrent = candidates.Except(new List<RemapCandidateInfo> { c }).ToList();
 
-					var existsHCore_Candidate = c.Context.HeaderContext?.Core?.Count > 0;
-					var existsI_Candidate = c.Context.InnerContext?.Content.TextLength > 0;
+			//		var existsHCore_Candidate = c.Context.HeaderContext?.Core?.Count > 0;
+			//		var existsI_Candidate = c.Context.InnerContext?.Content.TextLength > 0;
 
-					var maxSimA = MaxIfAny(candidatesExceptCurrent, cd => cd.AncestorSimilarity);
-					var maxSimHSeq = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderNonCoreSimilarity);
-					var maxSimHCore = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderCoreSimilarity);
-					var maxSimI = MaxIfAny(candidatesExceptCurrent, cd => cd.InnerSimilarity);
-					var maxSimSBefore = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsBeforeSimilarity);
-					var maxSimSAfter = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsAfterSimilarity);
+			//		var maxSimA = MaxIfAny(candidatesExceptCurrent, cd => cd.AncestorSimilarity);
+			//		var maxSimHSeq = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderNonCoreSimilarity);
+			//		var maxSimHCore = MaxIfAny(candidatesExceptCurrent, cd => cd.HeaderCoreSimilarity);
+			//		var maxSimI = MaxIfAny(candidatesExceptCurrent, cd => cd.InnerSimilarity);
+			//		var maxSimSBefore = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsBeforeSimilarity);
+			//		var maxSimSAfter = MaxIfAny(candidatesExceptCurrent, cd => cd.SiblingsAfterSimilarity);
 
-					var candidatesWithMaxSimA = candidatesExceptCurrent.Where(cd => cd.AncestorSimilarity == maxSimA).ToList();
-					var candidatesWithMaxSimHSeq = candidatesExceptCurrent.Where(cd => cd.HeaderNonCoreSimilarity == maxSimHSeq).ToList();
-					var candidatesWithMaxSimHCore = candidatesExceptCurrent.Where(cd => cd.HeaderCoreSimilarity == maxSimHCore).ToList();
-					var candidatesWithMaxSimI = candidatesExceptCurrent.Where(cd => cd.InnerSimilarity == maxSimI).ToList();
-					var candidatesWithMaxSimSBefore = candidatesExceptCurrent.Where(cd => cd.SiblingsBeforeSimilarity == maxSimSBefore).ToList();
-					var candidatesWithMaxSimSAfter = candidatesExceptCurrent.Where(cd => cd.SiblingsAfterSimilarity == maxSimSAfter).ToList();
+			//		var candidatesWithMaxSimA = candidatesExceptCurrent.Where(cd => cd.AncestorSimilarity == maxSimA).ToList();
+			//		var candidatesWithMaxSimHSeq = candidatesExceptCurrent.Where(cd => cd.HeaderNonCoreSimilarity == maxSimHSeq).ToList();
+			//		var candidatesWithMaxSimHCore = candidatesExceptCurrent.Where(cd => cd.HeaderCoreSimilarity == maxSimHCore).ToList();
+			//		var candidatesWithMaxSimI = candidatesExceptCurrent.Where(cd => cd.InnerSimilarity == maxSimI).ToList();
+			//		var candidatesWithMaxSimSBefore = candidatesExceptCurrent.Where(cd => cd.SiblingsBeforeSimilarity == maxSimSBefore).ToList();
+			//		var candidatesWithMaxSimSAfter = candidatesExceptCurrent.Where(cd => cd.SiblingsAfterSimilarity == maxSimSAfter).ToList();
 
-					return new CandidateFeatures
-					{
-						ExistsA_Point = BoolToInt(existsA_Point),
-						ExistsHSeq_Point = BoolToInt(existsHSeq_Point),
-						ExistsHCore_Point = BoolToInt(existsHCore_Point),
-						ExistsI_Point = BoolToInt(existsI_Point),
-						ExistsSBefore_Point = BoolToInt(existsSBefore_Point),
-						ExistsSAfter_Point = BoolToInt(existsSAfter_Point),
+			//		return new CandidateFeatures
+			//		{
+			//			ExistsA_Point = BoolToInt(existsA_Point),
+			//			ExistsHSeq_Point = BoolToInt(existsHSeq_Point),
+			//			ExistsHCore_Point = BoolToInt(existsHCore_Point),
+			//			ExistsI_Point = BoolToInt(existsI_Point),
+			//			ExistsSBefore_Point = BoolToInt(existsSBefore_Point),
+			//			ExistsSAfter_Point = BoolToInt(existsSAfter_Point),
 
-						ExistsHCore_Candidate = BoolToInt(existsHCore_Candidate),
-						ExistsI_Candidate = BoolToInt(existsI_Candidate),
-						IsSingleCandidate = BoolToInt(candidates.Count == 1),
+			//			ExistsHCore_Candidate = BoolToInt(existsHCore_Candidate),
+			//			ExistsI_Candidate = BoolToInt(existsI_Candidate),
+			//			IsSingleCandidate = BoolToInt(candidates.Count == 1),
 
-						SimHSeq = c.HeaderNonCoreSimilarity,
-						SimHCore = c.HeaderCoreSimilarity,
-						SimI = c.InnerSimilarity,
-						SimA = c.AncestorSimilarity,
-						SimSBefore = c.SiblingsBeforeSimilarity,
-						SimSAfter = c.SiblingsAfterSimilarity,
+			//			SimHSeq = c.HeaderNonCoreSimilarity,
+			//			SimHCore = c.HeaderCoreSimilarity,
+			//			SimI = c.InnerSimilarity,
+			//			SimA = c.AncestorSimilarity,
+			//			SimSBefore = c.SiblingsBeforeSimilarity,
+			//			SimSAfter = c.SiblingsAfterSimilarity,
 
-						//AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset.HasValue ?? false),
-						//AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset.HasValue ?? false),
-						//CorrectBefore = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset < c.Node.Location.Start.Offset),
-						//CorrectAfter = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset > c.Node.Location.Start.Offset),
+			//			//AncestorHasBeforeSibling = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset.HasValue ?? false),
+			//			//AncestorHasAfterSibling = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset.HasValue ?? false),
+			//			//CorrectBefore = BoolToInt(c.SiblingsSearchResult?.BeforeSiblingOffset < c.Node.Location.Start.Offset),
+			//			//CorrectAfter = BoolToInt(c.SiblingsSearchResult?.AfterSiblingOffset > c.Node.Location.Start.Offset),
 
-						MaxSimA = maxSimA,
-						MaxSimHSeq = maxSimHSeq,
-						MaxSimHCore = maxSimHCore,
-						MaxSimI = maxSimI,
-						MaxSimSBeforeGlobal = maxSimSBefore,
-						MaxSimSAfterGlobal = maxSimSAfter,
+			//			MaxSimA = maxSimA,
+			//			MaxSimHSeq = maxSimHSeq,
+			//			MaxSimHCore = maxSimHCore,
+			//			MaxSimI = maxSimI,
+			//			MaxSimSBeforeGlobal = maxSimSBefore,
+			//			MaxSimSAfterGlobal = maxSimSAfter,
 
-						MaxSimHSeq_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderNonCoreSimilarity),
-						MaxSimHCore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderCoreSimilarity),
-						MaxSimI_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.InnerSimilarity),
-						MaxSimSBefore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeSimilarity),
-						MaxSimSAfter_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterSimilarity),
+			//			MaxSimHSeq_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderNonCoreSimilarity),
+			//			MaxSimHCore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.HeaderCoreSimilarity),
+			//			MaxSimI_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.InnerSimilarity),
+			//			MaxSimSBefore_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsBeforeSimilarity),
+			//			MaxSimSAfter_SameA = MaxIfAny(sameAncestorsCandidates, cd => cd.SiblingsAfterSimilarity),
 
-						RatioBetterSimA = CountRatioConditional(candidatesExceptCurrent, cd => cd.AncestorSimilarity > c.AncestorSimilarity),
-						RatioBetterSimI = CountRatioConditional(candidatesExceptCurrent, cd => cd.InnerSimilarity > c.InnerSimilarity),
-						RatioBetterSimHSeq = CountRatioConditional(candidatesExceptCurrent, cd => cd.HeaderNonCoreSimilarity > c.HeaderNonCoreSimilarity),
-						RatioBetterSimSBefore = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsBeforeSimilarity > c.SiblingsBeforeSimilarity),
-						RatioBetterSimSAfter = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsAfterSimilarity > c.SiblingsAfterSimilarity),
+			//			RatioBetterSimA = CountRatioConditional(candidatesExceptCurrent, cd => cd.AncestorSimilarity > c.AncestorSimilarity),
+			//			RatioBetterSimI = CountRatioConditional(candidatesExceptCurrent, cd => cd.InnerSimilarity > c.InnerSimilarity),
+			//			RatioBetterSimHSeq = CountRatioConditional(candidatesExceptCurrent, cd => cd.HeaderNonCoreSimilarity > c.HeaderNonCoreSimilarity),
+			//			RatioBetterSimSBefore = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsBeforeSimilarity > c.SiblingsBeforeSimilarity),
+			//			RatioBetterSimSAfter = CountRatioConditional(candidatesExceptCurrent, cd => cd.SiblingsAfterSimilarity > c.SiblingsAfterSimilarity),
 
-						RatioSameAncestor = CountRatio(sameAncestorsCandidates, candidates),
+			//			RatioSameAncestor = CountRatio(sameAncestorsCandidates, candidates),
 
-						RatioBetterSimI_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.InnerSimilarity > c.InnerSimilarity),
-						RatioBetterSimHSeq_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.HeaderNonCoreSimilarity > c.HeaderNonCoreSimilarity),
-						RatioBetterSimSBefore_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsBeforeSimilarity > c.SiblingsBeforeSimilarity),
-						RatioBetterSimSAfter_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsAfterSimilarity > c.SiblingsAfterSimilarity),
+			//			RatioBetterSimI_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.InnerSimilarity > c.InnerSimilarity),
+			//			RatioBetterSimHSeq_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.HeaderNonCoreSimilarity > c.HeaderNonCoreSimilarity),
+			//			RatioBetterSimSBefore_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsBeforeSimilarity > c.SiblingsBeforeSimilarity),
+			//			RatioBetterSimSAfter_SameA = CountRatioConditional(sameAncestorsCandidates, cd => cd.SiblingsAfterSimilarity > c.SiblingsAfterSimilarity),
 
-						IsCandidateInnerContextLonger = BoolToInt(existsI_Candidate && (!existsI_Point
-							|| c.Context.InnerContext.Content.TextLength > point.InnerContext.Content.TextLength)),
-						InnerLengthRatio = existsI_Candidate && existsI_Point
-							? Math.Min(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
-								/ (double)Math.Max(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
-							: 0,
-						InnerLengthRatio1000_Point = Math.Min(point.InnerContext.Content.TextLength / (double)1000, 1),
-						InnerLengthRatio1000_Candidate = Math.Min(c.Context.InnerContext.Content.TextLength / (double)1000, 1),
+			//			IsCandidateInnerContextLonger = BoolToInt(existsI_Candidate && (!existsI_Point
+			//				|| c.Context.InnerContext.Content.TextLength > point.InnerContext.Content.TextLength)),
+			//			InnerLengthRatio = existsI_Candidate && existsI_Point
+			//				? Math.Min(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
+			//					/ (double)Math.Max(c.Context.InnerContext.Content.TextLength, point.InnerContext.Content.TextLength)
+			//				: 0,
+			//			InnerLengthRatio1000_Point = Math.Min(point.InnerContext.Content.TextLength / (double)1000, 1),
+			//			InnerLengthRatio1000_Candidate = Math.Min(c.Context.InnerContext.Content.TextLength / (double)1000, 1),
 
-						IsAuto = BoolToInt(c.IsAuto),
-					};
-				}).ToList();
-			}
+			//			IsAuto = BoolToInt(c.IsAuto),
+			//		};
+			//	}).ToList();
+			//}
 
 			return new List<CandidateFeatures>();
 		}
@@ -250,9 +251,7 @@ namespace Land.Markup.Binding
 							{
 								var siblingsArgs = new SiblingsConstructionArgs
 								{
-									Range = (visitor.Grouped[type].FirstOrDefault()?.Options.GetUseSiblings() ?? false)
-										? SiblingsConstructionArgs.SiblingsRange.All
-										: SiblingsConstructionArgs.SiblingsRange.Nearest,
+									CheckAllSiblings = (visitor.Grouped[type].FirstOrDefault()?.Options.GetCheckAllSiblings() ?? false),
 									ContextFinder = this
 								};
 
@@ -278,7 +277,7 @@ namespace Land.Markup.Binding
 								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
 									n, 
 									currentFile, 
-									siblingsArgs.Range, 
+									siblingsArgs.CheckAllSiblings, 
 									siblingsArgs.ContextFinder,
 									pair
 								);
@@ -334,27 +333,44 @@ namespace Land.Markup.Binding
 
 			var checkSiblings = searchType == SearchType.Local;
 			var checkClosest = searchType == SearchType.Local && !UseNaiveAlgorithm;
-			var checkLocation = searchType == SearchType.Local && !UseNaiveAlgorithm;
 
 			/// Запоминаем соответствие контекстов точкам привязки
 			var contextsToPoints = points.GroupBy(p => p.Context)
 				.ToDictionary(g => g.Key, g => g.ToList());
 
-			/// Ближайшие элементы, которые не являются точками привязки
-			var closestContexts = checkClosest
+			/// В отдельном списке запомниаем вспомогательные контексты,
+			/// не совпадающие с контекстами точек привязки
+			var auxiliaryContexts = checkClosest
 				? contextsToPoints.Keys
-					.SelectMany(p => p.ClosestContext).Distinct()
-					.Except(contextsToPoints.Keys)
+					.SelectMany(p => p.ClosestContext)
 					.ToList()
 				: new List<PointContext>();
 
+			if(checkSiblings)
+			{
+				foreach(var context in contextsToPoints.Keys)
+				{
+					if(context.SiblingsContext.Before.Entity != null)
+					{
+						auxiliaryContexts.Add(context.SiblingsContext.Before.Entity);
+					}
+
+					if (context.SiblingsContext.After.Entity != null)
+					{
+						auxiliaryContexts.Add(context.SiblingsContext.After.Entity);
+					}
+				}
+			}
+
+			auxiliaryContexts = auxiliaryContexts.Distinct()
+				.Except(contextsToPoints.Keys)
+				.ToList();
+
 			/// Запоминаем, каким элементам какой элемент предшествовал
-			LocationManager = checkLocation
-				? new LocationManager(
-					contextsToPoints.Keys.Concat(closestContexts), 
-					candidates.First().Context.FileContext.Length
-				)
-				: null;
+			LocationManager = new LocationManager(
+				contextsToPoints.Keys.Concat(auxiliaryContexts), 
+				candidates.First().Context.FileContext.Length
+			);
 
 			/// Результаты поиска элемента, которые вернём пользователю
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -366,7 +382,7 @@ namespace Land.Markup.Binding
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
-				foreach (var pointContext in contextsToPoints.Keys.Concat(closestContexts))
+				foreach (var pointContext in contextsToPoints.Keys.Concat(auxiliaryContexts))
 				{
 					var perfectMatch = PreHeuristic.GetSameElement(pointContext, candidates);
 
@@ -380,7 +396,7 @@ namespace Land.Markup.Binding
 
 						if (contextsToPoints.ContainsKey(pointContext))
 						{
-							ComputeContextSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings, false);
+							ComputeContextSimilarities(pointContext, new List<RemapCandidateInfo> { perfectMatch }, checkSiblings);
 
 							foreach (var point in contextsToPoints[pointContext])
 							{
@@ -405,13 +421,12 @@ namespace Land.Markup.Binding
 			/// Наивный алгоритм не учитывает ближайших
 			if (checkClosest)
 			{
-				foreach (var closestContext in closestContexts.Except(heuristicallyMatched))
+				foreach (var closestContext in auxiliaryContexts.Except(heuristicallyMatched))
 				{
 					evaluated[closestContext] = ComputeContextSimilarities(
 						closestContext,
 						candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
-						checkSiblings,
-						checkLocation
+						checkSiblings
 					);
 				}
 			}
@@ -428,7 +443,7 @@ namespace Land.Markup.Binding
 					.ToList();
 
 				evaluated[pointContext] = !UseNaiveAlgorithm
-					? ComputeContextSimilarities(pointContext, currentCandidates, checkSiblings, checkLocation)
+					? ComputeContextSimilarities(pointContext, currentCandidates, checkSiblings)
 					: ComputeContextSimilarities_old(pointContext, currentCandidates, checkSiblings);
 			}
 
@@ -476,101 +491,6 @@ namespace Land.Markup.Binding
 		}
 
 		#region Auto Result Selection
-
-		private void SelectGlobalBests(
-			Dictionary<PointContext, List<RemapCandidateInfo>> evaluated)
-		{
-			/// Проверяем, есть ли что перепривязывать и к чему
-			if (evaluated.Count > 0 && evaluated.First().Value.Count > 0)
-			{
-				var scores = new int[
-					evaluated.Count,
-					evaluated.First().Value.Count
-				];
-				var indicesToContexts = new PointContext[evaluated.Count];
-
-				var i = 0;
-				foreach (var from in evaluated)
-				{
-					indicesToContexts[i] = from.Key;
-
-					for (var j = 0; j < from.Value.Count; ++j)
-					{
-						scores[i, j] = (int)(10000 * (1 - (from.Value[j].Similarity ?? 0)));
-					}
-					++i;
-				}
-
-				/// Запускаем венгерский алгоритм для поиска паросочетания минимального веса
-				var bestMatchesFinder = new AssignmentProblem();
-				var bestMatches = bestMatchesFinder.Compute1(scores);
-
-				/// По индексам находим соответствие "исходный контекст" - "наилучший кандидат"
-				var contextMatches = indicesToContexts
-					.Select((context, idx) => new { context, idx })
-					.ToDictionary(
-						e => e.context, 
-						e => bestMatches[e.idx] != -1
-							? evaluated[e.context][bestMatches[e.idx]] : null
-					);
-
-				foreach (var point in evaluated.Keys.ToList())
-				{
-					evaluated[point] = evaluated[point]
-						.OrderByDescending(c => c.Similarity)
-						.ToList();
-				}
-
-				var unmatched = new HashSet<PointContext>(evaluated.Keys);
-				var oldUnmatchedCount = 0;
-
-				do
-				{
-					oldUnmatchedCount = unmatched.Count;
-
-					/// Проходим по найденным наилучшим соответствиям
-					foreach (var point in unmatched.ToList())
-					{
-						if (contextMatches[point] != null)
-						{
-							/// проверяем для него условие автоматического принятия решения
-							var bestIdx = evaluated[point].IndexOf(contextMatches[point]);
-							var prev = bestIdx > 0 ? evaluated[point][bestIdx - 1] : null;
-							var best = contextMatches[point];
-							var next = evaluated[point].Count > bestIdx + 1 ? evaluated[point][bestIdx + 1] : null;
-
-							/// Если оно выполняется, удаляем наилучшего кандидата 
-							/// из списков кандидатов для остальных элементов
-							if (IsSimilarEnough(best) 
-								&& (prev == null || AreDistantEnough(prev, best))
-								&& (next == null || AreDistantEnough(best, next)))
-							{
-								if (evaluated[point][0] != best)
-								{
-									evaluated[point].Remove(best);
-									evaluated[point].Insert(0, best);
-								}
-
-								best.IsAuto = true;
-								unmatched.Remove(point);
-								LocationManager?.Mapped(point, best.Context);
-
-								/// Удаляем сопоставленного кандидата из списков кандидатов
-								/// для остальных перепривязываемых элементов
-								foreach (var candidatesList in evaluated.Values)
-								{
-									if(candidatesList != evaluated[point])
-									{
-										candidatesList.Remove(best);
-									}
-								}
-							}
-						}
-					}
-				}
-				while (unmatched.Count != oldUnmatchedCount);
-			}
-		}
 
 		private void SelectLocalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
@@ -621,13 +541,14 @@ namespace Land.Markup.Binding
 							evaluationResults[context].Insert(0, first);
 							unmapped.Remove(context);
 
-							if (!UseNaiveAlgorithm && LocationManager != null)
+							if (!UseNaiveAlgorithm)
 							{
-								LocationManager?.Mapped(context, first.Context);
+								LocationManager.Mapped(context, first.Context);
 
 								foreach (var unmappedContext in unmapped)
 								{
-									TuneSimilaritiesByLocation(unmappedContext, evaluationResults[unmappedContext]);
+									ComputeContextSimilarities(unmappedContext, evaluationResults[unmappedContext], true);
+									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
 
 									evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
 										.OrderByDescending(c => c.Similarity)
@@ -705,29 +626,28 @@ namespace Land.Markup.Binding
 		public List<RemapCandidateInfo> ComputeContextSimilarities(
 			PointContext point,
 			List<RemapCandidateInfo> candidates,
-			bool checkSiblings,
-			bool checkLocation)
+			bool checkSiblings)
 		{
+			var actualCandidates = candidates.Where(c => !c.Deleted).ToList();
+
 			Parallel.ForEach(
-				candidates,
+				actualCandidates,
 				c =>
 				{
 					ComputeCoreSimilarities(point, c);
 
-					if (checkSiblings)
+					if (checkSiblings && point.SiblingsContext != null)
 					{
-						c.SiblingsSimilarity = EvalSimilarity(
+						c.SiblingsGlobalSimilarity = EvalSimilarity(
 							point.SiblingsContext,
 							c.Context.SiblingsContext
 						);
-						c.SiblingsBeforeSimilarity = EvalSimilarity(
-							point.SiblingsContext.Before.GlobalHash,
-							c.Context.SiblingsContext.Before.GlobalHash
-						);
-						c.SiblingsAfterSimilarity = EvalSimilarity(
-							point.SiblingsContext.After.GlobalHash,
-							c.Context.SiblingsContext.After.GlobalHash
-						);
+
+						if (point.SiblingsContext.Before.Entity != null
+							|| point.SiblingsContext.After.Entity != null)
+						{
+							c.SiblingsRangeSimilarity = LocationManager.GetSimilarity(point, c.Context);
+						}
 					}
 				}
 			);
@@ -772,62 +692,15 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
+						+ finalWeights[ContextType.SiblingsGlobal] * c.SiblingsGlobalSimilarity
+						+ finalWeights[ContextType.SiblingsRange] * c.SiblingsRangeSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
 
-			if (LocationManager != null)
-			{
-				TuneSimilaritiesByLocation(sourceContext, candidates);
-			}
-
 			foreach (var h in ScoringHeuristics)
 			{
 				 h.PredictSimilarity(sourceContext, actualCandidates);
-			}
-		}
-
-		public void TuneSimilaritiesByLocation(
-			PointContext sourceContext,
-			List<RemapCandidateInfo> candidates)
-		{
-			if (LocationManager != null)
-			{
-				Parallel.ForEach(
-					candidates,
-					c =>
-					{
-						c.LocationSimilarity = 0;
-
-						if(c.SimilarityBackup.HasValue)
-						{
-							c.Similarity = c.SimilarityBackup;
-						}
-					}
-				);
-
-				var candidatesInRange = candidates
-					.Where(c => LocationManager.InRange(sourceContext, c.Context))
-					.OrderByDescending(c => c.Similarity)
-					.ToList();
-
-				if (candidatesInRange.Count > 0 
-					&& candidatesInRange[0].Similarity > CANDIDATE_SIMILARITY_THRESHOLD)
-				{
-					var similarity = LocationManager.GetLocationSimilarity(sourceContext);
-					var boost = (1 - candidatesInRange[0].Similarity) * 0.5 * similarity;
-
-					Parallel.ForEach(
-						candidatesInRange,
-						c =>
-						{
-							c.SimilarityBackup = c.Similarity;
-							c.LocationSimilarity = similarity;
-							c.Similarity += c.Similarity * boost;
-						}
-					);
-				}
 			}
 		}
 
@@ -980,9 +853,9 @@ namespace Land.Markup.Binding
 
 			candidates = candidates.Except(closest).ToList();
 
-			ComputeContextSimilarities(point.Context, candidates, true, false);
+			ComputeContextSimilarities(point.Context, candidates, true);
 
-			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsSimilarity = 1 };
+			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsGlobalSimilarity = 1 };
 			var otherElements = new List<RemapCandidateInfo>(candidates);
 			candidates.Add(changedElement);
 
@@ -1379,7 +1252,7 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings)
 					{
-						c.SiblingsSimilarity =
+						c.SiblingsGlobalSimilarity =
 							(EvalSimilarity_old(point.SiblingsLeftContext_old, c.Context.SiblingsLeftContext_old)
 							+ EvalSimilarity_old(point.SiblingsRightContext_old, c.Context.SiblingsRightContext_old)) / 2.0;
 					}

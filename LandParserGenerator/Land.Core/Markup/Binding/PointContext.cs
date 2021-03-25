@@ -543,7 +543,7 @@ namespace Land.Markup.Binding
 
 			if (siblingsArgs !=null && core.SiblingsContext == null)
 			{
-				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.Range, siblingsArgs.ContextFinder);
+				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.CheckAllSiblings, siblingsArgs.ContextFinder);
 
 				#region Old
 				var oldSiblingsContext = GetSiblingsContext_old(node, file);
@@ -849,7 +849,7 @@ namespace Land.Markup.Binding
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
 			ParsedFile file,
-			SiblingsConstructionArgs.SiblingsRange range,
+			bool checkAllSiblings,
 			ContextFinder contextFinder,
 			AncestorSiblingsPair pair = null)
 		{
@@ -927,14 +927,12 @@ namespace Land.Markup.Binding
 			siblings.RemoveAt(markedElementIndex);
 
 			var beforeBuilder = new StringBuilder();
-			var beforeSiblings = range == SiblingsConstructionArgs.SiblingsRange.All
+			var beforeSiblings = checkAllSiblings
 				? siblings
 					.Take(markedElementIndex)
 					.Where(n => n.Location != null)
 					.ToList()
-				: markedElementIndex > 0 
-					? new List<Node> { siblings[markedElementIndex - 1] }
-					: new List<Node>();
+				: new List<Node>();
 
 			foreach (var part in beforeSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
@@ -943,14 +941,12 @@ namespace Land.Markup.Binding
 			}
 			
 			var afterBuilder = new StringBuilder();
-			var afterSiblings = range == SiblingsConstructionArgs.SiblingsRange.All
+			var afterSiblings = checkAllSiblings
 				? siblings
 					.Skip(markedElementIndex)
 					.Where(n => n.Location != null)
 					.ToList()
-				: markedElementIndex < siblings.Count
-					? new List<Node> { siblings[markedElementIndex] }
-					: new List<Node>();
+				: new List<Node>();
 
 			foreach (var part in afterSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
@@ -1070,13 +1066,7 @@ namespace Land.Markup.Binding
 
 	public class SiblingsConstructionArgs 
 	{ 
-		public enum SiblingsRange
-		{
-			All,
-			Nearest
-		}
-
-		public SiblingsRange Range { get; set; }
+		public bool CheckAllSiblings { get; set; }
 		public ContextFinder ContextFinder { get; set; }
 	}
 
