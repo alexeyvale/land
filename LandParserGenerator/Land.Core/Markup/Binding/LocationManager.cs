@@ -106,13 +106,13 @@ namespace Land.Markup.Binding
 		private void UpdateSimilarity(PointContext source)
 		{
 			var beforeCount = ContextToLineInfo[source].Index;
-			var afterCount = ContextToLineInfo.Count - ContextToLineInfo[source].Index;
+			var afterCount = ContextToLineInfo.Count - ContextToLineInfo[source].Index - 1;
 			var step = 0.8 / (beforeCount + afterCount);
 
 			ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].IndexBefore ?? 0)
 					+ step * (ContextToLineInfo.Count - (ContextToLineInfo[source].IndexAfer ?? ContextToLineInfo.Count))
-					+ (ContextToLineInfo[source].ImmediateAfterFound ? 0.1 : 0)
-					+ (ContextToLineInfo[source].ImmediateBeforeFound ? 0.1 : 0);
+					+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
+					+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0);
 		}
 	}
 }
