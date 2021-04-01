@@ -72,7 +72,7 @@ namespace Land.Markup.Binding
 				[ContextType.SiblingsGlobal] = source.SiblingsContext?.Before.GlobalHash.TextLength > 0
 					|| source.SiblingsContext?.After.GlobalHash.TextLength > 0,
 				[ContextType.SiblingsRange] = source.SiblingsContext?.Before.Entity != null
-					|| source.SiblingsContext?.Before.Entity != null,
+					|| source.SiblingsContext?.After.Entity != null,
 			};
 
 			foreach (var kvp in existenceFlags)
@@ -223,7 +223,9 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (source.SiblingsContext != null && candidates.Count > 0)
+			if (!weights[ContextType.SiblingsGlobal].HasValue 
+				&& source.SiblingsContext != null 
+				&& candidates.Count > 0)
 			{
 				var ordered = candidates.OrderByDescending(c => c.SiblingsGlobalSimilarity).ToList();
 
@@ -261,15 +263,17 @@ namespace Land.Markup.Binding
 
 	public class TuneSiblingsRangeWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
-		const double EXCELLENT_THRESHOLD = 0.9;
-		const double GARBAGE_THRESHOLD = 0.8;
+		const double EXCELLENT_THRESHOLD = 0.95;
+		const double GARBAGE_THRESHOLD = 0.85;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (source.SiblingsContext != null && candidates.Count > 0)
+			if (!weights[ContextType.SiblingsRange].HasValue 
+				&& source.SiblingsContext != null 
+				&& candidates.Count > 0)
 			{
 				var ordered = candidates.OrderByDescending(c => c.SiblingsRangeSimilarity).ToList();
 

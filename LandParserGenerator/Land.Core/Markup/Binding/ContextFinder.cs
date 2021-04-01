@@ -545,11 +545,14 @@ namespace Land.Markup.Binding
 							{
 								LocationManager.Mapped(context, first.Context);
 
+								foreach (var c in evaluationResults.Keys)
+								{
+									ComputeContextSimilarities(c, evaluationResults[c], true);
+									ComputeTotalSimilarities(c, evaluationResults[c]);
+								}
+
 								foreach (var unmappedContext in unmapped)
 								{
-									ComputeContextSimilarities(unmappedContext, evaluationResults[unmappedContext], true);
-									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
-
 									evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
 										.OrderByDescending(c => c.Similarity)
 										.ToList();
@@ -1003,7 +1006,7 @@ namespace Land.Markup.Binding
 			else if (a is AncestorsContextElement)
 				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
 			else if (a is PrioritizedWord)
-				return Levenshtein((a as PrioritizedWord).Text, (b as PrioritizedWord).Text);
+				return Levenshtein((a as PrioritizedWord).Text, (b as PrioritizedWord).Text, true);
 			else
 				return a.Equals(b) ? 1 : 0;
 		}
@@ -1112,7 +1115,7 @@ namespace Land.Markup.Binding
 			return 1 - distances[a.Count(), b.Count()] / denominator;
 		}
 
-		private double Levenshtein(string a, string b)
+		private double Levenshtein(string a, string b, bool areWords = false)
 		{
 			if (a.Length == 0 ^ b.Length == 0)
 				return 0;
@@ -1162,7 +1165,8 @@ namespace Land.Markup.Binding
 
 			var similarity = 1 - distances[a.Length, b.Length] / denominator;
 
-			return (UseNaiveAlgorithm || similarity >= 0.75) ? similarity : 0;
+			return !areWords ? similarity
+				: similarity >= 0.75 ? 1 : 0;
 		}
 
 		private static double PriorityCoefficient(object elem)
