@@ -523,7 +523,7 @@ namespace Land.Markup.Binding
 						var second = actualCandidates.Count > 1 ? actualCandidates[1] : null;
 
 						/// Берём наилучшее соответствие текущего кандидата другому исходному элементу
-						var otherBestMatch = evaluationResults.Keys.Intersect(unmapped)
+						var otherBestMatch = unmapped
 							.Where(e => e != context && evaluationResults[e][0].Context == first.Context)
 							.Select(e => new { Context = e, Best = evaluationResults[e][0] })
 							.OrderByDescending(e => e.Best.Similarity)
