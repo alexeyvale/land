@@ -22,12 +22,8 @@ namespace Land.Markup.Binding
 		private static readonly Func<PointContext, PointContext, bool> InnerPredicate = (a, b) =>
 			a.InnerContext.Content.Text == b.InnerContext.Content.Text
 				&& (a.InnerContext.Content.Hash?.SequenceEqual(b.InnerContext.Content.Hash) ?? true);
-		private static readonly Func<PointContext, PointContext, bool> AncestorsCorePredicate = (a, b) =>
-			a.AncestorsContext.SequenceEqual(b.AncestorsContext, AncestorsCoreComparer);
 		private static readonly Func<PointContext, PointContext, bool> AncestorsSequencePredicate = (a, b) =>
 			a.AncestorsContext.SequenceEqual(b.AncestorsContext);
-
-		private static readonly AncestorsCoreEqualityComparer AncestorsCoreComparer = new AncestorsCoreEqualityComparer();
 
 		private class AncestorsCoreEqualityComparer : IEqualityComparer<AncestorsContextElement>
 		{
@@ -51,12 +47,7 @@ namespace Land.Markup.Binding
 			{ 
 				HeaderCorePredicate, HeaderSequencePredicate, InnerPredicate 
 			};
-			var ancestorsPredicates = new Func<PointContext, PointContext, bool>[]
-			{
-				AncestorsCorePredicate, AncestorsSequencePredicate
-			};
 
-			var ancestorsIdx = 0;
 			/// Базовый предикат, которому должны удовлетворять похожие элементы,
 			/// выбираем, основываясь на том, как вычисляли контекст ближайших
 			var baseIdx = point.HeaderContext.Core.Count > 0
@@ -72,7 +63,7 @@ namespace Land.Markup.Binding
 			/// Проверяем, были ли в исходном файле элементы,
 			/// совпадающие с искомым при легковесном сравнении
 			var wereAlmostSame = point.ClosestContext != null
-				? point.ClosestContext.Where(e => ancestorsPredicates[0](e, point)).ToList()
+				? point.ClosestContext.Where(e => AncestorsSequencePredicate(e, point)).ToList()
 				: new List<PointContext>();
 
 			/// Если были совпадающие для более простого базового предиката,
@@ -82,24 +73,6 @@ namespace Land.Markup.Binding
 				wereAlmostSame = wereAlmostSame
 					.Where(e => basePredicates[i](e, point))
 					.ToList();
-
-				if (wereAlmostSame.Count > 0)
-				{
-					for (var j = 1; j < ancestorsPredicates.Length; ++j)
-					{
-						var strictComparison = wereAlmostSame
-							.Where(e => ancestorsPredicates[j](e, point))
-							.ToList();
-
-						if(strictComparison.Count == 0)
-						{
-							wereAlmostSame = strictComparison;
-							ancestorsIdx = j;
-
-							break;
-						}
-					}
-				}
 
 				if(wereAlmostSame.Count == 0)
 				{
@@ -112,7 +85,7 @@ namespace Land.Markup.Binding
 			{
 				var similarCandidates = candidates
 					.Where(c => basePredicates.Take(baseIdx.Value + 1).All(p => p(point, c.Context)) 
-						&& ancestorsPredicates[ancestorsIdx](c.Context, point))
+						&& AncestorsSequencePredicate(c.Context, point))
 					.ToList();
 
 				if(similarCandidates.Count <= 1)
@@ -129,18 +102,6 @@ namespace Land.Markup.Binding
 					if (similarCandidates.Count <= 1)
 					{
 						return similarCandidates.FirstOrDefault();
-					}
-
-					for (var j = ancestorsIdx + 1; j < ancestorsPredicates.Length; ++j)
-					{
-						var strictComparison = similarCandidates
-							.Where(c => ancestorsPredicates[j](c.Context, point))
-							.ToList();
-
-						if (strictComparison.Count <= 1)
-						{
-							return similarCandidates.FirstOrDefault();
-						}
 					}
 				}
 			}
