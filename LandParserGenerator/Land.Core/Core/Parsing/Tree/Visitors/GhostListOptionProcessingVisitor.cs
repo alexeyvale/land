@@ -13,20 +13,25 @@ namespace Land.Core.Parsing.Tree
 
 		public override void Visit(Node node)
 		{
-			// Убираем узел из дерева, если соответствующий символ помечен как ghost 
+			/// Убираем узел из дерева, если соответствующий символ помечен как ghost или void
 			for (var i = 0; i < node.Children.Count; ++i)
 			{
-				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
-				if (node.Children[i].Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST) || 
-					!node.Children[i].Options.GetOptions(NodeOption.GROUP_NAME).Any() &&
-					(GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Symbol) ||
-					!String.IsNullOrEmpty(node.Children[i].Alias) && 
-					GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, NodeOption.GHOST, node.Children[i].Alias)))
+				if (IsOptionSet(NodeOption.VOID, node.Children[i]))
 				{
 					var smbToRemove = node.Children[i];
 					node.Children.RemoveAt(i);
 
-					for (var j=smbToRemove.Children.Count -1; j >=0; --j)
+					--i;
+					continue;
+				}
+
+				/// Если узел призрачный локально или нет локальной опции, но проставлена глобальная
+				if (IsOptionSet(NodeOption.GHOST, node.Children[i]))
+				{
+					var smbToRemove = node.Children[i];
+					node.Children.RemoveAt(i);
+
+					for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
 					{
 						smbToRemove.Children[j].Parent = node;
 						node.Children.Insert(i, smbToRemove.Children[j]);
@@ -70,5 +75,12 @@ namespace Land.Core.Parsing.Tree
 
 			base.Visit(node);
 		}
+
+		private bool IsOptionSet(string option, Node nodeToCheck) =>
+			nodeToCheck.Options.IsSet(NodeOption.GROUP_NAME, option)
+				|| !nodeToCheck.Options.GetOptions(NodeOption.GROUP_NAME).Any()
+				&& (GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, option, nodeToCheck.Symbol)
+				|| !String.IsNullOrEmpty(nodeToCheck.Alias)
+				&& GrammarObject.Options.IsSet(NodeOption.GROUP_NAME, option, nodeToCheck.Alias));
 	}
 }

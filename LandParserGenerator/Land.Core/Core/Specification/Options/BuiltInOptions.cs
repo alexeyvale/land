@@ -29,6 +29,7 @@ namespace Land.Core.Specification
 		public const string GHOST = "ghost";
 		public const string LIST = "list";
 		public const string LEAF = "leaf";
+		public const string VOID = "void";
 	}
 
 	/// <summary>

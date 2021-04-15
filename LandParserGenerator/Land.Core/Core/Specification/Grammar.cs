@@ -426,11 +426,11 @@ namespace Land.Core.Specification
 			switch (group)
 			{
 				case NodeOption.GROUP_NAME:
-					errorSymbols = CheckIfNonterminals(symbols).Intersect(CheckIfAliases(symbols)).ToList();
+					errorSymbols = CheckIfSymbols(symbols).ToList();
 					if (errorSymbols.Count > 0)
 						throw new IncorrectGrammarException(
 							$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
-								$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как нетерминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
+								$"не определен{(errorSymbols.Count > 1 ? "ы" : "")}"
 						);
 					break;
 				case ParsingOption.GROUP_NAME:
