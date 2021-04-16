@@ -16,7 +16,7 @@ namespace Land.Markup.CoreExtension
 		public const string LAND = "land";
 		public const string EXACTMATCH = "exactmatch";
 		public const string HEADERCORE = "headercore";
-		public const string CHECKALLSIBLINGS = "checkallsiblings";
+		public const string NOTUNIQUE = "notunique";
 	}
 
 	public static class OptionsExtension
@@ -34,20 +34,20 @@ namespace Land.Markup.CoreExtension
 			manager.Set(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, new List<dynamic>() { value });
 		}
 
-		public static bool GetCheckAllSiblings(this SymbolOptionsManager manager)
+		public static bool GetNotUnique(this SymbolOptionsManager manager)
 		{
-			return manager.IsSet(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS);
+			return manager.IsSet(MarkupOption.GROUP_NAME, MarkupOption.NOTUNIQUE);
 		}
 
-		public static void SetCheckAllSiblings(this SymbolOptionsManager manager, bool value)
+		public static void SetNotUnique(this SymbolOptionsManager manager, bool value)
 		{
 			if (value)
 			{
-				manager.Set(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS, null);
+				manager.Set(MarkupOption.GROUP_NAME, MarkupOption.NOTUNIQUE, null);
 			}
 			else
 			{
-				manager.Clear(MarkupOption.GROUP_NAME, MarkupOption.CHECKALLSIBLINGS);
+				manager.Clear(MarkupOption.GROUP_NAME, MarkupOption.NOTUNIQUE);
 
 			}
 		}

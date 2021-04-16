@@ -251,7 +251,7 @@ namespace Land.Markup.Binding
 							{
 								var siblingsArgs = new SiblingsConstructionArgs
 								{
-									CheckAllSiblings = (visitor.Grouped[type].FirstOrDefault()?.Options.GetCheckAllSiblings() ?? false),
+									CheckAllSiblings = (visitor.Grouped[type].FirstOrDefault()?.Options.GetNotUnique() ?? false),
 									ContextFinder = this
 								};
 
@@ -378,7 +378,12 @@ namespace Land.Markup.Binding
 			/// Контексты, которые нашлись на первом этапе (эвристикой)
 			var heuristicallyMatched = new HashSet<PointContext>();
 
-			if (PreHeuristic != null)
+			/// При локальном поискк пробуем перепривязаться простым алгоритмом,
+			/// кроме случаев, когда в программе могут быть 
+			/// абсолютно идентичные сущности текущего типа
+			if (searchType == SearchType.Local
+				&& PreHeuristic != null 
+				&& !candidates.First().Node.Options.GetNotUnique())
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
