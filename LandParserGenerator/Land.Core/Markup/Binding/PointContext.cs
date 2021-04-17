@@ -983,8 +983,8 @@ namespace Land.Markup.Binding
 			Func<string, ParsedFile> getParsed,
 			ContextFinder contextFinder)
 		{
-			const double CLOSE_ELEMENT_THRESHOLD = 0.6;
-			const int MAX_COUNT = 10;
+			const double CLOSE_ELEMENT_THRESHOLD = 0.7;
+			const int MAX_COUNT = 5;
 
 			var candidates = new List<RemapCandidateInfo>();
 
@@ -1006,17 +1006,57 @@ namespace Land.Markup.Binding
 				);
 			};
 
+			#region For simple rebinding
+
+			var mayBeConfused = new List<PointContext>();
+
+			if (!node.Options.GetNotUnique())
+			{
+				mayBeConfused.AddRange(candidates
+					.Select(c => c.Context)
+					.Where(c => c.AncestorsContext.SequenceEqual(nodeContext.AncestorsContext)
+						&& c.HeaderContext.Core.SequenceEqual(nodeContext.HeaderContext.Core))
+				);
+
+				if (mayBeConfused.Count > 0)
+				{
+					var sameHeader = mayBeConfused
+						.Where(c => c.HeaderContext.NonCore.SequenceEqual(nodeContext.HeaderContext.NonCore))
+						.ToList();
+
+					if (sameHeader.Count > 0)
+					{
+						mayBeConfused = sameHeader;
+					}
+				}
+			}
+
+			#endregion
+
 			contextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
 			contextFinder.ComputeTotalSimilarities(nodeContext, candidates);
 
-			candidates = candidates
+			var result = candidates
 				.OrderByDescending(c => c.Similarity)
 				.ThenByDescending(c => c.AncestorSimilarity)
 				.Take(MAX_COUNT)
 				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
+				.Select(c => c.Context)
 				.ToList();
 
-			return candidates.Select(c=>c.Context).ToList();
+			if(mayBeConfused.Any())
+			{
+				/// Если мы не захватили тот элемент, 
+				/// с которым можно перепутать помечаемый
+				/// из-за полной похожести предков и заголовка
+				if(!result.Contains(mayBeConfused[0]))
+				{
+					result.RemoveAt(result.Count - 1);
+					result.Add(mayBeConfused[0]);
+				}
+			}
+
+			return result;
 		}
 	}
 
