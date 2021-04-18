@@ -705,6 +705,8 @@ namespace Land.Markup.Binding
 
 		public static List<ContextElement> GetInnerContext_old(Node node, ParsedFile file)
 		{
+			const int INNER_CONTEXT_LENGTH = 10;
+
 			var result = new List<ContextElement>();
 			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
@@ -729,7 +731,7 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return result;
+			return result.Take(INNER_CONTEXT_LENGTH).ToList();
 		}
 
 		public static Tuple<List<ContextElement>, List<ContextElement>> GetSiblingsContext_old(
