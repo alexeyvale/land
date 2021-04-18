@@ -956,20 +956,27 @@ namespace Land.Markup.Binding
 				afterBuilder.Append(part);
 			}
 
+			var beforeNeighbor = siblings
+				.Take(markedElementIndex)
+				.LastOrDefault(e=>e.Type == node.Type);
+			var afterNeighbour = siblings
+				.Skip(markedElementIndex + 1)
+				.FirstOrDefault(e => e.Type == node.Type);
+
 			var context = new SiblingsContext
 			{
 				Before = new SiblingsContextPart {
 					GlobalHash = new TextOrHash(beforeBuilder.ToString()),
-					Entity = markedElementIndex > 0
-						? contextFinder.ContextManager.GetContext(siblings[markedElementIndex - 1], file)
+					Entity = beforeNeighbor != null
+						? contextFinder.ContextManager.GetContext(beforeNeighbor, file)
 						: null
 				},
 
 				After = new SiblingsContextPart
 				{
 					GlobalHash = new TextOrHash(afterBuilder.ToString()),
-					Entity = markedElementIndex < siblings.Count
-						? contextFinder.ContextManager.GetContext(siblings[markedElementIndex], file)
+					Entity = afterNeighbour != null
+						? contextFinder.ContextManager.GetContext(afterNeighbour, file)
 						: null
 				}
 			};
