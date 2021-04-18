@@ -1053,7 +1053,7 @@ namespace Land.Markup.Binding
 				.Select(c => c.Context)
 				.ToList();
 
-			if(mayBeConfused.Any())
+			if (mayBeConfused.Any() && result.Any())
 			{
 				/// Если мы не захватили тот элемент, 
 				/// с которым можно перепутать помечаемый

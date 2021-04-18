@@ -32,7 +32,13 @@ namespace Land.Markup.Binding
 				.ToList();
 			ContextToLineInfo = ContextsOrderedByLine
 				.Select((e, i) => new { e, i })
-				.ToDictionary(e => e.e, e => new LineInfo { Index = e.i, OffsetBefore = 0, OffsetAfter = targetFileLength });
+				.ToDictionary(e => e.e, e => new LineInfo { 
+					Index = e.i, 
+					OffsetBefore = 0, 
+					OffsetAfter = targetFileLength,
+					ImmediateAfterFound = e.e.SiblingsContext?.After.Entity == null,
+					ImmediateBeforeFound = e.e.SiblingsContext?.Before.Entity == null,
+				});
 		}
 
 		/// <summary>
@@ -51,7 +57,7 @@ namespace Land.Markup.Binding
 					{
 						currentContext.IndexAfer = ContextToLineInfo[source].Index;
 						currentContext.OffsetAfter = target.StartOffset;
-						currentContext.ImmediateAfterFound =
+						currentContext.ImmediateAfterFound |=
 							ContextsOrderedByLine[i]?.SiblingsContext?.After.Entity == source;
 
 						UpdateSimilarity(ContextsOrderedByLine[i]);
@@ -73,7 +79,7 @@ namespace Land.Markup.Binding
 					{
 						currentContext.IndexBefore = ContextToLineInfo[source].Index;
 						currentContext.OffsetBefore = target.EndOffset;
-						currentContext.ImmediateBeforeFound =
+						currentContext.ImmediateBeforeFound |=
 							ContextsOrderedByLine[i]?.SiblingsContext?.Before.Entity == source;
 
 						UpdateSimilarity(ContextsOrderedByLine[i]);
@@ -107,12 +113,20 @@ namespace Land.Markup.Binding
 		{
 			var beforeCount = ContextToLineInfo[source].Index;
 			var afterCount = ContextToLineInfo.Count - ContextToLineInfo[source].Index - 1;
-			var step = 0.8 / (beforeCount + afterCount);
 
-			ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].IndexBefore ?? 0)
-					+ step * (ContextToLineInfo.Count - (ContextToLineInfo[source].IndexAfer ?? ContextToLineInfo.Count))
-					+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
-					+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0);
+			if (beforeCount > 0 || afterCount > 0)
+			{
+				var step = 0.8 / (beforeCount + afterCount);
+
+				ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].IndexBefore ?? 0)
+						+ step * (ContextToLineInfo.Count - (ContextToLineInfo[source].IndexAfer ?? ContextToLineInfo.Count))
+						+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
+						+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0);
+			}
+			else
+			{
+				ContextToLineInfo[source].LocationSimilarity = 0;
+			}
 		}
 	}
 }
