@@ -140,6 +140,10 @@ namespace Comparison
 					sameFirstPos = new List<List<string>>(),
 					differentFirstPos = new List<List<string>>();
 
+				int simpleRebindSameAuto = 0,
+					simpleRebindDifferentAuto = 0,
+					simpleRebindModifiedAuto = 0;
+
 				var similarities = new List<string>();
 
 				foreach (var cp in pointsOfType)
@@ -156,8 +160,8 @@ namespace Comparison
 							.SequenceEqual(basicResult[0].Context.HeaderContext.Sequence_old);
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
-					var hasNotChanged = modifiedRemapResult[cp].Count == 1 
-						&& modifiedRemapResult[cp][0].Weights == null;
+					var hasNotChanged = false; // modifiedRemapResult[cp].Count == 1 
+						//&& modifiedRemapResult[cp][0].Weights == null;
 
 					if (!hasNotChanged)
 					{
@@ -185,12 +189,15 @@ namespace Comparison
 
 						if(modifiedRemapResult[cp].Count > 0)
 						{
-							reportLines.Add($"HC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]};  " +
-								$"HNC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]:0.00};  " +
-								$"I={modifiedRemapResult[cp][0].Weights[ContextType.Inner]:0.00};  " +
-								$"A={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]:0.00};  " +
-								$"SG={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsGlobal]:0.00}; " +
-								$"SR={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsRange]:0.00}");
+							if (modifiedRemapResult[cp][0].Weights != null)
+							{
+								reportLines.Add($"HC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderCore]};  " +
+									$"HNC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]:0.00};  " +
+									$"I={modifiedRemapResult[cp][0].Weights[ContextType.Inner]:0.00};  " +
+									$"A={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]:0.00};  " +
+									$"SG={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsGlobal]:0.00}; " +
+									$"SR={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsRange]:0.00}");
+							}
 						}
 
 						foreach (var landCandidate in modifiedRemapResult[cp].Take(7))
@@ -210,31 +217,60 @@ namespace Comparison
 							report.WriteLine(line);
 						}
 
-						List<List<string>> customReport = null;
-
 						if (isModifiedAuto)
 						{
 							if (isBasicAuto)
 							{
-								customReport = sameFirst
-									? sameAutoResult : differentAutoResult;
+								if(sameFirst)
+								{
+									if (modifiedRemapResult[cp][0].Weights == null)
+									{
+										simpleRebindSameAuto += 1;
+									}
+									else
+									{
+										sameAutoResult.Add(reportLines);
+									}
+								}
+								else
+								{
+									if (modifiedRemapResult[cp][0].Weights == null)
+									{
+										simpleRebindDifferentAuto += 1;
+									}
+									else
+									{
+										differentAutoResult.Add(reportLines);
+									}
+								}
 							}
 							else
 							{
-								customReport = modifiedOnlyAutoResult;
+								if (modifiedRemapResult[cp][0].Weights == null)
+								{
+									simpleRebindModifiedAuto += 1;
+								}
+								else
+								{
+									modifiedOnlyAutoResult.Add(reportLines);
+								}
 							}
 						}
 						else if (isBasicAuto)
 						{
-							customReport = basicOnlyAutoResult;
+							basicOnlyAutoResult.Add(reportLines);
 						}
 						else
 						{
-							customReport = sameFirst
-								? sameFirstPos : differentFirstPos;
+							if(sameFirst)
+							{
+								sameFirstPos.Add(reportLines);
+							}
+							else
+							{
+								differentFirstPos.Add(reportLines);
+							}
 						}
-
-						customReport.Add(reportLines);
 					}
 				}
 
@@ -266,11 +302,26 @@ namespace Comparison
 						randomAutoIdx.SelectMany(idx => sameAutoResult[idx]));
 				}
 
+				if (sameFirstPos.Count > 50)
+				{
+
+					var randomAutoIdx = new HashSet<int>();
+					var random = new Random(7);
+
+					while (randomAutoIdx.Count < 50)
+					{
+						randomAutoIdx.Add(random.Next(sameFirstPos.Count));
+					}
+
+					File.WriteAllLines($"{key}_sameFirstPos_toCheck.txt",
+						randomAutoIdx.SelectMany(idx => sameFirstPos[idx]));
+				}
+
 				Console.WriteLine($"Total: {pointsOfType.Count}");
-				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");
+				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count} / {simpleRebindModifiedAuto}");
 				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
-				Console.WriteLine($"Same auto: {sameAutoResult.Count}");
-				Console.WriteLine($"Different auto: {differentAutoResult.Count}");
+				Console.WriteLine($"Same auto: {sameAutoResult.Count} / {simpleRebindSameAuto}");
+				Console.WriteLine($"Different auto: {differentAutoResult.Count} / {simpleRebindDifferentAuto}");
 				Console.WriteLine($"Same first: {sameFirstPos.Count}");
 				Console.WriteLine($"Different first: {differentFirstPos.Count}");
 				Console.WriteLine($"'{key}' done!");
