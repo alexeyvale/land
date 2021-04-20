@@ -409,12 +409,12 @@ namespace Land.Markup.Binding
 							}
 						}
 
-						LocationManager?.Mapped(pointContext, perfectMatch.Context);
+						LocationManager.Mapped(pointContext, perfectMatch.Context);
 					}
 				}
 			}
 
-			/// Если всё перепривязали эвристикой, можно вернуть результат
+			/// Если всё перепривязали простым алгоритмом, можно вернуть результат
 			if (contextsToPoints.Keys.Except(heuristicallyMatched).Count() == 0)
 			{
 				return result;
@@ -423,17 +423,13 @@ namespace Land.Markup.Binding
 			/// Контексты, для которых первично посчитаны похожести кандидатов
 			var evaluated = new Dictionary<PointContext, List<RemapCandidateInfo>>();
 
-			/// Наивный алгоритм не учитывает ближайших
-			if (checkClosest)
+			foreach (var context in auxiliaryContexts.Except(heuristicallyMatched))
 			{
-				foreach (var closestContext in auxiliaryContexts.Except(heuristicallyMatched))
-				{
-					evaluated[closestContext] = ComputeContextSimilarities(
-						closestContext,
-						candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
-						checkSiblings
-					);
-				}
+				evaluated[context] = ComputeContextSimilarities(
+					context,
+					candidates.Select(c => new RemapCandidateInfo { Node = c.Node, File = c.File, Context = c.Context }).ToList(),
+					checkSiblings
+				);
 			}
 
 			foreach (var pointContext in contextsToPoints.Keys.Except(heuristicallyMatched))
@@ -550,10 +546,10 @@ namespace Land.Markup.Binding
 							{
 								LocationManager.Mapped(context, first.Context);
 
-								foreach (var c in evaluationResults.Keys)
+								foreach (var unmappedContext in unmapped)
 								{
-									ComputeContextSimilarities(c, evaluationResults[c], true);
-									ComputeTotalSimilarities(c, evaluationResults[c]);
+									ComputeContextSimilarities(unmappedContext, evaluationResults[unmappedContext], true);
+									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
 								}
 
 								foreach (var unmappedContext in unmapped)
@@ -564,14 +560,11 @@ namespace Land.Markup.Binding
 								}
 							}
 
-							foreach (var key in evaluationResults.Keys)
+							foreach (var unmappedContext in unmapped)
 							{
-								if (key != context)
-								{
-									var itemToRemove = evaluationResults[key].Single(e => e.Context == first.Context);
-									///evaluationResults[key].Remove(itemToRemove);
-									itemToRemove.Deleted = true;
-								}
+								var itemToRemove = evaluationResults[unmappedContext].Single(e => e.Context == first.Context);
+								evaluationResults[unmappedContext].Remove(itemToRemove);
+								//itemToRemove.Deleted = true;
 							}
 						}
 					}

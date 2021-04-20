@@ -144,6 +144,8 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
+			if(weights[ContextType.Ancestors].HasValue) return weights;
+
 			var distinctSimilarities = candidates.Select(c => c.AncestorSimilarity)
 				.Distinct().OrderByDescending(e=>e).ToList();
 
@@ -175,6 +177,8 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
+			if (weights[ContextType.Inner].HasValue) return weights;
+
 			if (candidates.Count > 0)
 			{
 				var ordered = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
