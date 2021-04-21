@@ -155,9 +155,9 @@ namespace Comparison
 					var isBasicAuto = basicResult.FirstOrDefault()?.IsAuto ?? false;
 
 					var sameFirst = basicResult.Count == 0 && modifiedResult.Count == 0 ||
-						basicResult.Count > 0 && modifiedResult.Count > 0 &&
-						modifiedResult[0].Context.HeaderContext.Sequence_old
-							.SequenceEqual(basicResult[0].Context.HeaderContext.Sequence_old);
+						basicResult.Any(e=>!e.Deleted) && modifiedResult.Any(e => !e.Deleted) &&
+						modifiedResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old
+							.SequenceEqual(basicResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old);
 
 					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
 					var hasNotChanged = false; // modifiedRemapResult[cp].Count == 1 
@@ -318,6 +318,7 @@ namespace Comparison
 				}
 
 				Console.WriteLine($"Total: {pointsOfType.Count}");
+				Console.WriteLine($"Simple rebinding: {simpleRebindModifiedAuto + simpleRebindSameAuto + simpleRebindDifferentAuto}");
 				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count} / {simpleRebindModifiedAuto}");
 				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
 				Console.WriteLine($"Same auto: {sameAutoResult.Count} / {simpleRebindSameAuto}");

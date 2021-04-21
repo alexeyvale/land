@@ -331,7 +331,7 @@ namespace Land.Markup.Binding
 				return points.ToDictionary(e => e, e => new List<RemapCandidateInfo>());
 			}
 
-			var checkSiblings = searchType == SearchType.Local;
+			var checkSiblings = searchType == SearchType.Local && !UseNaiveAlgorithm;
 			var checkClosest = searchType == SearchType.Local && !UseNaiveAlgorithm;
 
 			/// Запоминаем соответствие контекстов точкам привязки
@@ -383,7 +383,8 @@ namespace Land.Markup.Binding
 			/// абсолютно идентичные сущности текущего типа
 			if (searchType == SearchType.Local
 				&& PreHeuristic != null 
-				&& !candidates.First().Node.Options.GetNotUnique())
+				&& !candidates.First().Node.Options.GetNotUnique()
+				&& !UseNaiveAlgorithm)
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
@@ -563,8 +564,8 @@ namespace Land.Markup.Binding
 							foreach (var unmappedContext in unmapped)
 							{
 								var itemToRemove = evaluationResults[unmappedContext].Single(e => e.Context == first.Context);
-								evaluationResults[unmappedContext].Remove(itemToRemove);
-								//itemToRemove.Deleted = true;
+								//evaluationResults[unmappedContext].Remove(itemToRemove);
+								itemToRemove.Deleted = true;
 							}
 						}
 					}
