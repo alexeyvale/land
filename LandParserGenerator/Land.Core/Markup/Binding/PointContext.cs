@@ -543,7 +543,7 @@ namespace Land.Markup.Binding
 
 			if (siblingsArgs !=null && core.SiblingsContext == null)
 			{
-				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.CheckAllSiblings, siblingsArgs.ContextFinder);
+				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.ContextFinder);
 
 				#region Old
 				var oldSiblingsContext = GetSiblingsContext_old(node, file);
@@ -851,10 +851,11 @@ namespace Land.Markup.Binding
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
 			ParsedFile file,
-			bool checkAllSiblings,
 			ContextFinder contextFinder,
 			AncestorSiblingsPair pair = null)
 		{
+			var checkAllSiblings = node.Options.GetNotUnique();
+
 			Node parentNode = null;
 			List<Node> siblings = null;
 
@@ -1010,6 +1011,8 @@ namespace Land.Markup.Binding
 				candidates.AddRange(visitor.Grouped[node.Type].Except(new List<Node> { node })
 					.Select(n => new RemapCandidateInfo
 					{
+						Node = n,
+						File = file,
 						Context = contextFinder.ContextManager.GetContext(n, file)
 					})
 				);
@@ -1017,20 +1020,19 @@ namespace Land.Markup.Binding
 
 			#region For simple rebinding
 
-			var mayBeConfused = new List<PointContext>();
+			var mayBeConfused = new List<RemapCandidateInfo>();
 
 			if (!node.Options.GetNotUnique())
 			{
 				mayBeConfused.AddRange(candidates
-					.Select(c => c.Context)
-					.Where(c => c.AncestorsContext.SequenceEqual(nodeContext.AncestorsContext)
-						&& c.HeaderContext.Core.SequenceEqual(nodeContext.HeaderContext.Core))
+					.Where(c => c.Context.AncestorsContext.SequenceEqual(nodeContext.AncestorsContext)
+						&& c.Context.HeaderContext.Core.SequenceEqual(nodeContext.HeaderContext.Core))
 				);
 
 				if (mayBeConfused.Count > 0)
 				{
 					var sameHeader = mayBeConfused
-						.Where(c => c.HeaderContext.NonCore.SequenceEqual(nodeContext.HeaderContext.NonCore))
+						.Where(c => c.Context.HeaderContext.NonCore.SequenceEqual(nodeContext.HeaderContext.NonCore))
 						.ToList();
 
 					if (sameHeader.Count > 0)
@@ -1050,7 +1052,6 @@ namespace Land.Markup.Binding
 				.ThenByDescending(c => c.AncestorSimilarity)
 				.Take(MAX_COUNT)
 				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
-				.Select(c => c.Context)
 				.ToList();
 
 			if (mayBeConfused.Any() && result.Any())
@@ -1065,7 +1066,18 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return result;
+			if (node.Options.GetNotUnique())
+			{
+				foreach (var elem in result)
+				{
+					elem.Context.SiblingsContext = 
+						GetSiblingsContext(elem.Node, elem.File, contextFinder);
+				}
+			}
+
+			return result
+				.Select(e=>e.Context)
+				.ToList();
 		}
 	}
 
@@ -1114,8 +1126,7 @@ namespace Land.Markup.Binding
 	}
 
 	public class SiblingsConstructionArgs 
-	{ 
-		public bool CheckAllSiblings { get; set; }
+	{
 		public ContextFinder ContextFinder { get; set; }
 	}
 

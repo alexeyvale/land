@@ -251,7 +251,6 @@ namespace Land.Markup.Binding
 							{
 								var siblingsArgs = new SiblingsConstructionArgs
 								{
-									CheckAllSiblings = (visitor.Grouped[type].FirstOrDefault()?.Options.GetNotUnique() ?? false),
 									ContextFinder = this
 								};
 
@@ -276,8 +275,7 @@ namespace Land.Markup.Binding
 
 								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
 									n, 
-									currentFile, 
-									siblingsArgs.CheckAllSiblings, 
+									currentFile,
 									siblingsArgs.ContextFinder,
 									pair
 								);

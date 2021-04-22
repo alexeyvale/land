@@ -152,7 +152,6 @@ namespace Land.Markup
 
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
-				CheckAllSiblings = node.Options.GetNotUnique(),
 				ContextFinder = ContextFinder
 			};
 
@@ -209,7 +208,6 @@ namespace Land.Markup
 
 					var subconcernSiblingsArgs = new SiblingsConstructionArgs
 					{
-						CheckAllSiblings = subgroup.First().Options.GetNotUnique(),
 						ContextFinder = ContextFinder
 					};
 
@@ -237,7 +235,6 @@ namespace Land.Markup
 
 				var siblingsArgs = new SiblingsConstructionArgs
 				{
-					CheckAllSiblings = (nodes.FirstOrDefault()?.Options.GetNotUnique() ?? false),
 					ContextFinder = ContextFinder
 				};
 
@@ -297,7 +294,6 @@ namespace Land.Markup
 		{
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
-				CheckAllSiblings = node.Options.GetNotUnique(),
 				ContextFinder = ContextFinder
 			};
 
@@ -659,7 +655,6 @@ namespace Land.Markup
 			{
 				var siblingsArgs = new SiblingsConstructionArgs
 				{
-					CheckAllSiblings = first.Node.Options.GetNotUnique(),
 					ContextFinder = ContextFinder
 				};
 
