@@ -101,6 +101,12 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
+			/// Если отсутствует ядро заголовка
+			if(weights[ContextType.HeaderCore] == 0)
+			{
+				return weights;
+			}
+
 			var maxSimilarityCandidates = candidates.Where(c => c.HeaderCoreSimilarity >= EXCELLENT_THRESHOLD).ToList();
 
 			DefaultWeightsProvider.Init(weights, ContextType.HeaderNonCore);

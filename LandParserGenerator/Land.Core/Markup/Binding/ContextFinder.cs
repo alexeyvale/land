@@ -383,8 +383,7 @@ namespace Land.Markup.Binding
 			/// абсолютно идентичные сущности текущего типа
 			if (searchType == SearchType.Local
 				&& PreHeuristic != null 
-				&& !candidates.First().Node.Options.GetNotUnique()
-				&& !UseNaiveAlgorithm)
+				&& !candidates.First().Node.Options.GetNotUnique())
 			{
 				/// Для каждой точки оцениваем похожесть кандидатов, 
 				/// если находим 100% соответствие, исключаем кандидата из списка
@@ -1195,8 +1194,12 @@ namespace Land.Markup.Binding
 			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
 		public static bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
-			second == null || first.Similarity == 1 && second.Similarity != 1
-				|| 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+			/// Либо у нас один кандидат
+			second == null 
+			/// Либо первый похож на 100%, а второй - нет
+			|| first.Similarity == 1 && second.Similarity != 1
+			/// Либо оба не похожи на 100% и достаточно отстоят друг от друга
+			|| second.Similarity != 1 && 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
 		#endregion
 
