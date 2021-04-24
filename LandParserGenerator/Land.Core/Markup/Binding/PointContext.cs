@@ -361,11 +361,11 @@ namespace Land.Markup.Binding
 
 	public class SiblingsContextPart
 	{
-		public TextOrHash GlobalHash { get; set; }
-		public PointContext Entity { get; set; }
+		public TextOrHash All { get; set; }
+		public List<PointContext> Nearest { get; set; }
 
 		[JsonIgnore]
-		public bool IsNotEmpty => GlobalHash.TextLength > 0;
+		public bool IsNotEmpty => All.TextLength > 0;
 	}
 
 	public class AncestorSiblingsPair
@@ -854,6 +854,8 @@ namespace Land.Markup.Binding
 			ContextFinder contextFinder,
 			AncestorSiblingsPair pair = null)
 		{
+			const int NEIGHBOURS_COUNT = 2;
+
 			var checkAllSiblings = node.Options.GetNotUnique();
 
 			Node parentNode = null;
@@ -885,8 +887,8 @@ namespace Land.Markup.Binding
 				{
 					return new SiblingsContext
 					{
-						After = new SiblingsContextPart { GlobalHash = new TextOrHash() },
-						Before = new SiblingsContextPart { GlobalHash = new TextOrHash() }
+						After = new SiblingsContextPart { All = new TextOrHash() },
+						Before = new SiblingsContextPart { All = new TextOrHash() }
 					};
 				}
 			}
@@ -930,54 +932,67 @@ namespace Land.Markup.Binding
 			siblings.RemoveAt(markedElementIndex);
 
 			var beforeBuilder = new StringBuilder();
-			var beforeSiblings = checkAllSiblings
-				? siblings
-					.Take(markedElementIndex)
-					.Where(n => n.Location != null)
-					.ToList()
-				: new List<Node>();
 
-			foreach (var part in beforeSiblings
-					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
+			if (checkAllSiblings)
 			{
-				beforeBuilder.Append(part);
+				var beforeSiblings = checkAllSiblings
+					? siblings
+						.Take(markedElementIndex)
+						.Where(n => n.Location != null)
+						.ToList()
+					: new List<Node>();
+
+				foreach (var part in beforeSiblings
+						.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
+				{
+					beforeBuilder.Append(part);
+				}
 			}
 			
 			var afterBuilder = new StringBuilder();
-			var afterSiblings = checkAllSiblings
+
+			if (checkAllSiblings)
+			{
+				var afterSiblings = checkAllSiblings
 				? siblings
 					.Skip(markedElementIndex)
 					.Where(n => n.Location != null)
 					.ToList()
 				: new List<Node>();
 
-			foreach (var part in afterSiblings
-					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
-			{
-				afterBuilder.Append(part);
+				foreach (var part in afterSiblings
+						.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
+				{
+					afterBuilder.Append(part);
+				}
 			}
 
-			var beforeNeighbor = siblings
+			var beforeNeighbors = siblings
 				.Take(markedElementIndex)
-				.LastOrDefault(e=>e.Type == node.Type);
-			var afterNeighbour = siblings
+				.Reverse()
+				.Where(e => e.Type == node.Type)
+				.Take(NEIGHBOURS_COUNT)
+				.ToList();
+			var afterNeighbours = siblings
 				.Skip(markedElementIndex + 1)
-				.FirstOrDefault(e => e.Type == node.Type);
+				.Where(e => e.Type == node.Type)
+				.Take(NEIGHBOURS_COUNT)
+				.ToList();
 
 			var context = new SiblingsContext
 			{
 				Before = new SiblingsContextPart {
-					GlobalHash = new TextOrHash(beforeBuilder.ToString()),
-					Entity = beforeNeighbor != null
-						? contextFinder.ContextManager.GetContext(beforeNeighbor, file)
+					All = new TextOrHash(beforeBuilder.ToString()),
+					Nearest = !checkAllSiblings
+						? beforeNeighbors.Select(n => contextFinder.ContextManager.GetContext(n, file)).ToList()
 						: null
 				},
 
 				After = new SiblingsContextPart
 				{
-					GlobalHash = new TextOrHash(afterBuilder.ToString()),
-					Entity = afterNeighbour != null
-						? contextFinder.ContextManager.GetContext(afterNeighbour, file)
+					All = new TextOrHash(afterBuilder.ToString()),
+					Nearest = !checkAllSiblings
+						? afterNeighbours.Select(n => contextFinder.ContextManager.GetContext(n, file)).ToList()
 						: null
 				}
 			};

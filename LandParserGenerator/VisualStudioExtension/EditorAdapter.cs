@@ -285,11 +285,6 @@ namespace Land.VisualStudioExtension
 
 		#endregion
 
-		public void RegisterOnDocumentSaved(Action<string> callback)
-		{
-			return;
-		}
-
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
 			ServiceEventAggregator.Instance.RegisterOnDocumentChanged(callback);

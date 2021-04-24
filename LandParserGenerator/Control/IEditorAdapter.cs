@@ -117,8 +117,6 @@ namespace Land.Control
 
 		#region Callbacks
 
-		void RegisterOnDocumentSaved(Action<string> callback);
-
 		void RegisterOnDocumentChanged(Action<string> callback);
 
 		HashSet<string> GetWorkingSet();

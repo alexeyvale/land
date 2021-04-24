@@ -17,8 +17,8 @@ namespace Land.Markup.Binding
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
 
-		public double SiblingsGlobalSimilarity { get; set; }
-		public double SiblingsRangeSimilarity { get; set; }
+		public double SiblingsAllSimilarity { get; set; }
+		public double SiblingsNearestSimilarity { get; set; }
 
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }
@@ -30,7 +30,12 @@ namespace Land.Markup.Binding
 
 		public override string ToString()
 		{
-			return $"{String.Format("{0:f4}", Similarity)} [H: {String.Format("{0:f2}", HeaderNonCoreSimilarity)}; A: {String.Format("{0:f2}", AncestorSimilarity)}; I: {String.Format("{0:f2}", InnerSimilarity)}]";
+			return $"{String.Format("{0:f4}", Similarity)} [Core(H): {String.Format("{0:f2}", HeaderCoreSimilarity)}; " +
+				$"NotCore(H): {String.Format("{0:f2}", HeaderNonCoreSimilarity)}; " +
+				$"A: {String.Format("{0:f2}", AncestorSimilarity)}; " +
+				$"I: {String.Format("{0:f2}", InnerSimilarity)}; " +
+				$"All(N): {String.Format("{0:f2}", SiblingsAllSimilarity)}; " +
+				$"Nearest(N): {String.Format("{0:f2}", SiblingsNearestSimilarity)}]";
 		}
 	}
 }

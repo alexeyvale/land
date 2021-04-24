@@ -195,8 +195,7 @@ namespace Comparison
 									$"HNC={modifiedRemapResult[cp][0].Weights[ContextType.HeaderNonCore]:0.00};  " +
 									$"I={modifiedRemapResult[cp][0].Weights[ContextType.Inner]:0.00};  " +
 									$"A={modifiedRemapResult[cp][0].Weights[ContextType.Ancestors]:0.00};  " +
-									$"SG={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsGlobal]:0.00}; " +
-									$"SR={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsRange]:0.00}");
+									$"SG={modifiedRemapResult[cp][0].Weights[ContextType.SiblingsAll]:0.00}");
 							}
 						}
 
@@ -205,7 +204,7 @@ namespace Comparison
 							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence_old)}     {landCandidate.Context.Line}");
 							reportLines.Add($"\t{landCandidate.Similarity:0.000}  [HC={landCandidate.HeaderCoreSimilarity:0.00};  HNC={landCandidate.HeaderNonCoreSimilarity:0.00};  " +
 								$"I={landCandidate.InnerSimilarity:0.00};  A={landCandidate.AncestorSimilarity:0.00};  " +
-								$"SG={landCandidate.SiblingsGlobalSimilarity:0.00}; SR={landCandidate.SiblingsRangeSimilarity:0.00}] " +
+								$"SG={landCandidate.SiblingsAllSimilarity:0.00}; SR={landCandidate.SiblingsNearestSimilarity:0.00}] " +
 								$"{(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
 						}
 						reportLines.Add("");

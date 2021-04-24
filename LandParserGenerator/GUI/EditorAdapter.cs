@@ -280,11 +280,6 @@ namespace Land.GUI
 			);
 		}
 
-		public void RegisterOnDocumentSaved(Action<string> callback)
-		{
-			throw new NotImplementedException();
-		}
-
 		#endregion
 
 		#region methods

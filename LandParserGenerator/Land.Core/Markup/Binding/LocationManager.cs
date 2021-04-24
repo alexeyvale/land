@@ -10,8 +10,8 @@ namespace Land.Markup.Binding
 		{
 			public int Index { get; set; }
 
-			public int? IndexBefore { get; set; }
-			public int? IndexAfer { get; set; }
+			public int? CountBefore { get; set; }
+			public int? CountAfter { get; set; }
 			public int OffsetBefore { get; set; }
 			public int OffsetAfter { get; set; }
 			public bool ImmediateBeforeFound { get; set; }
@@ -36,8 +36,8 @@ namespace Land.Markup.Binding
 					Index = e.i, 
 					OffsetBefore = 0, 
 					OffsetAfter = targetFileLength,
-					ImmediateAfterFound = e.e.SiblingsContext?.After.Entity == null,
-					ImmediateBeforeFound = e.e.SiblingsContext?.Before.Entity == null,
+					ImmediateAfterFound = e.e.SiblingsContext?.After.Nearest.Count == 0,
+					ImmediateBeforeFound = e.e.SiblingsContext?.Before.Nearest.Count == 0,
 				});
 		}
 
@@ -55,10 +55,10 @@ namespace Land.Markup.Binding
 				{
 					if (currentContext.OffsetBefore <= target.StartOffset)
 					{
-						currentContext.IndexAfer = ContextToLineInfo[source].Index;
+						currentContext.CountAfter = ContextToLineInfo.Count - ContextToLineInfo[source].Index;
 						currentContext.OffsetAfter = target.StartOffset;
 						currentContext.ImmediateAfterFound |=
-							ContextsOrderedByLine[i]?.SiblingsContext?.After.Entity == source;
+							(ContextsOrderedByLine[i]?.SiblingsContext?.After.Nearest.Contains(source) ?? false);
 
 						UpdateSimilarity(ContextsOrderedByLine[i]);
 					}
@@ -77,10 +77,10 @@ namespace Land.Markup.Binding
 				{
 					if (currentContext.OffsetAfter >= target.EndOffset)
 					{
-						currentContext.IndexBefore = ContextToLineInfo[source].Index;
+						currentContext.CountBefore = ContextToLineInfo[source].Index + 1;
 						currentContext.OffsetBefore = target.EndOffset;
 						currentContext.ImmediateBeforeFound |=
-							ContextsOrderedByLine[i]?.SiblingsContext?.Before.Entity == source;
+							(ContextsOrderedByLine[i]?.SiblingsContext?.Before.Nearest.Contains(source) ?? false);
 
 						UpdateSimilarity(ContextsOrderedByLine[i]);
 					}
@@ -118,8 +118,8 @@ namespace Land.Markup.Binding
 			{
 				var step = 0.8 / (beforeCount + afterCount);
 
-				ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].IndexBefore ?? 0)
-						+ step * (ContextToLineInfo.Count - (ContextToLineInfo[source].IndexAfer ?? ContextToLineInfo.Count))
+				ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].CountBefore ?? 0)
+						+ step * (ContextToLineInfo[source].CountAfter ?? 0)
 						+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
 						+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0);
 			}

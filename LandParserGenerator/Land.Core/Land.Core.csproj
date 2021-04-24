@@ -99,7 +99,6 @@
     <Compile Include="Markup\Binding\Munkres.cs" />
     <Compile Include="Markup\Binding\PointContextManager.cs" />
     <Compile Include="Markup\Binding\Models\AncestorCacheElement.cs" />
-    <Compile Include="Markup\Binding\Models\SiblingsSearchResult.cs" />
     <Compile Include="Markup\Binding\Models\RemapCandidateInfo.cs" />
     <Compile Include="Markup\Binding\FuzzyHashing.cs" />
     <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />

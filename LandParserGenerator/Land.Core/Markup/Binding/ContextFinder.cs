@@ -15,8 +15,7 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		SiblingsGlobal,
-		SiblingsRange
+		SiblingsAll
 	}
 
 	public class ContextFinder
@@ -348,14 +347,14 @@ namespace Land.Markup.Binding
 			{
 				foreach(var context in contextsToPoints.Keys)
 				{
-					if(context.SiblingsContext.Before.Entity != null)
+					if(context.SiblingsContext.Before.Nearest.Any())
 					{
-						auxiliaryContexts.Add(context.SiblingsContext.Before.Entity);
+						auxiliaryContexts.AddRange(context.SiblingsContext.Before.Nearest);
 					}
 
-					if (context.SiblingsContext.After.Entity != null)
+					if (context.SiblingsContext.After.Nearest.Any())
 					{
-						auxiliaryContexts.Add(context.SiblingsContext.After.Entity);
+						auxiliaryContexts.AddRange(context.SiblingsContext.After.Nearest);
 					}
 				}
 			}
@@ -628,6 +627,7 @@ namespace Land.Markup.Binding
 			bool checkSiblings)
 		{
 			var actualCandidates = candidates.Where(c => !c.Deleted).ToList();
+			var checkAllSiblings = checkSiblings && (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false);
 
 			Parallel.ForEach(
 				actualCandidates,
@@ -637,15 +637,17 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings && point.SiblingsContext != null)
 					{
-						c.SiblingsGlobalSimilarity = EvalSimilarity(
-							point.SiblingsContext,
-							c.Context.SiblingsContext
-						);
-
-						if (point.SiblingsContext.Before.Entity != null
-							|| point.SiblingsContext.After.Entity != null)
+						if (checkAllSiblings)
 						{
-							c.SiblingsRangeSimilarity = LocationManager.GetSimilarity(point, c.Context);
+							c.SiblingsAllSimilarity = EvalSimilarity(
+								point.SiblingsContext,
+								c.Context.SiblingsContext
+							);
+						}
+						else
+						{
+							c.SiblingsNearestSimilarity =
+								LocationManager.GetSimilarity(point, c.Context);
 						}
 					}
 				}
@@ -691,8 +693,7 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.SiblingsGlobal] * c.SiblingsGlobalSimilarity
-						+ finalWeights[ContextType.SiblingsRange] * c.SiblingsRangeSimilarity)
+						+ finalWeights[ContextType.SiblingsAll] * c.SiblingsAllSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
@@ -854,7 +855,7 @@ namespace Land.Markup.Binding
 
 			ComputeContextSimilarities(point.Context, candidates, true);
 
-			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsGlobalSimilarity = 1 };
+			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsAllSimilarity = 1 };
 			var otherElements = new List<RemapCandidateInfo>(candidates);
 			candidates.Add(changedElement);
 
@@ -969,16 +970,16 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(SiblingsContext a, SiblingsContext b)
 		{
-			if (a.Before.GlobalHash.TextLength == 0 && a.After.GlobalHash.TextLength == 0)
+			if (a.Before.All.TextLength == 0 && a.After.All.TextLength == 0)
 			{
-				return b.Before.GlobalHash.TextLength == 0 && b.After.GlobalHash.TextLength == 0 ? 1 : 0;
+				return b.Before.All.TextLength == 0 && b.After.All.TextLength == 0 ? 1 : 0;
 			}
 
-			var beforeSimilarity = EvalSimilarity(a.Before.GlobalHash, b.Before.GlobalHash);
-			var afterSimilarity = EvalSimilarity(a.After.GlobalHash, b.After.GlobalHash);
+			var beforeSimilarity = EvalSimilarity(a.Before.All, b.Before.All);
+			var afterSimilarity = EvalSimilarity(a.After.All, b.After.All);
 
-			return (beforeSimilarity * a.Before.GlobalHash.TextLength + afterSimilarity * a.After.GlobalHash.TextLength) /
-				(double)(a.Before.GlobalHash.TextLength + a.After.GlobalHash.TextLength);
+			return (beforeSimilarity * a.Before.All.TextLength + afterSimilarity * a.After.All.TextLength) /
+				(double)(a.Before.All.TextLength + a.After.All.TextLength);
 		}
 
 		#endregion
@@ -1256,7 +1257,7 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings)
 					{
-						c.SiblingsGlobalSimilarity =
+						c.SiblingsAllSimilarity =
 							(EvalSimilarity_old(point.SiblingsLeftContext_old, c.Context.SiblingsLeftContext_old)
 							+ EvalSimilarity_old(point.SiblingsRightContext_old, c.Context.SiblingsRightContext_old)) / 2.0;
 					}
