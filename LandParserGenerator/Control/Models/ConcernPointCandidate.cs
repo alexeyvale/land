@@ -28,7 +28,7 @@ namespace Land.Control
 		{
 			Node = node;
 			ViewHeader = String.Join(" ",
-				PointContext.GetHeaderContext(node).Sequence.Select(c => String.Join("", c.Value.Select(w=>w.Text)))
+				String.Join(" ", PointContext.GetHeaderContext(node).Sequence_old)
 			);
 		}
 	}

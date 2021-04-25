@@ -69,8 +69,9 @@ namespace Land.Markup.Binding
 					|| source.HeaderContext.NonCore.Count > 0,
 				[ContextType.Ancestors] = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
 					|| source.AncestorsContext.Count > 0),
-				[ContextType.Siblings] = source.SiblingsContext?.Before.All.TextLength > 0
-					|| source.SiblingsContext?.After.All.TextLength > 0
+				[ContextType.Siblings] = (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)
+					&& (source.SiblingsContext?.Before.All.TextLength > 0
+					|| source.SiblingsContext?.After.All.TextLength > 0)
 			};
 
 			foreach (var kvp in existenceFlags)
@@ -227,7 +228,8 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if (weights[ContextType.Siblings].HasValue) return weights;
+			if (weights[ContextType.Siblings].HasValue
+				|| !(candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)) return weights;
 
 			if (candidates.Count > 0)
 			{
@@ -288,10 +290,7 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if(!(candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false))
-			{
-				return weights;
-			}
+			if(!(candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)) return weights;
 
 			if (source.SiblingsContext != null)
 			{
