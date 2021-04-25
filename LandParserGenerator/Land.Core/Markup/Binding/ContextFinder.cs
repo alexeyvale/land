@@ -15,7 +15,7 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		SiblingsAll
+		Siblings
 	}
 
 	public class ContextFinder
@@ -329,6 +329,7 @@ namespace Land.Markup.Binding
 			}
 
 			var checkSiblings = searchType == SearchType.Local && !UseNaiveAlgorithm;
+			var checkAllSiblings = checkSiblings && (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false);
 			var checkClosest = searchType == SearchType.Local && !UseNaiveAlgorithm;
 
 			/// Запоминаем соответствие контекстов точкам привязки
@@ -347,12 +348,12 @@ namespace Land.Markup.Binding
 			{
 				foreach(var context in contextsToPoints.Keys)
 				{
-					if(context.SiblingsContext.Before.Nearest.Any())
+					if(context.SiblingsContext.Before.Nearest != null)
 					{
 						auxiliaryContexts.AddRange(context.SiblingsContext.Before.Nearest);
 					}
 
-					if (context.SiblingsContext.After.Nearest.Any())
+					if (context.SiblingsContext.After.Nearest != null)
 					{
 						auxiliaryContexts.AddRange(context.SiblingsContext.After.Nearest);
 					}
@@ -363,11 +364,14 @@ namespace Land.Markup.Binding
 				.Except(contextsToPoints.Keys)
 				.ToList();
 
-			/// Запоминаем, каким элементам какой элемент предшествовал
-			LocationManager = new LocationManager(
-				contextsToPoints.Keys.Concat(auxiliaryContexts), 
-				candidates.First().Context.FileContext.Length
-			);
+			if (!checkAllSiblings)
+			{
+				/// Запоминаем, каким элементам какой элемент предшествовал
+				LocationManager = new LocationManager(
+					contextsToPoints.Keys.Concat(auxiliaryContexts),
+					candidates.First().Context.FileContext.Length
+				);
+			}
 
 			/// Результаты поиска элемента, которые вернём пользователю
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -406,7 +410,7 @@ namespace Land.Markup.Binding
 							}
 						}
 
-						LocationManager.Mapped(pointContext, perfectMatch.Context);
+						LocationManager?.Mapped(pointContext, perfectMatch.Context);
 					}
 				}
 			}
@@ -541,7 +545,7 @@ namespace Land.Markup.Binding
 
 							if (!UseNaiveAlgorithm)
 							{
-								LocationManager.Mapped(context, first.Context);
+								LocationManager?.Mapped(context, first.Context);
 
 								foreach (var unmappedContext in unmapped)
 								{
@@ -639,14 +643,14 @@ namespace Land.Markup.Binding
 					{
 						if (checkAllSiblings)
 						{
-							c.SiblingsAllSimilarity = EvalSimilarity(
+							c.SiblingsSimilarity = EvalSimilarity(
 								point.SiblingsContext,
 								c.Context.SiblingsContext
 							);
 						}
 						else
 						{
-							c.SiblingsNearestSimilarity =
+							c.SiblingsSimilarity =
 								LocationManager.GetSimilarity(point, c.Context);
 						}
 					}
@@ -693,7 +697,7 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.SiblingsAll] * c.SiblingsAllSimilarity)
+						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
@@ -855,7 +859,7 @@ namespace Land.Markup.Binding
 
 			ComputeContextSimilarities(point.Context, candidates, true);
 
-			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsAllSimilarity = 1 };
+			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsSimilarity = 1 };
 			var otherElements = new List<RemapCandidateInfo>(candidates);
 			candidates.Add(changedElement);
 
@@ -1257,7 +1261,7 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings)
 					{
-						c.SiblingsAllSimilarity =
+						c.SiblingsSimilarity =
 							(EvalSimilarity_old(point.SiblingsLeftContext_old, c.Context.SiblingsLeftContext_old)
 							+ EvalSimilarity_old(point.SiblingsRightContext_old, c.Context.SiblingsRightContext_old)) / 2.0;
 					}

@@ -27,15 +27,14 @@ namespace Land.Markup
 
 			ContextFinder.SetHeuristic(typeof(EmptyContextHeuristic));
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAsFrequentlyChanging));
-			ContextFinder.SetHeuristic(typeof(TuneSiblingsAllWeightAsFrequentlyChanging));
-			///ContextFinder.SetHeuristic(typeof(TuneSiblingsRangeWeightAsFrequentlyChanging));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAsFrequentlyChanging));
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAccordingToLength));
-			ContextFinder.SetHeuristic(typeof(TuneSiblingsAllWeightAccordingToLength));
+			ContextFinder.SetHeuristic(typeof(TuneSiblingsWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneAncestorsWeight));
 			ContextFinder.SetHeuristic(typeof(TuneHeaderWeightIfSimilar));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
 
-			ContextFinder.SetHeuristic(typeof(TuneSimilarityByNeighbours));
+			//ContextFinder.SetHeuristic(typeof(TuneSimilarityByNeighbours));
 
 			#endregion
 		}

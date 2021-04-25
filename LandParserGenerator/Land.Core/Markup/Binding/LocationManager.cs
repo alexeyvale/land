@@ -111,17 +111,19 @@ namespace Land.Markup.Binding
 
 		private void UpdateSimilarity(PointContext source)
 		{
+			const double MATCHED_RATIO = 0.75;
+
 			var beforeCount = ContextToLineInfo[source].Index;
 			var afterCount = ContextToLineInfo.Count - ContextToLineInfo[source].Index - 1;
 
 			if (beforeCount > 0 || afterCount > 0)
 			{
-				var step = 0.8 / (beforeCount + afterCount);
+				var step = 1 / MATCHED_RATIO * (beforeCount + afterCount);
 
-				ContextToLineInfo[source].LocationSimilarity = step * (ContextToLineInfo[source].CountBefore ?? 0)
-						+ step * (ContextToLineInfo[source].CountAfter ?? 0)
-						+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
-						+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0);
+				ContextToLineInfo[source].LocationSimilarity = Math.Min(1, step * (ContextToLineInfo[source].CountBefore ?? 0)
+						+ step * (ContextToLineInfo[source].CountAfter ?? 0));
+						//+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
+						//+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0));
 			}
 			else
 			{
