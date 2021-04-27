@@ -15,7 +15,8 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings
+		SiblingsAll,
+		SiblingsNearest
 	}
 
 	public class ContextFinder
@@ -643,14 +644,14 @@ namespace Land.Markup.Binding
 					{
 						if (checkAllSiblings)
 						{
-							c.SiblingsSimilarity = EvalSimilarity(
+							c.SiblingsAllSimilarity = EvalSimilarity(
 								point.SiblingsContext,
 								c.Context.SiblingsContext
 							);
 						}
 						else
 						{
-							c.SiblingsSimilarity =
+							c.SiblingsNearestSimilarity =
 								LocationManager.GetSimilarity(point, c.Context);
 						}
 					}
@@ -697,7 +698,8 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
+						+ finalWeights[ContextType.SiblingsAll] * c.SiblingsAllSimilarity
+						+ finalWeights[ContextType.SiblingsNearest] * c.SiblingsNearestSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
@@ -835,107 +837,6 @@ namespace Land.Markup.Binding
 
 		public bool AreFilesSimilarEnough(FileContext a, FileContext b) =>
 			EvalSimilarity(a.Content, b.Content) > FILE_SIMILARITY_THRESHOLD;
-
-		public double GetBindingQualityScore(ConcernPoint point, ParsedFile file)
-		{
-			var siblingsArgs = new SiblingsConstructionArgs();
-			var heuristic = new ProgrammingLanguageHeuristic();
-			var visitor = new GroupNodesByTypeVisitor(new List<string> { point.Context.Type });
-			file.Root.Accept(visitor);
-
-			var candidates = visitor.Grouped[point.Context.Type]
-				.Except(new List<Node> { point.AstNode })
-				.Select(n => new RemapCandidateInfo
-				{
-					Context = ContextManager.GetContext(n, file, siblingsArgs, null)
-				})
-				.ToList();
-
-			var closest = point.Context.ClosestContext
-				.Select(c => heuristic.GetSameElement(c, candidates))
-				.ToList();
-
-			candidates = candidates.Except(closest).ToList();
-
-			ComputeContextSimilarities(point.Context, candidates, true);
-
-			var changedElement = new RemapCandidateInfo { AncestorSimilarity = 1, SiblingsSimilarity = 1 };
-			var otherElements = new List<RemapCandidateInfo>(candidates);
-			candidates.Add(changedElement);
-
-			var headerCoreStep = point.Context.HeaderContext.Core.Count > 0 ? 0.05 : 1.0;
-			var headerNonCoreStep = point.Context.HeaderContext.NonCore.Count > 0 ? 0.05 : 1.0;
-			var innerStep = point.Context.InnerContext.Content.TextLength > 0 ? 0.05 : 1.0;
-			var successCount = 0;
-
-			for (var headerCoreSimilarity = 1.0; headerCoreSimilarity >= 0; headerCoreSimilarity -= headerCoreStep)
-			{
-				for (var headerNonCoreSimilarity = 1.0; headerNonCoreSimilarity >= 0; headerNonCoreSimilarity -= headerNonCoreStep)
-				{
-					for (var innerSimilarity = 1.0; innerSimilarity >= 0; innerSimilarity -= innerStep)
-					{
-						foreach(var c in candidates)
-						{
-							c.Similarity = null;
-						}
-
-						changedElement.HeaderCoreSimilarity = headerCoreSimilarity;
-						changedElement.HeaderNonCoreSimilarity = headerNonCoreSimilarity;
-						changedElement.InnerSimilarity = innerSimilarity;
-
-						/// Эмуляция базового правила перепривязки
-						if(changedElement.HeaderCoreSimilarity == 1)
-						{
-							if(otherElements.All(c=>c.HeaderCoreSimilarity < 1))
-							{
-								++successCount;
-								continue;
-							}
-							else
-							{
-								if (changedElement.HeaderNonCoreSimilarity == 1)
-								{
-									if (otherElements.All(c => c.HeaderNonCoreSimilarity < 1))
-									{
-										++successCount;
-										continue;
-									}
-									else
-									{
-										if (changedElement.InnerSimilarity == 1)
-										{
-											if (otherElements.All(c => c.InnerSimilarity < 1))
-											{
-												++successCount;
-												continue;
-											}
-										}
-									}
-								}
-							}
-						}
-
-						ComputeTotalSimilarities(point.Context, candidates);
-						var ordered = candidates.OrderByDescending(c => c.Similarity).ToList();
-
-						if (ordered.Count > 0)
-						{
-							var first = ordered[0];
-							var second = ordered.Count > 1 ? ordered[1] : null;
-
-							if (first == changedElement
-								&& IsSimilarEnough(first)
-								&& (second == null || AreDistantEnough(first, second)))
-							{
-								++successCount;
-							}
-						}
-					}
-				}
-			}
-
-			return successCount / (1 / (headerCoreStep * headerNonCoreStep * innerStep)) * 100;
-		}
 
 		#region EvalSimilarity
 
@@ -1204,6 +1105,10 @@ namespace Land.Markup.Binding
 			/// Либо оба не похожи на 100% и достаточно отстоят друг от друга
 			|| second.Similarity != 1 && 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
 
+		public static bool AreDistantEnough(double first, double second) =>
+			first == 1 && second != 1
+			|| second != 1 && 1 - second >= (1 - first) * SECOND_DISTANCE_GAP_COEFFICIENT;
+
 		#endregion
 
 		#region Old
@@ -1253,15 +1158,18 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			bool checkSiblings)
 		{
+			var checkAllSiblings = checkSiblings
+				&& (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false);
+
 			Parallel.ForEach(
 				candidates,
 				c =>
 				{
 					ComputeCoreSimilarities_old(point, c);
 
-					if (checkSiblings)
+					if (checkAllSiblings)
 					{
-						c.SiblingsSimilarity =
+						c.SiblingsAllSimilarity =
 							(EvalSimilarity_old(point.SiblingsLeftContext_old, c.Context.SiblingsLeftContext_old)
 							+ EvalSimilarity_old(point.SiblingsRightContext_old, c.Context.SiblingsRightContext_old)) / 2.0;
 					}
