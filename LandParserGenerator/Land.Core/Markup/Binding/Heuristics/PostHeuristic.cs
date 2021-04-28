@@ -90,8 +90,8 @@ namespace Land.Markup.Binding
 
 	public class TuneHeaderWeightIfSimilar : IWeightsHeuristic
 	{
-		const double GARBAGE_THRESHOLD = 0.4;
-		const double EXCELLENT_THRESHOLD = 0.9;
+		const double BAD_SIM = 0.4;
+		const double GOOD_SIM = 0.9;
 		const double INDENT = 0.1;
 
 		public Dictionary<ContextType, double?> TuneWeights(
@@ -107,22 +107,12 @@ namespace Land.Markup.Binding
 			var orderedByCore = candidates
 				.OrderByDescending(c => c.HeaderCoreSimilarity)
 				.ToList();
-			var orderedByNonCore = candidates
-				.OrderByDescending(c => c.HeaderCoreSimilarity)
-				.ToList();
-
 			var maxCoreSim = orderedByCore[0].HeaderCoreSimilarity;
-			var maxNonCoreSim = orderedByNonCore[0].HeaderNonCoreSimilarity;
 
 			/// Повышаем вес ядра, если есть кандидаты с высокой его похожестью
-			weights[ContextType.HeaderCore] = maxCoreSim >= EXCELLENT_THRESHOLD ? 4 
-				: maxCoreSim <= EXCELLENT_THRESHOLD - INDENT ? 2 
-					: 4 - 2 * (EXCELLENT_THRESHOLD - maxCoreSim) / INDENT;
-
+			weights[ContextType.HeaderCore] = 4 - 2 * Math.Max(0, Math.Min(1, (GOOD_SIM - maxCoreSim) /INDENT));
 			/// При сильно непохожем ядре бессмысленно рассматривать остальной заголовок
-			weights[ContextType.HeaderNonCore] = maxCoreSim < GARBAGE_THRESHOLD ? 0 
-				: maxCoreSim < GARBAGE_THRESHOLD + INDENT ? (maxCoreSim - GARBAGE_THRESHOLD) / INDENT 
-					: 1;
+			weights[ContextType.HeaderNonCore] = Math.Max(0, Math.Min(1, (maxCoreSim - BAD_SIM) / INDENT));
 
 			/// Уменьшаем вес ядра, если по нему кандидаты плохо разделяются
 			if (candidates.Count > 1)
@@ -136,13 +126,6 @@ namespace Land.Markup.Binding
 				if (orderedByCore[1].HeaderNonCoreSimilarity != orderedByCore[0].HeaderNonCoreSimilarity)
 				{
 					weights[ContextType.HeaderNonCore] *= 4 - 1.5 * coreDifferenceCoeff;
-				}
-			}
-			else if (candidates.Count > 1 && maxCoreSim == orderedByCore[1].HeaderCoreSimilarity)
-			{
-				if (orderedByCore[1].HeaderNonCoreSimilarity != orderedByCore[0].HeaderNonCoreSimilarity)
-				{
-					weights[ContextType.HeaderNonCore] = 4;
 				}
 			}
 
@@ -162,7 +145,9 @@ namespace Land.Markup.Binding
 			if(weights[ContextType.Ancestors].HasValue) return weights;
 
 			var distinctSimilarities = candidates.Select(c => c.AncestorSimilarity)
-				.Distinct().OrderByDescending(e=>e).ToList();
+				.Distinct()
+				.OrderByDescending(e=>e)
+				.ToList();
 
 			if (distinctSimilarities.Count == 1)
 			{
@@ -171,7 +156,14 @@ namespace Land.Markup.Binding
 			}
 			else
 			{
-				weights[ContextType.Ancestors] = Math.Min(2, (1 - distinctSimilarities[1]) / (1 - distinctSimilarities[0]));
+				if (distinctSimilarities[0] == 1)
+				{
+					weights[ContextType.Ancestors] = 2;
+				}
+				else
+				{
+					weights[ContextType.Ancestors] = Math.Min(2, (1 - distinctSimilarities[1]) / (1 - distinctSimilarities[0]));
+				}
 			}
 
 			return weights;
@@ -232,14 +224,14 @@ namespace Land.Markup.Binding
 			RemapCandidateInfo c,
 			Dictionary<ContextType, double?> weights)
 		{
-			return (weights[ContextType.Ancestors].Value * c.AncestorSimilarity
-				+ weights[ContextType.Inner].Value * c.InnerSimilarity
-				+ weights[ContextType.HeaderNonCore].Value * c.HeaderNonCoreSimilarity
-				+ weights[ContextType.HeaderCore].Value * c.HeaderCoreSimilarity)
-				/ (weights[ContextType.Ancestors].Value
-					+ weights[ContextType.Inner].Value
-					+ weights[ContextType.HeaderNonCore].Value
-					+ weights[ContextType.HeaderCore].Value);
+			return ((weights[ContextType.Ancestors] ?? DefaultWeightsProvider.Get(ContextType.Ancestors)) * c.AncestorSimilarity
+				+ (weights[ContextType.Inner] ?? DefaultWeightsProvider.Get(ContextType.Inner)) * c.InnerSimilarity
+				+ (weights[ContextType.HeaderNonCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderNonCore)) * c.HeaderNonCoreSimilarity
+				+ (weights[ContextType.HeaderCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderCore)) * c.HeaderCoreSimilarity)
+				/ ((weights[ContextType.Ancestors] ?? DefaultWeightsProvider.Get(ContextType.Ancestors))
+					+ (weights[ContextType.Inner] ?? DefaultWeightsProvider.Get(ContextType.Inner))
+					+ (weights[ContextType.HeaderNonCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderNonCore))
+					+ (weights[ContextType.HeaderCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderCore)));
 		}
 
 		public Dictionary<ContextType, double?> TuneWeights(
@@ -293,7 +285,7 @@ namespace Land.Markup.Binding
 
 						weights[ContextType.SiblingsNearest] = maxTotalSimilarity <= 0.6 ? 0
 							: maxTotalSimilarity >= 0.8 ? 2
-							: 2 - 2 * (0.6 - maxTotalSimilarity) / 0.2;
+								: 2 - 2 * (maxTotalSimilarity - 0.6) / 0.2;
 					}
 					else
 					{
