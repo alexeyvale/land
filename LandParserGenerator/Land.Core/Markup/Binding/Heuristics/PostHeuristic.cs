@@ -126,6 +126,13 @@ namespace Land.Markup.Binding
 				if (orderedByCore[1].HeaderNonCoreSimilarity != orderedByCore[0].HeaderNonCoreSimilarity)
 				{
 					weights[ContextType.HeaderNonCore] *= 4 - 1.5 * coreDifferenceCoeff;
+
+					//var maxNotCoreSim = Math.Max(orderedByCore[1].HeaderNonCoreSimilarity, orderedByCore[0].HeaderNonCoreSimilarity);
+					//var minNotCoreSim = Math.Min(orderedByCore[1].HeaderNonCoreSimilarity, orderedByCore[0].HeaderNonCoreSimilarity);
+
+					//var nonCoreDifferenceCoeff = maxNotCoreSim < 1 ? Math.Min(2, (1 - minNotCoreSim) / (1 - maxNotCoreSim)) : 2;
+
+					//weights[ContextType.HeaderNonCore] *= 1 + 1.5 * nonCoreDifferenceCoeff;
 				}
 			}
 
@@ -156,14 +163,8 @@ namespace Land.Markup.Binding
 			}
 			else
 			{
-				if (distinctSimilarities[0] == 1)
-				{
-					weights[ContextType.Ancestors] = 2;
-				}
-				else
-				{
-					weights[ContextType.Ancestors] = Math.Min(2, (1 - distinctSimilarities[1]) / (1 - distinctSimilarities[0]));
-				}
+				weights[ContextType.Ancestors] = distinctSimilarities[0] == 1 ? 2 
+					: Math.Min(2, (1 - distinctSimilarities[1]) / (1 - distinctSimilarities[0]));
 			}
 
 			return weights;
@@ -283,9 +284,7 @@ namespace Land.Markup.Binding
 						var maxTotalSimilarity = bestLocation
 							.Max(c => ComputeTotalSimilarity(c, weights));
 
-						weights[ContextType.SiblingsNearest] = maxTotalSimilarity <= 0.6 ? 0
-							: maxTotalSimilarity >= 0.8 ? 2
-								: 2 - 2 * (maxTotalSimilarity - 0.6) / 0.2;
+						weights[ContextType.SiblingsNearest] = 2 * Math.Max(0, Math.Min(1, (maxTotalSimilarity - 0.7) / 0.1));
 					}
 					else
 					{
