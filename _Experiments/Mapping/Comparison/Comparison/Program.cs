@@ -112,7 +112,7 @@ namespace Comparison
 
 			searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
-			Console.WriteLine("Remapping...");
+			Console.WriteLine("Rebinding...");
 
 			var report = new StreamWriter("report.txt");
 
@@ -120,13 +120,13 @@ namespace Comparison
 			markupManager.ContextFinder.UseNaiveAlgorithm = false;
 			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
 			var modifiedRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
-			Console.WriteLine($"Modified remapping done in {DateTime.Now - start}");
+			Console.WriteLine($"Modified rebinding done in {DateTime.Now - start}");
 
 			start = DateTime.Now;
 			markupManager.ContextFinder.UseNaiveAlgorithm = true;
 			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
 			var basicRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
-			Console.WriteLine($"Base remapping done in {DateTime.Now - start}");
+			Console.WriteLine($"Base rebinding done in {DateTime.Now - start}");
 
 			foreach (var key in entityTypes)
 			{
@@ -179,7 +179,7 @@ namespace Comparison
 						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence_old)}     {cp.Context.Line}");
 						reportLines.Add("*");
 
-						foreach (var landCandidate in basicRemapResult[cp].Take(7))
+						foreach (var landCandidate in basicRemapResult[cp].Take(7).OrderBy(r=>r.Deleted))
 						{
 							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence_old)}     {landCandidate.Context.Line}");
 							reportLines.Add($"\t{landCandidate.Similarity:0.000}  [HC={landCandidate.HeaderCoreSimilarity:0.00};  H={landCandidate.HeaderNonCoreSimilarity:0.00};  I={landCandidate.InnerSimilarity:0.00};  A={landCandidate.AncestorSimilarity:0.00}] {(landCandidate.IsAuto ? "*" : (landCandidate.Deleted ? "#" : ""))}");
@@ -200,7 +200,7 @@ namespace Comparison
 							}
 						}
 
-						foreach (var landCandidate in modifiedRemapResult[cp].Take(7))
+						foreach (var landCandidate in modifiedRemapResult[cp].Take(7).OrderBy(r => r.Deleted))
 						{
 							reportLines.Add($"{String.Join(" ", landCandidate.Context.HeaderContext.Sequence_old)}     {landCandidate.Context.Line}");
 							reportLines.Add($"\t{landCandidate.Similarity:0.000}  [HC={landCandidate.HeaderCoreSimilarity:0.00};  HNC={landCandidate.HeaderNonCoreSimilarity:0.00};  " +
@@ -319,10 +319,10 @@ namespace Comparison
 
 				Console.WriteLine($"Total: {pointsOfType.Count}");
 				Console.WriteLine($"Simple rebinding: {simpleRebindModifiedAuto + simpleRebindSameAuto + simpleRebindDifferentAuto}");
-				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count} / {simpleRebindModifiedAuto}");
+				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");
 				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");
-				Console.WriteLine($"Same auto: {sameAutoResult.Count} / {simpleRebindSameAuto}");
-				Console.WriteLine($"Different auto: {differentAutoResult.Count} / {simpleRebindDifferentAuto}");
+				Console.WriteLine($"Same auto: {sameAutoResult.Count}");
+				Console.WriteLine($"Different auto: {differentAutoResult.Count}");
 				Console.WriteLine($"Same first: {sameFirstPos.Count}");
 				Console.WriteLine($"Different first: {differentFirstPos.Count}");
 				Console.WriteLine($"'{key}' done!");

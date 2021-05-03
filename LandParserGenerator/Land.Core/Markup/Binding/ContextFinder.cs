@@ -351,12 +351,12 @@ namespace Land.Markup.Binding
 				{
 					if(context.SiblingsContext.Before.Nearest != null)
 					{
-						auxiliaryContexts.AddRange(context.SiblingsContext.Before.Nearest);
+						auxiliaryContexts.Add(context.SiblingsContext.Before.Nearest);
 					}
 
 					if (context.SiblingsContext.After.Nearest != null)
 					{
-						auxiliaryContexts.AddRange(context.SiblingsContext.After.Nearest);
+						auxiliaryContexts.Add(context.SiblingsContext.After.Nearest);
 					}
 				}
 			}
@@ -1019,6 +1019,8 @@ namespace Land.Markup.Binding
 
 		private double Levenshtein(string a, string b, bool areWords = false)
 		{
+			const double WORD_SIM_THRESHOLD = 0.8;
+
 			if (a.Length == 0 ^ b.Length == 0)
 				return 0;
 			if (a.Length == 0 && b.Length == 0)
@@ -1067,8 +1069,8 @@ namespace Land.Markup.Binding
 
 			var similarity = 1 - distances[a.Length, b.Length] / denominator;
 
-			return !areWords ? similarity
-				: similarity >= 0.75 ? 1 : 0;
+			return !areWords ? similarity 
+				: similarity * Math.Min(1, Math.Pow(similarity / WORD_SIM_THRESHOLD, 4));
 		}
 
 		private static double PriorityCoefficient(object elem)

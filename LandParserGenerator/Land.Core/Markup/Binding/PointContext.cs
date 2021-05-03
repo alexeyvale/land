@@ -362,7 +362,7 @@ namespace Land.Markup.Binding
 	public class SiblingsContextPart
 	{
 		public TextOrHash All { get; set; }
-		public List<PointContext> Nearest { get; set; }
+		public PointContext Nearest { get; set; }
 
 		[JsonIgnore]
 		public bool IsNotEmpty => All.TextLength > 0;
@@ -967,24 +967,22 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			var beforeNeighbors = siblings
+			var beforeNeighbor = siblings
 				.Take(markedElementIndex)
 				.Reverse()
 				.Where(e => e.Type == node.Type)
-				.Take(NEIGHBOURS_COUNT)
-				.ToList();
-			var afterNeighbours = siblings
+				.FirstOrDefault();
+			var afterNeighbour = siblings
 				.Skip(markedElementIndex + 1)
 				.Where(e => e.Type == node.Type)
-				.Take(NEIGHBOURS_COUNT)
-				.ToList();
+				.FirstOrDefault();
 
 			var context = new SiblingsContext
 			{
 				Before = new SiblingsContextPart {
 					All = new TextOrHash(beforeBuilder.ToString()),
 					Nearest = !checkAllSiblings
-						? beforeNeighbors.Select(n => contextFinder.ContextManager.GetContext(n, file)).ToList()
+						? beforeNeighbor != null ? contextFinder.ContextManager.GetContext(beforeNeighbor, file) : null
 						: null
 				},
 
@@ -992,7 +990,7 @@ namespace Land.Markup.Binding
 				{
 					All = new TextOrHash(afterBuilder.ToString()),
 					Nearest = !checkAllSiblings
-						? afterNeighbours.Select(n => contextFinder.ContextManager.GetContext(n, file)).ToList()
+						? afterNeighbour != null ? contextFinder.ContextManager.GetContext(afterNeighbour, file) : null
 						: null
 				}
 			};
