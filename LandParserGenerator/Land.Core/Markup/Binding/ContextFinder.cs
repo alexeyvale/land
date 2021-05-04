@@ -550,7 +550,18 @@ namespace Land.Markup.Binding
 
 								foreach (var unmappedContext in unmapped)
 								{
-									ComputeContextSimilarities(unmappedContext, evaluationResults[unmappedContext], true);
+									if(LocationManager != null)
+									{
+										Parallel.ForEach(
+											evaluationResults[unmappedContext].Where(c=>!c.Deleted),
+											c =>
+											{
+												c.SiblingsNearestSimilarity =
+													LocationManager.GetSimilarity(unmappedContext, c.Context);
+											}
+										);
+									}
+
 									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
 								}
 
@@ -862,6 +873,11 @@ namespace Land.Markup.Binding
 			return a.Type == b.Type ? Levenshtein(a.HeaderContext.Sequence, b.HeaderContext.Sequence) : 0;
 		}
 
+		public double EvalSimilarity(PrioritizedWord a, PrioritizedWord b)
+		{
+			return a.Priority == b.Priority ? Levenshtein(a.Text, b.Text, true) : 0;
+		}
+
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)
 		{
 			var score = a.Hash != null && b.Hash != null
@@ -908,7 +924,7 @@ namespace Land.Markup.Binding
 			else if (a is AncestorsContextElement)
 				return EvalSimilarity(a as AncestorsContextElement, b as AncestorsContextElement);
 			else if (a is PrioritizedWord)
-				return Levenshtein((a as PrioritizedWord).Text, (b as PrioritizedWord).Text, true);
+				return EvalSimilarity(a as PrioritizedWord, b as PrioritizedWord);
 			else
 				return a.Equals(b) ? 1 : 0;
 		}
@@ -1019,8 +1035,6 @@ namespace Land.Markup.Binding
 
 		private double Levenshtein(string a, string b, bool areWords = false)
 		{
-			const double WORD_SIM_THRESHOLD = 0.8;
-
 			if (a.Length == 0 ^ b.Length == 0)
 				return 0;
 			if (a.Length == 0 && b.Length == 0)
@@ -1069,8 +1083,9 @@ namespace Land.Markup.Binding
 
 			var similarity = 1 - distances[a.Length, b.Length] / denominator;
 
-			return !areWords ? similarity 
-				: similarity * Math.Min(1, Math.Pow(similarity / WORD_SIM_THRESHOLD, 4));
+			return areWords 
+				? similarity >= 0.5 ? similarity : 0 
+				: similarity;
 		}
 
 		private static double PriorityCoefficient(object elem)

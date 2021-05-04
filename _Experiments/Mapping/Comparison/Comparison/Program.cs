@@ -12,6 +12,8 @@ namespace Comparison
 {
 	class Program
 	{
+		//const string MarkupFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\base";
+		//const string RelinkFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\modified";
 		const string MarkupFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\base";
 		const string RelinkFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified";
 
