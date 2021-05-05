@@ -9,7 +9,7 @@ namespace Land.Markup.Binding
 	{
 		private static Dictionary<ContextType, double> NaiveWeights { get; set; } = new Dictionary<ContextType, double>
 		{
-			{ContextType.HeaderCore,  2},
+			{ContextType.HeaderCore,  3},
 			{ContextType.HeaderNonCore,  1},
 			{ContextType.Inner, 1},
 			{ContextType.Ancestors, 2},
@@ -34,22 +34,22 @@ namespace Land.Markup.Binding
 
 	public interface IPostHeuristic { }
 
-    public interface IWeightsHeuristic : IPostHeuristic
-    {
-        Dictionary<ContextType, double?> TuneWeights(
-            PointContext source,
-            List<RemapCandidateInfo> candidates,
-            Dictionary<ContextType, double?> weights
-        );
-    }
+	public interface IWeightsHeuristic : IPostHeuristic
+	{
+		Dictionary<ContextType, double?> TuneWeights(
+			PointContext source,
+			List<RemapCandidateInfo> candidates,
+			Dictionary<ContextType, double?> weights
+		);
+	}
 
-    public interface ISimilarityHeuristic : IPostHeuristic
-    {
-        List<RemapCandidateInfo> PredictSimilarity(
-            PointContext source,
-            List<RemapCandidateInfo> candidates
-        );
-    }
+	public interface ISimilarityHeuristic : IPostHeuristic
+	{
+		List<RemapCandidateInfo> PredictSimilarity(
+			PointContext source,
+			List<RemapCandidateInfo> candidates
+		);
+	}
 
 	/// <summary>
 	/// Устанавливает нулевой вес для пустых контекстов
@@ -104,7 +104,7 @@ namespace Land.Markup.Binding
 
 			var goodCore = candidates
 				.Where(c => c.HeaderCoreSimilarity >= GOOD_SIM)
-				.OrderByDescending(c=>c.HeaderCoreSimilarity)
+				.OrderByDescending(c => c.HeaderCoreSimilarity)
 				.ToList();
 			var goodNonCore = (goodCore.Count > 0 ? goodCore : candidates)
 				.Where(c => c.HeaderNonCoreSimilarity >= GOOD_SIM)
@@ -114,36 +114,18 @@ namespace Land.Markup.Binding
 			weights[ContextType.HeaderCore] = 2;
 			weights[ContextType.HeaderNonCore] = 1;
 
-			/// Если есть кандидаты с высокой похожестью ядра заголовка
 			if (goodCore.Count > 0)
 			{
-				/// Если такой кандидат один, дополнительно повышаем вес ядра
-				if (goodCore.Count == 1)
-				{
-					weights[ContextType.HeaderCore] = 2 + 2 * Math.Sqrt((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
-				}
-				else
-				{
-					if(ContextFinder.AreDistantEnough(goodCore[0].HeaderCoreSimilarity, goodCore[1].HeaderCoreSimilarity))
-					{
-						weights[ContextType.HeaderCore] = 4;
-					}
-				}
+				weights[ContextType.HeaderCore] = 2 + 2 
+					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
-			if (goodNonCore.Count > 0)
+			var maxNonCoreWeight = goodCore.Count > 0 ? 4 : 2;
+
+			if (goodNonCore.Count == 1)
 			{
-				if (goodNonCore.Count == 1)
-				{
-					weights[ContextType.HeaderNonCore] = 1 + 3 * Math.Sqrt((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
-				}
-				else
-				{
-					if (ContextFinder.AreDistantEnough(goodNonCore[0].HeaderNonCoreSimilarity, goodNonCore[1].HeaderNonCoreSimilarity))
-					{
-						weights[ContextType.HeaderNonCore] = 4;
-					}
-				}
+				weights[ContextType.HeaderNonCore] = 1 + (maxNonCoreWeight - 1) 
+					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
 			return weights;
@@ -152,14 +134,14 @@ namespace Land.Markup.Binding
 
 	public class TuneAncestorsWeight : IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.8;
+		const double GOOD_SIM = 0.7;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if(weights[ContextType.Ancestors].HasValue) return weights;
+			if (weights[ContextType.Ancestors].HasValue) return weights;
 
 			var distinctSimilarities = candidates
 				.Select(c => c.AncestorSimilarity)
@@ -167,15 +149,9 @@ namespace Land.Markup.Binding
 				.OrderByDescending(e => e)
 				.ToList();
 
-			if (distinctSimilarities.Count == 1)
-			{
-				weights[ContextType.Ancestors] = 2 - 2 * (Math.Max(distinctSimilarities[0], GOOD_SIM) - GOOD_SIM) / (1 - GOOD_SIM);
-			}
-			else
-			{
-				weights[ContextType.Ancestors] = distinctSimilarities[0] == 1 ? 2
-					: ContextFinder.AreDistantEnough(distinctSimilarities[0], distinctSimilarities[1]) ? 2 : 1;
-			}
+			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1
+				? 1 - Math.Max(0, (distinctSimilarities[0] - GOOD_SIM) / (1 - GOOD_SIM))
+				: 2;
 
 			return weights;
 		}
@@ -195,25 +171,13 @@ namespace Land.Markup.Binding
 			{
 				if (weights[ContextType.Inner].HasValue) return weights;
 
-				var ordered = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
-				/// Количество кандидатов с хорошей похожестью внутренности
-				var excellentCandidatesCount = ordered.TakeWhile(c => c.InnerSimilarity >= GOOD_SIM).Count();
-				/// Маскимальная похожесть
-				var maxSimilarity = ordered.Select(c => c.InnerSimilarity).First();
+				var goodCandidates = candidates.Where(c => c.InnerSimilarity >= GOOD_SIM).ToList();
+				var maxSimilarity = candidates.Max(c => c.InnerSimilarity);
 
-				/// Если у всех кандидатов хорошая похожесть, внутренний контекст нам ничего не даст
-				if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
+				if (candidates.Count > 1 && goodCandidates.Count == candidates.Count)
 				{
 					weights[ContextType.Inner] = 0.5;
 				}
-				/// Если максимальная похожесть - единица, или самый похожий достаточно отстоит от следующего
-				else if (maxSimilarity == 1
-					|| (maxSimilarity >= GOOD_SIM
-						&& (ordered.Count == 1 || ContextFinder.AreDistantEnough(maxSimilarity, ordered[1].InnerSimilarity))))
-				{
-					weights[ContextType.Inner] = 2;
-				}
-				/// Иначе задаём вес тем ниже, чем ниже максимальная похожесть, поскольку данный контекст часто меняется и это нормально
 				else
 				{
 					weights[ContextType.Inner] = maxSimilarity < BAD_SIM ? 0.5
@@ -242,30 +206,11 @@ namespace Land.Markup.Binding
 				{
 					if (weights[ContextType.SiblingsAll].HasValue) return weights;
 
-					var ordered = candidates.OrderByDescending(c => c.SiblingsAllSimilarity).ToList();
+					var maxSimilarity = candidates.Max(c => c.SiblingsAllSimilarity);
 
-					/// Количество кандидатов с хорошей похожестью соседей
-					var excellentCandidatesCount = ordered.TakeWhile(c => c.SiblingsAllSimilarity >= GOOD_SIM).Count();
-					/// Максимальная похожесть
-					var maxSimilarity = ordered.Select(c => c.SiblingsAllSimilarity).First();
-
-					/// Если все кандидаты сильно похожи соседями на исходный элемент
-					if (candidates.Count > 1 && excellentCandidatesCount == candidates.Count)
-					{
-						weights[ContextType.SiblingsAll] = 0;
-					}
-					/// Если максимальная похожесть - единица, или самый похожий достаточно отстоит от следующего
-					else if (maxSimilarity == 1 || (maxSimilarity >= GOOD_SIM
-						&& (ordered.Count == 1 || ContextFinder.AreDistantEnough(maxSimilarity, ordered[1].SiblingsAllSimilarity))))
-					{
-						weights[ContextType.SiblingsAll] = 2;
-					}
-					else
-					{
-						weights[ContextType.SiblingsAll] = maxSimilarity < BAD_SIM ? 0
-							: maxSimilarity > GOOD_SIM ? 1
-							: (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
-					}
+					weights[ContextType.SiblingsAll] = maxSimilarity < BAD_SIM ? 0
+						: maxSimilarity > GOOD_SIM ? 1
+						: (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
 				}
 				else
 				{ }
@@ -292,7 +237,7 @@ namespace Land.Markup.Binding
 
 					var similarity = candidates.Max(c => c.SiblingsNearestSimilarity);
 
-					weights[ContextType.SiblingsNearest] = similarity == 1 ? 1 : 0;
+					weights[ContextType.SiblingsNearest] = similarity == 1 ? 2 : 0;
 				}
 			}
 
@@ -329,7 +274,7 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			if(weights[ContextType.SiblingsAll] == 0) return weights;
+			if (weights[ContextType.SiblingsAll] == 0) return weights;
 
 			DefaultWeightsProvider.Init(weights, ContextType.SiblingsAll);
 
@@ -351,9 +296,9 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
 		{
-			foreach(var val in Enum.GetValues(typeof(ContextType)).Cast<ContextType>())
+			foreach (var val in Enum.GetValues(typeof(ContextType)).Cast<ContextType>())
 			{
-				if(weights[val] == null)
+				if (weights[val] == null)
 				{
 					weights[val] = DefaultWeightsProvider.Get(val);
 				}
