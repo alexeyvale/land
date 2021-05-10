@@ -350,14 +350,13 @@ namespace Land.Markup.Binding
 				.Except(contextsToPoints.Keys)
 				.ToList();
 
-			if (!checkAllSiblings)
-			{
-				/// Запоминаем, каким элементам какой элемент предшествовал
-				LocationManager = new LocationManager(
+			/// Запоминаем, каким элементам какой элемент предшествовал
+			LocationManager = !checkAllSiblings 
+				? new LocationManager(
 					contextsToPoints.Keys.Concat(auxiliaryContexts),
 					candidates.First().Context.FileContext.Length
-				);
-			}
+				) 
+				: null;
 
 			/// Результаты поиска элемента, которые вернём пользователю
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();

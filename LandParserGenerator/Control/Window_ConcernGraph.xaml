@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:graphsharp="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
 		xmlns:zoom="clr-namespace:GraphSharp.Controls.Zoom;assembly=GraphSharp.Controls"
-		xmlns:core="clr-namespace:Land.Markup;assembly=Land.Core"
+		xmlns:core="clr-namespace:Land.Markup;assembly=Land.Markup"
         xmlns:local="clr-namespace:Land.Control"
         mc:Ignorable="d"
         Title="Граф функциональностей" Height="450" Width="800">

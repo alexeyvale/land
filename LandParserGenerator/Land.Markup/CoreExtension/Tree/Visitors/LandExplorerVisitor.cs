@@ -11,7 +11,8 @@ namespace Land.Markup.CoreExtension
 
 		public override void Visit(Node node)
 		{
-			if (node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+			if (node.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND)
+				&& node.Location != null)
 			{
 				Land.Add(node);
 			}

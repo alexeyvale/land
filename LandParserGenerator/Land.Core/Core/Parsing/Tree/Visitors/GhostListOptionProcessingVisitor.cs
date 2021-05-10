@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Land.Core.Specification;
-using Land.Markup.CoreExtension;
 
 namespace Land.Core.Parsing.Tree
 {
@@ -55,12 +54,6 @@ namespace Land.Core.Parsing.Tree
 					{
 						var smbToRemove = node.Children[i];
 						node.Children.RemoveAt(i);
-
-						/// TODO убрать использование расширения в ядре
-						if (smbToRemove.Options.GetPriority().HasValue)
-							smbToRemove.Children.ForEach(c => c.Options.SetPriority(
-								(c.Options.GetPriority() ?? 1) * smbToRemove.Options.GetPriority().Value
-							));
 
 						for (var j = smbToRemove.Children.Count - 1; j >= 0; --j)
 						{

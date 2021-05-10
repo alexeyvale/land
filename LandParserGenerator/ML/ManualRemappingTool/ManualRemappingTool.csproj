@@ -142,6 +142,10 @@
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>Land.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Land.Markup\Land.Markup.csproj">
+      <Project>{77cf2f7d-c132-443b-ae5f-649c632d3f9c}</Project>
+      <Name>Land.Markup</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -220,6 +220,7 @@ namespace Land.Core.Specification
 
 			var newName = AUTO_RULE_PREFIX + AutoRuleCounter++;
 			Rules.Add(newName, new NonterminalSymbol(newName, alternatives));
+
 			return newName;
 		}
 
@@ -735,11 +736,42 @@ namespace Land.Core.Specification
 					}
 				}
 
+				/// Проверяем корректность задания локальных опций
+				messages.AddRange(LocalOptionsCheck());
+
 				/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
 				State = messages.Any(m => m.Type == MessageType.Error) ? GrammarState.Invalid : GrammarState.Valid;
 			}
 
 			return messages;
+		}
+
+		private List<Message> LocalOptionsCheck()
+		{
+			var builtInGroups = new HashSet<string> { ParsingOption.GROUP_NAME, NodeOption.GROUP_NAME };
+			var result = new List<Message>();
+
+			foreach (var rule in Rules.Values)
+			{
+				foreach (var alt in rule)
+				{
+					foreach (var entry in alt)
+					{
+						var badGroups = entry.Options.GetGroups().Except(builtInGroups).ToList();
+
+						if (badGroups.Any())
+						{
+							result.Add(Message.Error(
+								$"В правиле для нетерминала {Userify(rule.Name)} присутствуют опции из категорий, локальное использование которых не допускается: {String.Join(", ", badGroups)}",
+								GetLocation(rule.Name),
+								"LanD"
+							));
+						}
+					}
+				}
+			}
+
+			return result;
 		}
 
 		/// Возвращает леворекурсивно определённые нетерминалы

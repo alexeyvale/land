@@ -16,8 +16,11 @@ namespace Land.Markup.CoreExtension
 
 		public override void Visit(Node node)
 		{
-			if (Grouped.ContainsKey(node.Type))
+			if (Grouped.ContainsKey(node.Type)
+				&& node.Location != null)
+			{
 				Grouped[node.Type].Add(node);
+			}
 
 			base.Visit(node);
 		}

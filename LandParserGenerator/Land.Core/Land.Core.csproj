@@ -61,10 +61,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="tlsh, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\components\TLSH\tlsh.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Parsing\Tree\Visitors\GrammarProvidedTreeVisitor.cs" />
@@ -91,32 +87,6 @@
     <Compile Include="Core\Lexing\ILexer.cs" />
     <Compile Include="Core\Lexing\ComplexTokenStream.cs" />
     <Compile Include="Core\Lexing\TokenStream.cs" />
-    <Compile Include="Markup\Binding\LocationManager.cs" />
-    <Compile Include="Markup\Binding\Heuristics\PostHeuristic.cs" />
-    <Compile Include="Markup\Binding\Heuristics\PreHeuristic.cs" />
-    <Compile Include="Markup\Binding\Models\CandidateFeatures.cs" />
-    <Compile Include="Markup\Binding\ContextFinder.cs" />
-    <Compile Include="Markup\Binding\Munkres.cs" />
-    <Compile Include="Markup\Binding\PointContextManager.cs" />
-    <Compile Include="Markup\Binding\Models\RemapCandidateInfo.cs" />
-    <Compile Include="Markup\Binding\FuzzyHashing.cs" />
-    <Compile Include="Markup\CoreExtension\Options\MarkupOptions.cs" />
-    <Compile Include="Markup\Relations\RelationType.cs" />
-    <Compile Include="Markup\Relations\RelationsCache.cs" />
-    <Compile Include="Markup\MarkupElementConverter.cs" />
-    <Compile Include="Markup\SerializationUnit.cs" />
-    <Compile Include="Markup\Tree\Visitors\GetLinearSequenceVisitor.cs" />
-    <Compile Include="Markup\Tree\Visitors\GroupPointsByTypeVisitor.cs" />
-    <Compile Include="Markup\Tree\Visitors\GroupPointsByFileVisitor.cs" />
-    <Compile Include="Markup\Binding\PointContext.cs" />
-    <Compile Include="Markup\Concern.cs" />
-    <Compile Include="Markup\ConcernPoint.cs" />
-    <Compile Include="Markup\MarkupElement.cs" />
-    <Compile Include="Markup\MarkupManager.cs" />
-    <Compile Include="Markup\Tree\Visitors\BaseMarkupVisitor.cs" />
-    <Compile Include="Markup\Relations\RelationsManager.cs" />
-    <Compile Include="Markup\CoreExtension\Tree\Visitors\GroupNodesByTypeVisitor.cs" />
-    <Compile Include="Markup\CoreExtension\Tree\Visitors\LandExplorerVisitor.cs" />
     <Compile Include="Core\Parsing\Preprocessing\NoopPreprocessor.cs" />
     <Compile Include="Core\Parsing\Preprocessing\PipelinePreprocessor.cs" />
     <Compile Include="Core\Parsing\Preprocessing\BasePreprocessor.cs" />
@@ -125,12 +95,10 @@
     <Compile Include="Core\Parsing\Tree\CustomBlockValidator.cs" />
     <Compile Include="Core\Parsing\Tree\BaseNodeGenerator.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\BaseNodeRetypingVisitor.cs" />
-    <Compile Include="Markup\CoreExtension\Tree\Visitors\MarkupOptionsProcessingVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\LeafOptionProcessingVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\InsertCustomBlocksVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\MergeAnyVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\RemoveAutoVisitor.cs" />
-    <Compile Include="Markup\CoreExtension\Tree\Visitors\CountLandNodesVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\UserifyVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\BaseTreeVisitor.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\GhostListOptionProcessingVisitor.cs" />

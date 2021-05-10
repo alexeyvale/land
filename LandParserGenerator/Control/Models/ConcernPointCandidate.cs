@@ -27,9 +27,7 @@ namespace Land.Control
 		public ExistingConcernPointCandidate(Node node)
 		{
 			Node = node;
-			ViewHeader = String.Join(" ",
-				String.Join(" ", PointContext.GetHeaderContext(node).Sequence_old)
-			);
+			ViewHeader = $"{node.Type}: {String.Join(" ", PointContext.GetHeaderContext(node).Sequence_old)}";
 		}
 	}
 

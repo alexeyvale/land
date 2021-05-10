@@ -91,6 +91,15 @@ namespace Land.Markup.Binding
 	public class TuneHeaderWeightIfSimilar : IWeightsHeuristic
 	{
 		const double GOOD_SIM = 0.8;
+		const double BAD_SIM = 0.4;
+		const double INDENT = 0.1;
+
+		public double GetWeight(double good, double usual, double bad, double max) =>
+			max >= GOOD_SIM ? good
+			: max >= GOOD_SIM - INDENT ? good - (good - usual) * (GOOD_SIM - max) / INDENT
+			: max >= BAD_SIM + INDENT ? usual
+			: max >= BAD_SIM ? bad + (usual - bad) * (max - BAD_SIM) / INDENT
+			: bad;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 				PointContext source,
@@ -149,9 +158,15 @@ namespace Land.Markup.Binding
 				.OrderByDescending(e => e)
 				.ToList();
 
+			//var ordered = candidates.OrderByDescending(c => c.AncestorSimilarity).ToList();
+			//var gapCount = ordered.Count > 1
+			//	? ordered.Skip(1).TakeWhile(c => !ContextFinder.AreDistantEnough(ordered[0].AncestorSimilarity, c.AncestorSimilarity)).Count() : 0;
+
 			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1
 				? 1 - Math.Max(0, (distinctSimilarities[0] - GOOD_SIM) / (1 - GOOD_SIM))
 				: 2;
+
+			//weights[ContextType.Ancestors] *= (candidates.Count - gapCount) / candidates.Count;
 
 			return weights;
 		}
