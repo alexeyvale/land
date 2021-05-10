@@ -91,15 +91,16 @@ namespace Land.Markup.Binding
 	public class TuneHeaderWeightIfSimilar : IWeightsHeuristic
 	{
 		const double GOOD_SIM = 0.8;
-		const double BAD_SIM = 0.4;
-		const double INDENT = 0.1;
 
-		public double GetWeight(double good, double usual, double bad, double max) =>
-			max >= GOOD_SIM ? good
-			: max >= GOOD_SIM - INDENT ? good - (good - usual) * (GOOD_SIM - max) / INDENT
-			: max >= BAD_SIM + INDENT ? usual
-			: max >= BAD_SIM ? bad + (usual - bad) * (max - BAD_SIM) / INDENT
-			: bad;
+		//const double BAD_SIM = 0.4;
+		//const double INDENT = 0.1;
+
+		//public double GetWeight(double good, double usual, double bad, double max) =>
+		//	max >= GOOD_SIM ? good
+		//	: max >= GOOD_SIM - INDENT ? good - (good - usual) * (GOOD_SIM - max) / INDENT
+		//	: max >= BAD_SIM + INDENT ? usual
+		//	: max >= BAD_SIM ? bad + (usual - bad) * (max - BAD_SIM) / INDENT
+		//	: bad;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 				PointContext source,
@@ -107,33 +108,44 @@ namespace Land.Markup.Binding
 				Dictionary<ContextType, double?> weights)
 		{
 			if (weights[ContextType.HeaderCore].HasValue
-				|| weights[ContextType.HeaderNonCore].HasValue) return weights;
+				&& weights[ContextType.HeaderNonCore].HasValue) return weights;
 
 			if (candidates.Count == 0) return weights;
 
-			var goodCore = candidates
-				.Where(c => c.HeaderCoreSimilarity >= GOOD_SIM)
-				.OrderByDescending(c => c.HeaderCoreSimilarity)
-				.ToList();
-			var goodNonCore = (goodCore.Count > 0 ? goodCore : candidates)
-				.Where(c => c.HeaderNonCoreSimilarity >= GOOD_SIM)
-				.OrderByDescending(c => c.HeaderNonCoreSimilarity)
-				.ToList();
+			var goodCore = weights[ContextType.HeaderCore].HasValue ? null
+				: candidates
+					.Where(c => c.HeaderCoreSimilarity >= GOOD_SIM)
+					.OrderByDescending(c => c.HeaderCoreSimilarity)
+					.ToList();
 
-			weights[ContextType.HeaderCore] = 2;
-			weights[ContextType.HeaderNonCore] = 1;
+			var goodNonCore = weights[ContextType.HeaderNonCore].HasValue ? null 
+				: (goodCore?.Count > 0 ? goodCore : candidates)
+					.Where(c => c.HeaderNonCoreSimilarity >= GOOD_SIM)
+					.OrderByDescending(c => c.HeaderNonCoreSimilarity)
+					.ToList();
 
-			if (goodCore.Count > 0)
+			if (!weights[ContextType.HeaderCore].HasValue)
+			{
+				weights[ContextType.HeaderCore] = 2;
+			}
+
+			if (!weights[ContextType.HeaderNonCore].HasValue)
+			{
+				weights[ContextType.HeaderNonCore] = 1;
+			}
+
+			if (goodCore?.Count > 0)
 			{
 				weights[ContextType.HeaderCore] = 2 + 2 
 					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
-			var maxNonCoreWeight = goodCore.Count > 0 ? 4 : 2;
-
-			if (goodNonCore.Count == 1)
+			if (goodNonCore?.Count > 0 
+				&& (goodNonCore.Count == 1 || !(goodCore?.Count > 0)))
 			{
-				weights[ContextType.HeaderNonCore] = 1 + (maxNonCoreWeight - 1) 
+				var maxNonCoreWeight = !(goodCore?.Count > 0) ? 2 : 4;
+
+				weights[ContextType.HeaderNonCore] = 1 + (maxNonCoreWeight - 1)
 					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 

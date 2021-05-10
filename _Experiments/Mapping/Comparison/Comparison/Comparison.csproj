@@ -36,6 +36,10 @@
     <Reference Include="Land.Core">
       <HintPath>components\LanD\Land.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Land.Markup, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae1ff9628e381c0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>components\LanD\Land.Markup.dll</HintPath>
+    </Reference>
     <Reference Include="sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=95a72bebf843c5e1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>components\LanD\sharp.dll</HintPath>
@@ -65,7 +69,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Core\bin\Debug\*" "$(ProjectDir)components\land\" /Y /I /S
-xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Core\bin\Debug\*" "$(ProjectDir)bin\debug\" /Y /I /S</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Markup\bin\Debug\*" "$(ProjectDir)components\land\" /Y /I /S
+xcopy "$(SolutionDir)..\..\..\LandParserGenerator\Land.Markup\bin\Debug\*" "$(ProjectDir)bin\debug\" /Y /I /S</PreBuildEvent>
   </PropertyGroup>
 </Project>

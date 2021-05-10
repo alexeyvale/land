@@ -12,10 +12,12 @@ namespace Comparison
 {
 	class Program
 	{
-		//const string MarkupFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\base";
-		//const string RelinkFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\modified";
-		const string MarkupFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\base";
-		const string RelinkFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified";
+		//const string BaseFolder = @"D:\Repositories\_mapping\Grammars\base";
+		//const string ModifiedFolder = @"D:\Repositories\_mapping\Grammars\modified";
+		//const string BaseFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\base";
+		//const string ModifiedFolder = @"D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified";
+		const string BaseFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\base";
+		const string ModifiedFolder = @"D:\Repositories\_mapping\PascalABC\1462\Common\modified";
 
 		public class GetNodeSequenceVisitor: BaseTreeVisitor
 		{
@@ -75,6 +77,7 @@ namespace Comparison
 			var heuristic = new ProgrammingLanguageHeuristic();
 			var markupManager = new MarkupManager(null, heuristic);
 			var entityTypes = new string[] { "class_struct_interface", "method", "field", "property" };
+			//var entityTypes = new string[] { "symbol_declaration", "rule", "alternative", "alternative_element" };
 
 			/// Создаём парсер C# и менеджер разметки из библиотеки LanD	
 			var landParser = sharp.ParserProvider.GetParser(false);
@@ -86,7 +89,7 @@ namespace Comparison
 			/////////////////////////////////////////////// STAGE 1
 
 			var counter = 0;
-			var files = new HashSet<string>(Directory.GetFiles(MarkupFolder, "*.cs"));
+			var files = new HashSet<string>(Directory.GetFiles(BaseFolder, "*.cs"));
 
 			/// Парсим отобранные файлы
 			var searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
@@ -110,7 +113,7 @@ namespace Comparison
 			Console.WriteLine("Stage 2 started...");
 
 			counter = 0;
-			files = new HashSet<string>(files.Select(f => Path.Combine(RelinkFolder, Path.GetFileName(f))));
+			files = new HashSet<string>(files.Select(f => Path.Combine(ModifiedFolder, Path.GetFileName(f))));
 
 			searchArea = GetSearchArea(landParser, files.ToList(), landErrors);
 
@@ -127,6 +130,8 @@ namespace Comparison
 			markupManager.ContextFinder.UseOldApproach = true;
 			var basicRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Base rebinding done in {DateTime.Now - start}");
+
+			Console.WriteLine();
 
 			foreach (var key in entityTypes)
 			{
@@ -176,8 +181,8 @@ namespace Comparison
 
 						var reportLines = new List<string>();
 
-						reportLines.Add($"file:///{MarkupFolder}\\{cp.Context.FileContext.Name}");
-						reportLines.Add($"file:///{RelinkFolder}\\{cp.Context.FileContext.Name}");
+						reportLines.Add($"file:///{BaseFolder}\\{cp.Context.FileContext.Name}");
+						reportLines.Add($"file:///{ModifiedFolder}\\{cp.Context.FileContext.Name}");
 						reportLines.Add("*");
 
 						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence_old)}     {cp.Context.Line}");
