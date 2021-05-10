@@ -119,14 +119,12 @@ namespace Comparison
 			var report = new StreamWriter("report.txt");
 
 			start = DateTime.Now;
-			markupManager.ContextFinder.UseNaiveAlgorithm = false;
-			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
+			markupManager.ContextFinder.UseOldApproach = false;
 			var modifiedRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Modified rebinding done in {DateTime.Now - start}");
 
 			start = DateTime.Now;
-			markupManager.ContextFinder.UseNaiveAlgorithm = true;
-			markupManager.ContextFinder.Optimization = ContextFinder.OptimizationType.LocalBest;
+			markupManager.ContextFinder.UseOldApproach = true;
 			var basicRemapResult = markupManager.Remap(searchArea, false, ContextFinder.SearchType.Local);
 			Console.WriteLine($"Base rebinding done in {DateTime.Now - start}");
 
@@ -161,9 +159,13 @@ namespace Comparison
 						modifiedResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old
 							.SequenceEqual(basicResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old);
 
-					/// Отсекаем элементы, привязку к которым можно обеспечить за счёт базовой эвристики
-					var hasNotChanged = false; // modifiedRemapResult[cp].Count == 1 
-						//&& modifiedRemapResult[cp][0].Weights == null;
+					var hasNotChanged = isModifiedAuto && File.ReadAllText(Path.Combine(MarkupFolder, cp.Context.FileName)).Substring(
+						cp.AstNode.Location.Start.Offset,
+						cp.AstNode.Location.Length.Value
+					) == searchArea.First(f=>f.Name == modifiedRemapResult[cp][0].File.Name).Text.Substring(
+						modifiedRemapResult[cp][0].Node.Location.Start.Offset,
+						modifiedRemapResult[cp][0].Node.Location.Length.Value
+					) && cp.Context.AncestorsContext.SequenceEqual(modifiedRemapResult[cp][0].Context.AncestorsContext);
 
 					if (!hasNotChanged)
 					{
@@ -319,7 +321,8 @@ namespace Comparison
 						randomAutoIdx.SelectMany(idx => sameFirstPos[idx]));
 				}
 
-				Console.WriteLine($"Total: {pointsOfType.Count}");
+				Console.WriteLine($"Total count: {pointsOfType.Count}");
+				Console.WriteLine($"Total marked: {simpleRebindModifiedAuto + simpleRebindSameAuto + simpleRebindDifferentAuto + modifiedOnlyAutoResult.Count + basicOnlyAutoResult.Count + sameAutoResult.Count + differentAutoResult.Count + sameFirstPos.Count + differentFirstPos.Count}");
 				Console.WriteLine($"Simple rebinding: {simpleRebindModifiedAuto + simpleRebindSameAuto + simpleRebindDifferentAuto}");
 				Console.WriteLine($"Modified only auto: {modifiedOnlyAutoResult.Count}");
 				Console.WriteLine($"Basic only auto: {basicOnlyAutoResult.Count}");

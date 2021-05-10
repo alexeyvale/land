@@ -165,7 +165,7 @@ namespace Land.Markup
 					siblingsArgs,
 					new ClosestConstructionArgs
 					{
-						SearchArea = GetSimilarOnly(file, searchArea),
+						SearchArea = new List<ParsedFile> { file },
 						GetParsed = ContextFinder.GetParsed,
 						ContextFinder = ContextFinder
 					}), 
@@ -223,7 +223,7 @@ namespace Land.Markup
 								subconcernSiblingsArgs,
 								new ClosestConstructionArgs
 								{
-									SearchArea = GetSimilarOnly(file, searchArea),
+									SearchArea = new List<ParsedFile> { file },
 									GetParsed = ContextFinder.GetParsed,
 									ContextFinder = ContextFinder
 								}), 
@@ -249,7 +249,7 @@ namespace Land.Markup
 							siblingsArgs,
 							new ClosestConstructionArgs
 							{
-								SearchArea = GetSimilarOnly(file, searchArea),
+								SearchArea = new List<ParsedFile> { file },
 								GetParsed = ContextFinder.GetParsed,
 								ContextFinder = ContextFinder
 							}), 
@@ -305,7 +305,7 @@ namespace Land.Markup
 				siblingsArgs,
 				new ClosestConstructionArgs
 				{
-					SearchArea = GetSimilarOnly(file, searchArea),
+					SearchArea = new List<ParsedFile> { file },
 					GetParsed = ContextFinder.GetParsed,
 					ContextFinder = ContextFinder
 				})
@@ -666,7 +666,7 @@ namespace Land.Markup
 					siblingsArgs,
 					new ClosestConstructionArgs
 					{
-						SearchArea = GetSimilarOnly(first.File, searchArea),
+						SearchArea = new List<ParsedFile> { first.File },
 						GetParsed = ContextFinder.GetParsed,
 						ContextFinder = ContextFinder
 					}
@@ -724,8 +724,5 @@ namespace Land.Markup
 				action(elem);
 			}
 		}
-
-		private List<ParsedFile> GetSimilarOnly(ParsedFile source, List<ParsedFile> searchArea) => 
-			searchArea.Where(f => ContextFinder.AreFilesSimilarEnough(source.BindingContext, f.BindingContext)).ToList();
 	}
 }

@@ -22,14 +22,11 @@ namespace Land.Markup.Binding
 	public class ContextFinder
 	{
 		public enum SearchType { Local, Global }
-		public enum OptimizationType { None, LocalBest }
 
-		public const double FILE_SIMILARITY_THRESHOLD = 0.8;
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
 		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 2;
 
-		public bool UseNaiveAlgorithm { get; set; } = false;
-		public OptimizationType Optimization { get; set; } = OptimizationType.LocalBest;
+		public bool UseOldApproach { get; set; } = false;
 
 		public Func<string, ParsedFile> GetParsed { get; set; }
 
@@ -211,8 +208,7 @@ namespace Land.Markup.Binding
 			SearchType searchType)
 		{
 			var candidates = new Dictionary<string, List<RemapCandidateInfo>>();
-			var ancestorsCache = new Dictionary<Node, AncestorCacheElement>();
-			var candidateAncestor = new Dictionary<RemapCandidateInfo, Node>();
+			var ancestorToSiblings = new Dictionary<Node, List<Node>>();
 
 			/// Инициализируем коллекции кандидатов для каждого типа
 			foreach (var type in points.Keys)
@@ -224,7 +220,9 @@ namespace Land.Markup.Binding
 			foreach (var currentFile in searchArea)
 			{
 				if (!EnsureRootExists(currentFile))
+				{
 					continue;
+				}
 
 				var visitor = new GroupNodesByTypeVisitor(points.Keys.ToList());
 				currentFile.Root.Accept(visitor);
@@ -233,6 +231,7 @@ namespace Land.Markup.Binding
 				{
 					/// Анализируем контекст соседей только при локальном поиске
 					var checkSiblings = searchType == SearchType.Local;
+					var siblingsArgs = checkSiblings ? new SiblingsConstructionArgs { ContextFinder = this } : null;
 
 					candidates[type].AddRange(visitor.Grouped[type]
 						.Select(n =>
@@ -244,15 +243,10 @@ namespace Land.Markup.Binding
 								Context = ContextManager.GetContext(n, currentFile)
 							};
 
-							AncestorSiblingsPair pair = null;
-
 							/// Если нужно проверить соседей, проверяем, не закешировали ли их
 							if (checkSiblings)
 							{
-								var siblingsArgs = new SiblingsConstructionArgs
-								{
-									ContextFinder = this
-								};
+								AncestorSiblingsPair pair = null;
 
 								/// Ищем предка, относительно которого нужно искать соседей
 								var ancestor = PointContext.GetAncestor(n)
@@ -261,11 +255,11 @@ namespace Land.Markup.Binding
 								/// Если таковой есть, пытаемся найти инфу о нём в кеше
 								if (ancestor != null)
 								{
-									pair = ancestorsCache.ContainsKey(ancestor)
+									pair = ancestorToSiblings.ContainsKey(ancestor)
 										? new AncestorSiblingsPair
 										{
 											Ancestor = ancestor,
-											Siblings = ancestorsCache[ancestor].Children
+											Siblings = ancestorToSiblings[ancestor]
 										}
 										: new AncestorSiblingsPair
 										{
@@ -280,20 +274,11 @@ namespace Land.Markup.Binding
 									pair
 								);
 
-								var oldSiblingsContext = PointContext.GetSiblingsContext_old(n, currentFile, pair);
-								candidate.Context.SiblingsLeftContext_old = oldSiblingsContext.Item1;
-								candidate.Context.SiblingsRightContext_old = oldSiblingsContext.Item2;
+								candidate.Context.SiblingsContext_old = PointContext.GetSiblingsContext_old(n, currentFile, pair);
 
-								candidateAncestor[candidate] = ancestor;
-
-								if (ancestor != null && !ancestorsCache.ContainsKey(ancestor))
+								if (ancestor != null && !ancestorToSiblings.ContainsKey(ancestor))
 								{
-									ancestorsCache[ancestor] = new AncestorCacheElement
-									{
-										Children = pair.Siblings,
-										PreprocessedChildren = pair.Siblings.ToLookup(e => e.Type, e =>
-											  new Tuple<int, byte[]>(e.Location.Start.Offset, PointContext.GetHash(e, currentFile)))
-									};
+									ancestorToSiblings[ancestor] = pair.Siblings;
 								}
 							}
 
@@ -329,9 +314,9 @@ namespace Land.Markup.Binding
 				return points.ToDictionary(e => e, e => new List<RemapCandidateInfo>());
 			}
 
-			var checkSiblings = searchType == SearchType.Local && !UseNaiveAlgorithm;
+			var checkSiblings = searchType == SearchType.Local && !UseOldApproach;
 			var checkAllSiblings = checkSiblings && (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false);
-			var checkClosest = searchType == SearchType.Local && !UseNaiveAlgorithm;
+			var checkClosest = searchType == SearchType.Local && !UseOldApproach;
 
 			/// Запоминаем соответствие контекстов точкам привязки
 			var contextsToPoints = points.GroupBy(p => p.Context)
@@ -445,12 +430,12 @@ namespace Land.Markup.Binding
 					})
 					.ToList();
 
-				evaluated[pointContext] = !UseNaiveAlgorithm
+				evaluated[pointContext] = !UseOldApproach
 					? ComputeContextSimilarities(pointContext, currentCandidates, checkSiblings)
 					: ComputeContextSimilarities_old(pointContext, currentCandidates, checkSiblings);
 			}
 
-			if (!UseNaiveAlgorithm)
+			if (!UseOldApproach)
 			{
 				Parallel.ForEach(
 					evaluated.Keys.ToList(),
@@ -467,15 +452,7 @@ namespace Land.Markup.Binding
 
 			if (searchType == SearchType.Local)
 			{
-				switch(Optimization)
-				{
-					case OptimizationType.LocalBest:
-						SelectLocalBests(evaluated);
-						break;
-					default:
-						SelectBests(evaluated);
-						break;
-				}
+				SelectOptimalBests(evaluated);
 			}
 			else
 			{
@@ -495,7 +472,7 @@ namespace Land.Markup.Binding
 
 		#region Auto Result Selection
 
-		private void SelectLocalBests(
+		private void SelectOptimalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
 			Parallel.ForEach(
@@ -544,7 +521,7 @@ namespace Land.Markup.Binding
 							evaluationResults[context].Insert(0, first);
 							unmapped.Remove(context);
 
-							if (!UseNaiveAlgorithm)
+							if (!UseOldApproach)
 							{
 								LocationManager?.Mapped(context, first.Context);
 
@@ -825,13 +802,6 @@ namespace Land.Markup.Binding
 						/// если не находим - берём файлы, похожие по содержимому
 						files = searchArea.Where(f => f.Name == file.Name).ToList();
 
-						if (files.Count == 0)
-						{
-							files = searchArea
-								.Where(f => AreFilesSimilarEnough(f.BindingContext, file))
-								.ToList();
-						}
-
 						var localResult = DoMultiTypeSearch(groupedPoints[file], files, searchType);
 
 						foreach (var elem in localResult)
@@ -845,9 +815,6 @@ namespace Land.Markup.Binding
 
 			return overallResult;
 		}
-
-		public bool AreFilesSimilarEnough(FileContext a, FileContext b) =>
-			EvalSimilarity(a.Content, b.Content) > FILE_SIMILARITY_THRESHOLD;
 
 		#region EvalSimilarity
 
@@ -1187,8 +1154,8 @@ namespace Land.Markup.Binding
 					if (checkAllSiblings)
 					{
 						c.SiblingsAllSimilarity =
-							(EvalSimilarity_old(point.SiblingsLeftContext_old, c.Context.SiblingsLeftContext_old)
-							+ EvalSimilarity_old(point.SiblingsRightContext_old, c.Context.SiblingsRightContext_old)) / 2.0;
+							(EvalSimilarity_old(point.SiblingsContext_old.Item1, c.Context.SiblingsContext_old.Item1)
+							+ EvalSimilarity_old(point.SiblingsContext_old.Item2, c.Context.SiblingsContext_old.Item2)) / 2.0;
 					}
 				}
 			);

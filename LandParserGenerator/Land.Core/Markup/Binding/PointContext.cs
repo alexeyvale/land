@@ -500,9 +500,7 @@ namespace Land.Markup.Binding
 
 		public List<ContextElement> InnerContext_old { get; set; }
 
-		public List<ContextElement> SiblingsLeftContext_old { get; set; }
-
-		public List<ContextElement> SiblingsRightContext_old { get; set; }
+		public Tuple<List<ContextElement>, List<ContextElement>> SiblingsContext_old { get; set; }
 
 		#endregion
 
@@ -546,10 +544,9 @@ namespace Land.Markup.Binding
 				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.ContextFinder);
 
 				#region Old
-				var oldSiblingsContext = GetSiblingsContext_old(node, file);
 
-				core.SiblingsLeftContext_old = oldSiblingsContext.Item1;
-				core.SiblingsRightContext_old = oldSiblingsContext.Item2;
+				core.SiblingsContext_old= GetSiblingsContext_old(node, file);
+
 				#endregion old
 			}
 			if (closestArgs != null && core.ClosestContext == null)
@@ -739,43 +736,32 @@ namespace Land.Markup.Binding
 			ParsedFile file,
 			AncestorSiblingsPair pair = null)
 		{
-			Node parentNode = null;
+			Node ancestor = null;
 			List<Node> siblings = null;
 
 			if (pair?.Ancestor != null)
 			{
-				parentNode = pair.Ancestor;
+				ancestor = pair.Ancestor;
 				goto SkipParentSearch;
 			}
 
 			/// Находим островного родителя
-			parentNode = node.Parent;
-			while (parentNode != null
-				&& !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
-			{
-				parentNode = parentNode.Parent;
-			}
+			ancestor = PointContext.GetAncestor(node)
+				?? (node != file.Root ? file.Root : null);
 
 			/// Если при подъёме дошли до неостровного корня, 
 			/// и сам элемент не является этим корнем
-			if (parentNode == null)
+			if (ancestor == null)
 			{
-				if (node != file.Root)
-				{
-					parentNode = file.Root;
-				}
-				else
-				{
-					return new Tuple<List<ContextElement>, List<ContextElement>>(
-						new List<ContextElement>(),
-						new List<ContextElement>()
-					);
-				}
-			}
+				return new Tuple<List<ContextElement>, List<ContextElement>>(
+					new List<ContextElement>(),
+					new List<ContextElement>()
+				);
+		}
 
 			if (pair != null)
 			{
-				pair.Ancestor = parentNode;
+				pair.Ancestor = ancestor;
 			}
 
 		SkipParentSearch:
@@ -787,7 +773,8 @@ namespace Land.Markup.Binding
 			}
 
 			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
-			siblings = new List<Node>(parentNode.Children);
+			siblings = new List<Node>(ancestor.Children);
+
 			for (var i = 0; i < siblings.Count; ++i)
 			{
 				if (!siblings[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
@@ -854,48 +841,35 @@ namespace Land.Markup.Binding
 			ContextFinder contextFinder,
 			AncestorSiblingsPair pair = null)
 		{
-			const int NEIGHBOURS_COUNT = 2;
-
 			var checkAllSiblings = node.Options.GetNotUnique();
 
-			Node parentNode = null;
+			Node ancestor = null;
 			List<Node> siblings = null;
 
 			if (pair?.Ancestor != null)
 			{
-				parentNode = pair.Ancestor;
+				ancestor = pair.Ancestor;
 				goto SkipParentSearch;
 			}
-				
+
 			/// Находим островного родителя
-			parentNode = node.Parent;
-			while (parentNode != null 
-				&& !parentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
-			{
-				parentNode = parentNode.Parent;
-			}
+			ancestor = PointContext.GetAncestor(node)
+				?? (node != file.Root ? file.Root : null);
 
 			/// Если при подъёме дошли до неостровного корня, 
 			/// и сам элемент не является этим корнем
-			if (parentNode == null)
+			if (ancestor == null)
 			{ 
-				if (node != file.Root)
+				return new SiblingsContext
 				{
-					parentNode = file.Root;
-				}
-				else
-				{
-					return new SiblingsContext
-					{
-						After = new SiblingsContextPart { All = new TextOrHash() },
-						Before = new SiblingsContextPart { All = new TextOrHash() }
-					};
-				}
+					After = new SiblingsContextPart { All = new TextOrHash() },
+					Before = new SiblingsContextPart { All = new TextOrHash() }
+				};
 			}
 
-			if (pair != null)
+			if(pair != null)
 			{
-				pair.Ancestor = parentNode;
+				pair.Ancestor = ancestor;
 			}
 
 		SkipParentSearch:
@@ -907,7 +881,7 @@ namespace Land.Markup.Binding
 			}
 
 			/// Спускаемся от родителя и собираем первые в глубину потомки-острова
-			siblings = new List<Node>(parentNode.Children);
+			siblings = new List<Node>(ancestor.Children);
 			for (var i = 0; i < siblings.Count; ++i)
 			{
 				if (!siblings[i].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
@@ -970,12 +944,10 @@ namespace Land.Markup.Binding
 			var beforeNeighbor = siblings
 				.Take(markedElementIndex)
 				.Reverse()
-				.Where(e => e.Type == node.Type)
-				.FirstOrDefault();
+				.FirstOrDefault(e => e.Type == node.Type);
 			var afterNeighbour = siblings
 				.Skip(markedElementIndex + 1)
-				.Where(e => e.Type == node.Type)
-				.FirstOrDefault();
+				.FirstOrDefault(e => e.Type == node.Type);
 
 			var context = new SiblingsContext
 			{
