@@ -88,7 +88,7 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneHeaderWeightIfSimilar : IWeightsHeuristic
+	public class TuneHeaderWeight : IWeightsHeuristic
 	{
 		const double GOOD_SIM = 0.8;
 
@@ -134,14 +134,17 @@ namespace Land.Markup.Binding
 				weights[ContextType.HeaderNonCore] = 1;
 			}
 
-			if (goodCore?.Count > 0)
+			if (goodCore?.Count > 0
+				&& (goodCore.Count == 1
+					|| goodCore[0].HeaderCoreSimilarity != goodCore[1].HeaderCoreSimilarity))
 			{
 				weights[ContextType.HeaderCore] = 2 + 2 
 					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
 			if (goodNonCore?.Count > 0 
-				&& (goodNonCore.Count == 1 || !(goodCore?.Count > 0)))
+				&& (goodNonCore.Count == 1 
+					|| goodNonCore[0].HeaderNonCoreSimilarity != goodNonCore[1].HeaderNonCoreSimilarity))
 			{
 				var maxNonCoreWeight = !(goodCore?.Count > 0) ? 2 : 4;
 
@@ -155,7 +158,7 @@ namespace Land.Markup.Binding
 
 	public class TuneAncestorsWeight : IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.7;
+		const double GOOD_SIM = 0.8;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
@@ -174,9 +177,7 @@ namespace Land.Markup.Binding
 			//var gapCount = ordered.Count > 1
 			//	? ordered.Skip(1).TakeWhile(c => !ContextFinder.AreDistantEnough(ordered[0].AncestorSimilarity, c.AncestorSimilarity)).Count() : 0;
 
-			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1
-				? 1 - Math.Max(0, (distinctSimilarities[0] - GOOD_SIM) / (1 - GOOD_SIM))
-				: 2;
+			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 ? 0 : Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
 
 			//weights[ContextType.Ancestors] *= (candidates.Count - gapCount) / candidates.Count;
 

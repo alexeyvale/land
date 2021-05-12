@@ -503,16 +503,17 @@ namespace Land.Markup.Binding
 
 						/// Берём наилучшее соответствие текущего кандидата другому исходному элементу
 						var otherBestMatch = unmapped
-							.Where(e => e != context && evaluationResults[e][0].Context == first.Context)
-							.Select(e => new { Context = e, Best = evaluationResults[e][0] })
-							.OrderByDescending(e => e.Best.Similarity)
+							.Where(e => e != context)
+							.Select(e => evaluationResults[e].First(r => !r.Deleted))
+							.Where(e => e.Context == first.Context)
+							.OrderByDescending(e => e.Similarity)
 							.FirstOrDefault();
 
 						/// Автоматически перепривязываемся, если выполняются локальные условия
 						/// и этот элемент не похож в большей степени на что-то другое
-						if (IsSimilarEnough(first) 
-							&& AreDistantEnough(first, second) 
-							&& AreDistantEnough(first, otherBestMatch?.Best))
+						if (IsSimilarEnough(first)
+							&& AreDistantEnough(first, second)
+							&& AreDistantEnough(first, otherBestMatch))
 						{
 							first.IsAuto = true;
 

@@ -32,7 +32,7 @@ namespace Land.Markup
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneSiblingsAllWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneAncestorsWeight));
-			ContextFinder.SetHeuristic(typeof(TuneHeaderWeightIfSimilar));
+			ContextFinder.SetHeuristic(typeof(TuneHeaderWeight));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
 
 			//ContextFinder.SetHeuristic(typeof(TuneSimilarityByNeighbours));
