@@ -134,9 +134,7 @@ namespace Land.Markup.Binding
 				weights[ContextType.HeaderNonCore] = 1;
 			}
 
-			if (goodCore?.Count > 0
-				&& (goodCore.Count == 1
-					|| goodCore[0].HeaderCoreSimilarity != goodCore[1].HeaderCoreSimilarity))
+			if (goodCore?.Count > 0)
 			{
 				weights[ContextType.HeaderCore] = 2 + 2 
 					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
@@ -146,9 +144,7 @@ namespace Land.Markup.Binding
 				&& (goodNonCore.Count == 1 
 					|| goodNonCore[0].HeaderNonCoreSimilarity != goodNonCore[1].HeaderNonCoreSimilarity))
 			{
-				var maxNonCoreWeight = !(goodCore?.Count > 0) ? 2 : 4;
-
-				weights[ContextType.HeaderNonCore] = 1 + (maxNonCoreWeight - 1)
+				weights[ContextType.HeaderNonCore] = 1 + 3
 					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
@@ -177,7 +173,7 @@ namespace Land.Markup.Binding
 			//var gapCount = ordered.Count > 1
 			//	? ordered.Skip(1).TakeWhile(c => !ContextFinder.AreDistantEnough(ordered[0].AncestorSimilarity, c.AncestorSimilarity)).Count() : 0;
 
-			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 ? 0 : Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
+			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 ? 0.5 : Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
 
 			//weights[ContextType.Ancestors] *= (candidates.Count - gapCount) / candidates.Count;
 
