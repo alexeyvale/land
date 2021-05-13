@@ -24,7 +24,10 @@ namespace Land.Markup.Binding
 		public enum SearchType { Local, Global }
 
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
-		public const double SECOND_DISTANCE_GAP_COEFFICIENT = 2;
+
+		public const double GAP_MAX = 2;
+		public const double GAP_MIN = 1.5;
+		public const double GAP_THRESHOLD = 0.8;
 
 		public bool UseOldApproach { get; set; } = false;
 
@@ -512,8 +515,8 @@ namespace Land.Markup.Binding
 						/// Автоматически перепривязываемся, если выполняются локальные условия
 						/// и этот элемент не похож в большей степени на что-то другое
 						if (IsSimilarEnough(first)
-							&& AreDistantEnough(first, second)
-							&& AreDistantEnough(first, otherBestMatch))
+							&& AreDistantEnough(first, second, UseOldApproach ? 2 : (double?)null)
+							&& AreDistantEnough(first, otherBestMatch, UseOldApproach ? 2 : (double?)null))
 						{
 							first.IsAuto = true;
 
@@ -1081,17 +1084,17 @@ namespace Land.Markup.Binding
 		public static bool IsSimilarEnough(RemapCandidateInfo candidate) =>
 			candidate.Similarity >= CANDIDATE_SIMILARITY_THRESHOLD;
 
-		public static bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second) =>
+		public static bool AreDistantEnough(RemapCandidateInfo first, RemapCandidateInfo second, double? staticGap = null) =>
 			/// Либо у нас один кандидат
 			second == null 
 			/// Либо первый похож на 100%, а второй - нет
 			|| first.Similarity == 1 && second.Similarity != 1
 			/// Либо оба не похожи на 100% и достаточно отстоят друг от друга
-			|| second.Similarity != 1 && 1 - second.Similarity >= (1 - first.Similarity) * SECOND_DISTANCE_GAP_COEFFICIENT;
+			|| second.Similarity != 1 && 1 - second.Similarity >= (1 - first.Similarity) * (staticGap ?? Math.Max(GAP_MIN, GAP_MAX - (GAP_MAX - GAP_MIN) * (1 - first.Similarity.Value) / (1 - GAP_THRESHOLD)));
 
 		public static bool AreDistantEnough(double first, double second) =>
 			first == 1 && second != 1
-			|| second != 1 && 1 - second >= (1 - first) * SECOND_DISTANCE_GAP_COEFFICIENT;
+			|| second != 1 && 1 - second >= (1 - first) * Math.Max(GAP_MIN, GAP_MAX - (GAP_MAX - GAP_MIN) * (1 - first) / (1 - GAP_THRESHOLD));
 
 		#endregion
 

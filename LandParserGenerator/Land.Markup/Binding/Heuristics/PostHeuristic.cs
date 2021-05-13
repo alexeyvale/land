@@ -124,6 +124,8 @@ namespace Land.Markup.Binding
 					.OrderByDescending(c => c.HeaderNonCoreSimilarity)
 					.ToList();
 
+			var orderedByNonCore = candidates.OrderByDescending(e => e.HeaderNonCoreSimilarity).ToList();
+
 			if (!weights[ContextType.HeaderCore].HasValue)
 			{
 				weights[ContextType.HeaderCore] = 2;
@@ -141,8 +143,8 @@ namespace Land.Markup.Binding
 			}
 
 			if (goodNonCore?.Count > 0 
-				&& (goodNonCore.Count == 1 
-					|| goodNonCore[0].HeaderNonCoreSimilarity != goodNonCore[1].HeaderNonCoreSimilarity))
+				&& (orderedByNonCore.Count == 1 
+					|| ContextFinder.AreDistantEnough(orderedByNonCore[0].HeaderNonCoreSimilarity, orderedByNonCore[1].HeaderNonCoreSimilarity)))
 			{
 				weights[ContextType.HeaderNonCore] = 1 + 3
 					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
@@ -154,7 +156,7 @@ namespace Land.Markup.Binding
 
 	public class TuneAncestorsWeight : IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.8;
+		const double GOOD_SIM = 0.7;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
@@ -169,13 +171,8 @@ namespace Land.Markup.Binding
 				.OrderByDescending(e => e)
 				.ToList();
 
-			//var ordered = candidates.OrderByDescending(c => c.AncestorSimilarity).ToList();
-			//var gapCount = ordered.Count > 1
-			//	? ordered.Skip(1).TakeWhile(c => !ContextFinder.AreDistantEnough(ordered[0].AncestorSimilarity, c.AncestorSimilarity)).Count() : 0;
-
-			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 ? 0.5 : Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
-
-			//weights[ContextType.Ancestors] *= (candidates.Count - gapCount) / candidates.Count;
+			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 
+				? 0.5 : 0.5 + 0.5 * Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
 
 			return weights;
 		}
@@ -195,18 +192,17 @@ namespace Land.Markup.Binding
 			{
 				if (weights[ContextType.Inner].HasValue) return weights;
 
-				var goodCandidates = candidates.Where(c => c.InnerSimilarity >= GOOD_SIM).ToList();
-				var maxSimilarity = candidates.Max(c => c.InnerSimilarity);
+				candidates = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
 
-				if (candidates.Count > 1 && goodCandidates.Count == candidates.Count)
+				if (candidates.Count > 1 && !ContextFinder.AreDistantEnough(candidates[0].InnerSimilarity, candidates[1].InnerSimilarity))
 				{
 					weights[ContextType.Inner] = 0.5;
 				}
 				else
 				{
-					weights[ContextType.Inner] = maxSimilarity < BAD_SIM ? 0.5
-						: maxSimilarity > GOOD_SIM ? 2
-						: 0.5 + 1.5 * (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
+					weights[ContextType.Inner] = candidates[0].InnerSimilarity < BAD_SIM ? 0.5
+						: candidates[0].InnerSimilarity > GOOD_SIM ? 2
+						: 0.5 + 1.5 * (Math.Max(candidates[0].InnerSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
 				}
 			}
 
