@@ -130,9 +130,6 @@ namespace Land.Markup.Binding
 					.ToList()
 				: null;
 
-			/// Упорядоченные по похожести неядровой части кандидаты
-			var orderedByNonCore = candidates.OrderByDescending(e => e.HeaderNonCoreSimilarity).ToList();
-
 			if (shouldSetCore)
 			{
 				weights[ContextType.HeaderCore] = 2;
@@ -154,8 +151,8 @@ namespace Land.Markup.Binding
 			/// или, если хороших по ядру нет, среди всех кандидатов.
 			/// Дополнительно проверяем, что первый и второй по похожести кандидаты не совпадают
 			if (goodNonCore?.Count > 0 
-				&& (orderedByNonCore.Count == 1 
-					|| ContextFinder.AreDistantEnough(orderedByNonCore[0].HeaderNonCoreSimilarity, orderedByNonCore[1].HeaderNonCoreSimilarity)))
+				&& (goodNonCore.Count == 1 
+					|| ContextFinder.AreDistantEnough(goodNonCore[0].HeaderNonCoreSimilarity, goodNonCore[1].HeaderNonCoreSimilarity)))
 			{
 				weights[ContextType.HeaderNonCore] = 1 + 3
 					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
