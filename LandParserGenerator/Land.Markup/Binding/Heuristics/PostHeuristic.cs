@@ -167,7 +167,7 @@ namespace Land.Markup.Binding
 
 	public class TuneAncestorsWeight : IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.7;
+		const double GOOD_SIM = 0.8;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
