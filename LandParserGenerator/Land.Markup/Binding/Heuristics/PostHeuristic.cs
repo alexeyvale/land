@@ -107,8 +107,8 @@ namespace Land.Markup.Binding
 				List<RemapCandidateInfo> candidates,
 				Dictionary<ContextType, double?> weights)
 		{
-			var shouldSetCore = weights[ContextType.HeaderCore].HasValue;
-			var shouldSetNonCore = weights[ContextType.HeaderNonCore].HasValue;
+			var shouldSetCore = !weights[ContextType.HeaderCore].HasValue;
+			var shouldSetNonCore = !weights[ContextType.HeaderNonCore].HasValue;
 
 			if (!shouldSetCore && !shouldSetNonCore) return weights;
 
