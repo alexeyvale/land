@@ -107,41 +107,52 @@ namespace Land.Markup.Binding
 				List<RemapCandidateInfo> candidates,
 				Dictionary<ContextType, double?> weights)
 		{
-			if (weights[ContextType.HeaderCore].HasValue
-				&& weights[ContextType.HeaderNonCore].HasValue) return weights;
+			var shouldSetCore = weights[ContextType.HeaderCore].HasValue;
+			var shouldSetNonCore = weights[ContextType.HeaderNonCore].HasValue;
+
+			if (!shouldSetCore && !shouldSetNonCore) return weights;
 
 			if (candidates.Count == 0) return weights;
 
-			var goodCore = weights[ContextType.HeaderCore].HasValue ? null
-				: candidates
+			/// Отбираем кандидатов с хорошей похожестью ядра
+			var goodCore = shouldSetCore
+				? candidates
 					.Where(c => c.HeaderCoreSimilarity >= GOOD_SIM)
 					.OrderByDescending(c => c.HeaderCoreSimilarity)
-					.ToList();
+					.ToList()
+				: null;
 
-			var goodNonCore = weights[ContextType.HeaderNonCore].HasValue ? null 
-				: (goodCore?.Count > 0 ? goodCore : candidates)
+			/// Отбираем кандидатов с хорошей похожестью остальной части заголовка
+			var goodNonCore = shouldSetNonCore
+				? (goodCore?.Count > 0 ? goodCore : candidates)
 					.Where(c => c.HeaderNonCoreSimilarity >= GOOD_SIM)
 					.OrderByDescending(c => c.HeaderNonCoreSimilarity)
-					.ToList();
+					.ToList()
+				: null;
 
+			/// Упорядоченные по похожести неядровой части кандидаты
 			var orderedByNonCore = candidates.OrderByDescending(e => e.HeaderNonCoreSimilarity).ToList();
 
-			if (!weights[ContextType.HeaderCore].HasValue)
+			if (shouldSetCore)
 			{
 				weights[ContextType.HeaderCore] = 2;
 			}
 
-			if (!weights[ContextType.HeaderNonCore].HasValue)
+			if (shouldSetNonCore)
 			{
 				weights[ContextType.HeaderNonCore] = 1;
 			}
 
+			/// Подстраиваем вес заголовка, если есть "хорошие" кандидаты
 			if (goodCore?.Count > 0)
 			{
 				weights[ContextType.HeaderCore] = 2 + 2 
 					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
 			}
 
+			/// Подстраиваем вес остальной части, если есть "хорошие" кандидаты среди хороших по ядру заголовка 
+			/// или, если хороших по ядру нет, среди всех кандидатов.
+			/// Дополнительно проверяем, что первый и второй по похожести кандидаты не совпадают
 			if (goodNonCore?.Count > 0 
 				&& (orderedByNonCore.Count == 1 
 					|| ContextFinder.AreDistantEnough(orderedByNonCore[0].HeaderNonCoreSimilarity, orderedByNonCore[1].HeaderNonCoreSimilarity)))
