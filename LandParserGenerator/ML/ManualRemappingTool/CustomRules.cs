@@ -68,7 +68,7 @@ namespace ManualRemappingTool
 			List<MappingElement> allSourceElements,
 			List<MappingElement> candidates)
 		{
-			var heuristic = new ProgrammingLanguageHeuristic();
+			var heuristic = new ContextsEqualityHeuristic();
 			var element = heuristic.GetSameElement(
 				new PointContext
 				{

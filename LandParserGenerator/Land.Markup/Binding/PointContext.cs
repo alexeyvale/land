@@ -1006,22 +1006,29 @@ namespace Land.Markup.Binding
 
 			var mayBeConfused = new List<RemapCandidateInfo>();
 
-			if (!node.Options.GetNotUnique())
-			{
-				mayBeConfused.AddRange(candidates
-					.Where(c => c.Context.AncestorsContext.SequenceEqual(nodeContext.AncestorsContext)
-						&& c.Context.HeaderContext.Core.SequenceEqual(nodeContext.HeaderContext.Core))
-				);
+			mayBeConfused.AddRange(candidates
+				.Where(c => c.Context.AncestorsContext.SequenceEqual(nodeContext.AncestorsContext)
+					&& c.Context.HeaderContext.Core.SequenceEqual(nodeContext.HeaderContext.Core))
+			);
 
-				if (mayBeConfused.Count > 0)
+			if (mayBeConfused.Count > 0)
+			{
+				var sameHeader = mayBeConfused
+					.Where(c => c.Context.HeaderContext.NonCore.SequenceEqual(nodeContext.HeaderContext.NonCore))
+					.ToList();
+
+				if (sameHeader.Count > 0)
 				{
-					var sameHeader = mayBeConfused
-						.Where(c => c.Context.HeaderContext.NonCore.SequenceEqual(nodeContext.HeaderContext.NonCore))
+					mayBeConfused = sameHeader;
+
+					var sameInner = mayBeConfused
+						.Where(c => c.Context.InnerContext.Content.Text == nodeContext.InnerContext.Content.Text
+							&& (c.Context.InnerContext.Content.Hash?.SequenceEqual(nodeContext.InnerContext.Content.Hash) ?? true))
 						.ToList();
 
-					if (sameHeader.Count > 0)
+					if (sameInner.Count > 0)
 					{
-						mayBeConfused = sameHeader;
+						mayBeConfused = sameInner;
 					}
 				}
 			}

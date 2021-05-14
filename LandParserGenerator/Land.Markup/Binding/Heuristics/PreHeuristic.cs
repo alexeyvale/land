@@ -13,7 +13,7 @@ namespace Land.Markup.Binding
 			List<RemapCandidateInfo> candidates);
 	}
 
-	public class ProgrammingLanguageHeuristic: IPreHeuristic
+	public class ContextsEqualityHeuristic: IPreHeuristic
 	{
 		private static readonly Func<PointContext, PointContext, bool> HeaderCorePredicate = (a, b) =>
 			a.HeaderContext.Core.SequenceEqual(b.HeaderContext.Core);
