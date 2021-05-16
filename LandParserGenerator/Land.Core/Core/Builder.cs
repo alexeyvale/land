@@ -266,26 +266,28 @@ namespace Land.Core
 			File.WriteAllText(parserFileName, GetParserProviderText(@namespace));
 			File.WriteAllText(nodeGeneratorFileName, GetNodeGeneratorText(builtGrammar, @namespace));
 
-			if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
-			{
-				/// Создаём файл ключа
-				Process process = new Process();
-				ProcessStartInfo startInfo = new ProcessStartInfo()
-				{
-					FileName = "cmd.exe",
-					Arguments = $"/C chcp 1251 | \"Resources/sn.exe\" -k \"{keyPath}\"",
-					CreateNoWindow = true,
-					RedirectStandardOutput = true,
-					UseShellExecute = false
-				};
-				process.StartInfo = startInfo;
-				process.Start();
+            //if (!String.IsNullOrEmpty(keyPath) && !File.Exists(keyPath))
+            //{
 
-				process.WaitForExit();
-			}
+            //    // Создаём файл ключа
 
-			/// Компилируем библиотеку
-			var codeProvider = new CSharpCodeProvider(); ;
+            //    Process process = new Process();
+            //    ProcessStartInfo startInfo = new ProcessStartInfo()
+            //    {
+            //        FileName = "cmd.exe",
+            //        Arguments = $"/C chcp 1251 | \"Resources/sn.exe\" -k \"{keyPath}\"",
+            //        CreateNoWindow = true,
+            //        RedirectStandardOutput = true,
+            //        UseShellExecute = false
+            //    };
+            //    process.StartInfo = startInfo;
+            //    process.Start();
+
+            //    process.WaitForExit();
+            //}
+
+            /// Компилируем библиотеку
+            var codeProvider = new CSharpCodeProvider();
 			var compilerParams = new System.CodeDom.Compiler.CompilerParameters();
 
 			compilerParams.GenerateInMemory = false;

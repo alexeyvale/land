@@ -36,10 +36,11 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>keys.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr4.Runtime.Standard, Version=4.7.0.0, Culture=neutral, PublicKeyToken=e78b2c5abd1fcb3f, processorArchitecture=MSIL">
@@ -120,7 +121,6 @@
     <None Include="App.config" />
     <None Include="Core\Specification\Parsing\_ymc\Land.lex" />
     <None Include="Core\Specification\Parsing\_ymc\Land.y" />
-    <None Include="keys.snk" />
     <None Include="packages.config" />
     <Content Include="Resources\Models\cs.pkl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -131,9 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\antlr-4.7-complete.jar">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\sn.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

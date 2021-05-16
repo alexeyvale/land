@@ -282,6 +282,14 @@ namespace Land.GUI
 							"Для генерации строго именованной сборки необходимы права администратора";
 						return;
 					}
+
+					if(!File.Exists(librarySettings.Input_KeysFile.Text))
+                    {
+						Grammar_StatusBar.Background = LightRed;
+						Grammar_StatusBarLabel.Content =
+							"Отсутствует файл ключа, указанный в настройках генерации строго именованной сборки";
+						return;
+					}
 				}
 
 				var messages = new List<Message>();
