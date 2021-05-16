@@ -512,8 +512,8 @@ namespace Land.Markup.Binding
 						/// Автоматически перепривязываемся, если выполняются локальные условия
 						/// и этот элемент не похож в большей степени на что-то другое
 						if (IsSimilarEnough(first)
-							&& AreDistantEnough(first, second, UseOldApproach ? 2 : (double?)null)
-							&& AreDistantEnough(first, otherBestMatch, UseOldApproach ? 2 : (double?)null))
+							&& AreDistantEnough(first, second, true ? GAP_MAX : (double?)null)
+							&& AreDistantEnough(first, otherBestMatch, true ? GAP_MAX : (double?)null))
 						{
 							first.IsAuto = true;
 
