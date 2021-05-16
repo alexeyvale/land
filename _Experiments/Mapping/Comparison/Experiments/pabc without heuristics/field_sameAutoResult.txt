@@ -1,0 +1,106 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CompilerOptionsContent.Designer.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CompilerOptionsContent.Designer.cs
+*
+private System . Windows . Forms . CheckBox cbUseOutputDirecory     178
+*
+private System . Windows . Forms . CheckBox cbUseOutputDirectory     178
+	0,978  [HC=0,95;  H=0,99;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=0,00;  A=2,00;  NA=0,00;  NN=0,50]
+private System . Windows . Forms . CheckBox cbUseOutputDirectory     178
+	0,987  [HC=0,97;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\OptionsManager.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\OptionsManager.cs
+*
+private string OptionsItemNameSkipStakTraceItemIfSourceFileInSystemDirectory     61
+*
+private string OptionsItemNameSkipStackTraceItemIfSourceFileInSystemDirectory     61
+	0,992  [HC=0,98;  H=0,99;  I=1,00;  A=1,00] *
+private string OptionsItemNameAutoInsertCode     67
+	0,703  [HC=0,38;  H=0,79;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private string OptionsItemNameSkipStackTraceItemIfSourceFileInSystemDirectory     61
+	0,994  [HC=0,98;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+private string OptionsItemNameAutoInsertCode     67
+	0,626  [HC=0,23;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SideTab.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SideTab.cs
+*
+SideTabItem choosedItem     88
+*
+SideTabItem chosenItem     103
+	0,909  [HC=0,82;  H=0,91;  I=1,00;  A=1,00] *
+float dpiY     109
+	0,487  [HC=0,09;  H=0,14;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+SideTabItem chosenItem     103
+	0,943  [HC=0,86;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+float dpiY     109
+	0,267  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+protected pattern_node _pattern     50029
+*
+protected pattern_node _pattern     52691
+	0,988  [HC=1,00;  H=1,00;  I=1,00;  A=0,96] *
+protected expression_list _pattern_expressions     51520
+	0,647  [HC=0,39;  H=0,53;  I=1,00;  A=0,91] 
+protected bool _has_deref     53720
+	0,632  [HC=0,38;  H=0,49;  I=1,00;  A=0,90] 
+protected procedure_definition _pr     15705
+	0,606  [HC=0,29;  H=0,54;  I=1,00;  A=0,92] 
+protected procedure_definition _pr     15920
+	0,605  [HC=0,29;  H=0,54;  I=1,00;  A=0,92] 
+protected statement _statment_for_formatting     15706
+	0,579  [HC=0,24;  H=0,50;  I=1,00;  A=0,92] 
+protected List < pattern_parameter > _parameters     48177
+	0,661  [HC=0,50;  H=0,35;  I=1,00;  A=0,89] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+protected pattern_node _pattern     52691
+	0,873  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,77;  NA=0,00; NN=0,00] *
+protected expression_list _pattern_expressions     51520
+	0,475  [HC=0,50;  HNC=0,25;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+protected bool _var_keyword_used     50241
+	0,439  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,77;  NA=0,00; NN=1,00] 
+protected List < pattern_parameter > _parameters     48177
+	0,373  [HC=0,50;  HNC=0,48;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+protected expression _const_params_check     49733
+	0,320  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,57;  NA=0,00; NN=0,00] 
+protected expression _const_param     51802
+	0,320  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,57;  NA=0,00; NN=0,00] 
+protected ident _identifier     52381
+	0,308  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,53;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\UserOptions.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\UserOptions.cs
+*
+public bool SkipStakTraceItemIfSourceFileInSystemDirectory     35
+*
+public bool SkipStackTraceItemIfSourceFileInSystemDirectory     35
+	0,990  [HC=0,98;  H=0,99;  I=1,00;  A=1,00] *
+public bool AutoInsertCodeIsEnabledOnStartup     41
+	0,617  [HC=0,20;  H=0,73;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public bool SkipStackTraceItemIfSourceFileInSystemDirectory     35
+	0,992  [HC=0,98;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public bool AutoInsertCodeIsEnabledOnStartup     41
+	0,573  [HC=0,10;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+

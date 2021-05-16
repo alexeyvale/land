@@ -1,0 +1,1572 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     840
+*
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     901
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+private Task ProcessUnknownFrameAsync ( )     930
+	0,749  [HC=0,69;  H=0,43;  I=1,00;  A=0,88] 
+private Task ProcessSettingsFrameAsync ( in ReadOnlySequence < byte > payload )     714
+	0,827  [HC=0,69;  H=0,97;  I=1,00;  A=0,88] #
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     462
+	0,812  [HC=0,66;  H=0,97;  I=1,00;  A=0,88] #
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,812  [HC=0,66;  H=0,97;  I=1,00;  A=0,88] #
+private Task ProcessPriorityFrameAsync ( )     654
+	0,734  [HC=0,66;  H=0,42;  I=1,00;  A=0,88] #
+private Task ProcessGoAwayFrameAsync ( )     820
+	0,734  [HC=0,66;  H=0,42;  I=1,00;  A=0,88] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     901
+	0,992  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,54] *
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,835  [HC=0,75;  HNC=1,00;  I=0,64;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     462
+	0,809  [HC=0,75;  HNC=1,00;  I=0,50;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessSettingsFrameAsync ( in ReadOnlySequence < byte > payload )     714
+	0,795  [HC=0,75;  HNC=1,00;  I=0,42;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessPriorityFrameAsync ( )     654
+	0,600  [HC=0,75;  HNC=0,31;  I=0,73;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessHeadersFrameAsync < TContext > ( IHttpApplication < TContext > application , in ReadOnlySequence < byte > payload )     518
+	0,569  [HC=0,48;  HNC=0,65;  I=0,42;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessFrameAsync < TContext > ( IHttpApplication < TContext > application , in ReadOnlySequence < byte > payload )     435
+	0,562  [HC=0,38;  HNC=0,65;  I=0,57;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ModelMetadataIdentity.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ModelMetadataIdentity.cs
+*
+public override bool Equals ( object obj )     199
+*
+public override bool Equals ( object ? obj )     198
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+*
+HC=4;  HNC=3,57;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public override bool Equals ( object ? obj )     198
+	0,991  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Authorization.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Authorization.netcoreapp.cs
+*
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object resource , string policyName )     168
+*
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     168
+	0,996  [HC=1,00;  H=0,97;  I=1,00;  A=1,00] *
+public override string ToString ( )     201
+	0,444  [HC=0,21;  H=0,08;  I=1,00;  A=0,69] 
+public override string ToString ( )     220
+	0,444  [HC=0,21;  H=0,08;  I=1,00;  A=0,69] 
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     167
+	0,949  [HC=1,00;  H=0,64;  I=1,00;  A=1,00] #
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     137
+	0,947  [HC=1,00;  H=0,92;  I=1,00;  A=0,86] #
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     135
+	0,904  [HC=1,00;  H=0,62;  I=1,00;  A=0,86] #
+public static System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( this Microsoft . AspNetCore . Authorization . IAuthorizationService service , System . Security . Claims . ClaimsPrincipal user , object ? resource , Microsoft . AspNetCore . Authorization . AuthorizationPolicy policy )     97
+	0,880  [HC=1,00;  H=0,61;  I=1,00;  A=0,77] #
+*
+HC=4;  HNC=3,90;  I=0,01;  A=1,00;  NA=0,00;  NN=2,00]
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     168
+	0,998  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override string ToString ( )     188
+	0,040  [HC=0,00;  HNC=0,01;  I=0,00;  A=0,39;  NA=0,00; NN=0,00] 
+public override string ToString ( )     201
+	0,040  [HC=0,00;  HNC=0,01;  I=0,00;  A=0,39;  NA=0,00; NN=0,00] 
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     137
+	0,738  [HC=1,00;  HNC=0,86;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     167
+	0,652  [HC=1,00;  HNC=0,54;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     135
+	0,598  [HC=1,00;  HNC=0,47;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public static System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( this Microsoft . AspNetCore . Authorization . IAuthorizationService service , System . Security . Claims . ClaimsPrincipal user , object ? resource , Microsoft . AspNetCore . Authorization . AuthorizationPolicy policy )     97
+	0,572  [HC=1,00;  HNC=0,45;  I=0,00;  A=0,48;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticateResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticateResult.cs
+*
+public static AuthenticateResult Fail ( string failureMessage )     98
+*
+public static AuthenticateResult Fail ( string ? failureMessage )     120
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+public static AuthenticateResult Fail ( string ? failureMessage , AuthenticationProperties ? properties )     129
+	0,945  [HC=1,00;  H=0,62;  I=1,00;  A=1,00] 
+public static AuthenticateResult Fail ( Exception ? failure , AuthenticationProperties ? properties )     110
+	0,930  [HC=1,00;  H=0,51;  I=1,00;  A=1,00] 
+public AuthenticateResult Clone ( )     53
+	0,500  [HC=0,00;  H=0,50;  I=1,00;  A=1,00] 
+public static AuthenticateResult Fail ( Exception ? failure )     99
+	0,962  [HC=1,00;  H=0,73;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,70;  I=1,48;  A=0,50;  NA=0,00;  NN=2,00]
+public static AuthenticateResult Fail ( string ? failureMessage )     120
+	0,994  [HC=1,00;  HNC=0,98;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static AuthenticateResult Fail ( string ? failureMessage , AuthenticationProperties ? properties )     129
+	0,832  [HC=1,00;  HNC=0,66;  I=0,52;  A=1,00;  NA=0,00; NN=1,00] 
+public AuthenticateResult Clone ( )     53
+	0,140  [HC=0,00;  HNC=0,31;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public static AuthenticateResult Fail ( Exception ? failure )     99
+	0,685  [HC=1,00;  HNC=0,58;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+public static AuthenticateResult Fail ( Exception ? failure , AuthenticationProperties ? properties )     110
+	0,537  [HC=1,00;  HNC=0,48;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     439
+*
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     462
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,880  [HC=0,81;  H=0,98;  I=1,00;  A=0,88] 
+private Task ProcessSettingsFrameAsync ( in ReadOnlySequence < byte > payload )     714
+	0,841  [HC=0,72;  H=0,97;  I=1,00;  A=0,88] 
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     901
+	0,812  [HC=0,66;  H=0,97;  I=1,00;  A=0,88] 
+private Task ProcessGoAwayFrameAsync ( )     820
+	0,790  [HC=0,78;  H=0,43;  I=1,00;  A=0,88] 
+private Task ProcessRstStreamFrameAsync ( )     679
+	0,767  [HC=0,73;  H=0,43;  I=1,00;  A=0,88] 
+private Task ProcessPriorityFrameAsync ( )     654
+	0,763  [HC=0,72;  H=0,43;  I=1,00;  A=0,88] 
+*
+HC=4;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     462
+	0,992  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,31] *
+private Task ProcessSettingsFrameAsync ( in ReadOnlySequence < byte > payload )     714
+	0,853  [HC=0,75;  HNC=1,00;  I=0,74;  A=0,91;  NA=0,00; NN=0,31] 
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,814  [HC=0,75;  HNC=1,00;  I=0,52;  A=0,91;  NA=0,00; NN=0,31] 
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     901
+	0,809  [HC=0,75;  HNC=1,00;  I=0,50;  A=0,91;  NA=0,00; NN=0,31] 
+private Task ProcessHeadersFrameAsync < TContext > ( IHttpApplication < TContext > application , in ReadOnlySequence < byte > payload )     518
+	0,625  [HC=0,48;  HNC=0,65;  I=0,72;  A=0,91;  NA=0,00; NN=0,31] 
+private Task ProcessPriorityFrameAsync ( )     654
+	0,567  [HC=0,75;  HNC=0,31;  I=0,55;  A=0,91;  NA=0,00; NN=0,31] 
+private Task ProcessWindowUpdateFrameAsync ( )     837
+	0,567  [HC=0,60;  HNC=0,31;  I=0,85;  A=0,91;  NA=0,00; NN=0,31] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.Forms.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.Forms.netstandard2.0.cs
+*
+public override bool Equals ( object obj )     49
+*
+public override bool Equals ( object ? obj )     50
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+*
+HC=4;  HNC=3,57;  I=0,48;  A=0,50;  NA=0,00;  NN=2,00]
+public override bool Equals ( object ? obj )     50
+	0,990  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+*
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+*
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,968  [HC=1,00;  H=1,00;  I=1,00;  A=0,89] *
+public Task DiagnosticsAreReturned_IfRouteAttribute_IsAppliedToPageModel ( )     82
+	0,802  [HC=0,64;  H=0,93;  I=1,00;  A=0,89] 
+public Task NoDiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageModel ( )     46
+	0,878  [HC=0,80;  H=0,96;  I=1,00;  A=0,89] #
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,870  [HC=0,79;  H=0,96;  I=1,00;  A=0,89] #
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethod ( )     54
+	0,864  [HC=0,77;  H=0,96;  I=1,00;  A=0,89] #
+public Task DiagnosticsAreReturned_IfRouteAttributesAreAppliedToPageHandlerMethod ( )     74
+	0,861  [HC=0,76;  H=0,95;  I=1,00;  A=0,89] #
+public Task DiagnosticsAreReturned_IfAttributeIsAppliedToBaseType ( )     70
+	0,781  [HC=0,59;  H=0,92;  I=1,00;  A=0,89] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,994  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=1,00] *
+public Task DiagnosticsAreReturned_IfRouteAttribute_IsAppliedToPageModel ( )     82
+	0,780  [HC=0,67;  HNC=1,00;  I=0,33;  A=0,86;  NA=0,00; NN=1,00] 
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,877  [HC=0,83;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+public Task DiagnosticsAreReturned_IfAttributeIsAppliedToBaseType ( )     70
+	0,825  [HC=0,63;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethod ( )     54
+	0,821  [HC=0,75;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethodForTypeWithPageModelAttribute ( )     66
+	0,757  [HC=0,47;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+public Task NoDiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageModel ( )     46
+	0,738  [HC=0,75;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TimingPipeFlusher.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TimingPipeFlusher.cs
+*
+public ValueTask < FlushResult > FlushAsync ( IHttpOutputAborter outputAborter , CancellationToken cancellationToken )     39
+*
+public ValueTask < FlushResult > FlushAsync ( IHttpOutputAborter ? outputAborter , CancellationToken cancellationToken )     41
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  A=1,00] *
+public ValueTask < FlushResult > FlushAsync ( MinDataRate ? minRate , long count )     46
+	0,955  [HC=1,00;  H=0,69;  I=1,00;  A=1,00] 
+public ValueTask < FlushResult > FlushAsync ( MinDataRate ? minRate , long count , IHttpOutputAborter ? outputAborter , CancellationToken cancellationToken )     51
+	0,946  [HC=1,00;  H=0,62;  I=1,00;  A=1,00] 
+*
+HC=4;  HNC=3,90;  I=2,00;  A=0,50;  NA=0,00;  NN=0,00]
+public ValueTask < FlushResult > FlushAsync ( IHttpOutputAborter ? outputAborter , CancellationToken cancellationToken )     41
+	0,997  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,63] *
+public ValueTask < FlushResult > FlushAsync ( MinDataRate ? minRate , long count , IHttpOutputAborter ? outputAborter , CancellationToken cancellationToken )     51
+	0,745  [HC=1,00;  HNC=0,70;  I=0,26;  A=1,00;  NA=0,00; NN=0,63] 
+public ValueTask < FlushResult > FlushAsync ( MinDataRate ? minRate , long count )     46
+	0,661  [HC=1,00;  HNC=0,31;  I=0,58;  A=1,00;  NA=0,00; NN=0,63] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+*
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < System . String , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > . GetEnumerator ( )     780
+*
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > . GetEnumerator ( )     795
+	0,977  [HC=0,96;  H=0,97;  I=1,00;  A=1,00] *
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > . GetEnumerator ( )     748
+	0,881  [HC=0,96;  H=0,97;  I=1,00;  A=0,67] #
+System . Collections . Generic . IEnumerator < string > System . Collections . Generic . IEnumerable < string > . GetEnumerator ( )     773
+	0,635  [HC=0,37;  H=0,37;  I=1,00;  A=0,98] #
+public static Microsoft . AspNetCore . Mvc . ModelBinding . BindingInfo ? GetBindingInfo ( System . Collections . Generic . IEnumerable < object > attributes , Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata modelMetadata )     471
+	0,404  [HC=0,07;  H=0,42;  I=1,00;  A=0,59] #
+public static Microsoft . AspNetCore . Mvc . ModelBinding . BindingInfo ? GetBindingInfo ( System . Collections . Generic . IEnumerable < object > attributes )     470
+	0,385  [HC=0,07;  H=0,29;  I=1,00;  A=0,59] #
+public void SetModelValue ( string key , object ? rawValue , string attemptedValue )     746
+	0,374  [HC=0,07;  H=0,08;  I=1,00;  A=0,67] #
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . BindingSource ? other )     493
+	0,348  [HC=0,03;  H=0,16;  I=1,00;  A=0,59] #
+*
+HC=3,52559300873908;  HNC=4,00;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > . GetEnumerator ( )     795
+	0,984  [HC=0,95;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , Microsoft . AspNetCore . Mvc . ModelBinding . ModelStateEntry > > . GetEnumerator ( )     748
+	0,644  [HC=0,95;  HNC=1,00;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] #
+System . Collections . Generic . IEnumerator < string > System . Collections . Generic . IEnumerable < string > . GetEnumerator ( )     773
+	0,503  [HC=0,32;  HNC=0,83;  I=1,00;  A=0,79;  NA=0,00; NN=0,00] #
+public void SetModelValue ( string key , object ? rawValue , string attemptedValue )     746
+	0,089  [HC=0,06;  HNC=0,02;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] #
+public static Microsoft . AspNetCore . Mvc . ModelBinding . BindingInfo ? GetBindingInfo ( System . Collections . Generic . IEnumerable < object > attributes )     470
+	0,079  [HC=0,06;  HNC=0,08;  I=1,00;  A=0,18;  NA=0,00; NN=0,00] #
+public static Microsoft . AspNetCore . Mvc . ModelBinding . BindingInfo ? GetBindingInfo ( System . Collections . Generic . IEnumerable < object > attributes , Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata modelMetadata )     471
+	0,077  [HC=0,06;  HNC=0,07;  I=1,00;  A=0,18;  NA=0,00; NN=0,00] #
+public override bool Equals ( object ? obj )     694
+	0,055  [HC=0,00;  HNC=0,06;  I=1,00;  A=0,24;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Routing.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Routing.Abstractions.netcoreapp.cs
+*
+public abstract string GetUriByAddress < TAddress > ( Microsoft . AspNetCore . Http . HttpContext httpContext , TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Routing . RouteValueDictionary ambientValues = null , string scheme = null , Microsoft . AspNetCore . Http . HostString ? host = default ( Microsoft . AspNetCore . Http . HostString ? ) , Microsoft . AspNetCore . Http . PathString ? pathBase = default ( Microsoft . AspNetCore . Http . PathString ? ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions options = null )     35
+*
+public abstract string GetUriByAddress < TAddress > ( Microsoft . AspNetCore . Http . HttpContext httpContext , TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Routing . RouteValueDictionary ? ambientValues = null , string ? scheme = null , Microsoft . AspNetCore . Http . HostString ? host = default ( Microsoft . AspNetCore . Http . HostString ? ) , Microsoft . AspNetCore . Http . PathString ? pathBase = default ( Microsoft . AspNetCore . Http . PathString ? ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     35
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  A=1,00] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , string scheme , Microsoft . AspNetCore . Http . HostString host , Microsoft . AspNetCore . Http . PathString pathBase = default ( Microsoft . AspNetCore . Http . PathString ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     36
+	0,955  [HC=1,00;  H=0,68;  I=1,00;  A=1,00] 
+public abstract string GetPathByAddress < TAddress > ( Microsoft . AspNetCore . Http . HttpContext httpContext , TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Routing . RouteValueDictionary ? ambientValues = null , Microsoft . AspNetCore . Http . PathString ? pathBase = default ( Microsoft . AspNetCore . Http . PathString ? ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     33
+	0,900  [HC=0,85;  H=0,76;  I=1,00;  A=1,00] #
+public abstract string GetPathByAddress < TAddress > ( TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Http . PathString pathBase = default ( Microsoft . AspNetCore . Http . PathString ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     34
+	0,874  [HC=0,85;  H=0,58;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,97;  I=0,01;  A=0,50;  NA=0,00;  NN=2,00]
+public abstract string GetUriByAddress < TAddress > ( Microsoft . AspNetCore . Http . HttpContext httpContext , TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Routing . RouteValueDictionary ? ambientValues = null , string ? scheme = null , Microsoft . AspNetCore . Http . HostString ? host = default ( Microsoft . AspNetCore . Http . HostString ? ) , Microsoft . AspNetCore . Http . PathString ? pathBase = default ( Microsoft . AspNetCore . Http . PathString ? ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     35
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , string scheme , Microsoft . AspNetCore . Http . HostString host , Microsoft . AspNetCore . Http . PathString pathBase = default ( Microsoft . AspNetCore . Http . PathString ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     36
+	0,920  [HC=1,00;  HNC=0,79;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public abstract string GetPathByAddress < TAddress > ( Microsoft . AspNetCore . Http . HttpContext httpContext , TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Routing . RouteValueDictionary ? ambientValues = null , Microsoft . AspNetCore . Http . PathString ? pathBase = default ( Microsoft . AspNetCore . Http . PathString ? ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     33
+	0,695  [HC=0,84;  HNC=0,86;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public abstract string GetPathByAddress < TAddress > ( TAddress address , Microsoft . AspNetCore . Routing . RouteValueDictionary values , Microsoft . AspNetCore . Http . PathString pathBase = default ( Microsoft . AspNetCore . Http . PathString ) , Microsoft . AspNetCore . Http . FragmentString fragment = default ( Microsoft . AspNetCore . Http . FragmentString ) , Microsoft . AspNetCore . Routing . LinkOptions ? options = null )     34
+	0,641  [HC=0,84;  HNC=0,72;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpConnectionDispatcherTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpConnectionDispatcherTests.cs
+*
+public async Task SynchronusExceptionEndsConnection ( )     963
+*
+public async Task SynchronousExceptionEndsConnection ( )     965
+	0,987  [HC=0,97;  H=1,00;  I=1,00;  A=1,00] *
+public async Task LongPollingConnectionClosingTriggersConnectionClosedToken ( )     2274
+	0,698  [HC=0,33;  H=0,89;  I=1,00;  A=1,00] 
+public async Task SSEConnectionClosingTriggersConnectionClosedToken ( )     2328
+	0,695  [HC=0,33;  H=0,89;  I=1,00;  A=1,00] 
+public async Task WebSocketConnectionClosingTriggersConnectionClosedToken ( )     2355
+	0,687  [HC=0,31;  H=0,88;  I=1,00;  A=1,00] 
+public async Task AbortingConnectionAbortsHttpContextAndTriggersConnectionClosedToken ( )     2403
+	0,683  [HC=0,30;  H=0,88;  I=1,00;  A=1,00] 
+public async Task LongPollingConnectionClosesWhenSendTimeoutReached ( )     1116
+	0,658  [HC=0,24;  H=0,87;  I=1,00;  A=1,00] 
+public async Task SSEConnectionClosesWhenSendTimeoutReached ( )     1156
+	0,658  [HC=0,24;  H=0,87;  I=1,00;  A=1,00] 
+*
+HC=3,77272727272727;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=2,00]
+public async Task SynchronousExceptionEndsConnection ( )     965
+	0,990  [HC=0,98;  HNC=1,00;  I=0,98;  A=1,00;  NA=0,00; NN=1,00] *
+public async Task SSEConnectionClosingTriggersConnectionClosedToken ( )     2328
+	0,586  [HC=0,21;  HNC=1,00;  I=0,84;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task AbortingConnectionAbortsHttpContextAndTriggersConnectionClosedToken ( )     2403
+	0,580  [HC=0,20;  HNC=1,00;  I=0,83;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task LongPollingConnectionClosingTriggersConnectionClosedToken ( )     2274
+	0,567  [HC=0,19;  HNC=1,00;  I=0,77;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task WebSocketConnectionClosingTriggersConnectionClosedToken ( )     2355
+	0,565  [HC=0,19;  HNC=1,00;  I=0,75;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task WebSocketConnectionClosesWhenSendTimeoutReached ( )     1188
+	0,547  [HC=0,06;  HNC=1,00;  I=0,88;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task SSEConnectionClosesWhenSendTimeoutReached ( )     1156
+	0,543  [HC=0,07;  HNC=1,00;  I=0,83;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteValueDictionary.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteValueDictionary.cs
+*
+bool ICollection < KeyValuePair < string , object > > . Remove ( KeyValuePair < string , object > item )     377
+*
+bool ICollection < KeyValuePair < string , object ? > > . Remove ( KeyValuePair < string , object ? > item )     379
+	0,979  [HC=0,98;  H=0,91;  I=1,00;  A=1,00] *
+public bool Remove ( string key , out object ? value )     442
+	0,513  [HC=0,13;  H=0,21;  I=1,00;  A=1,00] 
+void ICollection < KeyValuePair < string , object ? > > . Add ( KeyValuePair < string , object ? > item )     261
+	0,913  [HC=0,85;  H=0,84;  I=1,00;  A=1,00] #
+bool ICollection < KeyValuePair < string , object ? > > . Contains ( KeyValuePair < string , object ? > item )     307
+	0,904  [HC=0,82;  H=0,87;  I=1,00;  A=1,00] #
+void ICollection < KeyValuePair < string , object ? > > . CopyTo ( KeyValuePair < string , object ? > [ ] array , int arrayIndex )     335
+	0,889  [HC=0,85;  H=0,66;  I=1,00;  A=1,00] #
+IEnumerator < KeyValuePair < string , object ? > > IEnumerable < KeyValuePair < string , object ? > > . GetEnumerator ( )     367
+	0,775  [HC=0,62;  H=0,57;  I=1,00;  A=1,00] #
+*
+HC=3,88505747126437;  HNC=3,83;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+bool ICollection < KeyValuePair < string , object ? > > . Remove ( KeyValuePair < string , object ? > item )     379
+	0,981  [HC=0,99;  HNC=0,99;  I=0,93;  A=1,00;  NA=0,00; NN=1,00] *
+public bool Remove ( string key , out object ? value )     442
+	0,313  [HC=0,12;  HNC=0,35;  I=0,77;  A=1,00;  NA=0,00; NN=0,00] 
+void ICollection < KeyValuePair < string , object ? > > . CopyTo ( KeyValuePair < string , object ? > [ ] array , int arrayIndex )     335
+	0,550  [HC=0,87;  HNC=0,49;  I=0,49;  A=1,00;  NA=0,00; NN=0,00] #
+bool ICollection < KeyValuePair < string , object ? > > . Contains ( KeyValuePair < string , object ? > item )     307
+	0,520  [HC=0,87;  HNC=0,99;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+void ICollection < KeyValuePair < string , object ? > > . Add ( KeyValuePair < string , object ? > item )     261
+	0,496  [HC=0,87;  HNC=0,76;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+IEnumerator < KeyValuePair < string , object ? > > IEnumerable < KeyValuePair < string , object ? > > . GetEnumerator ( )     367
+	0,291  [HC=0,76;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpCharacters.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpCharacters.cs
+*
+public unsafe static int IndexOfInvalidTokenChar ( byte * s , int length )     168
+*
+public static int IndexOfInvalidTokenChar ( ReadOnlySpan < byte > span )     168
+	0,924  [HC=1,00;  H=0,47;  I=1,00;  A=1,00] *
+*
+HC=4;  HNC=1,00;  I=1,43;  A=0,50;  NA=0,00;  NN=2,00]
+public static int IndexOfInvalidTokenChar ( ReadOnlySpan < byte > span )     168
+	0,903  [HC=1,00;  HNC=0,44;  I=0,79;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+public async Task ChallengeThrowsForSchemeMismatch ( )     30
+*
+public async Task ChallengeThrowsForSchemeMismatch ( )     54
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  A=0,78] *
+public async Task ForbidThrowsForSchemeMismatch ( )     69
+	0,809  [HC=0,72;  H=0,95;  I=1,00;  A=0,78] 
+public async Task CanSignInWithoutIsAuthenticated ( )     98
+	0,583  [HC=0,22;  H=0,87;  I=1,00;  A=0,78] 
+public async Task CanOnlySignInWithIsAuthenticated ( )     84
+	0,569  [HC=0,19;  H=0,86;  I=1,00;  A=0,78] 
+public async Task CustomHandlersAuthenticateRunsClaimsTransformationEveryTime ( )     30
+	0,561  [HC=0,17;  H=0,86;  I=1,00;  A=0,78] 
+public async Task ServicesWithDefaultForbidMethod_CallsForbidMethod ( )     232
+	0,559  [HC=0,17;  H=0,86;  I=1,00;  A=0,78] 
+public async Task AuthenticateThrowsForSchemeMismatch ( )     15
+	0,807  [HC=0,71;  H=0,95;  I=1,00;  A=0,78] #
+*
+HC=4;  HNC=1,00;  I=2,00;  A=0,95;  NA=0,00;  NN=0,00]
+public async Task ChallengeThrowsForSchemeMismatch ( )     54
+	0,967  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,72;  NA=0,00; NN=0,03] *
+public async Task ForbidThrowsForSchemeMismatch ( )     69
+	0,845  [HC=0,80;  HNC=1,00;  I=0,92;  A=0,72;  NA=0,00; NN=0,03] 
+public async Task ServicesWithDefaultForbidMethod_CallsForbidMethod ( )     232
+	0,423  [HC=0,06;  HNC=1,00;  I=0,71;  A=0,72;  NA=0,00; NN=0,03] 
+public async Task ServicesWithDefaultUberMethodsTest ( )     177
+	0,410  [HC=0,00;  HNC=1,00;  I=0,79;  A=0,72;  NA=0,00; NN=0,03] 
+public async Task ServicesWithDefaultSignInMethodsTest ( )     195
+	0,409  [HC=0,00;  HNC=1,00;  I=0,78;  A=0,72;  NA=0,00; NN=0,03] 
+public async Task ServicesWithDefaultSignOutMethodsTest ( )     213
+	0,405  [HC=0,00;  HNC=1,00;  I=0,77;  A=0,72;  NA=0,00; NN=0,03] 
+public async Task AuthenticateThrowsForSchemeMismatch ( )     15
+	0,843  [HC=0,80;  HNC=1,00;  I=0,91;  A=0,72;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ParameterViewTest.Assignment.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ParameterViewTest.Assignment.cs
+*
+public void HasCaptureUnmatchedValuesParameteterWithWrongType_Throws ( )     386
+*
+public void HasCaptureUnmatchedValuesParameterWithWrongType_Throws ( )     386
+	0,983  [HC=0,96;  H=0,99;  I=1,00;  A=1,00] *
+*
+HC=3,7979797979798;  HNC=4,00;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public void HasCaptureUnmatchedValuesParameterWithWrongType_Throws ( )     386
+	0,994  [HC=0,98;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+void IHttp2StreamLifetimeHandler . OnStreamCompleted ( Http2Stream stream )     998
+*
+void IHttp2StreamLifetimeHandler . OnStreamCompleted ( Http2Stream stream )     1088
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+public void IncrementActiveClientStreamCount ( )     1392
+	0,589  [HC=0,36;  H=0,30;  I=1,00;  A=0,88] 
+private Http2StreamContext CreateHttp2StreamContext ( )     621
+	0,588  [HC=0,33;  H=0,36;  I=1,00;  A=0,88] 
+public void DecrementActiveClientStreamCount ( )     1397
+	0,579  [HC=0,33;  H=0,30;  I=1,00;  A=0,88] 
+public void OnHeadersComplete ( bool endStream )     1246
+	0,577  [HC=0,29;  H=0,42;  I=1,00;  A=0,88] 
+private void ReturnStream ( Http2Stream stream )     642
+	0,567  [HC=0,22;  H=0,55;  I=1,00;  A=0,88] 
+public void OnInputOrOutputCompleted ( )     142
+	0,576  [HC=0,31;  H=0,35;  I=1,00;  A=0,88] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+void IHttp2StreamLifetimeHandler . OnStreamCompleted ( Http2Stream stream )     1088
+	0,992  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,80] *
+private void RemoveStream ( Http2Stream stream )     1137
+	0,537  [HC=0,11;  HNC=0,93;  I=0,42;  A=0,91;  NA=0,00; NN=0,80] 
+private void ReturnStream ( Http2Stream stream )     642
+	0,460  [HC=0,11;  HNC=0,93;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public void OnHeadersComplete ( bool endStream )     1246
+	0,310  [HC=0,21;  HNC=0,42;  I=0,00;  A=0,91;  NA=0,00; NN=0,80] 
+public void OnInputOrOutputCompleted ( )     142
+	0,284  [HC=0,16;  HNC=0,25;  I=0,28;  A=0,91;  NA=0,00; NN=0,00] #
+private void AbortStream ( int streamId , IOException error )     1074
+	0,277  [HC=0,11;  HNC=0,24;  I=0,38;  A=0,91;  NA=0,00; NN=0,00] #
+public void StopProcessingNextRequest ( )     158
+	0,254  [HC=0,05;  HNC=0,25;  I=0,34;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Html.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Html.Abstractions.netcoreapp.cs
+*
+public Microsoft . AspNetCore . Html . IHtmlContentBuilder AppendHtml ( Microsoft . AspNetCore . Html . IHtmlContent htmlContent )     13
+*
+public Microsoft . AspNetCore . Html . IHtmlContentBuilder AppendHtml ( Microsoft . AspNetCore . Html . IHtmlContent ? htmlContent )     14
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+public Microsoft . AspNetCore . Html . IHtmlContentBuilder AppendHtml ( string ? encoded )     15
+	0,943  [HC=1,00;  H=0,60;  I=1,00;  A=1,00] 
+*
+HC=4;  HNC=3,90;  I=0,12;  A=0,50;  NA=0,00;  NN=2,00]
+public Microsoft . AspNetCore . Html . IHtmlContentBuilder AppendHtml ( Microsoft . AspNetCore . Html . IHtmlContent ? htmlContent )     14
+	0,998  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public Microsoft . AspNetCore . Html . IHtmlContentBuilder AppendHtml ( string ? encoded )     15
+	0,740  [HC=1,00;  HNC=0,30;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HtmlContentBuilder.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HtmlContentBuilder.cs
+*
+public IHtmlContentBuilder AppendHtml ( string encoded )     87
+*
+public IHtmlContentBuilder AppendHtml ( string ? encoded )     89
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  A=1,00] *
+public IHtmlContentBuilder AppendHtml ( IHtmlContent ? htmlContent )     77
+	0,953  [HC=1,00;  H=0,67;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,53;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public IHtmlContentBuilder AppendHtml ( string ? encoded )     89
+	0,991  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public IHtmlContentBuilder AppendHtml ( IHtmlContent ? htmlContent )     77
+	0,512  [HC=1,00;  HNC=0,31;  I=0,28;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ModelMetadata.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ModelMetadata.cs
+*
+public bool Equals ( ModelMetadata other )     418
+*
+public bool Equals ( ModelMetadata ? other )     418
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  A=1,00] *
+public override bool Equals ( object ? obj )     436
+	0,943  [HC=1,00;  H=0,60;  I=1,00;  A=1,00] 
+*
+HC=4;  HNC=3,68;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public bool Equals ( ModelMetadata ? other )     418
+	0,993  [HC=1,00;  HNC=0,98;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override bool Equals ( object ? obj )     436
+	0,633  [HC=1,00;  HNC=0,33;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+*
+public Task NoDiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageModel ( )     46
+*
+public Task NoDiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageModel ( )     46
+	0,968  [HC=1,00;  H=1,00;  I=1,00;  A=0,89] *
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,878  [HC=0,80;  H=0,96;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfRouteAttribute_IsAppliedToPageModel ( )     82
+	0,854  [HC=0,75;  H=0,95;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfAttributeIsAppliedToBaseType ( )     70
+	0,808  [HC=0,65;  H=0,93;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,786  [HC=0,60;  H=0,92;  I=1,00;  A=0,89] 
+public Task NoDiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageModel ( )     42
+	0,861  [HC=0,77;  H=0,95;  I=1,00;  A=0,89] #
+public Task NoDiagnosticsAreReturned_IfFiltersAreAppliedToPageModel ( )     38
+	0,854  [HC=0,75;  H=0,95;  I=1,00;  A=0,89] #
+*
+HC=4;  HNC=1,00;  I=0,35;  A=0,50;  NA=0,00;  NN=0,00]
+public Task NoDiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageModel ( )     46
+	0,988  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,44] *
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,757  [HC=0,75;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,44] 
+public Task DiagnosticsAreReturned_IfRouteAttribute_IsAppliedToPageModel ( )     82
+	0,757  [HC=0,75;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,44] 
+public Task DiagnosticsAreReturned_IfAttributeIsAppliedToBaseType ( )     70
+	0,672  [HC=0,63;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,44] 
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,643  [HC=0,58;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,44] 
+public Task NoDiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageModel ( )     42
+	0,874  [HC=0,83;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+public Task NoDiagnosticsAreReturned_IfFiltersAreAppliedToPageModel ( )     38
+	0,817  [HC=0,75;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static bool TryConvertToDateTimeOffset ( object obj , System . Globalization . CultureInfo culture , string format , out System . DateTimeOffset value )     34
+*
+public static bool TryConvertToDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTimeOffset value )     36
+	0,989  [HC=1,00;  H=0,92;  I=1,00;  A=1,00] *
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTimeOffset ? value )     46
+	0,882  [HC=0,76;  H=0,88;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTimeOffset ? value )     45
+	0,862  [HC=0,76;  H=0,74;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTime ? value )     44
+	0,765  [HC=0,50;  H=0,85;  I=1,00;  A=1,00] 
+public static bool TryConvertToDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTimeOffset value )     35
+	0,970  [HC=1,00;  H=0,79;  I=1,00;  A=1,00] #
+public static bool TryConvertToDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTime value )     34
+	0,886  [HC=0,77;  H=0,90;  I=1,00;  A=1,00] #
+public static bool TryConvertToDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTime value )     33
+	0,867  [HC=0,77;  H=0,76;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public static bool TryConvertToDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTimeOffset value )     36
+	0,999  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTimeOffset ? value )     46
+	0,682  [HC=0,86;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTimeOffset ? value )     45
+	0,671  [HC=0,86;  HNC=0,90;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public static bool TryConvertToNullableDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTime ? value )     44
+	0,583  [HC=0,67;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public static bool TryConvertToDateTimeOffset ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTimeOffset value )     35
+	0,742  [HC=1,00;  HNC=0,90;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public static bool TryConvertToDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , string format , out System . DateTime value )     34
+	0,665  [HC=0,83;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public static bool TryConvertToDateTime ( object ? obj , System . Globalization . CultureInfo ? culture , out System . DateTime value )     33
+	0,655  [HC=0,83;  HNC=0,86;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ItemsDictionary.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ItemsDictionary.cs
+*
+IEnumerator < KeyValuePair < object , object > > IEnumerable < KeyValuePair < object , object > > . GetEnumerator ( )     133
+*
+IEnumerator < KeyValuePair < object , object ? > > IEnumerable < KeyValuePair < object , object ? > > . GetEnumerator ( )     135
+	0,980  [HC=0,98;  H=0,92;  I=1,00;  A=1,00] *
+bool ICollection < KeyValuePair < object , object ? > > . Contains ( KeyValuePair < object , object ? > item )     94
+	0,775  [HC=0,61;  H=0,59;  I=1,00;  A=1,00] #
+bool ICollection < KeyValuePair < object , object ? > > . Remove ( KeyValuePair < object , object ? > item )     112
+	0,775  [HC=0,61;  H=0,59;  I=1,00;  A=1,00] #
+void ICollection < KeyValuePair < object , object ? > > . Clear ( )     92
+	0,768  [HC=0,63;  H=0,49;  I=1,00;  A=1,00] #
+void ICollection < KeyValuePair < object , object ? > > . CopyTo ( KeyValuePair < object , object ? > [ ] array , int arrayIndex )     97
+	0,761  [HC=0,59;  H=0,55;  I=1,00;  A=1,00] #
+void ICollection < KeyValuePair < object , object ? > > . Add ( KeyValuePair < object , object ? > item )     86
+	0,758  [HC=0,57;  H=0,58;  I=1,00;  A=1,00] #
+bool IDictionary < object , object ? > . Remove ( object key )     64
+	0,636  [HC=0,37;  H=0,34;  I=1,00;  A=1,00] #
+*
+HC=3,89690721649485;  HNC=3,95;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+IEnumerator < KeyValuePair < object , object ? > > IEnumerable < KeyValuePair < object , object ? > > . GetEnumerator ( )     135
+	0,996  [HC=0,99;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+void ICollection < KeyValuePair < object , object ? > > . Clear ( )     92
+	0,551  [HC=0,68;  HNC=0,77;  I=0,31;  A=1,00;  NA=0,00; NN=0,00] #
+void ICollection < KeyValuePair < object , object ? > > . Add ( KeyValuePair < object , object ? > item )     86
+	0,263  [HC=0,68;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool ICollection < KeyValuePair < object , object ? > > . Contains ( KeyValuePair < object , object ? > item )     94
+	0,263  [HC=0,68;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool ICollection < KeyValuePair < object , object ? > > . Remove ( KeyValuePair < object , object ? > item )     112
+	0,263  [HC=0,68;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+void ICollection < KeyValuePair < object , object ? > > . CopyTo ( KeyValuePair < object , object ? > [ ] array , int arrayIndex )     97
+	0,260  [HC=0,68;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool IDictionary < object , object ? > . TryGetValue ( object key , out object ? value )     67
+	0,188  [HC=0,44;  HNC=0,03;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static bool TryConvertToDateTimeOffset ( object obj , CultureInfo culture , out DateTimeOffset value )     991
+*
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset value )     1091
+	0,983  [HC=1,00;  H=0,88;  I=1,00;  A=1,00] *
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset value )     1104
+	0,964  [HC=1,00;  H=0,75;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset ? value )     1116
+	0,873  [HC=0,76;  H=0,82;  I=1,00;  A=1,00] 
+private static bool ConvertToDateTimeOffsetCore ( object ? obj , CultureInfo ? culture , out DateTimeOffset value )     1139
+	0,863  [HC=0,74;  H=0,82;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset ? value )     1129
+	0,857  [HC=0,76;  H=0,70;  I=1,00;  A=1,00] 
+public static bool TryConvertToDateTime ( object ? obj , CultureInfo ? culture , out DateTime value )     978
+	0,879  [HC=0,77;  H=0,84;  I=1,00;  A=1,00] #
+public static bool TryConvertToDateTime ( object ? obj , CultureInfo ? culture , string format , out DateTime value )     991
+	0,861  [HC=0,77;  H=0,72;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=1,00;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset value )     1091
+	0,999  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset value )     1104
+	0,915  [HC=1,00;  HNC=0,88;  I=0,66;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset ? value )     1116
+	0,876  [HC=0,86;  HNC=0,98;  I=0,71;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset ? value )     1129
+	0,869  [HC=0,86;  HNC=0,92;  I=0,70;  A=1,00;  NA=0,00; NN=1,00] 
+private static bool ConvertToNullableDateTimeOffsetCore ( object ? obj , CultureInfo ? culture , out DateTimeOffset ? value )     1168
+	0,750  [HC=0,57;  HNC=0,91;  I=0,71;  A=1,00;  NA=0,00; NN=1,00] 
+private static bool ConvertToDateTimeOffsetCore ( object ? obj , CultureInfo ? culture , out DateTimeOffset value )     1139
+	0,727  [HC=0,67;  HNC=0,92;  I=0,41;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToDateTime ( object ? obj , CultureInfo ? culture , out DateTime value )     978
+	0,638  [HC=0,83;  HNC=0,92;  I=0,65;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReader.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReader.cs
+*
+public override async Task < int > ReadAsync ( char [ ] buffer , int index , int count )     203
+*
+public override Task < int > ReadAsync ( char [ ] buffer , int index , int count )     215
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+public override async ValueTask < int > ReadAsync ( Memory < char > buffer , CancellationToken cancellationToken = default )     236
+	0,937  [HC=1,00;  H=0,56;  I=1,00;  A=1,00] 
+public override async Task < string ? > ReadLineAsync ( )     331
+	0,783  [HC=0,69;  H=0,40;  I=1,00;  A=1,00] 
+public async override Task < string > ReadToEndAsync ( )     531
+	0,754  [HC=0,64;  H=0,35;  I=1,00;  A=1,00] 
+public override string ? ReadLine ( )     368
+	0,702  [HC=0,56;  H=0,24;  I=1,00;  A=1,00] 
+public override int Read ( Span < char > buffer )     162
+	0,662  [HC=0,44;  H=0,30;  I=1,00;  A=1,00] 
+private ReadLineStepResult ReadLineStep ( ref StringBuilder ? sb , ref bool consumeLineFeed )     398
+	0,601  [HC=0,33;  H=0,21;  I=1,00;  A=1,00] 
+*
+HC=4;  HNC=3,06;  I=0,50;  A=1,00;  NA=0,00;  NN=2,00]
+public override Task < int > ReadAsync ( char [ ] buffer , int index , int count )     215
+	0,947  [HC=1,00;  HNC=0,94;  I=0,25;  A=1,00;  NA=0,00; NN=1,00] *
+public override async ValueTask < int > ReadAsync ( Memory < char > buffer , CancellationToken cancellationToken = default )     236
+	0,846  [HC=1,00;  HNC=0,54;  I=0,54;  A=1,00;  NA=0,00; NN=1,00] 
+public override async Task < string ? > ReadLineAsync ( )     331
+	0,637  [HC=0,67;  HNC=0,30;  I=0,25;  A=1,00;  NA=0,00; NN=1,00] 
+public override int Read ( Span < char > buffer )     162
+	0,592  [HC=0,50;  HNC=0,31;  I=0,58;  A=1,00;  NA=0,00; NN=1,00] 
+public override string ? ReadLine ( )     368
+	0,530  [HC=0,50;  HNC=0,14;  I=0,32;  A=1,00;  NA=0,00; NN=1,00] 
+private ReadLineStepResult ReadLineStep ( ref StringBuilder ? sb , ref bool consumeLineFeed )     398
+	0,528  [HC=0,33;  HNC=0,33;  I=0,46;  A=1,00;  NA=0,00; NN=1,00] 
+public async override Task < string > ReadToEndAsync ( )     531
+	0,356  [HC=0,50;  HNC=0,18;  I=0,40;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private Task ProcessUnknownFrameAsync ( )     869
+*
+private Task ProcessUnknownFrameAsync ( )     930
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+private Task ProcessGoAwayFrameAsync ( )     820
+	0,831  [HC=0,71;  H=0,94;  I=1,00;  A=0,88] #
+private Task ProcessPriorityFrameAsync ( )     654
+	0,818  [HC=0,68;  H=0,94;  I=1,00;  A=0,88] #
+private Task ProcessWindowUpdateFrameAsync ( )     837
+	0,807  [HC=0,66;  H=0,93;  I=1,00;  A=0,88] #
+private Task ProcessRstStreamFrameAsync ( )     679
+	0,806  [HC=0,65;  H=0,93;  I=1,00;  A=0,88] #
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,776  [HC=0,75;  H=0,43;  I=1,00;  A=0,88] #
+private Task ProcessDataFrameAsync ( in ReadOnlySequence < byte > payload )     462
+	0,758  [HC=0,71;  H=0,43;  I=1,00;  A=0,88] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+private Task ProcessUnknownFrameAsync ( )     930
+	0,992  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,57] *
+private Task ProcessPriorityFrameAsync ( )     654
+	0,818  [HC=0,75;  HNC=1,00;  I=0,54;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessGoAwayFrameAsync ( )     820
+	0,787  [HC=0,60;  HNC=1,00;  I=0,67;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessRstStreamFrameAsync ( )     679
+	0,751  [HC=0,60;  HNC=1,00;  I=0,48;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessWindowUpdateFrameAsync ( )     837
+	0,665  [HC=0,60;  HNC=1,00;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessPingFrameAsync ( in ReadOnlySequence < byte > payload )     794
+	0,553  [HC=0,75;  HNC=0,31;  I=0,47;  A=0,91;  NA=0,00; NN=0,00] #
+private Task ProcessContinuationFrameAsync ( in ReadOnlySequence < byte > payload )     901
+	0,550  [HC=0,75;  HNC=0,31;  I=0,45;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+*
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethod ( )     54
+*
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethod ( )     54
+	0,968  [HC=1,00;  H=1,00;  I=1,00;  A=0,89] *
+public Task DiagnosticsAreReturned_IfRouteAttributesAreAppliedToPageHandlerMethod ( )     74
+	0,894  [HC=0,84;  H=0,97;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,864  [HC=0,77;  H=0,96;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,864  [HC=0,77;  H=0,95;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethodDerivingFromCustomModel ( )     58
+	0,842  [HC=0,72;  H=0,95;  I=1,00;  A=0,89] 
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethodForTypeWithPageModelAttribute ( )     66
+	0,819  [HC=0,67;  H=0,94;  I=1,00;  A=0,89] 
+public Task NoDiagnosticsAreReturned_IfFiltersAreAppliedToPageModel ( )     38
+	0,869  [HC=0,78;  H=0,96;  I=1,00;  A=0,89] #
+*
+HC=4;  HNC=1,00;  I=0,50;  A=0,50;  NA=0,00;  NN=0,00]
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethod ( )     54
+	0,988  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,59] *
+public Task DiagnosticsAreReturned_IfRouteAttributesAreAppliedToPageHandlerMethod ( )     74
+	0,836  [HC=0,83;  HNC=1,00;  I=0,51;  A=0,86;  NA=0,00; NN=0,59] 
+public Task DiagnosticsAreReturned_IfAuthorizeAttributeIsAppliedToPageHandlerMethod ( )     62
+	0,821  [HC=0,75;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,59] 
+public Task DiagnosticsAreReturned_IfAllowAnonymousIsAppliedToPageHandlerMethod ( )     78
+	0,821  [HC=0,75;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,59] 
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethodDerivingFromCustomModel ( )     58
+	0,810  [HC=0,73;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,59] 
+public Task DiagnosticsAreReturned_IfFiltersAreAppliedToPageHandlerMethodForTypeWithPageModelAttribute ( )     66
+	0,753  [HC=0,65;  HNC=1,00;  I=1,00;  A=0,86;  NA=0,00; NN=0,59] 
+public Task NoDiagnosticsAreReturned_IfFiltersAreAppliedToPageModel ( )     38
+	0,723  [HC=0,73;  HNC=1,00;  I=0,00;  A=0,86;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TemplateParserTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TemplateParserTests.cs
+*
+public void Parse_ComplexSegment_OptionalParametersSeperatedByPeriod_Invalid ( string template , string parameter )     546
+*
+public void Parse_ComplexSegment_OptionalParametersSeparatedByPeriod_Invalid ( string template , string parameter )     546
+	0,993  [HC=0,98;  H=1,00;  I=1,00;  A=1,00] *
+public void Parse_ComplexSegment_ThreeParametersSeparatedByPeriod ( )     327
+	0,812  [HC=0,74;  H=0,47;  I=1,00;  A=1,00] #
+*
+HC=3,87654320987654;  HNC=4,00;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public void Parse_ComplexSegment_OptionalParametersSeparatedByPeriod_Invalid ( string template , string parameter )     546
+	0,996  [HC=0,99;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public void Parse_ComplexSegment_ThreeParametersSeparatedByPeriod ( )     327
+	0,442  [HC=0,77;  HNC=0,32;  I=0,36;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReaderTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReaderTest.cs
+*
+public static async Task ReadToEndAsync ( )     47
+*
+public static async Task ReadToEndAsync ( )     48
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  A=0,97] *
+public static async Task ReadToEndAsync_Reads_Asynchronously ( )     59
+	0,732  [HC=0,42;  H=0,91;  I=1,00;  A=0,97] 
+public static async Task ReadAsync_ReadInTwoChunks ( )     137
+	0,673  [HC=0,29;  H=0,90;  I=1,00;  A=0,97] 
+public static void Read_Span_ReadAllCharactersAtOnce ( )     273
+	0,646  [HC=0,32;  H=0,61;  I=1,00;  A=0,97] 
+public static void Read_ReadAllCharactersAtOnce ( )     119
+	0,635  [HC=0,30;  H=0,62;  I=1,00;  A=0,97] 
+public static IEnumerable < object [ ] > ReadLineData ( )     488
+	0,632  [HC=0,36;  H=0,41;  I=1,00;  A=0,97] 
+public override Task < int > ReadAsync ( byte [ ] buffer , int offset , int count , CancellationToken cancellationToken )     536
+	0,629  [HC=0,64;  H=0,18;  I=1,00;  A=0,65] 
+*
+HC=4;  HNC=4,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+public static async Task ReadToEndAsync ( )     48
+	0,986  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,85;  NA=0,00; NN=0,00] *
+public static async Task ReadToEndAsync_Reads_Asynchronously ( )     59
+	0,778  [HC=0,67;  HNC=1,00;  I=0,52;  A=0,85;  NA=0,00; NN=0,00] 
+public static async Task ReadAsync_ReadInTwoChunks ( )     137
+	0,587  [HC=0,17;  HNC=1,00;  I=0,47;  A=0,85;  NA=0,00; NN=0,00] 
+public static IEnumerable < object [ ] > ReadLineData ( )     488
+	0,539  [HC=0,25;  HNC=0,75;  I=0,54;  A=0,85;  NA=0,00; NN=0,00] 
+public static IEnumerable < object [ ] > HttpRequestDisposeDataAsync ( )     476
+	0,539  [HC=0,20;  HNC=0,75;  I=0,64;  A=0,85;  NA=0,00; NN=0,00] 
+public async static Task ReadAsync_Memory_ReadAllCharactersAtOnce ( )     311
+	0,524  [HC=0,13;  HNC=0,88;  I=0,46;  A=0,85;  NA=0,00; NN=0,00] 
+public async static Task ReadAsync_Memory_WithMoreDataThanInternalBufferSize ( )     330
+	0,516  [HC=0,10;  HNC=0,88;  I=0,46;  A=0,85;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo culture = null )     175
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  A=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long ? > setter , long ? existingValue , System . Globalization . CultureInfo ? culture = null )     190
+	0,994  [HC=1,00;  H=0,96;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short ? > setter , short ? existingValue , System . Globalization . CultureInfo ? culture = null )     188
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float ? > setter , float ? existingValue , System . Globalization . CultureInfo ? culture = null )     191
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < decimal ? > setter , decimal ? existingValue , System . Globalization . CultureInfo ? culture = null )     186
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] #
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < bool ? > setter , bool ? existingValue , System . Globalization . CultureInfo ? culture = null )     181
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] #
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < double ? > setter , double ? existingValue , System . Globalization . CultureInfo ? culture = null )     187
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,96;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short ? > setter , short ? existingValue , System . Globalization . CultureInfo ? culture = null )     188
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long ? > setter , long ? existingValue , System . Globalization . CultureInfo ? culture = null )     190
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float ? > setter , float ? existingValue , System . Globalization . CultureInfo ? culture = null )     191
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < string ? > setter , string existingValue , System . Globalization . CultureInfo ? culture = null )     193
+	0,980  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float > setter , float existingValue , System . Globalization . CultureInfo ? culture = null )     192
+	0,979  [HC=1,00;  HNC=0,94;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int > setter , int existingValue , System . Globalization . CultureInfo ? culture = null )     179
+	0,817  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < double ? > setter , double ? existingValue , System . Globalization . CultureInfo culture = null )     174
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < double ? > setter , double ? existingValue , System . Globalization . CultureInfo ? culture = null )     187
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  A=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long ? > setter , long ? existingValue , System . Globalization . CultureInfo ? culture = null )     190
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short ? > setter , short ? existingValue , System . Globalization . CultureInfo ? culture = null )     188
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float ? > setter , float ? existingValue , System . Globalization . CultureInfo ? culture = null )     191
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < bool ? > setter , bool ? existingValue , System . Globalization . CultureInfo ? culture = null )     181
+	0,994  [HC=1,00;  H=0,96;  I=1,00;  A=1,00] #
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < decimal ? > setter , decimal ? existingValue , System . Globalization . CultureInfo ? culture = null )     186
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,96;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < double ? > setter , double ? existingValue , System . Globalization . CultureInfo ? culture = null )     187
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short ? > setter , short ? existingValue , System . Globalization . CultureInfo ? culture = null )     188
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long ? > setter , long ? existingValue , System . Globalization . CultureInfo ? culture = null )     190
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float ? > setter , float ? existingValue , System . Globalization . CultureInfo ? culture = null )     191
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < string ? > setter , string existingValue , System . Globalization . CultureInfo ? culture = null )     193
+	0,980  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float > setter , float existingValue , System . Globalization . CultureInfo ? culture = null )     192
+	0,979  [HC=1,00;  HNC=0,94;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EventCallbackFactoryBinderExtensions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EventCallbackFactoryBinderExtensions.cs
+*
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < float > setter , float existingValue , CultureInfo culture = null )     167
+*
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < float > setter , float existingValue , CultureInfo ? culture = null )     205
+	0,995  [HC=1,00;  H=0,97;  I=1,00;  A=1,00] *
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < short > setter , short existingValue , CultureInfo ? culture = null )     148
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  A=1,00] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < decimal > setter , decimal existingValue , CultureInfo ? culture = null )     281
+	0,987  [HC=1,00;  H=0,91;  I=1,00;  A=1,00] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < DateTimeOffset > setter , DateTimeOffset existingValue , CultureInfo ? culture = null )     399
+	0,987  [HC=1,00;  H=0,91;  I=1,00;  A=1,00] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < long > setter , long existingValue , CultureInfo ? culture = null )     129
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  A=1,00] #
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < bool > setter , bool existingValue , CultureInfo ? culture = null )     53
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  A=1,00] #
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < int > setter , int existingValue , CultureInfo ? culture = null )     91
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,94;  I=2,00;  A=0,50;  NA=0,00;  NN=0,00]
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < float > setter , float existingValue , CultureInfo ? culture = null )     205
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,54] *
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < float ? > setter , float ? existingValue , CultureInfo ? culture = null )     224
+	0,944  [HC=1,00;  HNC=0,99;  I=0,73;  A=1,00;  NA=0,00; NN=0,54] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < double > setter , double existingValue , CultureInfo ? culture = null )     243
+	0,896  [HC=1,00;  HNC=0,92;  I=0,61;  A=1,00;  NA=0,00; NN=0,54] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < short ? > setter , short ? existingValue , CultureInfo ? culture = null )     186
+	0,895  [HC=1,00;  HNC=0,92;  I=0,62;  A=1,00;  NA=0,00; NN=0,54] 
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < bool ? > setter , bool ? existingValue , CultureInfo ? culture = null )     72
+	0,901  [HC=1,00;  HNC=0,92;  I=0,65;  A=1,00;  NA=0,00; NN=0,00] #
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < long ? > setter , long ? existingValue , CultureInfo ? culture = null )     167
+	0,885  [HC=1,00;  HNC=0,92;  I=0,57;  A=1,00;  NA=0,00; NN=0,00] #
+public static EventCallback < ChangeEventArgs > CreateBinder ( this EventCallbackFactory factory , object receiver , Action < long > setter , long existingValue , CultureInfo ? culture = null )     129
+	0,881  [HC=1,00;  HNC=0,92;  I=0,53;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static bool TryConvertToNullableDateTime ( object obj , CultureInfo culture , string format , out DateTime ? value )     916
+*
+public static bool TryConvertToNullableDateTime ( object ? obj , CultureInfo ? culture , string format , out DateTime ? value )     1016
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  A=1,00] *
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset ? value )     1129
+	0,907  [HC=0,82;  H=0,88;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset ? value )     1116
+	0,882  [HC=0,82;  H=0,70;  I=1,00;  A=1,00] 
+private static bool ConvertToNullableDateTimeCore ( object ? obj , CultureInfo ? culture , string ? format , out DateTime ? value )     1060
+	0,870  [HC=0,76;  H=0,81;  I=1,00;  A=1,00] 
+private static bool ConvertToNullableDateTimeCore ( object ? obj , CultureInfo ? culture , out DateTime ? value )     1055
+	0,851  [HC=0,76;  H=0,68;  I=1,00;  A=1,00] 
+public static bool TryConvertToNullableDateTime ( object ? obj , CultureInfo ? culture , out DateTime ? value )     1003
+	0,962  [HC=1,00;  H=0,74;  I=1,00;  A=1,00] #
+public static bool TryConvertToDateTime ( object ? obj , CultureInfo ? culture , string format , out DateTime value )     991
+	0,854  [HC=0,71;  H=0,84;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,83;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public static bool TryConvertToNullableDateTime ( object ? obj , CultureInfo ? culture , string format , out DateTime ? value )     1016
+	0,996  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset ? value )     1129
+	0,888  [HC=0,86;  HNC=0,94;  I=0,71;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToNullableDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset ? value )     1116
+	0,817  [HC=0,86;  HNC=0,81;  I=0,52;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , string format , out DateTimeOffset value )     1104
+	0,804  [HC=0,67;  HNC=0,98;  I=0,49;  A=1,00;  NA=0,00; NN=1,00] 
+private static bool ConvertToNullableDateTimeCore ( object ? obj , CultureInfo ? culture , string ? format , out DateTime ? value )     1060
+	0,762  [HC=0,67;  HNC=0,92;  I=0,36;  A=1,00;  NA=0,00; NN=1,00] 
+private static bool ConvertToNullableDateTimeCore ( object ? obj , CultureInfo ? culture , out DateTime ? value )     1055
+	0,760  [HC=0,67;  HNC=0,80;  I=0,56;  A=1,00;  NA=0,00; NN=1,00] 
+public static bool TryConvertToDateTimeOffset ( object ? obj , CultureInfo ? culture , out DateTimeOffset value )     1091
+	0,750  [HC=0,67;  HNC=0,86;  I=0,39;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationSchemeProviderTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationSchemeProviderTests.cs
+*
+public async Task DefaultForbidFallsbackToChallenge ( )     68
+*
+public async Task DefaultForbidFallsbackToChallenge ( )     68
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  A=0,78] *
+public async Task DefaultSchemesAreSet ( )     84
+	0,608  [HC=0,27;  H=0,88;  I=1,00;  A=0,78] 
+public async Task SignOutWillDefaultsToSignInThatDoesNotSignOut ( )     109
+	0,575  [HC=0,20;  H=0,87;  I=1,00;  A=0,78] 
+public async Task LookupUsesProvidedStringComparer ( )     153
+	0,539  [HC=0,12;  H=0,85;  I=1,00;  A=0,78] 
+public async Task DefaultSignOutFallsbackToSignIn ( )     52
+	0,731  [HC=0,55;  H=0,92;  I=1,00;  A=0,78] #
+public async Task DefaultSchemesFallbackToDefaultScheme ( )     34
+	0,716  [HC=0,51;  H=0,92;  I=1,00;  A=0,78] #
+public async Task NoDefaultsByDefault ( )     18
+	0,594  [HC=0,24;  H=0,87;  I=1,00;  A=0,78] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=0,95;  NA=0,00;  NN=0,00]
+public async Task DefaultForbidFallsbackToChallenge ( )     68
+	0,972  [HC=1,00;  HNC=1,00;  I=0,98;  A=0,72;  NA=0,00; NN=0,27] *
+public async Task DefaultSchemesAreSet ( )     84
+	0,618  [HC=0,20;  HNC=1,00;  I=0,64;  A=0,72;  NA=0,00; NN=0,27] 
+public async Task SignOutWillDefaultsToSignInThatDoesNotSignOut ( )     109
+	0,580  [HC=0,08;  HNC=1,00;  I=0,66;  A=0,72;  NA=0,00; NN=0,27] 
+public async Task LookupUsesProvidedStringComparer ( )     153
+	0,509  [HC=0,00;  HNC=1,00;  I=0,44;  A=0,72;  NA=0,00; NN=0,27] 
+public async Task DefaultSchemesFallbackToDefaultScheme ( )     34
+	0,722  [HC=0,48;  HNC=1,00;  I=0,64;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task DefaultSignOutFallsbackToSignIn ( )     52
+	0,718  [HC=0,43;  HNC=1,00;  I=0,73;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task NoDefaultsByDefault ( )     18
+	0,563  [HC=0,00;  HNC=1,00;  I=0,74;  A=0,72;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationHttpContextExtensions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationHttpContextExtensions.cs
+*
+public static Task SignInAsync ( this HttpContext context , ClaimsPrincipal principal , AuthenticationProperties properties )     131
+*
+public static Task SignInAsync ( this HttpContext context , ClaimsPrincipal principal , AuthenticationProperties ? properties )     131
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] *
+public static Task SignInAsync ( this HttpContext context , string ? scheme , ClaimsPrincipal principal , AuthenticationProperties ? properties )     142
+	0,964  [HC=1,00;  H=0,75;  I=1,00;  A=1,00] 
+public static Task SignOutAsync ( this HttpContext context , string ? scheme , AuthenticationProperties ? properties )     175
+	0,860  [HC=0,75;  H=0,77;  I=1,00;  A=1,00] 
+public static Task SignOutAsync ( this HttpContext context , AuthenticationProperties ? properties )     158
+	0,854  [HC=0,75;  H=0,73;  I=1,00;  A=1,00] 
+public static Task SignOutAsync ( this HttpContext context , string ? scheme )     166
+	0,847  [HC=0,75;  H=0,68;  I=1,00;  A=1,00] 
+public static Task ForbidAsync ( this HttpContext context , string ? scheme , AuthenticationProperties ? properties )     102
+	0,731  [HC=0,45;  H=0,75;  I=1,00;  A=1,00] #
+public static Task ForbidAsync ( this HttpContext context , AuthenticationProperties ? properties )     92
+	0,725  [HC=0,45;  H=0,71;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,90;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public static Task SignInAsync ( this HttpContext context , ClaimsPrincipal principal , AuthenticationProperties ? properties )     131
+	0,998  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static Task SignInAsync ( this HttpContext context , string ? scheme , ClaimsPrincipal principal , AuthenticationProperties ? properties )     142
+	0,849  [HC=1,00;  HNC=0,88;  I=0,30;  A=1,00;  NA=0,00; NN=1,00] 
+public static Task SignOutAsync ( this HttpContext context , AuthenticationProperties ? properties )     158
+	0,576  [HC=0,67;  HNC=0,79;  I=0,44;  A=1,00;  NA=0,00; NN=0,00] 
+public static Task SignOutAsync ( this HttpContext context , string ? scheme , AuthenticationProperties ? properties )     175
+	0,553  [HC=0,67;  HNC=0,81;  I=0,27;  A=1,00;  NA=0,00; NN=0,00] 
+public static Task SignOutAsync ( this HttpContext context , string ? scheme )     166
+	0,503  [HC=0,67;  HNC=0,61;  I=0,35;  A=1,00;  NA=0,00; NN=0,00] 
+public static Task ForbidAsync ( this HttpContext context , AuthenticationProperties ? properties )     92
+	0,466  [HC=0,33;  HNC=0,79;  I=0,42;  A=1,00;  NA=0,00; NN=0,00] #
+public static Task ChallengeAsync ( this HttpContext context , AuthenticationProperties ? properties )     56
+	0,464  [HC=0,33;  HNC=0,79;  I=0,41;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+*
+public override bool Equals ( object obj )     490
+*
+public override bool Equals ( object ? obj )     494
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+public override bool Equals ( object ? obj )     694
+	0,927  [HC=1,00;  H=0,89;  I=1,00;  A=0,80] 
+public override bool Equals ( object ? obj )     613
+	0,910  [HC=1,00;  H=0,89;  I=1,00;  A=0,74] 
+public override bool Equals ( object ? obj )     867
+	0,901  [HC=1,00;  H=0,89;  I=1,00;  A=0,71] 
+public override bool Equals ( object ? obj )     907
+	0,868  [HC=1,00;  H=0,89;  I=1,00;  A=0,59] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata ? other )     693
+	0,840  [HC=1,00;  H=0,28;  I=1,00;  A=0,80] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . BindingSource ? other )     493
+	0,896  [HC=1,00;  H=0,27;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public override bool Equals ( object ? obj )     494
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override bool Equals ( object ? obj )     613
+	0,686  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,48;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     694
+	0,675  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,39;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     867
+	0,669  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,34;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     907
+	0,660  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,27;  NA=0,00; NN=0,00] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata ? other )     693
+	0,590  [HC=1,00;  HNC=0,28;  I=1,00;  A=0,39;  NA=0,00; NN=0,00] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . BindingSource ? other )     493
+	0,665  [HC=1,00;  HNC=0,28;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+private static string FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , string format , CultureInfo culture )     406
+*
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , string ? format , CultureInfo ? culture )     441
+	0,976  [HC=1,00;  H=0,83;  I=1,00;  A=1,00] *
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , CultureInfo ? culture )     456
+	0,955  [HC=1,00;  H=0,68;  I=1,00;  A=1,00] #
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , string ? format , CultureInfo ? culture )     358
+	0,902  [HC=0,84;  H=0,80;  I=1,00;  A=1,00] #
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , CultureInfo ? culture )     373
+	0,880  [HC=0,84;  H=0,65;  I=1,00;  A=1,00] #
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , string ? format , CultureInfo ? culture )     405
+	0,879  [HC=0,78;  H=0,80;  I=1,00;  A=1,00] #
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , CultureInfo ? culture )     415
+	0,860  [HC=0,78;  H=0,67;  I=1,00;  A=1,00] #
+private static string FormatDateTimeValueCore ( DateTime value , string ? format , CultureInfo ? culture )     322
+	0,804  [HC=0,62;  H=0,76;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,52;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , string ? format , CultureInfo ? culture )     441
+	0,991  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , CultureInfo ? culture )     456
+	0,892  [HC=1,00;  HNC=0,83;  I=0,65;  A=1,00;  NA=0,00; NN=1,00] 
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , string ? format , CultureInfo ? culture )     358
+	0,666  [HC=0,86;  HNC=0,90;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , CultureInfo ? culture )     415
+	0,636  [HC=0,86;  HNC=0,84;  I=0,38;  A=1,00;  NA=0,00; NN=0,00] #
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , CultureInfo ? culture )     373
+	0,631  [HC=0,86;  HNC=0,76;  I=0,65;  A=1,00;  NA=0,00; NN=0,00] #
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , string ? format , CultureInfo ? culture )     405
+	0,601  [HC=0,86;  HNC=0,98;  I=0,40;  A=1,00;  NA=0,00; NN=0,00] #
+private static string FormatDateTimeValueCore ( DateTime value , string ? format , CultureInfo ? culture )     322
+	0,558  [HC=0,71;  HNC=0,91;  I=0,40;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IHttpParser.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IHttpParser.cs
+*
+bool ParseRequestLine ( TRequestHandler handler , in ReadOnlySequence < byte > buffer , out SequencePosition consumed , out SequencePosition examined )     11
+*
+bool ParseRequestLine ( TRequestHandler handler , ref SequenceReader < byte > reader )     12
+	0,905  [HC=1,00;  H=0,50;  I=1,00;  A=0,92] *
+bool ParseHeaders ( TRequestHandler handler , ref SequenceReader < byte > reader )     14
+	0,660  [HC=0,44;  H=0,48;  I=1,00;  A=0,92] 
+*
+HC=4;  HNC=1,00;  I=0,01;  A=0,50;  NA=0,00;  NN=0,00]
+bool ParseRequestLine ( TRequestHandler handler , ref SequenceReader < byte > reader )     12
+	0,899  [HC=1,00;  HNC=0,49;  I=1,00;  A=0,90;  NA=0,00; NN=0,00] *
+bool ParseHeaders ( TRequestHandler handler , ref SequenceReader < byte > reader )     14
+	0,415  [HC=0,33;  HNC=0,49;  I=1,00;  A=0,90;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NameValueHeaderValue.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NameValueHeaderValue.cs
+*
+internal static string ToString ( IList < NameValueHeaderValue > values , char separator , bool leadingSeparator )     238
+*
+internal static string ? ToString ( IList < NameValueHeaderValue > ? values , char separator , bool leadingSeparator )     239
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+internal static int GetHashCode ( IList < NameValueHeaderValue > ? values )     253
+	0,500  [HC=0,00;  H=0,50;  I=1,00;  A=1,00] 
+internal static void ToString ( IList < NameValueHeaderValue > ? values , char separator , bool leadingSeparator , StringBuilder destination )     210
+	0,967  [HC=1,00;  H=0,77;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,65;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+internal static string ? ToString ( IList < NameValueHeaderValue > ? values , char separator , bool leadingSeparator )     239
+	0,993  [HC=1,00;  HNC=0,98;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+internal static int GetHashCode ( IList < NameValueHeaderValue > ? values )     253
+	0,457  [HC=0,00;  HNC=0,52;  I=0,58;  A=1,00;  NA=0,00; NN=1,00] 
+internal static void ToString ( IList < NameValueHeaderValue > ? values , char separator , bool leadingSeparator , StringBuilder destination )     210
+	0,570  [HC=1,00;  HNC=0,66;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Authorization.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Authorization.netcoreapp.cs
+*
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     167
+*
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     167
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  A=1,00] *
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     168
+	0,948  [HC=1,00;  H=0,63;  I=1,00;  A=1,00] 
+public override string ToString ( )     201
+	0,441  [HC=0,21;  H=0,06;  I=1,00;  A=0,69] 
+public override string ToString ( )     220
+	0,440  [HC=0,21;  H=0,06;  I=1,00;  A=0,69] 
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     135
+	0,951  [HC=1,00;  H=0,94;  I=1,00;  A=0,86] #
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     137
+	0,901  [HC=1,00;  H=0,59;  I=1,00;  A=0,86] #
+public static System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( this Microsoft . AspNetCore . Authorization . IAuthorizationService service , System . Security . Claims . ClaimsPrincipal user , object ? resource , Microsoft . AspNetCore . Authorization . AuthorizationPolicy policy )     97
+	0,879  [HC=1,00;  H=0,60;  I=1,00;  A=0,77] #
+*
+HC=4;  HNC=3,95;  I=0,01;  A=1,00;  NA=0,00;  NN=2,00]
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     167
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     168
+	0,824  [HC=1,00;  HNC=0,51;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public override string ToString ( )     188
+	0,038  [HC=0,00;  HNC=0,01;  I=0,00;  A=0,39;  NA=0,00; NN=0,00] 
+public override string ToString ( )     201
+	0,038  [HC=0,00;  HNC=0,01;  I=0,00;  A=0,39;  NA=0,00; NN=0,00] 
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , System . Collections . Generic . IEnumerable < Microsoft . AspNetCore . Authorization . IAuthorizationRequirement > requirements )     135
+	0,740  [HC=1,00;  HNC=0,86;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public virtual System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( System . Security . Claims . ClaimsPrincipal user , object ? resource , string policyName )     137
+	0,588  [HC=1,00;  HNC=0,44;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public static System . Threading . Tasks . Task < Microsoft . AspNetCore . Authorization . AuthorizationResult > AuthorizeAsync ( this Microsoft . AspNetCore . Authorization . IAuthorizationService service , System . Security . Claims . ClaimsPrincipal user , object ? resource , Microsoft . AspNetCore . Authorization . AuthorizationPolicy policy )     97
+	0,579  [HC=1,00;  HNC=0,47;  I=0,00;  A=0,48;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+public async Task ServicesWithDefaultForbidMethod_CallsForbidMethod ( )     208
+*
+public async Task ServicesWithDefaultForbidMethod_CallsForbidMethod ( )     232
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  A=0,78] *
+public async Task ServicesWithDefaultSignInMethodsTest ( )     195
+	0,738  [HC=0,56;  H=0,93;  I=1,00;  A=0,78] 
+public async Task ServicesWithDefaultSignOutMethodsTest ( )     213
+	0,729  [HC=0,54;  H=0,92;  I=1,00;  A=0,78] 
+public async Task ServicesWithDefaultUberMethodsTest ( )     177
+	0,748  [HC=0,58;  H=0,93;  I=1,00;  A=0,78] #
+public async Task ServicesWithDefaultIAuthenticationHandlerMethodsTest ( )     157
+	0,701  [HC=0,48;  H=0,91;  I=1,00;  A=0,78] #
+public async Task CanSignInWithoutIsAuthenticated ( )     98
+	0,588  [HC=0,23;  H=0,87;  I=1,00;  A=0,78] #
+public async Task ForbidThrowsForSchemeMismatch ( )     69
+	0,569  [HC=0,19;  H=0,86;  I=1,00;  A=0,78] #
+*
+HC=4;  HNC=4,00;  I=2,00;  A=0,95;  NA=0,00;  NN=0,00]
+public async Task ServicesWithDefaultForbidMethod_CallsForbidMethod ( )     232
+	0,976  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,72;  NA=0,00; NN=0,34] *
+public async Task ServicesWithDefaultUberMethodsTest ( )     177
+	0,719  [HC=0,48;  HNC=1,00;  I=0,63;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task ServicesWithDefaultSignInMethodsTest ( )     195
+	0,661  [HC=0,38;  HNC=1,00;  I=0,52;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task ServicesWithDefaultSignOutMethodsTest ( )     213
+	0,650  [HC=0,38;  HNC=1,00;  I=0,46;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task ServicesWithDefaultIAuthenticationHandlerMethodsTest ( )     157
+	0,635  [HC=0,38;  HNC=1,00;  I=0,38;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task ForbidThrowsForSchemeMismatch ( )     69
+	0,605  [HC=0,13;  HNC=1,00;  I=0,72;  A=0,72;  NA=0,00; NN=0,00] #
+public async Task ChallengeThrowsForSchemeMismatch ( )     54
+	0,581  [HC=0,06;  HNC=1,00;  I=0,71;  A=0,72;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerator.cs
+*
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions options = default )     66
+*
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,995  [HC=1,00;  H=0,97;  I=1,00;  A=1,00] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,905  [HC=0,85;  H=0,80;  I=1,00;  A=1,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,870  [HC=0,85;  H=0,55;  I=1,00;  A=1,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,961  [HC=1,00;  H=0,73;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,95;  I=0,01;  A=0,50;  NA=0,00;  NN=0,00]
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,42] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,861  [HC=0,84;  HNC=0,87;  I=1,00;  A=1,00;  NA=0,00; NN=0,42] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,790  [HC=0,84;  HNC=0,71;  I=1,00;  A=1,00;  NA=0,00; NN=0,42] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,909  [HC=1,00;  HNC=0,81;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TokenExtensions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TokenExtensions.cs
+*
+public static Task < string > GetTokenAsync ( this IAuthenticationService auth , HttpContext context , string tokenName )     135
+*
+public static Task < string ? > GetTokenAsync ( this IAuthenticationService auth , HttpContext context , string tokenName )     140
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+public static async Task < string ? > GetTokenAsync ( this IAuthenticationService auth , HttpContext context , string ? scheme , string tokenName )     151
+	0,964  [HC=1,00;  H=0,75;  I=1,00;  A=1,00] 
+*
+HC=4;  HNC=3,87;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public static Task < string ? > GetTokenAsync ( this IAuthenticationService auth , HttpContext context , string tokenName )     140
+	0,997  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static async Task < string ? > GetTokenAsync ( this IAuthenticationService auth , HttpContext context , string ? scheme , string tokenName )     151
+	0,835  [HC=1,00;  HNC=0,83;  I=0,31;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelConnection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelConnection.cs
+*
+public void TickHeartbeat ( )     52
+*
+public void TickHeartbeat ( )     46
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+public void OnHeartbeat ( Action < object > action , object state )     64
+	0,741  [HC=0,69;  H=0,36;  I=1,00;  A=0,88] 
+public void Complete ( )     167
+	0,613  [HC=0,23;  H=0,85;  I=1,00;  A=0,88] 
+public void RequestClose ( )     154
+	0,542  [HC=0,08;  H=0,82;  I=1,00;  A=0,88] 
+public Task FireOnCompletedAsync ( )     91
+	0,524  [HC=0,10;  H=0,62;  I=1,00;  A=0,88] 
+protected IDisposable BeginConnectionScope ( BaseConnectionContext connectionContext )     174
+	0,485  [HC=0,10;  H=0,34;  I=1,00;  A=0,88] 
+private async Task CompleteAsyncAwaited ( Task currentTask , Stack < KeyValuePair < Func < object , Task > , object > > onCompleted )     130
+	0,471  [HC=0,15;  H=0,10;  I=1,00;  A=0,88] 
+*
+HC=4;  HNC=4,00;  I=2,00;  A=0,50;  NA=0,00;  NN=0,00]
+public void TickHeartbeat ( )     46
+	0,996  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] *
+public void OnHeartbeat ( Action < object > action , object state )     64
+	0,475  [HC=0,50;  HNC=0,31;  I=0,64;  A=0,91;  NA=0,00; NN=0,00] 
+public void RequestClose ( )     154
+	0,424  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public void Complete ( )     167
+	0,424  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public Task FireOnCompletedAsync ( )     91
+	0,343  [HC=0,00;  HNC=0,79;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+void IConnectionCompleteFeature . OnCompleted ( Func < object , Task > callback , object state )     77
+	0,133  [HC=0,00;  HNC=0,24;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+protected IDisposable BeginConnectionScope ( BaseConnectionContext connectionContext )     174
+	0,054  [HC=0,00;  HNC=0,03;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Mvc.Abstractions.netcoreapp.cs
+*
+public override bool Equals ( object obj )     601
+*
+public override bool Equals ( object ? obj )     613
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] *
+public override bool Equals ( object ? obj )     867
+	0,966  [HC=1,00;  H=0,89;  I=1,00;  A=0,94] 
+public override bool Equals ( object ? obj )     907
+	0,935  [HC=1,00;  H=0,89;  I=1,00;  A=0,83] 
+public override bool Equals ( object ? obj )     694
+	0,906  [HC=1,00;  H=0,89;  I=1,00;  A=0,73] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata ? other )     693
+	0,819  [HC=1,00;  H=0,28;  I=1,00;  A=0,73] 
+public override bool Equals ( object ? obj )     494
+	0,910  [HC=1,00;  H=0,89;  I=1,00;  A=0,74] #
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . BindingSource ? other )     493
+	0,822  [HC=1,00;  H=0,27;  I=1,00;  A=0,74] #
+*
+HC=4;  HNC=1,00;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public override bool Equals ( object ? obj )     613
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override bool Equals ( object ? obj )     867
+	0,701  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,60;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     907
+	0,689  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,51;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     694
+	0,686  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,48;  NA=0,00; NN=0,00] 
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . ModelMetadata ? other )     693
+	0,601  [HC=1,00;  HNC=0,28;  I=1,00;  A=0,48;  NA=0,00; NN=0,00] 
+public override bool Equals ( object ? obj )     494
+	0,686  [HC=1,00;  HNC=0,97;  I=1,00;  A=0,48;  NA=0,00; NN=0,00] #
+public bool Equals ( Microsoft . AspNetCore . Mvc . ModelBinding . BindingSource ? other )     493
+	0,601  [HC=1,00;  HNC=0,28;  I=1,00;  A=0,48;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+private static string FormatNullableDateTimeValueCore ( DateTime ? value , CultureInfo culture )     338
+*
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , CultureInfo ? culture )     373
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  A=1,00] *
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , string ? format , CultureInfo ? culture )     358
+	0,952  [HC=1,00;  H=0,67;  I=1,00;  A=1,00] 
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , CultureInfo ? culture )     456
+	0,904  [HC=0,84;  H=0,81;  I=1,00;  A=1,00] 
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , string ? format , CultureInfo ? culture )     441
+	0,878  [HC=0,84;  H=0,63;  I=1,00;  A=1,00] 
+private static string ? FormatNullableShortValueCore ( short ? value , CultureInfo ? culture )     186
+	0,856  [HC=0,74;  H=0,77;  I=1,00;  A=1,00] 
+private static string FormatDateTimeValueCore ( DateTime value , CultureInfo ? culture )     332
+	0,863  [HC=0,74;  H=0,81;  I=1,00;  A=1,00] #
+private static string FormatDateTimeValueCore ( DateTime value , string ? format , CultureInfo ? culture )     322
+	0,842  [HC=0,74;  H=0,67;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,50;  A=0,50;  NA=0,00;  NN=2,00]
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , CultureInfo ? culture )     373
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , CultureInfo ? culture )     456
+	0,923  [HC=0,86;  HNC=0,96;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+private static string ? FormatNullableDateTimeOffsetValueCore ( DateTimeOffset ? value , string ? format , CultureInfo ? culture )     441
+	0,890  [HC=0,86;  HNC=0,86;  I=0,65;  A=1,00;  NA=0,00; NN=1,00] 
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , CultureInfo ? culture )     415
+	0,805  [HC=0,67;  HNC=0,98;  I=0,58;  A=1,00;  NA=0,00; NN=1,00] 
+private static string FormatDateTimeOffsetValueCore ( DateTimeOffset value , string ? format , CultureInfo ? culture )     405
+	0,783  [HC=0,67;  HNC=0,89;  I=0,42;  A=1,00;  NA=0,00; NN=1,00] 
+private static string ? FormatNullableDateTimeValueCore ( DateTime ? value , string ? format , CultureInfo ? culture )     358
+	0,704  [HC=1,00;  HNC=0,81;  I=0,65;  A=1,00;  NA=0,00; NN=0,00] #
+private static string FormatDateTimeValueCore ( DateTime value , CultureInfo ? culture )     332
+	0,638  [HC=0,83;  HNC=0,98;  I=0,58;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+public X509Certificate2 CreateAspNetCoreHttpsDevelopmentCertificate ( DateTimeOffset notBefore , DateTimeOffset notAfter , string subjectOverride , DiagnosticInformation diagnostics = null )     180
+*
+internal X509Certificate2 CreateAspNetCoreHttpsDevelopmentCertificate ( DateTimeOffset notBefore , DateTimeOffset notAfter )     374
+	0,893  [HC=1,00;  H=0,50;  I=1,00;  A=0,88] *
+public void CleanupHttpsCertificates ( )     298
+	0,610  [HC=0,44;  H=0,19;  I=1,00;  A=0,88] 
+public void CreateDevelopmentCertificateEnd ( )     621
+	0,588  [HC=0,58;  H=0,20;  I=1,00;  A=0,58] 
+public EnsureCertificateResult EnsureAspNetCoreHttpsDevelopmentCertificate ( DateTimeOffset notBefore , DateTimeOffset notAfter , string path = null , bool trust = false , bool includePrivateKey = false , string password = null , bool isInteractive = true )     149
+	0,832  [HC=0,88;  H=0,42;  I=1,00;  A=0,88] #
+public bool IsHttpsDevelopmentCertificate ( X509Certificate2 certificate )     59
+	0,705  [HC=0,65;  H=0,23;  I=1,00;  A=0,88] #
+internal X509Certificate2 CreateSelfSignedCertificate ( X500DistinguishedName subject , IEnumerable < X509Extension > extensions , DateTimeOffset notBefore , DateTimeOffset notAfter )     493
+	0,632  [HC=0,44;  H=0,35;  I=1,00;  A=0,88] #
+internal void ExportCertificate ( X509Certificate2 certificate , string path , bool includePrivateKey , string password )     332
+	0,594  [HC=0,35;  H=0,36;  I=1,00;  A=0,88] #
+*
+HC=4;  HNC=1,00;  I=2,00;  A=1,00;  NA=0,00;  NN=0,00]
+internal X509Certificate2 CreateAspNetCoreHttpsDevelopmentCertificate ( DateTimeOffset notBefore , DateTimeOffset notAfter )     374
+	0,929  [HC=1,00;  HNC=0,63;  I=0,94;  A=0,91;  NA=0,00; NN=0,00] *
+public EnsureCertificateResult EnsureAspNetCoreHttpsDevelopmentCertificate ( DateTimeOffset notBefore , DateTimeOffset notAfter , string path = null , bool trust = false , bool includePrivateKey = false , string password = null , bool isInteractive = true )     149
+	0,601  [HC=0,86;  HNC=0,47;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+internal X509Certificate2 CreateSelfSignedCertificate ( X500DistinguishedName subject , IEnumerable < X509Extension > extensions , DateTimeOffset notBefore , DateTimeOffset notAfter )     493
+	0,428  [HC=0,29;  HNC=0,34;  I=0,52;  A=0,91;  NA=0,00; NN=0,00] 
+public void CleanupHttpsCertificates ( )     298
+	0,336  [HC=0,27;  HNC=0,08;  I=0,30;  A=0,91;  NA=0,00; NN=0,00] 
+public IList < X509Certificate2 > GetHttpsCertificates ( )     146
+	0,326  [HC=0,37;  HNC=0,22;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public bool IsHttpsDevelopmentCertificate ( X509Certificate2 certificate )     59
+	0,338  [HC=0,43;  HNC=0,08;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+public IList < X509Certificate2 > ListCertificates ( StoreName storeName , StoreLocation location , bool isValid , bool requireExportable = true )     63
+	0,279  [HC=0,13;  HNC=0,29;  I=0,25;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ModelStateDictionary.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ModelStateDictionary.cs
+*
+public void SetModelValue ( string key , object rawValue , string attemptedValue )     514
+*
+public void SetModelValue ( string key , object ? rawValue , string attemptedValue )     515
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  A=1,00] *
+*
+HC=4;  HNC=3,87;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public void SetModelValue ( string key , object ? rawValue , string attemptedValue )     515
+	0,997  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int > setter , int existingValue , System . Globalization . CultureInfo culture = null )     166
+*
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int > setter , int existingValue , System . Globalization . CultureInfo ? culture = null )     179
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  A=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long > setter , long existingValue , System . Globalization . CultureInfo ? culture = null )     180
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short > setter , short existingValue , System . Globalization . CultureInfo ? culture = null )     178
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float > setter , float existingValue , System . Globalization . CultureInfo ? culture = null )     192
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < decimal > setter , decimal existingValue , System . Globalization . CultureInfo ? culture = null )     176
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] #
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < bool > setter , bool existingValue , System . Globalization . CultureInfo ? culture = null )     171
+	0,992  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] #
+*
+HC=4;  HNC=3,96;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int > setter , int existingValue , System . Globalization . CultureInfo ? culture = null )     179
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < int ? > setter , int ? existingValue , System . Globalization . CultureInfo ? culture = null )     189
+	0,997  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < short > setter , short existingValue , System . Globalization . CultureInfo ? culture = null )     178
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < long > setter , long existingValue , System . Globalization . CultureInfo ? culture = null )     180
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < float > setter , float existingValue , System . Globalization . CultureInfo ? culture = null )     192
+	0,981  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < string ? > setter , string existingValue , System . Globalization . CultureInfo ? culture = null )     193
+	0,980  [HC=1,00;  HNC=0,95;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static Microsoft . AspNetCore . Components . EventCallback < Microsoft . AspNetCore . Components . ChangeEventArgs > CreateBinder ( this Microsoft . AspNetCore . Components . EventCallbackFactory factory , object receiver , System . Action < bool ? > setter , bool ? existingValue , System . Globalization . CultureInfo ? culture = null )     181
+	0,980  [HC=1,00;  HNC=0,94;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RoutePatternParserTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RoutePatternParserTest.cs
+*
+public void Parse_ComplexSegment_ThreeParametersSeperatedByPeriod ( )     241
+*
+public void Parse_ComplexSegment_ThreeParametersSeparatedByPeriod ( )     241
+	0,991  [HC=0,98;  H=1,00;  I=1,00;  A=1,00] *
+public void Parse_ComplexSegment_OptionalParametersSeparatedByPeriod_Invalid ( string template , string parameter )     397
+	0,812  [HC=0,74;  H=0,47;  I=1,00;  A=1,00] 
+*
+HC=3,86111111111111;  HNC=4,00;  I=2,00;  A=0,50;  NA=0,00;  NN=2,00]
+public void Parse_ComplexSegment_ThreeParametersSeparatedByPeriod ( )     241
+	0,996  [HC=0,99;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public void Parse_ComplexSegment_OptionalParametersSeparatedByPeriod_Invalid ( string template , string parameter )     397
+	0,463  [HC=0,77;  HNC=0,32;  I=0,49;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+*
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , object > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < System . String , System . Object > > . GetEnumerator ( )     503
+*
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , object ? > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , object ? > > . GetEnumerator ( )     531
+	0,926  [HC=0,87;  H=0,88;  I=1,00;  A=1,00] *
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Contains ( System . Collections . Generic . KeyValuePair < string , object ? > item )     528
+	0,824  [HC=0,70;  H=0,65;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Remove ( System . Collections . Generic . KeyValuePair < string , object ? > item )     530
+	0,823  [HC=0,70;  H=0,65;  I=1,00;  A=1,00] 
+void System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Add ( System . Collections . Generic . KeyValuePair < string , object ? > item )     527
+	0,815  [HC=0,69;  H=0,64;  I=1,00;  A=1,00] 
+void System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . CopyTo ( System . Collections . Generic . KeyValuePair < string , object > [ ] array , int arrayIndex )     529
+	0,814  [HC=0,70;  H=0,61;  I=1,00;  A=1,00] 
+System . Collections . Generic . IEnumerator < object > System . Collections . Generic . IEnumerable < object > . GetEnumerator ( )     163
+	0,632  [HC=0,49;  H=0,48;  I=1,00;  A=0,74] #
+public bool Remove ( string key , out object ? value )     526
+	0,457  [HC=0,03;  H=0,10;  I=1,00;  A=1,00] #
+*
+HC=2,56884057971015;  HNC=3,98;  I=0,12;  A=1,00;  NA=0,00;  NN=2,00]
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < string , object ? > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < string , object ? > > . GetEnumerator ( )     531
+	0,961  [HC=0,86;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Contains ( System . Collections . Generic . KeyValuePair < string , object ? > item )     528
+	0,307  [HC=0,69;  HNC=0,02;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+System . Collections . Generic . IEnumerator < object > System . Collections . Generic . IEnumerable < object > . GetEnumerator ( )     163
+	0,523  [HC=0,46;  HNC=0,88;  I=1,00;  A=0,28;  NA=0,00; NN=0,00] #
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Remove ( System . Collections . Generic . KeyValuePair < string , object ? > item )     530
+	0,307  [HC=0,69;  HNC=0,02;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+void System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . Add ( System . Collections . Generic . KeyValuePair < string , object ? > item )     527
+	0,294  [HC=0,69;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+void System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . CopyTo ( System . Collections . Generic . KeyValuePair < string , object > [ ] array , int arrayIndex )     529
+	0,293  [HC=0,69;  HNC=0,01;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+public bool Remove ( string key , out object ? value )     526
+	0,127  [HC=0,00;  HNC=0,03;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

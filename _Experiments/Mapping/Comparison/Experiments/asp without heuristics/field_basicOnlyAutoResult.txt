@@ -1,0 +1,84 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HandshakeProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HandshakeProtocol.cs
+*
+private static ConcurrentDictionary < IHubProtocol , ReadOnlyMemory < byte > > _messageCache     29
+*
+private static readonly ReadOnlyMemory < byte > _successHandshakeData     29
+	0,614  [HC=0,25;  H=0,54;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private static readonly ReadOnlyMemory < byte > _successHandshakeData     29
+	0,407  [HC=0,00;  HNC=0,55;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelConnection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelConnection.cs
+*
+private readonly ConnectionDelegate _connectionDelegate     26
+*
+protected readonly TransportConnectionManager _transportConnectionManager     26
+	0,620  [HC=0,35;  H=0,55;  I=1,00;  A=0,88] *
+private readonly CancellationTokenSource _connectionClosingCts     22
+	0,758  [HC=0,60;  H=0,75;  I=1,00;  A=0,88] #
+private readonly TaskCompletionSource _completionTcs     23
+	0,629  [HC=0,33;  H=0,65;  I=1,00;  A=0,88] #
+protected readonly ServiceContext _serviceContext     25
+	0,585  [HC=0,28;  H=0,51;  I=1,00;  A=0,88] #
+private bool _completed     20
+	0,568  [HC=0,28;  H=0,39;  I=1,00;  A=0,88] #
+private Stack < KeyValuePair < Func < object , Task > , object > > _onCompleted     19
+	0,551  [HC=0,33;  H=0,11;  I=1,00;  A=0,88] #
+private readonly object _heartbeatLock     17
+	0,525  [HC=0,11;  H=0,60;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=0,00;  A=2,00;  NA=0,00;  NN=0,50]
+protected readonly TransportConnectionManager _transportConnectionManager     26
+	0,557  [HC=0,30;  HNC=0,40;  I=1,00;  A=0,91;  NA=0,00; NN=1,00] 
+private readonly CancellationTokenSource _connectionClosingCts     22
+	0,445  [HC=0,33;  HNC=0,52;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+private readonly TaskCompletionSource _completionTcs     23
+	0,432  [HC=0,30;  HNC=0,52;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+private List < ( Action < object > handler , object state ) > _heartbeatHandlers     16
+	0,409  [HC=0,00;  HNC=0,24;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] #
+private bool _completed     20
+	0,403  [HC=0,00;  HNC=0,20;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] #
+private Stack < KeyValuePair < Func < object , Task > , object > > _onCompleted     19
+	0,403  [HC=0,00;  HNC=0,20;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] #
+protected readonly ServiceContext _serviceContext     25
+	0,311  [HC=0,00;  HNC=0,20;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
+*
+private object _totalRequestsLock     17
+*
+private int _totalRequests     16
+	0,849  [HC=0,76;  H=0,65;  I=1,00;  A=1,00] *
+private readonly int _maxTotalRequest     13
+	0,690  [HC=0,47;  H=0,42;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private int _totalRequests     16
+	0,633  [HC=0,67;  HNC=0,25;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+private readonly int _maxTotalRequest     13
+	0,383  [HC=0,23;  HNC=0,20;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SecretManagerTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SecretManagerTests.cs
+*
+private readonly StringBuilder _output     20
+*
+private readonly ITestOutputHelper _testOut     21
+	0,710  [HC=0,43;  H=0,68;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private readonly ITestOutputHelper _testOut     21
+	0,387  [HC=0,00;  HNC=0,40;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+

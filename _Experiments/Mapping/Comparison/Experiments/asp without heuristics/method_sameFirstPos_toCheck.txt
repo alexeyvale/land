@@ -1,0 +1,795 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplicationTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplicationTests.cs
+*
+public override bool IsEnabled ( string name )     502
+*
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,515  [HC=0,24;  H=0,31;  I=1,00;  A=0,79] 
+public void Set < TFeature > ( TFeature instance )     131
+	0,488  [HC=0,15;  H=0,39;  I=1,00;  A=0,79] 
+public TFeature Get < TFeature > ( )     127
+	0,473  [HC=0,15;  H=0,28;  I=1,00;  A=0,79] 
+public IEnumerator < KeyValuePair < Type , object > > GetEnumerator ( )     129
+	0,462  [HC=0,15;  H=0,20;  I=1,00;  A=0,79] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,435  [HC=0,09;  H=0,43;  I=1,00;  A=0,67] 
+public void DisposeContextDoesNotClearHttpContextIfDefaultHttpContextFactoryUsed ( )     19
+	0,433  [HC=0,09;  H=0,43;  I=1,00;  A=0,67] 
+public void CreateContextReinitializesPreviouslyStoredDefaultHttpContext ( )     49
+	0,431  [HC=0,08;  H=0,43;  I=1,00;  A=0,67] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,334  [HC=0,24;  HNC=0,06;  I=0,26;  A=0,54;  NA=0,00; NN=0,76] 
+public void Set < TFeature > ( TFeature instance )     131
+	0,251  [HC=0,00;  HNC=0,11;  I=0,32;  A=0,54;  NA=0,00; NN=0,76] 
+public TFeature Get < TFeature > ( )     127
+	0,246  [HC=0,00;  HNC=0,13;  I=0,26;  A=0,54;  NA=0,00; NN=0,76] 
+public IEnumerator < KeyValuePair < Type , object > > GetEnumerator ( )     129
+	0,246  [HC=0,00;  HNC=0,13;  I=0,26;  A=0,54;  NA=0,00; NN=0,76] 
+public void DisposeContextClearsHttpContextIfIHttpContextAccessorIsActive ( )     34
+	0,169  [HC=0,08;  HNC=0,13;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,152  [HC=0,04;  HNC=0,13;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void DisposeContextDoesNotClearHttpContextIfDefaultHttpContextFactoryUsed ( )     19
+	0,151  [HC=0,04;  HNC=0,13;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenApiAddURLTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenApiAddURLTests.cs
+*
+public void OpenApi_Add_URL_ActualResponse ( )     462
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private static object [ ] BindArguments ( byte [ ] input , ref int offset , IReadOnlyList < Type > parameterTypes , IFormatterResolver resolver )     322
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,489  [HC=0,10;  H=0,13;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,289  [HC=0,00;  HNC=0,17;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static HubMessage CreateInvocationMessage ( ref MessagePackReader reader , IInvocationBinder binder , int itemCount )     92
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplicationTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplicationTests.cs
+*
+public void Log < TState > ( LogLevel logLevel , EventId eventId , TState state , Exception exception , Func < TState , Exception , string > formatter )     457
+*
+public void Set < TFeature > ( TFeature instance )     131
+	0,602  [HC=0,46;  H=0,26;  I=1,00;  A=0,79] 
+public TFeature Get < TFeature > ( )     127
+	0,592  [HC=0,46;  H=0,19;  I=1,00;  A=0,79] 
+public IEnumerator < KeyValuePair < Type , object > > GetEnumerator ( )     129
+	0,463  [HC=0,15;  H=0,21;  I=1,00;  A=0,79] 
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,430  [HC=0,12;  H=0,08;  I=1,00;  A=0,79] 
+public void CreateContextReinitializesPreviouslyStoredDefaultHttpContext ( )     49
+	0,396  [HC=0,10;  H=0,14;  I=1,00;  A=0,67] 
+public void DisposeContextClearsHttpContextIfIHttpContextAccessorIsActive ( )     34
+	0,388  [HC=0,08;  H=0,14;  I=1,00;  A=0,67] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,386  [HC=0,08;  H=0,14;  I=1,00;  A=0,67] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void Set < TFeature > ( TFeature instance )     131
+	0,390  [HC=0,38;  HNC=0,35;  I=0,00;  A=0,54;  NA=0,00; NN=0,76] 
+public TFeature Get < TFeature > ( )     127
+	0,354  [HC=0,38;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,76] 
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,290  [HC=0,24;  HNC=0,01;  I=0,00;  A=0,54;  NA=0,00; NN=0,76] 
+public void CreateContextReinitializesPreviouslyStoredDefaultHttpContext ( )     49
+	0,280  [HC=0,30;  HNC=0,29;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void DisposeContextClearsHttpContextIfIHttpContextAccessorIsActive ( )     34
+	0,223  [HC=0,16;  HNC=0,29;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,223  [HC=0,16;  HNC=0,29;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void DisposeContextDoesNotClearHttpContextIfDefaultHttpContextFactoryUsed ( )     19
+	0,218  [HC=0,15;  HNC=0,29;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private void WriteInvocationMessage ( InvocationMessage message , Stream packer )     437
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,536  [HC=0,20;  H=0,17;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,467  [HC=0,25;  HNC=0,03;  I=0,41;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BadHttpRequestException.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BadHttpRequestException.cs
+*
+internal static void Throw ( RequestRejectionReason reason , StringValues detail )     130
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SystemTextJsonOutputFormatter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SystemTextJsonOutputFormatter.cs
+*
+private Stream GetWriteStream ( HttpContext httpContext , Encoding selectedEncoding )     101
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Server.Kestrel.Core.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Server.Kestrel.Core.netcoreapp.cs
+*
+bool Microsoft . AspNetCore . Server . Kestrel . Core . Internal . Http . IHttpParser < TRequestHandler > . ParseRequestLine ( TRequestHandler handler , in System . Buffers . ReadOnlySequence < byte > buffer , out System . SequencePosition consumed , out System . SequencePosition examined )     211
+*
+Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Use ( System . Func < Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate , Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate > middleware )     173
+	0,515  [HC=0,37;  H=0,36;  I=1,00;  A=0,57] 
+Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Build ( )     172
+	0,499  [HC=0,37;  H=0,25;  I=1,00;  A=0,57] 
+void OnStaticIndexedHeader ( int index , System . ReadOnlySpan < byte > value )     264
+	0,421  [HC=0,12;  H=0,20;  I=1,00;  A=0,69] 
+void OnStaticIndexedHeader ( int index )     263
+	0,402  [HC=0,12;  H=0,07;  I=1,00;  A=0,69] 
+public Microsoft . AspNetCore . Server . Kestrel . KestrelConfigurationLoader Configure ( Microsoft . Extensions . Configuration . IConfiguration config , bool reloadOnChange )     143
+	0,381  [HC=0,06;  H=0,34;  I=1,00;  A=0,57] 
+public void Listen ( System . Net . EndPoint endPoint , System . Action < Microsoft . AspNetCore . Server . Kestrel . Core . ListenOptions > configure )     147
+	0,365  [HC=0,05;  H=0,26;  I=1,00;  A=0,57] 
+public void Listen ( System . Net . EndPoint endPoint )     146
+	0,348  [HC=0,05;  H=0,14;  I=1,00;  A=0,57] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Use ( System . Func < Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate , Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate > middleware )     173
+	0,324  [HC=0,28;  HNC=0,04;  I=1,00;  A=0,27;  NA=0,00; NN=0,00] 
+Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Build ( )     172
+	0,321  [HC=0,28;  HNC=0,01;  I=1,00;  A=0,27;  NA=0,00; NN=0,00] 
+public Microsoft . AspNetCore . Server . Kestrel . KestrelConfigurationLoader Configure ( Microsoft . Extensions . Configuration . IConfiguration config , bool reloadOnChange )     143
+	0,221  [HC=0,00;  HNC=0,03;  I=1,00;  A=0,31;  NA=0,00; NN=0,00] 
+void OnStaticIndexedHeader ( int index , System . ReadOnlySpan < byte > value )     264
+	0,149  [HC=0,03;  HNC=0,15;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+void OnStaticIndexedHeader ( int index )     263
+	0,132  [HC=0,03;  HNC=0,03;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public void Listen ( System . Net . EndPoint endPoint , System . Action < Microsoft . AspNetCore . Server . Kestrel . Core . ListenOptions > configure )     147
+	0,103  [HC=0,03;  HNC=0,07;  I=0,00;  A=0,31;  NA=0,00; NN=0,00] 
+public void Listen ( System . Net . EndPoint endPoint )     146
+	0,099  [HC=0,03;  HNC=0,05;  I=0,00;  A=0,31;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Server.Kestrel.Core.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Server.Kestrel.Core.netcoreapp.cs
+*
+bool ParseRequestLine ( TRequestHandler handler , in System . Buffers . ReadOnlySequence < byte > buffer , out System . SequencePosition consumed , out System . SequencePosition examined )     236
+*
+void OnStaticIndexedHeader ( int index , System . ReadOnlySpan < byte > value )     264
+	0,467  [HC=0,14;  H=0,34;  I=1,00;  A=0,75] 
+void OnStaticIndexedHeader ( int index )     263
+	0,435  [HC=0,14;  H=0,11;  I=1,00;  A=0,75] 
+public void Listen ( System . Net . EndPoint endPoint )     146
+	0,398  [HC=0,19;  H=0,20;  I=1,00;  A=0,51] 
+public void Listen ( System . Net . EndPoint endPoint , System . Action < Microsoft . AspNetCore . Server . Kestrel . Core . ListenOptions > configure )     147
+	0,397  [HC=0,19;  H=0,20;  I=1,00;  A=0,51] 
+Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Use ( System . Func < Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate , Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate > middleware )     173
+	0,387  [HC=0,15;  H=0,24;  I=1,00;  A=0,51] 
+Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Build ( )     172
+	0,383  [HC=0,15;  H=0,22;  I=1,00;  A=0,51] 
+public Microsoft . AspNetCore . Server . Kestrel . KestrelConfigurationLoader Configure ( Microsoft . Extensions . Configuration . IConfiguration config , bool reloadOnChange )     143
+	0,378  [HC=0,13;  H=0,25;  I=1,00;  A=0,51] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+void OnStaticIndexedHeader ( int index , System . ReadOnlySpan < byte > value )     264
+	0,396  [HC=0,00;  HNC=0,15;  I=1,00;  A=0,66;  NA=0,00; NN=1,00] 
+void OnStaticIndexedHeader ( int index )     263
+	0,380  [HC=0,00;  HNC=0,03;  I=1,00;  A=0,66;  NA=0,00; NN=1,00] 
+public void Listen ( System . Net . EndPoint endPoint , System . Action < Microsoft . AspNetCore . Server . Kestrel . Core . ListenOptions > configure )     147
+	0,145  [HC=0,17;  HNC=0,07;  I=0,00;  A=0,26;  NA=0,00; NN=0,00] 
+public void Listen ( System . Net . EndPoint endPoint )     146
+	0,141  [HC=0,17;  HNC=0,05;  I=0,00;  A=0,26;  NA=0,00; NN=0,00] 
+public Microsoft . AspNetCore . Server . Kestrel . KestrelConfigurationLoader Configure ( Microsoft . Extensions . Configuration . IConfiguration config , bool reloadOnChange )     143
+	0,073  [HC=0,00;  HNC=0,03;  I=0,00;  A=0,26;  NA=0,00; NN=0,00] 
+Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Use ( System . Func < Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate , Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate > middleware )     173
+	0,065  [HC=0,00;  HNC=0,04;  I=0,00;  A=0,23;  NA=0,00; NN=0,00] 
+Microsoft . AspNetCore . Connections . MultiplexedConnectionDelegate Microsoft . AspNetCore . Connections . IMultiplexedConnectionBuilder . Build ( )     172
+	0,061  [HC=0,00;  HNC=0,01;  I=0,00;  A=0,23;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.cs
+*
+private Task FireOnStartingMayAwait ( Stack < KeyValuePair < Func < object , Task > , object > > onStarting )     747
+*
+private void CancelRequestAbortedTokenCallback ( )     448
+	0,529  [HC=0,18;  H=0,16;  I=1,00;  A=1,00] 
+public void Initialize ( HttpConnectionContext context )     81
+	0,528  [HC=0,18;  H=0,15;  I=1,00;  A=1,00] 
+private async ValueTask ProcessRequest < TContext > ( IHttpApplication < TContext > application )     650
+	0,505  [HC=0,08;  H=0,29;  I=1,00;  A=1,00] 
+protected void PoisonBody ( Exception abortReason )     495
+	0,489  [HC=0,09;  H=0,15;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private void CancelRequestAbortedTokenCallback ( )     448
+	0,333  [HC=0,00;  HNC=0,08;  I=0,41;  A=1,00;  NA=0,00; NN=0,00] 
+private async ValueTask ProcessRequest < TContext > ( IHttpApplication < TContext > application )     650
+	0,300  [HC=0,02;  HNC=0,19;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public void Initialize ( HttpConnectionContext context )     81
+	0,268  [HC=0,00;  HNC=0,01;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+protected void PoisonBody ( Exception abortReason )     495
+	0,268  [HC=0,00;  HNC=0,01;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SetCookieHeaderValueTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SetCookieHeaderValueTest.cs
+*
+public void SetCookieHeaderValue_AppendToStringBuilder_SameSiteNoneCompat ( )     349
+*
+public void SetCookieHeaderValue_TryParse_ExtensionOrderDoesntMatter ( )     414
+	0,744  [HC=0,44;  H=0,89;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void SetCookieHeaderValue_TryParse_ExtensionOrderDoesntMatter ( )     414
+	0,571  [HC=0,33;  HNC=1,00;  I=0,28;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private void SerializeArgument ( ref MessagePackWriter writer , object argument )     414
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RedisServerFixture.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RedisServerFixture.cs
+*
+public void Dispose ( )     53
+*
+public async Task DisposeAsync ( )     39
+	0,764  [HC=0,58;  H=0,60;  I=1,00;  A=1,00] 
+public async Task InitializeAsync ( )     50
+	0,561  [HC=0,13;  H=0,52;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public async Task DisposeAsync ( )     39
+	0,652  [HC=0,50;  HNC=0,73;  I=0,65;  A=1,00;  NA=0,00; NN=0,00] 
+public async Task InitializeAsync ( )     50
+	0,364  [HC=0,00;  HNC=0,73;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HtmlLocalizerOfT.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HtmlLocalizerOfT.cs
+*
+public virtual IHtmlLocalizer WithCulture ( CultureInfo culture )     84
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+*
+public void MapConnectionHandler < TConnectionHandler > ( Microsoft . AspNetCore . Http . PathString path )     41
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplicationTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplicationTests.cs
+*
+public void CreateContextWithDisabledLoggerDoesNotCreateActivity ( )     31
+*
+public void CreateContextReinitializesPreviouslyStoredDefaultHttpContext ( )     49
+	0,726  [HC=0,40;  H=0,88;  I=1,00;  A=1,00] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,705  [HC=0,35;  H=0,87;  I=1,00;  A=1,00] 
+public void DisposeContextClearsHttpContextIfIHttpContextAccessorIsActive ( )     34
+	0,670  [HC=0,28;  H=0,86;  I=1,00;  A=1,00] 
+public void DisposeContextDoesNotClearHttpContextIfDefaultHttpContextFactoryUsed ( )     19
+	0,664  [HC=0,26;  H=0,85;  I=1,00;  A=1,00] 
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,463  [HC=0,17;  H=0,39;  I=1,00;  A=0,67] 
+public void Set < TFeature > ( TFeature instance )     131
+	0,450  [HC=0,13;  H=0,41;  I=1,00;  A=0,67] 
+public TFeature Get < TFeature > ( )     127
+	0,446  [HC=0,13;  H=0,39;  I=1,00;  A=0,67] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void CreateContextReinitializesPreviouslyStoredDefaultHttpContext ( )     49
+	0,589  [HC=0,22;  HNC=1,00;  I=0,46;  A=1,00;  NA=0,00; NN=0,58] 
+public void CreateContextCreatesNewContextIfNotUsingDefaultHttpContextFactory ( )     68
+	0,581  [HC=0,25;  HNC=1,00;  I=0,32;  A=1,00;  NA=0,00; NN=0,58] 
+public void DisposeContextClearsHttpContextIfIHttpContextAccessorIsActive ( )     34
+	0,578  [HC=0,18;  HNC=1,00;  I=0,52;  A=1,00;  NA=0,00; NN=0,58] 
+public void DisposeContextDoesNotClearHttpContextIfDefaultHttpContextFactoryUsed ( )     19
+	0,545  [HC=0,08;  HNC=1,00;  I=0,56;  A=1,00;  NA=0,00; NN=0,58] 
+public TFeature Get < TFeature > ( )     127
+	0,232  [HC=0,02;  HNC=0,79;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+public IEnumerator < KeyValuePair < Type , object > > GetEnumerator ( )     129
+	0,223  [HC=0,00;  HNC=0,79;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+IEnumerator IEnumerable . GetEnumerator ( )     133
+	0,218  [HC=0,01;  HNC=0,71;  I=0,00;  A=0,44;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.SignalR.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.SignalR.netcoreapp.cs
+*
+public void MapHub < THub > ( Microsoft . AspNetCore . Http . PathString path , System . Action < Microsoft . AspNetCore . Http . Connections . HttpConnectionDispatcherOptions > configureOptions )     37
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BadHttpRequestException.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BadHttpRequestException.cs
+*
+internal static void Throw ( RequestRejectionReason reason , HttpMethod method )     44
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private static long ReadArrayLength ( byte [ ] input , ref int offset , string field )     662
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,519  [HC=0,15;  H=0,19;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,321  [HC=0,00;  HNC=0,08;  I=0,00;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LoggingStream.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LoggingStream.cs
+*
+private Task WriteAsync ( byte [ ] buffer , int offset , int count , CancellationToken cancellationToken , object state )     230
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static int ReadMapHeader ( ref MessagePackReader reader , string field )     634
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpResponseStream.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpResponseStream.cs
+*
+private Task WriteAsync ( byte [ ] buffer , int offset , int count , CancellationToken cancellationToken , object state )     103
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpsTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpsTests.cs
+*
+public async Task DevCertWithInvalidPrivateKeyProducesCustomWarning ( )     386
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private void PackHeaders ( Stream packer , IDictionary < string , string > headers )     569
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,540  [HC=0,22;  H=0,12;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,432  [HC=0,17;  HNC=0,02;  I=0,40;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+*
+bool System . Collections . Generic . IDictionary < System . Object , System . Object > . ContainsKey ( object key )     66
+*
+bool System . Collections . Generic . IDictionary < object , object ? > . ContainsKey ( object key )     72
+	0,876  [HC=0,78;  H=0,78;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . IDictionary < object , object ? > . Remove ( object key )     73
+	0,816  [HC=0,66;  H=0,74;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . IDictionary < object , object ? > . TryGetValue ( object key , out object ? value )     74
+	0,784  [HC=0,65;  H=0,55;  I=1,00;  A=1,00] 
+void System . Collections . Generic . IDictionary < object , object ? > . Add ( object key , object ? value )     71
+	0,783  [HC=0,65;  H=0,55;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Contains ( System . Collections . Generic . KeyValuePair < object , object ? > item )     68
+	0,723  [HC=0,54;  H=0,45;  I=1,00;  A=1,00] 
+void System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Clear ( )     67
+	0,718  [HC=0,50;  H=0,51;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Remove ( System . Collections . Generic . KeyValuePair < object , object ? > item )     70
+	0,705  [HC=0,50;  H=0,43;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+bool System . Collections . Generic . IDictionary < object , object ? > . ContainsKey ( object key )     72
+	0,911  [HC=0,78;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+bool System . Collections . Generic . IDictionary < object , object ? > . Remove ( object key )     73
+	0,844  [HC=0,61;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+bool System . Collections . Generic . IDictionary < object , object ? > . TryGetValue ( object key , out object ? value )     74
+	0,710  [HC=0,59;  HNC=0,54;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Contains ( System . Collections . Generic . KeyValuePair < object , object ? > item )     68
+	0,703  [HC=0,65;  HNC=0,32;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Remove ( System . Collections . Generic . KeyValuePair < object , object ? > item )     70
+	0,677  [HC=0,58;  HNC=0,32;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+System . Collections . Generic . IEnumerator < System . Collections . Generic . KeyValuePair < object , object ? > > System . Collections . Generic . IEnumerable < System . Collections . Generic . KeyValuePair < object , object ? > > . GetEnumerator ( )     75
+	0,653  [HC=0,61;  HNC=0,07;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+void System . Collections . Generic . IDictionary < object , object ? > . Add ( object key , object ? value )     71
+	0,562  [HC=0,61;  HNC=0,38;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultAuthorizationPolicyProvider.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultAuthorizationPolicyProvider.cs
+*
+private Task < AuthorizationPolicy > GetCachedPolicy ( ref Task < AuthorizationPolicy > cachedPolicy , AuthorizationPolicy currentPolicy )     52
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static int ReadInt32 ( ref MessagePackReader reader , string field )     590
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static string [ ] ReadStreamIds ( ref MessagePackReader reader )     240
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static CompletionMessage CreateCompletionMessage ( ref MessagePackReader reader , IInvocationBinder binder )     164
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Mvc.Localization.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Mvc.Localization.netcoreapp.cs
+*
+public virtual Microsoft . AspNetCore . Mvc . Localization . IHtmlLocalizer WithCulture ( System . Globalization . CultureInfo culture )     39
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static T ApplyHeaders < T > ( IDictionary < string , string > source , T destination )     569
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\JsonHubProtocolTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\JsonHubProtocolTests.cs
+*
+public bool Equals ( TemporaryCustomObject right )     187
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ProjectToolScenario.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ProjectToolScenario.cs
+*
+private string GetMetadata ( string key )     152
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private void WriteStreamIds ( string [ ] streamIds , ref MessagePackWriter writer )     484
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessageBody.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessageBody.cs
+*
+protected virtual void OnDataRead ( long bytesRead )     141
+*
+public virtual void Reset ( )     76
+	0,549  [HC=0,10;  H=0,54;  I=1,00;  A=1,00] 
+protected long TrackConsumedAndExaminedBytes ( ReadResult readResult , SequencePosition consumed , SequencePosition examined )     208
+	0,504  [HC=0,10;  H=0,22;  I=1,00;  A=1,00] 
+protected void AddAndCheckObservedBytes ( long observedBytes )     163
+	0,576  [HC=0,13;  H=0,66;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public virtual void Reset ( )     76
+	0,308  [HC=0,00;  HNC=0,31;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+protected long TrackConsumedAndExaminedBytes ( ReadResult readResult , SequencePosition consumed , SequencePosition examined )     208
+	0,284  [HC=0,00;  HNC=0,13;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+protected void AddAndCheckObservedBytes ( long observedBytes )     163
+	0,336  [HC=0,00;  HNC=0,52;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SystemTextJsonResultExecutor.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SystemTextJsonResultExecutor.cs
+*
+private Stream GetWriteStream ( HttpContext httpContext , Encoding selectedEncoding )     106
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private void PackHeaders ( ref MessagePackWriter writer , IDictionary < string , string > headers )     553
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+public DiagnosticInformation CleanupHttpsCertificates2 ( string subject = LocalhostHttpsDistinguishedName )     515
+*
+public void CleanupHttpsCertificates ( )     298
+	0,869  [HC=0,96;  H=0,45;  I=1,00;  A=0,88] 
+public IList < X509Certificate2 > GetHttpsCertificates ( )     146
+	0,737  [HC=0,72;  H=0,25;  I=1,00;  A=0,88] 
+internal void TrustCertificate ( X509Certificate2 certificate )     437
+	0,663  [HC=0,52;  H=0,33;  I=1,00;  A=0,88] 
+internal void RemoveAllCertificates ( StoreName storeName , StoreLocation storeLocation )     453
+	0,661  [HC=0,52;  H=0,32;  I=1,00;  A=0,88] #
+internal static void DisposeCertificates ( IEnumerable < X509Certificate2 > disposables )     522
+	0,659  [HC=0,52;  H=0,31;  I=1,00;  A=0,88] #
+public IList < X509Certificate2 > ListCertificates ( StoreName storeName , StoreLocation location , bool isValid , bool requireExportable = true )     63
+	0,653  [HC=0,52;  H=0,26;  I=1,00;  A=0,88] #
+internal void ExportCertificate ( X509Certificate2 certificate , string path , bool includePrivateKey , string password )     332
+	0,651  [HC=0,52;  H=0,24;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void CleanupHttpsCertificates ( )     298
+	0,556  [HC=0,75;  HNC=0,09;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public IList < X509Certificate2 > GetHttpsCertificates ( )     146
+	0,456  [HC=0,50;  HNC=0,09;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public IList < X509Certificate2 > ListCertificates ( StoreName storeName , StoreLocation location , bool isValid , bool requireExportable = true )     63
+	0,363  [HC=0,25;  HNC=0,15;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+internal static void DisposeCertificates ( IEnumerable < X509Certificate2 > disposables )     522
+	0,356  [HC=0,25;  HNC=0,10;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+internal void RemoveAllCertificates ( StoreName storeName , StoreLocation storeLocation )     453
+	0,356  [HC=0,25;  HNC=0,09;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+public bool IsHttpsDevelopmentCertificate ( X509Certificate2 certificate )     59
+	0,356  [HC=0,25;  HNC=0,09;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+internal void ExportCertificate ( X509Certificate2 certificate , string path , bool includePrivateKey , string password )     332
+	0,349  [HC=0,23;  HNC=0,11;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private void WriteCloseMessage ( CloseMessage message , Stream packer )     547
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,555  [HC=0,24;  H=0,15;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,413  [HC=0,25;  HNC=0,03;  I=0,00;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RenderTreeBuilder.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RenderTreeBuilder.cs
+*
+public void AddAttribute ( int sequence , string name , string value )     186
+*
+public void AddAttribute ( int sequence , string name , string ? value )     205
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  A=1,00] 
+public void AddAttribute ( int sequence , string name , MulticastDelegate ? value )     232
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public void AddAttribute ( int sequence , string name , object ? value )     348
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  A=1,00] 
+private static void ProfilingStart ( [ CallerMemberName ] string ? name = null )     837
+	0,508  [HC=0,07;  H=0,34;  I=1,00;  A=1,00] 
+public void AddContent ( int sequence , string ? textContent )     100
+	0,665  [HC=0,33;  H=0,66;  I=1,00;  A=1,00] #
+public void AddContent ( int sequence , RenderFragment ? fragment )     112
+	0,658  [HC=0,33;  H=0,61;  I=1,00;  A=1,00] #
+public void AddContent ( int sequence , object ? textContent )     157
+	0,656  [HC=0,33;  H=0,59;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void AddAttribute ( int sequence , string name , string ? value )     205
+	0,970  [HC=1,00;  HNC=0,99;  I=0,78;  A=1,00;  NA=0,00; NN=1,00] 
+public void AddAttribute ( int sequence , string name , MulticastDelegate ? value )     232
+	0,944  [HC=1,00;  HNC=0,80;  I=0,78;  A=1,00;  NA=0,00; NN=1,00] 
+private static void ProfilingStart ( [ CallerMemberName ] string ? name = null )     837
+	0,322  [HC=0,00;  HNC=0,41;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public void AddAttribute ( int sequence , string name , object ? value )     348
+	0,843  [HC=1,00;  HNC=0,88;  I=0,44;  A=1,00;  NA=0,00; NN=0,00] #
+public void AddContent ( int sequence , string ? textContent )     100
+	0,601  [HC=0,50;  HNC=0,65;  I=0,36;  A=1,00;  NA=0,00; NN=0,00] #
+public void AddContent ( int sequence , RenderFragment ? fragment )     112
+	0,582  [HC=0,50;  HNC=0,54;  I=0,32;  A=1,00;  NA=0,00; NN=0,00] #
+public void AddContent ( int sequence , object ? textContent )     157
+	0,539  [HC=0,50;  HNC=0,54;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+*
+public void MapConnections ( Microsoft . AspNetCore . Http . PathString path , System . Action < Microsoft . AspNetCore . Connections . IConnectionBuilder > configure )     44
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private void WriteCompletionMessage ( CompletionMessage message , Stream packer )     516
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,535  [HC=0,20;  H=0,16;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,413  [HC=0,25;  HNC=0,03;  I=0,00;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private static void ThrowInvalidDataException ( string field , string targetType )     645
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private static T ApplyHeaders < T > ( IDictionary < string , string > source , T destination )     348
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,505  [HC=0,12;  H=0,17;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,407  [HC=0,32;  HNC=0,08;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private static string ReadInvocationId ( byte [ ] input , ref int offset )     589
+*
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,536  [HC=0,17;  H=0,24;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal static MessagePackSerializerOptions CreateDefaultMessagePackSerializerOptions ( )     73
+	0,322  [HC=0,00;  HNC=0,09;  I=0,00;  A=1,00;  NA=0,00; NN=0,64] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationSchemeProviderTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationSchemeProviderTests.cs
+*
+public Task SignOutAsync ( AuthenticationProperties properties )     193
+*
+public Task SignOutAsync ( AuthenticationProperties ? properties )     210
+	0,940  [HC=1,00;  H=0,88;  I=1,00;  A=0,85] 
+public Task SignOutAsync ( AuthenticationProperties ? properties )     202
+	0,933  [HC=1,00;  H=0,88;  I=1,00;  A=0,83] 
+public Task SignInAsync ( ClaimsPrincipal user , AuthenticationProperties ? properties )     197
+	0,789  [HC=0,75;  H=0,61;  I=1,00;  A=0,83] #
+public Task ForbidAsync ( AuthenticationProperties ? properties )     184
+	0,664  [HC=0,42;  H=0,80;  I=1,00;  A=0,80] #
+public Task ChallengeAsync ( AuthenticationProperties ? properties )     179
+	0,637  [HC=0,36;  H=0,79;  I=1,00;  A=0,80] #
+public Task InitializeAsync ( AuthenticationScheme scheme , HttpContext context )     189
+	0,617  [HC=0,40;  H=0,53;  I=1,00;  A=0,80] #
+public Task < AuthenticateResult > AuthenticateAsync ( )     174
+	0,612  [HC=0,41;  H=0,46;  I=1,00;  A=0,80] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public Task SignOutAsync ( AuthenticationProperties ? properties )     210
+	0,947  [HC=1,00;  HNC=0,98;  I=1,00;  A=0,81;  NA=0,00; NN=1,00] 
+public Task SignOutAsync ( AuthenticationProperties ? properties )     202
+	0,906  [HC=1,00;  HNC=0,98;  I=1,00;  A=0,66;  NA=0,00; NN=1,00] 
+public Task SignInAsync ( ClaimsPrincipal user , AuthenticationProperties ? properties )     197
+	0,662  [HC=0,67;  HNC=0,64;  I=1,00;  A=0,66;  NA=0,00; NN=0,00] #
+public Task ForbidAsync ( AuthenticationProperties ? properties )     184
+	0,537  [HC=0,33;  HNC=0,98;  I=1,00;  A=0,52;  NA=0,00; NN=0,00] #
+public Task ChallengeAsync ( AuthenticationProperties ? properties )     179
+	0,537  [HC=0,33;  HNC=0,98;  I=1,00;  A=0,52;  NA=0,00; NN=0,00] #
+public Task InitializeAsync ( AuthenticationScheme scheme , HttpContext context )     189
+	0,462  [HC=0,33;  HNC=0,42;  I=1,00;  A=0,52;  NA=0,00; NN=0,00] #
+public Task < AuthenticateResult > AuthenticateAsync ( )     174
+	0,431  [HC=0,33;  HNC=0,18;  I=1,00;  A=0,52;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionManager.cs
+*
+public async Task < bool > AbortAllConnectionsAsync ( )     90
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Connections.netcoreapp.cs
+*
+public void MapConnections ( Microsoft . AspNetCore . Http . PathString path , Microsoft . AspNetCore . Http . Connections . HttpConnectionDispatcherOptions options , System . Action < Microsoft . AspNetCore . Connections . IConnectionBuilder > configure )     43
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MapSignalRTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MapSignalRTests.cs
+*
+public void NotAddingSignalRServiceThrowsWhenUsingEndpointRouting ( )     63
+*
+*
+
+**************************************************************
+

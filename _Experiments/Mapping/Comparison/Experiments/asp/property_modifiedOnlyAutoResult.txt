@@ -1,0 +1,288 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . Count     55
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,910  [HC=0,85;  H=0,82;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,866  [HC=0,77;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,707  [HC=0,44;  H=0,63;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,703  [HC=0,44;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,468  [HC=0,11;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,465  [HC=0,13;  H=0,15;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,40;  I=1,00;  A=0,86] #
+*
+HC=2,48659003831418;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,961  [HC=0,85;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,526  [HC=0,77;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Net . EndPoint EndPoint     144
+	0,122  [HC=0,03;  HNC=0,14;  I=0,35;  A=0,46;  NA=0,00; NN=0,00] 
+public virtual System . Net . EndPoint ? LocalEndPoint     18
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+public virtual System . Net . EndPoint ? RemoteEndPoint     19
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netcoreapp.cs
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . IsReadOnly     56
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,912  [HC=0,86;  H=0,82;  I=1,00;  A=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,870  [HC=0,78;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,703  [HC=0,43;  H=0,64;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,698  [HC=0,43;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,470  [HC=0,12;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,466  [HC=0,13;  H=0,14;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,41;  I=1,00;  A=0,86] #
+*
+HC=2,6426116838488;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,963  [HC=0,86;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool CanRead     234
+	0,459  [HC=0,05;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+bool CanWrite     235
+	0,446  [HC=0,00;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,310  [HC=0,71;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public abstract string ? ConnectionId     15
+	0,079  [HC=0,07;  HNC=0,00;  I=0,35;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.0.cs
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . Count     55
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,910  [HC=0,85;  H=0,82;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,866  [HC=0,77;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,707  [HC=0,44;  H=0,63;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,703  [HC=0,44;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,468  [HC=0,11;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,465  [HC=0,13;  H=0,15;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,40;  I=1,00;  A=0,86] #
+*
+HC=2,48659003831418;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,961  [HC=0,85;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,526  [HC=0,77;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Net . EndPoint EndPoint     144
+	0,122  [HC=0,03;  HNC=0,14;  I=0,35;  A=0,46;  NA=0,00; NN=0,00] 
+public virtual System . Net . EndPoint ? LocalEndPoint     18
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+public virtual System . Net . EndPoint ? RemoteEndPoint     19
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.0.cs
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . IsReadOnly     56
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,912  [HC=0,86;  H=0,82;  I=1,00;  A=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,870  [HC=0,78;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,703  [HC=0,43;  H=0,64;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,698  [HC=0,43;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,470  [HC=0,12;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,466  [HC=0,13;  H=0,14;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,41;  I=1,00;  A=0,86] #
+*
+HC=2,6426116838488;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,963  [HC=0,86;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool CanRead     234
+	0,459  [HC=0,05;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+bool CanWrite     235
+	0,446  [HC=0,00;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,310  [HC=0,71;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public abstract string ? ConnectionId     15
+	0,079  [HC=0,07;  HNC=0,00;  I=0,35;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.1.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.1.cs
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . Count     55
+*
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,910  [HC=0,85;  H=0,82;  I=1,00;  A=1,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,866  [HC=0,77;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,707  [HC=0,44;  H=0,63;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,703  [HC=0,44;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,468  [HC=0,11;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,465  [HC=0,13;  H=0,15;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,40;  I=1,00;  A=0,86] #
+*
+HC=2,48659003831418;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,961  [HC=0,85;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,526  [HC=0,77;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,422  [HC=0,37;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Net . EndPoint EndPoint     144
+	0,122  [HC=0,03;  HNC=0,14;  I=0,35;  A=0,46;  NA=0,00; NN=0,00] 
+public virtual System . Net . EndPoint ? LocalEndPoint     18
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+public virtual System . Net . EndPoint ? RemoteEndPoint     19
+	0,100  [HC=0,03;  HNC=0,08;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.1.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Connections.Abstractions.netstandard2.1.cs
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < System . Object , System . Object > > . IsReadOnly     56
+*
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,912  [HC=0,86;  H=0,82;  I=1,00;  A=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,870  [HC=0,78;  H=0,75;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,703  [HC=0,43;  H=0,64;  I=1,00;  A=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,698  [HC=0,43;  H=0,60;  I=1,00;  A=1,00] 
+public System . IServiceProvider ApplicationServices     155
+	0,470  [HC=0,12;  H=0,10;  I=1,00;  A=0,92] 
+public virtual System . Threading . CancellationToken ConnectionClosed     14
+	0,466  [HC=0,13;  H=0,14;  I=1,00;  A=0,86] #
+public abstract System . Collections . Generic . IDictionary < object , object ? > ? Items     17
+	0,464  [HC=0,04;  H=0,41;  I=1,00;  A=0,86] #
+*
+HC=2,6426116838488;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . IsReadOnly     62
+	0,963  [HC=0,86;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+bool CanRead     234
+	0,459  [HC=0,05;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+bool CanWrite     235
+	0,446  [HC=0,00;  HNC=1,00;  I=0,35;  A=0,31;  NA=0,00; NN=0,00] 
+System . Collections . Generic . ICollection < object > System . Collections . Generic . IDictionary < object , object ? > . Keys     64
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+System . Collections . Generic . ICollection < object ? > System . Collections . Generic . IDictionary < object , object ? > . Values     65
+	0,411  [HC=0,33;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+int System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < object , object ? > > . Count     61
+	0,310  [HC=0,71;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+public abstract string ? ConnectionId     15
+	0,079  [HC=0,07;  HNC=0,00;  I=0,35;  A=0,54;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+*
+System . Collections . Generic . IEnumerable < string > System . Collections . Generic . IReadOnlyDictionary < System . String , System . Object > . Keys     489
+*
+System . Collections . Generic . IEnumerable < string > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Keys     517
+	0,888  [HC=0,80;  H=0,82;  I=1,00;  A=1,00] 
+System . Collections . Generic . IEnumerable < object ? > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Values     518
+	0,847  [HC=0,74;  H=0,71;  I=1,00;  A=1,00] 
+public bool PreserveMatchedPathSegment     71
+	0,417  [HC=0,16;  H=0,02;  I=1,00;  A=0,71] 
+public int StatusCode     106
+	0,412  [HC=0,08;  H=0,03;  I=1,00;  A=0,82] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . IsReadOnly     516
+	0,711  [HC=0,45;  H=0,62;  I=1,00;  A=1,00] #
+*
+HC=2;  HNC=4,00;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+System . Collections . Generic . IEnumerable < string > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Keys     517
+	0,955  [HC=0,80;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+System . Collections . Generic . IEnumerable < object ? > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Values     518
+	0,866  [HC=0,72;  HNC=0,83;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] 
+public int StatusCode     106
+	0,032  [HC=0,00;  HNC=0,00;  I=0,00;  A=0,29;  NA=0,00; NN=0,00] 
+public bool PreserveMatchedPathSegment     71
+	0,024  [HC=0,00;  HNC=0,00;  I=0,00;  A=0,22;  NA=0,00; NN=0,00] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . IsReadOnly     516
+	0,239  [HC=0,51;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Http.Abstractions.netcoreapp.cs
+*
+System . Collections . Generic . IEnumerable < object > System . Collections . Generic . IReadOnlyDictionary < System . String , System . Object > . Values     490
+*
+System . Collections . Generic . IEnumerable < object ? > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Values     518
+	0,885  [HC=0,80;  H=0,78;  I=1,00;  A=1,00] 
+System . Collections . Generic . IEnumerable < string > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Keys     517
+	0,855  [HC=0,74;  H=0,75;  I=1,00;  A=1,00] 
+public bool PreserveMatchedPathSegment     71
+	0,416  [HC=0,16;  H=0,02;  I=1,00;  A=0,71] 
+public int StatusCode     106
+	0,412  [HC=0,07;  H=0,03;  I=1,00;  A=0,82] 
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . IsReadOnly     516
+	0,711  [HC=0,45;  H=0,62;  I=1,00;  A=1,00] #
+*
+HC=2;  HNC=3,77;  I=0,17;  A=1,00;  NA=0,00;  NN=2,00]
+System . Collections . Generic . IEnumerable < object ? > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Values     518
+	0,948  [HC=0,80;  HNC=0,98;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public int StatusCode     106
+	0,033  [HC=0,00;  HNC=0,00;  I=0,00;  A=0,29;  NA=0,00; NN=0,00] 
+public bool PreserveMatchedPathSegment     71
+	0,025  [HC=0,00;  HNC=0,00;  I=0,00;  A=0,22;  NA=0,00; NN=0,00] 
+System . Collections . Generic . IEnumerable < string > System . Collections . Generic . IReadOnlyDictionary < string , object ? > . Keys     517
+	0,648  [HC=0,72;  HNC=0,85;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+bool System . Collections . Generic . ICollection < System . Collections . Generic . KeyValuePair < string , object ? > > . IsReadOnly     516
+	0,245  [HC=0,51;  HNC=0,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

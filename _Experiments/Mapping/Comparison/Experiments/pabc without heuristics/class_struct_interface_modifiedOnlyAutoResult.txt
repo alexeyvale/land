@@ -1,0 +1,38 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\TreeHelper.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\TreeHelper.cs
+*
+public partial class yield_unknown_ident     1510
+*
+public partial class yield_unknown_ident     1563
+	1,000  [HC=1,00;  H=1,00;  I=1,00;  A=1,00] 
+public partial class pattern_node     1846
+	0,528  [HC=0,29;  H=0,82;  I=0,00;  A=1,00] 
+public partial class typecast_node     1851
+	0,528  [HC=0,29;  H=0,82;  I=0,00;  A=1,00] 
+public partial class empty_statement     1960
+	0,501  [HC=0,24;  H=0,80;  I=0,00;  A=1,00] 
+public partial class tuple_pattern_wild_card     1874
+	0,488  [HC=0,20;  H=0,82;  I=0,00;  A=1,00] 
+public partial class var_tuple_def_statement     584
+	0,486  [HC=0,20;  H=0,80;  I=0,00;  A=1,00] 
+public partial class function_lambda_definition     1681
+	0,489  [HC=0,21;  H=0,80;  I=0,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public partial class yield_unknown_ident     1563
+	0,968  [HC=1,00;  HNC=1,00;  I=0,76;  A=1,00;  NA=0,00; NN=1,00] *
+public partial class wild_card_deconstructor_parameter     1907
+	0,460  [HC=0,15;  HNC=1,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public partial class var_tuple_def_statement     584
+	0,436  [HC=0,00;  HNC=1,00;  I=0,27;  A=1,00;  NA=0,00; NN=0,00] 
+public partial class const_pattern     1918
+	0,435  [HC=0,00;  HNC=1,00;  I=0,26;  A=1,00;  NA=0,00; NN=0,00] 
+public partial class function_lambda_definition     1681
+	0,400  [HC=0,00;  HNC=1,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public partial class pattern_node     1846
+	0,400  [HC=0,00;  HNC=1,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public partial class typecast_node     1851
+	0,400  [HC=0,00;  HNC=1,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+

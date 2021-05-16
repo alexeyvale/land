@@ -1,0 +1,474 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AttributesShouldNotBeAppliedToPageModelAnalyzerTest.cs
+*
+public class AttributesShouldNotBeAppliedToPageModelAnalyzerTest     12
+*
+public class AttributesShouldNotBeAppliedToPageModelAnalyzerTest     12
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  A=0,78] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class AttributesShouldNotBeAppliedToPageModelAnalyzerTest     12
+	0,860  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,72;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationSchemeProviderTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationSchemeProviderTests.cs
+*
+public class AuthenticationSchemeProviderTests     16
+*
+public class AuthenticationSchemeProviderTests     16
+	0,859  [HC=1,00;  H=1,00;  I=0,90;  A=0,56] *
+private class IgnoreCaseSchemeProvider     216
+	0,350  [HC=0,45;  H=0,53;  I=0,00;  A=0,28] 
+private class SignInHandler     195
+	0,206  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] 
+private class SignOutHandler     208
+	0,206  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] 
+private class Handler     172
+	0,192  [HC=0,12;  H=0,42;  I=0,00;  A=0,28] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class AuthenticationSchemeProviderTests     16
+	0,781  [HC=1,00;  HNC=1,00;  I=0,87;  A=0,49;  NA=0,00; NN=0,00] *
+private class IgnoreCaseSchemeProvider     216
+	0,200  [HC=0,25;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class Handler     172
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class SignInHandler     195
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class SignOutHandler     208
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationSchemeProviderTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationSchemeProviderTests.cs
+*
+private class Handler     155
+*
+private class Handler     172
+	0,865  [HC=1,00;  H=1,00;  I=0,50;  A=0,78] *
+private class SignInHandler     195
+	0,574  [HC=0,54;  H=0,85;  I=0,00;  A=0,78] 
+private class SignOutHandler     208
+	0,556  [HC=0,50;  H=0,83;  I=0,00;  A=0,78] 
+private class IgnoreCaseSchemeProvider     216
+	0,377  [HC=0,13;  H=0,71;  I=0,00;  A=0,78] 
+public class AuthenticationSchemeProviderTests     16
+	0,192  [HC=0,12;  H=0,42;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class Handler     172
+	0,856  [HC=1,00;  HNC=1,00;  I=0,97;  A=0,72;  NA=0,00; NN=0,00] *
+private class SignInHandler     195
+	0,537  [HC=0,33;  HNC=1,00;  I=0,58;  A=0,72;  NA=0,00; NN=0,00] 
+private class SignOutHandler     208
+	0,526  [HC=0,33;  HNC=1,00;  I=0,50;  A=0,72;  NA=0,00; NN=0,00] 
+private class IgnoreCaseSchemeProvider     216
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] 
+public class AuthenticationSchemeProviderTests     16
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationSchemeProviderTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationSchemeProviderTests.cs
+*
+private class IgnoreCaseSchemeProvider     199
+*
+private class IgnoreCaseSchemeProvider     216
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  A=0,78] *
+private class SignInHandler     195
+	0,397  [HC=0,17;  H=0,72;  I=0,00;  A=0,78] 
+private class SignOutHandler     208
+	0,397  [HC=0,17;  H=0,72;  I=0,00;  A=0,78] 
+private class Handler     172
+	0,377  [HC=0,13;  H=0,71;  I=0,00;  A=0,78] #
+public class AuthenticationSchemeProviderTests     16
+	0,350  [HC=0,45;  H=0,53;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class IgnoreCaseSchemeProvider     216
+	0,860  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,72;  NA=0,00; NN=0,00] *
+private class SignInHandler     195
+	0,370  [HC=0,00;  HNC=1,00;  I=0,33;  A=0,72;  NA=0,00; NN=0,00] 
+private class Handler     172
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] #
+private class SignOutHandler     208
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] #
+public class AuthenticationSchemeProviderTests     16
+	0,200  [HC=0,25;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+public class AuthenticationServiceTests     13
+*
+public class AuthenticationServiceTests     13
+	0,859  [HC=1,00;  H=1,00;  I=0,90;  A=0,56] *
+public class SignOutHandler     316
+	0,248  [HC=0,15;  H=0,72;  I=0,00;  A=0,28] 
+private class RunOnce     246
+	0,225  [HC=0,19;  H=0,45;  I=0,00;  A=0,28] 
+private class BaseHandler     256
+	0,207  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] 
+private class SignInHandler     283
+	0,207  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] 
+private class UberHandler     344
+	0,207  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] 
+private class ForbidHandler     382
+	0,189  [HC=0,12;  H=0,42;  I=0,00;  A=0,28] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class AuthenticationServiceTests     13
+	0,794  [HC=1,00;  HNC=1,00;  I=0,97;  A=0,49;  NA=0,00; NN=0,00] *
+public class SignOutHandler     316
+	0,166  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class RunOnce     246
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class BaseHandler     256
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class SignInHandler     283
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class UberHandler     344
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+private class ForbidHandler     382
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+private class BaseHandler     223
+*
+private class BaseHandler     256
+	0,865  [HC=1,00;  H=1,00;  I=0,50;  A=0,78] *
+private class UberHandler     344
+	0,692  [HC=0,64;  H=0,88;  I=0,50;  A=0,78] 
+private class SignInHandler     283
+	0,645  [HC=0,54;  H=0,85;  I=0,50;  A=0,78] 
+private class ForbidHandler     382
+	0,645  [HC=0,54;  H=0,85;  I=0,50;  A=0,78] 
+public class SignOutHandler     316
+	0,586  [HC=0,50;  H=0,55;  I=0,50;  A=0,78] 
+private class RunOnce     246
+	0,404  [HC=0,18;  H=0,73;  I=0,00;  A=0,78] 
+public class AuthenticationServiceTests     13
+	0,207  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class BaseHandler     256
+	0,828  [HC=1,00;  HNC=1,00;  I=0,76;  A=0,72;  NA=0,00; NN=0,00] *
+private class UberHandler     344
+	0,634  [HC=0,50;  HNC=1,00;  I=0,81;  A=0,72;  NA=0,00; NN=0,00] 
+private class ForbidHandler     382
+	0,592  [HC=0,50;  HNC=1,00;  I=0,49;  A=0,72;  NA=0,00; NN=0,00] 
+private class SignInHandler     283
+	0,567  [HC=0,33;  HNC=1,00;  I=0,80;  A=0,72;  NA=0,00; NN=0,00] 
+public class SignOutHandler     316
+	0,512  [HC=0,33;  HNC=0,50;  I=0,89;  A=0,72;  NA=0,00; NN=0,00] 
+private class RunOnce     246
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] 
+public class AuthenticationServiceTests     13
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+private class UberHandler     307
+*
+private class UberHandler     344
+	0,855  [HC=1,00;  H=1,00;  I=0,43;  A=0,78] *
+private class ForbidHandler     382
+	0,672  [HC=0,62;  H=0,87;  I=0,43;  A=0,78] 
+private class SignInHandler     283
+	0,615  [HC=0,54;  H=0,85;  I=0,29;  A=0,78] 
+public class SignOutHandler     316
+	0,556  [HC=0,50;  H=0,55;  I=0,29;  A=0,78] 
+private class RunOnce     246
+	0,404  [HC=0,18;  H=0,73;  I=0,00;  A=0,78] 
+private class BaseHandler     256
+	0,661  [HC=0,64;  H=0,88;  I=0,29;  A=0,78] #
+public class AuthenticationServiceTests     13
+	0,207  [HC=0,15;  H=0,43;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class UberHandler     344
+	0,848  [HC=1,00;  HNC=1,00;  I=0,91;  A=0,72;  NA=0,00; NN=0,00] *
+private class ForbidHandler     382
+	0,622  [HC=0,50;  HNC=1,00;  I=0,72;  A=0,72;  NA=0,00; NN=0,00] 
+private class RunOnce     246
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] 
+private class BaseHandler     256
+	0,636  [HC=0,50;  HNC=1,00;  I=0,82;  A=0,72;  NA=0,00; NN=0,00] #
+private class SignInHandler     283
+	0,578  [HC=0,33;  HNC=1,00;  I=0,88;  A=0,72;  NA=0,00; NN=0,00] #
+public class SignOutHandler     316
+	0,509  [HC=0,33;  HNC=0,50;  I=0,87;  A=0,72;  NA=0,00; NN=0,00] #
+public class AuthenticationServiceTests     13
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
+*
+private class ForbidHandler     345
+*
+private class ForbidHandler     382
+	0,855  [HC=1,00;  H=1,00;  I=0,43;  A=0,78] *
+private class SignInHandler     283
+	0,615  [HC=0,54;  H=0,85;  I=0,29;  A=0,78] 
+public class SignOutHandler     316
+	0,556  [HC=0,50;  H=0,55;  I=0,29;  A=0,78] 
+private class RunOnce     246
+	0,391  [HC=0,15;  H=0,72;  I=0,00;  A=0,78] 
+private class UberHandler     344
+	0,672  [HC=0,62;  H=0,87;  I=0,43;  A=0,78] #
+private class BaseHandler     256
+	0,615  [HC=0,54;  H=0,85;  I=0,29;  A=0,78] #
+public class AuthenticationServiceTests     13
+	0,189  [HC=0,12;  H=0,42;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class ForbidHandler     382
+	0,853  [HC=1,00;  HNC=1,00;  I=0,95;  A=0,72;  NA=0,00; NN=0,00] *
+private class RunOnce     246
+	0,327  [HC=0,00;  HNC=1,00;  I=0,00;  A=0,72;  NA=0,00; NN=0,00] 
+private class BaseHandler     256
+	0,627  [HC=0,50;  HNC=1,00;  I=0,75;  A=0,72;  NA=0,00; NN=0,00] #
+private class UberHandler     344
+	0,619  [HC=0,50;  HNC=1,00;  I=0,69;  A=0,72;  NA=0,00; NN=0,00] #
+private class SignInHandler     283
+	0,552  [HC=0,33;  HNC=1,00;  I=0,69;  A=0,72;  NA=0,00; NN=0,00] #
+public class SignOutHandler     316
+	0,484  [HC=0,33;  HNC=0,50;  I=0,68;  A=0,72;  NA=0,00; NN=0,00] #
+public class AuthenticationServiceTests     13
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BuildServiceProviderAnalyzer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BuildServiceProviderAnalyzer.cs
+*
+internal class BuildServiceProviderValidator     10
+*
+internal class BuildServiceProviderAnalyzer     10
+	0,885  [HC=0,76;  H=0,92;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal class BuildServiceProviderAnalyzer     10
+	0,831  [HC=0,75;  HNC=1,00;  I=0,98;  A=1,00;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private class UserCancelledTrustException     838
+*
+internal class UserCancelledTrustException     750
+	0,917  [HC=1,00;  H=0,67;  I=1,00;  A=0,88] *
+public class CertificateManagerEventSource     567
+	0,387  [HC=0,17;  H=0,44;  I=0,00;  A=0,88] 
+internal struct CheckCertificateStateResult     754
+	0,285  [HC=0,07;  H=0,02;  I=0,00;  A=0,88] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal class UserCancelledTrustException     750
+	0,843  [HC=1,00;  HNC=0,50;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] *
+public class CertificateManagerEventSource     567
+	0,310  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+internal struct CheckCertificateStateResult     754
+	0,243  [HC=0,00;  HNC=0,00;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionDispatcher.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionDispatcher.cs
+*
+internal class ConnectionDispatcher     13
+*
+internal class ConnectionDispatcher < T >     13
+	0,791  [HC=0,87;  H=0,50;  I=0,43;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal class ConnectionDispatcher < T >     13
+	0,775  [HC=0,63;  HNC=1,00;  I=0,94;  A=1,00;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionLimitMiddleware.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionLimitMiddleware.cs
+*
+internal class ConnectionLimitMiddleware     11
+*
+internal class ConnectionLimitMiddleware < T >     12
+	0,826  [HC=0,89;  H=0,50;  I=0,60;  A=1,00] *
+private class ConnectionReleasor     54
+	0,448  [HC=0,48;  H=0,49;  I=0,20;  A=0,50] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+internal class ConnectionLimitMiddleware < T >     12
+	0,807  [HC=0,71;  HNC=1,00;  I=0,91;  A=1,00;  NA=0,00; NN=0,00] *
+private class ConnectionReleasor     54
+	0,353  [HC=0,33;  HNC=0,50;  I=0,65;  A=0,25;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionLimitMiddleware.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionLimitMiddleware.cs
+*
+private class ConnectionReleasor     54
+*
+private class ConnectionReleasor     54
+	0,929  [HC=1,00;  H=1,00;  I=1,00;  A=0,75] *
+internal class ConnectionLimitMiddleware < T >     12
+	0,425  [HC=0,46;  H=0,25;  I=0,33;  A=0,50] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class ConnectionReleasor     54
+	0,876  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,78;  NA=0,00; NN=0,00] *
+internal class ConnectionLimitMiddleware < T >     12
+	0,313  [HC=0,24;  HNC=0,50;  I=0,63;  A=0,25;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private class StreamCloseAwaitable     1332
+*
+private class StreamCloseAwaitable     1461
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+private static class GracefulCloseInitiator     1519
+	0,490  [HC=0,36;  H=0,59;  I=0,00;  A=0,88] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class StreamCloseAwaitable     1461
+	0,910  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] *
+private static class GracefulCloseInitiator     1519
+	0,465  [HC=0,33;  HNC=0,67;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static class GracefulCloseInitiator     1390
+*
+private static class GracefulCloseInitiator     1519
+	0,964  [HC=1,00;  H=1,00;  I=1,00;  A=0,88] *
+private class StreamCloseAwaitable     1461
+	0,490  [HC=0,36;  H=0,59;  I=0,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private static class GracefulCloseInitiator     1519
+	0,910  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,91;  NA=0,00; NN=0,00] *
+private class StreamCloseAwaitable     1461
+	0,465  [HC=0,33;  HNC=0,67;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpParserBenchmark.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpParserBenchmark.cs
+*
+private struct Adapter     80
+*
+private struct Adapter     100
+	0,845  [HC=1,00;  H=1,00;  I=0,25;  A=0,83] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private struct Adapter     100
+	0,875  [HC=1,00;  HNC=1,00;  I=0,76;  A=0,90;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReaderTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReaderTest.cs
+*
+public class HttpResponseStreamReaderTest     16
+*
+public class HttpRequestStreamReaderTest     17
+	0,858  [HC=0,82;  H=0,94;  I=0,60;  A=1,00] *
+private class AsyncOnlyStreamWrapper     498
+	0,350  [HC=0,32;  H=0,49;  I=0,00;  A=0,50] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class HttpRequestStreamReaderTest     17
+	0,804  [HC=0,80;  HNC=1,00;  I=0,63;  A=1,00;  NA=0,00; NN=0,00] *
+private class AsyncOnlyStreamWrapper     498
+	0,213  [HC=0,20;  HNC=0,50;  I=0,00;  A=0,25;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Model.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Model.cs
+*
+public class Model     6
+*
+public class Model     6
+	0,728  [HC=1,00;  H=1,00;  I=1,00;  A=0,05] *
+*
+HC=3;  HNC=1,00;  I=0,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class Model     6
+	0,616  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,00;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ParameterViewTest.Assignment.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ParameterViewTest.Assignment.cs
+*
+class HasDupliateCaptureUnmatchedValuesProperty     633
+*
+class HasDuplicateCaptureUnmatchedValuesProperty     633
+	0,988  [HC=0,98;  H=0,99;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+class HasDuplicateCaptureUnmatchedValuesProperty     633
+	0,926  [HC=0,98;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TokenExtensionTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TokenExtensionTests.cs
+*
+public class TokenExtensionTests     15
+*
+public class TokenExtensionTests     15
+	0,873  [HC=1,00;  H=1,00;  I=1,00;  A=0,56] *
+private class SimpleAuth     157
+	0,184  [HC=0,11;  H=0,42;  I=0,00;  A=0,28] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public class TokenExtensionTests     15
+	0,798  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,49;  NA=0,00; NN=0,00] *
+private class SimpleAuth     157
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TokenExtensionTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TokenExtensionTests.cs
+*
+private class SimpleAuth     157
+*
+private class SimpleAuth     157
+	0,889  [HC=1,00;  H=1,00;  I=0,67;  A=0,78] *
+public class TokenExtensionTests     15
+	0,184  [HC=0,11;  H=0,42;  I=0,00;  A=0,28] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private class SimpleAuth     157
+	0,857  [HC=1,00;  HNC=1,00;  I=0,98;  A=0,72;  NA=0,00; NN=0,00] *
+public class TokenExtensionTests     15
+	0,100  [HC=0,00;  HNC=0,50;  I=0,00;  A=0,12;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

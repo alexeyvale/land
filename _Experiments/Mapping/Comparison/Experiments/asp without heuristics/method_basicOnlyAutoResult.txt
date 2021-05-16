@@ -1,0 +1,590 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
+*
+public void FindCascadingParameters_IfHasNoParameters_ReturnsNull ( )     17
+*
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,956  [HC=0,90;  H=0,98;  I=1,00;  A=1,00] *
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,895  [HC=0,77;  H=0,96;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,893  [HC=0,76;  H=0,95;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,863  [HC=0,70;  H=0,94;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,790  [HC=0,54;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,789  [HC=0,54;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,782  [HC=0,52;  H=0,91;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,942  [HC=0,89;  HNC=1,00;  I=0,90;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,898  [HC=0,80;  HNC=1,00;  I=0,84;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,887  [HC=0,78;  HNC=1,00;  I=0,82;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,664  [HC=0,40;  HNC=1,00;  I=0,78;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,654  [HC=0,40;  HNC=1,00;  I=0,71;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,748  [HC=0,64;  HNC=1,00;  I=0,70;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,669  [HC=0,44;  HNC=1,00;  I=0,69;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
+*
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsNull ( )     30
+*
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,963  [HC=0,92;  H=0,98;  I=1,00;  A=1,00] *
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,856  [HC=0,68;  H=0,94;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,848  [HC=0,67;  H=0,94;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_ConsumerSpecifiesNameButSupplierDoesNot_ReturnsEmpty ( )     243
+	0,778  [HC=0,51;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,775  [HC=0,51;  H=0,90;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,775  [HC=0,51;  H=0,90;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,894  [HC=0,77;  H=0,95;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,953  [HC=0,90;  HNC=1,00;  I=0,95;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,911  [HC=0,80;  HNC=1,00;  I=0,93;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,869  [HC=0,70;  HNC=1,00;  I=0,92;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,678  [HC=0,46;  HNC=1,00;  I=0,72;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,646  [HC=0,40;  HNC=1,00;  I=0,64;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,728  [HC=0,64;  HNC=1,00;  I=0,55;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,641  [HC=0,40;  HNC=1,00;  I=0,61;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
+*
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsNull ( )     43
+*
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,955  [HC=0,90;  H=0,98;  I=1,00;  A=1,00] *
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,894  [HC=0,77;  H=0,95;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,790  [HC=0,54;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,782  [HC=0,52;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_TypeAssignmentIsInvalidForNullValue_ReturnsEmpty ( )     213
+	0,778  [HC=0,51;  H=0,91;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,895  [HC=0,77;  H=0,96;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,850  [HC=0,67;  H=0,94;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,946  [HC=0,89;  HNC=1,00;  I=0,93;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,900  [HC=0,78;  HNC=1,00;  I=0,92;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,870  [HC=0,70;  HNC=1,00;  I=0,93;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,655  [HC=0,40;  HNC=1,00;  I=0,71;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,645  [HC=0,40;  HNC=1,00;  I=0,64;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,764  [HC=0,73;  HNC=1,00;  I=0,55;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,659  [HC=0,44;  HNC=1,00;  I=0,61;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
+*
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsNull ( )     258
+*
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,965  [HC=0,92;  H=0,99;  I=1,00;  A=1,00] *
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,923  [HC=0,83;  H=0,97;  I=1,00;  A=1,00] 
+public void FindCascadingParameters_ConsumerSpecifiesNameButSupplierDoesNot_ReturnsEmpty ( )     243
+	0,803  [HC=0,57;  H=0,92;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,800  [HC=0,56;  H=0,92;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_SupplierSpecifiesNameButConsumerDoesNot_ReturnsEmpty ( )     228
+	0,790  [HC=0,54;  H=0,91;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,786  [HC=0,53;  H=0,91;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,779  [HC=0,52;  H=0,91;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,942  [HC=0,90;  HNC=1,00;  I=0,86;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,923  [HC=0,85;  HNC=1,00;  I=0,88;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoCascadingParameters_ReturnsEmpty ( )     30
+	0,660  [HC=0,46;  HNC=1,00;  I=0,58;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_SupplierSpecifiesNameButConsumerDoesNot_ReturnsEmpty ( )     228
+	0,723  [HC=0,50;  HNC=1,00;  I=0,92;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ConsumerSpecifiesNameButSupplierDoesNot_ReturnsEmpty ( )     243
+	0,715  [HC=0,50;  HNC=1,00;  I=0,86;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,706  [HC=0,50;  HNC=1,00;  I=0,79;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,682  [HC=0,42;  HNC=1,00;  I=0,85;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
+*
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsNull ( )     273
+*
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,965  [HC=0,92;  H=0,99;  I=1,00;  A=1,00] *
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,923  [HC=0,83;  H=0,97;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,808  [HC=0,58;  H=0,92;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_SupplierSpecifiesNameButConsumerDoesNot_ReturnsEmpty ( )     228
+	0,784  [HC=0,53;  H=0,91;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_ConsumerSpecifiesNameButSupplierDoesNot_ReturnsEmpty ( )     243
+	0,784  [HC=0,53;  H=0,91;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,779  [HC=0,52;  H=0,91;  I=1,00;  A=1,00] #
+public void FindCascadingParameters_IfHasNoAncestors_ReturnsEmpty ( )     43
+	0,772  [HC=0,50;  H=0,90;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void FindCascadingParameters_MatchingNameButMismatchingType_ReturnsEmpty ( )     273
+	0,954  [HC=0,90;  HNC=1,00;  I=0,95;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_MismatchingNameButMatchingType_ReturnsEmpty ( )     258
+	0,914  [HC=0,85;  HNC=1,00;  I=0,82;  A=1,00;  NA=0,00; NN=1,00] 
+public void FindCascadingParameters_IfHasNoParameters_ReturnsEmpty ( )     17
+	0,650  [HC=0,40;  HNC=1,00;  I=0,68;  A=1,00;  NA=0,00; NN=0,00] 
+public void FindCascadingParameters_ConsumerSpecifiesNameButSupplierDoesNot_ReturnsEmpty ( )     243
+	0,720  [HC=0,50;  HNC=1,00;  I=0,90;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_SupplierSpecifiesNameButConsumerDoesNot_ReturnsEmpty ( )     228
+	0,716  [HC=0,50;  HNC=1,00;  I=0,87;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_ComponentRequestsDerivedType_ReturnsEmpty ( )     180
+	0,706  [HC=0,50;  HNC=1,00;  I=0,80;  A=1,00;  NA=0,00; NN=0,00] #
+public void FindCascadingParameters_IfHasNoMatchesInAncestors_ReturnsEmpty ( )     56
+	0,656  [HC=0,36;  HNC=1,00;  I=0,83;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+public bool IsTrusted ( X509Certificate2 certificate )     459
+*
+public abstract bool IsTrusted ( X509Certificate2 certificate )     320
+	0,946  [HC=1,00;  H=0,88;  I=1,00;  A=0,88] *
+internal void TrustCertificate ( X509Certificate2 certificate )     437
+	0,592  [HC=0,25;  H=0,64;  I=1,00;  A=0,88] 
+protected abstract bool IsExportable ( X509Certificate2 c )     326
+	0,581  [HC=0,25;  H=0,57;  I=1,00;  A=0,88] 
+protected abstract void RemoveCertificateFromTrustedRoots ( X509Certificate2 certificate )     328
+	0,567  [HC=0,21;  H=0,59;  I=1,00;  A=0,88] 
+protected abstract void TrustCertificateCore ( X509Certificate2 certificate )     324
+	0,562  [HC=0,20;  H=0,58;  I=1,00;  A=0,88] 
+internal static string GetDescription ( X509Certificate2 c )     564
+	0,550  [HC=0,21;  H=0,45;  I=1,00;  A=0,88] 
+public bool IsHttpsDevelopmentCertificate ( X509Certificate2 certificate )     59
+	0,593  [HC=0,17;  H=0,88;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public abstract bool IsTrusted ( X509Certificate2 certificate )     320
+	0,767  [HC=1,00;  HNC=0,93;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+protected abstract bool IsExportable ( X509Certificate2 c )     326
+	0,541  [HC=0,50;  HNC=0,74;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+protected abstract void RemoveCertificateFromTrustedRoots ( X509Certificate2 certificate )     328
+	0,412  [HC=0,20;  HNC=0,67;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] 
+public bool IsHttpsDevelopmentCertificate ( X509Certificate2 certificate )     59
+	0,476  [HC=0,25;  HNC=1,00;  I=0,00;  A=0,91;  NA=0,00; NN=0,00] #
+private static void RemoveCertificateFromUserStore ( X509Certificate2 certificate )     536
+	0,385  [HC=0,00;  HNC=0,67;  I=0,40;  A=0,91;  NA=0,00; NN=0,00] #
+internal void RemoveCertificate ( X509Certificate2 certificate , RemoveLocations locations )     468
+	0,364  [HC=0,00;  HNC=0,45;  I=0,46;  A=0,91;  NA=0,00; NN=0,00] #
+internal void ExportCertificate ( X509Certificate2 certificate , string path , bool includePrivateKey , string password )     332
+	0,345  [HC=0,00;  HNC=0,28;  I=0,49;  A=0,91;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpParser.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpParser.cs
+*
+private unsafe void TakeSingleHeader ( byte * headerLine , int length , TRequestHandler handler )     329
+*
+private static bool TryTakeSingleHeader ( TRequestHandler handler , ReadOnlySpan < byte > headerLine )     337
+	0,846  [HC=0,84;  H=0,39;  I=1,00;  A=1,00] *
+private int GetUnknownMethodLength ( ReadOnlySpan < byte > span )     430
+	0,545  [HC=0,18;  H=0,27;  I=1,00;  A=1,00] 
+private void ParseRequestLine ( TRequestHandler handler , ReadOnlySpan < byte > requestLine )     49
+	0,536  [HC=0,13;  H=0,38;  I=1,00;  A=1,00] 
+private bool IsTlsHandshake ( ReadOnlySpan < byte > requestLine )     443
+	0,524  [HC=0,13;  H=0,29;  I=1,00;  A=1,00] 
+public bool ParseRequestLine ( TRequestHandler handler , ref SequenceReader < byte > reader )     38
+	0,517  [HC=0,13;  H=0,24;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private static bool TryTakeSingleHeader ( TRequestHandler handler , ReadOnlySpan < byte > headerLine )     337
+	0,720  [HC=0,75;  HNC=0,14;  I=0,51;  A=1,00;  NA=0,00; NN=1,00] 
+private void ParseRequestLine ( TRequestHandler handler , ReadOnlySpan < byte > requestLine )     49
+	0,359  [HC=0,00;  HNC=0,39;  I=0,30;  A=1,00;  NA=0,00; NN=0,00] 
+private bool IsTlsHandshake ( ReadOnlySpan < byte > requestLine )     443
+	0,290  [HC=0,00;  HNC=0,18;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public bool ParseRequestLine ( TRequestHandler handler , ref SequenceReader < byte > reader )     38
+	0,269  [HC=0,00;  HNC=0,02;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private int GetUnknownMethodLength ( ReadOnlySpan < byte > span )     430
+	0,282  [HC=0,00;  HNC=0,12;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReader.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReader.cs
+*
+public override async Task < int > ReadAsync ( char [ ] buffer , int index , int count )     203
+*
+public override Task < int > ReadAsync ( char [ ] buffer , int index , int count )     215
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+public override async ValueTask < int > ReadAsync ( Memory < char > buffer , CancellationToken cancellationToken = default )     236
+	0,937  [HC=1,00;  H=0,56;  I=1,00;  A=1,00] 
+public override async Task < string ? > ReadLineAsync ( )     331
+	0,783  [HC=0,69;  H=0,40;  I=1,00;  A=1,00] 
+public async override Task < string > ReadToEndAsync ( )     531
+	0,754  [HC=0,64;  H=0,35;  I=1,00;  A=1,00] 
+public override string ? ReadLine ( )     368
+	0,702  [HC=0,56;  H=0,24;  I=1,00;  A=1,00] 
+public override int Read ( Span < char > buffer )     162
+	0,662  [HC=0,44;  H=0,30;  I=1,00;  A=1,00] 
+private ReadLineStepResult ReadLineStep ( ref StringBuilder ? sb , ref bool consumeLineFeed )     398
+	0,601  [HC=0,33;  H=0,21;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override Task < int > ReadAsync ( char [ ] buffer , int index , int count )     215
+	0,892  [HC=1,00;  HNC=0,94;  I=0,25;  A=1,00;  NA=0,00; NN=1,00] 
+public override async ValueTask < int > ReadAsync ( Memory < char > buffer , CancellationToken cancellationToken = default )     236
+	0,878  [HC=1,00;  HNC=0,54;  I=0,54;  A=1,00;  NA=0,00; NN=1,00] 
+public override async Task < string ? > ReadLineAsync ( )     331
+	0,674  [HC=0,67;  HNC=0,30;  I=0,25;  A=1,00;  NA=0,00; NN=1,00] 
+public override int Read ( Span < char > buffer )     162
+	0,653  [HC=0,50;  HNC=0,31;  I=0,58;  A=1,00;  NA=0,00; NN=1,00] 
+public override string ? ReadLine ( )     368
+	0,596  [HC=0,50;  HNC=0,14;  I=0,32;  A=1,00;  NA=0,00; NN=1,00] 
+private ReadLineStepResult ReadLineStep ( ref StringBuilder ? sb , ref bool consumeLineFeed )     398
+	0,572  [HC=0,33;  HNC=0,33;  I=0,46;  A=1,00;  NA=0,00; NN=1,00] 
+public async override Task < string > ReadToEndAsync ( )     531
+	0,544  [HC=0,50;  HNC=0,18;  I=0,40;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReaderTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReaderTest.cs
+*
+private static HttpRequestStreamReader CreateReader ( )     256
+*
+private static HttpRequestStreamReader CreateReader ( )     404
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  A=0,97] *
+private static HttpRequestStreamReader CreateReader ( int bufferSize )     410
+	0,956  [HC=1,00;  H=0,75;  I=1,00;  A=0,97] 
+private static MemoryStream CreateStream ( )     416
+	0,749  [HC=0,50;  H=0,80;  I=1,00;  A=0,97] 
+public static void Read_Span_ReadAllCharactersAtOnce ( )     273
+	0,598  [HC=0,23;  H=0,57;  I=1,00;  A=0,97] 
+public static void TestRead ( )     75
+	0,722  [HC=0,50;  H=0,61;  I=1,00;  A=0,97] #
+public static void TestPeek ( )     89
+	0,647  [HC=0,33;  H=0,59;  I=1,00;  A=0,97] #
+public static void StreamCannotRead_ExpectArgumentException ( )     370
+	0,600  [HC=0,23;  H=0,57;  I=1,00;  A=0,97] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private static HttpRequestStreamReader CreateReader ( )     404
+	0,871  [HC=1,00;  HNC=1,00;  I=0,34;  A=0,85;  NA=0,00; NN=1,00] 
+private static HttpRequestStreamReader CreateReader ( int bufferSize )     410
+	0,831  [HC=1,00;  HNC=0,38;  I=0,66;  A=0,85;  NA=0,00; NN=1,00] 
+private static MemoryStream CreateStream ( )     416
+	0,703  [HC=0,50;  HNC=0,85;  I=0,73;  A=0,85;  NA=0,00; NN=1,00] 
+public static async Task ReadToEndAsync_Reads_Asynchronously ( )     59
+	0,444  [HC=0,11;  HNC=0,69;  I=0,62;  A=0,85;  NA=0,00; NN=0,00] 
+public static IEnumerable < object [ ] > ReadLineData ( )     488
+	0,393  [HC=0,00;  HNC=0,74;  I=0,52;  A=0,85;  NA=0,00; NN=0,00] 
+public static IEnumerable < object [ ] > HttpRequestDisposeDataAsync ( )     476
+	0,389  [HC=0,00;  HNC=0,74;  I=0,49;  A=0,85;  NA=0,00; NN=0,00] 
+public static void TestRead ( )     75
+	0,457  [HC=0,33;  HNC=0,73;  I=0,00;  A=0,85;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+public static unsafe string GetHeaderName ( this Span < byte > span )     88
+*
+public static unsafe string GetHeaderName ( this ReadOnlySpan < byte > span )     79
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+private static unsafe void GetHeaderName ( Span < char > buffer , IntPtr state )     93
+	0,931  [HC=1,00;  H=0,51;  I=1,00;  A=1,00] 
+public static string GetRequestHeaderString ( this ReadOnlySpan < byte > span , string name , Func < string , Encoding > encodingSelector )     139
+	0,664  [HC=0,41;  H=0,42;  I=1,00;  A=1,00] 
+public static bool GetKnownHttpScheme ( this Span < byte > span , out HttpScheme knownScheme )     385
+	0,655  [HC=0,33;  H=0,58;  I=1,00;  A=1,00] 
+public static unsafe string GetAsciiStringNonNullCharacters ( this ReadOnlySpan < byte > span )     109
+	0,652  [HC=0,23;  H=0,89;  I=1,00;  A=1,00] 
+public static string GetAsciiStringNonNullCharacters ( this Span < byte > span )     106
+	0,649  [HC=0,23;  H=0,86;  I=1,00;  A=1,00] 
+public static bool GetKnownVersion ( this ReadOnlySpan < byte > span , out HttpVersion knownVersion , out byte length )     328
+	0,633  [HC=0,33;  H=0,43;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public static unsafe string GetHeaderName ( this ReadOnlySpan < byte > span )     79
+	0,894  [HC=1,00;  HNC=0,80;  I=0,40;  A=1,00;  NA=0,00; NN=1,00] 
+private static unsafe void GetHeaderName ( Span < char > buffer , IntPtr state )     93
+	0,866  [HC=1,00;  HNC=0,32;  I=0,68;  A=1,00;  NA=0,00; NN=1,00] 
+public static string GetRequestHeaderString ( this ReadOnlySpan < byte > span , string name , Func < string , Encoding > encodingSelector )     139
+	0,610  [HC=0,50;  HNC=0,51;  I=0,56;  A=1,00;  NA=0,00; NN=0,00] 
+public static unsafe string GetAsciiStringNonNullCharacters ( this ReadOnlySpan < byte > span )     109
+	0,592  [HC=0,17;  HNC=0,80;  I=0,64;  A=1,00;  NA=0,00; NN=1,00] 
+public static string GetAsciiStringNonNullCharacters ( this Span < byte > span )     106
+	0,525  [HC=0,17;  HNC=0,94;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+public static HttpMethod GetKnownMethod ( this ReadOnlySpan < byte > span , out int methodLength )     204
+	0,509  [HC=0,33;  HNC=0,39;  I=0,43;  A=1,00;  NA=0,00; NN=0,00] #
+public static bool GetKnownVersion ( this ReadOnlySpan < byte > span , out HttpVersion knownVersion , out byte length )     328
+	0,486  [HC=0,33;  HNC=0,31;  I=0,33;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+public static unsafe bool GetKnownHttpScheme ( this Span < byte > span , out HttpScheme knownScheme )     392
+*
+public static bool GetKnownHttpScheme ( this Span < byte > span , out HttpScheme knownScheme )     385
+	0,992  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] *
+private static unsafe void GetHeaderName ( Span < char > buffer , IntPtr state )     93
+	0,648  [HC=0,33;  H=0,53;  I=1,00;  A=1,00] 
+internal static HttpVersion GetKnownVersionAndConfirmCR ( this ReadOnlySpan < byte > location )     352
+	0,639  [HC=0,33;  H=0,47;  I=1,00;  A=1,00] 
+public static HttpMethod GetKnownMethod ( this ReadOnlySpan < byte > span , out int methodLength )     204
+	0,768  [HC=0,56;  H=0,71;  I=1,00;  A=1,00] #
+public static bool GetKnownMethod ( this ReadOnlySpan < byte > span , out HttpMethod method , out int length )     198
+	0,756  [HC=0,56;  H=0,62;  I=1,00;  A=1,00] #
+public static bool GetKnownVersion ( this ReadOnlySpan < byte > span , out HttpVersion knownVersion , out byte length )     328
+	0,709  [HC=0,44;  H=0,63;  I=1,00;  A=1,00] #
+public static unsafe string GetHeaderName ( this ReadOnlySpan < byte > span )     79
+	0,661  [HC=0,33;  H=0,63;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public static bool GetKnownHttpScheme ( this Span < byte > span , out HttpScheme knownScheme )     385
+	0,858  [HC=1,00;  HNC=0,94;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+internal static HttpVersion GetKnownVersionAndConfirmCR ( this ReadOnlySpan < byte > location )     352
+	0,492  [HC=0,33;  HNC=0,19;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+private static unsafe void GetHeaderName ( Span < char > buffer , IntPtr state )     93
+	0,430  [HC=0,25;  HNC=0,22;  I=0,25;  A=1,00;  NA=0,00; NN=0,00] 
+public static string GetRequestHeaderString ( this ReadOnlySpan < byte > span , string name , Func < string , Encoding > encodingSelector )     139
+	0,415  [HC=0,25;  HNC=0,36;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public static bool GetKnownMethod ( this ReadOnlySpan < byte > span , out HttpMethod method , out int length )     198
+	0,593  [HC=0,50;  HNC=0,61;  I=0,33;  A=1,00;  NA=0,00; NN=0,00] #
+public static bool GetKnownVersion ( this ReadOnlySpan < byte > span , out HttpVersion knownVersion , out byte length )     328
+	0,551  [HC=0,50;  HNC=0,63;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+public static HttpMethod GetKnownMethod ( this ReadOnlySpan < byte > span , out int methodLength )     204
+	0,519  [HC=0,50;  HNC=0,39;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IAuthorizationService.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IAuthorizationService.cs
+*
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object resource , IEnumerable < IAuthorizationRequirement > requirements )     32
+*
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , IEnumerable < IAuthorizationRequirement > requirements )     32
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , string policyName )     52
+	0,954  [HC=1,00;  H=0,68;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , IEnumerable < IAuthorizationRequirement > requirements )     32
+	0,932  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , string policyName )     52
+	0,878  [HC=1,00;  HNC=0,58;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IAuthorizationService.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IAuthorizationService.cs
+*
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object resource , string policyName )     52
+*
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , string policyName )     52
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] *
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , IEnumerable < IAuthorizationRequirement > requirements )     32
+	0,957  [HC=1,00;  H=0,70;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , string policyName )     52
+	0,932  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+Task < AuthorizationResult > AuthorizeAsync ( ClaimsPrincipal user , object ? resource , IEnumerable < IAuthorizationRequirement > requirements )     32
+	0,885  [HC=1,00;  HNC=0,64;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerator.cs
+*
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions options = default )     44
+*
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  A=1,00] *
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,962  [HC=1,00;  H=0,74;  I=1,00;  A=1,00] 
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,897  [HC=0,85;  H=0,74;  I=1,00;  A=1,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,895  [HC=0,85;  H=0,73;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,933  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,904  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,855  [HC=0,84;  HNC=0,89;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,839  [HC=0,84;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerator.cs
+*
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions options = default )     66
+*
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,995  [HC=1,00;  H=0,97;  I=1,00;  A=1,00] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,905  [HC=0,85;  H=0,80;  I=1,00;  A=1,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,870  [HC=0,85;  H=0,55;  I=1,00;  A=1,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,961  [HC=1,00;  H=0,73;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,933  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,907  [HC=1,00;  HNC=0,81;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,851  [HC=0,84;  HNC=0,87;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,831  [HC=0,84;  HNC=0,71;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerator.cs
+*
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ambientValues = default , string scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions options = default )     105
+*
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,992  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] *
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,956  [HC=1,00;  H=0,69;  I=1,00;  A=1,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,899  [HC=0,85;  H=0,75;  I=1,00;  A=1,00] #
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,872  [HC=0,85;  H=0,57;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,933  [HC=1,00;  HNC=0,99;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,904  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,851  [HC=0,84;  HNC=0,87;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,828  [HC=0,84;  HNC=0,69;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerator.cs
+*
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions options = default )     142
+*
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,996  [HC=1,00;  H=0,97;  I=1,00;  A=1,00] *
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,953  [HC=1,00;  H=0,67;  I=1,00;  A=1,00] #
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,904  [HC=0,85;  H=0,79;  I=1,00;  A=1,00] #
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,899  [HC=0,85;  H=0,75;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public abstract string GetUriByAddress < TAddress > ( TAddress address , RouteValueDictionary values , string scheme , HostString host , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     142
+	0,933  [HC=1,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetUriByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , string ? scheme = default , HostString ? host = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     105
+	0,911  [HC=1,00;  HNC=0,83;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( TAddress address , RouteValueDictionary values , PathString pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     66
+	0,851  [HC=0,84;  HNC=0,86;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public abstract string GetPathByAddress < TAddress > ( HttpContext httpContext , TAddress address , RouteValueDictionary values , RouteValueDictionary ? ambientValues = default , PathString ? pathBase = default , FragmentString fragment = default , LinkOptions ? options = default )     44
+	0,842  [HC=0,84;  HNC=0,80;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RequestCookiesCollectionTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RequestCookiesCollectionTests.cs
+*
+public void UnEscapesKeyValues ( string input , string expectedKey , string expectedValue )     28
+*
+public void UnEscapesValues ( string input , string expectedKey , string expectedValue )     12
+	0,927  [HC=0,83;  H=0,99;  I=1,00;  A=1,00] *
+public void AppContextSwitchUnEscapesKeysAndValues ( string input , string expectedKey , string expectedValue )     27
+	0,769  [HC=0,47;  H=0,96;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void UnEscapesValues ( string input , string expectedKey , string expectedValue )     12
+	0,833  [HC=0,75;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public void AppContextSwitchUnEscapesKeysAndValues ( string input , string expectedKey , string expectedValue )     27
+	0,699  [HC=0,47;  HNC=1,00;  I=0,83;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCookiesTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCookiesTest.cs
+*
+public void EscapesKeyValuesBeforeSettingCookie ( string key , string value , string expected )     106
+*
+public void EscapesValuesBeforeSettingCookie ( string value , string expected )     91
+	0,929  [HC=0,91;  H=0,76;  I=1,00;  A=1,00] *
+public void AppContextSwitchEscapesKeysAndValuesBeforeSettingCookie ( string key , string value , string expected )     119
+	0,840  [HC=0,64;  H=0,97;  I=1,00;  A=1,00] 
+public void InvalidKeysThrow ( string key )     108
+	0,582  [HC=0,20;  H=0,48;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public void EscapesValuesBeforeSettingCookie ( string value , string expected )     91
+	0,892  [HC=0,83;  HNC=0,77;  I=0,93;  A=1,00;  NA=0,00; NN=1,00] 
+public void AppContextSwitchEscapesKeysAndValuesBeforeSettingCookie ( string key , string value , string expected )     119
+	0,818  [HC=0,58;  HNC=1,00;  I=0,91;  A=1,00;  NA=0,00; NN=1,00] 
+public void InvalidKeysThrow ( string key )     108
+	0,498  [HC=0,13;  HNC=0,53;  I=0,33;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+

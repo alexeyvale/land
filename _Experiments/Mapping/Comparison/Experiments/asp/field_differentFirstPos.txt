@@ -1,0 +1,102 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BrowserTestBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BrowserTestBase.cs
+*
+private bool _semaphoreHeld     27
+*
+private IWebDriver _browser     22
+	0,557  [HC=0,15;  H=0,44;  I=1,00;  A=1,00] 
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,526  [HC=0,10;  H=0,39;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  A=0,50;  NA=0,00;  NN=0,00]
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,214  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,75] 
+private IWebDriver _browser     22
+	0,214  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,75] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+public const string Http10Version     15
+*
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,548  [HC=0,21;  H=0,19;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,540  [HC=0,23;  H=0,09;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,496  [HC=0,13;  H=0,08;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,01;  A=0,50;  NA=0,00;  NN=0,00]
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+public const string Http11Version     16
+*
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,548  [HC=0,21;  H=0,19;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,540  [HC=0,23;  H=0,09;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,496  [HC=0,13;  H=0,08;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,01;  A=0,50;  NA=0,00;  NN=0,00]
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+public const string Http2Version     17
+*
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,548  [HC=0,21;  H=0,19;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,540  [HC=0,23;  H=0,09;  I=1,00;  A=1,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,496  [HC=0,13;  H=0,09;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,01;  A=0,50;  NA=0,00;  NN=0,00]
+private static readonly SpanAction < char , IntPtr > _getHeaderName     31
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly SpanAction < char , IntPtr > _getAsciiStringNonNullCharacters     32
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private static readonly UTF8EncodingSealed DefaultRequestHeaderEncoding     30
+	0,142  [HC=0,00;  HNC=0,00;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
+*
+private readonly int _requestQueueLimit     14
+*
+private readonly int _maxTotalRequest     13
+	0,619  [HC=0,18;  H=0,81;  I=1,00;  A=1,00] 
+private int _totalRequests     16
+	0,556  [HC=0,12;  H=0,54;  I=1,00;  A=1,00] #
+*
+HC=2;  HNC=4,00;  I=0,00;  A=0,50;  NA=0,00;  NN=0,00]
+private int _totalRequests     16
+	0,569  [HC=0,00;  HNC=0,80;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+private readonly int _maxTotalRequest     13
+	0,692  [HC=0,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

@@ -1,0 +1,104 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SideTab.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SideTab.cs
+*
+public SideTabItem ChoosedItem     215
+*
+public SideTabItem ChosenItem     232
+	0,913  [HC=0,82;  H=0,94;  I=1,00;  A=1,00] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public SideTabItem ChosenItem     232
+	0,894  [HC=0,86;  HNC=1,00;  I=0,63;  A=1,00;  NA=0,00; NN=1,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public List < pattern_deconstructor_parameter > parameters     49217
+*
+public List < pattern_parameter > parameters     48182
+	0,960  [HC=1,00;  H=0,92;  I=1,00;  A=0,90] *
+public pattern_node pattern     52696
+	0,665  [HC=0,50;  H=0,31;  I=1,00;  A=0,92] 
+public expression const_params_check     49755
+	0,624  [HC=0,38;  H=0,24;  I=1,00;  A=1,00] 
+public bool var_keyword_used     50280
+	0,572  [HC=0,29;  H=0,23;  I=1,00;  A=0,96] 
+public expression_list pattern_expressions     51525
+	0,570  [HC=0,28;  H=0,25;  I=1,00;  A=0,95] 
+public bool has_deref     53742
+	0,559  [HC=0,30;  H=0,23;  I=1,00;  A=0,89] 
+public List < syntax_tree_node > lst     51131
+	0,546  [HC=0,10;  H=0,72;  I=1,00;  A=0,90] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public List < pattern_parameter > parameters     48182
+	0,751  [HC=1,00;  HNC=0,82;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] *
+public pattern_node pattern     52696
+	0,475  [HC=0,50;  HNC=0,43;  I=0,49;  A=0,57;  NA=0,00; NN=0,00] 
+public expression const_params_check     49755
+	0,380  [HC=0,20;  HNC=0,25;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+public expression_list pattern_expressions     51525
+	0,353  [HC=0,25;  HNC=0,25;  I=0,31;  A=0,67;  NA=0,00; NN=0,00] 
+public expression const_param     51807
+	0,286  [HC=0,25;  HNC=0,25;  I=0,00;  A=0,57;  NA=0,00; NN=0,00] 
+public override Int32 subnodes_without_list_elements_count     51602
+	0,244  [HC=0,00;  HNC=0,20;  I=0,29;  A=0,67;  NA=0,00; NN=0,00] 
+public override Int32 subnodes_without_list_elements_count     52098
+	0,244  [HC=0,00;  HNC=0,20;  I=0,29;  A=0,67;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public pattern_node pattern     50034
+*
+public pattern_node pattern     52696
+	0,988  [HC=1,00;  H=1,00;  I=1,00;  A=0,96] *
+public expression_list pattern_expressions     51525
+	0,645  [HC=0,39;  H=0,52;  I=1,00;  A=0,91] 
+public bool has_deref     53742
+	0,629  [HC=0,38;  H=0,47;  I=1,00;  A=0,90] 
+public procedure_definition pr     15728
+	0,601  [HC=0,29;  H=0,51;  I=1,00;  A=0,92] 
+public procedure_definition pr     15943
+	0,600  [HC=0,29;  H=0,51;  I=1,00;  A=0,92] 
+public statement statment_for_formatting     15745
+	0,578  [HC=0,24;  H=0,49;  I=1,00;  A=0,92] 
+public List < pattern_parameter > parameters     48182
+	0,660  [HC=0,50;  H=0,34;  I=1,00;  A=0,89] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public pattern_node pattern     52696
+	0,873  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,77;  NA=0,00; NN=0,00] *
+public expression_list pattern_expressions     51525
+	0,408  [HC=0,50;  HNC=0,25;  I=0,50;  A=0,40;  NA=0,00; NN=0,00] 
+public bool var_keyword_used     50280
+	0,275  [HC=0,00;  HNC=0,25;  I=0,27;  A=0,77;  NA=0,00; NN=0,00] 
+public override Int32 subnodes_without_list_elements_count     52600
+	0,233  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,77;  NA=0,00; NN=0,00] 
+public override Int32 subnodes_count     52610
+	0,233  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,77;  NA=0,00; NN=0,00] 
+public override Int32 subnodes_without_list_elements_count     52749
+	0,233  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,77;  NA=0,00; NN=0,00] 
+public List < pattern_parameter > parameters     48182
+	0,437  [HC=0,50;  HNC=0,48;  I=0,49;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\TreeHelper.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\TreeHelper.cs
+*
+public bool IsRecursive     1784
+*
+public bool IsRecursive     1848
+	0,971  [HC=1,00;  H=1,00;  I=1,00;  A=0,90] *
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public bool IsRecursive     1848
+	0,708  [HC=1,00;  HNC=1,00;  I=0,00;  A=0,40;  NA=0,00; NN=1,00] *
+
+**************************************************************
+

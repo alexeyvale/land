@@ -1,0 +1,46 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HandshakeProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HandshakeProtocol.cs
+*
+private static ConcurrentDictionary < IHubProtocol , ReadOnlyMemory < byte > > _messageCache     29
+*
+private static readonly ReadOnlyMemory < byte > _successHandshakeData     29
+	0,614  [HC=0,25;  H=0,54;  I=1,00;  A=1,00] *
+*
+HC=2;  HNC=1,00;  I=0,50;  A=0,50;  NA=0,00;  NN=2,00]
+private static readonly ReadOnlyMemory < byte > _successHandshakeData     29
+	0,509  [HC=0,00;  HNC=0,55;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
+*
+private object _totalRequestsLock     17
+*
+private int _totalRequests     16
+	0,849  [HC=0,76;  H=0,65;  I=1,00;  A=1,00] *
+private readonly int _maxTotalRequest     13
+	0,690  [HC=0,47;  H=0,42;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,11;  A=0,50;  NA=0,00;  NN=2,00]
+private int _totalRequests     16
+	0,728  [HC=0,67;  HNC=0,25;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+private readonly int _maxTotalRequest     13
+	0,205  [HC=0,23;  HNC=0,20;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SecretManagerTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SecretManagerTests.cs
+*
+private readonly StringBuilder _output     20
+*
+private readonly ITestOutputHelper _testOut     21
+	0,710  [HC=0,43;  H=0,68;  I=1,00;  A=1,00] *
+*
+HC=2;  HNC=1,00;  I=0,18;  A=0,50;  NA=0,00;  NN=2,00]
+private readonly ITestOutputHelper _testOut     21
+	0,511  [HC=0,00;  HNC=0,40;  I=0,00;  A=1,00;  NA=0,00; NN=1,00] 
+
+**************************************************************
+

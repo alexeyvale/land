@@ -1,0 +1,278 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public string Name     5
+*
+public long ? WasmMemory     14
+	0,615  [HC=0,30;  H=0,41;  I=1,00;  A=1,00] 
+public long ? DownloadSize     11
+	0,554  [HC=0,17;  H=0,38;  I=1,00;  A=1,00] 
+public long ? UsedJSHeapSize     18
+	0,543  [HC=0,14;  H=0,37;  I=1,00;  A=1,00] 
+public long ? TotalJSHeapSize     21
+	0,538  [HC=0,13;  H=0,37;  I=1,00;  A=1,00] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,517  [HC=0,13;  H=0,22;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public BenchmarkDescriptor Descriptor     7
+*
+public long ? WasmMemory     14
+	0,559  [HC=0,20;  H=0,31;  I=1,00;  A=1,00] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,555  [HC=0,20;  H=0,29;  I=1,00;  A=1,00] 
+public long ? UsedJSHeapSize     18
+	0,532  [HC=0,14;  H=0,30;  I=1,00;  A=1,00] 
+public long ? DownloadSize     11
+	0,505  [HC=0,08;  H=0,28;  I=1,00;  A=1,00] 
+public long ? TotalJSHeapSize     21
+	0,497  [HC=0,07;  H=0,28;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,286  [HC=0,00;  HNC=0,43;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,246  [HC=0,00;  HNC=0,29;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,246  [HC=0,00;  HNC=0,29;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,246  [HC=0,00;  HNC=0,29;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,246  [HC=0,00;  HNC=0,29;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public string ShortDescription     9
+*
+public long ? TotalJSHeapSize     21
+	0,563  [HC=0,19;  H=0,38;  I=1,00;  A=1,00] 
+public long ? DownloadSize     11
+	0,534  [HC=0,13;  H=0,36;  I=1,00;  A=1,00] 
+public long ? WasmMemory     14
+	0,534  [HC=0,13;  H=0,36;  I=1,00;  A=1,00] 
+public long ? UsedJSHeapSize     18
+	0,534  [HC=0,13;  H=0,36;  I=1,00;  A=1,00] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,515  [HC=0,13;  H=0,23;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public int NumExecutions     13
+*
+public long ? WasmMemory     14
+	0,545  [HC=0,15;  H=0,35;  I=1,00;  A=1,00] 
+public long ? DownloadSize     11
+	0,509  [HC=0,08;  H=0,33;  I=1,00;  A=1,00] 
+public long ? UsedJSHeapSize     18
+	0,506  [HC=0,07;  H=0,33;  I=1,00;  A=1,00] 
+public long ? TotalJSHeapSize     21
+	0,504  [HC=0,07;  H=0,33;  I=1,00;  A=1,00] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,498  [HC=0,07;  H=0,29;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,261  [HC=0,00;  HNC=0,34;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public double Duration     15
+*
+public long ? DownloadSize     11
+	0,586  [HC=0,25;  H=0,35;  I=1,00;  A=1,00] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,545  [HC=0,20;  H=0,21;  I=1,00;  A=1,00] 
+public long ? UsedJSHeapSize     18
+	0,537  [HC=0,14;  H=0,33;  I=1,00;  A=1,00] 
+public long ? TotalJSHeapSize     21
+	0,532  [HC=0,13;  H=0,33;  I=1,00;  A=1,00] 
+public long ? WasmMemory     14
+	0,517  [HC=0,10;  H=0,32;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,236  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public string Name     19
+*
+public long ? WasmMemory     14
+	0,520  [HC=0,30;  H=0,41;  I=1,00;  A=0,67] 
+public long ? DownloadSize     11
+	0,458  [HC=0,17;  H=0,38;  I=1,00;  A=0,67] 
+public long ? UsedJSHeapSize     18
+	0,447  [HC=0,14;  H=0,37;  I=1,00;  A=0,67] 
+public long ? TotalJSHeapSize     21
+	0,443  [HC=0,13;  H=0,37;  I=1,00;  A=0,67] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,421  [HC=0,13;  H=0,22;  I=1,00;  A=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BenchmarkResult.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BenchmarkResult.cs
+*
+public string Description     21
+*
+public long ? UsedJSHeapSize     18
+	0,480  [HC=0,21;  H=0,39;  I=1,00;  A=0,67] 
+public long ? DownloadSize     11
+	0,458  [HC=0,17;  H=0,38;  I=1,00;  A=0,67] 
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,452  [HC=0,20;  H=0,23;  I=1,00;  A=0,67] 
+public long ? TotalJSHeapSize     21
+	0,443  [HC=0,13;  H=0,37;  I=1,00;  A=0,67] 
+public long ? WasmMemory     14
+	0,423  [HC=0,09;  H=0,36;  I=1,00;  A=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,10;  A=0,50;  NA=0,00;  NN=0,00]
+public List < BenchmarkScenarioResult > ScenarioResults     8
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? DownloadSize     11
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? WasmMemory     14
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? UsedJSHeapSize     18
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+public long ? TotalJSHeapSize     21
+	0,159  [HC=0,00;  HNC=0,25;  I=1,00;  A=0,44;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+public DiagnosticInformation Diagnostics     853
+*
+public static CertificateManager Instance     29
+	0,480  [HC=0,27;  H=0,38;  I=1,00;  A=0,58] 
+public bool Result     756
+	0,450  [HC=0,09;  H=0,40;  I=1,00;  A=0,74] 
+public string Subject     46
+	0,410  [HC=0,09;  H=0,43;  I=1,00;  A=0,58] 
+public static CertificateManagerEventSource Log     35
+	0,399  [HC=0,09;  H=0,35;  I=1,00;  A=0,58] 
+public string Message     757
+	0,455  [HC=0,09;  H=0,43;  I=1,00;  A=0,74] #
+public int AspNetHttpsCertificateVersion     39
+	0,446  [HC=0,17;  H=0,44;  I=1,00;  A=0,58] #
+*
+HC=2;  HNC=1,00;  I=0,38;  A=0,84;  NA=0,00;  NN=0,00]
+public bool Result     756
+	0,167  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,54;  NA=0,00; NN=0,94] 
+public string Subject     46
+	0,140  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,40;  NA=0,00; NN=0,94] 
+public static CertificateManager Instance     29
+	0,128  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+public static CertificateManagerEventSource Log     35
+	0,128  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+public string Message     757
+	0,167  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,54;  NA=0,00; NN=0,00] #
+public int AspNetHttpsCertificateVersion     39
+	0,140  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+public IList < Exception > Exceptions     860
+*
+public bool Result     756
+	0,418  [HC=0,10;  H=0,20;  I=1,00;  A=0,71] 
+public static CertificateManager Instance     29
+	0,384  [HC=0,10;  H=0,22;  I=1,00;  A=0,58] 
+public static CertificateManagerEventSource Log     35
+	0,384  [HC=0,10;  H=0,22;  I=1,00;  A=0,58] 
+public string Subject     46
+	0,383  [HC=0,10;  H=0,21;  I=1,00;  A=0,58] 
+public int AspNetHttpsCertificateVersion     39
+	0,422  [HC=0,17;  H=0,27;  I=1,00;  A=0,58] #
+public string Message     757
+	0,419  [HC=0,10;  H=0,21;  I=1,00;  A=0,71] #
+*
+HC=2;  HNC=1,00;  I=0,28;  A=0,78;  NA=0,00;  NN=0,00]
+public static CertificateManagerEventSource Log     35
+	0,162  [HC=0,00;  HNC=0,34;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+public bool Result     756
+	0,148  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,45;  NA=0,00; NN=0,00] 
+public string Subject     46
+	0,139  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+public static CertificateManager Instance     29
+	0,127  [HC=0,00;  HNC=0,20;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] 
+public int AspNetHttpsCertificateVersion     39
+	0,168  [HC=0,00;  HNC=0,37;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] #
+public string Message     757
+	0,148  [HC=0,00;  HNC=0,25;  I=0,00;  A=0,45;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

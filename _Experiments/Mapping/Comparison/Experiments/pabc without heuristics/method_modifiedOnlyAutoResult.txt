@@ -1,0 +1,456 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+public virtual void pre_do_visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     1840
+*
+public virtual void pre_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1920
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( pattern_parameter _pattern_parameter )     1840
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( const_pattern_parameter _const_pattern_parameter )     1912
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1960
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( recursive_pattern_parameter _recursive_pattern_parameter )     1968
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1984
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void pre_do_visit ( recursive_tuple_parameter _recursive_tuple_parameter )     1992
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public virtual void pre_do_visit ( pattern_parameter _pattern_parameter )     1840
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public virtual void pre_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1920
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void pre_do_visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     1936
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void pre_do_visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     1952
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void pre_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1984
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void pre_do_visit ( const_pattern_parameter _const_pattern_parameter )     1912
+	0,876  [HC=1,00;  HNC=0,57;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void pre_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1960
+	0,876  [HC=1,00;  HNC=0,57;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+public virtual void post_do_visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     1844
+*
+public virtual void post_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1924
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( pattern_parameter _pattern_parameter )     1844
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( const_pattern_parameter _const_pattern_parameter )     1916
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1964
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( recursive_pattern_parameter _recursive_pattern_parameter )     1972
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1988
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+public virtual void post_do_visit ( recursive_tuple_parameter _recursive_tuple_parameter )     1996
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public virtual void post_do_visit ( pattern_parameter _pattern_parameter )     1844
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public virtual void post_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1924
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void post_do_visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     1940
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void post_do_visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     1956
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void post_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1988
+	0,890  [HC=1,00;  HNC=0,67;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void post_do_visit ( const_pattern_parameter _const_pattern_parameter )     1916
+	0,876  [HC=1,00;  HNC=0,57;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+public virtual void post_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1964
+	0,876  [HC=1,00;  HNC=0,57;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\PatternsDesugaringVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\PatternsDesugaringVisitor.cs
+*
+private expression DesugarRecursiveDeconstructor ( expression expression , deconstructor_pattern pattern )     211
+*
+private expression DesugarRecursiveParameters ( expression expression , pattern_node pattern )     656
+	0,805  [HC=0,59;  H=0,88;  I=1,00;  A=1,00] 
+private DeconstructionDesugaringResult DesugarDeconstructorPattern ( deconstructor_pattern pattern , expression matchingExpression )     475
+	0,697  [HC=0,45;  H=0,53;  I=1,00;  A=1,00] 
+private expression DesugarDeconstructorPatternParameters ( deconstructor_pattern pattern )     250
+	0,682  [HC=0,38;  H=0,64;  I=1,00;  A=1,00] 
+private TupleDesugaringResult DesugarTuplePattern ( tuple_pattern pattern , expression matchingExpression )     578
+	0,668  [HC=0,38;  H=0,54;  I=1,00;  A=1,00] 
+private CollectionDesugaringResult DesugarCollectionPattern ( collection_pattern pattern , expression matchingExpression )     503
+	0,667  [HC=0,38;  H=0,53;  I=1,00;  A=1,00] 
+private void DesugarConstPatternCase ( expression matchingExpression , pattern_case patternCase )     307
+	0,659  [HC=0,31;  H=0,68;  I=1,00;  A=1,00] 
+private List < statement > ProcessDesugaringForDeconstructorPattern ( is_pattern_expr isExpression )     767
+	0,648  [HC=0,43;  H=0,26;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+private expression DesugarRecursiveParameters ( expression expression , pattern_node pattern )     656
+	0,809  [HC=0,67;  HNC=0,73;  I=0,84;  A=1,00;  NA=0,00; NN=1,00] *
+private expression DesugarDeconstructorPatternParameters ( deconstructor_pattern pattern )     250
+	0,533  [HC=0,25;  HNC=0,72;  I=0,53;  A=1,00;  NA=0,00; NN=0,00] 
+private List < statement > ProcessDesugaringForDeconstructorPattern ( is_pattern_expr isExpression )     767
+	0,495  [HC=0,34;  HNC=0,10;  I=0,59;  A=1,00;  NA=0,00; NN=0,00] 
+private void DesugarConstPatternCase ( expression matchingExpression , pattern_case patternCase )     307
+	0,495  [HC=0,25;  HNC=0,46;  I=0,50;  A=1,00;  NA=0,00; NN=0,00] 
+private DeconstructionDesugaringResult DesugarDeconstructorPattern ( deconstructor_pattern pattern , expression matchingExpression )     475
+	0,476  [HC=0,33;  HNC=0,20;  I=0,38;  A=1,00;  NA=0,00; NN=0,00] 
+private CollectionDesugaringResult DesugarCollectionPattern ( collection_pattern pattern , expression matchingExpression )     503
+	0,426  [HC=0,33;  HNC=0,20;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+private TupleDesugaringResult DesugarTuplePattern ( tuple_pattern pattern , expression matchingExpression )     578
+	0,426  [HC=0,33;  HNC=0,20;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void FillParentsInDirectChilds ( )     49564
+*
+public override void FillParentsInDirectChilds ( )     51950
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  A=0,97] 
+public override void FillParentsInDirectChilds ( )     49952
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInDirectChilds ( )     51844
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInDirectChilds ( )     52584
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInDirectChilds ( )     52733
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void FillParentsInDirectChilds ( )     53059
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void FillParentsInDirectChilds ( )     53197
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override void FillParentsInDirectChilds ( )     49952
+	0,939  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,77;  NA=0,00; NN=1,00] *
+public override void FillParentsInDirectChilds ( )     51950
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void FillParentsInDirectChilds ( )     52194
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void FillParentsInDirectChilds ( )     51709
+	0,808  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,53;  NA=0,00; NN=0,00] 
+public override void FillParentsInDirectChilds ( )     52286
+	0,808  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,53;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     49957
+	0,726  [HC=0,80;  HNC=1,00;  I=0,00;  A=0,77;  NA=0,00; NN=1,00] 
+public override void FillParentsInDirectChilds ( )     52446
+	0,712  [HC=1,00;  HNC=1,00;  I=0,00;  A=0,67;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void FillParentsInAllChilds ( )     49569
+*
+public override void FillParentsInAllChilds ( )     51955
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  A=0,97] 
+public override void FillParentsInAllChilds ( )     49957
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInAllChilds ( )     51851
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInAllChilds ( )     52591
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void FillParentsInAllChilds ( )     52740
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void FillParentsInAllChilds ( )     53068
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void FillParentsInAllChilds ( )     53204
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override void FillParentsInAllChilds ( )     49957
+	0,939  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,77;  NA=0,00; NN=1,00] *
+public override void FillParentsInAllChilds ( )     51955
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     52199
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     51714
+	0,808  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,53;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     52291
+	0,808  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,53;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     52591
+	0,750  [HC=1,00;  HNC=1,00;  I=0,48;  A=0,57;  NA=0,00; NN=0,00] 
+public override void FillParentsInAllChilds ( )     52740
+	0,750  [HC=1,00;  HNC=1,00;  I=0,48;  A=0,57;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void visit ( IVisitor visitor )     49616
+*
+public override void visit ( IVisitor visitor )     52002
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  A=0,97] 
+public override void visit ( IVisitor visitor )     50004
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void visit ( IVisitor visitor )     51910
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void visit ( IVisitor visitor )     52650
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  A=0,94] 
+public override void visit ( IVisitor visitor )     52799
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void visit ( IVisitor visitor )     53133
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+public override void visit ( IVisitor visitor )     53263
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  A=0,93] 
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override void visit ( IVisitor visitor )     50004
+	0,939  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,77;  NA=0,00; NN=1,00] *
+public override void visit ( IVisitor visitor )     52002
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void visit ( IVisitor visitor )     52246
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void visit ( IVisitor visitor )     52520
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void visit ( IVisitor visitor )     53133
+	0,845  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,67;  NA=0,00; NN=0,00] 
+public override void visit ( IVisitor visitor )     51910
+	0,820  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,57;  NA=0,00; NN=0,00] 
+public override void visit ( IVisitor visitor )     52650
+	0,820  [HC=1,00;  HNC=1,00;  I=1,00;  A=0,57;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     646
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,953  [HC=1,00;  H=0,81;  I=1,00;  A=0,93] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,951  [HC=1,00;  H=0,81;  I=1,00;  A=0,93] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4709
+	0,937  [HC=1,00;  H=0,81;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,714  [HC=1,00;  HNC=0,78;  I=0,30;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,712  [HC=1,00;  HNC=0,78;  I=0,28;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public virtual List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     484
+	0,704  [HC=1,00;  HNC=0,71;  I=0,37;  A=0,60;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     970
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,959  [HC=1,00;  H=0,81;  I=1,00;  A=0,95] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,955  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,954  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4709
+	0,939  [HC=1,00;  H=0,81;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,739  [HC=1,00;  HNC=0,78;  I=0,26;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public virtual List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     484
+	0,714  [HC=1,00;  HNC=0,71;  I=0,26;  A=0,69;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,712  [HC=1,00;  HNC=0,78;  I=0,28;  A=0,64;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     1952
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,959  [HC=1,00;  H=0,81;  I=1,00;  A=0,95] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,955  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,955  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,953  [HC=1,00;  H=0,81;  I=1,00;  A=0,93] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,951  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4709
+	0,933  [HC=1,00;  H=0,81;  I=1,00;  A=0,86] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,929  [HC=1,00;  HNC=0,78;  I=0,69;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,750  [HC=1,00;  HNC=0,78;  I=0,35;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] #
+public virtual List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     484
+	0,680  [HC=1,00;  HNC=0,71;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     2502
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,951  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,947  [HC=1,00;  H=0,81;  I=1,00;  A=0,91] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4709
+	0,936  [HC=1,00;  H=0,81;  I=1,00;  A=0,87] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3975
+	0,669  [HC=1,00;  HNC=0,78;  I=0,52;  A=0,36;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     3408
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,959  [HC=1,00;  H=0,81;  I=1,00;  A=0,95] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,954  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,954  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,951  [HC=1,00;  H=0,81;  I=1,00;  A=0,93] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3975
+	0,938  [HC=1,00;  H=0,81;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] #
+public virtual List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     484
+	0,680  [HC=1,00;  HNC=0,71;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\types.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\types.cs
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , bool no_search_in_extension_methods = false )     4079
+*
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,973  [HC=1,00;  H=0,81;  I=1,00;  A=1,00] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,959  [HC=1,00;  H=0,81;  I=1,00;  A=0,95] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,955  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,954  [HC=1,00;  H=0,81;  I=1,00;  A=0,94] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,949  [HC=1,00;  H=0,81;  I=1,00;  A=0,92] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,947  [HC=1,00;  H=0,81;  I=1,00;  A=0,91] 
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4709
+	0,939  [HC=1,00;  H=0,81;  I=1,00;  A=0,88] #
+*
+HC=3;  HNC=1,00;  I=1,00;  A=2,00;  NA=0,00;  NN=0,50]
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     4228
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  A=1,00;  NA=0,00; NN=1,00] *
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     986
+	0,739  [HC=1,00;  HNC=0,78;  I=0,26;  A=0,75;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     654
+	0,714  [HC=1,00;  HNC=0,78;  I=0,30;  A=0,64;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2033
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     3541
+	0,704  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,75;  NA=0,00; NN=0,00] #
+public virtual List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     484
+	0,680  [HC=1,00;  HNC=0,71;  I=0,00;  A=0,69;  NA=0,00; NN=0,00] #
+public override List < SymbolInfo > find_in_type ( string name , SymbolTable . Scope CurrentScope , type_node orig_generic_or_null = null , bool no_search_in_extension_methods = false )     2609
+	0,675  [HC=1,00;  HNC=0,78;  I=0,00;  A=0,64;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

@@ -1,0 +1,36 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BrowserTestBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BrowserTestBase.cs
+*
+private bool _semaphoreHeld     27
+*
+private IWebDriver _browser     22
+	0,557  [HC=0,15;  H=0,44;  I=1,00;  A=1,00] 
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,526  [HC=0,10;  H=0,39;  I=1,00;  A=1,00] 
+*
+HC=3;  HNC=1,00;  I=0,00;  A=2,00;  NA=0,00;  NN=0,50]
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,404  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,75] 
+private IWebDriver _browser     22
+	0,404  [HC=0,00;  HNC=0,25;  I=1,00;  A=1,00;  NA=0,00; NN=0,75] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
+*
+private readonly int _requestQueueLimit     14
+*
+private readonly int _maxTotalRequest     13
+	0,619  [HC=0,18;  H=0,81;  I=1,00;  A=1,00] 
+private int _totalRequests     16
+	0,556  [HC=0,12;  H=0,54;  I=1,00;  A=1,00] #
+*
+HC=3;  HNC=1,00;  I=0,00;  A=2,00;  NA=0,00;  NN=0,50]
+private int _totalRequests     16
+	0,431  [HC=0,00;  HNC=0,80;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] 
+private readonly int _maxTotalRequest     13
+	0,462  [HC=0,00;  HNC=1,00;  I=1,00;  A=1,00;  NA=0,00; NN=0,00] #
+
+**************************************************************
+

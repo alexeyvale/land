@@ -1,0 +1,23 @@
+For PascalABC.NET:
+
+"Initial" version commit: 45fccc19cb7f8e232f8fa2bee851bdc9d00a5c7a [45fccc1]
+Author: Alexander Zakharenko <wisestump@yandex.ru>
+Date: May 25, 2018. 18:02:25
+
+"Current" version commit: a972270fd0fd8b7c4586d4219b77b9542c9727ca [a972270]
+Author: Mikhalkovich Stanislav <miks@math.sfedu.ru>
+Date: May 26, 2020. 0:13:23
+________________________________________________________________________________
+
+For ASP.NET Core:
+
+"Initial" version commit: 4360535bab6f958a91b06dfcd31c539bbffa9a5a [4360535]
+Author: Steve Sanderson <SteveSandersonMS@users.noreply.github.com>
+Date: February 3, 2020. 21:49:44
+
+"Current" version commit: df5269fea23f310fd7730b9eb0da5cc910cc1e6c [df5269f]
+Author: Chris Ross <Tratcher@Outlook.com>
+Date: July 4, 2020. 10:12:19
+________________________________________________________________________________
+
+In "without heuristics" tests, the weights are set according to the basic approach, and 0.5 is used as the weight of the neighbours context.

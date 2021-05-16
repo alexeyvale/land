@@ -1,0 +1,208 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\RunnerManagerHandlers.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\RunnerManagerHandlers.cs
+*
+void RunnerManager_Started_Sync_Thread ( object fileName )     53
+*
+void ButtonsEnableDisable_RunStart ( )     27
+	0,606  [HC=0,23;  H=0,54;  I=1,00;  A=1,00] 
+void ButtonsEnableDisable_RunStop ( )     35
+	0,591  [HC=0,20;  H=0,54;  I=1,00;  A=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,47;  A=0,50;  NA=0,00;  NN=0,00]
+void ButtonsEnableDisable_RunStart ( )     27
+	0,196  [HC=0,00;  HNC=0,28;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+void ButtonsEnableDisable_RunStop ( )     35
+	0,196  [HC=0,00;  HNC=0,28;  I=0,00;  A=1,00;  NA=0,00; NN=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public deconstructor_pattern Add ( pattern_deconstructor_parameter elem , SourceContext sc = null )     49247
+*
+public pattern_node Add ( pattern_parameter elem , SourceContext sc = null )     48195
+	0,956  [HC=1,00;  H=0,89;  I=1,00;  A=0,90] 
+public semantic_check_sugared_var_def_statement_node Add ( syntax_tree_node elem , SourceContext sc = null )     51144
+	0,953  [HC=1,00;  H=0,87;  I=1,00;  A=0,90] 
+public void AddMany ( params syntax_tree_node [ ] els )     51172
+	0,632  [HC=0,43;  H=0,33;  I=1,00;  A=0,90] 
+public void AddMany ( params pattern_parameter [ ] els )     48223
+	0,631  [HC=0,43;  H=0,33;  I=1,00;  A=0,90] 
+public void AddFirst ( pattern_parameter el )     48205
+	0,614  [HC=0,38;  H=0,37;  I=1,00;  A=0,90] 
+public void AddFirst ( syntax_tree_node el )     51154
+	0,611  [HC=0,38;  H=0,34;  I=1,00;  A=0,90] 
+public void AddFirst ( IEnumerable < syntax_tree_node > els )     51162
+	0,608  [HC=0,38;  H=0,33;  I=1,00;  A=0,90] 
+*
+HC=4;  HNC=1,00;  I=2,00;  A=0,92;  NA=0,00;  NN=0,00]
+public pattern_node Add ( pattern_parameter elem , SourceContext sc = null )     48195
+	0,893  [HC=1,00;  HNC=0,70;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+public semantic_check_sugared_var_def_statement_node Add ( syntax_tree_node elem , SourceContext sc = null )     51144
+	0,830  [HC=1,00;  HNC=0,53;  I=0,83;  A=0,40;  NA=0,00; NN=0,00] 
+public void AddFirst ( syntax_tree_node el )     51154
+	0,429  [HC=0,50;  HNC=0,13;  I=0,45;  A=0,40;  NA=0,00; NN=0,00] 
+public void AddMany ( params syntax_tree_node [ ] els )     51172
+	0,429  [HC=0,50;  HNC=0,14;  I=0,44;  A=0,40;  NA=0,00; NN=0,00] 
+public void AddMany ( params pattern_parameter [ ] els )     48223
+	0,469  [HC=0,50;  HNC=0,20;  I=0,57;  A=0,40;  NA=0,00; NN=0,00] #
+public void AddFirst ( pattern_parameter el )     48205
+	0,444  [HC=0,50;  HNC=0,30;  I=0,42;  A=0,40;  NA=0,00; NN=0,00] #
+public void AddFirst ( IEnumerable < pattern_parameter > els )     48213
+	0,425  [HC=0,50;  HNC=0,11;  I=0,44;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+private int FindIndexInList ( pattern_deconstructor_parameter el )     49285
+*
+private int FindIndexInList ( pattern_parameter el )     48233
+	0,962  [HC=1,00;  H=0,94;  I=1,00;  A=0,90] 
+private int FindIndexInList ( syntax_tree_node el )     51182
+	0,956  [HC=1,00;  H=0,88;  I=1,00;  A=0,90] 
+public void ReplaceInList ( pattern_parameter el , pattern_parameter newel )     48292
+	0,659  [HC=0,47;  H=0,42;  I=1,00;  A=0,90] 
+public void ReplaceInList ( syntax_tree_node el , syntax_tree_node newel )     51241
+	0,655  [HC=0,47;  H=0,38;  I=1,00;  A=0,90] 
+public void ReplaceInList ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48302
+	0,645  [HC=0,47;  H=0,32;  I=1,00;  A=0,90] 
+public void ReplaceInList ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51251
+	0,643  [HC=0,47;  H=0,29;  I=1,00;  A=0,90] 
+public void AddFirst ( pattern_parameter el )     48205
+	0,595  [HC=0,27;  H=0,57;  I=1,00;  A=0,90] 
+*
+HC=4;  HNC=1,45;  I=2,00;  A=0,92;  NA=0,00;  NN=0,00]
+private int FindIndexInList ( pattern_parameter el )     48233
+	0,905  [HC=1,00;  HNC=0,83;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+private int FindIndexInList ( syntax_tree_node el )     51182
+	0,822  [HC=1,00;  HNC=0,49;  I=0,90;  A=0,40;  NA=0,00; NN=0,00] 
+public void ReplaceInList ( syntax_tree_node el , syntax_tree_node newel )     51241
+	0,415  [HC=0,50;  HNC=0,10;  I=0,48;  A=0,40;  NA=0,00; NN=0,00] 
+public void ReplaceInList ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51251
+	0,377  [HC=0,50;  HNC=0,08;  I=0,33;  A=0,40;  NA=0,00; NN=0,00] 
+public override void FillParentsInDirectChilds ( )     52446
+	0,284  [HC=0,30;  HNC=0,03;  I=0,32;  A=0,53;  NA=0,00; NN=0,00] 
+public void ReplaceInList ( pattern_parameter el , pattern_parameter newel )     48292
+	0,464  [HC=0,50;  HNC=0,25;  I=0,57;  A=0,40;  NA=0,00; NN=0,00] #
+public void ReplaceInList ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48302
+	0,315  [HC=0,50;  HNC=0,18;  I=0,00;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public void InsertAfter ( pattern_deconstructor_parameter el , pattern_deconstructor_parameter newel )     49295
+*
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,958  [HC=1,00;  H=0,91;  I=1,00;  A=0,90] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,949  [HC=1,00;  H=0,84;  I=1,00;  A=0,90] 
+public void InsertAfter ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48253
+	0,926  [HC=1,00;  H=0,69;  I=1,00;  A=0,90] 
+public void InsertAfter ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51202
+	0,920  [HC=1,00;  H=0,63;  I=1,00;  A=0,90] 
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,774  [HC=0,58;  H=0,87;  I=1,00;  A=0,90] 
+public void InsertBefore ( syntax_tree_node el , syntax_tree_node newel )     51214
+	0,765  [HC=0,58;  H=0,80;  I=1,00;  A=0,90] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,743  [HC=0,58;  H=0,65;  I=1,00;  A=0,90] 
+*
+HC=4;  HNC=1,42;  I=2,00;  A=0,92;  NA=0,00;  NN=0,00]
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,905  [HC=1,00;  HNC=0,83;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48253
+	0,839  [HC=1,00;  HNC=0,70;  I=0,81;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51202
+	0,785  [HC=1,00;  HNC=0,49;  I=0,74;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,755  [HC=1,00;  HNC=0,48;  I=0,62;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,612  [HC=0,50;  HNC=0,83;  I=0,78;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51224
+	0,560  [HC=0,50;  HNC=0,49;  I=0,80;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,599  [HC=0,50;  HNC=0,70;  I=0,81;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public void InsertAfter ( pattern_deconstructor_parameter el , IEnumerable < pattern_deconstructor_parameter > newels )     49305
+*
+public void InsertAfter ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48253
+	0,961  [HC=1,00;  H=0,93;  I=1,00;  A=0,90] 
+public void InsertAfter ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51202
+	0,954  [HC=1,00;  H=0,88;  I=1,00;  A=0,90] 
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,926  [HC=1,00;  H=0,69;  I=1,00;  A=0,90] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,920  [HC=1,00;  H=0,63;  I=1,00;  A=0,90] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,778  [HC=0,58;  H=0,90;  I=1,00;  A=0,90] 
+public void InsertBefore ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51224
+	0,771  [HC=0,58;  H=0,84;  I=1,00;  A=0,90] 
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,743  [HC=0,58;  H=0,65;  I=1,00;  A=0,90] 
+*
+HC=4;  HNC=1,96;  I=2,00;  A=0,92;  NA=0,00;  NN=0,00]
+public void InsertAfter ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48253
+	0,908  [HC=1,00;  HNC=0,86;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,831  [HC=1,00;  HNC=0,70;  I=0,81;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51202
+	0,785  [HC=1,00;  HNC=0,59;  I=0,72;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,689  [HC=1,00;  HNC=0,43;  I=0,45;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51224
+	0,582  [HC=0,50;  HNC=0,59;  I=0,82;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,555  [HC=0,50;  HNC=0,70;  I=0,59;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,672  [HC=0,50;  HNC=0,86;  I=0,95;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public void InsertBefore ( pattern_deconstructor_parameter el , pattern_deconstructor_parameter newel )     49317
+*
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,958  [HC=1,00;  H=0,91;  I=1,00;  A=0,90] 
+public void InsertBefore ( syntax_tree_node el , syntax_tree_node newel )     51214
+	0,949  [HC=1,00;  H=0,84;  I=1,00;  A=0,90] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,926  [HC=1,00;  H=0,69;  I=1,00;  A=0,90] 
+public void InsertBefore ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51224
+	0,920  [HC=1,00;  H=0,63;  I=1,00;  A=0,90] 
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,774  [HC=0,58;  H=0,87;  I=1,00;  A=0,90] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,765  [HC=0,58;  H=0,80;  I=1,00;  A=0,90] 
+public void InsertAfter ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48253
+	0,743  [HC=0,58;  H=0,65;  I=1,00;  A=0,90] 
+*
+HC=4;  HNC=1,42;  I=2,00;  A=0,92;  NA=0,00;  NN=0,00]
+public void InsertBefore ( pattern_parameter el , pattern_parameter newel )     48265
+	0,905  [HC=1,00;  HNC=0,83;  I=1,00;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( syntax_tree_node el , syntax_tree_node newel )     51214
+	0,811  [HC=1,00;  HNC=0,48;  I=0,85;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51224
+	0,791  [HC=1,00;  HNC=0,49;  I=0,77;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( pattern_parameter el , pattern_parameter newel )     48243
+	0,612  [HC=0,50;  HNC=0,83;  I=0,78;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , IEnumerable < syntax_tree_node > newels )     51202
+	0,576  [HC=0,50;  HNC=0,49;  I=0,87;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertAfter ( syntax_tree_node el , syntax_tree_node newel )     51192
+	0,560  [HC=0,50;  HNC=0,48;  I=0,80;  A=0,40;  NA=0,00; NN=0,00] 
+public void InsertBefore ( pattern_parameter el , IEnumerable < pattern_parameter > newels )     48275
+	0,785  [HC=1,00;  HNC=0,70;  I=0,59;  A=0,40;  NA=0,00; NN=0,00] #
+
+**************************************************************
+
