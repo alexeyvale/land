@@ -117,4 +117,10 @@ namespace Land.Core
 				^ (Start.Offset <= other.End.Offset && other.End.Offset <= End.Offset);
 		}
 	}
+
+    public class SegmentLocationComparer : IComparer<SegmentLocation>
+    {
+		public int Compare(SegmentLocation x, SegmentLocation y) =>
+			x.Start.Offset - y.Start.Offset;
+    }
 }

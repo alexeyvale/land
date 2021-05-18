@@ -43,6 +43,9 @@ code_or_empty	=	'%{' Any '%}' => direct_code | SPACE+ (Any LINE_END => direct_co
 	fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
 }
 
-%nodes leaf regex_from_decl regex_from_rule
+%nodes {
+	leaf regex_from_decl regex_from_rule
+	void LINE_END SPACE empty_string
+}
 
 %markup land group rule
