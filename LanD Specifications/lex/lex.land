@@ -14,7 +14,7 @@ REGEX_LITERAL_STR : '"'(~["]|'\\"')*'"'
 REGEX_SET_OP : '{-}'|'{+}'|'{*}'
 REGEX_ITEM :  REGEX_REPETITION|REGEX_CLASS|REGEX_PREDEFINED_CHAR_CLASS|REGEX_CHAR_CLASS|REGEX_ESCAPE_CHAR|REGEX_LITERAL_STR|REGEX_SET_OP|'<<EOF>>'
 
-LINE_END	: '\n'
+LINE_END	: '\r'?'\n'
 SPACE		: [\r\t ]
 
 file	=	declarations '%%' rules '%%' Any

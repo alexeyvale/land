@@ -14,12 +14,16 @@ DECLARATION_NAME : '%'ID
 
 grammar 		=	declaration* '%%' (rule | Any)* grammar_ending
 grammar_ending	=	('%%' Any)?
+
 declaration		=	symbol_declaration | other_declaration | Any
-symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
+symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%type' | '%start') ('<' ID '>')?
+symbol_declaration = symbol_declaration_header symbol+
+symbol = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
+
 rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'
-alternative		=	alternative_element*
-alternative_element	=	ID | block | LITERAL | '%prec'
+alternative		=    (alternative_element | block)*
+alternative_element    =    ID | LITERAL | '%prec'
 block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 
 %%
@@ -39,11 +43,14 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 
 %nodes {
 	ghost declaration
-	leaf alternative_element
+	leaf alternative_element symbol symbol_declaration_header
 }
 
 %markup {
-	land symbol_declaration rule alternative alternative_element
-	priority(0) ':' ';'
+	land symbol_declaration rule alternative
+	priority(0) ':' ';' '|'
 	notUnique alternative_element
+	headerCore(RULE_HEADER) rule
+	headerCore(alternative_element) alternative
+	headerCore(symbol_declaration_header) symbol_declaration
 }
