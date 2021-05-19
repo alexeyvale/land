@@ -15,13 +15,15 @@ namespace Land.Markup
 {
 	public class MarkupManager
 	{
+		public bool HasUnsavedChanges { get; set; }
+
 		public MarkupManager(Func<string, ParsedFile> getParsed, IPreHeuristic remappingHeuristic)
 		{
 			ContextFinder.GetParsed = getParsed;
 			ContextFinder.PreHeuristic = remappingHeuristic;
 
 			OnMarkupChanged += InvalidateRelations;
-
+			OnMarkupChanged += SetHasUnsavedChanges;
 
 			#region Подключение эвристик
 
@@ -77,6 +79,8 @@ namespace Land.Markup
 			Markup.Clear();
 
 			OnMarkupChanged?.Invoke();
+
+			HasUnsavedChanges = false;
 		}
 
 		/// <summary>
@@ -92,6 +96,11 @@ namespace Land.Markup
 		{
 			Relations.IsValid = false;
 		}
+
+		public void SetHasUnsavedChanges()
+        {
+			HasUnsavedChanges = true;
+        }
 
 		/// <summary>
 		/// Сброс узлов дерева у всех точек, связанных с указанным файлом
@@ -421,6 +430,8 @@ namespace Land.Markup
 					}
 				}
 			}
+
+			HasUnsavedChanges = false;
 		}
 
 		public void Deserialize(string fileName)
@@ -441,8 +452,10 @@ namespace Land.Markup
 				/// Восстанавливаем обратные связи между потомками и предками,
 				/// восстанавливаем связи с контекстами
 				var concernPoints = GetConcernPoints().ToDictionary(e => e.Id, e => e);
-				
-				foreach(var fc in unit.FileContexts)
+
+                #region Relative paths to absolute paths
+
+                foreach (var fc in unit.FileContexts)
 				{
 					if (!Path.IsPathRooted(fc.Name))
 					{
@@ -452,7 +465,19 @@ namespace Land.Markup
 					}
 				}
 
-				var fileContexts = unit.FileContexts.ToDictionary(e => e.Name, e => e);
+				foreach (var pc in unit.PointContexts)
+				{
+					if (!Path.IsPathRooted(pc.FileName))
+					{
+						pc.FileName = Path.GetFullPath(
+							Path.Combine(Path.GetDirectoryName(fileName), pc.FileName)
+						);
+					}
+				}
+
+                #endregion
+
+                var fileContexts = unit.FileContexts.ToDictionary(e => e.Name, e => e);
 
 				/// Связываем контексты с точками привязки в разметке
 				foreach (var context in unit.PointContexts)
@@ -603,7 +628,7 @@ namespace Land.Markup
 					.Take(AmbiguityTopCount).ToList();
 
 				if (!allowAutoDecisions || 
-					!ApplyCandidate(kvp.Key, candidates, searchArea))
+					!ApplyCandidate(kvp.Key, candidates))
 					ambiguous[kvp.Key] = candidates;
 			}
 
@@ -627,17 +652,20 @@ namespace Land.Markup
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			var result = ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Local);
-			var keys = result.Keys.ToList();
+			var result = ContextFinder.Find(
+				points,
+				searchArea, 
+				ContextFinder.SearchType.Local
+			);
 
-			foreach (var key in keys)
+			foreach (var key in result.Keys.ToList())
 			{
 				result[key] = result[key]
 					.TakeWhile(c => c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount)
 					.ToList();
 
-				if (!ApplyCandidate(key, result[key], searchArea))
+				if (!ApplyCandidate(key, result[key]))
 					ambiguous[key] = result[key];
 			}
 
@@ -648,8 +676,7 @@ namespace Land.Markup
 
 		private bool ApplyCandidate(
 			ConcernPoint point, 
-			IEnumerable<RemapCandidateInfo> candidates,
-			List<ParsedFile> searchArea)
+			IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
 

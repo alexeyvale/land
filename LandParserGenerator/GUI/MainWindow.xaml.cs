@@ -1067,7 +1067,7 @@ namespace Land.GUI
 			if (!NewTextChanged)
 			{
 				var candidates = 
-					LandExplorer.GetMappingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
+					LandExplorer.GetRebindingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
 					.ToList();
 
 				MappingDebug_SimilaritiesList.ItemsSource = candidates;

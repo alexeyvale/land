@@ -16,14 +16,15 @@ using Land.Core.Parsing.Tree;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Control.Helpers;
+using System.ComponentModel;
 
 namespace Land.Control
 {
 	/// <summary>
 	/// Логика взаимодействия для MarkupControl.xaml
 	/// </summary>
-	public partial class LandExplorerControl : UserControl
-    {
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
+	{
 		public enum LandExplorerCommand { AddPoint, Relink }
 
 		public class PendingCommandInfo
@@ -86,6 +87,10 @@ namespace Land.Control
 		/// </summary>
 		private ControlState State { get; set; } = new ControlState();
 
+		private Dispatcher FrontendUpdateDispatcher { get; set; }
+
+		#region Public properties
+
 		/// <summary>
 		/// Деревья для файлов, к которым осуществлена привязка
 		/// </summary>
@@ -96,7 +101,37 @@ namespace Land.Control
 		/// </summary>
 		public List<Message> Log { get; set; } = new List<Message>();
 
-		private Dispatcher FrontendUpdateDispatcher { get; set; }
+		/// <summary>
+		/// Признак того, что в панели имеются несохранённые изменения разметки
+		/// </summary>
+		public bool HasUnsavedChanges => MarkupManager.HasUnsavedChanges;
+
+		/// <summary>
+		/// Имя текущего открытого файла разметки
+		/// </summary>
+		public string MarkupFileName => !String.IsNullOrEmpty(MarkupFilePath) ? Path.GetFileName(MarkupFilePath) : null;
+
+		private string _markupFilePath;
+
+		/// <summary>
+		/// Путь к текущему открытому файлу разметки
+		/// </summary>
+		public string MarkupFilePath
+		{
+			get => _markupFilePath;
+
+			private set
+			{
+				_markupFilePath = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MarkupFileName)));
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		#endregion
+
+		#region Constructors
 
 		static LandExplorerControl()
 		{
@@ -128,9 +163,11 @@ namespace Land.Control
 			MarkupManager.OnMarkupChanged += RefreshMissingPointsList;
         }
 
-		#region Public
+        #endregion
 
-		public void Initialize(IEditorAdapter adapter)
+        #region Public methods
+
+        public void Initialize(IEditorAdapter adapter)
 		{
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
@@ -154,7 +191,7 @@ namespace Land.Control
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
-		public List<RemapCandidateInfo> GetMappingCandidates(ConcernPoint point, string fileText, Node root)
+		public List<RemapCandidateInfo> GetRebindingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
 				? MarkupManager.Find(point, 

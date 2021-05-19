@@ -11,10 +11,11 @@ using Land.Core;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Markup.CoreExtension;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		public ParserManager Parsers { get; private set; } = new ParserManager();
 

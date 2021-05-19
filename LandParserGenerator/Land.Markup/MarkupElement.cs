@@ -20,7 +20,7 @@ namespace Land.Markup
 			{
 				_name = value;
 
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
 			}
 		}
 
@@ -31,7 +31,7 @@ namespace Land.Markup
 			{
 				_comment = value;
 
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Comment"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Comment)));
 			}
 		}
 

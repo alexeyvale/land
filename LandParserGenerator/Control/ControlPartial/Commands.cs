@@ -15,10 +15,11 @@ using Land.Markup;
 using Land.Markup.Binding;
 using Land.Markup.Tree;
 using Land.Control.Helpers;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl: UserControl, INotifyPropertyChanged
 	{
 		private void Command_MarkupTree_Delete_Executed(object sender, RoutedEventArgs e)
 		{
@@ -152,12 +153,15 @@ namespace Land.Control
 			{
 				AddExtension = true,
 				DefaultExt = "landmark",
-				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
+				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*",
+				FileName = MarkupFilePath
 			};
 
+
 			if (saveFileDialog.ShowDialog() == true)
-			{
-				MarkupManager.Serialize(saveFileDialog.FileName, !SettingsObject.SaveAbsolutePath);
+            {
+				MarkupFilePath = saveFileDialog.FileName;
+				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
 			}
 		}
 
@@ -173,6 +177,7 @@ namespace Land.Control
 			if (openFileDialog.ShowDialog() == true)
 			{
 				MarkupManager.Deserialize(openFileDialog.FileName);
+				MarkupFilePath = openFileDialog.FileName;
 
 				var stubNode = new Node("");
 				stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
@@ -193,6 +198,7 @@ namespace Land.Control
 		private void Command_New_Executed(object sender, RoutedEventArgs e)
 		{
 			MarkupManager.Clear();
+			MarkupFilePath = null;
 		}
 
 		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
@@ -222,6 +228,11 @@ namespace Land.Control
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
+		}
+
+		private void Command_HasUnsavedChanges_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+			e.CanExecute = MarkupManager?.HasUnsavedChanges ?? false;
 		}
 
 		private void Command_MarkupTree_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)

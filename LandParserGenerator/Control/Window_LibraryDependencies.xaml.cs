@@ -27,7 +27,7 @@ namespace Land.Control
 			set
 			{
 				_isSelected = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsSelected"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
 			}
 		}
 

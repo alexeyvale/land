@@ -1,11 +1,12 @@
 ﻿using Land.Markup;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private int MAX_TEXT_SIZE = 30;
 		private int MIN_TEXT_SIZE = 9;

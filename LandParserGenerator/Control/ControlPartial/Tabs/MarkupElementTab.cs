@@ -16,10 +16,11 @@ using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
 using Land.Markup;
 using Land.Control.Helpers;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
@@ -111,7 +112,7 @@ namespace Land.Control
 
 				if (selectedCandidate != null)
 				{
-					double qualityScore;
+					//double qualityScore;
 
 					if (State.PendingCommand.Command == LandExplorerCommand.Relink)
 					{

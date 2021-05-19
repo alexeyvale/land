@@ -19,7 +19,7 @@
 	<UserControl.CommandBindings>
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
-		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_HasUnsavedChanges_CanExecute"/>
 
 		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
@@ -51,12 +51,13 @@
             <RowDefinition Height="60*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
             <RowDefinition Height="40*" MaxHeight="300"></RowDefinition>
-			<RowDefinition Height="30"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="100*"></RowDefinition>
+                <RowDefinition Height="20"></RowDefinition>
             </Grid.RowDefinitions>
             <ToolBar Grid.Row="0">
                 <ToolBar.Resources>
@@ -179,6 +180,8 @@
 					</Style>
 				</TreeView.ItemContainerStyle>
 			</TreeView>
+            <Label Grid.Row="2" Name="MarkupFileNameLabel" FontSize="10pt" Padding="5 2 10 2" HorizontalAlignment="Right"
+                   Content="{Binding Path=MarkupFileName, Mode=OneWay,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:LandExplorerControl}}}"></Label>
         </Grid>
         <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
 		<TabControl Grid.Row="2" Name="Tabs">
@@ -432,8 +435,8 @@
 				</ScrollViewer>
 			</TabItem>
 		</TabControl>
-		<StatusBar Name="ControlStatusBar" Grid.Row="3">
-			<Label Name="ControlStatusLabel"></Label>
-		</StatusBar>
+        <StatusBar Name="ControlStatusBar" Grid.Row="3">
+            <Label Name="ControlStatusLabel"></Label>
+        </StatusBar>
     </Grid>
 </UserControl>

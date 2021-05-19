@@ -12,10 +12,11 @@ using Microsoft.Win32;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Control.Helpers;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private void MissingTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{

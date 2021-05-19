@@ -12,10 +12,11 @@ using Microsoft.Win32;
 using Land.Core;
 using Land.Markup;
 using Land.Markup.Relations;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private void RelationParticipants_Swap_Click(object sender, RoutedEventArgs e)
 		{

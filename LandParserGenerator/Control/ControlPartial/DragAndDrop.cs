@@ -17,10 +17,11 @@ using Land.Core.Parsing.Tree;
 using Land.Core.Parsing.Preprocessing;
 using Land.Markup;
 using Land.Control.Helpers;
+using System.ComponentModel;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl : UserControl
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		/// Точка, в которой была нажата левая кнопка мыши
 		private Point LastMouseDown { get; set; }
