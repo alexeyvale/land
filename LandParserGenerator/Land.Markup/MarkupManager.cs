@@ -284,7 +284,9 @@ namespace Land.Markup
 			while (currentNode != null)
 			{
 				if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+				{
 					pointCandidates.AddFirst(currentNode);
+				}
 
 				currentNode = currentNode.Children
 					.Where(c => c.Location != null && c.Location.Includes(selection))

@@ -1,25 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using Microsoft.Win32;
-using Land.Core;
+﻿using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Markup.Tree;
-using Land.Control.Helpers;
+using Microsoft.Win32;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using SWF = System.Windows.Forms;
 
 namespace Land.Control
 {
-	public partial class LandExplorerControl: UserControl, INotifyPropertyChanged
+    public partial class LandExplorerControl: UserControl, INotifyPropertyChanged
 	{
 		private void Command_MarkupTree_Delete_Executed(object sender, RoutedEventArgs e)
 		{
@@ -167,6 +162,22 @@ namespace Land.Control
 
 		private void Command_Open_Executed(object sender, RoutedEventArgs e)
 		{
+			if (HasUnsavedChanges)
+			{
+				switch (SWF.MessageBox.Show(
+					"Сохранить изменения текущей разметки?",
+					"Создание новой разметки",
+					SWF.MessageBoxButtons.YesNoCancel,
+					SWF.MessageBoxIcon.Question))
+				{
+					case SWF.DialogResult.Yes:
+						Command_Save_Executed(sender, e);
+						break;
+					case SWF.DialogResult.Cancel:
+						return;
+				}
+			}
+
 			var openFileDialog = new OpenFileDialog()
 			{
 				AddExtension = true,
@@ -176,32 +187,33 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				MarkupManager.Deserialize(openFileDialog.FileName);
-				MarkupFilePath = openFileDialog.FileName;
-
-				var stubNode = new Node("");
-				stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
-
-				MarkupManager.DoWithMarkup(elem =>
-				{
-					if(elem is ConcernPoint p)
-					{
-						p.AstNode = stubNode;
-						p.HasIrrelevantLocation = true;
-					}
-				});
-
-				MarkupTreeView.ItemsSource = MarkupManager.Markup;
+				OpenFile(openFileDialog.FileName);
 			}
 		}
 
-		private void Command_New_Executed(object sender, RoutedEventArgs e)
-		{
-			MarkupManager.Clear();
-			MarkupFilePath = null;
-		}
+        private void Command_New_Executed(object sender, RoutedEventArgs e)
+        {
+            if (HasUnsavedChanges)
+            {
+                switch (SWF.MessageBox.Show(
+                    "Сохранить изменения текущей разметки?",
+                    "Создание новой разметки",
+                    SWF.MessageBoxButtons.YesNoCancel,
+                    SWF.MessageBoxIcon.Question))
+                {
+                    case SWF.DialogResult.Yes:
+                        Command_Save_Executed(sender, e);
+                        break;
+                    case SWF.DialogResult.Cancel:
+                        return;
+                }
+            }
 
-		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
+            MarkupManager.Clear();
+            MarkupFilePath = null;
+        }
+
+        private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
 		{
 			State.HighlightConcerns = !State.HighlightConcerns;
 
@@ -350,12 +362,35 @@ namespace Land.Control
 
 		#region Methods
 
-		private List<ConcernPointCandidate> GetConcernPointCandidates(Node root, 
-			SegmentLocation realSelection, SegmentLocation adjustedSelection)
+		private void OpenFile(string fileName)
+        {
+			MarkupManager.Deserialize(fileName);
+			MarkupFilePath = fileName;
+
+			var stubNode = new Node("");
+			stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
+
+			MarkupManager.DoWithMarkup(elem =>
+			{
+				if (elem is ConcernPoint p)
+				{
+					p.AstNode = stubNode;
+					p.HasIrrelevantLocation = true;
+				}
+			});
+
+			MarkupTreeView.ItemsSource = MarkupManager.Markup;
+		}
+
+		private List<ConcernPointCandidate> GetConcernPointCandidates(
+			Node root, 
+			SegmentLocation realSelection, 
+			SegmentLocation adjustedSelection)
 		{
 			/// Для выделения находим сущности, объемлющие его
 			var candidates = MarkupManager.GetConcernPointCandidates(root, realSelection)
-					.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c)).ToList();
+				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
+				.ToList();
 
 			/// Проверяем, можно ли обрамить его кастомным блоком
 			if (CustomBlockValidator.IsValid(root, adjustedSelection))

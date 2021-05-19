@@ -29,7 +29,7 @@ entity =
 		entity_attribute* modifier*
 		(
 		 	'enum' name Any '{' Any '}' ';'?											=> enum		|
-			%markup(priority(0.3), exactmatch) CLASS_STRUCT_INTERFACE name Any '{' entity* '}' ';'?	=> class_struct_interface	|
+			CLASS_STRUCT_INTERFACE name Any '{' entity* '}' ';'?						=> class_struct_interface	|
 			type name
 			(
 		  		arguments Any (init_expression? ';' | block)							=> method	|

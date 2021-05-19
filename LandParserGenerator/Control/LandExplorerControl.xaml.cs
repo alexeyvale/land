@@ -165,7 +165,7 @@ namespace Land.Control
 
         #endregion
 
-        #region Public methods
+        #region API
 
         public void Initialize(IEditorAdapter adapter)
 		{
@@ -180,6 +180,9 @@ namespace Land.Control
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
 		}
 
+		/// <summary>
+		/// Получить текущую разметку
+		/// </summary>
 		public ObservableCollection<MarkupElement> GetMarkup()
 		{
 			return MarkupManager.Markup;
@@ -191,6 +194,9 @@ namespace Land.Control
 				(File.Exists(fileName) ? File.ReadAllText(fileName) : null);
 		}
 
+		/// <summary>
+		/// Получить кандидатов для перепривязки
+		/// </summary>
 		public List<RemapCandidateInfo> GetRebindingCandidates(ConcernPoint point, string fileText, Node root)
 		{
 			return root != null
@@ -203,6 +209,66 @@ namespace Land.Control
 					})
 				: new List<RemapCandidateInfo>();
 		}
+
+		/// <summary>
+		/// Добавить функциональность
+		/// </summary>
+		public Concern AddConcern(string name, string comment = null, Concern parent = null) =>
+			MarkupManager.AddConcern(name, comment, parent);
+
+		/// <summary>
+		/// Добавить элемент функциональности
+		/// </summary>
+        public ConcernPoint AddConcernPoint(
+			string type,
+			int offset,
+			string fileName,
+			string name = null, 
+			string comment = null, 
+			Concern parent = null)
+        {
+			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
+
+			if(parsedFile != null)
+            {
+				var nodeToBind = MarkupManager.GetConcernPointCandidates(
+						parsedFile.Root,
+						new SegmentLocation { Start = new PointLocation(offset), End = new PointLocation(offset) }
+					)
+					.FirstOrDefault(c => c.Type == type);
+
+				if (nodeToBind != null)
+				{
+					return MarkupManager.AddConcernPoint(nodeToBind, parsedFile, new List<ParsedFile> { parsedFile }, name, comment, parent);
+				}
+			}
+
+			return null;
+        }
+
+		/// <summary>
+		/// Открыть в панели указанный файл разметки
+		/// </summary>
+		public void Open(string fileName)
+        {
+			OpenFile(fileName);
+		}
+
+		/// <summary>
+		/// Сохранить текущую разметку
+		/// </summary>
+		public void Save()
+        {
+			Command_Save_Executed(null, null);
+		}
+
+		/// <summary>
+		/// Создать новую разметку
+		/// </summary>
+		public void New()
+        {
+			Command_New_Executed(null, null);
+        }
 
 		#endregion
 

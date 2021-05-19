@@ -16,9 +16,9 @@ grammar 		=	declaration* '%%' (rule | Any)* grammar_ending
 grammar_ending	=	('%%' Any)?
 
 declaration		=	symbol_declaration | other_declaration | Any
+symbol_declaration = symbol_declaration_header symbol_declaration_element+
 symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%type' | '%start') ('<' ID '>')?
-symbol_declaration = symbol_declaration_header symbol+
-symbol = ID | LITERAL
+symbol_declaration_element = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
 
 rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'
@@ -43,11 +43,11 @@ block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
 
 %nodes {
 	ghost declaration
-	leaf alternative_element symbol symbol_declaration_header
+	leaf alternative_element symbol_declaration_element symbol_declaration_header
 }
 
 %markup {
-	land symbol_declaration rule alternative
+	land symbol_declaration symbol_declaration_element rule alternative alternative_element
 	priority(0) ':' ';' '|'
 	notUnique alternative_element
 	headerCore(RULE_HEADER) rule

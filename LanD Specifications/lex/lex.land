@@ -17,23 +17,26 @@ REGEX_ITEM :  REGEX_REPETITION|REGEX_CLASS|REGEX_PREDEFINED_CHAR_CLASS|REGEX_CHA
 LINE_END	: '\r'?'\n'
 SPACE		: [\r\t ]
 
+CURVE_BRACKETED : %left '{' %right '}'
+
 file	=	declarations '%%' rules '%%' Any
 
-declarations		=	(state_declaration|regex_declaration|code_or_empty|other_declaration)*
+declarations		=	(state_declaration|category_declaration|code_or_empty|other_declaration)*
 state_declaration	=	('%x'|'%s') id_list LINE_END
 other_declaration	=	'%' Any LINE_END
-regex_declaration	=	ID regex_from_decl LINE_END
-regex_from_decl		=	Any
+category_declaration	=	ID regex_from_declaration LINE_END
+regex_from_declaration	=	Any
 
-rules			=	(states? (group|rule)|code_or_empty)*
+rules			=	(group | rule | code_or_empty)*
 states			=	'<' (id_list|'*') '>'
 id_list			=	ID (','? ID)*
-group			=	'{' (group|rule)* '}'
-rule			=	regex_from_rule (LINE_END|SPACE) (context_code|Any) LINE_END
-regex_from_rule	=	(REGEX_ITEM|Any)+
+group			=	states? '{' (group|rule)* '}'
+rule			=	states? regex_list_from_rule context_code 
+regex_from_rule	=	(REGEX_ITEM | Any)+
+regex_list_from_rule	=	regex_from_rule ((SPACE|LINE_END)+ ('|' regex_from_rule)?)*
 
-context_code	=	'{' (AnyInclude('\'{\'', '\'}\'')|context_code)* '}'
-code_or_empty	=	'%{' Any '%}' => direct_code | SPACE+ (Any LINE_END => direct_code|LINE_END => empty_string)
+context_code	=	'{' AnyInclude('\'{\'', '\'}\'') '}' | Any LINE_END
+code_or_empty	=	'%{' Any '%}' | SPACE+ (Any LINE_END | LINE_END)
 
 %%
 
@@ -44,8 +47,12 @@ code_or_empty	=	'%{' Any '%}' => direct_code | SPACE+ (Any LINE_END => direct_co
 }
 
 %nodes {
-	leaf regex_from_decl regex_from_rule
-	void LINE_END SPACE empty_string
+	leaf regex_from_declaration regex_from_rule states
+	ghost regex_list_from_rule
+	void LINE_END SPACE code_or_empty
 }
 
-%markup land group rule
+%markup {
+	land group rule
+	priority(0) '<' '>' ','
+}

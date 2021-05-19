@@ -482,7 +482,8 @@ namespace Land.Core.Parsing.LR
 					LexingStream.GetNextToken(NestingStack.Peek(), out skippedBuffer);
 					skippedBuffer.Insert(0, currentToken);
 
-					value.AddRange(skippedBuffer.Select(t=>t.Name));
+					value.AddRange(skippedBuffer.Select(t=>t.Text));
+					endLocation = skippedBuffer.Last().Location.End;
 				}
 
 				/// Пытаемся пропустить Any в этом месте,
@@ -499,9 +500,9 @@ namespace Land.Core.Parsing.LR
 				));
 
 				Log.Add(Message.Warning(
-						$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
-						LexingStream.CurrentToken.Location.Start
-					));		
+					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+					LexingStream.CurrentToken.Location.Start
+				));		
 
 				var token = SkipAny(anyNode, false);
 
