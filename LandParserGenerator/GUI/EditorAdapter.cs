@@ -13,7 +13,7 @@ namespace Land.GUI
 	public class EditorAdapter : IEditorAdapter
 	{
 		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
-		private const string DEFAULT_LINE_END = "\n\r";
+		private const string DEFAULT_LINE_END = "\r\n";
 
 		private MainWindow EditorWindow { get; set; }
 		private string SettingsPath { get; set; }

@@ -20,7 +20,7 @@ namespace Land.VisualStudioExtension
 	public class EditorAdapter : IEditorAdapter
 	{
 		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
-		private const string DEFAULT_LINE_END = "\n\r";
+		private const string DEFAULT_LINE_END = "\r\n";
 
 		private DTE2 DteService => ServiceEventAggregator.Instance.DteService;
 
