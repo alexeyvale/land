@@ -43,7 +43,7 @@ namespace Land.Markup.Binding
 
 		public void ClearCache(string fileName)
 		{
-			var keysToRemove = Cache.Where(e => e.Value.FileContext.Name == fileName)
+			var keysToRemove = Cache.Where(e => e.Value.FileName == fileName)
 				.Select(e=>e.Key).ToList();
 
 			foreach(var key in keysToRemove)
@@ -51,8 +51,5 @@ namespace Land.Markup.Binding
 				Cache.Remove(key);
 			}
 		}
-
-		public List<FileContext> GetFileContexts() =>
-			Cache.Values.Select(e => e.FileContext).Distinct().ToList();
 	}
 }

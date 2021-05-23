@@ -1013,11 +1013,11 @@ namespace Land.GUI
 			{
 				if (!point.HasInvalidLocation)
 				{
-					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileContext.Name);
+					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 
 					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
 					{
-						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileContext.Name);
+						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
 					}
 
 					MoveCaretToSource(point.Location, MappingDebug_OldTextEditor, true);
@@ -1043,7 +1043,7 @@ namespace Land.GUI
 			/// Если текст, к которому пытаемся перепривязаться, изменился
 			if (NewTextChanged)
 			{
-				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileContext.Name)];
+				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileName)];
 
 				/// и при этом парсер сгенерирован
 				if (parser != null)

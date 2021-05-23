@@ -20,7 +20,7 @@ namespace ManualRemappingTool
 				Node = element.Node,
 				Context = new PointContext
 				{
-					Type = element.Node.Type,
+					Type = element.Node.Alias ?? element.Node.Symbol,
 					AncestorsContext = element.Ancestors,
 					HeaderContext = element.Header,
 					InnerContext = new InnerContext()
@@ -30,7 +30,7 @@ namespace ManualRemappingTool
 		public static explicit operator PointContext(MappingElement element) =>
 			element != null ? new PointContext
 			{
-				Type = element.Node.Type,
+				Type = element.Node.Alias ?? element.Node.Symbol,
 				AncestorsContext = element.Ancestors,
 				HeaderContext = element.Header,
 				InnerContext = new InnerContext()

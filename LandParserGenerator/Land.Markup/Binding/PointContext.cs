@@ -46,18 +46,29 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public abstract class TypedPrioritizedContextElement
+	public class HeaderContextElement: IEqualsIgnoreValue
 	{
+		public string Type { get; set; }
+
+		[JsonIgnore]
 		public double Priority { get; set; }
 
-		public string Type { get; set; }
-	}
-
-	public class HeaderContextElement: TypedPrioritizedContextElement, IEqualsIgnoreValue
-	{
+		[JsonIgnore]
 		public bool ExactMatch { get; set; }
 
+		[JsonIgnore]
 		public List<PrioritizedWord> Value { get; set; }
+
+		[JsonProperty]
+		private string SerializableValue
+        {
+			get => String.Join(" ", Value.Select(e=>e.Text));
+
+            set
+            {
+				Value = GetWords(value);
+            }
+        }
 
 		/// Проверка двух контекстов на совпадение всех полей, кроме поля Value
 		public bool EqualsIgnoreValue(object obj)
@@ -247,7 +258,11 @@ namespace Land.Markup.Binding
 	public class HeaderContext
 	{
 		public List<HeaderContextElement> Sequence { get; set; }
+
+		[JsonIgnore]
 		public List<int> NonCoreIndices { get; set; }
+
+		[JsonIgnore]
 		public List<int> CoreIndices { get; set; }
 
 		[JsonIgnore]
@@ -260,8 +275,10 @@ namespace Land.Markup.Binding
 
 		#region Old
 
+		[JsonIgnore]
 		public List<string> Sequence_old { get; set; }
 
+		[JsonIgnore]
 		public string Core_old =>
 			String.Join("", Core.Select(e => String.Join("", e.Value.Select(word => word.Text))).ToList());
 
@@ -362,6 +379,8 @@ namespace Land.Markup.Binding
 	public class SiblingsContextPart
 	{
 		public TextOrHash All { get; set; }
+
+		[JsonIgnore]
 		public PointContext Nearest { get; set; }
 
 		[JsonIgnore]
@@ -374,52 +393,42 @@ namespace Land.Markup.Binding
 		public List<Node> Siblings { get; set; }
 	}
 
-	public class FileContext
-	{
-		/// <summary>
-		/// Имя файла
-		/// </summary>
-		public string Name { get; set; }
-
-		/// <summary>
-		/// Количество строк
-		/// </summary>
-		public int Length { get; set; }
-
-		/// <summary>
-		/// Нечёткий хеш содержимого файла
-		/// </summary>
-		public TextOrHash Content { get; set; }
-	}
-
 	public class PointContext
 	{
+		#region Links
+
 		/// <summary>
 		/// Идентификаторы связанных точек привязки
 		/// </summary>
-		public HashSet<Guid> LinkedPoints { get; private set; } = 
-			new HashSet<Guid>();
+		public HashSet<Guid> LinkedPoints { get; private set; } = new HashSet<Guid>();
 
 		/// <summary>
-		/// Идентификаторы точек привязки, 
+		/// Идентификаторы точек привязки,
 		/// для которых данный контекст описывает ближайшую сущность
 		/// </summary>
-		public HashSet<Tuple<Guid, int>> LinkedClosestPoints { get; private set; } = 
-			new HashSet<Tuple<Guid, int>>();
+		public HashSet<Guid> LinkedClosestPoints { get; private set; } = new HashSet<Guid>();
+
+		public HashSet<Guid> LinkedAfterNeighbours { get; private set; } = new HashSet<Guid>();
+
+		public HashSet<Guid> LinkedBeforeNeighbours { get; private set; } = new HashSet<Guid>();
 
 		public void LinkPoint(Guid pointId)
 		{
 			this.LinkedPoints.Add(pointId);
 
-			for (var i = 0; i < this.ClosestContext?.Count; ++i)
+			if (this.ClosestContext != null)
 			{
-				if (this.ClosestContext[i] != null)
+				foreach (var element in this.ClosestContext)
 				{
-					this.ClosestContext[i].LinkedClosestPoints
-						.Add(new Tuple<Guid, int>(pointId, i));
+					element.LinkedClosestPoints.Add(pointId);
 				}
 			}
+
+			this.SiblingsContext.Before.Nearest?.LinkedAfterNeighbours.Add(pointId);
+			this.SiblingsContext.After.Nearest?.LinkedBeforeNeighbours.Add(pointId);
 		}
+
+		#endregion
 
 		/// <summary>
 		/// Тип сущности, которой соответствует точка привязки
@@ -434,23 +443,6 @@ namespace Land.Markup.Binding
 		public int StartOffset { get; set; }
 
 		public int EndOffset { get; set; }
-
-		private FileContext _fileContext;
-
-		/// <summary>
-		/// Контекст файла, в котором находится помеченный элемент
-		/// </summary>
-		[JsonIgnore]
-		public FileContext FileContext
-		{
-			get { return _fileContext; }
-
-			set
-			{
-				_fileContext = value;
-				FileName = _fileContext?.Name;
-			}
-		}
 
 		public string FileName { get; set; }
 
@@ -474,32 +466,18 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public SiblingsContext SiblingsContext { get; set; }
 
-		private List<PointContext> _closestContext;
-
 		/// <summary>
 		/// Контекст наиболее похожих на помеченный элементов
 		/// </summary>
 		[JsonIgnore]
-		public List<PointContext> ClosestContext
-		{
-			get { return _closestContext; }
-
-			set
-			{
-				_closestContext = value;
-
-				for (var i = 0; i < this.ClosestContext?.Count; ++i)
-				{
-					ClosestContext[i].LinkedClosestPoints
-						.UnionWith(LinkedPoints.Select(id => new Tuple<Guid, int>(id, i)));
-				}
-			}
-		}
+		public HashSet<PointContext> ClosestContext { get; set; }
 
 		#region Old
 
+		[JsonIgnore]
 		public List<ContextElement> InnerContext_old { get; set; }
 
+		[JsonIgnore]
 		public Tuple<List<ContextElement>, List<ContextElement>> SiblingsContext_old { get; set; }
 
 		#endregion
@@ -510,13 +488,13 @@ namespace Land.Markup.Binding
 		{
 			return new PointContext
 			{
-				Type = node.Type,
+				Type = node.Alias ?? node.Symbol,
 
+				FileName = file.Name,
 				Line = node.Location.Start.Line.Value,
 				StartOffset = node.Location.Start.Offset,
 				EndOffset = node.Location.End.Offset,
 
-				FileContext = file.BindingContext,
 				HeaderContext = GetHeaderContext(node),
 				InnerContext = GetInnerContext(node, file),
 				AncestorsContext = GetAncestorsContext(node),
@@ -824,16 +802,6 @@ namespace Land.Markup.Binding
 
 		#endregion
 
-		public static FileContext GetFileContext(string name, string text)
-		{
-			return new FileContext
-			{
-				Name = name,
-				Length = text.Length,
-				Content = new TextOrHash(text)
-			};
-		}
-
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
 			ParsedFile file,
@@ -969,7 +937,7 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
-		public static List<PointContext> GetClosestContext(
+		public static HashSet<PointContext> GetClosestContext(
 			Node node,
 			ParsedFile file,
 			PointContext nodeContext,
@@ -1066,9 +1034,7 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			return result
-				.Select(e=>e.Context)
-				.ToList();
+			return new HashSet<PointContext>(result.Select(e=>e.Context));
 		}
 	}
 

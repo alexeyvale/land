@@ -83,7 +83,7 @@ namespace Land.Control
 					{
 						Root = root,
 						Text = text,
-						BindingContext = PointContext.GetFileContext(fileName, text)
+						Name = fileName
 					} : null;
 				}
 				else

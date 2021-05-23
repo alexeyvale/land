@@ -75,8 +75,9 @@ namespace ManualRemappingTool
 					HeaderContext = sourceElement.Header,
 					AncestorsContext = sourceElement.Ancestors,
 					InnerContext = new InnerContext(),
-					ClosestContext = allSourceElements
-						.Where(e => e != sourceElement).Select(e => (PointContext)e).ToList()
+					ClosestContext = new HashSet<PointContext>(allSourceElements
+						.Where(e => e != sourceElement)
+						.Select(e => (PointContext)e))
 				},
 				candidates.Select(e => (RemapCandidateInfo)e).ToList()
 			) ;

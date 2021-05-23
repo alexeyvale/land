@@ -364,7 +364,7 @@ namespace Land.Control
 
 		private void OpenFile(string fileName)
         {
-			MarkupManager.Deserialize(fileName);
+			MarkupManager.Deserialize(fileName, Parsers.Grammars);
 			MarkupFilePath = fileName;
 
 			var stubNode = new Node("");

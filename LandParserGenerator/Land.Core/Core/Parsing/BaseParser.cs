@@ -99,16 +99,36 @@ namespace Land.Core.Parsing
 
 		protected void TreePostProcessing(Node root)
 		{
+			/// Запускаем стандартные визиторы
 			root.Accept(new RemoveAutoVisitor(GrammarObject));
 			root.Accept(new GhostListOptionProcessingVisitor(GrammarObject));
 			root.Accept(new LeafOptionProcessingVisitor(GrammarObject));
 			root.Accept(new MergeAnyVisitor(GrammarObject));
 			root.Accept(new UserifyVisitor(GrammarObject));
 
+			/// Формируем узлы для кастомных блоков
+			if (LexingStream.CustomBlocks?.Count > 0)
+			{
+				var visitor = new InsertCustomBlocksVisitor(GrammarObject, NodeGenerator, LexingStream.CustomBlocks);
+				root.Accept(visitor);
+				root = visitor.Root;
+
+				foreach (var block in visitor.CustomBlocks)
+				{
+					Log.Add(Message.Error(
+						$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
+							$"не учитываемой при синтаксическом анализе",
+						block.Start.Location.Start
+					));
+				}
+			}
+
+			/// Типизируем узлы
 			NodeRetypingVisitor.Root = root;
 			root.Accept(NodeRetypingVisitor);
 			root = NodeRetypingVisitor.Root;
 
+			/// Запускаем кастомные сторонние визиторы
 			VisitorConstructors.ForEach(c =>
 			{
 				var visitor = c.Invoke(GrammarObject);

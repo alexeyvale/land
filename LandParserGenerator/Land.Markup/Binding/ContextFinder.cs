@@ -355,10 +355,7 @@ namespace Land.Markup.Binding
 
 			/// Запоминаем, каким элементам какой элемент предшествовал
 			LocationManager = !checkAllSiblings 
-				? new LocationManager(
-					contextsToPoints.Keys.Concat(auxiliaryContexts),
-					candidates.First().Context.FileContext.Length
-				) 
+				? new LocationManager(contextsToPoints.Keys.Concat(auxiliaryContexts)) 
 				: null;
 
 			/// Результаты поиска элемента, которые вернём пользователю
@@ -725,7 +722,7 @@ namespace Land.Markup.Binding
 				.ToList();
 			/// Сначала ищем модель для типа файла и типа сущности
 			var modelPath = availableModels.FirstOrDefault(m =>
-				m.Contains(Path.GetExtension(elements.Keys.First().FileContext.Name).Trim('.'))
+				m.Contains(Path.GetExtension(elements.Keys.First().FileName).Trim('.'))
 			);
 
 			/// TODO если не нашли, нужно подгружать общую модель
@@ -791,18 +788,18 @@ namespace Land.Markup.Binding
 					break;
 				case SearchType.Local:
 					var groupedPoints = points
-						.GroupBy(p => p.Context.FileContext)
+						.GroupBy(p => p.Context.FileName)
 						.ToDictionary(e => e.Key, e =>
 							e.GroupBy(p => p.Context.Type).ToDictionary(el => el.Key, el => el.ToList())
 						);
 
-					foreach (var file in groupedPoints.Keys)
+					foreach (var fileName in groupedPoints.Keys)
 					{
 						/// При поиске в том же файле ищем тот же файл по полному совпадению пути,
 						/// если не находим - берём файлы, похожие по содержимому
-						files = searchArea.Where(f => f.Name == file.Name).ToList();
+						files = searchArea.Where(f => f.Name == fileName).ToList();
 
-						var localResult = DoMultiTypeSearch(groupedPoints[file], files, searchType);
+						var localResult = DoMultiTypeSearch(groupedPoints[fileName], files, searchType);
 
 						foreach (var elem in localResult)
 						{
@@ -906,7 +903,7 @@ namespace Land.Markup.Binding
 
 			var denominator = 0.0;
 
-			if (a is IEnumerable<TypedPrioritizedContextElement>)
+			if (a is IEnumerable<HeaderContextElement>)
 			{
 				var comparer = new EqualsIgnoreValueComparer();
 
@@ -916,7 +913,7 @@ namespace Land.Markup.Binding
 					.GroupBy(e => e, comparer).ToDictionary(g => g.Key, g => g.Count());
 
 				denominator += aSockets.Sum(kvp
-					=> ((TypedPrioritizedContextElement)kvp.Key).Priority * kvp.Value);
+					=> ((HeaderContextElement)kvp.Key).Priority * kvp.Value);
 
 				foreach (var kvp in aSockets)
 				{
@@ -927,7 +924,7 @@ namespace Land.Markup.Binding
 				}
 
 				denominator += bSockets.Where(kvp => kvp.Value > 0)
-					.Sum(kvp => ((TypedPrioritizedContextElement)kvp.Key).Priority * kvp.Value);
+					.Sum(kvp => ((HeaderContextElement)kvp.Key).Priority * kvp.Value);
 			}
 			//else if (a is List<string>)
 			//{

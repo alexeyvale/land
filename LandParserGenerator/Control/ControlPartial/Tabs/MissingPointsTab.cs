@@ -98,7 +98,7 @@ namespace Land.Control
 				if (item.DataContext is RemapCandidateInfo pair)
 				{
 					Editor.SetActiveDocumentAndOffset(
-						pair.Context.FileContext.Name,
+						pair.Context.FileName,
 						pair.Node.Location.Start
 					);
 

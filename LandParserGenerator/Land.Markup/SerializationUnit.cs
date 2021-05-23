@@ -14,8 +14,6 @@ namespace Land.Markup
 
 		public HashSet<PointContext> PointContexts { get; set; }
 
-		public HashSet<FileContext> FileContexts { get; set; }
-
 		public List<RelatedPair<MarkupElement>> ExternalRelatons { get; set; }
 	}
 }

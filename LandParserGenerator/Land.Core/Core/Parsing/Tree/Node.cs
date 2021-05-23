@@ -44,7 +44,7 @@ namespace Land.Core.Parsing.Tree
 
 		public SymbolArguments Arguments { get; set; }
 
-		public string Type => !String.IsNullOrEmpty(Alias) ? Alias : UserifiedSymbol ?? Symbol;
+		public string Type => Alias ?? UserifiedSymbol ?? Symbol;
 
 		protected SegmentLocation _location;
 		private bool LocationReady { get; set; } = false;

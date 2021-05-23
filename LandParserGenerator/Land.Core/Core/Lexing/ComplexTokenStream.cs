@@ -179,7 +179,7 @@ namespace Land.Core.Lexing
 						Location = new SegmentLocation { Start = token.Location.Start },
 
 						/// Можно не типизировать, типизируем при вставке блоков в дерево
-						Start = new Node(token.Name)			
+						Start = new Node(Grammar.CUSTOM_BLOCK_START_TOKEN_NAME)			
 					};
 
 					newBlock.Start.SetLocation(token.Location.Start, token.Location.End);
@@ -201,7 +201,7 @@ namespace Land.Core.Lexing
 					{
 						var currentBlock = CustomBlockStack.Pop();
 
-						currentBlock.End = new Node(token.Name);
+						currentBlock.End = new Node(Grammar.CUSTOM_BLOCK_END_TOKEN_NAME);
 						currentBlock.End.SetLocation(token.Location.Start, token.Location.End);
 						currentBlock.Location.End = token.Location.End;
 

@@ -143,13 +143,8 @@ namespace Land.Markup
 		public Node Root { get; set; }
 
 		/// <summary>
-		/// Описывающий файл контекст, используемый при перепривязке
-		/// </summary>
-		public FileContext BindingContext { get; set; }
-
-		/// <summary>
 		/// Имя файла
 		/// </summary>
-		public string Name => BindingContext?.Name;
+		public string Name { get; set; }
 	}
 }

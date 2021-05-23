@@ -6,6 +6,7 @@ using System.Reflection;
 using Land.Core.Parsing;
 using Land.Core;
 using Land.Markup;
+using Land.Core.Specification;
 
 namespace Land.Control
 {
@@ -15,6 +16,8 @@ namespace Land.Control
 			new Dictionary<string, ParserInfo> ();
 
 		public BaseParser this[string ext] => Parsers.ContainsKey(ext) ? Parsers[ext].Parser : null;
+
+		public Dictionary<string, Grammar> Grammars => Parsers.ToDictionary(e=>e.Key, e=>e.Value.Parser.GrammarObject);
 
 		public HashSet<string> Load(LandExplorerSettings settingsObject, string cacheDirectoryPath, List<Message> log)
 		{

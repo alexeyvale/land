@@ -49,6 +49,8 @@ namespace Land.Core.Specification
 		public const string UNDEFINED_TOKEN_NAME = "UNDEFINED";
 		public const string ERROR_TOKEN_NAME = "ERROR";
 		public const string ANY_TOKEN_NAME = "Any";
+		public const string CUSTOM_BLOCK_START_TOKEN_NAME = "CUSTOM_BLOCK_START";
+		public const string CUSTOM_BLOCK_END_TOKEN_NAME = "CUSTOM_BLOCK_END";
 
 		// Зарезервированные имена специальных нетерминальных символов
 		public const string CUSTOM_BLOCK_RULE_NAME = "custom_block";
@@ -102,6 +104,8 @@ namespace Land.Core.Specification
 			DeclareTerminal(new TerminalSymbol(ANY_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(EOF_TOKEN_NAME, null));
 			DeclareTerminal(new TerminalSymbol(UNDEFINED_TOKEN_NAME, null));
+			DeclareTerminal(new TerminalSymbol(CUSTOM_BLOCK_START_TOKEN_NAME, null));
+			DeclareTerminal(new TerminalSymbol(CUSTOM_BLOCK_END_TOKEN_NAME, null));
 
 			State = GrammarState.Valid;
 		}

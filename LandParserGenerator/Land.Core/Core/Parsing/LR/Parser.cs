@@ -165,22 +165,6 @@ namespace Land.Core.Parsing.LR
 			if (root != null)
 			{
 				TreePostProcessing(root);
-
-				if (LexingStream.CustomBlocks?.Count > 0)
-				{
-					var visitor = new InsertCustomBlocksVisitor(GrammarObject, NodeGenerator, LexingStream.CustomBlocks);
-					root.Accept(visitor);
-					root = visitor.Root;
-
-					foreach(var block in visitor.CustomBlocks)
-					{
-						Log.Add(Message.Error(
-							$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
-								$"не учитываемой при синтаксическом анализе",
-							block.Start.Location.Start
-						));
-					}
-				}
 			}
 
 			return root;

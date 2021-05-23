@@ -25,7 +25,7 @@ namespace Land.Markup.Binding
 		private List<PointContext> ContextsOrderedByLine { get; set; }
 		private Dictionary<PointContext, LineInfo> ContextToLineInfo { get; set; }
 
-		public LocationManager(IEnumerable<PointContext> contexts, int targetFileLength)
+		public LocationManager(IEnumerable<PointContext> contexts)
 		{
 			ContextsOrderedByLine = contexts
 				.OrderBy(c => c.StartOffset)
@@ -35,7 +35,7 @@ namespace Land.Markup.Binding
 				.ToDictionary(e => e.e, e => new LineInfo { 
 					Index = e.i, 
 					OffsetBefore = 0, 
-					OffsetAfter = targetFileLength,
+					OffsetAfter = int.MaxValue,
 					//ImmediateAfterFound = e.e.SiblingsContext?.After.Nearest.Count == 0,
 					//ImmediateBeforeFound = e.e.SiblingsContext?.Before.Nearest.Count == 0,
 				});

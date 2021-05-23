@@ -14,6 +14,9 @@ namespace Land.Markup.CoreExtension
 
 		public MarkupOptionsProcessingVisitor(Grammar g): base(g)
 		{
+			g.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.LAND, new List<string> { Grammar.CUSTOM_BLOCK_RULE_NAME }, null);
+			g.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, new List<string> { Grammar.CUSTOM_BLOCK_END_TOKEN_NAME }, new List<dynamic> { 0 });
+
 			Land = g.Options.GetSymbols(MarkupOption.GROUP_NAME, MarkupOption.LAND);
 
 			GlobalPriorities = g.Options.GetSymbols(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY)
@@ -22,18 +25,6 @@ namespace Land.Markup.CoreExtension
 
 		public override void Visit(Node node)
 		{
-			if(node.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
-			{
-				node.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.LAND, null);
-
-				node.Children.First().Options.Set(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH, null);
-				node.Children.First().Options.SetPriority(OptionsExtension.DEFAULT_PRIORITY);
-				node.Children.Last().Options.Set(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH, null);
-				node.Children.Last().Options.SetPriority(OptionsExtension.DEFAULT_PRIORITY);
-
-				/// TODO Возможно, тут надо как-то обработать опцию core
-			}
-
 			if (Land.Contains(node.Symbol) || Land.Contains(node.Alias))
 			{
 				node.Options.Set(MarkupOption.GROUP_NAME, MarkupOption.LAND, null);

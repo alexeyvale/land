@@ -10,6 +10,7 @@ using Land.Markup.Binding;
 using Land.Markup.Relations;
 using Land.Markup.Tree;
 using Land.Markup.CoreExtension;
+using Land.Core.Specification;
 
 namespace Land.Markup
 {
@@ -113,7 +114,7 @@ namespace Land.Markup
 			DoWithMarkup((MarkupElement elem) =>
 			{
 				if (elem is ConcernPoint concernPoint
-					&& concernPoint.Context.FileContext.Name == fileName)
+					&& concernPoint.Context.FileName == fileName)
 				{
 					concernPoint.AstNode = stubNode;
 					concernPoint.HasIrrelevantLocation = true;
@@ -203,7 +204,7 @@ namespace Land.Markup
 			file.Root.Accept(visitor);
 
 			/// Группируем land-сущности по типу (символу)
-			foreach (var group in visitor.Land.GroupBy(l => l.Symbol))
+			foreach (var group in visitor.Land.GroupBy(l => l.UserifiedSymbol))
 			{
 				Remap(group.Key, file.Name, searchArea);
 
@@ -352,6 +353,16 @@ namespace Land.Markup
 			{
 				contextsSet.Add(point.Context);
 				contextsSet.UnionWith(point.Context.ClosestContext);
+
+				if(point.Context.SiblingsContext?.Before.Nearest != null)
+				{
+					contextsSet.Add(point.Context.SiblingsContext.Before.Nearest);
+				}
+
+				if (point.Context.SiblingsContext?.After.Nearest != null)
+				{
+					contextsSet.Add(point.Context.SiblingsContext.After.Nearest);
+				}
 			}
 
 			return contextsSet;
@@ -394,8 +405,6 @@ namespace Land.Markup
 						directoryUri.MakeRelativeUri(new Uri(group.Key)).ToString()
 					);
 
-					group.First().FileContext.Name = relatileName;
-
 					foreach(var e in group)
 					{
 						e.FileName = relatileName;
@@ -409,7 +418,6 @@ namespace Land.Markup
 				{
 					Markup = Markup,
 					PointContexts = pointContexts,
-					FileContexts = new HashSet<FileContext>(pointContexts.Select(e => e.FileContext)),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
@@ -424,8 +432,6 @@ namespace Land.Markup
 						Path.Combine(Path.GetDirectoryName(fileName), group.Key)
 					);
 
-					group.First().FileContext.Name = fullName;
-
 					foreach (var e in group)
 					{
 						e.FileName = fullName;
@@ -436,7 +442,7 @@ namespace Land.Markup
 			HasUnsavedChanges = false;
 		}
 
-		public void Deserialize(string fileName)
+		public void Deserialize(string fileName, Dictionary<string, Grammar> grammars)
 		{
 			Clear();
 
@@ -449,23 +455,16 @@ namespace Land.Markup
 					});
 
 				/// Фиксируем разметку
-				Markup = unit.Markup;
+				foreach (var elem in unit.Markup)
+				{
+					Markup.Add(elem);
+				}
 
 				/// Восстанавливаем обратные связи между потомками и предками,
 				/// восстанавливаем связи с контекстами
 				var concernPoints = GetConcernPoints().ToDictionary(e => e.Id, e => e);
 
                 #region Relative paths to absolute paths
-
-                foreach (var fc in unit.FileContexts)
-				{
-					if (!Path.IsPathRooted(fc.Name))
-					{
-						fc.Name = Path.GetFullPath(
-							Path.Combine(Path.GetDirectoryName(fileName), fc.Name)
-						);
-					}
-				}
 
 				foreach (var pc in unit.PointContexts)
 				{
@@ -479,7 +478,7 @@ namespace Land.Markup
 
                 #endregion
 
-                var fileContexts = unit.FileContexts.ToDictionary(e => e.Name, e => e);
+				SetGrammarBasedProperties(unit.PointContexts, grammars);
 
 				/// Связываем контексты с точками привязки в разметке
 				foreach (var context in unit.PointContexts)
@@ -490,37 +489,37 @@ namespace Land.Markup
 					}
 				}
 
-				/// Связываем файловые контексты с основными контекстами
-				/// Связываем контексты-описания ближайших с контекстами точек
-				foreach (var context in unit.PointContexts)
+				/// Если у каких-то точек нет ближайших, присваиваем пустой массив
+				foreach (var point in concernPoints.Values)
 				{
-					context.FileContext = fileContexts[context.FileName];
-
-					foreach (var pair in context.LinkedClosestPoints)
+					if (point.Context.ClosestContext == null)
 					{
-						if(concernPoints[pair.Item1].Context.ClosestContext == null)
-						{
-							concernPoints[pair.Item1].Context.ClosestContext = new List<PointContext>();
-						}
-
-						if(concernPoints[pair.Item1].Context.ClosestContext.Count <= pair.Item2)
-						{
-							concernPoints[pair.Item1].Context.ClosestContext.AddRange(Enumerable.Repeat<PointContext>(
-								null, pair.Item2 - concernPoints[pair.Item1].Context.ClosestContext.Count + 1)
-							);
-						}
-
-						concernPoints[pair.Item1].Context.ClosestContext[pair.Item2] = context;
+						point.Context.ClosestContext = new HashSet<PointContext>();
 					}
 				}
 
-				/// Если у каких-то точек нет ближайших, присваиваем пустой массив
-				foreach(var point in concernPoints.Values)
+				/// Связываем контексты-описания ближайших с контекстами точек
+				foreach (var context in unit.PointContexts)
 				{
-					if(point.Context.ClosestContext == null)
+					foreach (var id in context.LinkedClosestPoints)
 					{
-						point.Context.ClosestContext = new List<PointContext>();
+						concernPoints[id].Context.ClosestContext.Add(context);
 					}
+
+					foreach (var id in context.LinkedAfterNeighbours)
+					{
+						concernPoints[id].Context.SiblingsContext.Before.Nearest = context;
+					}
+
+					foreach (var id in context.LinkedBeforeNeighbours)
+					{
+						concernPoints[id].Context.SiblingsContext.After.Nearest = context;
+					}
+				}
+
+				foreach (var point in concernPoints.Values)
+				{
+					point.Context.LinkPoint(point.Id);
 				}
 
 				/// Восстанавливаем обратные связи между элементами разметки
@@ -542,6 +541,86 @@ namespace Land.Markup
 					Relations.AddExternalRelation(pair.RelationType, pair.Item0, pair.Item1);
 			}
 		}
+
+		private void SetGrammarBasedProperties(HashSet<PointContext> points, Dictionary<string, Grammar> grammars)
+        {
+			foreach (var group in points.GroupBy(p => Path.GetExtension(p.FileName)))
+			{
+				/// Все контексты заголовка, для которых нужно восстановить приоритеты и режимы сравнения
+				var headerContexts = group
+					.SelectMany(e => e.HeaderContext.Sequence)
+					.Concat(group.SelectMany(p => p.AncestorsContext.SelectMany(a => a.HeaderContext.Sequence)))
+					.ToList();
+				/// Все типы, для которых нам нужна информация о ядрах
+				var typesOfElementsWithHeaders = group
+					.Select(e => e.Type)
+					.Concat(group.SelectMany(p => p.AncestorsContext.Select(a => a.Type)))
+					.ToList();
+				/// Информация о приоритетах, установленных в секции опций
+				var priorities = grammars[group.Key].Options.GetSymbols(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY)
+					.ToDictionary(e => e, e => (double)grammars[group.Key].Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.PRIORITY, e).First());
+				/// Информация о ядрах заголовков
+				var cores = grammars[group.Key].Options.GetSymbols(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE)
+					.ToDictionary(e => e, e => new HashSet<string>(grammars[group.Key].Options.GetParams(MarkupOption.GROUP_NAME, MarkupOption.HEADERCORE, e).Select(el => (string)el)));
+
+				/// Сгруппированная по типам элементов заголовка информация
+				var typeBasedHeaderElementInfo = headerContexts
+					.Select(e => e.Type)
+					.Distinct()
+					.ToDictionary(e => e, e =>
+					{
+						/// Проверяем, не является ли текущий тип алиасом чего-нибудь
+						var aliasOf = grammars[group.Key].Aliases.Keys
+							.FirstOrDefault(k => grammars[group.Key].Aliases[k].Contains(e));
+
+						return new
+						{
+							ExactMatch = grammars[group.Key].Options.IsSet(MarkupOption.EXACTMATCH, e)
+								|| !String.IsNullOrEmpty(aliasOf) && grammars[group.Key].Options.IsSet(MarkupOption.EXACTMATCH, aliasOf),
+							Priority = priorities.ContainsKey(e) ? priorities[e]
+								: priorities.ContainsKey(aliasOf) ? priorities[aliasOf]
+									: e == Grammar.ANY_TOKEN_NAME ? 0 : CoreExtension.OptionsExtension.DEFAULT_PRIORITY
+						};
+					});
+
+				/// Проставляем нужные приоритеты и режимы сравнения
+				foreach (var elem in headerContexts)
+				{
+					elem.ExactMatch = typeBasedHeaderElementInfo[elem.Type].ExactMatch;
+					elem.Priority = typeBasedHeaderElementInfo[elem.Type].Priority;
+				}
+
+				/// Функция для определения ядер у заголовков
+				Action<HeaderContext, string> setCore = (header, type) =>
+				{
+					/// Информация о ядре связана либо с данным типом, либо с типом, алиасом которого является данный
+					var typeToCheck = cores.ContainsKey(type) ? type 
+						: grammars[group.Key].Aliases.Keys.FirstOrDefault(k => grammars[group.Key].Aliases[k].Contains(type));
+
+					var grouped = header.Sequence
+						.Select((e, i) => new { elem = e, idx = i })
+						.GroupBy(e => cores[typeToCheck] != null && cores[typeToCheck].Contains(e.elem.Type))
+						.ToDictionary(g => g.Key, g => g.ToList());
+
+					header.NonCoreIndices = grouped.ContainsKey(false)
+						? grouped[false].Select(e => e.idx).ToList()
+						: new List<int>();
+					header.CoreIndices = grouped.ContainsKey(true)
+						? grouped[true].Select(e => e.idx).ToList()
+						: new List<int>();
+				};
+
+				foreach (var elem in group)
+				{
+					setCore(elem.HeaderContext, elem.Type);
+
+					foreach (var ancestorElem in elem.AncestorsContext)
+					{
+						setCore(ancestorElem.HeaderContext, ancestorElem.Type);
+					}
+				}
+			}
+        }
 
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
@@ -649,7 +728,7 @@ namespace Land.Markup
 		{
 			var points = GetConcernPoints()
 				.Where(p => p.Context.Type == pointType
-					&& p.Context.FileContext.Name == fileName)
+					&& p.Context.FileName == fileName)
 				.ToList();
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();

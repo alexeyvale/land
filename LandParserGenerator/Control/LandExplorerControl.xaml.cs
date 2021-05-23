@@ -205,7 +205,7 @@ namespace Land.Control
 					{
 						Text = fileText,
 						Root = root,
-						BindingContext = PointContext.GetFileContext(point.Context.FileContext.Name, fileText)
+						Name = point.Context.FileName
 					})
 				: new List<RemapCandidateInfo>();
 		}
@@ -465,7 +465,7 @@ namespace Land.Control
 							{
 								segments.Add(new DocumentSegment()
 								{
-									FileName = cp.Context.FileContext.Name,
+									FileName = cp.Context.FileName,
 									StartOffset = cp.Location.Start.Offset,
 									EndOffset = cp.Location.End.Offset,
 									CaptureWholeLine = captureWholeLine
@@ -485,7 +485,7 @@ namespace Land.Control
 				{
 					segments.Add(new DocumentSegment()
 					{
-						FileName = concernPoint.Context.FileContext.Name,
+						FileName = concernPoint.Context.FileName,
 						StartOffset = concernPoint.Location.Start.Offset,
 						EndOffset = concernPoint.Location.End.Offset,
 						CaptureWholeLine = captureWholeLine
@@ -503,7 +503,7 @@ namespace Land.Control
 				ProcessAmbiguities(
 					MarkupManager.Remap(
 						cp.Context.Type, 
-						cp.Context.FileContext.Name, 
+						cp.Context.FileName, 
 						GetPointSearchArea()
 					),
 					false
