@@ -3,6 +3,14 @@ COMMENT_L	: '//' ~[\n\r]*
 COMMENT_ML	: '/*' .*? '*/'
 STRING_ESC	: '@'('"' ~["]* '"')+
 
+SECTIONS_SEPARATOR	: %linestart '%%'
+CATEGORY_NAME	:	%linestart ID
+STATE_TYPE		:	%linestart ('%x'|'%s')
+DECLARATION_START		:	%linestart '%'
+STATES_START			:	%linestart '<'
+INNER_STATES_START		:	'<'
+STATES_END				:	'>'
+
 ID	: [a-zA-Z0-9_]+
 
 REGEX_REPETITION : '{'[0-9]+(','[0-9]*)?'}'
@@ -17,26 +25,25 @@ REGEX_ITEM :  REGEX_REPETITION|REGEX_CLASS|REGEX_PREDEFINED_CHAR_CLASS|REGEX_CHA
 LINE_END	: '\r'?'\n'
 SPACE		: [\r\t ]
 
-CURVE_BRACKETED : %left '{' %right '}'
+file	=	declarations SECTIONS_SEPARATOR rules SECTIONS_SEPARATOR Any
 
-file	=	declarations '%%' rules '%%' Any
-
-declarations		=	(state_declaration|category_declaration|code_or_empty|other_declaration)*
-state_declaration	=	('%x'|'%s') id_list LINE_END
-other_declaration	=	'%' Any LINE_END
-category_declaration	=	ID regex_from_declaration LINE_END
+declarations			=	(state_declaration | category_declaration | other_declaration | direct_code | Any)*
+state_declaration		=	STATE_TYPE id_list LINE_END
+other_declaration		=	DECLARATION_START Any LINE_END
+category_declaration	=	CATEGORY_NAME regex_from_declaration LINE_END
 regex_from_declaration	=	Any
 
-rules			=	(group | rule | code_or_empty)*
-states			=	'<' (id_list|'*') '>'
+rules			=	(group | rule | direct_code | Any LINE_END)*
+states			=	(STATES_START | INNER_STATES_START) (id_list|'*') STATES_END
 id_list			=	ID (','? ID)*
 group			=	states? '{' (group|rule)* '}'
 rule			=	states? regex_list_from_rule context_code 
 regex_from_rule	=	(REGEX_ITEM | Any)+
 regex_list_from_rule	=	regex_from_rule ((SPACE|LINE_END)+ ('|' regex_from_rule)?)*
 
-context_code	=	'{' AnyInclude('\'{\'', '\'}\'') '}' | Any LINE_END
-code_or_empty	=	'%{' Any '%}' | SPACE+ (Any LINE_END | LINE_END)
+direct_code		=	'%{' AnyAvoid(STATES_START, SECTIONS_SEPARATOR) '%}' // Recovery when closing %} is missing
+context_code	=	block | Any LINE_END
+block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPARATOR)) | block) '}' // Recovery when closing } is missing
 
 %%
 
@@ -44,15 +51,16 @@ code_or_empty	=	'%{' Any '%}' | SPACE+ (Any LINE_END | LINE_END)
 	start file
 	skip COMMENT LINE_END SPACE
 	fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
+	recovery
 }
 
 %nodes {
 	leaf regex_from_declaration regex_from_rule states
 	ghost regex_list_from_rule
-	void LINE_END SPACE code_or_empty
+	void LINE_END SPACE
 }
 
 %markup {
 	land group rule
-	priority(0) '<' '>' ','
+	priority(0) STATES_START INNER_STATES_START STATES_END ','
 }

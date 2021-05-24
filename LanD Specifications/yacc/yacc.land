@@ -8,23 +8,23 @@ STRING_ESC	: '@'('"' ~["]* '"')+
 LITERAL		: '\'' ('\\\''|'\\\\'|.)*? '\''
 DECLARATION_CODE : '%{' (STRING|COMMENT|.)*? '%}'
 
-RULE_HEADER : %linestart ID
-ID : [_a-zA-Z][_0-9a-zA-Z]*
-DECLARATION_NAME : '%'ID
+RULE_HEADER	: %linestart ID
+ID	: [_a-zA-Z][_0-9a-zA-Z]*
+DECLARATION_NAME	: '%'ID
+SECTIONS_SEPARATOR	: %linestart '%%'
 
-grammar 		=	declaration* '%%' (rule | Any)* grammar_ending
-grammar_ending	=	('%%' Any)?
+grammar 		=	(declaration | Any)* SECTIONS_SEPARATOR (rule | Any)* (SECTIONS_SEPARATOR Any)?
 
-declaration		=	symbol_declaration | other_declaration | Any
+declaration		=	symbol_declaration | other_declaration
 symbol_declaration = symbol_declaration_header symbol_declaration_element+
 symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%type' | '%start') ('<' ID '>')?
 symbol_declaration_element = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
 
-rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'
+rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'? // Recovery when ; is missing
 alternative		=    (alternative_element | block)*
-alternative_element    =    ID | LITERAL | '%prec'
-block			=	'{' (AnyAvoid(RULE_HEADER)|block)+ '}'
+alternative_element    =	ID | LITERAL | '%prec'
+block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recovery when closing } is missing
 
 %%
 

@@ -4,9 +4,9 @@
 
 // GPPG version 1.5.2
 // Machine:  DESKTOP-QMIGNCH
-// DateTime: 22.10.2019 20:46:26
+// DateTime: 24.05.2021 19:09:15
 // UserName: Алексей
-// Input file <./Land.y - 22.10.2019 20:46:26>
+// Input file <./Land.y - 24.05.2021 19:09:14>
 
 // options: no-lines gplex
 
@@ -78,14 +78,14 @@ public class ScanObj {
 [GeneratedCodeAttribute( "Gardens Point Parser Generator", "1.5.2")]
 public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
 {
-  // Verbatim content from ./Land.y - 22.10.2019 20:46:26
+  // Verbatim content from ./Land.y - 24.05.2021 19:09:14
     public Parser(AbstractScanner<ValueType, SegmentLocation> scanner) : base(scanner) { }
     
     public Grammar ConstructedGrammar;
     public List<Message> Log = new List<Message>();
     
     private HashSet<string> Aliases = new HashSet<string>();
-  // End verbatim content from ./Land.y - 22.10.2019 20:46:26
+  // End verbatim content from ./Land.y - 24.05.2021 19:09:14
 
 #pragma warning disable 649
   private static Dictionary<int, string> aliases;
@@ -127,7 +127,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
     states[22] = new State(-56);
     states[23] = new State(-57);
     states[24] = new State(-58);
-    states[25] = new State(new int[]{6,26,7,-59,11,-59});
+    states[25] = new State(new int[]{5,26,7,-59,11,-59});
     states[26] = new State(new int[]{30,22,22,23,24,24,25,25},new int[]{-17,27,-13,29,-12,30});
     states[27] = new State(new int[]{7,28,11,20});
     states[28] = new State(-61);
@@ -262,7 +262,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
     rules[58] = new Rule(-13, new int[]{24});
     rules[59] = new Rule(-13, new int[]{25});
     rules[60] = new Rule(-13, new int[]{-12});
-    rules[61] = new Rule(-12, new int[]{25,6,-17,7});
+    rules[61] = new Rule(-12, new int[]{25,5,-17,7});
     rules[62] = new Rule(-8, new int[]{-8,-6});
     rules[63] = new Rule(-8, new int[]{});
     rules[64] = new Rule(-6, new int[]{25});
@@ -592,7 +592,7 @@ public class Parser: ShiftReduceParser<ValueType, Land.Core.SegmentLocation>
       case 60: // argument -> argument_group
 { CurrentSemanticValue.dynamicVal = ValueStack[ValueStack.Depth-1].argGroupVal; }
         break;
-      case 61: // argument_group -> ID, LROUND_BRACKET, args, RROUND_BRACKET
+      case 61: // argument_group -> ID, ARGS_LROUND_BRACKET, args, RROUND_BRACKET
 { 
 			CurrentSemanticValue.argGroupVal = new ArgumentGroup()
 			{

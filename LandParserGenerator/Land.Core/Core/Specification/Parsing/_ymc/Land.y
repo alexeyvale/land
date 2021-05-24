@@ -406,7 +406,7 @@ argument
 	;
 
 argument_group
-	: ID LROUND_BRACKET args RROUND_BRACKET 
+	: ID ARGS_LROUND_BRACKET args RROUND_BRACKET 
 		{ 
 			$$ = new ArgumentGroup()
 			{
