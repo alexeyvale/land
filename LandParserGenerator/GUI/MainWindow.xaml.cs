@@ -1072,6 +1072,22 @@ namespace Land.GUI
 
 				MappingDebug_SimilaritiesList.ItemsSource = candidates;
 
+				if (candidates.Any())
+				{
+					var weights = candidates.First().Weights;
+					MappingDebug_SimilarityInfo.Text = weights != null
+						? String.Join(Environment.NewLine, 
+							new List<string>{
+								$"wCore(H) = {weights[ContextType.HeaderCore]}",
+								$"wNotCore(H) = {weights[ContextType.HeaderNonCore]}",
+								$"wS = {weights[ContextType.Ancestors]}",
+								$"wI = {weights[ContextType.Inner]}",
+								$"wN = {weights[ContextType.Siblings]}" 
+							}
+						)
+						: "Simple rebinding";
+				}
+
 				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);
 
 				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева

@@ -16,9 +16,7 @@ namespace Land.Markup.Binding
 
 		public double AncestorSimilarity { get; set; }
 		public double InnerSimilarity { get; set; }
-
-		public double SiblingsAllSimilarity { get; set; }
-		public double SiblingsNearestSimilarity { get; set; }
+		public double SiblingsSimilarity { get; set; }
 
 		public double? Similarity { get; set; }
 		public Dictionary<ContextType, double> Weights { get; set; }
@@ -32,8 +30,9 @@ namespace Land.Markup.Binding
 		{
 			return $"{String.Format("{0:f4}", Similarity)} [Core(H): {String.Format("{0:f2}", HeaderCoreSimilarity)}; " +
 				$"NotCore(H): {String.Format("{0:f2}", HeaderNonCoreSimilarity)}; " +
-				$"A: {String.Format("{0:f2}", AncestorSimilarity)}; " +
-				$"I: {String.Format("{0:f2}", InnerSimilarity)}]";
+				$"S: {String.Format("{0:f2}", AncestorSimilarity)}; " +
+				$"I: {String.Format("{0:f2}", InnerSimilarity)}; " +
+				$"N: {String.Format("{0:f2}", SiblingsSimilarity)}]";
 		}
 	}
 }

@@ -15,8 +15,7 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		SiblingsAll,
-		SiblingsNearest
+		Siblings
 	}
 
 	public class ContextFinder
@@ -530,7 +529,7 @@ namespace Land.Markup.Binding
 											evaluationResults[unmappedContext].Where(c=>!c.Deleted),
 											c =>
 											{
-												c.SiblingsNearestSimilarity =
+												c.SiblingsSimilarity =
 													LocationManager.GetSimilarity(unmappedContext, c.Context);
 											}
 										);
@@ -629,14 +628,14 @@ namespace Land.Markup.Binding
 					{
 						if (checkAllSiblings)
 						{
-							c.SiblingsAllSimilarity = EvalSimilarity(
+							c.SiblingsSimilarity = EvalSimilarity(
 								point.SiblingsContext,
 								c.Context.SiblingsContext
 							);
 						}
 						else
 						{
-							c.SiblingsNearestSimilarity =
+							c.SiblingsSimilarity =
 								LocationManager.GetSimilarity(point, c.Context);
 						}
 					}
@@ -683,8 +682,7 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.SiblingsAll] * c.SiblingsAllSimilarity
-						+ finalWeights[ContextType.SiblingsNearest] * c.SiblingsNearestSimilarity)
+						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
@@ -1150,7 +1148,7 @@ namespace Land.Markup.Binding
 
 					if (checkAllSiblings)
 					{
-						c.SiblingsAllSimilarity =
+						c.SiblingsSimilarity =
 							(EvalSimilarity_old(point.SiblingsContext_old.Item1, c.Context.SiblingsContext_old.Item1)
 							+ EvalSimilarity_old(point.SiblingsContext_old.Item2, c.Context.SiblingsContext_old.Item2)) / 2.0;
 					}
