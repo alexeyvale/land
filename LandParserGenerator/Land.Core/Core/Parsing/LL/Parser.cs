@@ -256,6 +256,7 @@ namespace Land.Core.Parsing.LL
 			/// В итоге первым терминалом, который окажется на стеке, должен быть Any
 			/// Подменяем свежесгенерированный узел для Any на переданный извне
 			anyNode.Options = stackTop.Options.Clone();
+			anyNode.Arguments = stackTop.Arguments.Clone();
 			var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
 			stackTop.Parent.ReplaceChild(anyNode, anyIndex);
 			Stack.Pop();
