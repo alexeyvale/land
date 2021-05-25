@@ -12,6 +12,7 @@ using Microsoft.Win32;
 
 using Land.Core.Parsing.Preprocessing;
 using Land.Control.Helpers;
+using System.Runtime.Serialization;
 
 namespace Land.Control
 {
@@ -57,6 +58,62 @@ namespace Land.Control
 		private void DialogResult_Cancel_Click(object sender, RoutedEventArgs e)
 		{
 			this.DialogResult = false;
+		}
+
+		private void ImportSettings_Click(object sender, RoutedEventArgs e)
+		{
+			var openFileDialog = new OpenFileDialog()
+			{
+				AddExtension = true,
+				DefaultExt = "xml",
+				Filter = "Файлы XML (*.xml)|*.xml|Все файлы (*.*)|*.*"
+			};
+
+			if (openFileDialog.ShowDialog() == true)
+			{
+				if (File.Exists(openFileDialog.FileName))
+				{
+					try
+					{
+						var serializer = new DataContractSerializer(
+							typeof(LandExplorerSettings),
+							new Type[] { typeof(ParserSettingsItem) }
+						);
+
+						using (FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open))
+						{
+							SettingsObject = (LandExplorerSettings)serializer.ReadObject(fs);
+							InitializeComponent();
+							GrammarsGrid.ItemsSource = SettingsObject.Parsers;
+						}
+					}
+					catch 
+					{}
+				}
+			}
+		}
+
+		private void ExportSettings_Click(object sender, RoutedEventArgs e)
+		{
+			var saveFileDialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				DefaultExt = "xml",
+				Filter = "Файлы XML (*.xml)|*.xml|Все файлы (*.*)|*.*"
+			};
+
+			if (saveFileDialog.ShowDialog() == true)
+			{
+				var serializer = new DataContractSerializer(
+					typeof(LandExplorerSettings),
+					new Type[] { typeof(ParserSettingsItem) }
+				);
+
+				using (FileStream fs = new FileStream(saveFileDialog.FileName, FileMode.Create))
+				{
+					serializer.WriteObject(fs, SettingsObject);
+				}
+			}
 		}
 
 		private void GrammarsGrid_Add_Click(object sender, RoutedEventArgs e)

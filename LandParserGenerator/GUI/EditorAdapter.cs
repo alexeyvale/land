@@ -16,11 +16,14 @@ namespace Land.GUI
 		private const string DEFAULT_LINE_END = "\r\n";
 
 		private MainWindow EditorWindow { get; set; }
-		private Action<string> DocumentSavingCallback { get; set; }
+		private LandExplorerControl Control { get; set; }
 
-		public EditorAdapter(MainWindow window)
+		public EditorAdapter(MainWindow window, LandExplorerControl control)
 		{
 			EditorWindow = window;
+			Control = control;
+
+			Control.Initialize(this);
 		}
 
 		#region IEditorAdapter
