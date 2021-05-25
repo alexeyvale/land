@@ -575,10 +575,10 @@ namespace Land.Markup
 
 						return new
 						{
-							ExactMatch = grammars[group.Key].Options.IsSet(MarkupOption.EXACTMATCH, e)
-								|| !String.IsNullOrEmpty(aliasOf) && grammars[group.Key].Options.IsSet(MarkupOption.EXACTMATCH, aliasOf),
+							ExactMatch = grammars[group.Key].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH, e)
+								|| !String.IsNullOrEmpty(aliasOf) && grammars[group.Key].Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.EXACTMATCH, aliasOf),
 							Priority = priorities.ContainsKey(e) ? priorities[e]
-								: priorities.ContainsKey(aliasOf) ? priorities[aliasOf]
+								: !String.IsNullOrEmpty(aliasOf) && priorities.ContainsKey(aliasOf) ? priorities[aliasOf]
 									: e == Grammar.ANY_TOKEN_NAME ? 0 : CoreExtension.OptionsExtension.DEFAULT_PRIORITY
 						};
 					});

@@ -159,12 +159,12 @@ namespace Comparison
 					var isModifiedAuto = modifiedResult.FirstOrDefault()?.IsAuto ?? false;
 					var isBasicAuto = basicResult.FirstOrDefault()?.IsAuto ?? false;
 
-					var sameFirst = basicResult.Count == 0 && modifiedResult.Count == 0 ||
-						basicResult.Any(e=>!e.Deleted) && modifiedResult.Any(e => !e.Deleted) &&
-						modifiedResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old
-							.SequenceEqual(basicResult.First(e => !e.Deleted).Context.HeaderContext.Sequence_old);
+					var sameFirst = basicResult.Count == 0 && modifiedResult.Count == 0 
+						|| basicResult.Count > 0 && modifiedResult.Count > 0
+							&& modifiedResult.First().Context.HeaderContext.Sequence_old
+								.SequenceEqual(basicResult.First().Context.HeaderContext.Sequence_old);
 
-					var hasNotChanged = isModifiedAuto && File.ReadAllText(Path.Combine(MarkupFolder, cp.Context.FileName)).Substring(
+					var hasNotChanged = isModifiedAuto && !cp.AstNode.Options.GetNotUnique() && File.ReadAllText(Path.Combine(BaseFolder, cp.Context.FileName)).Substring(
 						cp.AstNode.Location.Start.Offset,
 						cp.AstNode.Location.Length.Value
 					) == searchArea.First(f=>f.Name == modifiedRemapResult[cp][0].File.Name).Text.Substring(
@@ -181,8 +181,8 @@ namespace Comparison
 
 						var reportLines = new List<string>();
 
-						reportLines.Add($"file:///{BaseFolder}\\{cp.Context.FileContext.Name}");
-						reportLines.Add($"file:///{ModifiedFolder}\\{cp.Context.FileContext.Name}");
+						reportLines.Add($"file:///{BaseFolder}\\{cp.Context.FileName}");
+						reportLines.Add($"file:///{ModifiedFolder}\\{cp.Context.FileName}");
 						reportLines.Add("*");
 
 						reportLines.Add($"{String.Join(" ", cp.Context.HeaderContext.Sequence_old)}     {cp.Context.Line}");
