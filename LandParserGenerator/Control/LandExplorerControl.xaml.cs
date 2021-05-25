@@ -376,7 +376,7 @@ namespace Land.Control
 		private void LoadSettings()
 		{
 			/// Загружаем настройки панели способом, определённым в адаптере
-			SettingsObject = Editor.LoadSettings(SETTINGS_DEFAULT_PATH)
+			SettingsObject = Editor.LoadSettings() 
 				?? new LandExplorerSettings() { Id = Guid.NewGuid() };
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов

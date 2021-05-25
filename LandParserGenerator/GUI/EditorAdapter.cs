@@ -196,7 +196,7 @@ namespace Land.GUI
 			}
 		}
 
-		public void SaveSettings(LandExplorerSettings settings, string defaultPath)
+		public void SaveSettings(LandExplorerSettings settings)
 		{
 			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) });
 
@@ -207,7 +207,7 @@ namespace Land.GUI
 			}
 		}
 
-		public LandExplorerSettings LoadSettings(string defaultPath)
+		public LandExplorerSettings LoadSettings()
 		{
 			if (File.Exists(SettingsPath))
 			{

@@ -106,9 +106,9 @@ namespace Land.Control
 
 		#region Settings
 
-		void SaveSettings(LandExplorerSettings settings, string defaultPath);
+		void SaveSettings(LandExplorerSettings settings);
 
-		LandExplorerSettings LoadSettings(string defaultPath);
+		LandExplorerSettings LoadSettings();
 
 		event Action ShouldLoadSettings;
 

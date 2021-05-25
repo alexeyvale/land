@@ -291,9 +291,7 @@ namespace Land.Control
 
 				LogAction(() => ReloadParsers(), true, true);
 
-				Editor.SaveSettings(
-					SettingsObject, SETTINGS_DEFAULT_PATH
-				);
+				Editor.SaveSettings(SettingsObject);
 			}
 		}
 
