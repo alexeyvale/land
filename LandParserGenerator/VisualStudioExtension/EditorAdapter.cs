@@ -242,47 +242,6 @@ namespace Land.VisualStudioExtension
 
 		public string WorkingDirectory { get; set; }
 
-		public void SaveSettings(LandExplorerSettings settings, string defaultPath)
-		{
-			DataContractSerializer serializer = new DataContractSerializer(
-				typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) }
-			);
-
-			var settingsPath = Directory.Exists(WorkingDirectory) 
-				? Path.Combine(WorkingDirectory, LandExplorerControl.SETTINGS_FILE_NAME) 
-				: defaultPath;
-
-			using (FileStream fs = new FileStream(settingsPath, FileMode.Create))
-			{
-				serializer.WriteObject(fs, settings);
-			}
-		}
-
-		public LandExplorerSettings LoadSettings(string defaultPath)
-		{
-			var settingsPath = Directory.Exists(WorkingDirectory)
-				? Path.Combine(WorkingDirectory, LandExplorerControl.SETTINGS_FILE_NAME)
-				: defaultPath;
-
-			if (File.Exists(settingsPath))
-			{
-				DataContractSerializer serializer = new DataContractSerializer(
-					typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) }
-				);
-
-				using (FileStream fs = new FileStream(settingsPath, FileMode.Open))
-				{
-					return (LandExplorerSettings)serializer.ReadObject(fs);
-				}
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		public event Action ShouldLoadSettings;
-
 		#endregion
 
 		public void RegisterOnDocumentChanged(Action<string> callback)

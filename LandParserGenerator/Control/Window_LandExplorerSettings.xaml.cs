@@ -135,7 +135,9 @@ namespace Land.Control
 					var dependenciesWindow = new Window_LibraryDependencies(item.PreprocessorPath, item.PreprocessorDependencies);
 
 					if (dependenciesWindow.ShowDialog() ?? false)
+					{
 						item.PreprocessorDependencies = dependenciesWindow.Selected;
+					}
 				}
 			});
 		}

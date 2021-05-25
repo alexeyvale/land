@@ -17,6 +17,9 @@ using Land.Markup;
 using Land.Markup.Binding;
 using Land.Control.Helpers;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using System.Text;
+using Land.Control.Properties;
 
 namespace Land.Control
 {
@@ -55,10 +58,6 @@ namespace Land.Control
 			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control";
 		private static readonly string CACHE_DIRECTORY =
 			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\LanD Control\Cache";
-		public static readonly string SETTINGS_FILE_NAME = "LandExplorerSettings.xml";
-
-		public static string SETTINGS_DEFAULT_PATH => 
-			Path.Combine(APP_DATA_DIRECTORY, SETTINGS_FILE_NAME);
 
 		public static readonly Color HighlightingColor = Color.FromArgb(60, 100, 200, 100);
 
@@ -171,7 +170,6 @@ namespace Land.Control
 		{
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
-			Editor.ShouldLoadSettings += OnShouldLoadSettings;
 
 			/// Загружаем настройки панели разметки
 			LoadSettings();
@@ -368,16 +366,24 @@ namespace Land.Control
 
 		#region Settings
 
-		private void OnShouldLoadSettings()
-		{
-			FrontendUpdateDispatcher.Invoke(LoadSettings);
-		}
-
 		private void LoadSettings()
 		{
-			/// Загружаем настройки панели способом, определённым в адаптере
-			SettingsObject = Editor.LoadSettings() 
-				?? new LandExplorerSettings() { Id = Guid.NewGuid() };
+			var serializer = new DataContractSerializer(
+				typeof(LandExplorerSettings),
+				new Type[] { typeof(ParserSettingsItem) }
+			);
+
+			if (String.IsNullOrEmpty(Settings.Default.SerializedSettings))
+			{
+				SettingsObject = new LandExplorerSettings() { Id = Guid.NewGuid() };
+			}
+			else
+			{
+				using (var memStm = new MemoryStream(Encoding.UTF8.GetBytes(Settings.Default.SerializedSettings)))
+				{
+					SettingsObject = (LandExplorerSettings)serializer.ReadObject(memStm);
+				}
+			}
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);

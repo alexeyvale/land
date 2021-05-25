@@ -93,14 +93,20 @@ namespace Land.Control
 
 		private void Button_SelectAll_Click(object sender, RoutedEventArgs e)
 		{
-			foreach(var dep in PossibleDependencies.Where(d => d.Exists))
+			foreach (var dep in PossibleDependencies.Where(d => d.Exists))
+			{
 				dep.IsSelected = true;
+				Selected.Add(dep.Path);
+			}
 		}
 
 		private void Button_Reset_Click(object sender, RoutedEventArgs e)
 		{
-			foreach (var dep in PossibleDependencies.Where(d=>d.Exists))
+			foreach (var dep in PossibleDependencies.Where(d => d.Exists))
+			{
 				dep.IsSelected = false;
+				Selected.Remove(dep.Path);
+			}
 		}
 
 		private void PossibleDependenciesList_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

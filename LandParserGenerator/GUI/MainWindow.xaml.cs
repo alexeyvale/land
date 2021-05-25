@@ -112,7 +112,7 @@ namespace Land.GUI
 			}
 
 			/// Загружаем настройки панели разметки
-			EditorAdapter = new EditorAdapter(this, LandExplorerControl.SETTINGS_DEFAULT_PATH);
+			EditorAdapter = new EditorAdapter(this);
 			LandExplorer.Initialize(EditorAdapter);
 
 			/// Инициализирующие действия для массового парсинга

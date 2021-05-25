@@ -104,17 +104,6 @@ namespace Land.Control
 		#endregion
 
 
-		#region Settings
-
-		void SaveSettings(LandExplorerSettings settings);
-
-		LandExplorerSettings LoadSettings();
-
-		event Action ShouldLoadSettings;
-
-		#endregion
-
-
 		#region Callbacks
 
 		void RegisterOnDocumentChanged(Action<string> callback);

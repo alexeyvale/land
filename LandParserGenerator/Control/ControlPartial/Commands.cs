@@ -1,12 +1,16 @@
-﻿using Land.Core;
+﻿using Land.Control.Properties;
+using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Markup.Tree;
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -291,7 +295,22 @@ namespace Land.Control
 
 				LogAction(() => ReloadParsers(), true, true);
 
-				Editor.SaveSettings(SettingsObject);
+				var serializer = new DataContractSerializer(
+					typeof(LandExplorerSettings),
+					new Type[] { typeof(ParserSettingsItem) }
+				);
+
+				using (var memStm = new MemoryStream())
+				{
+					serializer.WriteObject(memStm, SettingsObject);
+					memStm.Seek(0, SeekOrigin.Begin);
+
+					using (var streamReader = new StreamReader(memStm))
+					{
+						Settings.Default.SerializedSettings = streamReader.ReadToEnd();
+						Settings.Default.Save();
+					}
+				}
 			}
 		}
 

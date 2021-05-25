@@ -16,15 +16,11 @@ namespace Land.GUI
 		private const string DEFAULT_LINE_END = "\r\n";
 
 		private MainWindow EditorWindow { get; set; }
-		private string SettingsPath { get; set; }
 		private Action<string> DocumentSavingCallback { get; set; }
 
-		public EditorAdapter(MainWindow window, string settingsPath)
+		public EditorAdapter(MainWindow window)
 		{
 			EditorWindow = window;
-			SettingsPath = settingsPath;
-
-			RefreshSettingsFileWatcher();
 		}
 
 		#region IEditorAdapter
@@ -195,78 +191,6 @@ namespace Land.GUI
 				document.Value.SegmentsColorizer.ResetSegments();
 			}
 		}
-
-		public void SaveSettings(LandExplorerSettings settings)
-		{
-			DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) });
-
-			using (FileStream fs = new FileStream(SettingsPath, FileMode.Create))
-			{
-				serializer.WriteObject(fs, settings);
-				SettingsWereSaved = true;
-			}
-		}
-
-		public LandExplorerSettings LoadSettings()
-		{
-			if (File.Exists(SettingsPath))
-			{
-				DataContractSerializer serializer = new DataContractSerializer(typeof(LandExplorerSettings), new Type[] { typeof(ParserSettingsItem) });
-
-				using (FileStream fs = new FileStream(SettingsPath, FileMode.Open, FileAccess.Read))
-				{
-					try
-					{
-						var settings = (LandExplorerSettings)serializer.ReadObject(fs);
-
-						if (SettingsFileWatcher.Path != Path.GetDirectoryName(SettingsPath))
-							SettingsFileWatcher.Path = Path.GetDirectoryName(SettingsPath);
-
-						return settings;
-					}
-					catch
-					{
-						return null;
-					}
-				}
-			}
-			else
-			{
-				return null;
-			}
-		}
-
-		private FileSystemWatcher SettingsFileWatcher { get; set; }
-
-		private bool SettingsWereSaved { get; set; }
-
-		private void RefreshSettingsFileWatcher()
-		{
-			SettingsFileWatcher?.Dispose();
-
-			SettingsFileWatcher = new FileSystemWatcher(Path.GetDirectoryName(SettingsPath));
-			SettingsFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
-			SettingsFileWatcher.Changed += SettingsFileChanged_Handler;
-			SettingsFileWatcher.EnableRaisingEvents = true;
-		}
-
-		private void SettingsFileChanged_Handler(object sender, FileSystemEventArgs e)
-		{
-			if (e.FullPath == SettingsPath)
-			{
-				var fileInfo = new FileInfo(SettingsPath);
-
-				if (fileInfo.Length > 0)
-				{
-					if(!SettingsWereSaved)
-						ShouldLoadSettings?.Invoke();
-					else
-						SettingsWereSaved = false;
-				}
-			}
-		}
-
-		public event Action ShouldLoadSettings;
 
 		public void RegisterOnDocumentChanged(Action<string> callback)
 		{
