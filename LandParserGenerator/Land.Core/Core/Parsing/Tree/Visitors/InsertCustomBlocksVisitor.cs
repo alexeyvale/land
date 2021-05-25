@@ -40,8 +40,8 @@ namespace Land.Core.Parsing.Tree
 
 			var node = NodeGenerator.Generate(Grammar.CUSTOM_BLOCK_RULE_NAME);
 
-			node.AddLastChild(NodeGenerator.Generate(block.Start));
-			node.AddLastChild(NodeGenerator.Generate(block.End));
+			node.AddLastChild(block.Start);
+			node.AddLastChild(block.End);
 
 			return node;
 		}
