@@ -98,11 +98,15 @@
             </DataGrid>
         </DockPanel>
 
-        <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" VerticalAlignment="Bottom" Grid.Row="2">
-			<Button Margin="0, 0, 10, 0" Width="80" Click="DialogResult_Ok_Click">Сохранить</Button>
-			<Button Margin="0, 0, 60, 0" Width="80" Click="DialogResult_Cancel_Click">Отмена</Button>
-			<Button Margin="0, 0, 10, 0" Width="80" Click="ImportSettings_Click">Импорт</Button>
-			<Button Width="80" Click="ExportSettings_Click">Экспорт</Button>
-		</StackPanel>
-    </Grid>
+		<DockPanel Grid.Row="2">
+			<StackPanel DockPanel.Dock="Left" Orientation="Horizontal" FlowDirection="LeftToRight" Margin="0 6 0 0">
+				<Button Margin="0, 0, 10, 0" Width="80" Click="DialogResult_Ok_Click">Сохранить</Button>
+				<Button Margin="0, 0, 60, 0" Width="80" Click="DialogResult_Cancel_Click">Отмена</Button>
+			</StackPanel>
+			<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" FlowDirection="RightToLeft" Margin="0 6 0 0">
+				<Button Margin="0, 0, 10, 0" Width="80" Click="ExportSettings_Click">Экспорт</Button>
+				<Button Width="80" Click="ImportSettings_Click">Импорт</Button>
+			</StackPanel>
+		</DockPanel>
+	</Grid>
 </Window>
