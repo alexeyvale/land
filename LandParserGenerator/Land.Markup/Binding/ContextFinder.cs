@@ -593,7 +593,7 @@ namespace Land.Markup.Binding
 				Levenshtein(point.HeaderContext.Core, candidate.Context.HeaderContext.Core);
 
 			candidate.AncestorSimilarity =
-				Math.Pow(Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext), 2);
+				Levenshtein(point.AncestorsContext, candidate.Context.AncestorsContext);
 			candidate.InnerSimilarity =
 				EvalSimilarity(point.InnerContext, candidate.Context.InnerContext);
 		}
