@@ -1020,7 +1020,11 @@ namespace Land.Markup.Binding
 				/// из-за полной похожести предков и заголовка
 				if(!result.Contains(mayBeConfused[0]))
 				{
-					result.RemoveAt(result.Count - 1);
+					if (result.Count == MAX_COUNT)
+					{
+						result.RemoveAt(result.Count - 1);
+					}
+
 					result.Add(mayBeConfused[0]);
 				}
 			}
