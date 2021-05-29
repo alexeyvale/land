@@ -658,7 +658,7 @@ namespace Land.Markup.Binding
 			{
 				var current = stack.Pop();
 
-				if (current.Children.Count > 0)
+				if (current.Type != Grammar.ANY_TOKEN_NAME && current.Children.Count > 0)
 				{
 					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{

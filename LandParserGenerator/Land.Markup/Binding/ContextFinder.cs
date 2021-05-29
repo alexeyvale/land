@@ -210,7 +210,7 @@ namespace Land.Markup.Binding
 			SearchType searchType)
 		{
 			var candidates = new Dictionary<string, List<RemapCandidateInfo>>();
-			var ancestorToSiblings = new Dictionary<Node, List<Node>>();
+			var ancestorToSiblings = new Dictionary<Node, AncestorSiblingsPair>();
 
 			/// Инициализируем коллекции кандидатов для каждого типа
 			foreach (var type in points.Keys)
@@ -258,11 +258,7 @@ namespace Land.Markup.Binding
 								if (ancestor != null)
 								{
 									pair = ancestorToSiblings.ContainsKey(ancestor)
-										? new AncestorSiblingsPair
-										{
-											Ancestor = ancestor,
-											Siblings = ancestorToSiblings[ancestor]
-										}
+										? ancestorToSiblings[ancestor]
 										: new AncestorSiblingsPair
 										{
 											Ancestor = ancestor
@@ -280,7 +276,7 @@ namespace Land.Markup.Binding
 
 								if (ancestor != null && !ancestorToSiblings.ContainsKey(ancestor))
 								{
-									ancestorToSiblings[ancestor] = pair.Siblings;
+									ancestorToSiblings[ancestor] = pair;
 								}
 							}
 

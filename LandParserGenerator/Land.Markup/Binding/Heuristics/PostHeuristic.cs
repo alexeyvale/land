@@ -218,8 +218,8 @@ namespace Land.Markup.Binding
 
 	public class TuneSiblingsAllWeightAsFrequentlyChanging : IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.9;
-		const double BAD_SIM = 0.7;
+		const double GOOD_SIM = 0.8;
+		const double BAD_SIM = 0.6;
 
 		public Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
