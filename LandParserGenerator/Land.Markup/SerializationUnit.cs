@@ -8,11 +8,17 @@ using Land.Markup.Binding;
 
 namespace Land.Markup
 {
+	public struct AncestorsPointsPair
+	{
+		public List<AncestorsContextElement> Ancestors { get; set; }
+		public List<PointContext> Points { get; set; }
+	}
+
 	public struct SerializationUnit
 	{
 		public ObservableCollection<MarkupElement> Markup { get; set; }
 
-		public HashSet<PointContext> PointContexts { get; set; }
+		public List<AncestorsPointsPair> PointContexts { get; set; }
 
 		public List<RelatedPair<MarkupElement>> ExternalRelatons { get; set; }
 	}

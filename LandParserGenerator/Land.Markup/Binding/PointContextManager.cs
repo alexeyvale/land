@@ -9,6 +9,7 @@ namespace Land.Markup.Binding
 	public class PointContextManager
 	{
 		private Dictionary<Node, PointContext> Cache { get; set; } = new Dictionary<Node, PointContext>();
+		private Dictionary<string, Dictionary<Node, List<AncestorsContextElement>>> Ancestors { get; set; } = new Dictionary<string, Dictionary<Node, List<AncestorsContextElement>>>();
 
 		public PointContext GetContext(
 			Node node,
@@ -16,7 +17,22 @@ namespace Land.Markup.Binding
 		{
 			if (!Cache.ContainsKey(node))
 			{
-				Cache[node] = PointContext.GetCoreContext(node, file);
+				var ancestor = PointContext.GetAncestor(node);
+
+				var cachedAncestorsContext = ancestor != null && Ancestors.ContainsKey(file.Name) && Ancestors[file.Name].ContainsKey(ancestor)
+					? Ancestors[file.Name][ancestor] : null;
+
+				Cache[node] = PointContext.GetCoreContext(node, file, cachedAncestorsContext);
+
+				if (cachedAncestorsContext == null && ancestor != null)
+				{
+					if (!Ancestors.ContainsKey(file.Name))
+					{
+						Ancestors[file.Name] = new Dictionary<Node, List<AncestorsContextElement>>();
+					}
+
+					Ancestors[file.Name][ancestor] = Cache[node].AncestorsContext;
+				}
 			}
 
 			return Cache[node];
@@ -30,25 +46,46 @@ namespace Land.Markup.Binding
 		{
 			if (!Cache.ContainsKey(node))
 			{
-				return Cache[node] = PointContext
-					.GetExtendedContext(node, file, siblingsArgs, closestArgs);
+				var ancestor = PointContext.GetAncestor(node);
+
+				var cachedAncestorsContext = ancestor != null && Ancestors.ContainsKey(file.Name) && Ancestors[file.Name].ContainsKey(ancestor)
+					? Ancestors[file.Name][ancestor] : null;
+
+				Cache[node] = PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, null, cachedAncestorsContext);
+
+				if (cachedAncestorsContext == null && ancestor != null)
+				{
+					if (!Ancestors.ContainsKey(file.Name))
+					{
+						Ancestors[file.Name] = new Dictionary<Node, List<AncestorsContextElement>>();
+					}
+
+					Ancestors[file.Name][ancestor] = Cache[node].AncestorsContext;
+				}
+
+				return Cache[node];
 			}
 			else
 			{
-				return PointContext.GetExtendedContext(
-					node, file, siblingsArgs, closestArgs, Cache[node]
-				);
+				return PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, Cache[node]);
 			}
 		}
 
 		public void ClearCache(string fileName)
 		{
-			var keysToRemove = Cache.Where(e => e.Value.FileName == fileName)
-				.Select(e=>e.Key).ToList();
+			var keysToRemove = Cache
+				.Where(e => e.Value.FileName == fileName)
+				.Select(e => e.Key)
+				.ToList();
 
-			foreach(var key in keysToRemove)
+			foreach (var key in keysToRemove)
 			{
 				Cache.Remove(key);
+			}
+
+			if (Ancestors.ContainsKey(fileName))
+			{
+				Ancestors.Remove(fileName);
 			}
 		}
 	}

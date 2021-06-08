@@ -3,12 +3,13 @@ DOCTYPE_DECL	: '<!' (DOCTYPE_DECL|STRING|.)*? '>'
 CDATA			: '<![CDATA[' .*? ']]>'
 PROCESS_INSTR	: %left ('<?'|'<?xml')	%right '?>'
 
-ID		: [_a-zA-Z][-._a-zA-Z0-9]*
+ID		: [_a-zA-Z\u0430-\u044F\u0410-\u042F][-._a-zA-Z\u0430-\u044F\u0410-\u042F0-9]*
 STRING	: '"' ~[<"]*? '"' | '\'' ~[<']*? '\''
 
-file		=	xml_prolog? (tag|Any)*
+file		=	xml_prolog? (element|Any)*
 xml_prolog	=	'<?xml' attribute* '?>'
-tag			=	'<' name attribute* ('>' (tag|Any)* '</' name '>' | '/>')
+element			=	'<' name attribute* ('>' (element|Any)* closing_tag | '/>')
+closing_tag	=	'</' name '>'
 attribute	=	name '=' STRING
 name		=	ID (':' ID)*
 
@@ -20,5 +21,12 @@ name		=	ID (':' ID)*
 }
 
 %nodes {
-	leaf name
+	leaf name attribute closing_tag
+}
+
+%markup {
+	land element
+	headercore(name) element
+	priority(0) '<' '>' '/>' closing_tag
+	notUnique element
 }

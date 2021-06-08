@@ -33,12 +33,9 @@ namespace Land.Markup
 			ContextFinder.SetHeuristic(typeof(TuneSiblingsAllWeightAsFrequentlyChanging));
 			ContextFinder.SetHeuristic(typeof(TuneSiblingsNearestWeight));
 			ContextFinder.SetHeuristic(typeof(TuneInnerWeightAccordingToLength));
-			///ContextFinder.SetHeuristic(typeof(TuneSiblingsAllWeightAccordingToLength));
 			ContextFinder.SetHeuristic(typeof(TuneAncestorsWeight));
 			ContextFinder.SetHeuristic(typeof(TuneHeaderWeight));
 			ContextFinder.SetHeuristic(typeof(DefaultWeightsHeuristic));
-
-			//ContextFinder.SetHeuristic(typeof(TuneSimilarityByNeighbours));
 
 			#endregion
 		}
@@ -354,14 +351,10 @@ namespace Land.Markup
 				contextsSet.Add(point.Context);
 				contextsSet.UnionWith(point.Context.ClosestContext);
 
-				if(point.Context.SiblingsContext?.Before.Nearest != null)
+				if(point.Context.SiblingsContext != null)
 				{
-					contextsSet.Add(point.Context.SiblingsContext.Before.Nearest);
-				}
-
-				if (point.Context.SiblingsContext?.After.Nearest != null)
-				{
-					contextsSet.Add(point.Context.SiblingsContext.After.Nearest);
+					contextsSet.UnionWith(point.Context.SiblingsContext.Before.Nearest);
+					contextsSet.UnionWith(point.Context.SiblingsContext.After.Nearest);
 				}
 			}
 
@@ -417,11 +410,15 @@ namespace Land.Markup
 				var unit = new SerializationUnit()
 				{
 					Markup = Markup,
-					PointContexts = pointContexts,
+					PointContexts = pointContexts
+						.GroupBy(c => c.AncestorsContext)
+						.Select(c => new AncestorsPointsPair { Ancestors = c.Key, Points = c.ToList()})
+						.ToList(),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
-				fs.Write(JsonConvert.SerializeObject(unit, Formatting.Indented));
+				fs.Write(JsonConvert.SerializeObject(unit, Formatting.Indented, 
+					new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
 			}
 
 			if (useRelativePaths)
@@ -453,11 +450,23 @@ namespace Land.Markup
 					{
 						Converters = { new MarkupElementConverter() }
 					});
+				var pointContexts = new List<PointContext>();
 
 				/// Фиксируем разметку
 				foreach (var elem in unit.Markup)
 				{
 					Markup.Add(elem);
+				}
+
+				/// Восстанавливаем связи с предками
+				foreach(var pair in unit.PointContexts)
+				{
+					pointContexts.AddRange(pair.Points);
+
+					foreach (var context in pair.Points)
+					{
+						context.AncestorsContext = pair.Ancestors;
+					}
 				}
 
 				/// Восстанавливаем обратные связи между потомками и предками,
@@ -466,7 +475,7 @@ namespace Land.Markup
 
                 #region Relative paths to absolute paths
 
-				foreach (var pc in unit.PointContexts)
+				foreach (var pc in pointContexts)
 				{
 					if (!Path.IsPathRooted(pc.FileName))
 					{
@@ -478,10 +487,10 @@ namespace Land.Markup
 
                 #endregion
 
-				SetGrammarBasedProperties(unit.PointContexts, grammars);
+				SetGrammarBasedProperties(pointContexts, grammars);
 
 				/// Связываем контексты с точками привязки в разметке
-				foreach (var context in unit.PointContexts)
+				foreach (var context in pointContexts)
 				{
 					foreach(var id in context.LinkedPoints)
 					{
@@ -489,17 +498,29 @@ namespace Land.Markup
 					}
 				}
 
-				/// Если у каких-то точек нет ближайших, присваиваем пустой массив
+				/// Если у каких-то точек нет ближайших или соседей, присваиваем пустой массив
 				foreach (var point in concernPoints.Values)
 				{
 					if (point.Context.ClosestContext == null)
 					{
 						point.Context.ClosestContext = new HashSet<PointContext>();
 					}
+
+					if(point.Context.SiblingsContext != null)
+					{
+						if(point.Context.SiblingsContext.Before.Nearest == null)
+						{
+							point.Context.SiblingsContext.Before.Nearest = new List<PointContext>();
+						}
+						if (point.Context.SiblingsContext.After.Nearest == null)
+						{
+							point.Context.SiblingsContext.After.Nearest = new List<PointContext>();
+						}
+					}
 				}
 
 				/// Связываем контексты-описания ближайших с контекстами точек
-				foreach (var context in unit.PointContexts)
+				foreach (var context in pointContexts)
 				{
 					foreach (var id in context.LinkedClosestPoints)
 					{
@@ -508,12 +529,12 @@ namespace Land.Markup
 
 					foreach (var id in context.LinkedAfterNeighbours)
 					{
-						concernPoints[id].Context.SiblingsContext.Before.Nearest = context;
+						concernPoints[id].Context.SiblingsContext.Before.Nearest.Add(context);
 					}
 
 					foreach (var id in context.LinkedBeforeNeighbours)
 					{
-						concernPoints[id].Context.SiblingsContext.After.Nearest = context;
+						concernPoints[id].Context.SiblingsContext.After.Nearest.Add(context);
 					}
 				}
 
@@ -542,7 +563,7 @@ namespace Land.Markup
 			}
 		}
 
-		private void SetGrammarBasedProperties(HashSet<PointContext> points, Dictionary<string, Grammar> grammars)
+		private void SetGrammarBasedProperties(IEnumerable<PointContext> points, Dictionary<string, Grammar> grammars)
         {
 			foreach (var group in points.GroupBy(p => Path.GetExtension(p.FileName)))
 			{

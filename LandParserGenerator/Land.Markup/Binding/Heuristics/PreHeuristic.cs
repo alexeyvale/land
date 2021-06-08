@@ -25,20 +25,6 @@ namespace Land.Markup.Binding
 		private static readonly Func<PointContext, PointContext, bool> AncestorsSequencePredicate = (a, b) =>
 			a.AncestorsContext.SequenceEqual(b.AncestorsContext);
 
-		private class AncestorsCoreEqualityComparer : IEqualityComparer<AncestorsContextElement>
-		{
-			public bool Equals(AncestorsContextElement x, AncestorsContextElement y)
-			{
-				return x.HeaderContext.Core.Count > 0 && x.HeaderContext.EqualsByCore(y.HeaderContext)
-					|| x.HeaderContext.Equals(y.HeaderContext);
-			}
-
-			public int GetHashCode(AncestorsContextElement obj)
-			{
-				throw new NotImplementedException();
-			}
-		}
-
 		public RemapCandidateInfo GetSameElement(
 			PointContext point,
 			List<RemapCandidateInfo> candidates)

@@ -13,7 +13,8 @@ namespace Land.Markup.Binding
 			{ContextType.HeaderNonCore,  1},
 			{ContextType.Inner, 1},
 			{ContextType.Ancestors, 2},
-			{ContextType.Siblings, 0.5}
+			{ContextType.SiblingsAll, 0.5},
+			{ContextType.SiblingsNearest, 0.5}
 		};
 
 		public static double Get(ContextType contextType) =>
@@ -69,9 +70,8 @@ namespace Land.Markup.Binding
 					|| source.HeaderContext.NonCore.Count > 0,
 				[ContextType.Ancestors] = (candidates.Any(c => c.Context.AncestorsContext.Count > 0)
 					|| source.AncestorsContext.Count > 0),
-				[ContextType.Siblings] = (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)
-					? source.SiblingsContext?.Before.All.TextLength > 0 || source.SiblingsContext?.After.All.TextLength > 0
-					: true
+				[ContextType.SiblingsAll] = (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false),
+				[ContextType.SiblingsNearest] = true
 			};
 
 			foreach (var kvp in existenceFlags)
@@ -230,13 +230,35 @@ namespace Land.Markup.Binding
 			{
 				if (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)
 				{
-					if (weights[ContextType.Siblings].HasValue) return weights;
+					if (weights[ContextType.SiblingsAll].HasValue) return weights;
 
-					var maxSimilarity = candidates.Max(c => c.SiblingsSimilarity);
+					/// Отбираем кандидатов с наилучшей похожестью предков
+					var bestAncestorCandidates = candidates
+						.GroupBy(c => c.Context.AncestorsContext)
+						.OrderByDescending(g => g.First().AncestorSimilarity)
+						.First()
+						.ToList();
+					/// Среди них отбираем наиболее похожих
+					var bestCandidates = bestAncestorCandidates
+						.GroupBy(c => c.HeaderCoreSimilarity * (weights[ContextType.HeaderCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderCore)) 
+							+ c.HeaderNonCoreSimilarity * (weights[ContextType.HeaderNonCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderNonCore))
+							+ c.InnerSimilarity * (weights[ContextType.Inner] ?? DefaultWeightsProvider.Get(ContextType.Inner)))
+						.OrderByDescending(g => g.Key)
+						.First()
+						.ToList();
+					
+					if (bestCandidates.Count > 1)
+					{
+						var maxSimilarity = bestCandidates.Max(c => c.SiblingsAllSimilarity);
 
-					weights[ContextType.Siblings] = maxSimilarity < BAD_SIM ? 0
-						: maxSimilarity > GOOD_SIM ? 1
-						: (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
+						weights[ContextType.SiblingsAll] = maxSimilarity < BAD_SIM ? 0
+							: maxSimilarity > GOOD_SIM ? 1
+							: (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
+					}
+					else
+					{
+						weights[ContextType.SiblingsAll] = 0;
+					}
 				}
 				else
 				{ }
@@ -255,15 +277,10 @@ namespace Land.Markup.Binding
 		{
 			if (candidates.Count > 0)
 			{
-				if (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)
-				{ }
-				else
-				{
-					if (weights[ContextType.Siblings].HasValue) return weights;
+				if (weights[ContextType.SiblingsNearest].HasValue) return weights;
 
-					weights[ContextType.Siblings] = 
-						candidates.Max(c => c.SiblingsSimilarity) == 1 ? 2 : 0;
-				}
+				weights[ContextType.SiblingsNearest] =
+					candidates.Max(c => c.SiblingsNearestSimilarity) == 1 ? 2 : 0;
 			}
 
 			return weights;
@@ -285,36 +302,6 @@ namespace Land.Markup.Binding
 
 			weights[ContextType.Inner] *= source.InnerContext.Content.TextLength /
 				Math.Max(source.InnerContext.Content.TextLength, LENGTH_THRESHOLD);
-
-			return weights;
-		}
-	}
-
-	public class TuneSiblingsAllWeightAccordingToLength : IWeightsHeuristic
-	{
-		const double LENGTH_THRESHOLD = 200;
-
-		public Dictionary<ContextType, double?> TuneWeights(
-			PointContext source,
-			List<RemapCandidateInfo> candidates,
-			Dictionary<ContextType, double?> weights)
-		{
-			if (candidates.Count > 0)
-			{
-				if (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false)
-				{
-					if (weights[ContextType.Siblings] == 0) return weights;
-
-					DefaultWeightsProvider.Init(weights, ContextType.Siblings);
-
-					var maxLength = Math.Max(
-						source.SiblingsContext.Before.All.TextLength,
-						source.SiblingsContext.After.All.TextLength
-					);
-
-					weights[ContextType.Siblings] *= maxLength / Math.Max(maxLength, LENGTH_THRESHOLD);
-				}
-			}
 
 			return weights;
 		}

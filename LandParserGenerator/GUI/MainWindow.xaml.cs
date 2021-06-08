@@ -1081,7 +1081,8 @@ namespace Land.GUI
 								$"wNotCore(H) = {weights[ContextType.HeaderNonCore]}",
 								$"wS = {weights[ContextType.Ancestors]}",
 								$"wI = {weights[ContextType.Inner]}",
-								$"wN = {weights[ContextType.Siblings]}" 
+								$"wNearest(N) = {weights[ContextType.SiblingsNearest]}",
+								$"wAll(N) = {weights[ContextType.SiblingsAll]}"
 							}
 						)
 						: "Simple rebinding";

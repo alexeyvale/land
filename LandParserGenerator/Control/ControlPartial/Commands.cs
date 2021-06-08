@@ -153,7 +153,8 @@ namespace Land.Control
 				AddExtension = true,
 				DefaultExt = "landmark",
 				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*",
-				FileName = MarkupFilePath
+				InitialDirectory = Path.GetDirectoryName(MarkupFilePath),
+				FileName = Path.GetFileName(MarkupFilePath)
 			};
 
 

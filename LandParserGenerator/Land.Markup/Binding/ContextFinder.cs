@@ -15,7 +15,8 @@ namespace Land.Markup.Binding
 		HeaderNonCore,
 		Ancestors,
 		Inner,
-		Siblings
+		SiblingsAll,
+		SiblingsNearest
 	}
 
 	public class ContextFinder
@@ -313,7 +314,6 @@ namespace Land.Markup.Binding
 			}
 
 			var checkSiblings = searchType == SearchType.Local && !UseOldApproach;
-			var checkAllSiblings = checkSiblings && (candidates.FirstOrDefault()?.Node.Options.GetNotUnique() ?? false);
 			var checkClosest = searchType == SearchType.Local && !UseOldApproach;
 
 			/// Запоминаем соответствие контекстов точкам привязки
@@ -330,17 +330,10 @@ namespace Land.Markup.Binding
 
 			if(checkSiblings)
 			{
-				foreach(var context in contextsToPoints.Keys)
+				foreach (var context in contextsToPoints.Keys)
 				{
-					if(context.SiblingsContext.Before.Nearest != null)
-					{
-						auxiliaryContexts.Add(context.SiblingsContext.Before.Nearest);
-					}
-
-					if (context.SiblingsContext.After.Nearest != null)
-					{
-						auxiliaryContexts.Add(context.SiblingsContext.After.Nearest);
-					}
+					auxiliaryContexts.AddRange(context.SiblingsContext.Before.Nearest);
+					auxiliaryContexts.AddRange(context.SiblingsContext.After.Nearest);
 				}
 			}
 
@@ -349,9 +342,7 @@ namespace Land.Markup.Binding
 				.ToList();
 
 			/// Запоминаем, каким элементам какой элемент предшествовал
-			LocationManager = !checkAllSiblings 
-				? new LocationManager(contextsToPoints.Keys.Concat(auxiliaryContexts)) 
-				: null;
+			LocationManager = new LocationManager(contextsToPoints.Keys.Concat(auxiliaryContexts));
 
 			/// Результаты поиска элемента, которые вернём пользователю
 			var result = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
@@ -484,7 +475,7 @@ namespace Land.Markup.Binding
 				foreach (var context in unmapped.ToList())
 				{
 					var actualCandidates = evaluationResults[context]
-						.Where(c=>!c.Deleted)
+						.Where(c => !c.Deleted)
 						.ToList();
 
 					if (actualCandidates.Count > 0)
@@ -519,13 +510,13 @@ namespace Land.Markup.Binding
 
 								foreach (var unmappedContext in unmapped)
 								{
-									if(LocationManager != null)
+									if (LocationManager != null)
 									{
 										Parallel.ForEach(
-											evaluationResults[unmappedContext].Where(c=>!c.Deleted),
+											evaluationResults[unmappedContext].Where(c => !c.Deleted),
 											c =>
 											{
-												c.SiblingsSimilarity =
+												c.SiblingsNearestSimilarity =
 													LocationManager.GetSimilarity(unmappedContext, c.Context);
 											}
 										);
@@ -622,17 +613,11 @@ namespace Land.Markup.Binding
 
 					if (checkSiblings && point.SiblingsContext != null)
 					{
+						c.SiblingsNearestSimilarity = LocationManager.GetSimilarity(point, c.Context);
+
 						if (checkAllSiblings)
 						{
-							c.SiblingsSimilarity = EvalSimilarity(
-								point.SiblingsContext,
-								c.Context.SiblingsContext
-							);
-						}
-						else
-						{
-							c.SiblingsSimilarity =
-								LocationManager.GetSimilarity(point, c.Context);
+							c.SiblingsAllSimilarity = EvalSimilarity(point.SiblingsContext, c.Context.SiblingsContext);
 						}
 					}
 				}
@@ -678,7 +663,8 @@ namespace Land.Markup.Binding
 						+ finalWeights[ContextType.Inner] * c.InnerSimilarity
 						+ finalWeights[ContextType.HeaderNonCore] * c.HeaderNonCoreSimilarity
 						+ finalWeights[ContextType.HeaderCore] * c.HeaderCoreSimilarity
-						+ finalWeights[ContextType.Siblings] * c.SiblingsSimilarity)
+						+ finalWeights[ContextType.SiblingsNearest] * c.SiblingsNearestSimilarity
+						+ finalWeights[ContextType.SiblingsAll] * c.SiblingsAllSimilarity)
 					/ finalWeights.Values.Sum();
 				c.Weights = finalWeights;
 			});
@@ -838,10 +824,11 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)
 		{
-			var score = a.Hash != null && b.Hash != null
+			var score = a.Text != null && b.Text != null
+				? Levenshtein(a.Text, b.Text)
+				: a.Hash != null && b.Hash != null
 					? FuzzyHashing.CompareHashes(a.Hash, b.Hash)
-					: a.Text != null && b.Text != null
-						? Levenshtein(a.Text, b.Text) : 0;
+					: 0;
 
 			return score < FuzzyHashing.MIN_TEXT_LENGTH / (double)TextOrHash.MAX_TEXT_LENGTH
 				? 0 : score;
@@ -857,8 +844,7 @@ namespace Land.Markup.Binding
 			var beforeSimilarity = EvalSimilarity(a.Before.All, b.Before.All);
 			var afterSimilarity = EvalSimilarity(a.After.All, b.After.All);
 
-			return (beforeSimilarity * a.Before.All.TextLength + afterSimilarity * a.After.All.TextLength) /
-				(double)(a.Before.All.TextLength + a.After.All.TextLength);
+			return (beforeSimilarity + afterSimilarity) / 2;
 		}
 
 		#endregion
@@ -1144,7 +1130,7 @@ namespace Land.Markup.Binding
 
 					if (checkAllSiblings)
 					{
-						c.SiblingsSimilarity =
+						c.SiblingsAllSimilarity =
 							(EvalSimilarity_old(point.SiblingsContext_old.Item1, c.Context.SiblingsContext_old.Item1)
 							+ EvalSimilarity_old(point.SiblingsContext_old.Item2, c.Context.SiblingsContext_old.Item2)) / 2.0;
 					}
