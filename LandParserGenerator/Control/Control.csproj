@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlPartial\Tabs\RelationTab.cs" />
+    <Compile Include="Helpers\SettingsSerializer.cs" />
     <Compile Include="Models\ParserInfo.cs" />
     <Compile Include="Parsing\CacheAction.cs" />
     <Compile Include="Parsing\ParserManager.cs" />

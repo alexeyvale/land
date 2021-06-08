@@ -268,6 +268,25 @@ namespace Land.Control
 			Command_New_Executed(null, null);
         }
 
+		/// <summary>
+		/// Заданы ли настройки панели разметки
+		/// </summary>
+		public bool AreSettingsSet() =>
+			SettingsObject?.Parsers != null && SettingsObject.Parsers.Count > 0;
+
+		/// <summary>
+		/// Импорт настроек
+		/// </summary>
+		public void ImportSettings(string fileName)
+		{
+			SettingsObject = SettingsSerializer.Deserialize(fileName, true);
+
+			Settings.Default.SerializedSettings = SettingsSerializer.Serialize(SettingsObject);
+			Settings.Default.Save();
+
+			LogAction(() => ReloadParsers(), true, true);
+		}
+
 		#endregion
 
 		#region Status

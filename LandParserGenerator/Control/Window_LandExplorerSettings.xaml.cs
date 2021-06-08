@@ -26,6 +26,7 @@ namespace Land.Control
 		public Window_LandExplorerSettings(LandExplorerSettings settingsObject)
 		{
 			SettingsObject = settingsObject;
+
 			InitializeComponent();
 		}
 
@@ -71,63 +72,7 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				if (File.Exists(openFileDialog.FileName))
-				{
-					try
-					{
-						var serializer = new DataContractSerializer(
-							typeof(LandExplorerSettings),
-							new Type[] { typeof(ParserSettingsItem) }
-						);
-
-						using (FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open))
-						{
-							SettingsObject = (LandExplorerSettings)serializer.ReadObject(fs);						
-						}
-
-						/// Если в файле прописаны относительные пути, разворачиваем их в абсолютные
-						/// относительно пути к файлу настроек
-						Func<string, string> getRootedPath = (p)=> Path.GetFullPath(
-							Path.Combine(Path.GetDirectoryName(openFileDialog.FileName), p)
-						);
-
-						foreach (var parser in SettingsObject.Parsers)
-						{
-							if(!Path.IsPathRooted(parser.ParserPath))
-							{
-								parser.ParserPath = getRootedPath(parser.ParserPath);
-							}
-
-							if (!Path.IsPathRooted(parser.PreprocessorPath))
-							{
-								parser.PreprocessorPath = getRootedPath(parser.PreprocessorPath);
-							}
-
-							foreach(var dep in parser.ParserDependencies.ToList())
-							{
-								if (!Path.IsPathRooted(dep))
-								{
-									parser.ParserDependencies.Remove(dep);
-									parser.ParserDependencies.Add(getRootedPath(dep));
-								}
-							}
-
-							foreach (var dep in parser.PreprocessorDependencies.ToList())
-							{
-								if (!Path.IsPathRooted(dep))
-								{
-									parser.PreprocessorDependencies.Remove(dep);
-									parser.PreprocessorDependencies.Add(getRootedPath(dep));
-								}
-							}
-						}
-
-						InitializeComponent();
-						GrammarsGrid.ItemsSource = SettingsObject.Parsers;
-					}
-					catch 
-					{}
-				}
+				SettingsObject = SettingsSerializer.Deserialize(openFileDialog.FileName, true);
 			}
 		}
 
