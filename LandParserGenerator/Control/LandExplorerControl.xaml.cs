@@ -287,6 +287,16 @@ namespace Land.Control
 			LogAction(() => ReloadParsers(), true, true);
 		}
 
+		public void Rebind(ContextFinder.SearchType searchType)
+		{
+			ApplyMapping_Click(
+				searchType == ContextFinder.SearchType.Local
+					? ApplyMappingLocal 
+					: ApplyMappingGlobal,
+				null
+			);
+		}
+
 		#endregion
 
 		#region Status

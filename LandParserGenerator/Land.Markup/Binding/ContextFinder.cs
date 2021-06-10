@@ -775,8 +775,7 @@ namespace Land.Markup.Binding
 
 					foreach (var fileName in groupedPoints.Keys)
 					{
-						/// При поиске в том же файле ищем тот же файл по полному совпадению пути,
-						/// если не находим - берём файлы, похожие по содержимому
+						/// При поиске в том же файле ищем тот же файл по полному совпадению пути
 						files = searchArea.Where(f => f.Name == fileName).ToList();
 
 						var localResult = DoMultiTypeSearch(groupedPoints[fileName], files, searchType);
