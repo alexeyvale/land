@@ -38,12 +38,12 @@ states			=	(STATES_START | INNER_STATES_START) (id_list|'*') STATES_END
 id_list			=	ID (','? ID)*
 group			=	states? '{' (group|rule)* '}'
 rule			=	states? regex_list_from_rule context_code 
-regex_from_rule	=	(REGEX_ITEM | Any)+
-regex_list_from_rule	=	regex_from_rule ((SPACE|LINE_END)+ ('|' regex_from_rule)?)*
+regex_from_rule	=	(REGEX_ITEM | CATEGORY_NAME | STATE_TYPE | DECLARATION_START | STATES_END | ID | STRING_ESC | UNDEFINED)+
+regex_list_from_rule	=	regex_from_rule ('|' regex_from_rule)* (SPACE|LINE_END)+
 
 direct_code		=	'%{' AnyAvoid(STATES_START, SECTIONS_SEPARATOR) '%}' // Recovery when closing %} is missing
 context_code	=	block | Any LINE_END
-block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPARATOR)) | block) '}' // Recovery when closing } is missing
+block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPARATOR)) | block)* '}' // Recovery when closing } is missing
 
 %%
 
