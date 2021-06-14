@@ -287,14 +287,14 @@ namespace Land.Control
 			LogAction(() => ReloadParsers(), true, true);
 		}
 
-		public void Rebind(ContextFinder.SearchType searchType)
+		public void RebindLocally()
 		{
-			ApplyMapping_Click(
-				searchType == ContextFinder.SearchType.Local
-					? ApplyMappingLocal 
-					: ApplyMappingGlobal,
-				null
-			);
+			ApplyMapping_Click(ApplyMappingLocal, null);
+		}
+
+		public void RebindGlobally()
+		{
+			ApplyMapping_Click(ApplyMappingGlobal, null);
 		}
 
 		#endregion
