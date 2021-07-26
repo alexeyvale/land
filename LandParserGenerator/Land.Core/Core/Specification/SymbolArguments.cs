@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Land.Core.Specification
 {
-	public enum AnyArgument { Include, Except, Avoid, IgnorePairs }
+	public enum AnyArgument { Include, Except, Avoid, IgnorePairs, Error }
 
 	[Serializable]
 	public class SymbolArguments

@@ -374,6 +374,15 @@ namespace Land.Markup.Binding
 	{
 		public SiblingsContextPart Before { get; set; }
 		public SiblingsContextPart After { get; set; }
+
+		public int CountBefore { get; set; }
+		public int CountAfter { get; set; }
+		public int CountTotal { get; set; }
+
+		[JsonIgnore]
+		public int CountInside => CountTotal - CountAfter - CountBefore;
+		[JsonIgnore]
+		public bool IsSimplified => Before == null;
 	}
 
 	public class SiblingsContextPart
@@ -384,13 +393,20 @@ namespace Land.Markup.Binding
 		public List<PointContext> Nearest { get; set; }
 
 		[JsonIgnore]
-		public bool IsNotEmpty => All.TextLength > 0;
+		public bool IsNotEmpty => All?.TextLength > 0;
 	}
 
-	public class AncestorSiblingsPair
+	public class SiblingsContextConstructionCache
 	{
 		public Node Ancestor { get; set; }
 		public List<Node> Siblings { get; set; }
+		public Dictionary<string, List<BorderPoint>> Neighbours { get; set; }
+	}
+
+	public class BorderPoint
+	{
+		public int Offset { get; set; }
+		public Node Node { get; set; }
 	}
 
 	public class PointContext
@@ -532,15 +548,13 @@ namespace Land.Markup.Binding
 
 			if (closestArgs != null && core.ClosestContext == null)
 			{
-				core.ClosestContext = GetClosestContext(
-					node, file, core,
-					closestArgs.SearchArea, closestArgs.GetParsed, closestArgs.ContextFinder
-				);
+				core.ClosestContext = GetClosestContext(node, file, core, closestArgs);
 			}
 
-			if (siblingsArgs !=null && core.SiblingsContext == null)
+			/// Конструируем контекст соседей, если его нет или если он создан в упрощённом порядке
+			if (siblingsArgs !=null && (core.SiblingsContext == null || core.SiblingsContext.IsSimplified))
 			{
-				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs.ContextFinder);
+				core.SiblingsContext = GetSiblingsContext(node, file, siblingsArgs);
 
 				#region Old
 
@@ -725,14 +739,14 @@ namespace Land.Markup.Binding
 		public static Tuple<List<ContextElement>, List<ContextElement>> GetSiblingsContext_old(
 			Node node,
 			ParsedFile file,
-			AncestorSiblingsPair pair = null)
+			SiblingsContextConstructionCache cache = null)
 		{
 			Node ancestor = null;
 			List<Node> siblings = null;
 
-			if (pair?.Ancestor != null)
+			if (cache?.Ancestor != null)
 			{
-				ancestor = pair.Ancestor;
+				ancestor = cache.Ancestor;
 				goto SkipParentSearch;
 			}
 
@@ -750,16 +764,16 @@ namespace Land.Markup.Binding
 				);
 		}
 
-			if (pair != null)
+			if (cache != null)
 			{
-				pair.Ancestor = ancestor;
+				cache.Ancestor = ancestor;
 			}
 
 		SkipParentSearch:
 
-			if (pair?.Siblings != null)
+			if (cache?.Siblings != null)
 			{
-				siblings = pair.Siblings.ToList();
+				siblings = cache.Siblings.ToList();
 				goto SkipSiblingsSearch;
 			}
 
@@ -778,9 +792,9 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			if (pair != null)
+			if (cache != null)
 			{
-				pair.Siblings = siblings.ToList();
+				cache.Siblings = siblings.ToList();
 			}
 
 		SkipSiblingsSearch:
@@ -819,18 +833,59 @@ namespace Land.Markup.Binding
 		public static SiblingsContext GetSiblingsContext(
 			Node node, 
 			ParsedFile file,
-			ContextFinder contextFinder,
-			AncestorSiblingsPair pair = null)
+			SiblingsConstructionArgs args,
+			SiblingsContextConstructionCache cache = null)
 		{
+			List<BorderPoint> neighbours = null;
+
+			if (cache?.Neighbours != null && cache.Neighbours.ContainsKey(node.Type))
+			{
+				neighbours = cache.Neighbours[node.Type];
+			}
+			else
+			{
+				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
+				file.Root.Accept(visitor);
+
+				neighbours = visitor.Grouped[node.Type].SelectMany(e => new List<BorderPoint>
+				{
+					new BorderPoint
+					{
+						Node = e,
+						Offset = e.Location.Start.Offset,
+					},
+					new BorderPoint
+					{
+						Node = e,
+						Offset = e.Location.End.Offset,
+					},
+				}).OrderBy(e=>e.Offset).ToList();
+
+				if (cache != null)
+				{
+					if(cache.Neighbours == null)
+					{
+						cache.Neighbours = new Dictionary<string, List<BorderPoint>>();
+					}
+
+					cache.Neighbours[node.Type] = neighbours;
+				}
+			}
+
+			var markedElementIndicesInNeighbours = neighbours
+				.Select((n, i) => new { Element = n, Index = i })
+				.Where(e => e.Element.Node == node)
+				.ToList();
+
 			var checkAllSiblings = node.Options.GetNotUnique();
-			const int MAX_SIBLINGS_COUNT = 2;
+			const int MAX_COUNT = 1;
 
 			Node ancestor = null;
 			List<Node> siblings = null;
 
-			if (pair?.Ancestor != null)
+			if (cache?.Ancestor != null)
 			{
-				ancestor = pair.Ancestor;
+				ancestor = cache.Ancestor;
 				goto SkipParentSearch;
 			}
 
@@ -839,7 +894,7 @@ namespace Land.Markup.Binding
 				?? (node != file.Root ? file.Root : null);
 
 			/// Если при подъёме дошли до неостровного корня, 
-			/// и сам элемент не является этим корнем
+			/// и сам элемент является этим корнем
 			if (ancestor == null)
 			{
 				return new SiblingsContext
@@ -857,16 +912,16 @@ namespace Land.Markup.Binding
 				};
 			}
 
-			if(pair != null)
+			if(cache != null)
 			{
-				pair.Ancestor = ancestor;
+				cache.Ancestor = ancestor;
 			}
 
 		SkipParentSearch:
 
-			if(pair?.Siblings != null)
+			if(cache?.Siblings != null)
 			{
-				siblings = pair.Siblings.ToList();
+				siblings = cache.Siblings.ToList();
 				goto SkipSiblingsSearch;
 			}
 
@@ -884,9 +939,9 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			if(pair != null)
+			if(cache != null)
 			{
-				pair.Siblings = siblings.ToList();
+				cache.Siblings = siblings.ToList();
 			}
 
 		SkipSiblingsSearch:
@@ -916,9 +971,9 @@ namespace Land.Markup.Binding
 			if (checkAllSiblings)
 			{
 				var afterSiblings = siblings
-				.Skip(markedElementIndex)
-				.Where(n => n.Location != null)
-				.ToList();
+					.Skip(markedElementIndex)
+					.Where(n => n.Location != null)
+					.ToList();
 
 				foreach (var part in afterSiblings
 					.Select(n => file.Text.Substring(n.Location.Start.Offset, n.Location.Length.Value)))
@@ -927,31 +982,46 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			var beforeNeighbors = siblings
-				.Take(markedElementIndex)
+			var beforeNeighbors = neighbours
+				.Take(markedElementIndicesInNeighbours[0].Index)
 				.Reverse()
-				.Where(e => e.Type == node.Type && e.Location != null)
-				.Take(MAX_SIBLINGS_COUNT)
+				.Where(e => e.Node.Location != null)
 				.ToList();
-			var afterNeighbours = siblings
-				.Skip(markedElementIndex + 1)
-				.Where(e => e.Type == node.Type && e.Location != null)
-				.Take(MAX_SIBLINGS_COUNT)
+
+			var afterNeighbours = neighbours
+				.Skip(markedElementIndicesInNeighbours[1].Index + 1)
+				.Where(e => e.Node.Location != null)
 				.ToList();
 
 			var context = new SiblingsContext
 			{
-				Before = new SiblingsContextPart
+				Before = !args.CountOnly ? new SiblingsContextPart
 				{
 					All = checkAllSiblings ? new TextOrHash(beforeBuilder.ToString()) : null,
-					Nearest = beforeNeighbors.Select(e => contextFinder.ContextManager.GetContext(e, file)).ToList()
-				},
+					Nearest = beforeNeighbors.Take(MAX_COUNT).Select(e => 
+						args.ContextFinder.ContextManager.GetContext(e.Node, file, new SiblingsConstructionArgs
+						{
+							ContextFinder = args.ContextFinder,
+							CountOnly = true
+						}, null)
+					).ToList()
+				} : null,
 
-				After = new SiblingsContextPart
+				After = !args.CountOnly ? new SiblingsContextPart
 				{
 					All = checkAllSiblings ? new TextOrHash(afterBuilder.ToString()) : null,
-					Nearest = afterNeighbours.Select(e => contextFinder.ContextManager.GetContext(e, file)).ToList()
-				}
+					Nearest = afterNeighbours.Take(MAX_COUNT).Select(e => 
+						args.ContextFinder.ContextManager.GetContext(e.Node, file, new SiblingsConstructionArgs
+						{
+							ContextFinder = args.ContextFinder,
+							CountOnly = true
+						}, null)
+					).ToList()
+				} : null,
+
+				CountBefore = beforeNeighbors.Count,
+				CountAfter = afterNeighbours.Count,
+				CountTotal = neighbours.Count
 			};
 
 			return context;
@@ -961,20 +1031,18 @@ namespace Land.Markup.Binding
 			Node node,
 			ParsedFile file,
 			PointContext nodeContext,
-			List<ParsedFile> searchArea,
-			Func<string, ParsedFile> getParsed,
-			ContextFinder contextFinder)
+			ClosestConstructionArgs args)
 		{
-			const double CLOSE_ELEMENT_THRESHOLD = 0.7;
+			//const double CLOSE_ELEMENT_THRESHOLD = 0.7;
 			const int MAX_COUNT = 5;
 
 			var candidates = new List<RemapCandidateInfo>();
 
-			foreach (var f in searchArea)
+			foreach (var f in args.SearchArea)
 			{
 				if (f.Root == null)
 				{
-					f.Root = getParsed(f.Name)?.Root;
+					f.Root = args.GetParsed(f.Name)?.Root;
 				}
 
 				var visitor = new GroupNodesByTypeVisitor(new List<string> { node.Type });
@@ -985,7 +1053,7 @@ namespace Land.Markup.Binding
 					{
 						Node = n,
 						File = file,
-						Context = contextFinder.ContextManager.GetContext(n, file)
+						Context = args.ContextFinder.ContextManager.GetContext(n, file)
 					})
 				);
 			};
@@ -1023,14 +1091,14 @@ namespace Land.Markup.Binding
 
 			#endregion
 
-			contextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
-			contextFinder.ComputeTotalSimilarities(nodeContext, candidates);
+			args.ContextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
+			args.ContextFinder.ComputeTotalSimilarities(nodeContext, candidates);
 
 			var result = candidates
 				.OrderByDescending(c => c.Similarity)
 				.ThenByDescending(c => c.AncestorSimilarity)
 				.Take(MAX_COUNT)
-				.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
+				//.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
 				.ToList();
 
 			if (mayBeConfused.Any() && result.Any())
@@ -1049,13 +1117,10 @@ namespace Land.Markup.Binding
 				}
 			}
 
-			if (node.Options.GetNotUnique())
+			foreach (var elem in result)
 			{
-				foreach (var elem in result)
-				{
-					elem.Context.SiblingsContext = 
-						GetSiblingsContext(elem.Node, elem.File, contextFinder);
-				}
+				elem.Context.SiblingsContext = 
+					GetSiblingsContext(elem.Node, elem.File, args.SiblingsArgs, null);
 			}
 
 			return new HashSet<PointContext>(result.Select(e=>e.Context));
@@ -1109,6 +1174,8 @@ namespace Land.Markup.Binding
 	public class SiblingsConstructionArgs 
 	{
 		public ContextFinder ContextFinder { get; set; }
+
+		public bool CountOnly { get; set; }
 	}
 
 	public class ClosestConstructionArgs
@@ -1116,5 +1183,6 @@ namespace Land.Markup.Binding
 		public List<ParsedFile> SearchArea { get; set; }
 		public Func<string, ParsedFile> GetParsed { get; set; }
 		public ContextFinder ContextFinder { get; set; }
+		public SiblingsConstructionArgs SiblingsArgs { get; set; }
 	}
 }

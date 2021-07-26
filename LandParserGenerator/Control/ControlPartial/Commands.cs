@@ -129,7 +129,9 @@ namespace Land.Control
 			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
 			if (parsedFile != null)
-				MarkupManager.AddLand(parsedFile, GetPointSearchArea());
+			{
+				MarkupManager.AddLand(parsedFile);
+			}
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)

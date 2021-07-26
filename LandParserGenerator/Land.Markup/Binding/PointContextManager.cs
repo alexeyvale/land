@@ -44,31 +44,7 @@ namespace Land.Markup.Binding
 			SiblingsConstructionArgs siblingsArgs,
 			ClosestConstructionArgs closestArgs)
 		{
-			if (!Cache.ContainsKey(node))
-			{
-				var ancestor = PointContext.GetAncestor(node);
-
-				var cachedAncestorsContext = ancestor != null && Ancestors.ContainsKey(file.Name) && Ancestors[file.Name].ContainsKey(ancestor)
-					? Ancestors[file.Name][ancestor] : null;
-
-				Cache[node] = PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, null, cachedAncestorsContext);
-
-				if (cachedAncestorsContext == null && ancestor != null)
-				{
-					if (!Ancestors.ContainsKey(file.Name))
-					{
-						Ancestors[file.Name] = new Dictionary<Node, List<AncestorsContextElement>>();
-					}
-
-					Ancestors[file.Name][ancestor] = Cache[node].AncestorsContext;
-				}
-
-				return Cache[node];
-			}
-			else
-			{
-				return PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, Cache[node]);
-			}
+			return PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, GetContext(node, file));
 		}
 
 		public void ClearCache(string fileName)

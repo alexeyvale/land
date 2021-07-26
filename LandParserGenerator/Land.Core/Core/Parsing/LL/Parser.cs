@@ -25,6 +25,8 @@ namespace Land.Core.Parsing.LL
 
 		private Dictionary<string, Tuple<SymbolArguments, Stack<string>>> RecoveryCache { get; set; }
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
+		private Message LastUnexpectedTokenMessage { get; set; }
+
 
 		public Parser(
 			Grammar g, 
@@ -103,7 +105,7 @@ namespace Land.Core.Parsing.LL
 				if (EnableTracing)
 				{
 					Log.Add(Message.Trace(
-						$"Текущий токен: {this.GetTokenInfoForMessage(token)}\t |\t Стек: {StackString}",
+						$"Текущий токен: {this.Messagify(token)}\t |\t Стек: {StackString}",
 						LexingStream.CurrentToken.Location.Start
 					));
 				}
@@ -143,8 +145,8 @@ namespace Land.Core.Parsing.LL
 								token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 							else
 							{
-								Log.Add(Message.Warning(
-									$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", runtimeFirst.Select(t => GrammarObject.Userify(t)))}",
+								Log.Add(LastUnexpectedTokenMessage = Message.Warning(
+									$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", runtimeFirst.Select(t => this.Messagify(t)))}",
 									token.Location.Start
 								));
 
@@ -164,10 +166,10 @@ namespace Land.Core.Parsing.LL
 				/// ни найти ветку правила для нетерминала на вершине стека
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(Message.Warning(
+					Log.Add(LastUnexpectedTokenMessage = Message.Warning(
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
-							$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался символ {GrammarObject.Userify(stackTop.Symbol)}" :
-							$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}, ожидался один из следующих символов: {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => GrammarObject.Userify(t.Key)))}",
+							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидался {this.Messagify(stackTop.Symbol)}" :
+							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => this.Messagify(t.Key)))}",
 						LexingStream.CurrentToken.Location.Start
 					));
 
@@ -257,6 +259,14 @@ namespace Land.Core.Parsing.LL
 			/// Подменяем свежесгенерированный узел для Any на переданный извне
 			anyNode.Options = stackTop.Options.Clone();
 			anyNode.Arguments = stackTop.Arguments.Clone();
+
+			/// Проверяем, не происходит ли восстановление в действительно некорректной программе
+			if (anyNode.Arguments.Contains(AnyArgument.Error)
+				&& LastUnexpectedTokenMessage != null)
+			{
+				LastUnexpectedTokenMessage.Type = MessageType.Error;
+			}
+
 			var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
 			stackTop.Parent.ReplaceChild(anyNode, anyIndex);
 			Stack.Pop();
@@ -316,8 +326,8 @@ namespace Land.Core.Parsing.LL
 
 				if (!stopTokens.Contains(token.Name))
 				{
-					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из следующих символов: { String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t))) }",
+					var message = LastUnexpectedTokenMessage = Message.Trace(
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидались { String.Join(", ", stopTokens.Select(t => this.Messagify(t))) }",
 						token.Location.Start
 					);
 
@@ -385,7 +395,7 @@ namespace Land.Core.Parsing.LL
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(
-					$"Возобновление разбора невозможно: восстановление в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Messagify(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -393,7 +403,7 @@ namespace Land.Core.Parsing.LL
 			}
 
 			Log.Add(Message.Warning(
-				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				$"Процесс восстановления запущен в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
 
@@ -469,7 +479,7 @@ namespace Land.Core.Parsing.LL
 				));
 
 				Log.Add(Message.Warning(
-					$"Попытка продолжить разбор на нетерминале {GrammarObject.Userify(currentNode.Symbol)} в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+					$"Попытка продолжить разбор на нетерминале {GrammarObject.Userify(currentNode.Symbol)} в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -481,7 +491,7 @@ namespace Land.Core.Parsing.LL
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					Log.Add(Message.Warning(
-						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {this.GetTokenInfoForMessage(token)}",
+						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {this.Messagify(token)}",
 						token.Location.Start
 					));
 

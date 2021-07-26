@@ -231,13 +231,23 @@ namespace Land.Control
             {
 				var nodeToBind = MarkupManager.GetConcernPointCandidates(
 						parsedFile.Root,
-						new SegmentLocation { Start = new PointLocation(offset), End = new PointLocation(offset) }
+						new SegmentLocation 
+						{ 
+							Start = new PointLocation(offset), 
+							End = new PointLocation(offset) 
+						}
 					)
 					.FirstOrDefault(c => c.Type == type);
 
 				if (nodeToBind != null)
 				{
-					return MarkupManager.AddConcernPoint(nodeToBind, parsedFile, new List<ParsedFile> { parsedFile }, name, comment, parent);
+					return MarkupManager.AddConcernPoint(
+						nodeToBind, 
+						parsedFile,
+						name, 
+						comment,
+						parent
+					);
 				}
 			}
 
@@ -538,8 +548,7 @@ namespace Land.Control
 				ProcessAmbiguities(
 					MarkupManager.Remap(
 						cp.Context.Type, 
-						cp.Context.FileName, 
-						GetPointSearchArea()
+						GetPointSearchArea().FirstOrDefault(e=>e.Name == cp.Context.FileName)
 					),
 					false
 				);

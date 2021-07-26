@@ -13,13 +13,36 @@ namespace Land.Core
 		/// <summary>
 		/// Получение строкового описания токена для сущности, обладающей доступом к грамматике языка
 		/// </summary>
-		public static string GetTokenInfoForMessage(this IGrammarProvided target, IToken token)
+		public static string Messagify(this IGrammarProvided target, IToken token)
 		{
+			//if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name))
+			//{
+			//	return $"'{token.Text}' ({target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name)[0]})";
+			//}
+
 			var userified = target.GrammarObject.Userify(token.Name);
+
 			if (userified == token.Name && token.Name != Grammar.ANY_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
+			{
 				return $"{token.Name}: '{token.Text}'";
+			}
 			else
+			{
 				return userified;
+			}
+		}
+
+		/// <summary>
+		/// Получение строкового описания символа для сущности, обладающей доступом к грамматике языка
+		/// </summary>
+		public static string Messagify(this IGrammarProvided target, string symbol)
+		{
+			//if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol))
+			//{
+			//	return $"{target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol)[0]}";
+			//}
+
+			return target.GrammarObject.Userify(symbol);
 		}
 
 		/// <summary>

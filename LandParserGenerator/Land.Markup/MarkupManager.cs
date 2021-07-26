@@ -152,12 +152,11 @@ namespace Land.Markup
 		public ConcernPoint AddConcernPoint(
 			Node node, 
 			ParsedFile file, 
-			List<ParsedFile> searchArea,
 			string name = null, 
 			string comment = null, 
 			Concern parent = null)
 		{
-			Remap(node.Type, file.Name, searchArea);
+			Remap(node.Type, file);
 
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
@@ -174,7 +173,8 @@ namespace Land.Markup
 					{
 						SearchArea = new List<ParsedFile> { file },
 						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder
+						ContextFinder = ContextFinder,
+						SiblingsArgs = siblingsArgs
 					}), 
 				parent);
 
@@ -193,9 +193,7 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление всей "суши", присутствующей в дереве разбора
 		/// </summary>
-		public void AddLand(
-			ParsedFile file,
-			List<ParsedFile> searchArea)
+		public void AddLand(ParsedFile file)
 		{
 			var visitor = new LandExplorerVisitor();
 			file.Root.Accept(visitor);
@@ -203,7 +201,7 @@ namespace Land.Markup
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.UserifiedSymbol))
 			{
-				Remap(group.Key, file.Name, searchArea);
+				Remap(group.Key, file);
 
 				var concern = AddConcern(group.Key);
 				/// В пределах символа группируем по псевдониму
@@ -232,7 +230,8 @@ namespace Land.Markup
 								{
 									SearchArea = new List<ParsedFile> { file },
 									GetParsed = ContextFinder.GetParsed,
-									ContextFinder = ContextFinder
+									ContextFinder = ContextFinder,
+									SiblingsArgs = subconcernSiblingsArgs
 								}), 
 							subconcern));
 					}
@@ -258,7 +257,8 @@ namespace Land.Markup
 							{
 								SearchArea = new List<ParsedFile> { file },
 								GetParsed = ContextFinder.GetParsed,
-								ContextFinder = ContextFinder
+								ContextFinder = ContextFinder,
+								SiblingsArgs = siblingsArgs
 							}), 
 						concern)
 					);
@@ -316,7 +316,8 @@ namespace Land.Markup
 				{
 					SearchArea = new List<ParsedFile> { file },
 					GetParsed = ContextFinder.GetParsed,
-					ContextFinder = ContextFinder
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
 				})
 			);
 
@@ -744,19 +745,18 @@ namespace Land.Markup
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			string pointType,
-			string fileName,
-			List<ParsedFile> searchArea)
+			ParsedFile file)
 		{
 			var points = GetConcernPoints()
 				.Where(p => p.Context.Type == pointType
-					&& p.Context.FileName == fileName)
+					&& p.Context.FileName == file.Name)
 				.ToList();
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			var result = ContextFinder.Find(
 				points,
-				searchArea, 
+				new List<ParsedFile> { file }, 
 				ContextFinder.SearchType.Local
 			);
 
@@ -797,7 +797,8 @@ namespace Land.Markup
 					{
 						SearchArea = new List<ParsedFile> { first.File },
 						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder
+						ContextFinder = ContextFinder,
+						SiblingsArgs = siblingsArgs
 					}
 				);
 

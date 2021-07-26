@@ -17,6 +17,7 @@ namespace Land.Core.Parsing.LR
 		private Stack<int> NestingStack { get; set; }
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
+		private Message LastUnexpectedTokenMessage { get; set; }
 
 		public Parser(
 			Grammar g,
@@ -53,7 +54,7 @@ namespace Land.Core.Parsing.LR
 
 				if(EnableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {this.GetTokenInfoForMessage(token)} | Стек: {Stack.ToString(GrammarObject)}",
+						$"Текущий токен: {this.Messagify(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Location.Start
 					));
 
@@ -133,8 +134,8 @@ namespace Land.Core.Parsing.LR
 				}
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(Message.Warning(
-						$"Неожиданный символ {this.GetTokenInfoForMessage(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+					Log.Add(LastUnexpectedTokenMessage = Message.Warning(
+						$"Неожиданный символ {this.Messagify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						LexingStream.CurrentToken.Location.Start
 					));
 
@@ -186,12 +187,14 @@ namespace Land.Core.Parsing.LR
 			var tokenIndex = LexingStream.CurrentIndex;
 			var rawActions = Table[Stack.PeekState(), Grammar.ANY_TOKEN_NAME];
 
-			if(EnableTracing)
+			if (EnableTracing)
+			{
 				Log.Add(Message.Trace(
 					$"Инициирован пропуск Any | Стек: {Stack.ToString(GrammarObject)} | Состояние: {Environment.NewLine}\t\t"
 						+ Table.ToString(Stack.PeekState(), null, "\t\t"),
 					token.Location.Start
 				));
+			}
 
 			/// Пока по Any нужно производить свёртки (ячейка таблицы непуста и нет конфликтов)
 			while (rawActions.Count == 1 && rawActions.First() is ReduceAction)
@@ -222,18 +225,27 @@ namespace Land.Core.Parsing.LR
 			anyNode.Options = marker.Alternative[marker.Position].Options;
 			anyNode.Arguments = marker.Alternative[marker.Position].Arguments;
 
+			/// Проверяем, не происходит ли восстановление в действительно некорректной программе
+			if (anyNode.Arguments.Contains(AnyArgument.Error)
+				&& LastUnexpectedTokenMessage != null)
+			{
+				LastUnexpectedTokenMessage.Type = MessageType.Error;
+			}
+
 			/// Производим перенос
 			var shift = (ShiftAction)rawActions.Where(a => a is ShiftAction).Single();
 			/// Вносим в стек новое состояние
 			Stack.Push(anyNode, shift.TargetItemIndex);
 			NestingStack.Push(LexingStream.GetPairsCount());
 
-			if(EnableTracing)
+			if (EnableTracing)
+			{
 				Log.Add(Message.Trace(
 					$"Поиск окончания последовательности, соответствующей Any | Стек: {Stack.ToString(GrammarObject)} | Состояние: {Environment.NewLine}\t\t" 
 						+ Table.ToString(Stack.PeekState(), null, "\t\t"),
 					token.Location.Start
 				));
+			}
 
 			var stopTokens = GetStopTokens(anyNode.Arguments, Stack.PeekState());
 			var ignorePairs = anyNode.Arguments.Contains(AnyArgument.IgnorePairs);
@@ -270,19 +282,23 @@ namespace Land.Core.Parsing.LR
 				}
 			}
 
-			if(endLocation != null)
+			if (endLocation != null)
+			{
 				anyNode.SetLocation(startLocation, endLocation);
+			}
 
 			if (token.Name == Grammar.ERROR_TOKEN_NAME)
+			{
 				return token;
+			}
 
 			/// Если дошли до конца входной строки, и это было не по плану
 			if (!stopTokens.Contains(token.Name))
 			{
 				if (enableRecovery)
 				{
-					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
+					var message = LastUnexpectedTokenMessage = Message.Trace(
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
 						token.Location.Start
 					);
 
@@ -310,7 +326,7 @@ namespace Land.Core.Parsing.LR
 				else
 				{
 					Log.Add(Message.Error(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидался один из токенов {String.Join(", ", stopTokens.Select(t => GrammarObject.Userify(t)))}",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
 						token.Location.Start
 					));
 
@@ -367,7 +383,7 @@ namespace Land.Core.Parsing.LR
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(
-					$"Возобновление разбора невозможно: восстановление в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)} уже проводилось",
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Messagify(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -375,7 +391,7 @@ namespace Land.Core.Parsing.LR
 			}
 
 			Log.Add(Message.Warning(
-				$"Процесс восстановления запущен в позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+				$"Процесс восстановления запущен в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
 
@@ -484,7 +500,7 @@ namespace Land.Core.Parsing.LR
 				));
 
 				Log.Add(Message.Warning(
-					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.GetTokenInfoForMessage(LexingStream.CurrentToken)}",
+					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.Messagify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));		
 

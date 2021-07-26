@@ -211,7 +211,7 @@ namespace Land.Markup.Binding
 			SearchType searchType)
 		{
 			var candidates = new Dictionary<string, List<RemapCandidateInfo>>();
-			var ancestorToSiblings = new Dictionary<Node, AncestorSiblingsPair>();
+			var ancestorToSiblingsCache = new Dictionary<Node, SiblingsContextConstructionCache>();
 
 			/// Инициализируем коллекции кандидатов для каждого типа
 			foreach (var type in points.Keys)
@@ -226,6 +226,8 @@ namespace Land.Markup.Binding
 				{
 					continue;
 				}
+
+				var neighboursCache = GetNeighbours(currentFile, points.Keys.ToList());
 
 				var visitor = new GroupNodesByTypeVisitor(points.Keys.ToList());
 				currentFile.Root.Accept(visitor);
@@ -249,7 +251,7 @@ namespace Land.Markup.Binding
 							/// Если нужно проверить соседей, проверяем, не закешировали ли их
 							if (checkSiblings)
 							{
-								AncestorSiblingsPair pair = null;
+								SiblingsContextConstructionCache cache = null;
 
 								/// Ищем предка, относительно которого нужно искать соседей
 								var ancestor = PointContext.GetAncestor(n)
@@ -258,26 +260,27 @@ namespace Land.Markup.Binding
 								/// Если таковой есть, пытаемся найти инфу о нём в кеше
 								if (ancestor != null)
 								{
-									pair = ancestorToSiblings.ContainsKey(ancestor)
-										? ancestorToSiblings[ancestor]
-										: new AncestorSiblingsPair
+									cache = ancestorToSiblingsCache.ContainsKey(ancestor)
+										? ancestorToSiblingsCache[ancestor]
+										: new SiblingsContextConstructionCache
 										{
-											Ancestor = ancestor
+											Ancestor = ancestor,
+											Neighbours = neighboursCache
 										};
 								}
 
 								candidate.Context.SiblingsContext = PointContext.GetSiblingsContext(
 									n, 
 									currentFile,
-									siblingsArgs.ContextFinder,
-									pair
+									siblingsArgs,
+									cache
 								);
 
-								candidate.Context.SiblingsContext_old = PointContext.GetSiblingsContext_old(n, currentFile, pair);
+								candidate.Context.SiblingsContext_old = PointContext.GetSiblingsContext_old(n, currentFile, cache);
 
-								if (ancestor != null && !ancestorToSiblings.ContainsKey(ancestor))
+								if (ancestor != null && !ancestorToSiblingsCache.ContainsKey(ancestor))
 								{
-									ancestorToSiblings[ancestor] = pair;
+									ancestorToSiblingsCache[ancestor] = cache;
 								}
 							}
 
@@ -334,6 +337,15 @@ namespace Land.Markup.Binding
 				{
 					auxiliaryContexts.AddRange(context.SiblingsContext.Before.Nearest);
 					auxiliaryContexts.AddRange(context.SiblingsContext.After.Nearest);
+
+					if (checkClosest)
+					{
+						foreach (var closest in context.ClosestContext)
+						{
+							auxiliaryContexts.AddRange(closest.SiblingsContext.Before.Nearest);
+							auxiliaryContexts.AddRange(closest.SiblingsContext.After.Nearest);
+						}
+					}
 				}
 			}
 
@@ -450,6 +462,32 @@ namespace Land.Markup.Binding
 			}
 
 			return result;
+		}
+
+		private Dictionary<string, List<BorderPoint>> GetNeighbours(ParsedFile file, List<string> types)
+		{
+			var visitor = new GroupNodesByTypeVisitor(types);
+			file.Root.Accept(visitor);
+
+			return visitor.Grouped.ToDictionary(
+				e=>e.Key, 
+				e=>e.Value
+					.SelectMany(n => new List<BorderPoint>
+					{
+						new BorderPoint
+						{
+							Node = n,
+							Offset = n.Location.Start.Offset,
+						},
+						new BorderPoint
+						{
+							Node = n,
+							Offset = n.Location.End.Offset,
+						},
+					})
+					.OrderBy(n => n.Offset)
+					.ToList()
+				);
 		}
 
 		#region Auto Result Selection

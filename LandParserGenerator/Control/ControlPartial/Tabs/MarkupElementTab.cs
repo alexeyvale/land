@@ -139,7 +139,6 @@ namespace Land.Control
 						var point = MarkupManager.AddConcernPoint(
 							selectedCandidate.Node,
 							State.PendingCommand.Document,
-							GetPointSearchArea(),
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,
 							State.PendingCommand.Target?.DataContext as Concern

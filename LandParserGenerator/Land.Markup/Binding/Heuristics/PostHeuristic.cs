@@ -51,6 +51,14 @@ namespace Land.Markup.Binding
 		);
 	}
 
+	public abstract class MinMaxTuningHeurisic : IWeightsHeuristic
+	{
+		public abstract Dictionary<ContextType, double?> TuneWeights(PointContext source, List<RemapCandidateInfo> candidates, Dictionary<ContextType, double?> weights);
+
+		protected double GetWeight(double minW, double maxW, double minSim, double maxSim, double bestSim) =>
+			minW + (maxW - minW) * Math.Max(0, Math.Min(1, (bestSim - minSim)/(maxSim - minSim)));
+	}
+
 	/// <summary>
 	/// Устанавливает нулевой вес для пустых контекстов
 	/// </summary>
@@ -86,21 +94,18 @@ namespace Land.Markup.Binding
 		}
 	}
 
-	public class TuneHeaderWeight : IWeightsHeuristic
+	public class TuneHeaderWeight : MinMaxTuningHeurisic, IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.8;
+		const double MIN_W_CORE = 2;
+		const double MIN_W_NON_CORE = 1;
 
-		//const double BAD_SIM = 0.4;
-		//const double INDENT = 0.1;
+		const double MAX_W_CORE = 4;
+		const double MAX_W_NON_CORE = 4;
 
-		//public double GetWeight(double good, double usual, double bad, double max) =>
-		//	max >= GOOD_SIM ? good
-		//	: max >= GOOD_SIM - INDENT ? good - (good - usual) * (GOOD_SIM - max) / INDENT
-		//	: max >= BAD_SIM + INDENT ? usual
-		//	: max >= BAD_SIM ? bad + (usual - bad) * (max - BAD_SIM) / INDENT
-		//	: bad;
+		const double MIN_SIM = 0.8;
+		const double MAX_SIM = 1;
 
-		public Dictionary<ContextType, double?> TuneWeights(
+		public override Dictionary<ContextType, double?> TuneWeights(
 				PointContext source,
 				List<RemapCandidateInfo> candidates,
 				Dictionary<ContextType, double?> weights)
@@ -115,7 +120,7 @@ namespace Land.Markup.Binding
 			/// Отбираем кандидатов с хорошей похожестью ядра
 			var goodCore = shouldSetCore
 				? candidates
-					.Where(c => c.HeaderCoreSimilarity >= GOOD_SIM)
+					.Where(c => c.HeaderCoreSimilarity >= MIN_SIM)
 					.OrderByDescending(c => c.HeaderCoreSimilarity)
 					.ToList()
 				: null;
@@ -123,26 +128,26 @@ namespace Land.Markup.Binding
 			/// Отбираем кандидатов с хорошей похожестью остальной части заголовка
 			var goodNonCore = shouldSetNonCore
 				? (goodCore?.Count > 0 ? goodCore : candidates)
-					.Where(c => c.HeaderNonCoreSimilarity >= GOOD_SIM)
+					.Where(c => c.HeaderNonCoreSimilarity >= MIN_SIM)
 					.OrderByDescending(c => c.HeaderNonCoreSimilarity)
 					.ToList()
 				: null;
 
 			if (shouldSetCore)
 			{
-				weights[ContextType.HeaderCore] = 2;
+				weights[ContextType.HeaderCore] = MIN_W_CORE;
 			}
 
 			if (shouldSetNonCore)
 			{
-				weights[ContextType.HeaderNonCore] = 1;
+				weights[ContextType.HeaderNonCore] = MIN_W_NON_CORE;
 			}
 
 			/// Подстраиваем вес заголовка, если есть "хорошие" кандидаты
 			if (goodCore?.Count > 0)
 			{
-				weights[ContextType.HeaderCore] = 2 + 2 
-					* ((goodCore[0].HeaderCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
+				weights[ContextType.HeaderCore] = 
+					GetWeight(MIN_W_CORE, MAX_W_CORE, MIN_SIM, MAX_SIM, goodCore[0].HeaderCoreSimilarity);
 			}
 
 			/// Подстраиваем вес остальной части, если есть "хорошие" кандидаты среди хороших по ядру заголовка 
@@ -152,19 +157,22 @@ namespace Land.Markup.Binding
 				&& (goodNonCore.Count == 1 
 					|| ContextFinder.AreDistantEnough(goodNonCore[0].HeaderNonCoreSimilarity, goodNonCore[1].HeaderNonCoreSimilarity)))
 			{
-				weights[ContextType.HeaderNonCore] = 1 + 3
-					* ((goodNonCore[0].HeaderNonCoreSimilarity - GOOD_SIM) / (1 - GOOD_SIM));
+				weights[ContextType.HeaderNonCore] =
+					GetWeight(MIN_W_NON_CORE, MAX_W_NON_CORE, MIN_SIM, MAX_SIM, goodNonCore[0].HeaderNonCoreSimilarity);
 			}
 
 			return weights;
 		}
 	}
 
-	public class TuneAncestorsWeight : IWeightsHeuristic
+	public class TuneAncestorsWeight : MinMaxTuningHeurisic, IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.8;
+		const double MIN_W = 0.5;
+		const double MAX_W = 1;
+		const double MIN_SIM = 0;
+		const double MAX_SIM = 0.8;
 
-		public Dictionary<ContextType, double?> TuneWeights(
+		public override Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
@@ -178,18 +186,20 @@ namespace Land.Markup.Binding
 				.ToList();
 
 			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 
-				? 0.5 : 0.5 + 0.5 * Math.Min(1, distinctSimilarities[0] / GOOD_SIM);
+				? MIN_W : GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, distinctSimilarities[0]);
 
 			return weights;
 		}
 	}
 
-	public class TuneInnerWeightAsFrequentlyChanging : IWeightsHeuristic
+	public class TuneInnerWeightAsFrequentlyChanging : MinMaxTuningHeurisic, IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.9;
-		const double BAD_SIM = 0.6;
+		const double MAX_W = 2;
+		const double MIN_W = 0.5;
+		const double MAX_SIM = 0.9;
+		const double MIN_SIM = 0.6;
 
-		public Dictionary<ContextType, double?> TuneWeights(
+		public override Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
@@ -200,28 +210,22 @@ namespace Land.Markup.Binding
 
 				candidates = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
 
-				if (candidates.Count > 1 && !ContextFinder.AreDistantEnough(candidates[0].InnerSimilarity, candidates[1].InnerSimilarity))
-				{
-					weights[ContextType.Inner] = 0.5;
-				}
-				else
-				{
-					weights[ContextType.Inner] = candidates[0].InnerSimilarity < BAD_SIM ? 0.5
-						: candidates[0].InnerSimilarity > GOOD_SIM ? 2
-						: 0.5 + 1.5 * (Math.Max(candidates[0].InnerSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
-				}
+				weights[ContextType.Inner] =
+					GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, candidates[0].InnerSimilarity);
 			}
 
 			return weights;
 		}
 	}
 
-	public class TuneSiblingsAllWeightAsFrequentlyChanging : IWeightsHeuristic
+	public class TuneSiblingsAllWeightAsFrequentlyChanging : MinMaxTuningHeurisic, IWeightsHeuristic
 	{
-		const double GOOD_SIM = 0.8;
-		const double BAD_SIM = 0.6;
+		const double MAX_W = 1;
+		const double MIN_W = 0;
+		const double MAX_SIM = 0.8;
+		const double MIN_SIM = 0.6;
 
-		public Dictionary<ContextType, double?> TuneWeights(
+		public override Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
@@ -251,26 +255,28 @@ namespace Land.Markup.Binding
 					{
 						var maxSimilarity = bestCandidates.Max(c => c.SiblingsAllSimilarity);
 
-						weights[ContextType.SiblingsAll] = maxSimilarity < BAD_SIM ? 0
-							: maxSimilarity > GOOD_SIM ? 1
-							: (Math.Max(maxSimilarity, BAD_SIM) - BAD_SIM) / (GOOD_SIM - BAD_SIM);
+						weights[ContextType.SiblingsAll] = 
+							GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, maxSimilarity);
 					}
 					else
 					{
 						weights[ContextType.SiblingsAll] = 0;
 					}
 				}
-				else
-				{ }
 			}
 
 			return weights;
 		}
 	}
 
-	public class TuneSiblingsNearestWeight : IWeightsHeuristic
+	public class TuneSiblingsNearestWeight : MinMaxTuningHeurisic, IWeightsHeuristic
 	{
-		public Dictionary<ContextType, double?> TuneWeights(
+		const double MAX_W = 2;
+		const double MIN_W = 0;
+		const double MIN_SIM = 0.9;
+		const double MAX_SIM = 1;
+
+		public override Dictionary<ContextType, double?> TuneWeights(
 			PointContext source,
 			List<RemapCandidateInfo> candidates,
 			Dictionary<ContextType, double?> weights)
@@ -279,8 +285,10 @@ namespace Land.Markup.Binding
 			{
 				if (weights[ContextType.SiblingsNearest].HasValue) return weights;
 
-				weights[ContextType.SiblingsNearest] =
-					candidates.Max(c => c.SiblingsNearestSimilarity) == 1 ? 2 : 0;
+				var maxSimilarity = candidates.Max(c => c.SiblingsNearestSimilarity);
+
+				weights[ContextType.SiblingsNearest] = 
+					GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, maxSimilarity);
 			}
 
 			return weights;

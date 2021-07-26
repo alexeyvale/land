@@ -193,7 +193,7 @@ namespace Land.Core.Lexing
 					if (CustomBlockStack.Count == 0)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданная закрывающая конструкция {this.GetTokenInfoForMessage(token)} для пользовательского блока",
+							$"Неожиданная закрывающая конструкция {this.Messagify(token)} для пользовательского блока",
 							token.Location.Start
 						));
 					}
@@ -224,7 +224,7 @@ namespace Land.Core.Lexing
 					if (PairStack.Count == 0)
 					{
 						Log.Add(Message.Error(
-							$"Отсутствует открывающая конструкция для парной закрывающей {this.GetTokenInfoForMessage(token)}",
+							$"Отсутствует открывающая конструкция для парной закрывающей {this.Messagify(token)}",
 							token.Location.Start
 						));
 
@@ -233,7 +233,7 @@ namespace Land.Core.Lexing
 					else if (PairStack.Peek() != closed.Value)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданная закрывающая конструкция {this.GetTokenInfoForMessage(token)}, ожидается {String.Join("или ", PairStack.Peek().Right.Select(e => GrammarObject.Userify(e)))} для открывающей конструкции {String.Join("или ", PairStack.Peek().Left.Select(e => GrammarObject.Userify(e)))}",
+							$"Неожиданная закрывающая конструкция {this.Messagify(token)}, ожидается {String.Join("или ", PairStack.Peek().Right.Select(e => this.Messagify(e)))} для открывающей конструкции {String.Join("или ", PairStack.Peek().Left.Select(e => this.Messagify(e)))}",
 							token.Location.Start
 						));
 

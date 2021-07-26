@@ -6,38 +6,32 @@ namespace Land.Markup.Binding
 {
 	public class LocationManager
 	{
-		public class LineInfo
+		public class LocationInfo
 		{
-			public int Index { get; set; }
-
-			public int? CountBefore { get; set; }
-			public int? CountAfter { get; set; }
+			public int CountBefore { get; set; }
+			public int CountAfter { get; set; }
 			public int OffsetBefore { get; set; }
 			public int OffsetAfter { get; set; }
-			public bool ImmediateBeforeFound { get; set; }
-			public bool ImmediateAfterFound { get; set; }
 
 			public double LocationSimilarity { get; set; }
 
 			public bool Permutation { get; set; }
 		}
 
-		private List<PointContext> ContextsOrderedByLine { get; set; }
-		private Dictionary<PointContext, LineInfo> ContextToLineInfo { get; set; }
+		private List<PointContext> Contexts { get; set; }
+		private Dictionary<PointContext, LocationInfo> ContextToLocationInfo { get; set; }
 
 		public LocationManager(IEnumerable<PointContext> contexts)
 		{
-			ContextsOrderedByLine = contexts
-				.OrderBy(c => c.StartOffset)
-				.ToList();
-			ContextToLineInfo = ContextsOrderedByLine
-				.Select((e, i) => new { e, i })
-				.ToDictionary(e => e.e, e => new LineInfo { 
-					Index = e.i, 
-					OffsetBefore = 0, 
+			Contexts = contexts.ToList();
+
+			ContextToLocationInfo = Contexts
+				.ToDictionary(e => e, e => new LocationInfo
+				{
+					OffsetBefore = 0,
 					OffsetAfter = int.MaxValue,
-					//ImmediateAfterFound = e.e.SiblingsContext?.After.Nearest.Count == 0,
-					//ImmediateBeforeFound = e.e.SiblingsContext?.Before.Nearest.Count == 0,
+					CountBefore = 0,
+					CountAfter = 0
 				});
 		}
 
@@ -47,87 +41,66 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public void Mapped(PointContext source, PointContext target)
 		{
-			for (var i = 0; i < ContextToLineInfo[source].Index; ++i)
+			foreach(var elem in Contexts)
 			{
-				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
-
-				if (currentContext.OffsetAfter > target.StartOffset)
+				/// Пропускаем сам перепривязанный элемент и элементы, охватывающие его
+				if(elem == source
+					|| elem.SiblingsContext.CountBefore < source.SiblingsContext.CountBefore
+					&& elem.SiblingsContext.CountAfter < source.SiblingsContext.CountAfter)
 				{
-					if (currentContext.OffsetBefore <= target.StartOffset)
-					{
-						currentContext.CountAfter = ContextToLineInfo.Count - ContextToLineInfo[source].Index;
-						currentContext.OffsetAfter = target.StartOffset;
-						//currentContext.ImmediateAfterFound |=
-						//	(ContextsOrderedByLine[i]?.SiblingsContext?.After.Nearest.Contains(source) ?? false);
-
-						UpdateSimilarity(ContextsOrderedByLine[i]);
-					}
-					else
-					{
-						currentContext.Permutation = true;
-					}
+					continue;
 				}
-			}
 
-			for (var i = ContextToLineInfo[source].Index + 1; i < ContextsOrderedByLine.Count; ++i)
-			{
-				var currentContext = ContextToLineInfo[ContextsOrderedByLine[i]];
+				var isInside = elem.SiblingsContext.CountBefore > source.SiblingsContext.CountBefore
+					&& elem.SiblingsContext.CountAfter > source.SiblingsContext.CountAfter;
 
-				if (currentContext.OffsetBefore < target.EndOffset)
+				if(ContextToLocationInfo[elem].CountBefore <= source.SiblingsContext.CountBefore
+					&& elem.SiblingsContext.CountBefore > source.SiblingsContext.CountBefore)
 				{
-					if (currentContext.OffsetAfter >= target.EndOffset)
-					{
-						currentContext.CountBefore = ContextToLineInfo[source].Index + 1;
-						currentContext.OffsetBefore = target.EndOffset;
-						//currentContext.ImmediateBeforeFound |=
-						//	(ContextsOrderedByLine[i]?.SiblingsContext?.Before.Nearest.Contains(source) ?? false);
-
-						UpdateSimilarity(ContextsOrderedByLine[i]);
-					}
-					else
-					{
-						currentContext.Permutation = true;
-					}
+					ContextToLocationInfo[elem].CountBefore = source.SiblingsContext.CountBefore 
+						+ (isInside ? 1 : source.SiblingsContext.CountInside);
+					ContextToLocationInfo[elem].OffsetBefore = (isInside ? target.StartOffset : target.EndOffset);
 				}
+
+				if (ContextToLocationInfo[elem].CountAfter <= source.SiblingsContext.CountAfter
+					&& elem.SiblingsContext.CountAfter > source.SiblingsContext.CountAfter)
+				{
+					ContextToLocationInfo[elem].CountAfter = source.SiblingsContext.CountAfter
+						+ (isInside ? 1 : source.SiblingsContext.CountInside);
+					ContextToLocationInfo[elem].OffsetAfter = (isInside ? target.EndOffset : target.StartOffset);
+				}
+
+				UpdateSimilarity(elem);
 			}
 		}
 
 		public int GetFrom(PointContext source) =>
-			ContextToLineInfo[source].OffsetBefore;
+			ContextToLocationInfo[source].OffsetBefore;
 
 		public int GetTo(PointContext source) =>
-			ContextToLineInfo[source].OffsetAfter;
+			ContextToLocationInfo[source].OffsetAfter;
 
 		public bool InRange(PointContext source, PointContext target) =>
 			GetFrom(source) <= target.StartOffset
 			&& GetTo(source) >= target.EndOffset;
 
 		public double GetLocationSimilarity(PointContext source) =>
-			ContextToLineInfo[source].LocationSimilarity;
+			ContextToLocationInfo[source].LocationSimilarity;
 
 		public double GetSimilarity(PointContext source, PointContext target) =>
-			!ContextToLineInfo[source].Permutation && InRange(source, target) 
-				? ContextToLineInfo[source].LocationSimilarity : 0;
+			InRange(source, target) ? ContextToLocationInfo[source].LocationSimilarity : 0;
 
 		private void UpdateSimilarity(PointContext source)
 		{
-			const double RATIO_THRESHOLD = 0.8;
-
-			var beforeCount = ContextToLineInfo[source].Index;
-			var afterCount = ContextToLineInfo.Count - ContextToLineInfo[source].Index - 1;
-
-			if (beforeCount > 0 || afterCount > 0)
+			if (source.SiblingsContext.CountBefore > 0 || source.SiblingsContext.CountAfter > 0)
 			{
-				var step = 1 / (double)(beforeCount + afterCount);
-
-				ContextToLineInfo[source].LocationSimilarity = Math.Min(1, (step * (ContextToLineInfo[source].CountBefore ?? 0)
-					+ step * (ContextToLineInfo[source].CountAfter ?? 0)) / RATIO_THRESHOLD);
-					//+ ((ContextToLineInfo[source].ImmediateAfterFound || afterCount == 0) ? 0.1 : 0)
-					//+ ((ContextToLineInfo[source].ImmediateBeforeFound || beforeCount == 0) ? 0.1 : 0));
+				ContextToLocationInfo[source].LocationSimilarity =
+					(ContextToLocationInfo[source].CountBefore + ContextToLocationInfo[source].CountAfter)
+						/ (double)(source.SiblingsContext.CountBefore + source.SiblingsContext.CountAfter);
 			}
 			else
 			{
-				ContextToLineInfo[source].LocationSimilarity = 0;
+				ContextToLocationInfo[source].LocationSimilarity = 0;
 			}
 		}
 	}
