@@ -21,7 +21,7 @@ symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%typ
 symbol_declaration_element = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
 
-rule			=	RULE_HEADER ':' alternative ('|' alternative)* ';'? // Recovery when ; is missing
+rule			=	RULE_HEADER ':' (alternative ('|' alternative)* ';' | AnyError) // Recovery when ; is missing
 alternative		=    (alternative_element | block)*
 alternative_element    =	ID | LITERAL | '%prec'
 block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recovery when closing } is missing
