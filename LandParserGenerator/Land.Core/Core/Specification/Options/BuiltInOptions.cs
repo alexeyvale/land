@@ -17,6 +17,7 @@ namespace Land.Core.Specification
 		public const string FRAGMENT = "fragment";
 		public const string IGNOREUNDEFINED = "ignoreundefined";
 		public const string RECOVERY = "recovery";
+		public const string USERIFY = "userify";
 	}
 
 	/// <summary>

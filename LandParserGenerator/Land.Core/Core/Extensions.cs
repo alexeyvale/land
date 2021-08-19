@@ -11,7 +11,7 @@ namespace Land.Core
 	public static class Extensions
 	{
 		/// <summary>
-		/// Получение строкового описания токена для сущности, обладающей доступом к грамматике языка
+		/// Получение строкового описания токена в терминах грамматики языка
 		/// </summary>
 		public static string Messagify(this IGrammarProvided target, IToken token)
 		{
@@ -33,7 +33,7 @@ namespace Land.Core
 		}
 
 		/// <summary>
-		/// Получение строкового описания символа для сущности, обладающей доступом к грамматике языка
+		/// Получение строкового описания символа в терминах грамматики языка
 		/// </summary>
 		public static string Messagify(this IGrammarProvided target, string symbol)
 		{
@@ -43,6 +43,30 @@ namespace Land.Core
 			//}
 
 			return target.GrammarObject.Userify(symbol);
+		}
+
+		public static string Userify(this IGrammarProvided target, IToken token)
+		{
+			if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name))
+			{
+				return $"'{token.Text}' ({target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name)[0]})";
+			}
+			else
+			{
+				return Messagify(target, token);
+			}
+		}
+
+		public static string Userify(this IGrammarProvided target, string symbol)
+		{
+			if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol))
+			{
+				return $"{target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol)[0]}";
+			}
+			else
+			{
+				return Messagify(target, symbol);
+			}
 		}
 
 		/// <summary>

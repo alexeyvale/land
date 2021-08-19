@@ -194,7 +194,11 @@ namespace Land.Core.Lexing
 					{
 						Log.Add(Message.Error(
 							$"Неожиданная закрывающая конструкция {this.Messagify(token)} для пользовательского блока",
-							token.Location.Start
+							token.Location.Start,
+							addInfo: new Dictionary<string, object>
+							{
+								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) }
+							}
 						));
 					}
 					else
@@ -225,7 +229,11 @@ namespace Land.Core.Lexing
 					{
 						Log.Add(Message.Error(
 							$"Отсутствует открывающая конструкция для парной закрывающей {this.Messagify(token)}",
-							token.Location.Start
+							token.Location.Start,
+							addInfo: new Dictionary<string, object>
+							{
+								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) }
+							}
 						));
 
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
@@ -234,7 +242,12 @@ namespace Land.Core.Lexing
 					{
 						Log.Add(Message.Error(
 							$"Неожиданная закрывающая конструкция {this.Messagify(token)}, ожидается {String.Join("или ", PairStack.Peek().Right.Select(e => this.Messagify(e)))} для открывающей конструкции {String.Join("или ", PairStack.Peek().Left.Select(e => this.Messagify(e)))}",
-							token.Location.Start
+							token.Location.Start,
+							addInfo: new Dictionary<string, object>
+							{
+								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
+								{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), PairStack.Peek().Right.Select(e => this.Userify(e)).ToList() }
+							}
 						));
 
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);

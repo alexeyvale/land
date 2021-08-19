@@ -25,7 +25,7 @@ namespace Land.Core.Parsing.LL
 
 		private Dictionary<string, Tuple<SymbolArguments, Stack<string>>> RecoveryCache { get; set; }
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
-		private Message LastUnexpectedTokenMessage { get; set; }
+		private Message LastRecoveryMessage { get; set; }
 
 
 		public Parser(
@@ -145,9 +145,14 @@ namespace Land.Core.Parsing.LL
 								token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 							else
 							{
-								Log.Add(LastUnexpectedTokenMessage = Message.Warning(
+								Log.Add(LastRecoveryMessage = Message.Warning(
 									$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", runtimeFirst.Select(t => this.Messagify(t)))}",
-									token.Location.Start
+									token.Location.Start,
+									addInfo: new Dictionary<string, object>
+									{
+										{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
+										{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), runtimeFirst.Select(e => this.Userify(e)).ToList() }
+									}
 								));
 
 								token = ErrorRecovery();
@@ -166,11 +171,18 @@ namespace Land.Core.Parsing.LL
 				/// ни найти ветку правила для нетерминала на вершине стека
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(LastUnexpectedTokenMessage = Message.Warning(
+					Log.Add(LastRecoveryMessage = Message.Warning(
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидался {this.Messagify(stackTop.Symbol)}" :
 							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => this.Messagify(t.Key)))}",
-						LexingStream.CurrentToken.Location.Start
+						LexingStream.CurrentToken.Location.Start,
+						addInfo: new Dictionary<string, object>
+						{
+							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
+							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), GrammarObject.Tokens.ContainsKey(stackTop.Symbol)
+								? new List<string> { this.Userify(stackTop.Symbol) }
+								: Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(e => this.Userify(e.Key)).ToList() }
+						}
 					));
 
 					token = ErrorRecovery();
@@ -262,9 +274,9 @@ namespace Land.Core.Parsing.LL
 
 			/// Проверяем, не происходит ли восстановление в действительно некорректной программе
 			if (anyNode.Arguments.Contains(AnyArgument.Error)
-				&& LastUnexpectedTokenMessage != null)
+				&& LastRecoveryMessage != null)
 			{
-				LastUnexpectedTokenMessage.Type = MessageType.Error;
+				LastRecoveryMessage.Type = MessageType.Error;
 			}
 
 			var anyIndex = stackTop.Parent.Children.IndexOf(stackTop);
@@ -326,9 +338,14 @@ namespace Land.Core.Parsing.LL
 
 				if (!stopTokens.Contains(token.Name))
 				{
-					var message = LastUnexpectedTokenMessage = Message.Trace(
+					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидались { String.Join(", ", stopTokens.Select(t => this.Messagify(t))) }",
-						token.Location.Start
+						token.Location.Start,
+						addInfo: new Dictionary<string, object>
+						{
+							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
+							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+						}
 					);
 
 					message.Type = enableRecovery ? MessageType.Warning : MessageType.Error;
@@ -344,6 +361,8 @@ namespace Land.Core.Parsing.LL
 						anyNode.Reset();
 						///	Возвращаем узел обратно на стек
 						Stack.Push(anyNode);
+
+						LastRecoveryMessage = message;
 
 						return ErrorRecovery(stopTokens,
 							anyNode.Arguments.Contains(AnyArgument.Avoid, token.Name) ? token.Name : null);

@@ -17,7 +17,7 @@ namespace Land.Core.Parsing.LR
 		private Stack<int> NestingStack { get; set; }
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
-		private Message LastUnexpectedTokenMessage { get; set; }
+		private Message LastRecoveryMessage { get; set; }
 
 		public Parser(
 			Grammar g,
@@ -134,9 +134,14 @@ namespace Land.Core.Parsing.LR
 				}
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(LastUnexpectedTokenMessage = Message.Warning(
+					Log.Add(LastRecoveryMessage = Message.Warning(
 						$"Неожиданный символ {this.Messagify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
-						LexingStream.CurrentToken.Location.Start
+						LexingStream.CurrentToken.Location.Start,
+						addInfo: new Dictionary<string, object>
+						{
+							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
+							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => this.Userify(e.Lookahead)).ToList() }
+						}
 					));
 
 					token = ErrorRecovery();
@@ -227,9 +232,9 @@ namespace Land.Core.Parsing.LR
 
 			/// Проверяем, не происходит ли восстановление в действительно некорректной программе
 			if (anyNode.Arguments.Contains(AnyArgument.Error)
-				&& LastUnexpectedTokenMessage != null)
+				&& LastRecoveryMessage != null)
 			{
-				LastUnexpectedTokenMessage.Type = MessageType.Error;
+				LastRecoveryMessage.Type = MessageType.Error;
 			}
 
 			/// Производим перенос
@@ -297,9 +302,14 @@ namespace Land.Core.Parsing.LR
 			{
 				if (enableRecovery)
 				{
-					var message = LastUnexpectedTokenMessage = Message.Trace(
+					var message = Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
-						token.Location.Start
+						token.Location.Start,
+						addInfo: new Dictionary<string, object>
+						{
+							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
+							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+						}
 					);
 
 					if (GrammarObject.Options.IsRecoveryEnabled())
@@ -312,6 +322,8 @@ namespace Land.Core.Parsing.LR
 						Log.Add(message);
 
 						LexingStream.MoveTo(tokenIndex, nestingCopy);
+
+						LastRecoveryMessage = message;
 
 						return ErrorRecovery(stopTokens,
 							anyNode.Arguments.Contains(AnyArgument.Avoid, token.Name) ? token.Name : null);
@@ -327,7 +339,12 @@ namespace Land.Core.Parsing.LR
 				{
 					Log.Add(Message.Error(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
-						token.Location.Start
+						token.Location.Start,
+						addInfo: new Dictionary<string, object>
+						{
+							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
+							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+						}
 					));
 
 					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);

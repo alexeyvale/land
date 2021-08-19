@@ -21,8 +21,8 @@ symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%typ
 symbol_declaration_element = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
 
-rule			=	RULE_HEADER ':' (alternative ('|' alternative)* ';' | AnyError) // Recovery when ; is missing
-alternative		=    (alternative_element | block)*
+rule			=	RULE_HEADER ':' (alternative ('|' alternative)* ';')
+alternative		=   (alternative_element | block)* | AnyError // Recovery when ; is missing
 alternative_element    =	ID | LITERAL | '%prec'
 block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recovery when closing } is missing
 
@@ -33,6 +33,11 @@ block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recove
 	start grammar
 	skip COMMENT STRING DECLARATION_CODE
 	recovery
+	userify("заголовок правила") RULE_HEADER
+	userify("идентификатор") ID
+	userify("литерал") LITERAL
+	userify("разделитель секций") SECTIONS_SEPARATOR
+	userify("начало описания") DECLARATION_NAME
 }
 
 %customblock {
