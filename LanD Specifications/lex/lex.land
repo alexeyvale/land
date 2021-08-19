@@ -52,6 +52,15 @@ block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPAR
 	skip COMMENT LINE_END SPACE
 	fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
 	recovery
+	
+	userify("идентификатор") ID
+	userify("разделитель секций") SECTIONS_SEPARATOR
+	userify("наименование категории") CATEGORY_NAME
+	userify("тип состояния анализатора") STATE_TYPE
+	userify("начало объявления") DECLARATION_START
+	userify("начало списка состояний") STATES_START
+	userify("начало вложенного списка состояний") INNER_STATES_START
+	userify("конец списка состояний") STATES_END
 }
 
 %nodes {

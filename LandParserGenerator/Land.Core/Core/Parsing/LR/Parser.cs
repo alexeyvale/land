@@ -139,8 +139,14 @@ namespace Land.Core.Parsing.LR
 						LexingStream.CurrentToken.Location.Start,
 						addInfo: new Dictionary<string, object>
 						{
-							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
-							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => this.Userify(e.Lookahead)).ToList() }
+							{ 
+								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
+								this.Userify(LexingStream.CurrentToken) 
+							},
+							{ 
+								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
+								Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => this.Userify(e.Lookahead)).ToList() 
+							}
 						}
 					));
 
@@ -307,8 +313,14 @@ namespace Land.Core.Parsing.LR
 						token.Location.Start,
 						addInfo: new Dictionary<string, object>
 						{
-							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
-							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+							{ 
+								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
+								this.Userify(token) 
+							},
+							{ 
+								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
+								stopTokens.Select(e => this.Userify(e)).ToList() 
+							}
 						}
 					);
 
@@ -342,8 +354,14 @@ namespace Land.Core.Parsing.LR
 						token.Location.Start,
 						addInfo: new Dictionary<string, object>
 						{
-							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
-							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+							{ 
+								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
+								this.Userify(token)
+							},
+							{ 
+								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
+								stopTokens.Select(e => this.Userify(e)).ToList() 
+							}
 						}
 					));
 
