@@ -15,7 +15,7 @@ namespace Land.Core.Parsing.LL
 		private TableLL1 Table { get; set; }
 
 		private Stack<Node> Stack { get; set; }
-		private string StackString => String.Join(" ", Stack.Select(s => GrammarObject.Userify(s.Symbol)));
+		private string StackString => String.Join(" ", Stack.Select(s => GrammarObject.Developerify(s.Symbol)));
 
 		/// <summary>
 		/// Уровень вложенности относительно описанных в грамматике пар,
@@ -105,7 +105,7 @@ namespace Land.Core.Parsing.LL
 				if (EnableTracing)
 				{
 					Log.Add(Message.Trace(
-						$"Текущий токен: {this.Messagify(token)}\t |\t Стек: {StackString}",
+						$"Текущий токен: {this.Developerify(token)}\t |\t Стек: {StackString}",
 						LexingStream.CurrentToken.Location.Start
 					));
 				}
@@ -146,12 +146,13 @@ namespace Land.Core.Parsing.LL
 							else
 							{
 								Log.Add(LastRecoveryMessage = Message.Warning(
-									$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", runtimeFirst.Select(t => this.Messagify(t)))}",
+									$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", runtimeFirst.Select(t => this.Developerify(t)))}",
 									token.Location.Start,
-									addInfo: new Dictionary<string, object>
+									addInfo: new Dictionary<MessageAddInfoKey, object>
 									{
-										{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
-										{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), runtimeFirst.Select(e => this.Userify(e)).ToList() }
+										{ MessageAddInfoKey.UnexpectedToken, LexingStream.CurrentToken.Name },
+										{ MessageAddInfoKey.UnexpectedLexeme, LexingStream.CurrentToken.Text },
+										{ MessageAddInfoKey.ExpectedTokens, runtimeFirst.ToList() }
 									}
 								));
 
@@ -173,15 +174,19 @@ namespace Land.Core.Parsing.LL
 				{
 					Log.Add(LastRecoveryMessage = Message.Warning(
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
-							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидался {this.Messagify(stackTop.Symbol)}" :
-							$"Неожиданный токен {this.Messagify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => this.Messagify(t.Key)))}",
+							$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидался {this.Developerify(stackTop.Symbol)}" :
+							$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => this.Developerify(t.Key)))}",
 						LexingStream.CurrentToken.Location.Start,
-						addInfo: new Dictionary<string, object>
+						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
-							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(LexingStream.CurrentToken) },
-							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), GrammarObject.Tokens.ContainsKey(stackTop.Symbol)
-								? new List<string> { this.Userify(stackTop.Symbol) }
-								: Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(e => this.Userify(e.Key)).ToList() }
+							{ MessageAddInfoKey.UnexpectedToken, LexingStream.CurrentToken.Name },
+							{ MessageAddInfoKey.UnexpectedLexeme, LexingStream.CurrentToken.Text },
+							{ 
+								MessageAddInfoKey.ExpectedTokens, 
+								GrammarObject.Tokens.ContainsKey(stackTop.Symbol)
+									? new List<string> { stackTop.Symbol }
+									: Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(e => e.Key).ToList() 
+							}
 						}
 					));
 
@@ -339,12 +344,13 @@ namespace Land.Core.Parsing.LL
 				if (!stopTokens.Contains(token.Name))
 				{
 					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Userify(token.Name)}, ожидались { String.Join(", ", stopTokens.Select(t => this.Messagify(t))) }",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {GrammarObject.Developerify(token.Name)}, ожидались { String.Join(", ", stopTokens.Select(t => this.Developerify(t))) }",
 						token.Location.Start,
-						addInfo: new Dictionary<string, object>
+						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
-							{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
-							{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), stopTokens.Select(e => this.Userify(e)).ToList() }
+							{ MessageAddInfoKey.UnexpectedToken, token.Name },
+							{ MessageAddInfoKey.UnexpectedLexeme, token.Text },
+							{ MessageAddInfoKey.ExpectedTokens, stopTokens.ToList() }
 						}
 					);
 
@@ -414,7 +420,7 @@ namespace Land.Core.Parsing.LL
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(
-					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Messagify(LexingStream.CurrentToken)} уже проводилось",
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Developerify(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -422,7 +428,7 @@ namespace Land.Core.Parsing.LL
 			}
 
 			Log.Add(Message.Warning(
-				$"Процесс восстановления запущен в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
+				$"Процесс восстановления запущен в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
 
@@ -498,7 +504,7 @@ namespace Land.Core.Parsing.LL
 				));
 
 				Log.Add(Message.Warning(
-					$"Попытка продолжить разбор на нетерминале {GrammarObject.Userify(currentNode.Symbol)} в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
+					$"Попытка продолжить разбор на нетерминале {GrammarObject.Developerify(currentNode.Symbol)} в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -510,7 +516,7 @@ namespace Land.Core.Parsing.LL
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					Log.Add(Message.Warning(
-						$"Произведено восстановление на уровне {GrammarObject.Userify(currentNode.Symbol)}, разбор продолжен с токена {this.Messagify(token)}",
+						$"Произведено восстановление на уровне {GrammarObject.Developerify(currentNode.Symbol)}, разбор продолжен с токена {this.Developerify(token)}",
 						token.Location.Start
 					));
 

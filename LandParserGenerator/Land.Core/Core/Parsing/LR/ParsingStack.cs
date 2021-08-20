@@ -56,7 +56,7 @@ namespace Land.Core.Parsing.LR
 
 		public string ToString(Grammar grammar)
 		{
-			return String.Join(" ", SymbolsStack.Reverse().Select(s=>grammar.Userify(s.Symbol)));
+			return String.Join(" ", SymbolsStack.Reverse().Select(s=>grammar.Developerify(s.Symbol)));
 		}
 	}
 }

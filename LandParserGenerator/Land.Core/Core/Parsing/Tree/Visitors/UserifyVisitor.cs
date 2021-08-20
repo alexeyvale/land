@@ -12,7 +12,7 @@ namespace Land.Core.Parsing.Tree
 
 		public override void Visit(Node node)
 		{
-			node.UserifiedSymbol = GrammarObject.Userify(node.Symbol);
+			node.UserifiedSymbol = GrammarObject.Developerify(node.Symbol);
 			base.Visit(node);
 		}
 	}

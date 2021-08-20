@@ -665,7 +665,7 @@ namespace Land.Core.Specification
 						{
 							if (this[smb] == null)
 								messages.Add(Message.Error(
-									$"Неизвестный символ {smb} в правиле для нетерминала {Userify(rule.Name)}",
+									$"Неизвестный символ {smb} в правиле для нетерминала {Developerify(rule.Name)}",
 									GetLocation(rule.Name),
 									"LanD"
 								));
@@ -683,7 +683,7 @@ namespace Land.Core.Specification
 									{
 										if (this[arg] == null)
 											messages.Add(Message.Error(
-												$"Неизвестный символ {Userify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)}",
+												$"Неизвестный символ {Developerify(arg)} в аргументах опции {kvp.Key} символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Developerify(rule.Name)}",
 												GetLocation(rule.Name),
 												"LanD"
 											));
@@ -695,7 +695,7 @@ namespace Land.Core.Specification
 								if (union.Count < smb.Arguments.AnyArguments.Sum(o => o.Value.Count))
 								{
 									messages.Add(Message.Error(
-												$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Userify(rule.Name)} пересекаются",
+												$"Множества аргументов нескольких опций символа {Grammar.ANY_TOKEN_NAME} для нетерминала {Developerify(rule.Name)} пересекаются",
 												GetLocation(rule.Name),
 												"LanD"
 											));
@@ -717,7 +717,7 @@ namespace Land.Core.Specification
 						foreach (var nt in emptyElementsRepetition)
 						{
 							messages.Add(Message.Error(
-								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
+								$"Определение нетерминала {Developerify(nt)} допускает левую рекурсию: в списке допустимо бесконечное количество пустых элементов",
 								GetLocation(nt),
 								"LanD"
 							));
@@ -726,7 +726,7 @@ namespace Land.Core.Specification
 						foreach (var nt in FindLeftRecursion().Except(emptyElementsRepetition))
 						{
 							messages.Add(Message.Error(
-								$"Определение нетерминала {Userify(nt)} допускает левую рекурсию",
+								$"Определение нетерминала {Developerify(nt)} допускает левую рекурсию",
 								GetLocation(nt),
 								"LanD"
 							));
@@ -766,7 +766,7 @@ namespace Land.Core.Specification
 						if (badGroups.Any())
 						{
 							result.Add(Message.Error(
-								$"В правиле для нетерминала {Userify(rule.Name)} присутствуют опции из категорий, локальное использование которых не допускается: {String.Join(", ", badGroups)}",
+								$"В правиле для нетерминала {Developerify(rule.Name)} присутствуют опции из категорий, локальное использование которых не допускается: {String.Join(", ", badGroups)}",
 								GetLocation(rule.Name),
 								"LanD"
 							));
@@ -921,13 +921,13 @@ namespace Land.Core.Specification
 				if (warningTokens.Count() > 0)
 				{
 					var anyUserifyRegex = $"{Grammar.ANY_TOKEN_NAME}({AnyArgument.Except.ToString()})?\\d+";
-					var fromAltUserified = Regex.Replace(Userify(pair.Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
-					var fromNontermUserified = Regex.Replace(Userify(pair.Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+					var fromAltUserified = Regex.Replace(Developerify(pair.Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+					var fromNontermUserified = Regex.Replace(Developerify(pair.Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
 
 					foreach (var token in warningTokens)
 					{
-						var nextAltUserified = Regex.Replace(Userify(anys[token].Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
-						var nextNontermUserified = Regex.Replace(Userify(anys[token].Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+						var nextAltUserified = Regex.Replace(Developerify(anys[token].Item1), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
+						var nextNontermUserified = Regex.Replace(Developerify(anys[token].Item1.NonterminalSymbolName), anyUserifyRegex, Grammar.ANY_TOKEN_NAME);
 
 						messages.Add(Message.Warning(
 							$"После символа {Grammar.ANY_TOKEN_NAME} из альтернативы {fromAltUserified} нетерминала {fromNontermUserified} может следовать символ {Grammar.ANY_TOKEN_NAME} из альтернативы {nextAltUserified} нетерминала {nextNontermUserified}",
@@ -959,10 +959,10 @@ namespace Land.Core.Specification
 			AutoRuleUserWrittenForm = new Dictionary<string, string>();
 
 			foreach(var smb in Rules.Keys.Where(k=>k.StartsWith(AUTO_RULE_PREFIX)))
-				AutoRuleUserWrittenForm[smb] = Userify(smb);
+				AutoRuleUserWrittenForm[smb] = Developerify(smb);
 		}
 
-		public string Userify(string name)
+		public string Developerify(string name)
 		{
 			if(name.StartsWith(AUTO_RULE_PREFIX))
 			{
@@ -977,44 +977,51 @@ namespace Land.Core.Specification
 					switch (AutoRuleQuantifier[name].Quantifier)
 					{
 						case Quantifier.ONE_OR_MORE:
-							return Userify(elementName) + "+";
+							return Developerify(elementName) + "+";
 						case Quantifier.ZERO_OR_MORE:
-							return Userify(elementName) + "*";
+							return Developerify(elementName) + "*";
 						case Quantifier.ZERO_OR_ONE:					
-							return Userify(elementName) + "?";
+							return Developerify(elementName) + "?";
 					}
 				}
 				else
 				{
-					return $"({String.Join(" | ", Rules[name].Alternatives.Select(a=>Userify(a)))})";
+					return $"({String.Join(" | ", Rules[name].Alternatives.Select(a=>Developerify(a)))})";
                 }
 			}
 
 			return AutoTokenUserWrittenForm.ContainsKey(name) ? AutoTokenUserWrittenForm[name] : name;
 		}
 
-		public string Userify(Entry entry)
+		public string Developerify(Entry entry)
 		{
 			if (entry.Arguments.AnyArguments.Count > 0)
-				return $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Arguments.AnyArguments.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Userify(e)))})"))})";
+				return $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Arguments.AnyArguments.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Developerify(e)))})"))})";
 			else
-				return Userify(entry.Symbol);
+				return Developerify(entry.Symbol);
 		}
 
-		public string Userify(ISymbol smb)
+		public string Developerify(ISymbol smb)
 		{
-			return Userify(smb.Name);
+			return Developerify(smb.Name);
 		}
 
-		public string Userify(Alternative alt)
+		public string Developerify(Alternative alt)
 		{
 			/// Если альтернатива пустая, показываем пользователю эпсилон
-			return alt.Elements.Count > 0 ? String.Join(" ", UserifyElementwise(alt)) : "\u03B5";
+			return alt.Elements.Count > 0 ? String.Join(" ", DeveloperifyElementwise(alt)) : "\u03B5";
 		}
 
-		public List<string> UserifyElementwise(Alternative alt)
+		public List<string> DeveloperifyElementwise(Alternative alt)
 		{
-			return alt.Elements.Select(e => Userify(e)).ToList();
+			return alt.Elements.Select(e => Developerify(e)).ToList();
+		}
+
+		public string Userify(string name)
+		{
+			return this.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, name)
+				? $"{this.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, name)[0]}"
+				: Developerify(name);
 		}
 
 		#endregion
@@ -1438,10 +1445,10 @@ namespace Land.Core.Specification
 						/// Если текущий символ - это параметризованный Any, выводим его параметры
 						if(entry.Arguments.AnyArguments.Count > 0)
 						{
-							result += $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Arguments.AnyArguments.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Userify(e)))})"))}) ";
+							result += $"{Grammar.ANY_TOKEN_NAME}({String.Join(", ", entry.Arguments.AnyArguments.Select(kvp => $"{kvp.Key}({String.Join(", ", kvp.Value.Select(e => Developerify(e)))})"))}) ";
 						}
 						else
-							result += $"{Userify(entry.Symbol)} ";
+							result += $"{Developerify(entry.Symbol)} ";
                     }
 					result += Environment.NewLine;
 				}

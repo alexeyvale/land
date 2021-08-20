@@ -54,7 +54,7 @@ namespace Land.Core.Parsing.LR
 
 				if(EnableTracing && token.Name != Grammar.ERROR_TOKEN_NAME && token.Name != Grammar.ANY_TOKEN_NAME)
 					Log.Add(Message.Trace(
-						$"Текущий токен: {this.Messagify(token)} | Стек: {Stack.ToString(GrammarObject)}",
+						$"Текущий токен: {this.Developerify(token)} | Стек: {Stack.ToString(GrammarObject)}",
 						token.Location.Start
 					));
 
@@ -119,7 +119,7 @@ namespace Land.Core.Parsing.LR
 						if (EnableTracing)
 						{
 							Log.Add(Message.Trace(
-								$"Свёртка по правилу {GrammarObject.Userify(reduce.ReductionAlternative)} -> {GrammarObject.Userify(reduce.ReductionAlternative.NonterminalSymbolName)}",
+								$"Свёртка по правилу {GrammarObject.Developerify(reduce.ReductionAlternative)} -> {GrammarObject.Developerify(reduce.ReductionAlternative.NonterminalSymbolName)}",
 								token.Location.Start
 							));
 						}
@@ -135,17 +135,15 @@ namespace Land.Core.Parsing.LR
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
 					Log.Add(LastRecoveryMessage = Message.Warning(
-						$"Неожиданный символ {this.Messagify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
+						$"Неожиданный символ {this.Developerify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						LexingStream.CurrentToken.Location.Start,
-						addInfo: new Dictionary<string, object>
+						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
+							{ MessageAddInfoKey.UnexpectedToken, LexingStream.CurrentToken.Name },
+							{ MessageAddInfoKey.UnexpectedLexeme, LexingStream.CurrentToken.Text },
 							{ 
-								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
-								this.Userify(LexingStream.CurrentToken) 
-							},
-							{ 
-								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
-								Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => this.Userify(e.Lookahead)).ToList() 
+								MessageAddInfoKey.ExpectedTokens, 
+								Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => e.Lookahead).ToList() 
 							}
 						}
 					));
@@ -309,18 +307,13 @@ namespace Land.Core.Parsing.LR
 				if (enableRecovery)
 				{
 					var message = Message.Trace(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME}: неожиданный токен {this.Developerify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Developerify(t)))}",
 						token.Location.Start,
-						addInfo: new Dictionary<string, object>
+						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
-							{ 
-								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
-								this.Userify(token) 
-							},
-							{ 
-								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
-								stopTokens.Select(e => this.Userify(e)).ToList() 
-							}
+							{ MessageAddInfoKey.UnexpectedToken, token.Name },
+							{ MessageAddInfoKey.UnexpectedLexeme, token.Text },
+							{ MessageAddInfoKey.ExpectedTokens, stopTokens.ToList() }
 						}
 					);
 
@@ -350,18 +343,13 @@ namespace Land.Core.Parsing.LR
 				else
 				{
 					Log.Add(Message.Error(
-						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {this.Messagify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Messagify(t)))}",
+						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {this.Developerify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Developerify(t)))}",
 						token.Location.Start,
-						addInfo: new Dictionary<string, object>
+						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
-							{ 
-								MessageAddInfoKey.UnexpectedTokenUserified.ToString(), 
-								this.Userify(token)
-							},
-							{ 
-								MessageAddInfoKey.ExpectedTokensUserified.ToString(), 
-								stopTokens.Select(e => this.Userify(e)).ToList() 
-							}
+							{ MessageAddInfoKey.UnexpectedToken, token.Name },
+							{ MessageAddInfoKey.UnexpectedLexeme, token.Text },
+							{ MessageAddInfoKey.ExpectedTokens, stopTokens.ToList() }
 						}
 					));
 
@@ -418,7 +406,7 @@ namespace Land.Core.Parsing.LR
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
 				Log.Add(Message.Error(
-					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Messagify(LexingStream.CurrentToken)} уже проводилось",
+					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Developerify(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
 				));
 
@@ -426,7 +414,7 @@ namespace Land.Core.Parsing.LR
 			}
 
 			Log.Add(Message.Warning(
-				$"Процесс восстановления запущен в позиции токена {this.Messagify(LexingStream.CurrentToken)}",
+				$"Процесс восстановления запущен в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
 
@@ -535,7 +523,7 @@ namespace Land.Core.Parsing.LR
 				));
 
 				Log.Add(Message.Warning(
-					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.Messagify(LexingStream.CurrentToken)}",
+					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));		
 

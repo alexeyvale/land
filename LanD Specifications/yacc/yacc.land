@@ -33,6 +33,7 @@ block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recove
 	start grammar
 	skip COMMENT STRING DECLARATION_CODE
 	recovery
+	
 	userify("заголовок правила") RULE_HEADER
 	userify("идентификатор") ID
 	userify("литерал") LITERAL

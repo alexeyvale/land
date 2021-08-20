@@ -46,7 +46,7 @@ namespace Land.Core
 			{
 				var fragment = grammar.Options.GetSymbols(ParsingOption.GROUP_NAME, ParsingOption.FRAGMENT).Contains(token) ? "fragment " : String.Empty;
 				grammarOutput.WriteLine($"{fragment}{token}: {grammar.Tokens[token].Pattern}{(grammar.Tokens[token].LineStart ? $" {{this.InputStream.LA(-1 - Text.Length) == 10 || this.InputStream.LA(-1 - Text.Length) == -1}}?" : "")} ;");
-				tokensForLines[++linesCounter] = grammar.Userify(token);
+				tokensForLines[++linesCounter] = grammar.Developerify(token);
 			}
 
 			grammarOutput.WriteLine(@"WS: [ \n\r\t\u00A0] -> skip ;");
@@ -95,7 +95,7 @@ namespace Land.Core
 						var autoNames = System.Text.RegularExpressions.Regex.Matches(parts[4], $"{Grammar.AUTO_TOKEN_PREFIX}[0-9]+");
 						foreach(System.Text.RegularExpressions.Match name in autoNames)
 						{
-							parts[4] = parts[4].Replace(name.Value, grammar.Userify(name.Value));
+							parts[4] = parts[4].Replace(name.Value, grammar.Developerify(name.Value));
 						}
 
 						var errorToken = tokensForLines[int.Parse(parts[2])];

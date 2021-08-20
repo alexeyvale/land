@@ -7,7 +7,7 @@ namespace Land.Core
 {
 	public enum MessageType { Trace, Error, Warning }
 
-	public enum MessageAddInfoKey { UnexpectedTokenUserified, ExpectedTokensUserified }
+	public enum MessageAddInfoKey { UnexpectedToken, UnexpectedLexeme, ExpectedTokens }
 
 	[Serializable]
 	public class Message
@@ -18,7 +18,7 @@ namespace Land.Core
 		public string Text { get; set; }
 		public MessageType Type { get; set; }
 
-		public Dictionary<string, object> AddInfo { get; set; }
+		public Dictionary<MessageAddInfoKey, object> AddInfo { get; set; }
 
 		public override string ToString()
 		{
@@ -38,7 +38,7 @@ namespace Land.Core
 
 		private Message() { }
 
-		private static Message Create(MessageType type, string text, PointLocation loc, string src = null, string fileName = null, Dictionary<string, object> addInfo = null)
+		private static Message Create(MessageType type, string text, PointLocation loc, string src = null, string fileName = null, Dictionary<MessageAddInfoKey, object> addInfo = null)
 		{
 			return new Message()
 			{
@@ -51,17 +51,17 @@ namespace Land.Core
 			};
 		}
 
-		public static Message Trace(string text, PointLocation loc, string src = null, Dictionary<string, object> addInfo = null)
+		public static Message Trace(string text, PointLocation loc, string src = null, Dictionary<MessageAddInfoKey, object> addInfo = null)
 		{
 			return Create(MessageType.Trace, text, loc, src, null, addInfo);
 		}
 
-		public static Message Error(string text, PointLocation loc, string src = null, Dictionary<string, object> addInfo = null)
+		public static Message Error(string text, PointLocation loc, string src = null, Dictionary<MessageAddInfoKey, object> addInfo = null)
 		{
 			return Create(MessageType.Error, text, loc, src, null, addInfo);
 		}
 
-		public static Message Warning(string text, PointLocation loc, string src = null, Dictionary<string, object> addInfo = null)
+		public static Message Warning(string text, PointLocation loc, string src = null, Dictionary<MessageAddInfoKey, object> addInfo = null)
 		{
 			return Create(MessageType.Warning, text, loc, src, null, addInfo);
 		}

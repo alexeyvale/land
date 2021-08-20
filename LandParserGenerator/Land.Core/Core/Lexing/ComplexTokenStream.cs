@@ -193,11 +193,12 @@ namespace Land.Core.Lexing
 					if (CustomBlockStack.Count == 0)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданная закрывающая конструкция {this.Messagify(token)} для пользовательского блока",
+							$"Неожиданная закрывающая конструкция {this.Developerify(token)} для пользовательского блока",
 							token.Location.Start,
-							addInfo: new Dictionary<string, object>
+							addInfo: new Dictionary<MessageAddInfoKey, object>
 							{
-								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) }
+								{ MessageAddInfoKey.UnexpectedToken, token.Name },
+								{ MessageAddInfoKey.UnexpectedLexeme, token.Text }
 							}
 						));
 					}
@@ -228,11 +229,12 @@ namespace Land.Core.Lexing
 					if (PairStack.Count == 0)
 					{
 						Log.Add(Message.Error(
-							$"Отсутствует открывающая конструкция для парной закрывающей {this.Messagify(token)}",
+							$"Отсутствует открывающая конструкция для парной закрывающей {this.Developerify(token)}",
 							token.Location.Start,
-							addInfo: new Dictionary<string, object>
+							addInfo: new Dictionary<MessageAddInfoKey, object>
 							{
-								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) }
+								{ MessageAddInfoKey.UnexpectedToken, token.Name },
+								{ MessageAddInfoKey.UnexpectedLexeme, token.Text }
 							}
 						));
 
@@ -241,12 +243,13 @@ namespace Land.Core.Lexing
 					else if (PairStack.Peek() != closed.Value)
 					{
 						Log.Add(Message.Error(
-							$"Неожиданная закрывающая конструкция {this.Messagify(token)}, ожидается {String.Join("или ", PairStack.Peek().Right.Select(e => this.Messagify(e)))} для открывающей конструкции {String.Join("или ", PairStack.Peek().Left.Select(e => this.Messagify(e)))}",
+							$"Неожиданная закрывающая конструкция {this.Developerify(token)}, ожидается {String.Join("или ", PairStack.Peek().Right.Select(e => this.Developerify(e)))} для открывающей конструкции {String.Join("или ", PairStack.Peek().Left.Select(e => this.Developerify(e)))}",
 							token.Location.Start,
-							addInfo: new Dictionary<string, object>
+							addInfo: new Dictionary<MessageAddInfoKey, object>
 							{
-								{ MessageAddInfoKey.UnexpectedTokenUserified.ToString(), this.Userify(token) },
-								{ MessageAddInfoKey.ExpectedTokensUserified.ToString(), PairStack.Peek().Right.Select(e => this.Userify(e)).ToList() }
+								{ MessageAddInfoKey.UnexpectedToken, token.Name },
+								{ MessageAddInfoKey.UnexpectedLexeme, token.Text },
+								{ MessageAddInfoKey.ExpectedTokens, PairStack.Peek().Right.ToList() }
 							}
 						));
 

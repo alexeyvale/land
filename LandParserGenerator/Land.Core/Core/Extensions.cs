@@ -13,14 +13,9 @@ namespace Land.Core
 		/// <summary>
 		/// Получение строкового описания токена в терминах грамматики языка
 		/// </summary>
-		public static string Messagify(this IGrammarProvided target, IToken token)
+		public static string Developerify(this IGrammarProvided target, IToken token)
 		{
-			//if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name))
-			//{
-			//	return $"'{token.Text}' ({target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name)[0]})";
-			//}
-
-			var userified = target.GrammarObject.Userify(token.Name);
+			var userified = target.GrammarObject.Developerify(token.Name);
 
 			if (userified == token.Name && token.Name != Grammar.ANY_TOKEN_NAME && token.Name != Grammar.EOF_TOKEN_NAME)
 			{
@@ -35,38 +30,9 @@ namespace Land.Core
 		/// <summary>
 		/// Получение строкового описания символа в терминах грамматики языка
 		/// </summary>
-		public static string Messagify(this IGrammarProvided target, string symbol)
+		public static string Developerify(this IGrammarProvided target, string symbol)
 		{
-			//if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol))
-			//{
-			//	return $"{target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol)[0]}";
-			//}
-
-			return target.GrammarObject.Userify(symbol);
-		}
-
-		public static string Userify(this IGrammarProvided target, IToken token)
-		{
-			if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name))
-			{
-				return $"'{token.Text}' ({target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, token.Name)[0]})";
-			}
-			else
-			{
-				return Messagify(target, token);
-			}
-		}
-
-		public static string Userify(this IGrammarProvided target, string symbol)
-		{
-			if (target.GrammarObject.Options.IsSet(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol))
-			{
-				return $"{target.GrammarObject.Options.GetParams(ParsingOption.GROUP_NAME, ParsingOption.USERIFY, symbol)[0]}";
-			}
-			else
-			{
-				return Messagify(target, symbol);
-			}
+			return target.GrammarObject.Developerify(symbol);
 		}
 
 		/// <summary>

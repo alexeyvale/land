@@ -80,7 +80,7 @@ namespace Land.Core.Parsing.LL
 					if(this[nt, tok].Count > 1)
 					{
 						errors.Add(Message.Error(
-							$"Грамматика не является LL(1): для нетерминала {GrammarObject.Userify(nt)} и токена {GrammarObject.Userify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok].Select(e=>GrammarObject.Userify(e)))}",
+							$"Грамматика не является LL(1): для нетерминала {GrammarObject.Developerify(nt)} и токена {GrammarObject.Developerify(tok)} допустимо несколько альтернатив: {String.Join(", ", this[nt, tok].Select(e=>GrammarObject.Developerify(e)))}",
 							GrammarObject.GetLocation(nt),
 							"LanD"
 						));

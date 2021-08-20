@@ -152,10 +152,10 @@ namespace Land.Core.Parsing.LR
 						var lookahead = Lookaheads.FirstOrDefault(l => l.Value == lookaheadIdx).Key;
 						/// Формируем строковые представления действий, которые по этому токену можно сделать
 						var actions = Actions[itemIdx, lookaheadIdx].Select(a => a is ReduceAction
-								? $"{a.ActionName} по ветке {GrammarObject.Userify(((ReduceAction)a).ReductionAlternative)} нетерминала {GrammarObject.Userify(((ReduceAction)a).ReductionAlternative.NonterminalSymbolName)}"
+								? $"{a.ActionName} по ветке {GrammarObject.Developerify(((ReduceAction)a).ReductionAlternative)} нетерминала {GrammarObject.Developerify(((ReduceAction)a).ReductionAlternative.NonterminalSymbolName)}"
 								: $"{a.ActionName}").ToList();
 
-						var messageText = $"Грамматика не является LR(1): для токена {GrammarObject.Userify(lookahead)} и состояния{Environment.NewLine}"
+						var messageText = $"Грамматика не является LR(1): для токена {GrammarObject.Developerify(lookahead)} и состояния{Environment.NewLine}"
 							+ $"\t\t{ToString(itemIdx, lookahead, "\t\t")}{Environment.NewLine}"
 							+ $"\tвозможны действия:{Environment.NewLine}" + "\t\t" + String.Join(Environment.NewLine + "\t\t", actions);
 
@@ -228,12 +228,12 @@ namespace Land.Core.Parsing.LR
 
 			foreach (var group in altPosGroups)
 			{
-				var userified = GrammarObject.UserifyElementwise(group.Key.Alternative);
+				var userified = GrammarObject.DeveloperifyElementwise(group.Key.Alternative);
 				userified.Insert(group.Key.Position, "\u2022");
 
 				var groupString = $"{String.Join("   ", userified)}";
 				if (String.IsNullOrEmpty(lookahead))
-					groupString += $"    |    {String.Join(", ", group.Select(l => GrammarObject.Userify(l.Lookahead)))}";
+					groupString += $"    |    {String.Join(", ", group.Select(l => GrammarObject.Developerify(l.Lookahead)))}";
 
 				strings.Add(groupString);
             }
