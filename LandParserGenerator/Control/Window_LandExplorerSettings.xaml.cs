@@ -72,7 +72,13 @@ namespace Land.Control
 
 			if (openFileDialog.ShowDialog() == true)
 			{
-				SettingsObject = SettingsSerializer.Deserialize(openFileDialog.FileName, true);
+				var deserialized = SettingsSerializer.Deserialize(openFileDialog.FileName, true);
+
+				SettingsObject.Parsers = deserialized.Parsers;
+				SettingsObject.PreserveIndentation = deserialized.PreserveIndentation;
+				SettingsObject.SaveAbsolutePath = deserialized.SaveAbsolutePath;
+
+				GrammarsGrid.ItemsSource = SettingsObject.Parsers;
 			}
 		}
 
