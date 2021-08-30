@@ -27,7 +27,19 @@ namespace Land.Control
 
 		private void Command_MarkupTree_Relink_Executed(object sender, RoutedEventArgs e)
 		{
-			Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
+			/// Переходим к точке, которую хотим перепривязать
+			var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
+
+			if (EnsureLocationValid(point))
+			{
+				Editor.SetActiveDocumentAndOffset(
+					point.Context.FileName,
+					point.Location.Start
+				);
+
+				/// Выбираем сущности всех уровней, к которым можно привязаться в данном месте
+				Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
+			}
 		}
 
 		private void Command_MissingTree_Delete_Executed(object sender, RoutedEventArgs e)
@@ -99,7 +111,7 @@ namespace Land.Control
 			}
 		}
 
-		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
+		private void Command_SelectPoint_Executed(object sender, RoutedEventArgs e)
 		{
 			var fileName = Editor.GetActiveDocumentName();
 			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
@@ -110,7 +122,7 @@ namespace Land.Control
 				{
 					Target = State.SelectedItem_MarkupTreeView,
 					Document = parsedFile,
-					Command = LandExplorerCommand.AddPoint
+					Command = LandExplorerCommand.SelectPoint
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
@@ -120,6 +132,34 @@ namespace Land.Control
 				ConfigureMarkupElementTab(true);
 
 				SetStatus("Добавление точки", ControlStatus.Pending);
+			}
+		}
+
+		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
+		{
+			var fileName = Editor.GetActiveDocumentName();
+			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
+
+			if (parsedFile != null)
+			{
+				var candidate = GetConcernPointCandidates(
+					parsedFile.Root,
+					Editor.GetActiveDocumentSelection(false),
+					Editor.GetActiveDocumentSelection(true)
+				)
+				.OfType<ExistingConcernPointCandidate>()
+				.FirstOrDefault();
+
+				if (candidate != null)
+				{
+					MarkupManager.AddConcernPoint(
+						candidate.Node,
+						parsedFile,
+						candidate.ViewHeader,
+						null,
+						State.SelectedItem_MarkupTreeView?.DataContext as Concern
+					);
+				}
 			}
 		}
 
@@ -150,6 +190,18 @@ namespace Land.Control
 
 		private void Command_Save_Executed(object sender, RoutedEventArgs e)
 		{
+			if(!String.IsNullOrWhiteSpace(MarkupFilePath))
+			{
+				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
+			}
+			else
+			{
+				Command_SaveAs_Executed(sender, e);
+			}
+		}
+
+		private void Command_SaveAs_Executed(object sender, RoutedEventArgs e)
+		{
 			var saveFileDialog = new SaveFileDialog()
 			{
 				AddExtension = true,
@@ -159,9 +211,8 @@ namespace Land.Control
 				FileName = Path.GetFileName(MarkupFilePath)
 			};
 
-
 			if (saveFileDialog.ShowDialog() == true)
-            {
+			{
 				MarkupFilePath = saveFileDialog.FileName;
 				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
 			}
@@ -415,7 +466,7 @@ namespace Land.Control
 			/// Проверяем, можно ли обрамить его кастомным блоком
 			if (CustomBlockValidator.IsValid(root, adjustedSelection))
 			{
-				candidates.Insert(0, new CustomConcernPointCandidate(
+				candidates.Add(new CustomConcernPointCandidate(
 					realSelection, adjustedSelection, "Новый пользовательский блок"
 				));
 			}

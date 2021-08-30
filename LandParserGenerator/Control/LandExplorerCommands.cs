@@ -4,14 +4,25 @@ namespace Land.Control
 {
 	public static class LandExplorerCommands
 	{
-		public static RoutedUICommand AddPoint { get; } = new RoutedUICommand
+		public static RoutedUICommand SelectPoint { get; } = new RoutedUICommand
 			(
 				"Добавить точку привязки",
-				"AddPoint",
+				"SelectPoint",
 				typeof(LandExplorerCommands),
 				new InputGestureCollection()
 				{
 					new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Shift)
+				}
+			);
+
+		public static RoutedUICommand AddPoint { get; } = new RoutedUICommand
+			(
+				"Быстрое добавление точки привязки",
+				"AddPoint",
+				typeof(LandExplorerCommands),
+				new InputGestureCollection()
+				{
+					new KeyGesture(Key.A, ModifierKeys.Control | ModifierKeys.Alt)
 				}
 			);
 

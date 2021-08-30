@@ -112,12 +112,12 @@ namespace Land.Control
 
 				if (selectedCandidate != null)
 				{
-					//double qualityScore;
-
-					if (State.PendingCommand.Command == LandExplorerCommand.Relink)
+					if (State.PendingCommand.Command == LandExplorerCommand.Relink
+						&& (State.PendingCommand.Target.DataContext is ConcernPoint
+							|| State.PendingCommand.Target.DataContext is RemapCandidates))
 					{
-						var point = State.PendingCommand.Target.DataContext is ConcernPoint cPoint
-							? cPoint : (State.PendingCommand.Target.DataContext as RemapCandidates).Point;
+						var point = (State.PendingCommand.Target.DataContext as ConcernPoint) 
+							?? (State.PendingCommand.Target.DataContext as RemapCandidates).Point;
 
 						MarkupManager.RelinkConcernPoint(
 							point,
@@ -125,11 +125,6 @@ namespace Land.Control
 							State.PendingCommand.Document,
 							GetPointSearchArea()
 						);
-
-						//qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
-						//	point,
-						//	State.PendingCommand.Document
-						//);
 
 						point.Name = ConcernPointNameText.Text;
 						point.Comment = ConcernPointCommentText.Text;
@@ -143,11 +138,6 @@ namespace Land.Control
 							ConcernPointCommentText.Text,
 							State.PendingCommand.Target?.DataContext as Concern
 						);
-
-						//qualityScore = MarkupManager.ContextFinder.GetBindingQualityScore(
-						//	point,
-						//	State.PendingCommand.Document
-						//);
 
 						if (State.PendingCommand.Target != null)
 							State.PendingCommand.Target.IsExpanded = true;

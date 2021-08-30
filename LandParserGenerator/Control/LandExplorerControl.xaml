@@ -20,7 +20,9 @@
 		<CommandBinding Command="ApplicationCommands.New" Executed="Command_New_Executed" CanExecute="Command_AlwaysEnabled_CanExecute" />
 		<CommandBinding Command="ApplicationCommands.Open" Executed="Command_Open_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="ApplicationCommands.Save" Executed="Command_Save_Executed" CanExecute="Command_HasUnsavedChanges_CanExecute"/>
+		<CommandBinding Command="ApplicationCommands.SaveAs" Executed="Command_SaveAs_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
+		<CommandBinding Command="local:LandExplorerCommands.SelectPoint" Executed="Command_SelectPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddPoint" Executed="Command_AddPoint_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddConcern" Executed="Command_AddConcern_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.AddLand" Executed="Command_AddLand_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
@@ -84,12 +86,16 @@
 						Command="ApplicationCommands.Open" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Name="SaveConcernMarkup" Content="&#xf0c7;" ToolTip="Сохранить разметку" 
 						Command="ApplicationCommands.Save" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Name="SaveConcernMarkupAs" Content="&#xf56e;" ToolTip="Сохранить как..." 
+						Command="ApplicationCommands.SaveAs" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
                 <Separator Margin="7"></Separator>
 
+				<Button Content="&#xf03a;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.SelectPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf067;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf0fe;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" 
+				<Button Content="&#xf65e;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" 
 						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf0ac;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
@@ -201,6 +207,10 @@
 									<Setter Property="BorderBrush" Value="White"/>
 								</Style>
 							</StackPanel.Resources>
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 5" Height="25">
+								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
+								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
+							</StackPanel>
 							<ListBox       
 								FontSize="12pt"
 								Height="80"
@@ -230,10 +240,6 @@
 										 Height="60"
 										 ScrollViewer.VerticalScrollBarVisibility="Auto"
 										 Name="ConcernPointCommentText"/>
-							</StackPanel>
-							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="25">
-								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
-								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
 						</StackPanel>
 						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">

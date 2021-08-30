@@ -28,7 +28,7 @@ namespace Land.Control
 	/// </summary>
 	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
-		public enum LandExplorerCommand { AddPoint, Relink }
+		public enum LandExplorerCommand { SelectPoint, Relink }
 
 		public class PendingCommandInfo
 		{
@@ -265,18 +265,28 @@ namespace Land.Control
 		/// <summary>
 		/// Сохранить текущую разметку
 		/// </summary>
-		public void Save()
-        {
+		public void Save(string fileName = null)
+		{
+			if(!String.IsNullOrWhiteSpace(fileName))
+			{
+				MarkupFilePath = fileName;
+			}
+
 			Command_Save_Executed(null, null);
 		}
 
 		/// <summary>
 		/// Создать новую разметку
 		/// </summary>
-		public void New()
+		public void New(string fileName = null)
         {
 			Command_New_Executed(null, null);
-        }
+
+			if (!String.IsNullOrWhiteSpace(fileName))
+			{
+				Save(fileName);
+			}
+		}
 
 		/// <summary>
 		/// Заданы ли настройки панели разметки
