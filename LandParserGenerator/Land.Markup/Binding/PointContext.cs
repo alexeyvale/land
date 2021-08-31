@@ -1127,6 +1127,43 @@ namespace Land.Markup.Binding
 		}
 	}
 
+	public class LineContext
+	{
+		/// <summary>
+		/// Идентификаторы связанных точек привязки
+		/// </summary>
+		public HashSet<Guid> LinkedPoints { get; private set; } = new HashSet<Guid>();
+
+		public void LinkPoint(Guid pointId)
+		{
+			this.LinkedPoints.Add(pointId);
+		}
+
+		public TextOrHash InnerContext { get; set; }
+		public Tuple<TextOrHash, TextOrHash> NeighboursContext { get; set; }
+
+		public LineContext(Node node, SegmentLocation line, string text)
+		{
+			var beforeSegment = new SegmentLocation()
+			{
+				Start = node.Location.Start,
+				End = line.Start
+			};
+
+			var afterSegment = new SegmentLocation()
+			{
+				Start = line.End,
+				End = node.Location.End
+			};
+
+			InnerContext = new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));
+			NeighboursContext = new Tuple<TextOrHash, TextOrHash>(
+				new TextOrHash(text.Substring(beforeSegment.Start.Offset, beforeSegment.Length.Value)),
+				new TextOrHash(text.Substring(afterSegment.Start.Offset, afterSegment.Length.Value))
+			);
+		}
+	}
+
 	public class TextOrHash
 	{
 		public const int MAX_TEXT_LENGTH = 100;

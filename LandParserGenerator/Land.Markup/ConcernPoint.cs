@@ -28,6 +28,24 @@ namespace Land.Markup
 			}
 		}
 
+		private LineContext _lineContext;
+
+		[JsonIgnore]
+		public LineContext LineContext
+		{
+			get { return _lineContext; }
+
+			set
+			{
+				_lineContext = value;
+
+				if (value != null)
+				{
+					_lineContext.LinkPoint(Id);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
 		/// </summary>
@@ -46,30 +64,22 @@ namespace Land.Markup
 		[JsonIgnore]
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
-		/// <summary>
-		/// Узел AST, которому соответствует точка
-		/// </summary>
-		private Node _node;
+
+		private SegmentLocation _location;
 
 		[JsonIgnore]
-		public Node AstNode
+		public SegmentLocation Location
 		{
-			get => _node;
+			get => _location;
 			set
 			{
-				_node = value;
+				_location = value;
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasMissingLocation"));
 			}
 		}
-
-		/// <summary>
-		/// Координаты участка в тексте, которому соответствует точка 
-		/// </summary>
-		[JsonIgnore]
-		public SegmentLocation Location => _node?.Location;
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
@@ -80,31 +90,11 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(Node node, PointContext context, Concern parent = null)
+		public ConcernPoint(string name, string comment, SegmentLocation location, PointContext context, LineContext line, Concern parent = null)
 		{
 			Context = context;
-			AstNode = node;
-			Parent = parent;
-			Name = node.Type;
-
-			if (node.Value.Count > 0)
-				Name += ": " + String.Join(" ", node.Value);
-			else
-			{
-				if (node.Children.Count > 0)
-				{
-					Name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
-						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
-				}
-			}
-
-			base.PropertyChanged += ParentPropertyChanged;
-		}
-
-		public ConcernPoint(string name, string comment, Node node, PointContext context, Concern parent = null)
-		{
-			Context = context;
-			AstNode = node;
+			LineContext = line;
+			Location = location;
 			Parent = parent;
 			Name = name;
 			Comment = comment;
@@ -112,21 +102,42 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public void Relink(Node node, PointContext context)
+		public void Relink(SegmentLocation location, PointContext context, LineContext line)
 		{
-			AstNode = node;
+			Location = location;
 			Context = context;
+			LineContext = line;
 		}
 
 		public void Relink(RemapCandidateInfo candidate)
 		{
-			AstNode = candidate.Node;
+			Location = candidate.Node.Location;
 			Context = candidate.Context;
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);
+		}
+
+		public static string GetDefaultName(Node node)
+		{
+			var name = node.Type;
+
+			if (node.Value.Count > 0)
+			{
+				name += ": " + String.Join(" ", node.Value);
+			}
+			else
+			{
+				if (node.Children.Count > 0)
+				{
+					name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
+				}
+			}
+
+			return name;
 		}
 	}
 

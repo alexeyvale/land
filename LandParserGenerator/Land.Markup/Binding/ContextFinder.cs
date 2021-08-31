@@ -778,7 +778,7 @@ namespace Land.Markup.Binding
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> FindPoints(
 			List<ConcernPoint> points,
 			List<ParsedFile> searchArea,
 			SearchType searchType)
@@ -828,6 +828,44 @@ namespace Land.Markup.Binding
 			}
 
 			return overallResult;
+		}
+
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> FindLines(
+			List<ConcernPoint> points,
+			List<ParsedFile> searchArea)
+		{
+			List<ParsedFile> files = null;
+
+			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+
+			var groupedPoints = points
+				.GroupBy(p => p.Context.FileName)
+				.ToDictionary(e => e.Key, e =>
+					e.GroupBy(p => p.Context.Type).ToDictionary(el => el.Key, el => el.ToList())
+				);
+
+			foreach (var fileName in groupedPoints.Keys)
+			{
+				/// При поиске в том же файле ищем тот же файл по полному совпадению пути
+				files = searchArea.Where(f => f.Name == fileName).ToList();
+
+				var localResult = DoMultiTypeSearch(groupedPoints[fileName], files);
+
+				foreach (var elem in localResult)
+				{
+					overallResult[elem.Key] = elem.Value;
+				}
+			}
+
+			return overallResult;
+		}
+
+		private void DoLineSearch(ConcernPoint point, ParsedFile file)
+		{
+			//var lines = file.Text.Substring(point.Location.Start.Offset, point.Location.Length.Value)
+			//	.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+			//	.Select(l => new LineContext())
+			//	.ToList();
 		}
 
 		#region EvalSimilarity

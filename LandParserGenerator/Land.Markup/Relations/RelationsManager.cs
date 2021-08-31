@@ -80,7 +80,7 @@ namespace Land.Markup.Relations
 			InternalRelations.FillAsTransposition(RelationType.IsPhysicalAncestorOf, RelationType.IsPhysicalDescendantOf);
 
 			/// Строим отношение, связывающее точки, помечающие одну и ту же сущность
-			var grouped = points.GroupBy(p => p.AstNode);
+			var grouped = points.GroupBy(p => p.Context);
 
 			foreach(var group in grouped)
 			{
