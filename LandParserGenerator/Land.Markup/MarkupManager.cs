@@ -96,9 +96,9 @@ namespace Land.Markup
 		}
 
 		public void SetHasUnsavedChanges()
-        {
+		{
 			HasUnsavedChanges = true;
-        }
+		}
 
 		/// <summary>
 		/// Сброс узлов дерева у всех точек, связанных с указанным файлом
@@ -150,10 +150,10 @@ namespace Land.Markup
 		/// Добавление точки привязки
 		/// </summary>
 		public ConcernPoint AddConcernPoint(
-			Node node, 
-			ParsedFile file, 
-			string name = null, 
-			string comment = null, 
+			Node node,
+			ParsedFile file,
+			string name = null,
+			string comment = null,
 			Concern parent = null)
 		{
 			Remap(node.Type, file);
@@ -179,14 +179,14 @@ namespace Land.Markup
 			};
 
 			var point = new ConcernPoint(
-				node, 
+				node,
 				ContextFinder.ContextManager.GetContext(
-					node, 
+					node,
 					file,
 					siblingsArgs,
 					closestArgs,
 					searchScopeArgs
-				), 
+				),
 				parent
 			);
 
@@ -253,14 +253,14 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, 
+							node,
 							ContextFinder.ContextManager.GetContext(
-								node, 
+								node,
 								file,
 								siblingsArgs,
 								closestArgs,
 								searchScopeArgs
-							), 
+							),
 							subconcern
 						));
 					}
@@ -273,14 +273,14 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, 
+						node,
 						ContextFinder.ContextManager.GetContext(
-							node, 
+							node,
 							file,
 							siblingsArgs,
 							closestArgs,
 							searchScopeArgs
-						), 
+						),
 						concern
 					));
 				}
@@ -319,38 +319,45 @@ namespace Land.Markup
 		/// Смена узла, к которому привязана точка
 		/// </summary>
 		public void RelinkConcernPoint(
-			ConcernPoint point, 
-			Node node, 
+			ConcernPoint point,
+			Node node,
 			ParsedFile file,
 			List<ParsedFile> searchArea)
 		{
-			var siblingsArgs = new SiblingsConstructionArgs
+			if (node.Type != "LAND_LINE")
 			{
-				ContextFinder = ContextFinder
-			};
+				var siblingsArgs = new SiblingsConstructionArgs
+				{
+					ContextFinder = ContextFinder
+				};
 
-			var closestArgs = new ClosestConstructionArgs
+				var closestArgs = new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { file },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				};
+
+				var searchScopeArgs = new SearchScopeConstructionArgs
+				{
+					ClosestArgs = closestArgs,
+					SiblingsArgs = siblingsArgs,
+					ContextFinder = ContextFinder
+				};
+
+				point.Relink(node, ContextFinder.ContextManager.GetContext(
+					node,
+					file,
+					siblingsArgs,
+					closestArgs,
+					searchScopeArgs
+				));
+			}
+			else
 			{
-				SearchArea = new List<ParsedFile> { file },
-				GetParsed = ContextFinder.GetParsed,
-				ContextFinder = ContextFinder,
-				SiblingsArgs = siblingsArgs
-			};
-
-			var searchScopeArgs = new SearchScopeConstructionArgs
-			{
-				ClosestArgs = closestArgs,
-				SiblingsArgs = siblingsArgs,
-				ContextFinder = ContextFinder
-			};
-
-			point.Relink(node, ContextFinder.ContextManager.GetContext(
-				node, 
-				file,
-				siblingsArgs,
-				closestArgs,
-				searchScopeArgs
-			));
+				point.Relink(node, GetContextForLine(node, file);
+			}
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -383,7 +390,7 @@ namespace Land.Markup
 				contextsSet.Add(point.Context);
 				contextsSet.UnionWith(point.Context.ClosestContext);
 
-				if(point.Context.SiblingsContext != null)
+				if (point.Context.SiblingsContext != null)
 				{
 					contextsSet.UnionWith(point.Context.SiblingsContext.Before.Nearest);
 					contextsSet.UnionWith(point.Context.SiblingsContext.After.Nearest);
@@ -405,7 +412,7 @@ namespace Land.Markup
 
 			elem.Parent = newParent;
 
-			if(newParent != null)
+			if (newParent != null)
 				newParent.Elements.Add(elem);
 			else
 				Markup.Add(elem);
@@ -430,7 +437,7 @@ namespace Land.Markup
 						directoryUri.MakeRelativeUri(new Uri(group.Key)).ToString()
 					);
 
-					foreach(var e in group)
+					foreach (var e in group)
 					{
 						e.FileName = relatileName;
 					}
@@ -444,12 +451,12 @@ namespace Land.Markup
 					Markup = Markup,
 					PointContexts = pointContexts
 						.GroupBy(c => c.AncestorsContext)
-						.Select(c => new AncestorsPointsPair { Ancestors = c.Key, Points = c.ToList()})
+						.Select(c => new AncestorsPointsPair { Ancestors = c.Key, Points = c.ToList() })
 						.ToList(),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
 
-				fs.Write(JsonConvert.SerializeObject(unit, Formatting.Indented, 
+				fs.Write(JsonConvert.SerializeObject(unit, Formatting.Indented,
 					new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
 			}
 
@@ -491,7 +498,7 @@ namespace Land.Markup
 				}
 
 				/// Восстанавливаем связи с предками
-				foreach(var pair in unit.PointContexts)
+				foreach (var pair in unit.PointContexts)
 				{
 					pointContexts.AddRange(pair.Points);
 
@@ -505,7 +512,7 @@ namespace Land.Markup
 				/// восстанавливаем связи с контекстами
 				var concernPoints = GetConcernPoints().ToDictionary(e => e.Id, e => e);
 
-                #region Relative paths to absolute paths
+				#region Relative paths to absolute paths
 
 				foreach (var pc in pointContexts)
 				{
@@ -517,14 +524,14 @@ namespace Land.Markup
 					}
 				}
 
-                #endregion
+				#endregion
 
 				SetGrammarBasedProperties(pointContexts, grammars);
 
 				/// Связываем контексты с точками привязки в разметке
 				foreach (var context in pointContexts)
 				{
-					foreach(var id in context.LinkedPoints)
+					foreach (var id in context.LinkedPoints)
 					{
 						concernPoints[id].Context = context;
 					}
@@ -538,9 +545,9 @@ namespace Land.Markup
 						point.Context.ClosestContext = new HashSet<PointContext>();
 					}
 
-					if(point.Context.SiblingsContext != null)
+					if (point.Context.SiblingsContext != null)
 					{
-						if(point.Context.SiblingsContext.Before.Nearest == null)
+						if (point.Context.SiblingsContext.Before.Nearest == null)
 						{
 							point.Context.SiblingsContext.Before.Nearest = new List<PointContext>();
 						}
@@ -596,7 +603,7 @@ namespace Land.Markup
 		}
 
 		private void SetGrammarBasedProperties(IEnumerable<PointContext> points, Dictionary<string, Grammar> grammars)
-        {
+		{
 			foreach (var group in points.GroupBy(p => Path.GetExtension(p.FileName)))
 			{
 				/// Все контексты заголовка, для которых нужно восстановить приоритеты и режимы сравнения
@@ -647,7 +654,7 @@ namespace Land.Markup
 				Action<HeaderContext, string> setCore = (header, type) =>
 				{
 					/// Информация о ядре связана либо с данным типом, либо с типом, алиасом которого является данный
-					var typeToCheck = cores.ContainsKey(type) ? type 
+					var typeToCheck = cores.ContainsKey(type) ? type
 						: grammars[group.Key].Aliases.Keys.FirstOrDefault(k => grammars[group.Key].Aliases[k].Contains(type));
 
 					var grouped = header.Sequence
@@ -673,7 +680,7 @@ namespace Land.Markup
 					}
 				}
 			}
-        }
+		}
 
 		/// <summary>
 		/// Поиск узла дерева, которому соответствует заданная точка привязки
@@ -681,8 +688,8 @@ namespace Land.Markup
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
 			return ContextFinder.Find(
-				new List<ConcernPoint> { point }, 
-				new List<ParsedFile> { targetInfo }, 
+				new List<ConcernPoint> { point },
+				new List<ParsedFile> { targetInfo },
 				ContextFinder.SearchType.Local
 			)[point];
 		}
@@ -739,7 +746,7 @@ namespace Land.Markup
 			/// Если требуется глобальный поиск, 
 			/// выполняем его для того, что не нашли локально, 
 			/// потом мёржим результаты
-			if(searchType == ContextFinder.SearchType.Global)
+			if (searchType == ContextFinder.SearchType.Global)
 			{
 				points = points.Except(result
 					.Where(e => e.Value.FirstOrDefault()?.IsAuto ?? false)
@@ -748,7 +755,7 @@ namespace Land.Markup
 
 				var globalResult = ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Global);
 
-				foreach(var key in globalResult.Keys)
+				foreach (var key in globalResult.Keys)
 				{
 					result[key] = globalResult[key];
 				}
@@ -761,7 +768,7 @@ namespace Land.Markup
 					//.TakeWhile(c=>c.Similarity >= GarbageThreshold)
 					.Take(AmbiguityTopCount).ToList();
 
-				if (!allowAutoDecisions || 
+				if (!allowAutoDecisions ||
 					!ApplyCandidate(kvp.Key, candidates))
 					ambiguous[kvp.Key] = candidates;
 			}
@@ -787,7 +794,7 @@ namespace Land.Markup
 
 			var result = ContextFinder.Find(
 				points,
-				new List<ParsedFile> { file }, 
+				new List<ParsedFile> { file },
 				ContextFinder.SearchType.Local
 			);
 
@@ -808,7 +815,7 @@ namespace Land.Markup
 		}
 
 		private bool ApplyCandidate(
-			ConcernPoint point, 
+			ConcernPoint point,
 			IEnumerable<RemapCandidateInfo> candidates)
 		{
 			var first = candidates.FirstOrDefault();
@@ -836,7 +843,7 @@ namespace Land.Markup
 				};
 
 				point.Context = ContextFinder.ContextManager.GetContext(
-					first.Node, 
+					first.Node,
 					first.File,
 					siblingsArgs,
 					closestArgs,
@@ -894,6 +901,58 @@ namespace Land.Markup
 
 				action(elem);
 			}
+		}
+
+		private PointContext GetContextForLine(Node node, ParsedFile file)
+		{
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				ContextFinder = ContextFinder
+			};
+
+			var closestArgs = new ClosestConstructionArgs
+			{
+				SearchArea = new List<ParsedFile> { file },
+				GetParsed = ContextFinder.GetParsed,
+				ContextFinder = ContextFinder,
+				SiblingsArgs = siblingsArgs
+			};
+
+			var searchScopeArgs = new SearchScopeConstructionArgs
+			{
+				ClosestArgs = closestArgs,
+				SiblingsArgs = siblingsArgs,
+				ContextFinder = ContextFinder
+			};
+
+			var beforeSegment = new SegmentLocation()
+			{
+				Start = node.Parent?.Location.Start ?? new PointLocation(0),
+				End = node.Location.Start
+			};
+
+			var afterSegment = new SegmentLocation()
+			{
+				Start = node.Location.End,
+				End = node.Parent?.Location.End ?? new PointLocation(file.Text.Length)
+			};
+
+			return new PointContext
+			{
+				InnerContext = new InnerContext(new List<SegmentLocation> { node.Location }, file.Text),
+				SearchScope = ContextFinder.ContextManager.GetContext(node.Parent, file, siblingsArgs, closestArgs, null),
+				SiblingsContext = new SiblingsContext
+				{
+					Before = new SiblingsContextPart
+					{
+						All = new TextOrHash(file.Text.Substring(beforeSegment.Start.Offset, beforeSegment.Length.Value))
+					},
+					After = new SiblingsContextPart
+					{
+						All = new TextOrHash(file.Text.Substring(afterSegment.Start.Offset, afterSegment.Length.Value))
+					},
+				}
+			};
 		}
 	}
 }

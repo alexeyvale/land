@@ -478,13 +478,13 @@ namespace Land.Control
 				{
 					var index = candidates.IndexOf(candidate);
 
-					var node = new Node("LAND_STRING")
+					var node = new Node("LAND_LINE")
 					{
 						Parent = candidate.Node,
 						Options = new Core.Specification.SymbolOptionsManager(
 							new Dictionary<string, Dictionary<string, List<dynamic>>> {
 								{
-									Land.Markup.CoreExtension.MarkupOption.GROUP_NAME,
+									Markup.CoreExtension.MarkupOption.GROUP_NAME,
 									new Dictionary<string, List<dynamic>> {
 										{ Land.Markup.CoreExtension.MarkupOption.LAND, new List<dynamic> { true } }
 									}
