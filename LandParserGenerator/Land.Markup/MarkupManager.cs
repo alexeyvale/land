@@ -163,20 +163,32 @@ namespace Land.Markup
 				ContextFinder = ContextFinder
 			};
 
+			var closestArgs = new ClosestConstructionArgs
+			{
+				SearchArea = new List<ParsedFile> { file },
+				GetParsed = ContextFinder.GetParsed,
+				ContextFinder = ContextFinder,
+				SiblingsArgs = siblingsArgs
+			};
+
+			var searchScopeArgs = new SearchScopeConstructionArgs
+			{
+				ClosestArgs = closestArgs,
+				SiblingsArgs = siblingsArgs,
+				ContextFinder = ContextFinder
+			};
+
 			var point = new ConcernPoint(
 				node, 
 				ContextFinder.ContextManager.GetContext(
 					node, 
 					file,
 					siblingsArgs,
-					new ClosestConstructionArgs
-					{
-						SearchArea = new List<ParsedFile> { file },
-						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder,
-						SiblingsArgs = siblingsArgs
-					}), 
-				parent);
+					closestArgs,
+					searchScopeArgs
+				), 
+				parent
+			);
 
 			if (!String.IsNullOrEmpty(name))
 			{
@@ -207,6 +219,26 @@ namespace Land.Markup
 				/// В пределах символа группируем по псевдониму
 				var subgroups = group.GroupBy(g => g.Alias);
 
+				var siblingsArgs = new SiblingsConstructionArgs
+				{
+					ContextFinder = ContextFinder
+				};
+
+				var closestArgs = new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { file },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				};
+
+				var searchScopeArgs = new SearchScopeConstructionArgs
+				{
+					ClosestArgs = closestArgs,
+					SiblingsArgs = siblingsArgs,
+					ContextFinder = ContextFinder
+				};
+
 				/// Для всех точек, для которых указан псевдоним
 				foreach (var subgroup in subgroups.Where(s => !String.IsNullOrEmpty(s.Key)))
 				{
@@ -225,15 +257,12 @@ namespace Land.Markup
 							ContextFinder.ContextManager.GetContext(
 								node, 
 								file,
-								subconcernSiblingsArgs,
-								new ClosestConstructionArgs
-								{
-									SearchArea = new List<ParsedFile> { file },
-									GetParsed = ContextFinder.GetParsed,
-									ContextFinder = ContextFinder,
-									SiblingsArgs = subconcernSiblingsArgs
-								}), 
-							subconcern));
+								siblingsArgs,
+								closestArgs,
+								searchScopeArgs
+							), 
+							subconcern
+						));
 					}
 				}
 
@@ -241,27 +270,19 @@ namespace Land.Markup
 				var nodes = subgroups.Where(s => String.IsNullOrEmpty(s.Key))
 					.SelectMany(s => s).ToList();
 
-				var siblingsArgs = new SiblingsConstructionArgs
-				{
-					ContextFinder = ContextFinder
-				};
-
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, ContextFinder.ContextManager.GetContext(
+						node, 
+						ContextFinder.ContextManager.GetContext(
 							node, 
 							file,
 							siblingsArgs,
-							new ClosestConstructionArgs
-							{
-								SearchArea = new List<ParsedFile> { file },
-								GetParsed = ContextFinder.GetParsed,
-								ContextFinder = ContextFinder,
-								SiblingsArgs = siblingsArgs
-							}), 
-						concern)
-					);
+							closestArgs,
+							searchScopeArgs
+						), 
+						concern
+					));
 				}
 			}
 
@@ -308,18 +329,28 @@ namespace Land.Markup
 				ContextFinder = ContextFinder
 			};
 
+			var closestArgs = new ClosestConstructionArgs
+			{
+				SearchArea = new List<ParsedFile> { file },
+				GetParsed = ContextFinder.GetParsed,
+				ContextFinder = ContextFinder,
+				SiblingsArgs = siblingsArgs
+			};
+
+			var searchScopeArgs = new SearchScopeConstructionArgs
+			{
+				ClosestArgs = closestArgs,
+				SiblingsArgs = siblingsArgs,
+				ContextFinder = ContextFinder
+			};
+
 			point.Relink(node, ContextFinder.ContextManager.GetContext(
 				node, 
 				file,
 				siblingsArgs,
-				new ClosestConstructionArgs
-				{
-					SearchArea = new List<ParsedFile> { file },
-					GetParsed = ContextFinder.GetParsed,
-					ContextFinder = ContextFinder,
-					SiblingsArgs = siblingsArgs
-				})
-			);
+				closestArgs,
+				searchScopeArgs
+			));
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -789,17 +820,27 @@ namespace Land.Markup
 					ContextFinder = ContextFinder
 				};
 
+				var closestArgs = new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { first.File },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				};
+
+				var searchScopeArgs = new SearchScopeConstructionArgs
+				{
+					ClosestArgs = closestArgs,
+					SiblingsArgs = siblingsArgs,
+					ContextFinder = ContextFinder
+				};
+
 				point.Context = ContextFinder.ContextManager.GetContext(
 					first.Node, 
 					first.File,
 					siblingsArgs,
-					new ClosestConstructionArgs
-					{
-						SearchArea = new List<ParsedFile> { first.File },
-						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder,
-						SiblingsArgs = siblingsArgs
-					}
+					closestArgs,
+					searchScopeArgs
 				);
 
 				point.AstNode = first.Node;

@@ -418,6 +418,8 @@ namespace Land.Markup.Binding
 		/// </summary>
 		public HashSet<Guid> LinkedPoints { get; private set; } = new HashSet<Guid>();
 
+		public HashSet<Guid> LinkedSearchScopePoints { get; private set; } = new HashSet<Guid>();
+
 		/// <summary>
 		/// Идентификаторы точек привязки,
 		/// для которых данный контекст описывает ближайшую сущность
@@ -431,6 +433,11 @@ namespace Land.Markup.Binding
 		public void LinkPoint(Guid pointId)
 		{
 			this.LinkedPoints.Add(pointId);
+
+			if(this.SearchScope != null)
+			{
+				this.SearchScope.LinkedSearchScopePoints.Add(pointId);
+			}
 
 			if (this.ClosestContext != null)
 			{
@@ -488,6 +495,9 @@ namespace Land.Markup.Binding
 		[JsonIgnore]
 		public List<AncestorsContextElement> AncestorsContext { get; set; }
 
+		[JsonIgnore]
+		public PointContext SearchScope { get; set; }
+
 		/// <summary>
 		/// Контекст уровня, на котором находится узел, к которому привязана точка разметки
 		/// </summary>
@@ -538,12 +548,18 @@ namespace Land.Markup.Binding
 			ParsedFile file, 
 			SiblingsConstructionArgs siblingsArgs,
 			ClosestConstructionArgs closestArgs,
+			SearchScopeConstructionArgs searchScopeArgs,
 			PointContext core = null,
 			List<AncestorsContextElement> cachedAncestorsContext = null)
 		{
 			if (core == null)
 			{
-				core = PointContext.GetCoreContext(node, file, cachedAncestorsContext);
+				core = GetCoreContext(node, file, cachedAncestorsContext);
+			}
+
+			if (node.Type == "LAND_STRING")
+			{
+				core.SearchScope = GetSearchScope(node, file, searchScopeArgs);
 			}
 
 			if (closestArgs != null && core.ClosestContext == null)
@@ -669,7 +685,9 @@ namespace Land.Markup.Binding
 			{
 				if (currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME
 					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+				{
 					context.Add((AncestorsContextElement)currentNode);
+				}
 
 				currentNode = currentNode.Parent;
 			}
@@ -993,17 +1011,30 @@ namespace Land.Markup.Binding
 				.Where(e => e.Node.Location != null)
 				.ToList();
 
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				ContextFinder = args.ContextFinder,
+				CountOnly = true
+			};
+
+			var searchScopeArgs = new SearchScopeConstructionArgs
+			{
+				SiblingsArgs = siblingsArgs
+			};
+
 			var context = new SiblingsContext
 			{
 				Before = !args.CountOnly ? new SiblingsContextPart
 				{
 					All = checkAllSiblings ? new TextOrHash(beforeBuilder.ToString()) : null,
 					Nearest = beforeNeighbors.Take(MAX_COUNT).Select(e => 
-						args.ContextFinder.ContextManager.GetContext(e.Node, file, new SiblingsConstructionArgs
-						{
-							ContextFinder = args.ContextFinder,
-							CountOnly = true
-						}, null)
+						args.ContextFinder.ContextManager.GetContext(
+							e.Node, 
+							file, 
+							siblingsArgs, 
+							null,
+							searchScopeArgs
+						)
 					).ToList()
 				} : null,
 
@@ -1011,11 +1042,13 @@ namespace Land.Markup.Binding
 				{
 					All = checkAllSiblings ? new TextOrHash(afterBuilder.ToString()) : null,
 					Nearest = afterNeighbours.Take(MAX_COUNT).Select(e => 
-						args.ContextFinder.ContextManager.GetContext(e.Node, file, new SiblingsConstructionArgs
-						{
-							ContextFinder = args.ContextFinder,
-							CountOnly = true
-						}, null)
+						args.ContextFinder.ContextManager.GetContext(
+							e.Node, 
+							file,
+							siblingsArgs, 
+							null,
+							searchScopeArgs
+						)
 					).ToList()
 				} : null,
 
@@ -1125,6 +1158,32 @@ namespace Land.Markup.Binding
 
 			return new HashSet<PointContext>(result.Select(e=>e.Context));
 		}
+
+		public static PointContext GetSearchScope(
+			Node node,
+			ParsedFile file,
+			SearchScopeConstructionArgs searchScopeArgs)
+		{
+			var currentNode = node.Parent;
+
+			while (currentNode != null)
+			{
+				if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+				{
+					return searchScopeArgs.ContextFinder.ContextManager.GetContext(
+						currentNode,
+						file,
+						searchScopeArgs.SiblingsArgs,
+						searchScopeArgs.ClosestArgs,
+						searchScopeArgs
+					);
+				}
+
+				currentNode = currentNode.Parent;
+			}
+
+			return null;
+		}
 	}
 
 	public class TextOrHash
@@ -1183,6 +1242,13 @@ namespace Land.Markup.Binding
 		public List<ParsedFile> SearchArea { get; set; }
 		public Func<string, ParsedFile> GetParsed { get; set; }
 		public ContextFinder ContextFinder { get; set; }
+		public SiblingsConstructionArgs SiblingsArgs { get; set; }
+	}
+
+	public class SearchScopeConstructionArgs
+	{
+		public ContextFinder ContextFinder { get; set; }
+		public ClosestConstructionArgs ClosestArgs { get; set; }
 		public SiblingsConstructionArgs SiblingsArgs { get; set; }
 	}
 }

@@ -42,9 +42,17 @@ namespace Land.Markup.Binding
 			Node node,
 			ParsedFile file,
 			SiblingsConstructionArgs siblingsArgs,
-			ClosestConstructionArgs closestArgs)
+			ClosestConstructionArgs closestArgs,
+			SearchScopeConstructionArgs searchScopeArgs)
 		{
-			return PointContext.GetExtendedContext(node, file, siblingsArgs, closestArgs, GetContext(node, file));
+			return PointContext.GetExtendedContext(
+				node, 
+				file, 
+				siblingsArgs, 
+				closestArgs,
+				searchScopeArgs,
+				GetContext(node, file)
+			);
 		}
 
 		public void ClearCache(string fileName)
