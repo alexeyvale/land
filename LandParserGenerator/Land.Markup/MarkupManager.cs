@@ -156,37 +156,48 @@ namespace Land.Markup
 			string comment = null,
 			Concern parent = null)
 		{
-			Remap(node.Type, file);
+			var context = (PointContext)null;
 
-			var siblingsArgs = new SiblingsConstructionArgs
+			if (node.Type != "LAND_LINE")
 			{
-				ContextFinder = ContextFinder
-			};
+				Remap(node.Type, file);
 
-			var closestArgs = new ClosestConstructionArgs
-			{
-				SearchArea = new List<ParsedFile> { file },
-				GetParsed = ContextFinder.GetParsed,
-				ContextFinder = ContextFinder,
-				SiblingsArgs = siblingsArgs
-			};
+				var siblingsArgs = new SiblingsConstructionArgs
+				{
+					ContextFinder = ContextFinder
+				};
 
-			var searchScopeArgs = new SearchScopeConstructionArgs
-			{
-				ClosestArgs = closestArgs,
-				SiblingsArgs = siblingsArgs,
-				ContextFinder = ContextFinder
-			};
+				var closestArgs = new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { file },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				};
 
-			var point = new ConcernPoint(
-				node,
-				ContextFinder.ContextManager.GetContext(
+				var searchScopeArgs = new SearchScopeConstructionArgs
+				{
+					ClosestArgs = closestArgs,
+					SiblingsArgs = siblingsArgs,
+					ContextFinder = ContextFinder
+				};
+
+				context = ContextFinder.ContextManager.GetContext(
 					node,
 					file,
 					siblingsArgs,
 					closestArgs,
 					searchScopeArgs
-				),
+				);
+			}
+			else
+			{
+				context = GetContextForLine(node, file);
+			}
+
+			var point = new ConcernPoint(
+				node,
+				context,
 				parent
 			);
 
@@ -356,7 +367,7 @@ namespace Land.Markup
 			}
 			else
 			{
-				point.Relink(node, GetContextForLine(node, file);
+				point.Relink(node, GetContextForLine(node, file));
 			}
 
 			OnMarkupChanged?.Invoke();
@@ -939,6 +950,7 @@ namespace Land.Markup
 
 			return new PointContext
 			{
+				FileName = file.Name,
 				InnerContext = new InnerContext(new List<SegmentLocation> { node.Location }, file.Text),
 				SearchScope = ContextFinder.ContextManager.GetContext(node.Parent, file, siblingsArgs, closestArgs, null),
 				SiblingsContext = new SiblingsContext
