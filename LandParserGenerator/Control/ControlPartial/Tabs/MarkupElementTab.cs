@@ -91,7 +91,7 @@ namespace Land.Control
 
 				/// Теперь в дереве должен появиться узел, соответствующий пользовательскому блоку
 				var customBlockNode = MarkupManager
-					.GetConcernPointCandidates(parsedFile.Root, customPoint.RealSelection)
+					.GetConcernPointCandidates(parsedFile.Root, customPoint.RealSelection, customPoint.AdjustedSelection)
 					.FirstOrDefault(cand => cand.Type == Grammar.CUSTOM_BLOCK_RULE_NAME);
 
 				return customBlockNode != null

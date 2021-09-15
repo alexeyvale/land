@@ -152,6 +152,7 @@ namespace Land.Control
 					Editor.GetActiveDocumentSelection(true)
 				)
 				.OfType<ExistingConcernPointCandidate>()
+				.Where(c => c.Node.Type != MarkupManager.LINE_NODE_TYPE)
 				.FirstOrDefault();
 
 				if (candidate != null)
@@ -463,46 +464,19 @@ namespace Land.Control
 			SegmentLocation adjustedSelection)
 		{
 			/// Для выделения находим сущности, объемлющие его
-			var candidates = MarkupManager.GetConcernPointCandidates(file.Root, realSelection)
-				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
+			var candidates = MarkupManager.GetConcernPointCandidates(file.Root, realSelection, adjustedSelection)
+				.Select(c => {
+					var candidate = new ExistingConcernPointCandidate(c);
+
+					if (c.Type == MarkupManager.LINE_NODE_TYPE)
+					{
+						candidate.ViewHeader = "строка: "
+							+ file.Text.Substring(adjustedSelection.Start.Offset, adjustedSelection.Length.Value).Trim();
+					}
+
+					return (ConcernPointCandidate)candidate;
+				})
 				.ToList();
-
-			/// Проверяем, можно ли привязаться к строке
-			if (adjustedSelection.Start.Line == adjustedSelection.End.Line)
-			{
-				var candidate = candidates
-					.OfType<ExistingConcernPointCandidate>()
-					.FirstOrDefault(c => c.Node.Location.Includes(adjustedSelection));
-
-				if (candidate != null)
-				{
-					var index = candidates.IndexOf(candidate);
-
-					var node = new Node("LAND_LINE")
-					{
-						Parent = candidate.Node,
-						Options = new Core.Specification.SymbolOptionsManager(
-							new Dictionary<string, Dictionary<string, List<dynamic>>> {
-								{
-									Markup.CoreExtension.MarkupOption.GROUP_NAME,
-									new Dictionary<string, List<dynamic>> {
-										{ Land.Markup.CoreExtension.MarkupOption.LAND, new List<dynamic> { true } }
-									}
-								}
-							}
-						)
-					};
-
-					node.SetLocation(adjustedSelection.Start, adjustedSelection.End);
-
-					candidates.Insert(index, new ExistingConcernPointCandidate
-					{
-						Node = node,
-						ViewHeader = "строка: "
-							+ file.Text.Substring(adjustedSelection.Start.Offset, adjustedSelection.Length.Value).Trim()
-					});
-				}
-			}
 
 			/// Проверяем, можно ли обрамить его кастомным блоком
 			if (CustomBlockValidator.IsValid(file.Root, adjustedSelection))

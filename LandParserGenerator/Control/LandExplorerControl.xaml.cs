@@ -230,14 +230,15 @@ namespace Land.Control
 			if(parsedFile != null)
             {
 				var nodeToBind = MarkupManager.GetConcernPointCandidates(
-						parsedFile.Root,
-						new SegmentLocation 
-						{ 
-							Start = new PointLocation(offset), 
-							End = new PointLocation(offset) 
-						}
-					)
-					.FirstOrDefault(c => c.Type == type);
+					parsedFile.Root,
+					new SegmentLocation
+					{
+						Start = new PointLocation(offset),
+						End = new PointLocation(offset)
+					},
+					null
+				)
+				.FirstOrDefault(c => c.Type == type);
 
 				if (nodeToBind != null)
 				{

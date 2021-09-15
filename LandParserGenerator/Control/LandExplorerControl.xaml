@@ -207,10 +207,6 @@
 									<Setter Property="BorderBrush" Value="White"/>
 								</Style>
 							</StackPanel.Resources>
-							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 5" Height="25">
-								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
-								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
-							</StackPanel>
 							<ListBox       
 								FontSize="12pt"
 								Height="80"
@@ -240,6 +236,10 @@
 										 Height="60"
 										 ScrollViewer.VerticalScrollBarVisibility="Auto"
 										 Name="ConcernPointCommentText"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Margin="0 5 0 0" Height="25">
+								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
+								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
 						</StackPanel>
 						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">

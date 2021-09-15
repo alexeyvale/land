@@ -16,6 +16,8 @@ namespace Land.Markup
 {
 	public class MarkupManager
 	{
+		public const string LINE_NODE_TYPE = "LAND_LINE";
+
 		public bool HasUnsavedChanges { get; set; }
 
 		public MarkupManager(Func<string, ParsedFile> getParsed, IPreHeuristic remappingHeuristic)
@@ -152,13 +154,13 @@ namespace Land.Markup
 		public ConcernPoint AddConcernPoint(
 			Node node,
 			ParsedFile file,
-			string name = null,
+			string name,
 			string comment = null,
 			Concern parent = null)
 		{
-			var context = (PointContext)null;
+			PointContext context;
 
-			if (node.Type != "LAND_LINE")
+			if (node.Type != LINE_NODE_TYPE)
 			{
 				Remap(node.Type, file);
 
@@ -201,10 +203,7 @@ namespace Land.Markup
 				parent
 			);
 
-			if (!String.IsNullOrEmpty(name))
-			{
-				point.Name = name;
-			}
+			point.Name = name;
 			point.Comment = comment;
 
 			AddElement(point);
@@ -304,7 +303,7 @@ namespace Land.Markup
 		/// Получение всех узлов, к которым можно привязаться,
 		/// если команда привязки была вызвана в позиции offset
 		/// </summary>
-		public LinkedList<Node> GetConcernPointCandidates(Node root, SegmentLocation selection)
+		public LinkedList<Node> GetConcernPointCandidates(Node root, SegmentLocation selection, SegmentLocation adjustedSelection)
 		{
 			var pointCandidates = new LinkedList<Node>();
 			var currentNode = root;
@@ -323,6 +322,39 @@ namespace Land.Markup
 					.FirstOrDefault();
 			}
 
+			/// Проверяем, можно ли привязаться к строке
+			if (adjustedSelection != null 
+				&& adjustedSelection.Start.Line == adjustedSelection.End.Line)
+			{
+				var enclosingNode = pointCandidates
+					.FirstOrDefault(c => c.Location.Includes(adjustedSelection));
+
+				if (enclosingNode != null)
+				{
+					var index = pointCandidates.Find(enclosingNode);
+
+					var node = new Node(MarkupManager.LINE_NODE_TYPE)
+					{
+						Parent = enclosingNode,
+						Options = new SymbolOptionsManager(
+							new Dictionary<string, Dictionary<string, List<dynamic>>> {
+								{
+									MarkupOption.GROUP_NAME,
+									new Dictionary<string, List<dynamic>> {
+										{ MarkupOption.LAND, new List<dynamic> { true } }
+									}
+								}
+							}
+						)
+					};
+
+					node.SetLocation(adjustedSelection.Start, adjustedSelection.End);
+
+					pointCandidates.AddBefore(index, node);
+				}
+			}
+
+
 			return pointCandidates;
 		}
 
@@ -335,7 +367,7 @@ namespace Land.Markup
 			ParsedFile file,
 			List<ParsedFile> searchArea)
 		{
-			if (node.Type != "LAND_LINE")
+			if (node.Type != LINE_NODE_TYPE)
 			{
 				var siblingsArgs = new SiblingsConstructionArgs
 				{
@@ -746,7 +778,10 @@ namespace Land.Markup
 			ContextFinder.SearchType searchType)
 		{
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
-			var points = GetConcernPoints();
+
+			var points = GetConcernPoints()
+				.Where(p=>p.Context.Type != LINE_NODE_TYPE)
+				.ToList();
 
 			/// Локальный поиск имеет смысл проводить, если только его провести и нужно,
 			/// или если нужен глобальный поиск, но разрешена автоперепривязка
