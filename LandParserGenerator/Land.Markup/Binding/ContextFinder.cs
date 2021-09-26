@@ -831,40 +831,35 @@ namespace Land.Markup.Binding
 			return overallResult;
 		}
 
-		public LineContext FindLine(
+		public (LineContext, SegmentLocation) FindLine(
 			LineContext context,
 			Node outerNode,
-			ParsedFile file,
-			out SegmentLocation lineLocation)
+			ParsedFile file)
 		{
-			lineLocation = null; 
-
-			/// Все строки в пределах сущности
-			var split = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
-				.Split('\n');
-
-			var lines = new List<Tuple<TextOrHash, SegmentLocation>>();
 			var currentOffset = outerNode.Location.Start.Offset;
 
-			for (var i = 0; i < split.Length; ++i)
-			{
-				var lineNumber = outerNode.Location.Start.Line + i;
-
-				lines.Add(new Tuple<TextOrHash, SegmentLocation>(new TextOrHash(split[i]), new SegmentLocation
+			var lines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
+				.Split('\n')
+				.Select((e, i)=> new
 				{
-					Start = new PointLocation(lineNumber, 0, currentOffset),
-					End = new PointLocation(lineNumber, 0, currentOffset += split[i].Length + 1)
-				}));
-			}
+					InnerContext = new TextOrHash(e),
+					Location = new SegmentLocation
+					{
+						Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
+						End = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset += e.Length + 1)
+					}
+				})
+				.ToList();
 
-			if (lines.Count == 0) return null;
+			if (lines.Count == 0) return (null, null);
 
 			/// Сначала проверяем сходство содержимого строки
 			var orderedByInner = lines
-				.Select(l => new { ContextLocationPair = l, InnerSimilarity = EvalSimilarity(
-					context.InnerContext,
-					l.Item1
-				)})
+				.Select(l => new 
+				{ 
+					ContextLocationPair = l, 
+					InnerSimilarity = EvalSimilarity(context.InnerContext,l.InnerContext)
+				})
 				.OrderByDescending(e => e.InnerSimilarity)
 				.ToList();
 
@@ -875,11 +870,11 @@ namespace Land.Markup.Binding
 				{
 					LineContext = new LineContext(
 						outerNode, 
-						e.ContextLocationPair.Item2, 
+						e.ContextLocationPair.Location, 
 						file.Text, 
-						e.ContextLocationPair.Item1
+						e.ContextLocationPair.InnerContext
 					),
-					Location = e.ContextLocationPair.Item2
+					Location = e.ContextLocationPair.Location
 				})
 				.ToList();
 
@@ -887,13 +882,13 @@ namespace Land.Markup.Binding
 			if (bestLines.Count > 1)
 			{
 				bestLines = bestLines
-					.OrderByDescending(e => (EvalSimilarity(context.NeighboursContext.Item1, e.LineContext.NeighboursContext.Item1) 
-						+ EvalSimilarity(context.NeighboursContext.Item2, e.LineContext.NeighboursContext.Item2)) / 2.0)
+					.OrderByDescending(e => 
+						(EvalSimilarity(context.NeighboursContext.Item1, e.LineContext.NeighboursContext.Item1) 
+							+ EvalSimilarity(context.NeighboursContext.Item2, e.LineContext.NeighboursContext.Item2)) / 2.0)
 					.ToList();
 			}
 
-			lineLocation = bestLines.First().Location;
-			return bestLines.First().LineContext;
+			return (bestLines.First().LineContext, bestLines.First().Location);
 		}
 
 		private void DoLineSearch(ConcernPoint point, ParsedFile file)

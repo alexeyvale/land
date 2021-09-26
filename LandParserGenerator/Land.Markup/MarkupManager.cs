@@ -354,17 +354,33 @@ namespace Land.Markup
 		/// </summary>
 		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
 		{
-			var lineLocation = (SegmentLocation)null;
-			var lineContext = point.LineContext != null
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				ContextFinder = ContextFinder
+			};
+
+			var context = ContextFinder.ContextManager.GetContext(
+				candidate.Node,
+				candidate.File,
+				siblingsArgs,
+				new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { candidate.File },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				}
+			);
+
+			var (lineContext, lineLocation) = point.LineContext != null
 				? ContextFinder.FindLine(
 					point.LineContext,
 					candidate.Node,
-					candidate.File,
-					out lineLocation
+					candidate.File
 				)
-				: null;
+				: (null, null);
 
-			point.Relink(candidate.Context, candidate.Node.Location, lineContext, lineLocation);
+			point.Relink(context, candidate.Node.Location, lineContext, lineLocation);
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -819,36 +835,7 @@ namespace Land.Markup
 
 			if (first?.IsAuto ?? false)
 			{
-				var siblingsArgs = new SiblingsConstructionArgs
-				{
-					ContextFinder = ContextFinder
-				};
-
-				var context = ContextFinder.ContextManager.GetContext(
-					first.Node, 
-					first.File,
-					siblingsArgs,
-					new ClosestConstructionArgs
-					{
-						SearchArea = new List<ParsedFile> { first.File },
-						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder,
-						SiblingsArgs = siblingsArgs
-					}
-				);
-
-				var lineLocation = (SegmentLocation)null;
-				var lineContext = point.LineContext != null
-					? ContextFinder.FindLine(
-						point.LineContext,
-						first.Node,
-						first.File,
-						out lineLocation
-					)
-					: null;
-
-				point.Relink(context, first.Node.Location, lineContext, lineLocation);
-
+				RelinkConcernPoint(point, first);
 				return true;
 			}
 			else
