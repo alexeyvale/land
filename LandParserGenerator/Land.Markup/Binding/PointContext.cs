@@ -1142,7 +1142,7 @@ namespace Land.Markup.Binding
 		public TextOrHash InnerContext { get; set; }
 		public Tuple<TextOrHash, TextOrHash> NeighboursContext { get; set; }
 
-		public LineContext(Node node, SegmentLocation line, string text)
+		public LineContext(Node node, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
 		{
 			var beforeSegment = new SegmentLocation()
 			{
@@ -1156,7 +1156,7 @@ namespace Land.Markup.Binding
 				End = node.Location.End
 			};
 
-			InnerContext = new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));
+			InnerContext = cachedInnerContext ?? new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));
 			NeighboursContext = new Tuple<TextOrHash, TextOrHash>(
 				new TextOrHash(text.Substring(beforeSegment.Start.Offset, beforeSegment.Length.Value)),
 				new TextOrHash(text.Substring(afterSegment.Start.Offset, afterSegment.Length.Value))

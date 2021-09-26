@@ -110,7 +110,12 @@ namespace Land.Markup
 				if (elem is ConcernPoint concernPoint
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.Location = new SegmentLocation
+					concernPoint.NodeLocation = new SegmentLocation
+					{
+						Start = new PointLocation(0, 0, 0),
+						End = new PointLocation(0, 0, 0)
+					};
+					concernPoint.LineLocation = new SegmentLocation
 					{
 						Start = new PointLocation(0, 0, 0),
 						End = new PointLocation(0, 0, 0)
@@ -185,9 +190,10 @@ namespace Land.Markup
 			var point = new ConcernPoint(
 				name ?? ConcernPoint.GetDefaultName(node),
 				comment,
-				line ?? node.Location,
 				context,
+				node.Location,
 				lineContext,
+				line,
 				parent
 			);
 
@@ -230,7 +236,6 @@ namespace Land.Markup
 						AddElement(new ConcernPoint(
 							ConcernPoint.GetDefaultName(node),
 							null,
-							node.Location,
 							ContextFinder.ContextManager.GetContext(
 								node, 
 								file,
@@ -243,6 +248,8 @@ namespace Land.Markup
 									SiblingsArgs = subconcernSiblingsArgs
 								}
 							),
+							node.Location,
+							null,
 							null,
 							subconcern
 						));
@@ -263,7 +270,6 @@ namespace Land.Markup
 					AddElement(new ConcernPoint(
 						ConcernPoint.GetDefaultName(node),
 						null,
-						node.Location,
 						ContextFinder.ContextManager.GetContext(
 							node, 
 							file,
@@ -276,6 +282,8 @@ namespace Land.Markup
 								SiblingsArgs = siblingsArgs
 							}
 						),
+						node.Location,
+						null,
 						null,
 						concern
 					));
@@ -318,8 +326,7 @@ namespace Land.Markup
 			ConcernPoint point, 
 			Node node,
 			SegmentLocation line,
-			ParsedFile file,
-			List<ParsedFile> searchArea)
+			ParsedFile file)
 		{
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
@@ -327,7 +334,6 @@ namespace Land.Markup
 			};
 
 			point.Relink(
-				line ?? node.Location, 
 				ContextFinder.ContextManager.GetContext(
 					node, 
 					file,
@@ -340,7 +346,9 @@ namespace Land.Markup
 						SiblingsArgs = siblingsArgs
 					}
 				),
-				line != null ? new LineContext(node, line, file.Text) : null
+				node.Location,
+				line != null ? new LineContext(node, line, file.Text) : null,
+				line
 			);
 
 			OnMarkupChanged?.Invoke();
@@ -351,6 +359,15 @@ namespace Land.Markup
 		/// </summary>
 		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
 		{
+			var lineContext = point.LineContext != null
+				? ContextFinder.FindLine(
+					point.LineContext,
+					candidate.Node.Location,
+					candidate.File,
+					out SegmentLocation lineLocation
+				)
+				: null;
+
 			point.Relink(candidate);
 
 			OnMarkupChanged?.Invoke();
@@ -824,12 +841,12 @@ namespace Land.Markup
 					}
 				);
 
-				point.Location = first.Node.Location;
+				point.NodeLocation = first.Node.Location;
 				return true;
 			}
 			else
 			{
-				point.Location = null;
+				point.NodeLocation = null;
 				return false;
 			}
 		}

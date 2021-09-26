@@ -56,7 +56,7 @@ namespace Land.Markup
 		/// Признак того, что координаты потеряны
 		/// </summary>
 		[JsonIgnore]
-		public bool HasMissingLocation => Location == null;
+		public bool HasMissingLocation => LineContext != null && _lineLocation == null || _nodeLocation == null;
 
 		/// <summary>
 		/// Признак того, что координаты невозможно использовать для перехода
@@ -65,15 +65,31 @@ namespace Land.Markup
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
 
-		private SegmentLocation _location;
+		private SegmentLocation _nodeLocation;
 
 		[JsonIgnore]
-		public SegmentLocation Location
+		public SegmentLocation NodeLocation
 		{
-			get => _location;
+			get => _nodeLocation;
 			set
 			{
-				_location = value;
+				_nodeLocation = value;
+				HasIrrelevantLocation = false;
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasMissingLocation"));
+			}
+		}
+
+		private SegmentLocation _lineLocation;
+
+		[JsonIgnore]
+		public SegmentLocation LineLocation
+		{
+			get => _lineLocation;
+			set
+			{
+				_lineLocation = value;
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
@@ -90,11 +106,19 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(string name, string comment, SegmentLocation location, PointContext context, LineContext line, Concern parent = null)
+		public ConcernPoint(
+			string name, 
+			string comment, 
+			PointContext context,
+			SegmentLocation location,
+			LineContext line,
+			SegmentLocation lineLocation,
+			Concern parent = null)
 		{
 			Context = context;
 			LineContext = line;
-			Location = location;
+			NodeLocation = location;
+			LineLocation = lineLocation;
 			Parent = parent;
 			Name = name;
 			Comment = comment;
@@ -102,16 +126,21 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public void Relink(SegmentLocation location, PointContext context, LineContext line)
+		public void Relink(
+			PointContext context, 
+			SegmentLocation location, 
+			LineContext lineContext, 
+			SegmentLocation lineLocation)
 		{
-			Location = location;
+			NodeLocation = location;
+			LineLocation = lineLocation;
 			Context = context;
-			LineContext = line;
+			LineContext = lineContext;
 		}
 
 		public void Relink(RemapCandidateInfo candidate)
 		{
-			Location = candidate.Node.Location;
+			NodeLocation = candidate.Node.Location;
 			Context = candidate.Context;
 		}
 

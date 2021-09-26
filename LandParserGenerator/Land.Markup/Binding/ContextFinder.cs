@@ -6,6 +6,7 @@ using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Land.Core;
 
 namespace Land.Markup.Binding
 {
@@ -830,34 +831,48 @@ namespace Land.Markup.Binding
 			return overallResult;
 		}
 
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> FindLines(
-			List<ConcernPoint> points,
-			List<ParsedFile> searchArea)
+		public LineContext FindLine(
+			LineContext context,
+			SegmentLocation outerNodeLocation,
+			ParsedFile file,
+			out SegmentLocation lineLocation)
 		{
-			List<ParsedFile> files = null;
+			lineLocation = null;
 
-			var overallResult = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			var 
 
-			var groupedPoints = points
-				.GroupBy(p => p.Context.FileName)
-				.ToDictionary(e => e.Key, e =>
-					e.GroupBy(p => p.Context.Type).ToDictionary(el => el.Key, el => el.ToList())
-				);
+			/// Все строки в пределах сущности
+			var lines = file.Text.Substring(outerNodeLocation.Start.Offset, outerNodeLocation.Length.Value)
+				.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+				.ToList();
 
-			foreach (var fileName in groupedPoints.Keys)
+			if(lines.Count == 0)
 			{
-				/// При поиске в том же файле ищем тот же файл по полному совпадению пути
-				files = searchArea.Where(f => f.Name == fileName).ToList();
-
-				var localResult = DoMultiTypeSearch(groupedPoints[fileName], files);
-
-				foreach (var elem in localResult)
-				{
-					overallResult[elem.Key] = elem.Value;
-				}
+				return null;
 			}
 
-			return overallResult;
+			/// Сначала проверяем сходство содержимого строки
+			var orderedByInner = lines
+				.Select(l => new { Line = l, InnerSimilarity = EvalSimilarity(
+					context.InnerContext,
+					new TextOrHash(l)
+				)})
+				.OrderByDescending(e => e.InnerSimilarity)
+				.ToList();
+
+			/// Если есть несколько идентичных самых похожих строк, проверяем окружение
+			if (orderedByInner.Count > 1
+				&& orderedByInner[0].InnerSimilarity == orderedByInner[1].InnerSimilarity)
+			{
+				var bestSimilarity = orderedByInner[0].InnerSimilarity;
+
+				var bestLines = orderedByInner
+					.TakeWhile(e => e.InnerSimilarity == bestSimilarity)
+					.Select(e => new LineContext())
+					.ToList();
+			}
+
+
 		}
 
 		private void DoLineSearch(ConcernPoint point, ParsedFile file)

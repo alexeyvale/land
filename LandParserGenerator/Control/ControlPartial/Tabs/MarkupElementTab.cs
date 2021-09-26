@@ -123,8 +123,7 @@ namespace Land.Control
 							point,
 							selectedCandidate.Node,
 							selectedCandidate.Line,
-							State.PendingCommand.Document,
-							GetPointSearchArea()
+							State.PendingCommand.Document
 						);
 
 						point.Name = ConcernPointNameText.Text;
