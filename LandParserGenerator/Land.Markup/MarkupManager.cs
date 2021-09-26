@@ -115,11 +115,6 @@ namespace Land.Markup
 						Start = new PointLocation(0, 0, 0),
 						End = new PointLocation(0, 0, 0)
 					};
-					concernPoint.LineLocation = new SegmentLocation
-					{
-						Start = new PointLocation(0, 0, 0),
-						End = new PointLocation(0, 0, 0)
-					};
 					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
@@ -325,7 +320,7 @@ namespace Land.Markup
 		public void RelinkConcernPoint(
 			ConcernPoint point, 
 			Node node,
-			SegmentLocation line,
+			SegmentLocation lineLocation,
 			ParsedFile file)
 		{
 			var siblingsArgs = new SiblingsConstructionArgs
@@ -347,8 +342,8 @@ namespace Land.Markup
 					}
 				),
 				node.Location,
-				line != null ? new LineContext(node, line, file.Text) : null,
-				line
+				lineLocation != null ? new LineContext(node, lineLocation, file.Text) : null,
+				lineLocation
 			);
 
 			OnMarkupChanged?.Invoke();
@@ -359,16 +354,17 @@ namespace Land.Markup
 		/// </summary>
 		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
 		{
+			var lineLocation = (SegmentLocation)null;
 			var lineContext = point.LineContext != null
 				? ContextFinder.FindLine(
 					point.LineContext,
-					candidate.Node.Location,
+					candidate.Node,
 					candidate.File,
-					out SegmentLocation lineLocation
+					out lineLocation
 				)
 				: null;
 
-			point.Relink(candidate);
+			point.Relink(candidate.Context, candidate.Node.Location, lineContext, lineLocation);
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -828,7 +824,7 @@ namespace Land.Markup
 					ContextFinder = ContextFinder
 				};
 
-				point.Context = ContextFinder.ContextManager.GetContext(
+				var context = ContextFinder.ContextManager.GetContext(
 					first.Node, 
 					first.File,
 					siblingsArgs,
@@ -841,7 +837,18 @@ namespace Land.Markup
 					}
 				);
 
-				point.NodeLocation = first.Node.Location;
+				var lineLocation = (SegmentLocation)null;
+				var lineContext = point.LineContext != null
+					? ContextFinder.FindLine(
+						point.LineContext,
+						first.Node,
+						first.File,
+						out lineLocation
+					)
+					: null;
+
+				point.Relink(context, first.Node.Location, lineContext, lineLocation);
+
 				return true;
 			}
 			else

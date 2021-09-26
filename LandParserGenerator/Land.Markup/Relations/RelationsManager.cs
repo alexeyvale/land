@@ -66,13 +66,13 @@ namespace Land.Markup.Relations
 					var point1 = points[i];
 					var point2 = points[j];
 
-					if (point1.NodeLocation.End.Offset <= point2.NodeLocation.Start.Offset)
+					if (point1.Location.End.Offset <= point2.Location.Start.Offset)
 						InternalRelations.AddRelation(RelationType.Preceeds, point1, point2);
 					
-					if (point1.NodeLocation.Includes(point2.NodeLocation))
+					if (point1.Location.Includes(point2.Location))
 						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point2, point1);
 
-					if (point2.NodeLocation.Includes(point1.NodeLocation))
+					if (point2.Location.Includes(point1.Location))
 						InternalRelations.AddRelation(RelationType.IsPhysicalDescendantOf, point1, point2);
 				}
 

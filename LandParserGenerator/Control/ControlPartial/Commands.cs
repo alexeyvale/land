@@ -454,7 +454,7 @@ namespace Land.Control
 			{
 				if (elem is ConcernPoint p)
 				{
-					p.Location = new SegmentLocation
+					p.NodeLocation = new SegmentLocation
 					{
 						Start = new PointLocation(0, 0, 0),
 						End = new PointLocation(0, 0, 0)

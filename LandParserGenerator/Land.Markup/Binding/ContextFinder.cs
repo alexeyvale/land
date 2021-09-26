@@ -833,46 +833,67 @@ namespace Land.Markup.Binding
 
 		public LineContext FindLine(
 			LineContext context,
-			SegmentLocation outerNodeLocation,
+			Node outerNode,
 			ParsedFile file,
 			out SegmentLocation lineLocation)
 		{
-			lineLocation = null;
-
-			var 
+			lineLocation = null; 
 
 			/// Все строки в пределах сущности
-			var lines = file.Text.Substring(outerNodeLocation.Start.Offset, outerNodeLocation.Length.Value)
-				.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
-				.ToList();
+			var split = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
+				.Split('\n');
 
-			if(lines.Count == 0)
+			var lines = new List<Tuple<TextOrHash, SegmentLocation>>();
+			var currentOffset = outerNode.Location.Start.Offset;
+
+			for (var i = 0; i < split.Length; ++i)
 			{
-				return null;
+				var lineNumber = outerNode.Location.Start.Line + i;
+
+				lines.Add(new Tuple<TextOrHash, SegmentLocation>(new TextOrHash(split[i]), new SegmentLocation
+				{
+					Start = new PointLocation(lineNumber, 0, currentOffset),
+					End = new PointLocation(lineNumber, 0, currentOffset += split[i].Length + 1)
+				}));
 			}
+
+			if (lines.Count == 0) return null;
 
 			/// Сначала проверяем сходство содержимого строки
 			var orderedByInner = lines
-				.Select(l => new { Line = l, InnerSimilarity = EvalSimilarity(
+				.Select(l => new { ContextLocationPair = l, InnerSimilarity = EvalSimilarity(
 					context.InnerContext,
-					new TextOrHash(l)
+					l.Item1
 				)})
 				.OrderByDescending(e => e.InnerSimilarity)
 				.ToList();
 
-			/// Если есть несколько идентичных самых похожих строк, проверяем окружение
-			if (orderedByInner.Count > 1
-				&& orderedByInner[0].InnerSimilarity == orderedByInner[1].InnerSimilarity)
-			{
-				var bestSimilarity = orderedByInner[0].InnerSimilarity;
+			var bestSimilarity = orderedByInner[0].InnerSimilarity;
+			var bestLines = orderedByInner
+				.TakeWhile(e => e.InnerSimilarity == bestSimilarity)
+				.Select(e => new
+				{
+					LineContext = new LineContext(
+						outerNode, 
+						e.ContextLocationPair.Item2, 
+						file.Text, 
+						e.ContextLocationPair.Item1
+					),
+					Location = e.ContextLocationPair.Item2
+				})
+				.ToList();
 
-				var bestLines = orderedByInner
-					.TakeWhile(e => e.InnerSimilarity == bestSimilarity)
-					.Select(e => new LineContext())
+			/// Если есть несколько идентичных самых похожих строк, проверяем окружение
+			if (bestLines.Count > 1)
+			{
+				bestLines = bestLines
+					.OrderByDescending(e => (EvalSimilarity(context.NeighboursContext.Item1, e.LineContext.NeighboursContext.Item1) 
+						+ EvalSimilarity(context.NeighboursContext.Item2, e.LineContext.NeighboursContext.Item2)) / 2.0)
 					.ToList();
 			}
 
-
+			lineLocation = bestLines.First().Location;
+			return bestLines.First().LineContext;
 		}
 
 		private void DoLineSearch(ConcernPoint point, ParsedFile file)

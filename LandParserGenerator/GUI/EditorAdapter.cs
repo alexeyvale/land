@@ -162,6 +162,7 @@ namespace Land.GUI
 			if (location != null)
 			{
 				documentTab.Editor.CaretOffset = location.Offset;
+
 				documentTab.Editor.ScrollTo(
 					location.Line.Value, 
 					location.Column.Value + MainWindow.COLUMN_CORRECTION_ITEM

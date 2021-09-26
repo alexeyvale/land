@@ -97,6 +97,9 @@ namespace Land.Markup
 			}
 		}
 
+		[JsonIgnore]
+		public SegmentLocation Location => LineLocation ?? NodeLocation;
+
 		public new event PropertyChangedEventHandler PropertyChanged;
 
 		public void ParentPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -129,19 +132,13 @@ namespace Land.Markup
 		public void Relink(
 			PointContext context, 
 			SegmentLocation location, 
-			LineContext lineContext, 
-			SegmentLocation lineLocation)
+			LineContext lineContext = null, 
+			SegmentLocation lineLocation = null)
 		{
 			NodeLocation = location;
 			LineLocation = lineLocation;
 			Context = context;
 			LineContext = lineContext;
-		}
-
-		public void Relink(RemapCandidateInfo candidate)
-		{
-			NodeLocation = candidate.Node.Location;
-			Context = candidate.Context;
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)
