@@ -22,6 +22,9 @@ namespace Land.Markup.Binding
 
 	public class ContextFinder
 	{
+		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
+		private const string DEFAULT_LINE_END = "\r\n";
+
 		public enum SearchType { Local, Global }
 
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
@@ -837,16 +840,17 @@ namespace Land.Markup.Binding
 			ParsedFile file)
 		{
 			var currentOffset = outerNode.Location.Start.Offset;
+			var lineEnd = GetLineEnd(file.Text);
 
 			var lines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
-				.Split('\n')
+				.Split(new string[] { lineEnd }, StringSplitOptions.None)
 				.Select((e, i)=> new
 				{
 					InnerContext = new TextOrHash(e),
 					Location = new SegmentLocation
 					{
 						Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
-						End = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset += e.Length + 1)
+						End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - 1)
 					}
 				})
 				.ToList();
@@ -1159,6 +1163,17 @@ namespace Land.Markup.Binding
 				file.Root = GetParsed(file.Name)?.Root;
 
 			return file.Root != null;
+		}
+
+		public static string GetLineEnd(string text)
+		{
+			var lineEnd = String.Join("", text
+				.SkipWhile(c => !LINE_END_SYMBOLS.Contains(c))
+				.TakeWhile(c => LINE_END_SYMBOLS.Contains(c))
+			);
+			
+			return !String.IsNullOrEmpty(lineEnd)
+				? lineEnd : DEFAULT_LINE_END;
 		}
 
 		public static bool IsSimilarEnough(RemapCandidateInfo candidate) =>
