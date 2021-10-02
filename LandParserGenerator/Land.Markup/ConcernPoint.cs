@@ -28,6 +28,24 @@ namespace Land.Markup
 			}
 		}
 
+		private LineContext _lineContext;
+
+		[JsonIgnore]
+		public LineContext LineContext
+		{
+			get { return _lineContext; }
+
+			set
+			{
+				_lineContext = value;
+
+				if (value != null)
+				{
+					_lineContext.LinkPoint(Id);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Признак того, что координаты, хранимые точкой, не соответствуют тексту
 		/// </summary>
@@ -38,7 +56,7 @@ namespace Land.Markup
 		/// Признак того, что координаты потеряны
 		/// </summary>
 		[JsonIgnore]
-		public bool HasMissingLocation => Location == null;
+		public bool HasMissingLocation => LineContext != null && _lineLocation == null || _nodeLocation == null;
 
 		/// <summary>
 		/// Признак того, что координаты невозможно использовать для перехода
@@ -46,18 +64,16 @@ namespace Land.Markup
 		[JsonIgnore]
 		public bool HasInvalidLocation => HasIrrelevantLocation || HasMissingLocation;
 
-		/// <summary>
-		/// Узел AST, которому соответствует точка
-		/// </summary>
-		private Node _node;
+
+		private SegmentLocation _nodeLocation;
 
 		[JsonIgnore]
-		public Node AstNode
+		public SegmentLocation NodeLocation
 		{
-			get => _node;
+			get => _nodeLocation;
 			set
 			{
-				_node = value;
+				_nodeLocation = value;
 				HasIrrelevantLocation = false;
 
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
@@ -65,11 +81,24 @@ namespace Land.Markup
 			}
 		}
 
-		/// <summary>
-		/// Координаты участка в тексте, которому соответствует точка 
-		/// </summary>
+		private SegmentLocation _lineLocation;
+
 		[JsonIgnore]
-		public SegmentLocation Location => _node?.Location;
+		public SegmentLocation LineLocation
+		{
+			get => _lineLocation;
+			set
+			{
+				_lineLocation = value;
+				HasIrrelevantLocation = false;
+
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Location"));
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasMissingLocation"));
+			}
+		}
+
+		[JsonIgnore]
+		public SegmentLocation Location => LineLocation ?? NodeLocation;
 
 		public new event PropertyChangedEventHandler PropertyChanged;
 
@@ -80,31 +109,19 @@ namespace Land.Markup
 
 		public ConcernPoint() { }
 
-		public ConcernPoint(Node node, PointContext context, Concern parent = null)
+		public ConcernPoint(
+			string name, 
+			string comment, 
+			PointContext context,
+			SegmentLocation location,
+			LineContext line,
+			SegmentLocation lineLocation,
+			Concern parent = null)
 		{
 			Context = context;
-			AstNode = node;
-			Parent = parent;
-			Name = node.Type;
-
-			if (node.Value.Count > 0)
-				Name += ": " + String.Join(" ", node.Value);
-			else
-			{
-				if (node.Children.Count > 0)
-				{
-					Name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
-						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
-				}
-			}
-
-			base.PropertyChanged += ParentPropertyChanged;
-		}
-
-		public ConcernPoint(string name, string comment, Node node, PointContext context, Concern parent = null)
-		{
-			Context = context;
-			AstNode = node;
+			LineContext = line;
+			NodeLocation = location;
+			LineLocation = lineLocation;
 			Parent = parent;
 			Name = name;
 			Comment = comment;
@@ -112,21 +129,41 @@ namespace Land.Markup
 			base.PropertyChanged += ParentPropertyChanged;
 		}
 
-		public void Relink(Node node, PointContext context)
+		public void Relink(
+			PointContext context, 
+			SegmentLocation location, 
+			LineContext lineContext = null, 
+			SegmentLocation lineLocation = null)
 		{
-			AstNode = node;
+			NodeLocation = location;
+			LineLocation = lineLocation;
 			Context = context;
-		}
-
-		public void Relink(RemapCandidateInfo candidate)
-		{
-			AstNode = candidate.Node;
-			Context = candidate.Context;
+			LineContext = lineContext;
 		}
 
 		public override void Accept(BaseMarkupVisitor visitor)
 		{
 			visitor.Visit(this);
+		}
+
+		public static string GetDefaultName(Node node)
+		{
+			var name = node.Type;
+
+			if (node.Value.Count > 0)
+			{
+				name += ": " + String.Join(" ", node.Value);
+			}
+			else
+			{
+				if (node.Children.Count > 0)
+				{
+					name += ": " + String.Join(" ", node.Children.SelectMany(c => c.Value.Count > 0 ? c.Value
+						: new List<string>() { '"' + (String.IsNullOrEmpty(c.Alias) ? c.Symbol : c.Alias) + '"' }));
+				}
+			}
+
+			return name;
 		}
 	}
 

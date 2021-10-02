@@ -105,15 +105,16 @@ namespace Land.Markup
 		/// </summary>
 		public void InvalidatePoints(string fileName)
 		{
-			var stubNode = new Node("");
-			stubNode.SetLocation(new PointLocation(0, 0, 0), new PointLocation(0, 0, 0));
-
 			DoWithMarkup((MarkupElement elem) =>
 			{
 				if (elem is ConcernPoint concernPoint
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.AstNode = stubNode;
+					concernPoint.NodeLocation = new SegmentLocation
+					{
+						Start = new PointLocation(0, 0, 0),
+						End = new PointLocation(0, 0, 0)
+					};
 					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
@@ -150,7 +151,8 @@ namespace Land.Markup
 		/// Добавление точки привязки
 		/// </summary>
 		public ConcernPoint AddConcernPoint(
-			Node node, 
+			Node node,
+			SegmentLocation line,
 			ParsedFile file, 
 			string name = null, 
 			string comment = null, 
@@ -163,26 +165,32 @@ namespace Land.Markup
 				ContextFinder = ContextFinder
 			};
 
-			var point = new ConcernPoint(
-				node, 
-				ContextFinder.ContextManager.GetContext(
-					node, 
-					file,
-					siblingsArgs,
-					new ClosestConstructionArgs
-					{
-						SearchArea = new List<ParsedFile> { file },
-						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder,
-						SiblingsArgs = siblingsArgs
-					}), 
-				parent);
+			var context = ContextFinder.ContextManager.GetContext(
+				node,
+				file,
+				siblingsArgs,
+				new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { file },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				}
+			);
 
-			if (!String.IsNullOrEmpty(name))
-			{
-				point.Name = name;
-			}
-			point.Comment = comment;
+			var lineContext = line != null 
+				? new LineContext(node, line, file.Text) 
+				: null;
+
+			var point = new ConcernPoint(
+				name ?? ConcernPoint.GetDefaultName(node),
+				comment,
+				context,
+				node.Location,
+				lineContext,
+				line,
+				parent
+			);
 
 			AddElement(point);
 
@@ -221,7 +229,8 @@ namespace Land.Markup
 					foreach (var node in subgroup)
 					{
 						AddElement(new ConcernPoint(
-							node, 
+							ConcernPoint.GetDefaultName(node),
+							null,
 							ContextFinder.ContextManager.GetContext(
 								node, 
 								file,
@@ -232,8 +241,13 @@ namespace Land.Markup
 									GetParsed = ContextFinder.GetParsed,
 									ContextFinder = ContextFinder,
 									SiblingsArgs = subconcernSiblingsArgs
-								}), 
-							subconcern));
+								}
+							),
+							node.Location,
+							null,
+							null,
+							subconcern
+						));
 					}
 				}
 
@@ -249,7 +263,9 @@ namespace Land.Markup
 				foreach (var node in nodes)
 				{
 					AddElement(new ConcernPoint(
-						node, ContextFinder.ContextManager.GetContext(
+						ConcernPoint.GetDefaultName(node),
+						null,
+						ContextFinder.ContextManager.GetContext(
 							node, 
 							file,
 							siblingsArgs,
@@ -259,9 +275,13 @@ namespace Land.Markup
 								GetParsed = ContextFinder.GetParsed,
 								ContextFinder = ContextFinder,
 								SiblingsArgs = siblingsArgs
-							}), 
-						concern)
-					);
+							}
+						),
+						node.Location,
+						null,
+						null,
+						concern
+					));
 				}
 			}
 
@@ -299,26 +319,31 @@ namespace Land.Markup
 		/// </summary>
 		public void RelinkConcernPoint(
 			ConcernPoint point, 
-			Node node, 
-			ParsedFile file,
-			List<ParsedFile> searchArea)
+			Node node,
+			SegmentLocation lineLocation,
+			ParsedFile file)
 		{
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
 				ContextFinder = ContextFinder
 			};
 
-			point.Relink(node, ContextFinder.ContextManager.GetContext(
-				node, 
-				file,
-				siblingsArgs,
-				new ClosestConstructionArgs
-				{
-					SearchArea = new List<ParsedFile> { file },
-					GetParsed = ContextFinder.GetParsed,
-					ContextFinder = ContextFinder,
-					SiblingsArgs = siblingsArgs
-				})
+			point.Relink(
+				ContextFinder.ContextManager.GetContext(
+					node, 
+					file,
+					siblingsArgs,
+					new ClosestConstructionArgs
+					{
+						SearchArea = new List<ParsedFile> { file },
+						GetParsed = ContextFinder.GetParsed,
+						ContextFinder = ContextFinder,
+						SiblingsArgs = siblingsArgs
+					}
+				),
+				node.Location,
+				lineLocation != null ? new LineContext(node, lineLocation, file.Text) : null,
+				lineLocation
 			);
 
 			OnMarkupChanged?.Invoke();
@@ -329,7 +354,33 @@ namespace Land.Markup
 		/// </summary>
 		public void RelinkConcernPoint(ConcernPoint point, RemapCandidateInfo candidate)
 		{
-			point.Relink(candidate);
+			var siblingsArgs = new SiblingsConstructionArgs
+			{
+				ContextFinder = ContextFinder
+			};
+
+			var context = ContextFinder.ContextManager.GetContext(
+				candidate.Node,
+				candidate.File,
+				siblingsArgs,
+				new ClosestConstructionArgs
+				{
+					SearchArea = new List<ParsedFile> { candidate.File },
+					GetParsed = ContextFinder.GetParsed,
+					ContextFinder = ContextFinder,
+					SiblingsArgs = siblingsArgs
+				}
+			);
+
+			var (lineContext, lineLocation) = point.LineContext != null
+				? ContextFinder.FindLine(
+					point.LineContext,
+					candidate.Node,
+					candidate.File
+				)
+				: (null, null);
+
+			point.Relink(context, candidate.Node.Location, lineContext, lineLocation);
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -649,7 +700,7 @@ namespace Land.Markup
 		/// </summary>
 		public List<RemapCandidateInfo> Find(ConcernPoint point, ParsedFile targetInfo)
 		{
-			return ContextFinder.Find(
+			return ContextFinder.FindPoints(
 				new List<ConcernPoint> { point }, 
 				new List<ParsedFile> { targetInfo }, 
 				ContextFinder.SearchType.Local
@@ -702,7 +753,7 @@ namespace Land.Markup
 			/// Локальный поиск имеет смысл проводить, если только его провести и нужно,
 			/// или если нужен глобальный поиск, но разрешена автоперепривязка
 			var result = allowAutoDecisions || searchType == ContextFinder.SearchType.Local
-				? ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Local)
+				? ContextFinder.FindPoints(points, searchArea, ContextFinder.SearchType.Local)
 				: new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
 			/// Если требуется глобальный поиск, 
@@ -715,7 +766,7 @@ namespace Land.Markup
 					.Select(e => e.Key)
 				).ToList();
 
-				var globalResult = ContextFinder.Find(points, searchArea, ContextFinder.SearchType.Global);
+				var globalResult = ContextFinder.FindPoints(points, searchArea, ContextFinder.SearchType.Global);
 
 				foreach(var key in globalResult.Keys)
 				{
@@ -754,7 +805,7 @@ namespace Land.Markup
 
 			var ambiguous = new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
 
-			var result = ContextFinder.Find(
+			var result = ContextFinder.FindPoints(
 				points,
 				new List<ParsedFile> { file }, 
 				ContextFinder.SearchType.Local
@@ -784,30 +835,12 @@ namespace Land.Markup
 
 			if (first?.IsAuto ?? false)
 			{
-				var siblingsArgs = new SiblingsConstructionArgs
-				{
-					ContextFinder = ContextFinder
-				};
-
-				point.Context = ContextFinder.ContextManager.GetContext(
-					first.Node, 
-					first.File,
-					siblingsArgs,
-					new ClosestConstructionArgs
-					{
-						SearchArea = new List<ParsedFile> { first.File },
-						GetParsed = ContextFinder.GetParsed,
-						ContextFinder = ContextFinder,
-						SiblingsArgs = siblingsArgs
-					}
-				);
-
-				point.AstNode = first.Node;
+				RelinkConcernPoint(point, first);
 				return true;
 			}
 			else
 			{
-				point.AstNode = null;
+				point.NodeLocation = null;
 				return false;
 			}
 		}

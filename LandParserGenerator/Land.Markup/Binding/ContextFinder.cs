@@ -6,6 +6,7 @@ using Land.Core.Parsing.Tree;
 using Land.Markup.CoreExtension;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Land.Core;
 
 namespace Land.Markup.Binding
 {
@@ -21,6 +22,9 @@ namespace Land.Markup.Binding
 
 	public class ContextFinder
 	{
+		private const string LINE_END_SYMBOLS = "\u000A\u000D\u0085\u2028\u2029";
+		private const string DEFAULT_LINE_END = "\r\n";
+
 		public enum SearchType { Local, Global }
 
 		public const double CANDIDATE_SIMILARITY_THRESHOLD = 0.6;
@@ -778,7 +782,7 @@ namespace Land.Markup.Binding
 		/// <summary>
 		/// Поиск узлов дерева, соответствующих точкам привязки
 		/// </summary>
-		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Find(
+		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> FindPoints(
 			List<ConcernPoint> points,
 			List<ParsedFile> searchArea,
 			SearchType searchType)
@@ -828,6 +832,75 @@ namespace Land.Markup.Binding
 			}
 
 			return overallResult;
+		}
+
+		public (LineContext, SegmentLocation) FindLine(
+			LineContext context,
+			Node outerNode,
+			ParsedFile file)
+		{
+			var currentOffset = outerNode.Location.Start.Offset;
+			var lineEnd = GetLineEnd(file.Text);
+
+			var lines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
+				.Split(new string[] { lineEnd }, StringSplitOptions.None)
+				.Select((e, i)=> new
+				{
+					InnerContext = new TextOrHash(e),
+					Location = new SegmentLocation
+					{
+						Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
+						End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - 1)
+					}
+				})
+				.ToList();
+
+			if (lines.Count == 0) return (null, null);
+
+			/// Сначала проверяем сходство содержимого строки
+			var orderedByInner = lines
+				.Select(l => new 
+				{ 
+					ContextLocationPair = l, 
+					InnerSimilarity = EvalSimilarity(context.InnerContext,l.InnerContext)
+				})
+				.OrderByDescending(e => e.InnerSimilarity)
+				.ToList();
+
+			var bestSimilarity = orderedByInner[0].InnerSimilarity;
+			var bestLines = orderedByInner
+				.TakeWhile(e => e.InnerSimilarity == bestSimilarity)
+				.Select(e => new
+				{
+					LineContext = new LineContext(
+						outerNode, 
+						e.ContextLocationPair.Location, 
+						file.Text, 
+						e.ContextLocationPair.InnerContext
+					),
+					Location = e.ContextLocationPair.Location
+				})
+				.ToList();
+
+			/// Если есть несколько идентичных самых похожих строк, проверяем окружение
+			if (bestLines.Count > 1)
+			{
+				bestLines = bestLines
+					.OrderByDescending(e => 
+						(EvalSimilarity(context.NeighboursContext.Item1, e.LineContext.NeighboursContext.Item1) 
+							+ EvalSimilarity(context.NeighboursContext.Item2, e.LineContext.NeighboursContext.Item2)) / 2.0)
+					.ToList();
+			}
+
+			return (bestLines.First().LineContext, bestLines.First().Location);
+		}
+
+		private void DoLineSearch(ConcernPoint point, ParsedFile file)
+		{
+			//var lines = file.Text.Substring(point.Location.Start.Offset, point.Location.Length.Value)
+			//	.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+			//	.Select(l => new LineContext())
+			//	.ToList();
 		}
 
 		#region EvalSimilarity
@@ -1090,6 +1163,17 @@ namespace Land.Markup.Binding
 				file.Root = GetParsed(file.Name)?.Root;
 
 			return file.Root != null;
+		}
+
+		public static string GetLineEnd(string text)
+		{
+			var lineEnd = String.Join("", text
+				.SkipWhile(c => !LINE_END_SYMBOLS.Contains(c))
+				.TakeWhile(c => LINE_END_SYMBOLS.Contains(c))
+			);
+			
+			return !String.IsNullOrEmpty(lineEnd)
+				? lineEnd : DEFAULT_LINE_END;
 		}
 
 		public static bool IsSimilarEnough(RemapCandidateInfo candidate) =>

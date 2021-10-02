@@ -242,7 +242,8 @@ namespace Land.Control
 				if (nodeToBind != null)
 				{
 					return MarkupManager.AddConcernPoint(
-						nodeToBind, 
+						nodeToBind,
+						null,
 						parsedFile,
 						name, 
 						comment,

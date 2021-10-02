@@ -122,8 +122,8 @@ namespace Land.Control
 						MarkupManager.RelinkConcernPoint(
 							point,
 							selectedCandidate.Node,
-							State.PendingCommand.Document,
-							GetPointSearchArea()
+							selectedCandidate.Line,
+							State.PendingCommand.Document
 						);
 
 						point.Name = ConcernPointNameText.Text;
@@ -133,6 +133,7 @@ namespace Land.Control
 					{
 						var point = MarkupManager.AddConcernPoint(
 							selectedCandidate.Node,
+							selectedCandidate.Line,
 							State.PendingCommand.Document,
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,

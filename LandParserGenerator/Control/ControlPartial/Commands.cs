@@ -98,8 +98,11 @@ namespace Land.Control
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(parsedFile.Root, 
-						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
+					GetConcernPointCandidates(
+						parsedFile, 
+						Editor.GetActiveDocumentSelection(false), 
+						Editor.GetActiveDocumentSelection(true)
+					);
 
 				var point = target.DataContext is RemapCandidates pair
 					? pair.Point
@@ -126,8 +129,11 @@ namespace Land.Control
 				};
 
 				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(parsedFile.Root,
-						Editor.GetActiveDocumentSelection(false), Editor.GetActiveDocumentSelection(true));
+					GetConcernPointCandidates(
+						parsedFile,
+						Editor.GetActiveDocumentSelection(false), 
+						Editor.GetActiveDocumentSelection(true)
+					);
 
 				ConfigureMarkupElementTab(true);
 
@@ -143,17 +149,20 @@ namespace Land.Control
 			if (parsedFile != null)
 			{
 				var candidate = GetConcernPointCandidates(
-					parsedFile.Root,
+					parsedFile,
 					Editor.GetActiveDocumentSelection(false),
 					Editor.GetActiveDocumentSelection(true)
 				)
 				.OfType<ExistingConcernPointCandidate>()
-				.FirstOrDefault();
+				.FirstOrDefault(c => c.Line == null
+					&& c.Node.Type != Land.Core.Specification.Grammar.CUSTOM_BLOCK_RULE_NAME
+				);
 
 				if (candidate != null)
 				{
 					MarkupManager.AddConcernPoint(
 						candidate.Node,
+						null,
 						parsedFile,
 						candidate.ViewHeader,
 						null,
@@ -445,7 +454,11 @@ namespace Land.Control
 			{
 				if (elem is ConcernPoint p)
 				{
-					p.AstNode = stubNode;
+					p.NodeLocation = new SegmentLocation
+					{
+						Start = new PointLocation(0, 0, 0),
+						End = new PointLocation(0, 0, 0)
+					};
 					p.HasIrrelevantLocation = true;
 				}
 			});
@@ -454,17 +467,38 @@ namespace Land.Control
 		}
 
 		private List<ConcernPointCandidate> GetConcernPointCandidates(
-			Node root, 
+			ParsedFile file, 
 			SegmentLocation realSelection, 
 			SegmentLocation adjustedSelection)
 		{
 			/// Для выделения находим сущности, объемлющие его
-			var candidates = MarkupManager.GetConcernPointCandidates(root, realSelection)
+			var candidates = MarkupManager.GetConcernPointCandidates(file.Root, realSelection)
 				.Select(c => (ConcernPointCandidate)new ExistingConcernPointCandidate(c))
 				.ToList();
 
+			/// Проверяем, можно ли привязаться к строке
+			if(adjustedSelection.Start.Line == adjustedSelection.End.Line)
+			{
+				var candidate = candidates
+					.OfType<ExistingConcernPointCandidate>()
+					.FirstOrDefault(c => c.Node.Location.Includes(adjustedSelection));
+
+				if(candidate != null)
+				{
+					var index = candidates.IndexOf(candidate);
+
+					candidates.Insert(index, new ExistingConcernPointCandidate
+					{
+						Node = candidate.Node,
+						Line = adjustedSelection,
+						ViewHeader = "строка: " 
+							+ file.Text.Substring(adjustedSelection.Start.Offset, adjustedSelection.Length.Value).Trim()
+					});
+				}
+			}
+
 			/// Проверяем, можно ли обрамить его кастомным блоком
-			if (CustomBlockValidator.IsValid(root, adjustedSelection))
+			if (CustomBlockValidator.IsValid(file.Root, adjustedSelection))
 			{
 				candidates.Add(new CustomConcernPointCandidate(
 					realSelection, adjustedSelection, "Новый пользовательский блок"

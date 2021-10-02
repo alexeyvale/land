@@ -48,7 +48,6 @@ namespace Land.Markup.CoreExtension
 			else
 			{
 				manager.Clear(MarkupOption.GROUP_NAME, MarkupOption.NOTUNIQUE);
-
 			}
 		}
 
