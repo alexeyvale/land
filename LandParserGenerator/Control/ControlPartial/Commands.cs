@@ -383,7 +383,9 @@ namespace Land.Control
 			{
 				ProcessAmbiguities(
 					MarkupManager.Remap(
-						GetPointSearchArea(),
+						GetPointSearchArea()
+							.Select(f=> TryParse(f, null, out bool success, true))
+							.ToList(),
 						true,
 						sender == ApplyMappingLocal 
 							? ContextFinder.SearchType.Local 
@@ -459,6 +461,16 @@ namespace Land.Control
 						Start = new PointLocation(0, 0, 0),
 						End = new PointLocation(0, 0, 0)
 					};
+
+					if(p.LineContext != null)
+					{
+						p.LineLocation = new SegmentLocation
+						{
+							Start = new PointLocation(0, 0, 0),
+							End = new PointLocation(0, 0, 0)
+						};
+					}
+
 					p.HasIrrelevantLocation = true;
 				}
 			});

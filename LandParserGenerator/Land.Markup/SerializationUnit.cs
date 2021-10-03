@@ -20,6 +20,8 @@ namespace Land.Markup
 
 		public List<AncestorsPointsPair> PointContexts { get; set; }
 
+		public List<LineContext> LineContexts { get; set; }
+
 		public List<RelatedPair<MarkupElement>> ExternalRelatons { get; set; }
 	}
 }

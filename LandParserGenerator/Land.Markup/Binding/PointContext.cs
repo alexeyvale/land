@@ -454,6 +454,32 @@ namespace Land.Markup.Binding
 			}
 		}
 
+		public void UnlinkPoint(Guid pointId)
+		{
+			this.LinkedPoints.Remove(pointId);
+
+			if (this.ClosestContext != null)
+			{
+				foreach (var element in this.ClosestContext)
+				{
+					element.LinkedClosestPoints.Remove(pointId);
+				}
+			}
+
+			if (this.SiblingsContext?.Before?.Nearest != null)
+			{
+				foreach (var element in this.SiblingsContext.Before.Nearest)
+				{
+					element.LinkedAfterNeighbours.Remove(pointId);
+				}
+
+				foreach (var element in this.SiblingsContext.After.Nearest)
+				{
+					element.LinkedBeforeNeighbours.Remove(pointId);
+				}
+			}
+		}
+
 		#endregion
 
 		/// <summary>
@@ -1139,8 +1165,15 @@ namespace Land.Markup.Binding
 			this.LinkedPoints.Add(pointId);
 		}
 
+		public void UnlinkPoint(Guid pointId)
+		{
+			this.LinkedPoints.Remove(pointId);
+		}
+
 		public TextOrHash InnerContext { get; set; }
 		public Tuple<TextOrHash, TextOrHash> NeighboursContext { get; set; }
+
+		public LineContext() { }
 
 		public LineContext(Node node, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
 		{

@@ -253,12 +253,24 @@ namespace Land.VisualStudioExtension
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			return new HashSet<string>(GetAllProjects(DteService.Solution)
-				.Select(p =>
+			var allProjects = GetProjects(DteService.Solution)
+				.Where(p =>
 				{
 					ThreadHelper.ThrowIfNotOnUIThread();
-					return Path.GetDirectoryName(p.FileName);
-				}));
+					return !string.IsNullOrEmpty(p.FileName);
+				})
+				.ToList();
+			var allFiles = new HashSet<string>();
+
+			foreach(var project in allProjects)
+			{
+				foreach(ProjectItem item in project.ProjectItems)
+				{
+					allFiles.UnionWith(GetFiles(item));
+				}
+			}
+
+			return allFiles;
 		}
 
 		#region Methods
@@ -280,7 +292,7 @@ namespace Land.VisualStudioExtension
 			return null;
 		}
 
-		private IEnumerable<Project> GetAllProjects(Solution sln)
+		private IEnumerable<Project> GetProjects(Solution sln)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -288,9 +300,6 @@ namespace Land.VisualStudioExtension
 				.Cast<Project>()
 				.SelectMany(GetProjects);
 		}
-
-		private int GetVSOffset(PointLocation loc, int lineEndLength) =>
-			loc.Offset - loc.Line.Value * (lineEndLength - 1) + lineEndLength;
 
 		private IEnumerable<Project> GetProjects(Project project)
 		{
@@ -312,6 +321,31 @@ namespace Land.VisualStudioExtension
 
 			return new[] { project };
 		}
+
+		private IEnumerable<string> GetFiles(ProjectItem item)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			switch(item.Kind)
+			{
+				case EnvDTE.Constants.vsProjectItemKindPhysicalFile:
+					return new[] { item.FileNames[0] };
+				case EnvDTE.Constants.vsProjectItemKindPhysicalFolder:
+				case EnvDTE.Constants.vsProjectItemKindSubProject:
+				case EnvDTE.Constants.vsProjectItemKindVirtualFolder:
+					var files = new HashSet<string>();
+					foreach(ProjectItem pi in item.ProjectItems)
+					{
+						files.UnionWith(GetFiles(pi));
+					}
+					return files;
+				default:
+					return Array.Empty<string>();
+			}
+		}
+
+		private int GetVSOffset(PointLocation loc, int lineEndLength) =>
+			loc.Offset - loc.Line.Value * (lineEndLength - 1) + lineEndLength;
 
 		private string GetDocumentLineEnd(TextDocument doc)
 		{

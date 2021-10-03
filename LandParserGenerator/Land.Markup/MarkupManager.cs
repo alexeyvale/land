@@ -115,6 +115,16 @@ namespace Land.Markup
 						Start = new PointLocation(0, 0, 0),
 						End = new PointLocation(0, 0, 0)
 					};
+
+					if (concernPoint.LineContext != null)
+					{
+						concernPoint.LineLocation = new SegmentLocation
+						{
+							Start = new PointLocation(0, 0, 0),
+							End = new PointLocation(0, 0, 0)
+						};
+					}
+
 					concernPoint.HasIrrelevantLocation = true;
 				}
 			});
@@ -128,9 +138,23 @@ namespace Land.Markup
 		public void RemoveElement(MarkupElement elem)
 		{
 			if (elem.Parent != null)
+			{
 				elem.Parent.Elements.Remove(elem);
+			}
 			else
+			{
 				Markup.Remove(elem);
+			}
+
+			if(elem is ConcernPoint point)
+			{
+				point.Context.UnlinkPoint(point.Id);
+
+				if(point.LineContext != null)
+				{
+					point.LineContext.UnlinkPoint(point.Id);
+				}
+			}
 
 			OnMarkupChanged?.Invoke();
 		}
@@ -464,7 +488,11 @@ namespace Land.Markup
 					Markup = Markup,
 					PointContexts = pointContexts
 						.GroupBy(c => c.AncestorsContext)
-						.Select(c => new AncestorsPointsPair { Ancestors = c.Key, Points = c.ToList()})
+						.Select(c => new AncestorsPointsPair { Ancestors = c.Key, Points = c.ToList() })
+						.ToList(),
+					LineContexts = GetConcernPoints()
+						.Where(p => p.LineContext != null)
+						.Select(p => p.LineContext)
 						.ToList(),
 					ExternalRelatons = Relations.ExternalRelations.GetRelatedPairs()
 				};
@@ -551,27 +579,28 @@ namespace Land.Markup
 				}
 
 				/// Если у каких-то точек нет ближайших или соседей, присваиваем пустой массив
-				foreach (var point in concernPoints.Values)
+				foreach (var point in pointContexts)
 				{
-					if (point.Context.ClosestContext == null)
+					/// Контекст ближайших есть только у невспомогательных точек привязки
+					if (point.ClosestContext == null && point.LinkedPoints.Count > 0)
 					{
-						point.Context.ClosestContext = new HashSet<PointContext>();
+						point.ClosestContext = new HashSet<PointContext>();
 					}
 
-					if(point.Context.SiblingsContext != null)
+					if(point.SiblingsContext != null)
 					{
-						if(point.Context.SiblingsContext.Before.Nearest == null)
+						if(point.SiblingsContext.Before.Nearest == null)
 						{
-							point.Context.SiblingsContext.Before.Nearest = new List<PointContext>();
+							point.SiblingsContext.Before.Nearest = new List<PointContext>();
 						}
-						if (point.Context.SiblingsContext.After.Nearest == null)
+						if (point.SiblingsContext.After.Nearest == null)
 						{
-							point.Context.SiblingsContext.After.Nearest = new List<PointContext>();
+							point.SiblingsContext.After.Nearest = new List<PointContext>();
 						}
 					}
 				}
 
-				/// Связываем контексты-описания ближайших с контекстами точек
+				/// Связываем контексты-описания соседей и ближайших с контекстами точек
 				foreach (var context in pointContexts)
 				{
 					foreach (var id in context.LinkedClosestPoints)
@@ -590,9 +619,17 @@ namespace Land.Markup
 					}
 				}
 
-				foreach (var point in concernPoints.Values)
+				/// Для совместимости
+				if (unit.LineContexts != null)
 				{
-					point.Context.LinkPoint(point.Id);
+					/// Связываем контексты строк с точками привязки
+					foreach (var line in unit.LineContexts)
+					{
+						foreach (var id in line.LinkedPoints)
+						{
+							concernPoints[id].LineContext = line;
+						}
+					}
 				}
 
 				/// Восстанавливаем обратные связи между элементами разметки
@@ -774,7 +811,6 @@ namespace Land.Markup
 				}
 			}
 
-
 			foreach (var kvp in result)
 			{
 				var candidates = kvp.Value
@@ -798,6 +834,11 @@ namespace Land.Markup
 			string pointType,
 			ParsedFile file)
 		{
+			if(file == null)
+			{
+				return new Dictionary<ConcernPoint, List<RemapCandidateInfo>>();
+			}
+
 			var points = GetConcernPoints()
 				.Where(p => p.Context.Type == pointType
 					&& p.Context.FileName == file.Name)

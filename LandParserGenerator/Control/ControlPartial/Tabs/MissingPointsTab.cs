@@ -52,7 +52,9 @@ namespace Land.Control
 		private void ProcessAmbiguities(Dictionary<ConcernPoint, List<RemapCandidateInfo>> recentAmbiguities, bool globalRemap)
 		{
 			if (globalRemap)
+			{
 				State.RecentAmbiguities = recentAmbiguities;
+			}
 			else
 			{
 				foreach (var kvp in recentAmbiguities)

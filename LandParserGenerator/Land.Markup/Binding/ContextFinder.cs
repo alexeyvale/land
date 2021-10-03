@@ -895,14 +895,6 @@ namespace Land.Markup.Binding
 			return (bestLines.First().LineContext, bestLines.First().Location);
 		}
 
-		private void DoLineSearch(ConcernPoint point, ParsedFile file)
-		{
-			//var lines = file.Text.Substring(point.Location.Start.Offset, point.Location.Length.Value)
-			//	.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
-			//	.Select(l => new LineContext())
-			//	.ToList();
-		}
-
 		#region EvalSimilarity
 
 		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
@@ -929,7 +921,8 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(PrioritizedWord a, PrioritizedWord b)
 		{
-			return a.Priority == b.Priority ? Levenshtein(a.Text, b.Text, true) : 0;
+			return a.Priority == b.Priority 
+				? Levenshtein(a.Text, b.Text, true) : 0;
 		}
 
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)

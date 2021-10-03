@@ -445,11 +445,8 @@ namespace Land.Control
 
 		#region Other helpers
 
-		private List<ParsedFile> GetPointSearchArea() =>
-			(GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles())
-				.Select(f => TryParse(f, null, out bool success, true))
-				.Where(r => r != null)
-				.ToList();
+		private HashSet<string> GetPointSearchArea() =>
+			GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles();
 
 		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
@@ -558,8 +555,13 @@ namespace Land.Control
 			{
 				ProcessAmbiguities(
 					MarkupManager.Remap(
-						cp.Context.Type, 
-						GetPointSearchArea().FirstOrDefault(e=>e.Name == cp.Context.FileName)
+						cp.Context.Type,
+						TryParse(
+							GetPointSearchArea().FirstOrDefault(e => e == cp.Context.FileName),
+							null, 
+							out bool success, 
+							true
+						)
 					),
 					false
 				);
