@@ -445,8 +445,15 @@ namespace Land.Control
 
 		#region Other helpers
 
-		private HashSet<string> GetPointSearchArea() =>
-			GetFileSet(Editor.GetWorkingSet()) ?? MarkupManager.GetReferencedFiles();
+		private HashSet<string> GetPointSearchArea()
+		{
+			var searchArea = GetFileSet(Editor.GetWorkingSet())
+				?? new HashSet<string>();
+
+			searchArea.UnionWith(MarkupManager.GetReferencedFiles());
+
+			return searchArea;
+		}
 
 		private HashSet<string> GetFileSet(HashSet<string> paths)
 		{
