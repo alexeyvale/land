@@ -39,6 +39,12 @@ block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recove
 	userify("литерал") LITERAL
 	userify("разделитель секций") SECTIONS_SEPARATOR
 	userify("начало описания") DECLARATION_NAME
+	
+	userify("описание") symbol_declaration
+	userify("элемент описания") symbol_declaration_element
+	userify("правило") rule
+	userify("альтернатива") alternative
+	userify("вхождение символа в альтернативу") alternative_element
 }
 
 %customblock {

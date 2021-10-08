@@ -61,6 +61,9 @@ block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPAR
 	userify("начало списка состояний") STATES_START
 	userify("начало вложенного списка состояний") INNER_STATES_START
 	userify("конец списка состояний") STATES_END
+	
+	userify("группа правил") group
+	userify("правило") rule
 }
 
 %nodes {
