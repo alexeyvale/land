@@ -589,11 +589,12 @@ namespace Land.Markup
 
 					if(point.SiblingsContext != null)
 					{
-						if(point.SiblingsContext.Before.Nearest == null)
+						if (point.SiblingsContext.Before != null)
 						{
 							point.SiblingsContext.Before.Nearest = new List<PointContext>();
 						}
-						if (point.SiblingsContext.After.Nearest == null)
+
+						if (point.SiblingsContext.After != null)
 						{
 							point.SiblingsContext.After.Nearest = new List<PointContext>();
 						}
@@ -704,12 +705,17 @@ namespace Land.Markup
 				Action<HeaderContext, string> setCore = (header, type) =>
 				{
 					/// Информация о ядре связана либо с данным типом, либо с типом, алиасом которого является данный
-					var typeToCheck = cores.ContainsKey(type) ? type 
-						: grammars[group.Key].Aliases.Keys.FirstOrDefault(k => grammars[group.Key].Aliases[k].Contains(type));
+					var typeToCheck = cores.ContainsKey(type) ? type : null;
+
+					if(typeToCheck == null)
+					{
+						var typeForAlias = grammars[group.Key].Aliases.FirstOrDefault(kvp => kvp.Value.Contains(type)).Key;
+						typeToCheck = !string.IsNullOrEmpty(typeForAlias) && cores.ContainsKey(typeForAlias) ? typeForAlias : null;
+					}
 
 					var grouped = header.Sequence
 						.Select((e, i) => new { elem = e, idx = i })
-						.GroupBy(e => cores[typeToCheck] != null && cores[typeToCheck].Contains(e.elem.Type))
+						.GroupBy(e => typeToCheck != null && cores[typeToCheck].Contains(e.elem.Type))
 						.ToDictionary(g => g.Key, g => g.ToList());
 
 					header.NonCoreIndices = grouped.ContainsKey(false)
