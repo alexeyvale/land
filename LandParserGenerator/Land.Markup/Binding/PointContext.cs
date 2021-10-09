@@ -619,8 +619,7 @@ namespace Land.Markup.Binding
 
 			while (currentNode != null)
 			{
-				if (currentNode.Symbol != Grammar.CUSTOM_BLOCK_RULE_NAME
-					&& currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
+				if (currentNode.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND))
 					return currentNode;
 
 				currentNode = currentNode.Parent;
