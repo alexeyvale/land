@@ -300,7 +300,9 @@ namespace Land.Control
 		/// </summary>
 		public void ImportSettings(string fileName)
 		{
+			var settingsId = SettingsObject.Id;
 			SettingsObject = SettingsSerializer.Deserialize(fileName, true);
+			SettingsObject.Id = settingsId;
 
 			Settings.Default.SerializedSettings = SettingsSerializer.Serialize(SettingsObject);
 			Settings.Default.Save();
