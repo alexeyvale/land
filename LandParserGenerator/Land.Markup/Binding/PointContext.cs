@@ -1174,18 +1174,18 @@ namespace Land.Markup.Binding
 
 		public LineContext() { }
 
-		public LineContext(Node node, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
+		public LineContext(SegmentLocation nodeLocation, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
 		{
 			var beforeSegment = new SegmentLocation()
 			{
-				Start = node.Location.Start,
+				Start = nodeLocation.Start,
 				End = line.Start
 			};
 
 			var afterSegment = new SegmentLocation()
 			{
 				Start = line.End,
-				End = node.Location.End
+				End = nodeLocation.End
 			};
 
 			InnerContext = cachedInnerContext ?? new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));

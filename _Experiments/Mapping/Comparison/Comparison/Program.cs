@@ -1,4 +1,5 @@
-﻿using Land.Core.Parsing.Tree;
+﻿using Land.Core;
+using Land.Core.Parsing.Tree;
 using Land.Markup;
 using Land.Markup.Binding;
 using Land.Markup.CoreExtension;
@@ -179,8 +180,8 @@ namespace Comparison
 								&& modifiedResult.First().Context.StartOffset == basicResult.First().Context.StartOffset;
 
 						var hasNotChanged = isModifiedAuto && initialFile.Text.Substring(
-							cp.AstNode.Location.Start.Offset,
-							cp.AstNode.Location.Length.Value
+							cp.NodeLocation.Start.Offset,
+							cp.NodeLocation.Length.Value
 						) == currentFile.Text.Substring(
 							modifiedRemapResult[cp][0].Node.Location.Start.Offset,
 							modifiedRemapResult[cp][0].Node.Location.Length.Value
@@ -458,6 +459,7 @@ namespace Comparison
 
 					markupManager.AddConcernPoint(
 						node,
+						null,
 						parsedFiles[expectedPoint.FileName]
 					);
 				}
@@ -525,8 +527,8 @@ namespace Comparison
 								.SequenceEqual(basicResult.First().Context.HeaderContext.Sequence_old);
 
 					var hasNotChanged = isModifiedAuto && File.ReadAllText(Path.Combine(BaseFolder, cp.Context.FileName)).Substring(
-						cp.AstNode.Location.Start.Offset,
-						cp.AstNode.Location.Length.Value
+						cp.NodeLocation.Start.Offset,
+						cp.NodeLocation.Length.Value
 					) == searchArea.First(f=>f.Name == modifiedRemapResult[cp][0].File.Name).Text.Substring(
 						modifiedRemapResult[cp][0].Node.Location.Start.Offset,
 						modifiedRemapResult[cp][0].Node.Location.Length.Value

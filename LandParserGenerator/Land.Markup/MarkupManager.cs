@@ -182,7 +182,7 @@ namespace Land.Markup
 			string comment = null, 
 			Concern parent = null)
 		{
-			Remap(node.Type, file);
+			Remap(node.Type, file, true);
 
 			var siblingsArgs = new SiblingsConstructionArgs
 			{
@@ -203,7 +203,7 @@ namespace Land.Markup
 			);
 
 			var lineContext = line != null 
-				? new LineContext(node, line, file.Text) 
+				? new LineContext(node.Location, line, file.Text) 
 				: null;
 
 			var point = new ConcernPoint(
@@ -233,7 +233,7 @@ namespace Land.Markup
 			/// Группируем land-сущности по типу (символу)
 			foreach (var group in visitor.Land.GroupBy(l => l.UserifiedSymbol))
 			{
-				Remap(group.Key, file);
+				Remap(group.Key, file, true);
 
 				var concern = AddConcern(group.Key);
 				/// В пределах символа группируем по псевдониму
@@ -366,7 +366,7 @@ namespace Land.Markup
 					}
 				),
 				node.Location,
-				lineLocation != null ? new LineContext(node, lineLocation, file.Text) : null,
+				lineLocation != null ? new LineContext(node.Location, lineLocation, file.Text) : null,
 				lineLocation
 			);
 
@@ -838,7 +838,8 @@ namespace Land.Markup
 		/// </summary>
 		public Dictionary<ConcernPoint, List<RemapCandidateInfo>> Remap(
 			string pointType,
-			ParsedFile file)
+			ParsedFile file,
+			bool allowAutoDecisions)
 		{
 			if(file == null)
 			{
@@ -865,8 +866,10 @@ namespace Land.Markup
 					.Take(AmbiguityTopCount)
 					.ToList();
 
-				if (!ApplyCandidate(key, result[key]))
+				if (!allowAutoDecisions || !ApplyCandidate(key, result[key]))
+				{
 					ambiguous[key] = result[key];
+				}
 			}
 
 			OnMarkupChanged?.Invoke();

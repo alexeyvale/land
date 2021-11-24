@@ -842,15 +842,16 @@ namespace Land.Markup.Binding
 			var currentOffset = outerNode.Location.Start.Offset;
 			var lineEnd = GetLineEnd(file.Text);
 
-			var lines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
-				.Split(new string[] { lineEnd }, StringSplitOptions.None)
-				.Select((e, i)=> new
+			var rawLines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
+				.Split(new string[] { lineEnd }, StringSplitOptions.None);
+
+			var lines = rawLines.Select((e, i)=> new
 				{
 					InnerContext = new TextOrHash(e),
 					Location = new SegmentLocation
 					{
 						Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
-						End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - 1)
+						End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - lineEnd.Length)
 					}
 				})
 				.ToList();
@@ -869,11 +870,11 @@ namespace Land.Markup.Binding
 
 			var bestSimilarity = orderedByInner[0].InnerSimilarity;
 			var bestLines = orderedByInner
-				.TakeWhile(e => e.InnerSimilarity == bestSimilarity)
+				.TakeWhile(e => !AreDistantEnough(bestSimilarity, e.InnerSimilarity))
 				.Select(e => new
 				{
 					LineContext = new LineContext(
-						outerNode, 
+						outerNode.Location, 
 						e.ContextLocationPair.Location, 
 						file.Text, 
 						e.ContextLocationPair.InnerContext
