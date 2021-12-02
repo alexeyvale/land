@@ -737,5 +737,173 @@ namespace Comparison
 			Console.WriteLine("Job's done!");
 			Console.ReadLine();
 		}
+
+		static void LineBinding()
+		{
+			const int TOTAL_NUMBER_OF_METHODS = 100;
+			const int LINES_IN_METHOD = 2;
+
+			var heuristic = new ContextsEqualityHeuristic();
+			var markupManager = new MarkupManager(null, heuristic);
+
+			/// Создаём парсер и менеджер разметки из библиотеки LanD	
+			var landParser = sharp.ParserProvider.GetParser(false);
+			landParser.SetVisitor(g => new MarkupOptionsProcessingVisitor(g));
+			landParser.SetPreprocessor(new SharpPreprocessing.ConditionalCompilation.SharpPreprocessor());
+
+			var landErrors = new List<string>();
+			var initialFiles = new HashSet<string>(Directory.GetFiles(BaseFolder, "*.cs"));
+			var report = new StreamWriter("report.txt");
+			var totalCount = 0;
+			var singleMatchCount = 0;
+
+			var counter = 0;
+			var allMethods = new List<Tuple<ConcernPoint, List<SegmentLocation>, RemapCandidateInfo>>();
+			var gen = new Random(7);
+
+			foreach (var file in initialFiles.ToList())
+			{
+				++counter;
+				if (counter % 100 == 0)
+				{
+					Console.WriteLine($"{counter} out of {initialFiles.Count}...");
+				}
+
+				var initialFile = ParseFile(landParser, file, landErrors);
+				var currentFile = ParseFile(landParser, Path.Combine(ModifiedFolder, Path.GetFileName(file)), landErrors);
+
+				if (initialFile.Root == null || currentFile.Root == null)
+				{
+					Console.WriteLine($"{Path.GetFileName(file)} skipped...");
+					continue;
+				}
+
+				markupManager.AddLand(initialFile);
+
+				markupManager.ContextFinder.UseOldApproach = false;
+				var modifiedRemapResult = markupManager.Remap("method", currentFile, false);
+
+				foreach (var cp in modifiedRemapResult.Keys)
+				{
+					var modifiedResult = modifiedRemapResult[cp].Where(e => !e.Deleted).ToList();
+					var isModifiedAuto = modifiedResult.FirstOrDefault()?.IsAuto ?? false;
+
+					var hasNotChanged = isModifiedAuto && initialFile.Text.Substring(
+						cp.NodeLocation.Start.Offset,
+						cp.NodeLocation.Length.Value
+					) == currentFile.Text.Substring(
+						modifiedRemapResult[cp][0].Node.Location.Start.Offset,
+						modifiedRemapResult[cp][0].Node.Location.Length.Value
+					) && cp.Context.AncestorsContext.SequenceEqual(modifiedRemapResult[cp][0].Context.AncestorsContext);
+
+					if (!hasNotChanged && isModifiedAuto)
+					{
+						/// Ищем узел, соответствующий телу метода
+						var bodyNode = markupManager.GetConcernPointCandidates(initialFile.Root, cp.NodeLocation)
+							.First(c => c.Type == "method").Children
+							.FirstOrDefault(c => c.Type == "method_body");
+
+						/// Если тело есть
+						if (bodyNode != null)
+						{
+							/// Получаем его текст
+							var bodyText = initialFile.Text.Substring(
+								bodyNode.Location.Start.Offset,
+								bodyNode.Location.Length.Value
+							);
+							/// Разбиваем на строки
+							var lines = bodyText.Split('\n');
+							/// Если строк хватает для интересной привязки
+							if (lines.Length >= 4)
+							{
+								var selectedLines = new HashSet<int>();
+
+								while (selectedLines.Count < LINES_IN_METHOD && selectedLines.Count != lines.Length - 2)
+								{
+									while (!selectedLines.Add(gen.Next(1, lines.Length - 1))) ;
+								}
+
+								allMethods.Add(new Tuple<ConcernPoint, List<SegmentLocation>, RemapCandidateInfo>(
+									cp,
+									selectedLines.Select(idx =>
+									{
+										var startOffset = bodyNode.Location.Start.Offset + idx
+											+ lines.Take(idx).Sum(l => l.Length);
+
+										return new SegmentLocation
+										{
+											Start = new PointLocation(bodyNode.Location.Start.Line + idx, null, startOffset),
+											End = new PointLocation(startOffset + lines[idx].Length)
+										};
+									}).ToList(),
+									modifiedResult.First()
+								));
+							}
+						}
+					}
+				}
+
+				markupManager.Clear();
+				markupManager.ContextFinder.ContextManager.ClearCache(initialFile.Name);
+				markupManager.ContextFinder.ContextManager.ClearCache(currentFile.Name);
+			}
+
+			var selectedMethods = new List<Tuple<ConcernPoint, List<SegmentLocation>, RemapCandidateInfo>>();
+
+			while(allMethods.Count > 0 && selectedMethods.Count < TOTAL_NUMBER_OF_METHODS)
+			{
+				var idx = gen.Next(allMethods.Count);
+
+				selectedMethods.Add(allMethods[idx]);
+				allMethods.RemoveAt(idx);
+			}
+
+			foreach(var file in selectedMethods.ToLookup(m=>m.Item1.Context.FileName))
+			{
+				var initialFile = ParseFile(landParser, Path.Combine(BaseFolder, Path.GetFileName(file.Key)), landErrors);
+				var currentFile = ParseFile(landParser, Path.Combine(ModifiedFolder, Path.GetFileName(file.Key)), landErrors);
+
+				report.WriteLine($"file:///{Path.Combine(BaseFolder,Path.GetFileName(file.Key))}");
+				report.WriteLine($"file:///{Path.Combine(ModifiedFolder,Path.GetFileName(file.Key))}");
+				report.WriteLine("*");
+
+				foreach (var method in file)
+				{
+					foreach(var line in method.Item2)
+					{
+						totalCount += 1;
+
+						var lineContext = new LineContext(method.Item1.NodeLocation, line, initialFile.Text);
+						var (newLineContext, newLineLocation) = markupManager.ContextFinder
+							.FindLine(lineContext, method.Item3.Node, currentFile, out bool singleMatch);
+
+						if (singleMatch)
+						{
+							singleMatchCount += 1;
+						}
+
+						report.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
+
+						if (newLineLocation != null)
+						{
+							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}");
+						}
+						else
+						{
+							report.WriteLine("*** не найдено ***");
+						}
+					}
+				}
+
+				report.WriteLine("");
+			}
+
+			report.Close();
+
+			Console.WriteLine("Job's done!");
+			Console.WriteLine($"Total marked: {totalCount} lines");
+			Console.WriteLine($"Single match: {singleMatchCount}");
+			Console.ReadLine();
+		}
 	}
 }

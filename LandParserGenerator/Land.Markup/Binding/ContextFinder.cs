@@ -893,7 +893,7 @@ namespace Land.Markup.Binding
 					.ToList();
 			}
 
-			return (bestLines.First().LineContext, bestLines.First().Location);
+			return (bestLines.FirstOrDefault()?.LineContext, bestLines.FirstOrDefault()?.Location);
 		}
 
 		#region EvalSimilarity
@@ -1181,9 +1181,9 @@ namespace Land.Markup.Binding
 			/// Либо оба не похожи на 100% и достаточно отстоят друг от друга
 			|| second.Similarity != 1 && 1 - second.Similarity >= (1 - first.Similarity) * (staticGap ?? Math.Max(GAP_MIN, GAP_MAX - (GAP_MAX - GAP_MIN) * (1 - first.Similarity.Value) / (1 - GAP_THRESHOLD)));
 
-		public static bool AreDistantEnough(double first, double second) =>
+		public static bool AreDistantEnough(double first, double second, double? staticGap = null) =>
 			first == 1 && second != 1
-			|| second != 1 && 1 - second >= (1 - first) * Math.Max(GAP_MIN, GAP_MAX - (GAP_MAX - GAP_MIN) * (1 - first) / (1 - GAP_THRESHOLD));
+			|| second != 1 && 1 - second >= (1 - first) * (staticGap ?? Math.Max(GAP_MIN, GAP_MAX - (GAP_MAX - GAP_MIN) * (1 - first) / (1 - GAP_THRESHOLD)));
 
 		#endregion
 
