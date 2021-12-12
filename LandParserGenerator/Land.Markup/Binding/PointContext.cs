@@ -1169,13 +1169,28 @@ namespace Land.Markup.Binding
 			this.LinkedPoints.Remove(pointId);
 		}
 
+		public bool HadSame { get; set; }
 		public TextOrHash InnerContext { get; set; }
-		public Tuple<TextOrHash, TextOrHash> NeighboursContext { get; set; }
+		public Tuple<TextOrHash, TextOrHash> OuterContext { get; set; }
 
 		public LineContext() { }
 
 		public LineContext(SegmentLocation nodeLocation, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
 		{
+			var lineEnd = ContextFinder.GetLineEnd(text);
+
+			var allLines = text
+				.Substring(nodeLocation.Start.Offset, nodeLocation.Length.Value)
+				.Split(new string[] { lineEnd }, StringSplitOptions.None)
+				.Select(l=>TextOrHash.Preprocess(l))
+				.ToList();
+
+			var targetLine = TextOrHash.Preprocess(
+				text.Substring(line.Start.Offset, line.Length.Value)
+			);
+
+			HadSame = allLines.Count(l => l == targetLine) > 1;
+
 			var beforeSegment = new SegmentLocation()
 			{
 				Start = nodeLocation.Start,
@@ -1189,7 +1204,7 @@ namespace Land.Markup.Binding
 			};
 
 			InnerContext = cachedInnerContext ?? new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));
-			NeighboursContext = new Tuple<TextOrHash, TextOrHash>(
+			OuterContext = new Tuple<TextOrHash, TextOrHash>(
 				new TextOrHash(text.Substring(beforeSegment.Start.Offset, beforeSegment.Length.Value)),
 				new TextOrHash(text.Substring(afterSegment.Start.Offset, afterSegment.Length.Value))
 			);
@@ -1210,9 +1225,7 @@ namespace Land.Markup.Binding
 
 		public TextOrHash(string text)
 		{
-			text = System.Text.RegularExpressions.Regex.Replace(
-				text.ToLower(), "[\n\r\f\t ]+", ""
-			);
+			text = Preprocess(text);
 
 			TextLength = text.Length;
 
@@ -1228,6 +1241,11 @@ namespace Land.Markup.Binding
 				Text = text;
 			}
 		}
+
+		public static string Preprocess(string text) =>
+			System.Text.RegularExpressions.Regex.Replace(
+				text.ToLower(), "[\n\r\f\t ]+", ""
+			);
 	}
 
 	public class EqualsIgnoreValueComparer :
