@@ -740,7 +740,7 @@ namespace Comparison
 
 		static void LineBinding()
 		{
-			const int TOTAL_NUMBER_OF_METHODS = 100;
+			const int TOTAL_NUMBER_OF_METHODS = 120;
 			const int LINES_IN_METHOD = 2;
 
 			var heuristic = new ContextsEqualityHeuristic();
@@ -754,8 +754,10 @@ namespace Comparison
 			var landErrors = new List<string>();
 			var initialFiles = new HashSet<string>(Directory.GetFiles(BaseFolder, "*.cs"));
 			var report = new StreamWriter("report.txt");
+			var reportToCheck = new StreamWriter("reportToCheck.txt");
 			var totalCount = 0;
-			var singleMatchCount = 0;
+			var toCheckCount = 0;
+			var shortLineCount = 0;
 
 			var counter = 0;
 			var allMethods = new List<Tuple<ConcernPoint, List<SegmentLocation>, RemapCandidateInfo>>();
@@ -863,9 +865,12 @@ namespace Comparison
 				var initialFile = ParseFile(landParser, Path.Combine(BaseFolder, Path.GetFileName(file.Key)), landErrors);
 				var currentFile = ParseFile(landParser, Path.Combine(ModifiedFolder, Path.GetFileName(file.Key)), landErrors);
 
-				report.WriteLine($"file:///{Path.Combine(BaseFolder,Path.GetFileName(file.Key))}");
-				report.WriteLine($"file:///{Path.Combine(ModifiedFolder,Path.GetFileName(file.Key))}");
+				report.WriteLine("");
+				report.WriteLine($"file:///{Path.Combine(BaseFolder, Path.GetFileName(file.Key))}");
+				report.WriteLine($"file:///{Path.Combine(ModifiedFolder, Path.GetFileName(file.Key))}");
 				report.WriteLine("*");
+
+				var hasToCheck = false;
 
 				foreach (var method in file)
 				{
@@ -875,18 +880,40 @@ namespace Comparison
 
 						var lineContext = new LineContext(method.Item1.NodeLocation, line, initialFile.Text);
 						var (newLineContext, newLineLocation) = markupManager.ContextFinder
-							.FindLine(lineContext, method.Item3.Node, currentFile, out bool singleMatch);
+							.FindLine(lineContext, method.Item3.Node, currentFile, out double score, out double innerSim, out double outerSim, out bool confusionFlag);
 
-						if (singleMatch)
+						if (newLineLocation == null || score < 0.97)
 						{
-							singleMatchCount += 1;
+							toCheckCount += 1;
+
+							if (!hasToCheck)
+							{
+								hasToCheck = true;
+								reportToCheck.WriteLine("");
+								reportToCheck.WriteLine($"file:///{Path.Combine(BaseFolder, Path.GetFileName(file.Key))}");
+								reportToCheck.WriteLine($"file:///{Path.Combine(ModifiedFolder, Path.GetFileName(file.Key))}");
+								reportToCheck.WriteLine("*");
+							}
+
+							reportToCheck.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
+
+							if (newLineLocation != null)
+							{
+								reportToCheck.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
+							}
+							else
+							{
+								reportToCheck.WriteLine("*** не найдено ***");
+							}
 						}
+
+						if(lineContext.InnerContext.TextLength <= 1) { shortLineCount++; }
 
 						report.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
 
 						if (newLineLocation != null)
 						{
-							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}");
+							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
 						}
 						else
 						{
@@ -894,15 +921,15 @@ namespace Comparison
 						}
 					}
 				}
-
-				report.WriteLine("");
 			}
 
 			report.Close();
+			reportToCheck.Close();
 
 			Console.WriteLine("Job's done!");
 			Console.WriteLine($"Total marked: {totalCount} lines");
-			Console.WriteLine($"Single match: {singleMatchCount}");
+			Console.WriteLine($"To check: {toCheckCount} lines");
+			Console.WriteLine($"Short: {shortLineCount} lines");
 			Console.ReadLine();
 		}
 	}

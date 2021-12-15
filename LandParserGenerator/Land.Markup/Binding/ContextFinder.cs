@@ -839,61 +839,62 @@ namespace Land.Markup.Binding
 			Node outerNode,
 			ParsedFile file)
 		{
+			const double MIN_WEIGHT = 0.25;
+			const double MAX_WEIGHT = 1;
+
 			var currentOffset = outerNode.Location.Start.Offset;
 			var lineEnd = GetLineEnd(file.Text);
 
-			var rawLines = file.Text.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
+			/// Разбиваем текст объемлющей сущности на строки
+			var rawLines = file.Text
+				.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
 				.Split(new string[] { lineEnd }, StringSplitOptions.None);
 
-			var lines = rawLines.Select((e, i)=> new
+			if (rawLines.Length == 0) return (null, null);
+
+			/// Для каждой строки вычисляем контекст строки и считаем похожести на искомую строку
+			var lines = rawLines.Select((e, i) => {
+				var location = new SegmentLocation
 				{
-					InnerContext = new TextOrHash(e),
-					Location = new SegmentLocation
-					{
-						Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
-						End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - lineEnd.Length)
-					}
-				})
-				.ToList();
+					Start = new PointLocation(outerNode.Location.Start.Line + i, 0, currentOffset),
+					End = new PointLocation(outerNode.Location.Start.Line + i, 0, (currentOffset += e.Length + lineEnd.Length) - lineEnd.Length)
+				};
 
-			if (lines.Count == 0) return (null, null);
+				var lineContext = new LineContext(
+					outerNode.Location,
+					location,
+					file.Text,
+					new TextOrHash(e)
+				);
 
-			/// Сначала проверяем сходство содержимого строки
-			var orderedByInner = lines
-				.Select(l => new 
-				{ 
-					ContextLocationPair = l, 
-					InnerSimilarity = EvalSimilarity(context.InnerContext,l.InnerContext)
-				})
-				.OrderByDescending(e => e.InnerSimilarity)
-				.ToList();
-
-			var bestSimilarity = orderedByInner[0].InnerSimilarity;
-			var bestLines = orderedByInner
-				.TakeWhile(e => !AreDistantEnough(bestSimilarity, e.InnerSimilarity))
-				.Select(e => new
+				return new
 				{
-					LineContext = new LineContext(
-						outerNode.Location, 
-						e.ContextLocationPair.Location, 
-						file.Text, 
-						e.ContextLocationPair.InnerContext
-					),
-					Location = e.ContextLocationPair.Location
-				})
+					Context = lineContext,
+					Location = location,
+					InnerSimilarity = EvalSimilarity(context.InnerContext, lineContext.InnerContext),
+					OuterSimilarity = (EvalSimilarity(context.OuterContext.Item1, lineContext.OuterContext.Item1)
+						+ EvalSimilarity(context.OuterContext.Item2, lineContext.OuterContext.Item2)) / 2.0
+				};
+			}).ToList();
+
+			/// Сортируем строки по убыванию внутренней похожести
+			var orderedByInner = lines.OrderByDescending(l => l.InnerSimilarity).ToList();
+
+			/// Признак того, что можно перепутать искомую строчку с какой-то другой
+			var mayBeConfusedByInner = context.HadSame 
+				|| orderedByInner.TakeWhile(e => !AreDistantEnough(orderedByInner[0].InnerSimilarity, e.InnerSimilarity, GAP_MAX)).Count() > 1;
+
+			var innerWeight = mayBeConfusedByInner ? MIN_WEIGHT : MAX_WEIGHT;
+			var outerWeight = mayBeConfusedByInner ? MAX_WEIGHT : MIN_WEIGHT;
+
+			var totalSimilarities = lines.ToDictionary(l => l,
+				l => (l.InnerSimilarity * innerWeight + l.OuterSimilarity * outerWeight) / (innerWeight + outerWeight));
+
+			lines = lines
+				.OrderByDescending(l => totalSimilarities[l])
 				.ToList();
 
-			/// Если есть несколько идентичных самых похожих строк, проверяем окружение
-			if (bestLines.Count > 1)
-			{
-				bestLines = bestLines
-					.OrderByDescending(e => 
-						(EvalSimilarity(context.NeighboursContext.Item1, e.LineContext.NeighboursContext.Item1) 
-							+ EvalSimilarity(context.NeighboursContext.Item2, e.LineContext.NeighboursContext.Item2)) / 2.0)
-					.ToList();
-			}
-
-			return (bestLines.FirstOrDefault()?.LineContext, bestLines.FirstOrDefault()?.Location);
+			return (lines[0].Context, lines[0].Location);
 		}
 
 		#region EvalSimilarity
