@@ -1,0 +1,364 @@
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\DefaultLanguageInformation.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\DefaultLanguageInformation.cs
+*
+[1037]	if (scope.Name.StartsWith("$"))
+[1094]	if (scope.Name.StartsWith("$"))	0,96	[1,00, 0,78, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\PatternsDesugaringVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\PatternsDesugaringVisitor.cs
+*
+[323]	// удаляем else из if
+[937]	// удаляем else из if	0,86	[1,00, 0,30, False]
+[292]	// Добавляем, чтобы на конвертировать еще раз, если потребуется
+[882]	// Добавляем, чтобы на конвертировать еще раз, если потребуется	0,86	[1,00, 0,30, False]
+[193]	var patternLocation = GetLocation(isPatternExpr);
+[641]	var patternLocation = GetLocation(isPatternExpr);	0,93	[1,00, 0,65, False]
+[202]	}
+[647]	}	0,84	[1,00, 0,80, True]
+[114]	// TODO Patterns: convert to compilation error
+[211]	{	0,72	[0,00, 0,90, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\syntax_tree_visitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\syntax_tree_visitor.cs
+*
+[2682]	if ((context.converting_block() == block_type.function_block ||
+[2754]	if ((context.converting_block() == block_type.function_block ||	0,96	[1,00, 0,80, False]
+[2675]	}
+[2725]	}	0,80	[1,00, 0,75, True]
+[12201]	ExecuteCommonChecks(deconstructor);
+[12843]	ExecuteCommonChecks(deconstructor);	0,97	[1,00, 0,96, True]
+[13263]	AddError(get_location(type), "STRUCT_TYPE_DEFINITION_IN_FORMAL_PARAM");
+[13995]	AddError(get_location(type), "STRUCT_TYPE_DEFINITION_IN_FORMAL_PARAM");	0,96	[1,00, 0,80, False]
+[11297]	if (_type_declaration.attributes != null)
+[11802]	if (_type_declaration.attributes != null)	0,57	[1,00, 0,46, True]
+[12492]	WarningsList.Add(new OverrideOrReintroduceExpected(loc));
+[13145]	WarningsList.Add(new OverrideOrReintroduceExpected(loc));	0,94	[1,00, 0,71, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\NETGenerator.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\NETGenerator.cs
+*
+[5285]	}
+[5536]	}	0,95	[1,00, 0,94, True]
+[7836]	}
+[8154]	}	0,95	[1,00, 0,94, True]
+[7856]	}
+[8174]	}	0,90	[1,00, 0,87, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\DomSyntaxTreeVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\DomSyntaxTreeVisitor.cs
+*
+[1933]	_unit_module.compiler_directives = new List<PascalABCCompiler.SyntaxTree.compiler_directive>();
+[2251]	_unit_module.compiler_directives = new List<PascalABCCompiler.SyntaxTree.compiler_directive>();	0,95	[1,00, 0,73, False]
+[1983]	doc = new document(_unit_module.file_name);
+[2314]	doc = new document(_unit_module.file_name);	0,95	[1,00, 0,75, False]
+[637]	else returned_scope = null;
+[695]	else returned_scope = null;	0,93	[1,00, 0,65, False]
+[633]	//throw new Exception("The method or operation is not implemented.");
+[688]	//throw new Exception("The method or operation is not implemented.");	0,95	[1,00, 0,77, False]
+[784]	{
+[953]	{	0,92	[1,00, 0,90, True]
+[790]	{
+[959]	{	0,95	[1,00, 0,94, True]
+[3906]	}
+[4461]	}	0,95	[1,00, 0,94, True]
+[3800]	{
+[4341]	{	0,94	[1,00, 0,93, True]
+[3313]	//throw new Exception("The method or operation is not implemented.");
+[3848]	//throw new Exception("The method or operation is not implemented.");	0,97	[1,00, 0,84, False]
+[3315]	returned_scope = new SetScope(returned_scope as TypeScope);
+[3850]	TypeScope ts = returned_scope as TypeScope;	0,72	[0,65, 0,74, True]
+[2896]	awaitedProcType = ps.parameters[i + (ps.IsExtension ? 1 : 0)].sc as TypeScope;
+[3341]	awaitedProcType = ps.parameters[i + (ps.IsExtension ? 1 : 0)].sc as TypeScope;	0,97	[1,00, 0,83, False]
+[119]	return true;
+[120]	return true;	0,87	[1,00, 0,84, True]
+[133]	else if (node is tuple_node)
+[144]	else if (node is tuple_node)	0,93	[1,00, 0,64, False]
+[415]	returned_scopes = cur_scope.FindOverloadNames(_ident.name);
+[459]	returned_scopes = cur_scope.FindOverloadNames(_ident.name);	0,95	[1,00, 0,93, True]
+[2519]	if (ts != null)
+[2906]	if (ts != null)	0,93	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ViewOptionsContent.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ViewOptionsContent.cs
+*
+[85]	}
+[85]	}	0,83	[1,00, 0,79, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+[15752]	accessor_name?.FillParentsInAllChilds();
+[15806]	accessor_name?.FillParentsInAllChilds();	0,90	[1,00, 0,50, False]
+[15751]	FillParentsInDirectChilds();
+[15805]	FillParentsInDirectChilds();	0,95	[1,00, 0,77, False]
+[15900]	FillParentsInDirectChilds();
+[16020]	FillParentsInDirectChilds();	0,95	[1,00, 0,76, False]
+[15901]	accessor_name?.FillParentsInAllChilds();
+[16021]	accessor_name?.FillParentsInAllChilds();	0,90	[1,00, 0,50, False]
+[49550]	pattern_deconstructor_parameter copy = new pattern_deconstructor_parameter();
+[49938]	pattern_parameter copy = new pattern_parameter();	0,92	[0,62, 1,00, True]
+[15744]	if (accessor_name != null)
+[15794]	if (accessor_name != null)	0,90	[1,00, 0,50, False]
+[15745]	accessor_name.Parent = this;
+[15795]	accessor_name.Parent = this;	0,90	[1,00, 0,50, False]
+[15876]	if (accessor_name != null)
+[15982]	if (accessor_name != null)	0,90	[1,00, 0,50, False]
+[15880]	}
+[15996]	}	0,79	[1,00, 0,74, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SymTable.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SymTable.cs
+*
+[708]	{
+[721]	{	0,93	[1,00, 0,91, True]
+[1738]	//SortedDictionary<string,SymInfo> dict = new SortedDictionary<string,SymInfo>();
+[2017]	List<SymInfo> lst = new List<SymInfo>();	0,48	[0,39, 0,50, True]
+[1739]	return null;
+[2022]	return lst.ToArray();	0,47	[0,35, 0,50, True]
+[1782]	if (topScope != null) return topScope.FindNameInAnyOrder(name);
+[2072]	return parent.FindNameInAnyOrder(name);	0,51	[0,57, 0,50, True]
+[1783]	return null;
+[2072]	return parent.FindNameInAnyOrder(name);	0,57	[0,00, 0,71, True]
+[1764]	//SortedDictionary<string,SymInfo> dict = new SortedDictionary<string,SymInfo>();
+[2047]	List<SymInfo> lst = new List<SymInfo>();	0,48	[0,39, 0,50, True]
+[1765]	return new SymInfo[0];
+[2052]	return lst.ToArray();	0,47	[0,35, 0,50, True]
+[2002]	foreach (ElementScope parameter in this.parameters)
+[2310]	foreach (ElementScope parameter in this.parameters)	0,59	[1,00, 0,48, True]
+[2006]	{
+[2311]	{	0,66	[1,00, 0,58, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\LocalVars.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\LocalVars.cs
+*
+[1167]	{
+[1167]	{	0,92	[1,00, 0,90, True]
+[1176]	list.Add(new ValueItem(v as NamedValue, this.DebugType));
+[1178]	list.Add(new ValueItem(v as NamedValue, this.DebugType));	0,92	[1,00, 0,90, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CodeFormatter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CodeFormatter.cs
+*
+[525]	}
+[680]	}	0,71	[1,00, 0,64, True]
+[519]	if (sn is program_module || sn is unit_module)
+[662]	if (sn is program_module || sn is unit_module)	0,89	[1,00, 0,43, False]
+[2444]	for (int i = 0; i < _template_param_list.params_list.Count; i++)
+[2662]	for (int i = 0; i < _template_param_list.params_list.Count; i++)	0,93	[1,00, 0,67, False]
+[2449]	}
+[2668]	}	0,76	[1,00, 0,70, True]
+[231]	sb.Append(Text.Substring(start_pos, end_pos - start_pos + 1));
+[270]	string node_text = Text.Substring(start_pos, Math.Max(end_pos - start_pos + 1, 0));	0,61	[0,66, 0,42, False]
+[232]	}
+[274]	}	0,87	[1,00, 0,84, True]
+[2970]	if (_is_pattern_expr.left != null)
+[3200]	if (_is_pattern_expr.left != null)	0,95	[1,00, 0,74, False]
+[2587]	{
+[2806]	{	0,77	[1,00, 0,71, True]
+[2585]	visit_node(_enumerator.name);
+[2804]	visit_node(_enumerator.name);	0,90	[1,00, 0,50, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SymbolTable.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SymbolTable.cs
+*
+[956]	return;
+[994]	return;	0,87	[1,00, 0,84, True]
+[955]	if (Result.Count > add && StopIfFind)
+[993]	if (Result.Count > add && StopIfFind)	0,90	[1,00, 0,88, True]
+[831]	scope = ((ClassMethodScope)scope).MyClass;
+[862]	scope = scope.TopScope;	0,88	[0,40, 1,00, True]
+[1091]	
+[1169]		0,87	[1,00, 0,84, True]
+[1009]	//мы в ImplementationPart?
+[1079]	//мы в ImplementationPart?	0,94	[1,00, 0,70, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamReader.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamReader.cs
+*
+[1639]	read_syntax_tree_node(_write_accessor_name);
+[1677]	read_syntax_tree_node(_write_accessor_name);	0,93	[1,00, 0,65, False]
+[1640]	_write_accessor_name.accessor_name = _read_node() as ident;
+[1678]	_write_accessor_name.accessor_name = _read_node() as ident;	0,90	[1,00, 0,50, False]
+[4049]	else
+[4101]	{	0,39	[0,00, 0,49, True]
+[4058]	_deconstructor_pattern.type = _read_node() as type_definition;
+[4103]	_deconstructor_pattern.type = _read_node() as type_definition;	0,85	[1,00, 0,25, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ExpressionVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ExpressionVisitor.cs
+*
+[332]	if (ts != null)
+[389]	//if (ts != null)	0,88	[0,86, 0,98, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Compiler.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Compiler.cs
+*
+[3078]	if ((CurrentUnit = ReadDLL(UnitName)) != null)
+[3182]	if ((CurrentUnit = ReadDLL(UnitName)) != null)	0,96	[1,00, 0,80, False]
+[2464]	if (Path.GetDirectoryName(UnitName) != string.Empty)
+[2543]	if (Path.GetDirectoryName(UnitName) != string.Empty)	0,96	[1,00, 0,80, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CompilerInformation.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CompilerInformation.cs
+*
+[235]	CodeCompletion.CodeCompletionTester.TestIntellisense(Path.Combine(@"c:\Work\Miks\_PABCNETGitHub\TestSuite", "intellisense_tests"));
+[236]	CodeCompletion.CodeCompletionTester.TestIntellisense(Path.Combine(@"c:\Work\Miks\_PABCNETGitHub\TestSuite", "intellisense_tests"));	0,90	[1,00, 0,50, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SideTab.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SideTab.cs
+*
+[306]	
+[329]		0,93	[1,00, 0,91, True]
+[304]	
+[327]		0,94	[1,00, 0,93, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CapturedVariablesTreeBuilder.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CapturedVariablesTreeBuilder.cs
+*
+[162]	si.sym_info.semantic_node_type == semantic_node_type.basic_function_node && idName == "exit")
+[198]	si.sym_info.semantic_node_type == semantic_node_type.ref_type_node ||	0,66	[0,67, 0,66, True]
+[177]	return;
+[204]	return;	0,67	[1,00, 0,59, True]
+[126]	{
+[127]	{	0,49	[1,00, 0,36, True]
+[128]	}
+[134]	}	0,74	[1,00, 0,68, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\DomConverter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\DomConverter.cs
+*
+[292]	if (ts.topScope is InterfaceUnitScope)
+[311]	if (ts.topScope is InterfaceUnitScope)	0,95	[1,00, 0,94, True]
+[307]	{
+[326]	{	0,96	[1,00, 0,95, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\convertion_data_and_alghoritms.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\convertion_data_and_alghoritms.cs
+*
+[436]	switch (fn.semantic_node_type)
+[436]	switch (fn.semantic_node_type)	0,96	[1,00, 0,95, True]
+[426]	case semantic_node_type.compiled_function_node:
+[426]	case semantic_node_type.compiled_function_node:	0,93	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\compilation_context.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\compilation_context.cs
+*
+[2498]	if (CurrentHandlerList.Contains(name.ToLower()))
+[2512]	if (CurrentHandlerList.Contains(name.ToLower()))	0,95	[1,00, 0,76, False]
+[2501]	//TODO: Можно передавать список всех повторных объявлений.
+[2515]	//TODO: Можно передавать список всех повторных объявлений.	0,90	[1,00, 0,50, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CodeCompletionHighlighter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CodeCompletionHighlighter.cs
+*
+[232]	if (string.Compare(word, "class", true) != 0 || !isClassMember(end_off, textArea))
+[395]	if (string.Compare(word, "class", true) != 0 || !isClassMember(end_off, textArea))	0,94	[1,00, 0,71, False]
+[241]	return new TmpPos(end_off - 3, word.Length);
+[404]	return new TmpPos(end_off - 3, word.Length);	0,92	[1,00, 0,62, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\MarkMethodHasYieldVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\MarkMethodHasYieldVisitor.cs
+*
+[75]	{
+[104]	{	0,83	[1,00, 0,79, True]
+[85]	
+[131]		0,85	[1,00, 0,82, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Assign.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Assign.cs
+*
+[227]	var cfr = to as class_field_reference;
+[255]	var cfr = to as class_field_reference;	0,86	[1,00, 0,83, True]
+[219]	var b = FindIEnumerableElementType(from.type, ref elem_type, out bb);
+[247]	var b = FindIEnumerableElementType(from.type, ref elem_type, out bb);	0,95	[1,00, 0,74, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Helpers.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Helpers.cs
+*
+[814]	Type generic_def = null;
+[859]	Type generic_def = null;	0,94	[1,00, 0,69, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\semantic_checks_for_sugar.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\semantic_checks_for_sugar.cs
+*
+[77]	IsSlicedType = 3;
+[77]	IsSlicedType = 3;	0,93	[1,00, 0,65, False]
+[61]	var IsSlicedType = 0; // проверим, является ли semvar.type динамическим массивом, списком List или строкой
+[61]	var IsSlicedType = 0; // проверим, является ли semvar.type динамическим массивом, списком List или строкой	0,94	[1,00, 0,72, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamWriter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamWriter.cs
+*
+[5473]	}
+[5512]	}	0,96	[1,00, 0,95, True]
+[5471]	bw.Write((byte)1);
+[5510]	bw.Write((byte)1);	0,97	[1,00, 0,96, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\static_executors.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\static_executors.cs
+*
+[2489]	}
+[2493]	}	0,96	[1,00, 0,95, True]
+[2475]	{
+[2475]	{	0,94	[1,00, 0,93, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ProcessYieldsCapturedVars.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ProcessYieldsCapturedVars.cs
+*
+[405]	return UpperTo<declarations>().list
+[418]	cd = UpperTo<declarations>().list	0,82	[0,82, 0,81, False]
+[391]	{
+[404]	{	0,88	[1,00, 0,85, True]
+[616]	pdCloned.proc_header.name.meth_name = new ident(YieldConsts.YieldHelperMethodPrefix + "_error_checkerr>" + pd.proc_header.name.meth_name.name,
+[649]	pdCloned.proc_header.name.meth_name = new ident(YieldConsts.YieldHelperMethodPrefix + "_error_checkerr>" + pd.proc_header.name.meth_name.name,	0,96	[1,00, 0,82, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CapturedVariablesSubstitutor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CapturedVariablesSubstitutor.cs
+*
+[312]	if (forNode != null)
+[322]	if (forNode != null)	0,97	[1,00, 0,84, False]
+[332]	}
+[347]	}	0,84	[1,00, 0,80, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\LambdaResultTypeInferrer.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\LambdaResultTypeInferrer.cs
+*
+[94]	}
+[108]	}	0,60	[1,00, 0,50, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Foreach.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Foreach.cs
+*
+[157]	var i = GenIdentName();
+[211]	var i = GenIdentName();	0,96	[1,00, 0,81, False]
+[145]	}
+[202]	// SSM 23.08.16 Закомментировал оптимизацию. Не работает с лямбдами. Лямбды обходят старое дерево. А заменить foreach на for на этом этапе пока не получается - не развита инфраструктура	0,52	[0,00, 0,65, True]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\PCUReader.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\PCUReader.cs
+*
+[1419]	compiled_function_node orig = GetCompiledMethod(br.ReadInt32());
+[1445]	compiled_function_node orig = GetCompiledMethod(br.ReadInt32());	0,90	[1,00, 0,50, False]
+[1421]	return orig.get_instance(parameters, false, null);
+[1448]	var instance = orig.get_instance(parameters, false, null);	0,72	[0,81, 0,38, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+[3785]	DefaultVisit(_pattern_node);
+[3941]	DefaultVisit(_pattern_node);	0,95	[1,00, 0,75, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Form1.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Form1.cs
+*
+[380]	WorkbenchServiceFactory.ProjectService.OpenProject(FileNameToWait);
+[390]	WorkbenchServiceFactory.ProjectService.OpenProject(FileNameToWait);	0,96	[1,00, 0,82, False]
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ProjectHelper.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ProjectHelper.cs
+*
+[239]	currentProject = null;
+[250]	currentProject = null;	0,96	[1,00, 0,80, False]
+[240]	uid = 1;
+[251]	uid = 1;	0,95	[1,00, 0,75, False]

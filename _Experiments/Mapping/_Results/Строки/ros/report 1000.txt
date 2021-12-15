@@ -1,0 +1,1188 @@
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractReferenceFinder.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractReferenceFinder.cs
+*
+[946]	}
+[946]	}	0,69	[1,00, 0,61, True]
+[945]	solution, projects, options, cancellationToken);
+[945]	typedSymbol, solution, projects, options, cascadeDirection, cancellationToken);	0,45	[0,61, 0,41, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FindImplementingMembersCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FindImplementingMembersCommandHandler.cs
+*
+[159]	#pragma warning restore CA2007 // Consider calling ConfigureAwait on the awaited task
+[147]	await context.OnDefinitionFoundAsync(definitionItem, cancellationToken).ConfigureAwait(false);	0,71	[0,00, 0,89, True]
+[147]	foreach (var interfaceMember in interfaceSymbol.GetMembers())
+[137]	foreach (var interfaceMember in interfaceSymbol.GetMembers())	0,93	[1,00, 0,66, False]
+[69]	var context = presenter.StartSearch(
+[67]		0,67	[0,00, 0,84, True]
+[107]	#pragma warning disable CA2007 // Consider calling ConfigureAwait on the awaited task
+[103]	var compilation = await document.Project.GetCompilationAsync(cancellationToken).ConfigureAwait(false);	0,61	[0,26, 0,70, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCompilationOptionsTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCompilationOptionsTests.cs
+*
+[457]	var options = new CSharpCompilationOptions[values.Length];
+[457]	var options = new CSharpCompilationOptions[values.Length];	1,00	[1,00, 0,98, False]
+[461]	options[i] = new CSharpCompilationOptions(OutputKind.ConsoleApplication, nullableContextOptions: values[i]);
+[461]	options[i] = new CSharpCompilationOptions(OutputKind.ConsoleApplication, nullableContextOptions: values[i]);	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractGenerateConstructorFromMembersCodeRefactoringProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractGenerateConstructorFromMembersCodeRefactoringProvider.cs
+*
+[102]	{
+[192]	{	0,95	[1,00, 0,94, True]
+[95]	if (containingType?.TypeKind != TypeKind.Class && containingType?.TypeKind != TypeKind.Struct)
+[185]	if (containingType?.TypeKind != TypeKind.Class && containingType?.TypeKind != TypeKind.Struct)	0,99	[1,00, 0,93, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CustomAttributesBag.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CustomAttributesBag.cs
+*
+[70]	WellKnownAttributeData.Seal(data);
+[70]	WellKnownAttributeData.Seal(data);	0,97	[1,00, 0,84, False]
+[73]	return setOnOurThread;
+[75]	return setOnOurThread;	0,97	[1,00, 0,85, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource_ProduceTags.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource_ProduceTags.cs
+*
+[354]	}).ToImmutableArray();
+[282]	});	0,78	[0,00, 0,97, True]
+[350]	}
+[278]	}	0,91	[1,00, 0,89, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DeltaMetadataWriter.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DeltaMetadataWriter.cs
+*
+[1485]	base.Visit(methodImplementation);
+[1464]	base.Visit(methodImplementation);	0,99	[1,00, 0,96, False]
+[1481]	// the method implementation already exists.
+[1458]	// the method implementation already exists.	0,98	[1,00, 0,91, False]
+[342]	return default(FieldDefinitionHandle);
+[323]	=> default;	0,21	[0,00, 0,26, True]
+[340]	// Fields are associated with the
+[323]	=> default;	0,40	[0,00, 0,49, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Constraints.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Constraints.cs
+*
+[267]	
+[267]		0,98	[1,00, 0,98, True]
+[222]	}
+[222]	}	0,99	[1,00, 0,99, True]
+[82]	{
+[82]	{	0,99	[1,00, 0,99, True]
+[35]	Debug.Assert(typeParameters.Length > 0);
+[35]	Debug.Assert(typeParameters.Length > 0);	0,99	[1,00, 0,97, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Statements.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Statements.cs
+*
+[1332]	
+[1327]		0,97	[1,00, 0,96, True]
+[1340]	return null;
+[1335]	return null;	0,99	[1,00, 0,99, True]
+[3413]	{
+[3412]	{	0,94	[1,00, 0,93, True]
+[3418]	return new BoundNonConstructorMethodBody(declaration,
+[3417]	return new BoundNonConstructorMethodBody(declaration,	0,98	[1,00, 0,90, False]
+[3255]	var expressionSyntax = body.CheckAndUnwrapRefExpression(diagnostics, out refKind);
+[3254]	var expressionSyntax = body.CheckAndUnwrapRefExpression(diagnostics, out refKind);	0,99	[1,00, 0,96, False]
+[3253]	
+[3252]		0,96	[1,00, 0,95, True]
+[1780]	if (expression.HasAnyErrors && expression.Kind != BoundKind.UnboundLambda)
+[1775]	if (expression.HasAnyErrors && expression.Kind != BoundKind.UnboundLambda)	0,99	[1,00, 0,94, False]
+[1809]	}
+[1804]	}	0,96	[1,00, 0,95, True]
+[2449]	Debug.Assert(node != null);
+[2444]	Debug.Assert(node != null);	0,99	[1,00, 0,97, False]
+[2451]	return switchBinder.BindSwitchStatementCore(node, switchBinder, diagnostics);
+[2446]	return switchBinder.BindSwitchStatementCore(node, switchBinder, diagnostics);	0,99	[1,00, 0,96, False]
+[370]	break;
+[370]	break;	1,00	[1,00, 1,00, True]
+[358]	{
+[358]	{	0,99	[1,00, 0,99, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FormatDocumentRangeTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FormatDocumentRangeTests.cs
+*
+[40]	
+[40]		0,94	[1,00, 0,71, False]
+[30]	@"class A
+[30]	@"class A	0,84	[1,00, 0,80, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FoldingRangesTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FoldingRangesTests.cs
+*
+[41]	using var workspace = CreateTestWorkspace(markup, out var locations);
+[41]	using var testLspServer = CreateTestLspServer(markup, out var locations);	0,74	[0,73, 0,79, False]
+[43]	.Select(location => CreateFoldingRange(LSP.FoldingRangeKind.Comment, location.Range))
+[43]	.Select(location => CreateFoldingRange(LSP.FoldingRangeKind.Comment, location.Range))	0,92	[1,00, 0,58, False]
+[71]	TextDocument = CreateTextDocumentIdentifier(new Uri(document.FilePath))
+[71]	TextDocument = CreateTextDocumentIdentifier(new Uri(document.FilePath))	0,90	[1,00, 0,49, False]
+[72]	};
+[72]	};	0,93	[1,00, 0,65, False]
+[56]	}";
+[56]	}";	0,97	[1,00, 0,85, False]
+[63]	AssertJsonEquals(expected, results);
+[63]	AssertJsonEquals(expected, results);	0,99	[1,00, 0,95, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\IOperationTests_IIsPatternExpression.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\IOperationTests_IIsPatternExpression.cs
+*
+[1424]	void M1(object o)
+[1422]	void M1(object o)	1,00	[1,00, 0,98, False]
+[1422]	class C
+[1420]	class C	0,99	[1,00, 0,96, False]
+[1345]	var compilation = CreateCompilation(source);
+[1343]	var compilation = CreateCompilation(source);	1,00	[1,00, 0,98, False]
+[1366]	IDeclarationPatternOperation (OperationKind.DeclarationPattern, Type: null) (Syntax: 'var x') (InputType: ?, NarrowedType: ?, DeclaredSymbol: ?? x, MatchesNull: True)
+[1364]	IDeclarationPatternOperation (OperationKind.DeclarationPattern, Type: null) (Syntax: 'var x') (InputType: System.Int32, NarrowedType: System.Int32, DeclaredSymbol: System.Int32 x, MatchesNull: True)	0,95	[0,75, 1,00, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EnumAndCompletionListTagCompletionProviderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EnumAndCompletionListTagCompletionProviderTests.cs
+*
+[614]	
+[725]		0,66	[1,00, 0,57, True]
+[619]	goo(first: E.a, $$
+[721]	goo(first: E.a, $$	0,92	[1,00, 0,58, False]
+[1147]	
+[1414]		0,73	[1,00, 0,66, True]
+[1154]	";
+[1427]	";	0,95	[1,00, 0,75, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSnippetExpansionClient.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSnippetExpansionClient.cs
+*
+[339]	ExpansionSession = null;
+[424]	if (ExpansionSession != null)	0,68	[0,81, 0,16, False]
+[340]	return true;
+[427]	return true;	0,98	[1,00, 0,91, False]
+[293]	{
+[379]	{	0,87	[1,00, 0,83, True]
+[292]	if (indentCaretOnCommit && endLineText == string.Empty)
+[378]	if (_indentCaretOnCommit && endLineText == string.Empty)	0,98	[0,98, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCompilation.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCompilation.cs
+*
+[2315]	}
+[2322]	}	0,42	[1,00, 0,28, True]
+[2318]	
+[2322]	}	0,24	[0,00, 0,30, True]
+[1627]	entryPoint = new EntryPoint(null, diagnostics.ToReadOnlyAndFree());
+[1644]	entryPoint = new EntryPoint(null, diagnostics.ToReadOnlyAndFree());	0,97	[1,00, 0,87, False]
+[1632]	}
+[1650]	}	0,94	[1,00, 0,93, True]
+[2709]	var builder = DiagnosticBag.GetInstance();
+[2835]	return builder.ToReadOnlyAndFree();	0,67	[0,31, 0,76, True]
+[2708]	{
+[2830]	{	0,82	[1,00, 0,77, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Logger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Logger.cs
+*
+[316]	{
+[316]	{	0,90	[1,00, 0,87, True]
+[309]	var logger = GetLogger();
+[309]	var logger = GetLogger();	0,97	[1,00, 0,85, False]
+[99]	}
+[99]	}	0,77	[1,00, 0,71, True]
+[103]	logMessage.Free();
+[103]	logMessage.Free();	0,98	[1,00, 0,89, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Expressions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Expressions.cs
+*
+[2750]	}
+[2763]	}	0,97	[1,00, 0,97, True]
+[2751]	case SyntaxKind.SingleVariableDesignation:
+[2764]	case SyntaxKind.SingleVariableDesignation:	1,00	[1,00, 0,99, False]
+[2282]	if (operand is null)
+[2295]	if (operand is null)	0,97	[1,00, 0,87, False]
+[2286]	
+[2299]		0,89	[1,00, 0,87, True]
+[3236]	return BindStackAllocWithInitializer(
+[3247]	return BindStackAllocWithInitializer(	0,99	[1,00, 0,97, False]
+[3219]	ImmutableArray<BoundExpression> boundInitializerExpressions = BindArrayInitializerExpressions(initializer, diagnostics, dimension: 1, rank: 1);
+[3230]	ImmutableArray<BoundExpression> boundInitializerExpressions = BindArrayInitializerExpressions(initializer, diagnostics, dimension: 1, rank: 1);	0,98	[1,00, 0,90, False]
+[6317]	if (!boundMethodGroup.HasErrors && typeArgumentsSyntax.Any(SyntaxKind.OmittedTypeArgument))
+[6328]	if (!boundMethodGroup.HasErrors && typeArgumentsSyntax.Any(SyntaxKind.OmittedTypeArgument))	1,00	[1,00, 0,99, False]
+[6307]	{
+[6318]	{	0,99	[1,00, 0,99, True]
+[5382]	
+[5390]		0,99	[1,00, 0,98, True]
+[5397]	diagnostics.Add(ErrorCode.ERR_NoNewAbstract, node.Location, type);
+[5405]	diagnostics.Add(ErrorCode.ERR_NoNewAbstract, node.Location, type);	1,00	[1,00, 0,99, False]
+[1366]	var typeExpression = new BoundTypeExpression(node.Type, aliasOpt: alias, typeWithAnnotations);
+[1381]	var typeExpression = new BoundTypeExpression(node.Type, aliasOpt: alias, typeWithAnnotations);	0,99	[1,00, 0,96, False]
+[1365]	TypeWithAnnotations typeWithAnnotations = this.BindType(node.Type, diagnostics, out AliasSymbol alias);
+[1380]	TypeWithAnnotations typeWithAnnotations = this.BindType(node.Type, diagnostics, out AliasSymbol alias);	0,98	[1,00, 0,89, False]
+[249]	{
+[250]	{	0,97	[1,00, 0,96, True]
+[251]	// by not entering this if statement
+[252]	// by not entering this if statement	0,99	[1,00, 0,97, False]
+[2509]	if (underlyingExpr.HasErrors || bag.HasAnyErrors())
+[2522]	if (underlyingExpr.HasErrors || bag.HasAnyErrors())	0,99	[1,00, 0,94, False]
+[2515]	operand,
+[2528]	operand,	0,99	[1,00, 0,95, False]
+[2638]	}
+[2651]	}	0,99	[1,00, 0,99, True]
+[2630]	// Only report the first "non-trailing named args required C# 7.2" error,
+[2643]	// Only report the first "non-trailing named args required C# 7.2" error,	1,00	[1,00, 0,99, False]
+[6950]	if (!propertySymbol.IsStatic)
+[6963]	if (!propertySymbol.IsStatic)	1,00	[1,00, 0,98, False]
+[6948]	bool hasError = this.CheckInstanceOrStatic(node, receiver, propertySymbol, ref lookupResult, diagnostics);
+[6961]	bool hasError = this.CheckInstanceOrStatic(node, receiver, propertySymbol, ref lookupResult, diagnostics);	0,99	[1,00, 0,96, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Operators.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Operators.cs
+*
+[3599]	return new BoundNullCoalescingOperator(node, leftOperand, rightOperand,
+[3598]	return new BoundNullCoalescingOperator(node, leftOperand, rightOperand,	1,00	[1,00, 0,99, False]
+[3595]	Error(diagnostics, ErrorCode.ERR_BadBinaryOps, node, SyntaxFacts.GetText(node.OperatorToken.Kind()), leftOperand.Display, rightOperand.Display);
+[3594]	Error(diagnostics, ErrorCode.ERR_BadBinaryOps, node, SyntaxFacts.GetText(node.OperatorToken.Kind()), leftOperand.Display, rightOperand.Display);	0,99	[1,00, 0,97, False]
+[2256]	{
+[2256]	{	0,97	[1,00, 0,96, True]
+[2299]	return new BoundAddressOfOperator(node, operand, pointerType, hasErrors);
+[2299]	return new BoundAddressOfOperator(node, operand, pointerType, hasErrors);	1,00	[1,00, 0,98, False]
+[619]	resultRight,
+[619]	resultRight,	1,00	[1,00, 1,00, False]
+[534]	// find a unique best applicable operator." For example:
+[534]	// find a unique best applicable operator." For example:	1,00	[1,00, 1,00, False]
+[2430]	BoundLiteral constant = BindIntegralMinValConstants(node, operand, diagnostics);
+[2428]	BoundLiteral constant = BindIntegralMinValConstants(node, operand, diagnostics);	0,98	[1,00, 0,92, False]
+[2429]	BoundExpression operand = BindToNaturalType(BindValue(node.Operand, diagnostics, GetUnaryAssignmentKind(node.Kind())), diagnostics);
+[2427]	BoundExpression operand = BindToNaturalType(BindValue(node.Operand, diagnostics, GetUnaryAssignmentKind(node.Kind())), diagnostics);	0,98	[1,00, 0,89, False]
+[3822]	// The exception for dynamic is called out in the spec, it's the same behavior that ?? has with respect to dynamic.
+[3821]	// The exception for dynamic is called out in the spec, it's the same behavior that ?? has with respect to dynamic.	0,97	[1,00, 0,86, False]
+[3832]	}
+[3832]	}	0,93	[1,00, 0,91, True]
+[1597]	
+[1597]		0,99	[1,00, 0,99, True]
+[1583]	case BinaryOperatorKind.Equal:
+[1583]	case BinaryOperatorKind.Equal:	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractMoveTypeService.MoveTypeEditor.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractMoveTypeService.MoveTypeEditor.cs
+*
+[174]	
+[186]		0,61	[1,00, 0,52, True]
+[166]	// file with the moved type.  Essentially, those imports were here just to serve
+[188]	// However, keep all the attributes on these types as theses are the	0,50	[0,27, 0,56, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorageTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorageTests.cs
+*
+[243]	
+[243]		0,99	[1,00, 0,98, True]
+[246]	var value = int.Parse(ReadStringToEnd(await storage.ReadStreamAsync(solution.Projects.Single().Documents.Single(), streamName1)));
+[246]	var value = int.Parse(ReadStringToEnd(await storage.ReadStreamAsync(solution.Projects.Single().Documents.Single(), streamName1)));	1,00	[1,00, 0,98, False]
+[520]	using (var storage = await GetStorageAsync(solution))
+[520]	await using (var storage = await GetStorageAsync(solution))	0,95	[0,91, 0,96, True]
+[524]	}
+[524]	}	0,98	[1,00, 0,98, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTableDataSourceFindUsagesContext.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTableDataSourceFindUsagesContext.cs
+*
+[405]	return default;
+[395]	return default;	0,97	[1,00, 0,83, False]
+[404]	_progressQueue.AddWork((current, maximum));
+[394]	_progressQueue.AddWork((current, maximum));	0,97	[1,00, 0,83, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractCodeActionTest.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractCodeActionTest.cs
+*
+[185]	? members
+[187]	? members	0,97	[1,00, 0,87, False]
+[182]	OptionsCallback?.Invoke(options);
+[184]	OptionsCallback?.Invoke(options);	0,96	[1,00, 0,78, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LocalRewriter_DeconstructionAssignmentOperator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LocalRewriter_DeconstructionAssignmentOperator.cs
+*
+[128]	ImmutableArray<Conversion> underlyingConversions = conversion.UnderlyingConversions;
+[128]	ImmutableArray<Conversion> underlyingConversions = conversion.UnderlyingConversions;	1,00	[1,00, 0,98, False]
+[166]	var tupleType = NamedTypeSymbol.CreateTuple(locationOpt: null, elementTypesWithAnnotations: builder!.SelectAsArray(e => TypeWithAnnotations.Create(e.Type)),
+[166]	var tupleType = NamedTypeSymbol.CreateTuple(locationOpt: null, elementTypesWithAnnotations: builder!.SelectAsArray(e => TypeWithAnnotations.Create(e.Type)),	0,97	[1,00, 0,85, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DefaultInterfaceImplementationTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DefaultInterfaceImplementationTests.cs
+*
+[14225]	// (4,20): warning CS0626: Method, operator, or accessor 'I1.P1.get' is marked external and has no attributes on it. Consider adding a DllImport attribute to specify the external implementation.
+[14225]	// (4,20): warning CS0626: Method, operator, or accessor 'I1.P1.get' is marked external and has no attributes on it. Consider adding a DllImport attribute to specify the external implementation.	0,97	[1,00, 0,96, True]
+[14232]	// (8,28): error CS8501: Target runtime doesn't support default interface implementation.
+[14232]	// (8,28): error CS8501: Target runtime doesn't support default interface implementation.	0,99	[1,00, 0,97, False]
+[27079]	);
+[27079]	);	0,96	[1,00, 0,95, True]
+[26934]	Assert.Same(implementation, test2.FindImplementationForInterfaceMember(accessor));
+[26934]	Assert.Same(implementation, test2.FindImplementationForInterfaceMember(accessor));	0,99	[1,00, 0,98, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSyncNamespaceCodeRefactoringProvider.State.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSyncNamespaceCodeRefactoringProvider.State.cs
+*
+[77]	//
+[77]	//	1,00	[1,00, 1,00, True]
+[94]	}
+[94]	}	0,99	[1,00, 0,99, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EmbeddedTypesManager.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EmbeddedTypesManager.cs
+*
+[69]	if (info != null)
+[69]	if (info.DiagnosticInfo != null)	0,78	[0,48, 0,85, True]
+[61]	
+[61]		0,89	[1,00, 0,87, True]
+[96]	out info,
+[96]	out info,	0,97	[1,00, 0,87, False]
+[100]	{
+[100]	{	0,94	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Query.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Query.cs
+*
+[705]	state.SetUnboundLambda(lambda);
+[703]	state.SetUnboundLambda(lambda);	0,98	[1,00, 0,92, False]
+[704]	var lambda = new UnboundLambda(node, state, hasErrors: false) { WasCompilerGenerated = true };
+[702]	var lambda = new UnboundLambda(node, state, withDependencies, hasErrors: false) { WasCompilerGenerated = true };	0,85	[0,83, 0,94, False]
+[26]	var fromClause = node.FromClause;
+[26]	var fromClause = node.FromClause;	0,99	[1,00, 0,96, False]
+[54]	// is translated into
+[54]	// is translated into	0,99	[1,00, 0,99, True]
+[684]	return MakeQueryUnboundLambda(expression, new QueryUnboundLambdaState(this, qvm, ImmutableArray.Create(parameter), (LambdaSymbol lambdaSymbol, Binder lambdaBodyBinder, DiagnosticBag diagnostics) =>
+[682]	return MakeQueryUnboundLambda(expression, new QueryUnboundLambdaState(this, qvm, ImmutableArray.Create(parameter), (LambdaSymbol lambdaSymbol, Binder lambdaBodyBinder, BindingDiagnosticBag diagnostics) =>	0,95	[0,95, 0,92, False]
+[685]	{
+[683]	{	0,95	[1,00, 0,94, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractDocumentationCommentCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractDocumentationCommentCommandHandler.cs
+*
+[100]	{
+[98]	{	1,00	[1,00, 1,00, True]
+[104]	
+[102]		1,00	[1,00, 1,00, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveHost.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveHost.cs
+*
+[406]	Contract.ThrowIfNull(sourceSearchPaths);
+[407]	Contract.ThrowIfNull(sourceSearchPaths);	0,98	[1,00, 0,89, False]
+[407]	Contract.ThrowIfNull(baseDirectory);
+[408]	Contract.ThrowIfNull(baseDirectory);	0,98	[1,00, 0,91, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCompilerOptionsTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCompilerOptionsTests.cs
+*
+[30]	var parseOptions = environment.Workspace.CurrentSolution.Projects.Single().ParseOptions;
+[31]	var parseOptions = environment.Workspace.CurrentSolution.Projects.Single().ParseOptions;	0,98	[1,00, 0,92, False]
+[28]	using var environment = new TestEnvironment();
+[29]	using var environment = new TestEnvironment();	0,97	[1,00, 0,84, False]
+[191]	
+[192]		0,98	[1,00, 0,97, True]
+[193]	Assert.Equal(initialProjectDisplayName, project.DisplayName);
+[194]	Assert.Equal(initialProjectDisplayName, project.DisplayName);	0,99	[1,00, 0,97, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LocalRewriter_BinaryOperator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LocalRewriter_BinaryOperator.cs
+*
+[1759]	return UnsafeGetSpecialTypeMethod(syntax, member, compilation, diagnostics).AsMember(nullableType2);
+[1759]	return UnsafeGetSpecialTypeMethod(syntax, member, compilation, diagnostics).AsMember(nullableType2);	1,00	[1,00, 0,98, False]
+[1758]	Debug.Assert(nullableType2 is { });
+[1758]	Debug.Assert(nullableType2 is { });	0,98	[1,00, 0,92, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Extensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Extensions.cs
+*
+[51]	: ImmutableArray<string>.Empty;
+[50]	: ImmutableArray<string>.Empty;	0,99	[1,00, 0,94, False]
+[47]	var aliasesText = item.GetMetadata(MetadataNames.Aliases);
+[46]	var aliasesText = item.GetMetadata(MetadataNames.Aliases);	0,99	[1,00, 0,96, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpTestBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpTestBase.cs
+*
+[1166]	
+[1233]		0,96	[1,00, 0,95, True]
+[1172]	return c;
+[1239]	return c;	1,00	[1,00, 0,98, False]
+[1186]	references: references,
+[1253]	references: references,	0,99	[1,00, 0,94, False]
+[1185]	GetUniqueName(),
+[1252]	GetUniqueName(),	0,99	[1,00, 0,96, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CodeGenTupleTest.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CodeGenTupleTest.cs
+*
+[26653]	}
+[26741]	}	0,98	[1,00, 0,97, True]
+[26661]	System.Console.WriteLine(System.ValueTuple.CombineHashCodes(2, 3));
+[26749]	System.Console.WriteLine(System.ValueTuple.CombineHashCodes(2, 3));	0,99	[1,00, 0,97, False]
+[12252]	
+[12280]		1,00	[1,00, 1,00, True]
+[12246]	);
+[12274]	);	1,00	[1,00, 1,00, True]
+[4614]	"System.String (System.String, System.String).Item1",
+[4635]	"System.String (System.String, System.String).Item1",	0,99	[1,00, 0,94, False]
+[4603]	Assert.Equal("error CS8128: Member 'Item1' was not found on type '(T1, T2)' from assembly 'comp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'.",
+[4625]	Assert.Equal("error CS8128: Member 'Item1' was not found on type '(T1, T2)' from assembly 'comp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'.",	1,00	[1,00, 0,99, False]
+[12343]	"System.Int32 (System.Int32 a1, System.Int32 a2, System.Int32 a3, System.Int32 a4, System.Int32 a5, System.Int32 a6, System.Int32 a7, System.Int32 Item1).Item6",
+[12371]	"System.Int32 (System.Int32 a1, System.Int32 a2, System.Int32 a3, System.Int32 a4, System.Int32 a5, System.Int32 a6, System.Int32 a7, System.Int32 Item1).Item6",	1,00	[1,00, 1,00, False]
+[12349]	"(System.Int32 a1, System.Int32 a2, System.Int32 a3, System.Int32 a4, System.Int32 a5, System.Int32 a6, System.Int32 a7, System.Int32 Item1)..ctor(System.Int32 item1, System.Int32 item2, System.Int32 item3, System.Int32 item4, System.Int32 item5, System.Int32 item6, System.Int32 item7, System.ValueTuple<System.Int32> rest)",
+[12379]	"(System.Int32 a1, System.Int32 a2, System.Int32 a3, System.Int32 a4, System.Int32 a5, System.Int32 a6, System.Int32 a7, System.Int32 Item1)..ctor(System.Int32 item1, System.Int32 item2, System.Int32 item3, System.Int32 item4, System.Int32 item5, System.Int32 item6, System.Int32 item7, System.ValueTuple<System.Int32> rest)",	1,00	[1,00, 0,98, False]
+[26794]	using System;
+[26880]	using System;	0,88	[1,00, 0,41, False]
+[26816]	
+[26902]		0,53	[1,00, 0,42, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BraceHighlightingViewTaggerProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BraceHighlightingViewTaggerProvider.cs
+*
+[53]	TaggerEventSources.OnCaretPositionChanged(textView, subjectBuffer, TaggerDelay.NearImmediate),
+[54]	TaggerEventSources.OnCaretPositionChanged(textView, subjectBuffer),	0,75	[0,72, 0,75, True]
+[51]	return TaggerEventSources.Compose(
+[52]	return TaggerEventSources.Compose(	0,96	[1,00, 0,79, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceServiceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceServiceTests.cs
+*
+[116]	var solution = service.Test_GetWorkspace().CurrentSolution;
+[151]	await service.StartDebuggingSessionAsync(	0,66	[0,27, 0,76, True]
+[120]	if (initialState != CommittedSolution.DocumentState.None)
+[158]	if (initialState != CommittedSolution.DocumentState.None)	0,98	[1,00, 0,88, False]
+[839]	
+[876]		0,87	[1,00, 0,84, True]
+[869]	
+[908]		0,88	[1,00, 0,85, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AttributeTests_Nullable.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AttributeTests_Nullable.cs
+*
+[352]	{
+[352]	{	0,91	[1,00, 0,88, True]
+[344]	{
+[344]	{	0,96	[1,00, 0,95, True]
+[4224]	var source =
+[4224]	var source =	1,00	[1,00, 0,98, False]
+[4226]	{
+[4226]	{	0,98	[1,00, 0,98, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ExternalErrorDiagnosticUpdateSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ExternalErrorDiagnosticUpdateSource.cs
+*
+[408]	state.AddError(documentId, diagnostic);
+[417]	state.AddError(documentId, diagnostic);	0,96	[1,00, 0,81, False]
+[404]	
+[413]		0,97	[1,00, 0,83, False]
+[469]	lock (_gate)
+[479]	lock (_gate)	0,90	[1,00, 0,50, False]
+[471]	return (_stateDoNotAccessDirectly, _activeCancellationSourceDoNotAccessDirectly?.Token ?? _disposalToken);
+[481]	return _stateDoNotAccessDirectly;	0,47	[0,33, 0,50, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LocalRewriter_UsingStatement.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LocalRewriter_UsingStatement.cs
+*
+[224]	Debug.Assert(rewrittenDeclaration is { });
+[226]	Debug.Assert(rewrittenDeclaration is { });	1,00	[1,00, 0,99, False]
+[257]	statements: ImmutableArray.Create<BoundStatement>(
+[261]	statements: ImmutableArray.Create<BoundStatement>(	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpRecommendationServiceRunner.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpRecommendationServiceRunner.cs
+*
+[53]	{
+[53]	{	0,99	[1,00, 0,99, True]
+[60]	// Non-parenthesized lambdas cannot explicitly specify the type of the single parameter
+[60]	// Non-parenthesized lambdas cannot explicitly specify the type of the single parameter	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LogMessage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LogMessage.cs
+*
+[235]	logMessage._arg0 = arg0;
+[242]	logMessage._arg0 = arg0;	0,94	[1,00, 0,72, False]
+[238]	logMessage._arg3 = arg3;
+[245]	logMessage._arg3 = arg3;	0,92	[1,00, 0,61, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractBlockStructureProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractBlockStructureProvider.cs
+*
+[39]	{
+[36]	{	0,82	[1,00, 0,77, True]
+[38]	try
+[35]	try	0,95	[1,00, 0,77, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AutomaticLineEnderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AutomaticLineEnderTests.cs
+*
+[561]	$$
+[566]	$$	0,95	[1,00, 0,73, False]
+[563]	{
+[568]	{	0,82	[1,00, 0,78, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpSemanticFacts.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpSemanticFacts.cs
+*
+[64]	if (symbol.Locations.Contains(location))
+[64]	// So check if the symbol's location encompasses the span of the token we're asking about.	0,71	[0,32, 0,81, True]
+[58]	foreach (var ancestor in token.GetAncestors<SyntaxNode>())
+[58]	foreach (var ancestor in token.GetAncestors<SyntaxNode>())	0,98	[1,00, 0,89, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpEditAndContinueAnalyzer.cs
+*
+[1047]	}
+[1227]	oldBody = SyntaxUtilities.TryGetEffectiveGetterBody(oldDeclaration);	0,57	[0,00, 0,71, True]
+[1033]	// Detect a transition between a property/indexer with an expression body and with an explicit getter.
+[1220]	// Detect a transition between a property/indexer with an expression body and with an explicit getter.	0,93	[1,00, 0,67, False]
+[1923]	// as long as it represents semantically the same namespace as the one of the original type declaration.
+[2114]	// as long as it represents semantically the same namespace as the one of the original type declaration.	0,97	[1,00, 0,83, False]
+[1922]	// We could perhaps allow moving a type declaration to a different namespace syntax node
+[2113]	// We could perhaps allow moving a type declaration to a different namespace syntax node	0,90	[1,00, 0,50, False]
+[518]	
+[520]		0,97	[1,00, 0,97, True]
+[517]	}
+[519]	}	0,97	[1,00, 0,97, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ExpressionSyntaxExtensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ExpressionSyntaxExtensions.cs
+*
+[737]	case SyntaxKind.IsExpression:
+[738]	case SyntaxKind.IsExpression:	1,00	[1,00, 1,00, False]
+[807]	// From C# spec, 7.3.1:
+[808]	// From C# spec, 7.3.1:	1,00	[1,00, 1,00, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FormatDocumentOnTypeTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FormatDocumentOnTypeTests.cs
+*
+[52]	return await GetLanguageServer(solution)
+[84]	bool insertSpaces = true,	0,57	[0,00, 0,71, True]
+[51]	var queue = CreateRequestQueue(solution);
+[85]	int tabSize = 4)	0,58	[0,00, 0,72, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+[198]	_threadingContext.ThrowIfNotOnUIThread();
+[161]	_threadingContext.ThrowIfNotOnUIThread();	1,00	[1,00, 1,00, False]
+[205]	InertClassifierProvider.CaptureExistingClassificationSpans(_classifierAggregator, textView, textBuffer);
+[168]	InertClassifierProvider.CaptureExistingClassificationSpans(_classifierAggregator, textView, textBuffer);	1,00	[1,00, 1,00, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FileChangeTracker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FileChangeTracker.cs
+*
+[121]	{
+[122]	{	0,94	[1,00, 0,93, True]
+[119]	}
+[120]	}	0,92	[1,00, 0,90, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveNavigateToTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveNavigateToTests.cs
+*
+[570]	
+[570]		0,93	[1,00, 0,92, True]
+[561]	var itemDisplay = item.DisplayFactory.CreateItemDisplay(item);
+[561]	var itemDisplay = item.DisplayFactory.CreateItemDisplay(item);	0,97	[1,00, 0,87, False]
+[123]	{
+[123]	{	0,91	[1,00, 0,89, True]
+[121]	{
+[126]	{	0,84	[1,00, 0,81, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BasicGoToDefinition.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BasicGoToDefinition.cs
+*
+[38]	Dim gibberish As SomeClass
+[38]	Dim gibberish As SomeClass	0,99	[1,00, 0,97, False]
+[29]	VisualStudio.SolutionExplorer.AddFile(project, "FileDef.vb");
+[29]	VisualStudio.SolutionExplorer.AddFile(project, "FileDef.vb");	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractNavigateToTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractNavigateToTests.cs
+*
+[72]	await TestAsync(content, body, testHost, w => new FirstDocIsActiveAndVisibleDocumentTrackingService(w.Workspace));
+[88]	await TestAsync(content, body, testHost, testComposition);	0,57	[0,00, 0,72, True]
+[70]	await TestAsync(content, body, testHost, null);
+[88]	await TestAsync(content, body, testHost, testComposition);	0,58	[0,72, 0,00, False]
+[118]	_aggregator = new NavigateToTestAggregator(_provider);
+[126]	_aggregator = new NavigateToTestAggregator(_provider);	0,95	[1,00, 0,75, False]
+[117]	_provider = new NavigateToItemProvider(workspace, AsynchronousOperationListenerProvider.NullListener);
+[125]	_provider = new NavigateToItemProvider(workspace, AsynchronousOperationListenerProvider.NullListener, workspace.GetService<IThreadingContext>());	0,93	[0,64, 1,00, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ExpressionCompilerTestHelpers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ExpressionCompilerTestHelpers.cs
+*
+[855]	diagnostics.Verify();
+[834]	diagnostics.Verify();	1,00	[1,00, 0,98, False]
+[829]	emittingPdb: pdbPath != null,
+[806]	emittingPdb: pdbPath != null,	0,98	[1,00, 0,92, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Await.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Await.cs
+*
+[298]	return false;
+[296]	return false;	0,98	[1,00, 0,98, True]
+[295]	if (expression.Type is null)
+[293]	if (expression.Type is null)	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\IndexedPropertyTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\IndexedPropertyTests.cs
+*
+[1458]	Private Property Q_IA(o As Object) As Object Implements IA.Q
+[1459]	Private Property Q_IA(o As Object) As Object Implements IA.Q	0,98	[1,00, 0,88, False]
+[1485]	o = c.P;
+[1486]	o = c.P;	0,96	[1,00, 0,81, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Imports.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Imports.cs
+*
+[232]	}
+[229]	}	0,95	[1,00, 0,94, True]
+[146]	SyntaxToken identifier = usingDirective.Alias.Name.Identifier;
+[146]	SyntaxToken identifier = usingDirective.Alias.Name.Identifier;	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FindReferencesOfOverloadsCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FindReferencesOfOverloadsCommandHandler.cs
+*
+[84]	result[i++] = item;
+[82]	result[i++] = item;	0,97	[1,00, 0,84, False]
+[85]	}
+[83]	}	0,89	[1,00, 0,86, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ConversionsBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ConversionsBase.cs
+*
+[2903]	source.DependsOn((TypeParameterSymbol)destination))
+[2903]	source.DependsOn((TypeParameterSymbol)destination))	0,99	[1,00, 0,93, False]
+[2884]	// The following implicit conversions exist for a given type parameter T:
+[2884]	// The following implicit conversions exist for a given type parameter T:	0,98	[1,00, 0,89, False]
+[2827]	{
+[2827]	{	0,97	[1,00, 0,96, True]
+[2848]	}
+[2848]	}	0,98	[1,00, 0,98, True]
+[2350]	if (IncludeNullability && !HasTopLevelNullabilityImplicitConversion(elementType, argument0))
+[2350]	if (IncludeNullability && !HasTopLevelNullabilityImplicitConversion(elementType, argument0))	0,96	[1,00, 0,78, False]
+[2351]	{
+[2351]	{	0,79	[1,00, 0,74, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSession.cs
+*
+[570]	if (result.HasChangesAndCompilationErrors)
+[556]	if (analysis.HasChangesAndSyntaxErrors)	0,75	[0,56, 0,80, True]
+[560]	{
+[551]	{	0,81	[1,00, 0,77, True]
+[603]	var allEdits = ArrayBuilder<SemanticEdit>.GetInstance();
+[593]	using var _1 = ArrayBuilder<SemanticEditInfo>.GetInstance(out var allEdits);	0,72	[0,59, 0,75, True]
+[634]	{
+[612]	{	0,86	[1,00, 0,83, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder.ValueChecks.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder.ValueChecks.cs
+*
+[3296]	return false;
+[3311]	return false;	0,99	[1,00, 0,97, False]
+[3298]	}
+[3313]	}	0,98	[1,00, 0,97, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\GetTextDocumentWithContextHandlerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\GetTextDocumentWithContextHandlerTests.cs
+*
+[100]	return await GetLanguageServer(solution).ExecuteRequestAsync<LSP.GetTextDocumentWithContextParams, LSP.ActiveProjectContexts?>(queue, LSP.MSLSPMethods.ProjectContextsName,
+[99]	return await testLspServer.ExecuteRequestAsync<LSP.GetTextDocumentWithContextParams, LSP.ActiveProjectContexts?>(LSP.MSLSPMethods.ProjectContextsName,	0,68	[0,67, 0,76, False]
+[99]	var queue = CreateRequestQueue(solution);
+[98]	{	0,53	[0,00, 0,66, True]
+[37]	Assert.Equal("CSProj", context.Label);
+[37]	Assert.Equal("CSProj", context.Label);	0,99	[1,00, 0,93, False]
+[24]	</Project>
+[24]	</Project>	0,98	[1,00, 0,89, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ActiveStatementTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ActiveStatementTests.cs
+*
+[8582]	{
+[8607]	{	0,83	[1,00, 0,79, True]
+[8575]	{
+[8597]	{	0,83	[1,00, 0,79, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CurlyBraceCompletionService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CurlyBraceCompletionService.cs
+*
+[248]	var startPoint = openingPoint;
+[255]	var startPoint = openingPoint;	0,99	[1,00, 0,95, False]
+[278]	while (startPoint >= 0 && char.IsWhiteSpace(text[startPoint]))
+[284]	while (startPoint >= 0 && char.IsWhiteSpace(text[startPoint]))	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AnonymousTypesSymbolTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AnonymousTypesSymbolTests.cs
+*
+[648]	.maxstack  1
+[653]	.maxstack  1	0,91	[1,00, 0,89, True]
+[619]	static void PrintFields(Type type)
+[624]	static void PrintFields(Type type)	0,99	[1,00, 0,94, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FSharpNavigationBarItemService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FSharpNavigationBarItemService.cs
+*
+[74]	item.Spans,
+[82]	item.Spans.ToImmutableArrayOrEmpty(),	0,67	[0,30, 0,76, True]
+[70]	return
+[76]	{	0,70	[0,00, 0,87, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractDocumentHighlightsService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractDocumentHighlightsService.cs
+*
+[59]	{
+[59]	return result;	0,66	[0,00, 0,83, True]
+[56]	var result = await TryGetEmbeddedLanguageHighlightsAsync(
+[56]	var result = await TryGetEmbeddedLanguageHighlightsAsync(	0,97	[1,00, 0,86, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompilerServerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompilerServerTests.cs
+*
+[1062]	// Create DLL "lib.dll"
+[1062]	// Create DLL "lib.dll"	1,00	[1,00, 0,98, False]
+[1095]	
+[1095]		0,94	[1,00, 0,92, True]
+[730]	Sub Main()
+[730]	Sub Main()	1,00	[1,00, 0,98, False]
+[727]	End Class" },
+[727]	End Class" },	0,99	[1,00, 0,97, False]
+[331]	using var serverData = await ServerUtil.CreateServer(_logger, compilerServerHost: testableCompilerServerHost);
+[331]	using var serverData = await ServerUtil.CreateServer(_logger, compilerServerHost: testableCompilerServerHost);	0,99	[1,00, 0,96, False]
+[336]	Assert.Equal(CompletionData.RequestError, listener.CompletionDataList.Single());
+[336]	Assert.Equal(CompletionData.RequestError, listener.CompletionDataList.Single());	0,99	[1,00, 0,96, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ConvertIfToSwitchTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ConvertIfToSwitchTests.cs
+*
+[2576]	
+[2576]		0,96	[1,00, 0,95, True]
+[2580]	B,
+[2580]	B,	0,96	[1,00, 0,95, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AsyncQueueTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AsyncQueueTests.cs
+*
+[228]	Assert.Equal(13, value);
+[228]	Assert.Equal(13, value);	0,98	[1,00, 0,91, False]
+[223]	queue.Complete();
+[223]	queue.Complete();	0,94	[1,00, 0,69, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\FindImplementationsHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\FindImplementationsHandler.cs
+*
+[44]	
+[48]		0,99	[1,00, 0,98, True]
+[37]	
+[42]		0,97	[1,00, 0,96, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractFindUsagesService_FindReferences.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractFindUsagesService_FindReferences.cs
+*
+[56]	return FindLiteralOrSymbolReferencesAsync(document, position, new DefinitionTrackingContext(context));
+[57]	document, position, new DefinitionTrackingContext(context), cancellationToken);	0,80	[0,40, 0,90, True]
+[55]	// This also means that we don't need to be on the UI thread.
+[55]	// This also means that we don't need to be on the UI thread.	0,96	[1,00, 0,81, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompletionTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompletionTests.cs
+*
+[28]	void M()
+[28]	void M()	0,98	[1,00, 0,88, False]
+[27]	{
+[27]	{	0,93	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Symbols.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Symbols.cs
+*
+[2339]	var code = (where.Parent is QueryClauseSyntax) ? ErrorCode.ERR_TypeVarNotFoundRangeVariable : ErrorCode.ERR_TypeVarNotFound;
+[2373]	var code = (where.Parent is QueryClauseSyntax) ? ErrorCode.ERR_TypeVarNotFoundRangeVariable : ErrorCode.ERR_TypeVarNotFound;	1,00	[1,00, 0,99, False]
+[2283]	if (options.IsAttributeTypeLookup() && !options.IsVerbatimNameAttributeTypeLookup())
+[2317]	if (options.IsAttributeTypeLookup() && !options.IsVerbatimNameAttributeTypeLookup())	1,00	[1,00, 0,99, False]
+[500]	isNullableEnabled,
+[503]	isNullableEnabled,	0,99	[1,00, 0,99, True]
+[479]	return BindNamespaceOrTypeOrAliasSymbol(refTypeSyntax.Type, diagnostics, basesBeingResolved, suppressUseSiteDiagnostics);
+[480]	return BindNamespaceOrTypeOrAliasSymbol(refTypeSyntax.Type, diagnostics, basesBeingResolved, suppressUseSiteDiagnostics);	1,00	[1,00, 0,98, False]
+[307]	return UnwrapAlias(symbol, out alias, diagnostics, syntax, basesBeingResolved).TypeWithAnnotations;
+[308]	return UnwrapAlias(symbol, out alias, diagnostics, syntax, basesBeingResolved).TypeWithAnnotations;	0,99	[1,00, 0,95, False]
+[306]	var symbol = BindTypeOrAlias(syntax, diagnostics, basesBeingResolved);
+[307]	var symbol = BindTypeOrAlias(syntax, diagnostics, basesBeingResolved);	0,98	[1,00, 0,88, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AnalyzerDriver.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AnalyzerDriver.cs
+*
+[2175]	Debug.Assert(!IsDiagnosticAnalyzerSuppressed(analyzer, analyzerExecutor.Compilation.Options, analyzerManager, analyzerExecutor, severityFilter));
+[2176]	Debug.Assert(!IsDiagnosticAnalyzerSuppressed(analyzer, analyzerExecutor.Compilation.Options, analyzerManager, analyzerExecutor, severityFilter));	0,99	[1,00, 0,96, False]
+[2172]	var builder = ImmutableDictionary.CreateBuilder<DiagnosticAnalyzer, GeneratedCodeAnalysisFlags>();
+[2173]	var builder = ImmutableSegmentedDictionary.CreateBuilder<DiagnosticAnalyzer, GeneratedCodeAnalysisFlags>();	0,86	[0,83, 0,97, False]
+[2700]	
+[2701]		1,00	[1,00, 1,00, True]
+[2653]	var operationBlocksToAnalyze = GetOperationBlocksToAnalyze(executableCodeBlocks, semanticModel, cancellationToken);
+[2654]	var operationBlocksToAnalyze = GetOperationBlocksToAnalyze(executableCodeBlocks, semanticModel, cancellationToken);	1,00	[1,00, 1,00, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ConvertConcatenationToInterpolatedStringTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ConvertConcatenationToInterpolatedStringTests.cs
+*
+[312]	
+[319]		0,93	[1,00, 0,91, True]
+[334]	}");
+[341]	}");	0,99	[1,00, 0,96, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTypeImportCompletionProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTypeImportCompletionProvider.cs
+*
+[69]	}
+[161]	}	0,61	[1,00, 0,52, True]
+[63]	// We can return cached item directly, item's span will be fixed by completion service.
+[130]	// We can return cached item directly, item's span will be fixed by completion service.	0,87	[1,00, 0,37, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpSymbolMatcher.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpSymbolMatcher.cs
+*
+[984]	this);
+[969]	this);	0,99	[1,00, 0,93, False]
+[980]	{
+[965]	{	0,93	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AnonymousTypeManager.SymbolCollection.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AnonymousTypeManager.SymbolCollection.cs
+*
+[64]	}
+[60]	hasError |= diagnostics.ReportUseSite(symbol, NoLocation.Singleton);	0,63	[0,00, 0,79, True]
+[62]	{
+[56]	{	0,66	[1,00, 0,58, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractGoToCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractGoToCommandHandler.cs
+*
+[49]	return findUsagesService != null
+[46]	return findUsagesService != null	0,99	[1,00, 0,95, False]
+[47]	var document = args.SubjectBuffer.CurrentSnapshot.GetOpenDocumentInCurrentContextWithChanges();
+[44]	var document = args.SubjectBuffer.CurrentSnapshot.GetOpenDocumentInCurrentContextWithChanges();	0,97	[1,00, 0,86, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ImplicitObjectCreationTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ImplicitObjectCreationTests.cs
+*
+[4371]	//         a.M(new());
+[4373]	//         a.M(new());	0,91	[1,00, 0,89, True]
+[4348]	var libAv1 = CreateCompilation(
+[4348]	var libAv1 = CreateCompilation(	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CommonCompiler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CommonCompiler.cs
+*
+[1247]	{
+[1249]	{	0,99	[1,00, 0,98, True]
+[1128]	success = compilation.CompileMethods(
+[1134]	success = compilation.CompileMethods(	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompletionHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompletionHandler.cs
+*
+[112]	return CompletionItemKind.Event;
+[169]	return CompletionItemKind.Event;	0,99	[1,00, 0,95, False]
+[101]	case XamlCompletionKind.MarkupExtensionParameter:
+[159]	case XamlCompletionKind.MarkupExtensionParameter:	0,98	[1,00, 0,92, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DiagnosticIncrementalAnalyzer_BuildSynchronization.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DiagnosticIncrementalAnalyzer_BuildSynchronization.cs
+*
+[37]	if (!PreferBuildErrors(options))
+[37]	if (!PreferBuildErrors(options))	1,00	[1,00, 1,00, False]
+[106]	foreach (var projectsByLanguage in solution.Projects.GroupBy(p => p.Language))
+[106]	foreach (var projectsByLanguage in solution.Projects.GroupBy(p => p.Language))	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Initializers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Initializers.cs
+*
+[179]	// All sibling initializers share the same parent node and tree so we can reuse the binder
+[179]	// All sibling initializers share the same parent node and tree so we can reuse the binder	1,00	[1,00, 0,98, False]
+[188]	var initializer = siblingInitializers[j];
+[188]	var initializer = siblingInitializers[j];	1,00	[1,00, 1,00, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Patterns.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Patterns.cs
+*
+[283]	var expression = BindExpression(patternExpression, diagnostics: diagnostics, invoked: false, indexed: false);
+[284]	var expression = BindExpression(patternExpression, diagnostics: diagnostics, invoked: false, indexed: false);	0,99	[1,00, 0,97, False]
+[286]	return wasExpression ? BindExpressionForPatternContinued(expression, inputType, patternExpression, ref hasErrors, diagnostics, out constantValueOpt) : expression;
+[287]	return wasExpression ? BindExpressionForPatternContinued(expression, inputType, patternExpression, ref hasErrors, diagnostics, out constantValueOpt) : expression;	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Controller.Session_ComputeModel.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Controller.Session_ComputeModel.cs
+*
+[78]	{
+[78]	{	0,99	[1,00, 0,99, True]
+[67]	}
+[67]	}	0,99	[1,00, 0,99, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractNavigateToSearchService.InProcess.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractNavigateToSearchService.InProcess.cs
+*
+[218]	case DeclaredSymbolInfoKind.Method:
+[308]	case DeclaredSymbolInfoKind.Method:	1,00	[1,00, 0,98, False]
+[207]	return NavigateToItemKind.Enum;
+[297]	return NavigateToItemKind.Enum;	0,99	[1,00, 0,97, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractGenerateConstructorFromMembersCodeRefactoringProvider.GenerateConstructorWithDialogCodeAction.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractGenerateConstructorFromMembersCodeRefactoringProvider.GenerateConstructorWithDialogCodeAction.cs
+*
+[53]	
+[54]		0,99	[1,00, 0,93, False]
+[55]	FeaturesResources.Pick_members_to_be_used_as_constructor_parameters,
+[56]	FeaturesResources.Pick_members_to_be_used_as_constructor_parameters,	0,99	[1,00, 0,97, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Invocation.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Invocation.cs
+*
+[31]	case SyntaxKind.SimpleMemberAccessExpression:
+[31]	case SyntaxKind.SimpleMemberAccessExpression:	0,99	[1,00, 0,94, False]
+[38]	}
+[38]	}	0,95	[1,00, 0,94, True]
+[1906]	return ok;
+[1920]	return ok;	0,99	[1,00, 0,99, True]
+[1873]	}
+[1887]	}	0,95	[1,00, 0,94, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EarlyWellKnownAttributeBinder.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EarlyWellKnownAttributeBinder.cs
+*
+[31]	dummyDiagnosticBag.Free();
+[31]	dummyDiagnosticBag.Free();	0,99	[1,00, 0,96, False]
+[29]	var boundAttribute = base.GetAttribute(node, boundAttributeType, dummyDiagnosticBag);
+[29]	var boundAttribute = base.GetAttribute(node, boundAttributeType, dummyDiagnosticBag);	0,98	[1,00, 0,89, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractDocumentDifferenceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractDocumentDifferenceService.cs
+*
+[81]	{
+[81]	{	0,98	[1,00, 0,98, True]
+[89]	
+[89]		0,94	[1,00, 0,93, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Lookup.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Lookup.cs
+*
+[1369]	}
+[1380]	}	1,00	[1,00, 1,00, True]
+[1361]	{
+[1372]	{	0,99	[1,00, 0,99, True]
+[151]	// don't create diagnosis unless lookup fails
+[151]	// don't create diagnosis unless lookup fails	0,97	[1,00, 0,85, False]
+[153]	if (!result.IsMultiViable && !result.IsClear)
+[153]	if (!result.IsMultiViable && !result.IsClear)	0,97	[1,00, 0,83, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ExplicitInterfaceHelpers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ExplicitInterfaceHelpers.cs
+*
+[31]	discardedDiagnostics.Free();
+[30]		0,77	[0,00, 0,96, True]
+[29]	string discardedAliasOpt;
+[28]	string discardedAliasOpt;	0,97	[1,00, 0,83, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DocumentationCommentCompiler.IncludeElementExpander.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DocumentationCommentCompiler.IncludeElementExpander.cs
+*
+[104]	Debug.Assert(sourceIncludeElementNodes.All(syntax => syntax.SyntaxTree.Options.DocumentationMode < DocumentationMode.Diagnose),
+[104]	Debug.Assert(sourceIncludeElementNodes.All(syntax => syntax.SyntaxTree.Options.DocumentationMode < DocumentationMode.Diagnose),	1,00	[1,00, 0,99, False]
+[120]	documentedTypeParameters,
+[120]	documentedTypeParameters,	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BindingAsyncTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BindingAsyncTests.cs
+*
+[3154]	Diagnostic(ErrorCode.ERR_BadSpecialByRefLocal, "tr").WithArguments("System.TypedReference"));
+[3154]	Diagnostic(ErrorCode.ERR_BadSpecialByRefLocal, "tr").WithArguments("System.TypedReference"));	1,00	[1,00, 0,98, False]
+[3141]	using System.Threading.Tasks;
+[3141]	using System.Threading.Tasks;	1,00	[1,00, 0,98, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpToggleLineCommentCommandHandlerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpToggleLineCommentCommandHandlerTests.cs
+*
+[847]	@"
+[847]	@"	1,00	[1,00, 1,00, True]
+[837]	@"
+[837]	@"	1,00	[1,00, 1,00, True]
+[175]	class C
+[175]	class C	0,89	[1,00, 0,86, True]
+[176]	{
+[176]	{	0,89	[1,00, 0,86, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ISymbolExtensions_2.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ISymbolExtensions_2.cs
+*
+[89]	
+[90]		0,98	[1,00, 0,97, True]
+[128]	return ((IPointerTypeSymbol)symbol).PointedAtType.GetGlyph();
+[129]	return ((IPointerTypeSymbol)symbol).PointedAtType.GetGlyph();	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractFindUsagesService.ProgressAdapter.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractFindUsagesService.ProgressAdapter.cs
+*
+[103]	definitionItem = await definition.ToClassifiedDefinitionItemAsync(
+[101]	definitionItem = await group.ToClassifiedDefinitionItemAsync(	0,81	[0,84, 0,68, False]
+[99]	using (await _gate.DisposableWaitAsync(cancellationToken).ConfigureAwait(false))
+[97]	using (await _gate.DisposableWaitAsync(cancellationToken).ConfigureAwait(false))	0,94	[1,00, 0,70, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BinaryOperatorOverloadResolution.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BinaryOperatorOverloadResolution.cs
+*
+[1000]	{
+[1001]	{	0,98	[1,00, 0,97, True]
+[980]	{
+[981]	{	0,97	[1,00, 0,96, True]
+[709]	// We consider the `null` literal, but not the `default` literal, since the latter does not require a reference equality
+[710]	// We consider the `null` literal, but not the `default` literal, since the latter does not require a reference equality	0,99	[1,00, 0,94, False]
+[691]	{
+[692]	{	0,92	[1,00, 0,90, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DebuggingSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DebuggingSession.cs
+*
+[171]	// update baselines:
+[201]	// update baselines:	0,95	[1,00, 0,76, False]
+[158]	// Save new non-remappable regions for the next edit session.
+[188]	// Save new non-remappable regions for the next edit session.	0,97	[1,00, 0,86, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DiagnosticAnalyzerServiceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DiagnosticAnalyzerServiceTests.cs
+*
+[959]	var analyzer1Id = analyzer1.GetAnalyzerId();
+[969]	var analyzer1Id = analyzer1.GetAnalyzerId();	1,00	[1,00, 0,99, False]
+[965]	var documentId = documentAnalysis ? project.Documents.Single().Id : null;
+[975]	var document = documentAnalysis ? project.Documents.Single() : null;	0,94	[0,92, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ImportCompletionItem.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ImportCompletionItem.cs
+*
+[45]	builder.Add(ReceiverKey, extensionMethodData.Value.receiverTypeSymbolKey);
+[45]	builder.Add(ReceiverKey, extensionMethodData.Value.receiverTypeSymbolKey);	1,00	[1,00, 0,98, False]
+[44]	builder.Add(MethodKey, extensionMethodData.Value.methodSymbolKey);
+[44]	builder.Add(MethodKey, extensionMethodData.Value.methodSymbolKey);	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BoundNodeClassWriter.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BoundNodeClassWriter.cs
+*
+[813]	return FieldNullHandling(BaseType(node), fieldName);
+[813]	return FieldNullHandling(BaseType(node), fieldName);	1,00	[1,00, 0,98, False]
+[808]	if (f.Type.EndsWith('?'))
+[808]	if (f.Type.EndsWith('?'))	0,99	[1,00, 0,97, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ClientConnectionHandlerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ClientConnectionHandlerTests.cs
+*
+[171]	
+[171]		0,96	[1,00, 0,95, True]
+[178]	Assert.Equal(CompletionData.RequestError, completionData);
+[178]	Assert.Equal(CompletionData.RequestError, completionData);	1,00	[1,00, 0,98, False]
+[32]	};
+[32]	};	0,98	[1,00, 0,90, False]
+[30]	{
+[30]	{	0,97	[1,00, 0,97, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ClassifierHelper.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ClassifierHelper.cs
+*
+[103]	// Fill in those gaps so we have *all* parts of the span
+[93]	// Fill in those gaps so we have *all* parts of the span	0,99	[1,00, 0,96, False]
+[106]	using var _2 = ArrayBuilder<ClassifiedSpan>.GetInstance(out var filledInSemanticSpans);
+[96]	using var _2 = ArrayBuilder<ClassifiedSpan>.GetInstance(out var filledInSemanticSpans);	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_TupleOperators.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_TupleOperators.cs
+*
+[163]	
+[163]		0,98	[1,00, 0,98, True]
+[154]	ImmutableArray<MethodSymbol> originalUserDefinedOperators;
+[154]	ImmutableArray<MethodSymbol> originalUserDefinedOperators;	0,98	[1,00, 0,91, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DocumentAnalysisResults.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DocumentAnalysisResults.cs
+*
+[166]	hasSemanticErrors: null);
+[175]	hasSyntaxErrors: false);	0,42	[0,63, 0,37, True]
+[165]	ImmutableArray<SourceLineUpdate>.Empty,
+[173]	lineEditsOpt: ImmutableArray<SourceLineUpdate>.Empty,	0,66	[0,75, 0,63, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractConvertTypeOfToNameOfCodeFixProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractConvertTypeOfToNameOfCodeFixProvider.cs
+*
+[58]	var nameOfSyntax = editor.Generator.NameOfExpression(typeExpression);
+[58]	var nameOfSyntax = editor.Generator.NameOfExpression(typeExpression);	0,97	[1,00, 0,85, False]
+[59]	editor.ReplaceNode(nodeToReplace, nameOfSyntax);
+[59]	editor.ReplaceNode(nodeToReplace, nameOfSyntax);	0,97	[1,00, 0,83, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ChecksumSynchronizer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ChecksumSynchronizer.cs
+*
+[129]	if (!_assetProvider.EnsureCacheEntryIfExists(checksum))
+[129]	if (!_assetProvider.EnsureCacheEntryIfExists(checksum))	0,96	[1,00, 0,81, False]
+[127]	Debug.Assert(checksum != Checksum.Null);
+[127]	if (checksum != Checksum.Null)	0,92	[0,66, 0,99, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Crefs.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Crefs.cs
+*
+[488]	//       /// <see cref="C{Q}.M(C{Q}.Inner)"/>
+[486]	//       /// <see cref="C{Q}.M(C{Q}.Inner)"/>	1,00	[1,00, 0,99, False]
+[501]	// Inner as C{Q}.Inner).  Additional details are available in DevDiv #743425.
+[499]	// Inner as C{Q}.Inner).  Additional details are available in DevDiv #743425.	1,00	[1,00, 1,00, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractEditAndContinueAnalyzer.cs
+*
+[1326]	{
+[1335]	{	0,98	[1,00, 0,97, True]
+[1336]	
+[1345]		0,99	[1,00, 0,98, True]
+[1921]	}
+[1935]	}	0,99	[1,00, 0,99, True]
+[1890]	
+[1904]		0,98	[1,00, 0,98, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AttributeTests_NullablePublicOnly.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AttributeTests_NullablePublicOnly.cs
+*
+[74]	}
+[74]	}	0,99	[1,00, 0,98, True]
+[86]	var comp = CreateCompilation(new[] { source1, source2 }, options: options, parseOptions: parseOptions);
+[86]	var comp = CreateCompilation(new[] { source1, source2 }, options: options, parseOptions: parseOptions);	0,99	[1,00, 0,94, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LambdaSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LambdaSymbol.cs
+*
+[345]	for (int p = 0; p < unboundLambda.ParameterCount; ++p)
+[343]	for (int p = 0; p < unboundLambda.ParameterCount; ++p)	0,99	[1,00, 0,96, False]
+[353]	TypeWithAnnotations type;
+[351]	TypeWithAnnotations type;	1,00	[1,00, 0,99, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractCompletionProviderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractCompletionProviderTests.cs
+*
+[211]	var code = workspaceFixture.Target.Code;
+[220]	var code = workspaceFixture.Target.Code;	0,98	[1,00, 0,89, False]
+[208]	using var workspaceFixture = GetOrCreateWorkspaceFixture();
+[217]	using var workspaceFixture = GetOrCreateWorkspaceFixture();	0,98	[1,00, 0,92, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpNamingStyleDiagnosticAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpNamingStyleDiagnosticAnalyzer.cs
+*
+[40]	return true;
+[40]	return true;	0,87	[1,00, 0,83, True]
+[36]	})
+[36]	})	0,98	[1,00, 0,89, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AddParameterDialogViewModel.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AddParameterDialogViewModel.cs
+*
+[143]	
+[142]		0,96	[1,00, 0,95, True]
+[137]	
+[136]		0,97	[1,00, 0,97, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ActiveStatementTrackingService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ActiveStatementTrackingService.cs
+*
+[75]	TrackingChanged?.Invoke();
+[74]	TrackingChanged?.Invoke();	0,97	[1,00, 0,87, False]
+[65]	var newSession = new TrackingSession(_workspace, _spanProvider);
+[65]	var newSession = new TrackingSession(_workspace, _spanProvider);	0,91	[1,00, 0,55, False]

@@ -1,0 +1,398 @@
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceAssemblySymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceAssemblySymbol.cs
+*
+[2015]	return;
+[2017]	return;	0,94	[1,00, 0,93, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UnaryOperatorOverloadResolution.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UnaryOperatorOverloadResolution.cs
+*
+[47]	
+[47]		0,93	[1,00, 0,91, True]
+[26]	Debug.Assert(result.Results.Count == 0);
+[26]	Debug.Assert(result.Results.Count == 0);	0,97	[1,00, 0,84, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProximityExpressionsGetterTests.Statements.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProximityExpressionsGetterTests.Statements.cs
+*
+[175]	////         private static void CollectExpressionTerms(int position, ExpressionSyntax expression, IList<string> terms, ref ExpressionType expressionType)
+[175]	////         private static void CollectExpressionTerms(int position, ExpressionSyntax expression, IList<string> terms, ref ExpressionType expressionType)	0,96	[1,00, 0,82, False]
+[234]	var tree = GetTree();
+[234]	var tree = GetTree();	0,97	[1,00, 0,84, False]
+[851]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 7507);
+[851]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 7507, cancellationToken: default);	0,85	[0,27, 1,00, True]
+[1243]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 9866);
+[1243]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 9866, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[1649]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 12761);
+[1649]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 12761, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[1763]	AssertEx.SetEqual(new[] { "ExpressionType", "expressionType", "ExpressionType.Invalid" }, terms);
+[1763]	AssertEx.SetEqual(new[] { "ExpressionType", "expressionType", "ExpressionType.Invalid" }, terms);	0,96	[1,00, 0,79, False]
+[1762]	Assert.NotNull(terms);
+[1762]	Assert.NotNull(terms);	0,96	[1,00, 0,82, False]
+[965]	AssertEx.SetEqual(new[] { "position", "expression", "terms", "expressionType" }, terms);
+[965]	AssertEx.SetEqual(new[] { "position", "expression", "terms", "expressionType" }, terms);	0,97	[1,00, 0,84, False]
+[529]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 4801);
+[529]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 4801, cancellationToken: default);	0,89	[0,43, 1,00, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TargetTypedConditionalOperatorTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TargetTypedConditionalOperatorTests.cs
+*
+[76]	
+[85]		0,94	[1,00, 0,92, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableContextTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableContextTests.cs
+*
+[2198]	return nullableData.
+[2244]	return nullableData.Data.	0,79	[0,79, 0,80, False]
+[2197]	toString ??= GetNullableDataKeyAsString;
+[2243]	toString ??= GetNullableDataKeyAsString;	0,93	[1,00, 0,67, False]
+[2148]	// does not handle '#nullable restore'.
+[2194]	// does not handle '#nullable restore'.	0,95	[1,00, 0,74, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForLocalFunctionsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForLocalFunctionsAnalyzerTests.cs
+*
+[142]	2 +
+[180]	2 +	0,92	[1,00, 0,60, False]
+[145]	}
+[183]	}	0,74	[1,00, 0,67, True]
+[397]	{
+[498]	{	0,65	[1,00, 0,57, True]
+[392]	@"class C
+[493]	class C	0,59	[0,75, 0,55, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TupleTypeSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TupleTypeSymbol.cs
+*
+[256]	Binder.ReportUseSiteDiagnostics(firstTupleType, diagnostics, syntax);
+[258]	Binder.ReportUseSite(firstTupleType, diagnostics, syntax);	0,86	[0,84, 0,93, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NavigateToTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NavigateToTests.cs
+*
+[319]	await TestAsync(
+[320]	await TestAsync(	0,95	[1,00, 0,73, False]
+[321]	{
+[322]	{	0,86	[1,00, 0,83, True]
+[397]	var item = (await _aggregator.GetItemsAsync("CEH")).Single();
+[398]	var item = (await _aggregator.GetItemsAsync("CEH")).Single();	0,96	[1,00, 0,82, False]
+[395]	await TestAsync(testHost, program, async w =>
+[396]	await TestAsync(testHost, composition, program, async w =>	0,79	[0,77, 0,85, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SuppressMessageAttributeTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SuppressMessageAttributeTests.cs
+*
+[481]	[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(""Test"", ""Token"", Scope=""NamespaceAndDescendants"", Target=""A.B"")]
+[511]	[assembly: " + attrName + @"(""Test"", ""Token"", Scope=""NamespaceAndDescendants"", Target=""A.B"")]	0,74	[0,70, 0,90, False]
+[1276]	await VerifyBasicAsync(@"
+[1347]	await VerifyBasicAsync(@"	0,91	[1,00, 0,53, False]
+[1286]	",
+[1357]	",	0,95	[1,00, 0,77, False]
+[681]	}|]
+[719]	}|]	0,97	[1,00, 0,83, False]
+[680]	public event System.Action<int> E2, E3;
+[718]	public event System.Action<int> E2, E3;	0,97	[1,00, 0,84, False]
+[900]	get { return 2; }
+[949]	get { return 2; }	0,97	[1,00, 0,84, False]
+[903]	}
+[952]	}	0,89	[1,00, 0,86, True]
+[1249]	{
+[1318]	{	0,82	[1,00, 0,78, True]
+[1250]	}
+[1319]	}	0,89	[1,00, 0,86, True]
+[460]	[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(""Test"", ""Token"", Scope=""namespace"", Target=""A.B"")]
+[489]	[assembly: " + attrName + @"(""Test"", ""Token"", Scope=""namespace"", Target=""A.B"")]	0,80	[0,54, 0,87, True]
+[466]	}
+[495]	}	0,92	[1,00, 0,90, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\MSBuildWorkspaceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\MSBuildWorkspaceTests.cs
+*
+[526]	Assert.Equal(Platform.AnyCpu, compilation.Options.Platform);
+[504]	Assert.Equal(Platform.AnyCpu, compilation.Options.Platform);	0,95	[1,00, 0,74, False]
+[3114]	}
+[2900]	}	0,59	[1,00, 0,49, True]
+[1339]	{
+[1215]	{	0,92	[1,00, 0,90, True]
+[1342]	workspace.SkipUnrecognizedProjects = false;
+[1217]	workspace.SkipUnrecognizedProjects = false;	0,97	[1,00, 0,83, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProximityExpressionsGetterTests.Lines.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProximityExpressionsGetterTests.Lines.cs
+*
+[3409]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 14372);
+[3409]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 14372, cancellationToken: default);	0,90	[0,48, 1,00, True]
+[3407]	//// ^
+[3407]	//// ^	0,96	[1,00, 0,82, False]
+[1561]	Assert.NotNull(terms);
+[1561]	Assert.NotNull(terms);	0,96	[1,00, 0,81, False]
+[3062]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 12086);
+[3062]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 12086, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[3063]	Assert.NotNull(terms);
+[3063]	Assert.NotNull(terms);	0,97	[1,00, 0,83, False]
+[1644]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 6421);
+[1644]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 6421, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[2311]	var tree = GetTree();
+[2311]	var tree = GetTree();	0,96	[1,00, 0,82, False]
+[3560]	////
+[3560]	////	0,97	[1,00, 0,83, False]
+[3814]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 15801);
+[3814]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 15801, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[3813]	var tree = GetTree();
+[3813]	var tree = GetTree();	0,95	[1,00, 0,73, False]
+[2076]	AssertEx.SetEqual(new[] { "objectionCreation", "objectionCreation.ArgumentListOpt", "ExpressionType", "expressionType", "ExpressionType.ValidExpression" }, terms);
+[2076]	AssertEx.SetEqual(new[] { "objectionCreation", "objectionCreation.ArgumentListOpt", "ExpressionType", "expressionType", "ExpressionType.ValidExpression" }, terms);	0,97	[1,00, 0,84, False]
+[2070]	////             }
+[2070]	////             }	0,93	[1,00, 0,92, True]
+[142]	//// ^
+[142]	//// ^	0,96	[1,00, 0,81, False]
+[2609]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 10108);
+[2609]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 10108, cancellationToken: default);	0,80	[0,00, 1,00, True]
+[1890]	////             // the sub arguments are valid terms.
+[1890]	////             // the sub arguments are valid terms.	0,97	[1,00, 0,85, False]
+[811]	AssertEx.SetEqual(new[] { "ExpressionType", "expressionType", "ExpressionType.ValidExpression", "expression", "expression.Kind" }, terms);
+[811]	AssertEx.SetEqual(new[] { "ExpressionType", "expressionType", "ExpressionType.ValidExpression", "expression", "expression.Kind" }, terms);	0,96	[1,00, 0,79, False]
+[2736]	////             if ((flags & ExpressionType.ValidTerm) == ExpressionType.ValidTerm)
+[2736]	////             if ((flags & ExpressionType.ValidTerm) == ExpressionType.ValidTerm)	0,97	[1,00, 0,83, False]
+[2741]	Assert.NotNull(terms);
+[2741]	Assert.NotNull(terms);	0,96	[1,00, 0,80, False]
+[1451]	var tree = GetTree();
+[1451]	var tree = GetTree();	0,96	[1,00, 0,78, False]
+[1159]	AssertEx.SetEqual(new[] { "expression", "PrefixUnaryExpressionSyntax", "expression.Kind" }, terms);
+[1159]	AssertEx.SetEqual(new[] { "expression", "PrefixUnaryExpressionSyntax", "expression.Kind" }, terms);	0,95	[1,00, 0,76, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForOperatorsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForOperatorsAnalyzerTests.cs
+*
+[113]	{
+[145]	{	0,71	[1,00, 0,64, True]
+[107]	await TestInRegularAndScriptAsync(
+[135]	{	0,61	[0,00, 0,76, True]
+[129]	@"class C
+[169]	class C	0,63	[0,75, 0,60, True]
+[133]	throw new NotImplementedException();
+[173]	throw new NotImplementedException();	0,91	[1,00, 0,53, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionState_Checksum.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionState_Checksum.cs
+*
+[58]	{
+[66]	{	0,92	[1,00, 0,91, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+[1429]	
+[3090]		0,96	[1,00, 0,95, True]
+[4380]	}
+[7185]	var src1 = @"class B { ~B() { } }";	0,33	[0,00, 0,42, True]
+[4396]	edits.VerifyRudeDiagnostics(
+[7194]	edits.VerifySemanticDiagnostics(	0,65	[0,75, 0,24, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.LastLineCache.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.LastLineCache.cs
+*
+[57]	classifications = null;
+[53]	this.Clear();	0,69	[0,00, 0,86, True]
+[46]	lock (_gate)
+[42]	{	0,67	[0,00, 0,83, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\MethodTypeInference.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\MethodTypeInference.cs
+*
+[2143]	if (sourceSignature.ParameterCount != targetSignature.ParameterCount)
+[2143]	if (sourceSignature.ParameterCount != targetSignature.ParameterCount)	0,96	[1,00, 0,79, False]
+[2151]	}
+[2151]	}	0,94	[1,00, 0,93, True]
+[1277]	return false;
+[1277]	return false;	0,94	[1,00, 0,93, True]
+[2492]	
+[2492]		0,92	[1,00, 0,91, True]
+[2514]	else
+[2514]	else	0,91	[1,00, 0,89, True]
+[2907]	}
+[2907]	}	0,93	[1,00, 0,92, True]
+[2890]	return false;
+[2890]	return false;	0,91	[1,00, 0,89, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SymbolErrorTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SymbolErrorTests.cs
+*
+[3198]	//     sealed void M();
+[3198]	//     sealed void M();	0,97	[1,00, 0,96, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RenameTrackingTaggerProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RenameTrackingTaggerProvider.cs
+*
+[124]	}
+[127]	}	0,90	[1,00, 0,88, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TypeSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TypeSymbol.cs
+*
+[172]	var result = BaseTypeNoUseSiteDiagnostics;
+[172]	var result = BaseTypeNoUseSiteDiagnostics;	0,91	[1,00, 0,53, False]
+[177]	result.AddUseSiteDiagnostics(ref useSiteDiagnostics);
+[177]	result.AddUseSiteInfo(ref useSiteInfo);	0,83	[0,65, 0,87, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceMemberContainerSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceMemberContainerSymbol.cs
+*
+[1870]	{
+[1972]	{	0,97	[1,00, 0,96, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WithReferencesFindUsagesContext.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WithReferencesFindUsagesContext.cs
+*
+[45]	if (definition.DisplayIfNoReferences)
+[46]	if (definition.DisplayIfNoReferences)	0,91	[1,00, 0,54, False]
+[44]	// create them on demand when we hear about references for this definition.
+[44]	// immediately.  Otherwise, we'll create them on demand when we hear about references for this	0,69	[0,52, 0,74, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\MSBuildWorkspace.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\MSBuildWorkspace.cs
+*
+[366]	if (document != null)
+[369]	if (document != null)	0,95	[1,00, 0,75, False]
+[368]	var encoding = DetermineEncoding(text, document);
+[371]	var encoding = DetermineEncoding(text, document);	0,94	[1,00, 0,71, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Symbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Symbol.cs
+*
+[861]	compilation.DeclarationDiagnostics.AddRange(diagnostics);
+[872]	compilation.DeclarationDiagnostics.AddRange(diagnostics.DiagnosticBag);	0,77	[0,80, 0,64, False]
+[857]	if (!diagnostics.IsEmptyWithoutResolution)
+[858]	if (ContainingSymbol is SourceMemberContainerTypeSymbol container)	0,60	[0,31, 0,68, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ReferenceManagerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ReferenceManagerTests.cs
+*
+[2792]	
+[2781]		0,94	[1,00, 0,93, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PeWriter.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PeWriter.cs
+*
+[337]	return new ResourceSectionBuilderFromResources(nativeResourcesOpt);
+[339]	return new ResourceSectionBuilderFromResources(nativeResourcesOpt);	0,90	[1,00, 0,50, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectChanges.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectChanges.cs
+*
+[197]	}
+[146]	public IEnumerable<DocumentId> GetChangedAnalyzerConfigDocuments()	0,00	[0,00, 0,00, True]
+[192]	var newState = _newProject.GetAnalyzerConfigDocumentState(doc.Id);
+[146]	public IEnumerable<DocumentId> GetChangedAnalyzerConfigDocuments()	0,21	[0,34, 0,18, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableWalker_Patterns.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableWalker_Patterns.cs
+*
+[202]	{
+[202]	{	0,93	[1,00, 0,91, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RequestExecutionQueue.DocumentChangeTracker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RequestExecutionQueue.DocumentChangeTracker.cs
+*
+[88]	Contract.ThrowIfFalse(_trackedDocuments.ContainsKey(documentUri), "didClose received for a document that isn't open.");
+[102]	Contract.ThrowIfFalse(_trackedDocuments.ContainsKey(documentUri), $"didClose received for {documentUri} which is not open.");	0,61	[0,52, 1,00, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableWalker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableWalker.cs
+*
+[4168]	
+[4186]		0,79	[1,00, 0,74, True]
+[4143]	
+[4163]		0,88	[1,00, 0,85, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UnsafeTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UnsafeTests.cs
+*
+[8929]	}
+[8929]	}	0,91	[1,00, 0,89, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WorkspaceSymbolsTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WorkspaceSymbolsTests.cs
+*
+[206]	PartialResultToken = progress
+[208]	PartialResultToken = progress	0,95	[1,00, 0,74, False]
+[203]	var request = new LSP.WorkspaceSymbolParams
+[205]	var request = new LSP.WorkspaceSymbolParams	0,94	[1,00, 0,71, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WorkCoordinator.NormalPriorityProcessor.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WorkCoordinator.NormalPriorityProcessor.cs
+*
+[354]	}
+[362]	}	0,97	[1,00, 0,96, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RecordTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RecordTests.cs
+*
+[1027]	IL_000a:  callvirt   ""System.Type C.EqualityContract.get""
+[1055]	IL_000e:  callvirt   ""System.Type C.EqualityContract.get""	0,92	[0,98, 0,91, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RemoteEditAndContinueService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RemoteEditAndContinueService.cs
+*
+[100]	GetService().EndEditSession(out var documentsToReanalyze);
+[87]	GetService().BreakStateEntered(out var documentsToReanalyze);	0,80	[0,76, 0,94, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionUpdate.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionUpdate.cs
+*
+[40]	ImmutableArray<IDisposable>.Empty,
+[39]	ImmutableArray<(Guid, ImmutableArray<(ManagedModuleMethodId, NonRemappableRegion)>)>.Empty,	0,69	[0,35, 0,77, True]
+[41]	ImmutableArray<(ProjectId, EmitBaseline)>.Empty,
+[40]	ImmutableArray<(ProjectId, EmitBaseline)>.Empty,	0,92	[1,00, 0,59, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TextViewWindow_OutOfProc.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TextViewWindow_OutOfProc.cs
+*
+[123]	_instance.Workspace.WaitForAsyncOperations(Helper.HangMitigatingTimeout, FeatureAttribute.QuickInfo);
+[118]	=> _textViewWindowInProc.InvokeQuickInfo();	0,17	[0,25, 0,15, True]
+[122]	_instance.ExecuteCommand(WellKnownCommandNames.Edit_QuickInfo);
+[118]	=> _textViewWindowInProc.InvokeQuickInfo();	0,45	[0,33, 0,48, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForConstructorsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForConstructorsAnalyzerTests.cs
+*
+[41]	await TestInRegularAndScript1Async(
+[47]	var code = @"	0,57	[0,00, 0,71, True]
+[48]	}",
+[53]	{	0,54	[0,00, 0,67, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxGeneratorExtensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxGeneratorExtensions.cs
+*
+[177]	compilation.GetTypeByMetadataName("System.ArgumentNullException"),
+[177]	compilation.GetTypeByMetadataName("System.ArgumentNullException"),	0,93	[1,00, 0,64, False]
+[178]	factory.NameOfExpression(
+[178]	factory.NameOfExpression(	0,94	[1,00, 0,71, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\OverloadResolution.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\OverloadResolution.cs
+*
+[2278]	
+[2277]		0,96	[1,00, 0,95, True]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UnboundLambda.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UnboundLambda.cs
+*
+[85]	// Nullability (and conversions) are ignored.
+[88]	// Nullability (and conversions) are ignored.	0,95	[1,00, 0,76, False]
+[86]	return GetInferredReturnType(conversions: null, nullableState: null, ref useSiteDiagnostics);
+[89]	return GetInferredReturnType(conversions: null, nullableState: null, ref useSiteInfo);	0,89	[0,90, 0,86, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SynthesizedRecordObjectMethod.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SynthesizedRecordObjectMethod.cs
+*
+[29]	VerifyOverridesMethodFromObject(this, ReturnType.SpecialType, diagnostics);
+[29]	VerifyOverridesMethodFromObject(this, OverriddenSpecialMember, diagnostics);	0,82	[0,81, 0,88, False]
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PatternMatchingTests3.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PatternMatchingTests3.cs
+*
+[4333]	break;
+[4353]	break;	0,95	[1,00, 0,94, True]
