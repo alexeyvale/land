@@ -110,22 +110,26 @@ namespace Land.Markup
 				if (elem is ConcernPoint concernPoint
 					&& concernPoint.Context.FileName == fileName)
 				{
-					concernPoint.NodeLocation = new SegmentLocation
+					/// Если координаты узла отсутствуют, локация уже обозначена как Missing
+					if (concernPoint.NodeLocation != null)
 					{
-						Start = new PointLocation(0, 0, 0),
-						End = new PointLocation(0, 0, 0)
-					};
-
-					if (concernPoint.LineContext != null)
-					{
-						concernPoint.LineLocation = new SegmentLocation
+						concernPoint.NodeLocation = new SegmentLocation
 						{
 							Start = new PointLocation(0, 0, 0),
 							End = new PointLocation(0, 0, 0)
 						};
-					}
 
-					concernPoint.HasIrrelevantLocation = true;
+						if (concernPoint.LineContext != null)
+						{
+							concernPoint.LineLocation = new SegmentLocation
+							{
+								Start = new PointLocation(0, 0, 0),
+								End = new PointLocation(0, 0, 0)
+							};
+						}
+
+						concernPoint.HasIrrelevantLocation = true;
+					}
 				}
 			});
 
@@ -891,6 +895,8 @@ namespace Land.Markup
 			else
 			{
 				point.NodeLocation = null;
+				point.LineLocation = null;
+
 				return false;
 			}
 		}
