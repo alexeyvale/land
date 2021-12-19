@@ -80,7 +80,7 @@ namespace Land.Core.Lexing
 		/// </summary>
 		public Direction CurrentTokenDirection { get; private set; }
 
-		public List<CustomBlockNode> CustomBlocks { get; set; }
+		public List<CustomBlockNode> CustomBlockTrees { get; set; }
 
 		public Stack<CustomBlockNode> CustomBlockStack { get; set; }
 
@@ -122,7 +122,7 @@ namespace Land.Core.Lexing
 				if (end.Count > 1)
 					CustomBlockDefinition.EndLexemSuffix = (string)end[1];
 
-				CustomBlocks = new List<CustomBlockNode>();
+				CustomBlockTrees = new List<CustomBlockNode>();
 				CustomBlockStack = new Stack<CustomBlockNode>();
 			}
 		}
@@ -214,13 +214,15 @@ namespace Land.Core.Lexing
 						currentBlock.End.SetLocation(token.Location.Start, token.Location.End);
 						currentBlock.Location.End = token.Location.End;
 
-						CustomBlocks.Add(currentBlock);
-
 						/// Добавляем произвольный блок в дерево ПБ
 						if(CustomBlockStack.Any())
 						{
 							CustomBlockStack.Peek().Children.Add(currentBlock);
 							currentBlock.Parent = CustomBlockStack.Peek();
+						}
+						else
+						{
+							CustomBlockTrees.Add(currentBlock);
 						}
 					}
 				}

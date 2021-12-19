@@ -107,13 +107,13 @@ namespace Land.Core.Parsing
 			root.Accept(new UserifyVisitor(GrammarObject));
 
 			/// Формируем узлы для кастомных блоков
-			if (LexingStream.CustomBlocks?.Count > 0)
+			if (LexingStream.CustomBlockTrees?.Count > 0)
 			{
-				var visitor = new InsertCustomBlocksVisitor(GrammarObject, NodeGenerator, LexingStream.CustomBlocks);
+				var visitor = new InsertCustomBlocksVisitor(GrammarObject, NodeGenerator, LexingStream.CustomBlockTrees);
 				root.Accept(visitor);
 				root = visitor.Root;
 
-				foreach (var block in visitor.CustomBlocks)
+				foreach (var block in visitor.BadBlocks)
 				{
 					Log.Add(Message.Error(
 						$"Блок \"{block.Start.Value[0]}\" прорезает несколько сущностей программы или находится в области, " +
