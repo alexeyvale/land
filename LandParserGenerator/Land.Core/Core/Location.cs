@@ -72,6 +72,40 @@ namespace Land.Core
 			};
 		}
 
+		public List<SegmentLocation> Exclude(SegmentLocation other)
+		{
+			if (other == null)
+				return new List<SegmentLocation> { this };
+
+			if (other.Includes(this))
+				return new List<SegmentLocation>();
+
+			if (this.Includes(other) || this.Overlaps(other))
+			{
+				var result = new List<SegmentLocation>();
+
+				if (other.Start.Offset > this.Start.Offset)
+					result.Add(new SegmentLocation
+					{
+						Start = new PointLocation(this.Start.Offset),
+						End = new PointLocation(other.Start.Offset - 1)
+					}
+				);
+
+				if (this.End.Offset > other.End.Offset)
+					result.Add(new SegmentLocation
+					{
+						Start = new PointLocation(other.End.Offset + 1),
+						End = new PointLocation(this.End.Offset)
+					}
+				);
+
+				return result;
+			}
+
+			return new List<SegmentLocation> { this };
+		}
+
 		public SegmentLocation SmartMerge(SegmentLocation loc)
 		{
 			if (loc == null)
@@ -110,6 +144,9 @@ namespace Land.Core
 				&& End.Offset >= other.End.Offset;
 		}
 
+		/// <summary>
+		/// Проверка строгого пересечения локаций (без вложения)
+		/// </summary>
 		public bool Overlaps(SegmentLocation other)
 		{
 			return other != null

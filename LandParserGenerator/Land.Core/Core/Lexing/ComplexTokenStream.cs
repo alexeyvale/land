@@ -18,6 +18,10 @@ namespace Land.Core.Lexing
 		public int StartOffset => Location.Start.Offset;
 
 		public int EndOffset => Location.End.Offset;
+
+		public CustomBlockNode Parent;
+
+		public List<CustomBlockNode> Children = new List<CustomBlockNode>();
 	}
 
 	public class CustomBlockDefinition
@@ -211,6 +215,13 @@ namespace Land.Core.Lexing
 						currentBlock.Location.End = token.Location.End;
 
 						CustomBlocks.Add(currentBlock);
+
+						/// Добавляем произвольный блок в дерево ПБ
+						if(CustomBlockStack.Any())
+						{
+							CustomBlockStack.Peek().Children.Add(currentBlock);
+							currentBlock.Parent = CustomBlockStack.Peek();
+						}
 					}
 				}
 			}
