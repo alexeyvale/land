@@ -704,20 +704,29 @@ namespace Land.Markup.Binding
 
 		public static InnerContext GetInnerContext(Node node, ParsedFile file)
 		{
-			var locations = new List<SegmentLocation>();
+			var locations = new List<SegmentLocation> { node.Location };
 			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
 			while (stack.Any())
 			{
 				var current = stack.Pop();
 
-				if (current.Type != Grammar.ANY_TOKEN_NAME && current.Children.Count > 0)
+				if (current.Location != null)
 				{
-					if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+					/// Удаляем элементы, которые попадут в контекст заголовка
+					if (current.Options.GetPriority() > 0 
+						&& (current.Children.Count == 0 || current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)))
 					{
-						locations.Add(current.Location);
+						/// Находим область, включающую в себя текущий рассматриваемый лист
+						var outerLocation = locations.FirstOrDefault(l => l.Includes(current.Location));
+						var indexOfOuter = locations.IndexOf(outerLocation);
+
+						/// Вычитаем из неё участок, соответствующий листу
+						locations.RemoveAt(indexOfOuter);
+						locations.InsertRange(indexOfOuter, outerLocation.Exclude(current.Location));
 					}
-					else
+					/// Произвольные блоки для нас прозрачны при вычислении контекстов
+					else if(current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
 						for (var i = current.Children.Count - 2; i >= 1; --i)
 							stack.Push(current.Children[i]);
