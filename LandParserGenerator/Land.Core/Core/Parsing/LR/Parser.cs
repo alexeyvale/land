@@ -174,7 +174,7 @@ namespace Land.Core.Parsing.LR
 
 			if (root != null)
 			{
-				TreePostProcessing(root);
+				root = TreePostProcessing(root);
 			}
 
 			return root;

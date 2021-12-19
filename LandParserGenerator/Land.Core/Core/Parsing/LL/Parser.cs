@@ -216,7 +216,7 @@ namespace Land.Core.Parsing.LL
 				}
 			}
 
-			TreePostProcessing(root);
+			root = TreePostProcessing(root);
 
 			return root;
 		}

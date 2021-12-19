@@ -97,7 +97,7 @@ namespace Land.Core.Parsing
 			VisitorConstructors.Add(constructor);
 		}
 
-		protected void TreePostProcessing(Node root)
+		protected Node TreePostProcessing(Node root)
 		{
 			/// Запускаем стандартные визиторы
 			root.Accept(new RemoveAutoVisitor(GrammarObject));
@@ -134,6 +134,8 @@ namespace Land.Core.Parsing
 				var visitor = c.Invoke(GrammarObject);
 				root.Accept(visitor);
 			});
+
+			return root;
 		}
 
 		public override object InitializeLifetimeService() => null;
