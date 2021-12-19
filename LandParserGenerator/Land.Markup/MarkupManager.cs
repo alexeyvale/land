@@ -400,13 +400,13 @@ namespace Land.Markup
 				}
 			);
 
-			var (lineContext, lineLocation) = point.LineContext != null
+			var (lineContext, lineLocation, totalSimilarity) = point.LineContext != null
 				? ContextFinder.FindLine(
 					point.LineContext,
 					candidate.Node,
 					candidate.File
 				)
-				: (null, null);
+				: (null, null, 0);
 
 			point.Relink(context, candidate.Node.Location, lineContext, lineLocation);
 

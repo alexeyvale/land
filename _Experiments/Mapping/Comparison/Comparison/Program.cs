@@ -742,6 +742,7 @@ namespace Comparison
 		{
 			const int TOTAL_NUMBER_OF_METHODS = 120;
 			const int LINES_IN_METHOD = 2;
+			const double TO_CHECK_THRESHOLD = 0.97;
 
 			var heuristic = new ContextsEqualityHeuristic();
 			var markupManager = new MarkupManager(null, heuristic);
@@ -879,10 +880,10 @@ namespace Comparison
 						totalCount += 1;
 
 						var lineContext = new LineContext(method.Item1.NodeLocation, line, initialFile.Text);
-						var (newLineContext, newLineLocation) = markupManager.ContextFinder
-							.FindLine(lineContext, method.Item3.Node, currentFile, out double score, out double innerSim, out double outerSim, out bool confusionFlag);
+						var (newLineContext, newLineLocation, score) = markupManager.ContextFinder
+							.FindLine(lineContext, method.Item3.Node, currentFile); //out double score, out double innerSim, out double outerSim, out bool confusionFlag);
 
-						if (newLineLocation == null || score < 0.97)
+						if (newLineLocation == null || score < TO_CHECK_THRESHOLD)
 						{
 							toCheckCount += 1;
 
@@ -899,7 +900,7 @@ namespace Comparison
 
 							if (newLineLocation != null)
 							{
-								reportToCheck.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
+								reportToCheck.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}");//\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
 							}
 							else
 							{
@@ -907,13 +908,13 @@ namespace Comparison
 							}
 						}
 
-						if(lineContext.InnerContext.TextLength <= 1) { shortLineCount++; }
+						if (lineContext.InnerContext.TextLength <= 1) { shortLineCount++; }
 
 						report.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
 
 						if (newLineLocation != null)
 						{
-							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
+							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}");//\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
 						}
 						else
 						{
