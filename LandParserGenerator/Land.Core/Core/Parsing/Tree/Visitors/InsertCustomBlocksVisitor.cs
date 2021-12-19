@@ -12,7 +12,9 @@ namespace Land.Core.Parsing.Tree
 
 		private Grammar GrammarObject { get; set; }
 
-		public List<CustomBlockNode> CustomBlocks { get; set; }
+		private List<CustomBlockNode> InitialBlocks { get; set; }
+
+		public List<CustomBlockNode> BadBlocks { get; set; } = new List<CustomBlockNode>();
 
 		public Node Root { get; set; }
 
@@ -31,13 +33,11 @@ namespace Land.Core.Parsing.Tree
 		{
 			GrammarObject = grammar;
 			NodeGenerator = nodeGenerator;
-			CustomBlocks = new List<CustomBlockNode>(customBlocks);
+			InitialBlocks = new List<CustomBlockNode>(customBlocks);
 		}
 
 		private Node GetNodeFrom(CustomBlockNode block)
 		{
-			CustomBlocks.Remove(block);
-
 			var node = NodeGenerator.Generate(Grammar.CUSTOM_BLOCK_RULE_NAME);
 
 			node.AddLastChild(block.Start);
@@ -46,132 +46,115 @@ namespace Land.Core.Parsing.Tree
 			return node;
 		}
 
-		private void ProcessAny(Node node, List<CustomBlockNode> blocks)
-		{
-			if (blocks.Count > 0)
-			{
-				var level = new List<Node> { GetNodeFrom(blocks[0]) };
-				var linear = new List<Node>();
-
-				for (var i = 1; i < blocks.Count; ++i)
-				{
-					if(blocks[i].StartOffset > blocks[i-1].EndOffset)
-						level.Add(GetNodeFrom(blocks[i]));
-					else
-					{
-						linear.AddRange(level);
-
-						var higherLevel = GetNodeFrom(blocks[i]);
-
-						foreach (var blockNode in level)
-							higherLevel.InsertChild(blockNode, higherLevel.Children.Count - 1);
-
-						level.Clear();
-						level.Add(higherLevel);
-					}
-				}
-
-				linear.AddRange(level);
-
-				foreach (var blockNode in linear)
-					node.AddLastChild(blockNode, true);
-			}
-		}
-
 		public override void Visit(Node root)
 		{
-			Root = root;
+			/// Не будем менять список, полученный извне
+			var blocks = InitialBlocks.ToList();
 
-			if (root.Type == Grammar.ANY_TOKEN_NAME)
+			/// Проверяем, есть ли ПБ, охватывающий корень
+			var outerBlock = blocks.FirstOrDefault(b => b.Location.Includes(root.Location));
+
+			/// Пока такой ПБ есть
+			while (outerBlock != null)
 			{
-				ProcessAny(root, CustomBlocks);
-			}
-			else
-			{
-				var outerBlocks = CustomBlocks.Where(b => b.Location.Includes(Root.Location)).ToList();
+				var newNode = GetNodeFrom(outerBlock);
 
-				Visit(Root, CustomBlocks.Except(outerBlocks).ToList());
-
-				foreach (var block in outerBlocks)
+				if(root.Parent != null)
 				{
-					var newNode = GetNodeFrom(block);
-					newNode.InsertChild(Root, 1);
-
-					Root = newNode;
+					root.Parent.ReplaceChild(newNode, 1);
 				}
+				newNode.InsertChild(Root, 1);
+
+				var index = blocks.IndexOf(outerBlock);
+				blocks.RemoveAt(index);
+				blocks.InsertRange(index, outerBlock.Children);
+
+				outerBlock = blocks.FirstOrDefault(b => b.Location.Includes(Root.Location));
 			}
+
+			Root = root;
+			while(Root.Parent != null)
+			{
+				Root = Root.Parent;
+			}
+
+			Visit(root, blocks);
 		}
 
 		public void Visit(Node node, List<CustomBlockNode> blocks)
 		{
-			if (node.Type == Grammar.ANY_TOKEN_NAME)
+			while (blocks.Count > 0)
 			{
-				ProcessAny(node, blocks);
-			}
-			else
-			{
-				if (blocks.Count > 0)
+				foreach (var block in blocks.ToList())
 				{
-					var locatedNodes = node.Children.Where(c => c.Location != null).ToList();
+					/// Выбираем потомков текущего узла, пересекающихся с блоком или объемлющих его, но не совпадающих с ним
+					var overlappingOrOuterChildren = node.Children
+						.Where(p => p.Location != null && (p.Location.Overlaps(block.Location) 
+							|| p.Location.Includes(block.Location) && !p.Location.Equals(block.Location)))
+						.ToList();
 
-					/// Находим вложенные в потомков блоки и блоки, перекрывающиеся ровно с одним потомком,
-					/// обрабатываем их при рекурсивных посещениях
-					for (var i = 0; i < locatedNodes.Count; ++i)
-					{
-						var innerBlocks = blocks
-							.Where(b => locatedNodes[i].Location.Overlaps(b.Location) 
-								&& (i == locatedNodes.Count - 1 || !b.Location.Overlaps(locatedNodes[i + 1].Location) && !b.Location.Includes(locatedNodes[i + 1].Location))
-								&& (i == 0 || !b.Location.Overlaps(locatedNodes[i - 1].Location) && !b.Location.Includes(locatedNodes[i - 1].Location))
-								|| locatedNodes[i].Location.Includes(b.Location) && !locatedNodes[i].Location.Equals(b.Location))
-							.ToList();
-
-						foreach (var block in innerBlocks)
-							blocks.Remove(block);
-
-						Visit(locatedNodes[i], innerBlocks);
-					}
-
-					foreach (var block in blocks)
+					if (overlappingOrOuterChildren.Count == 0)
 					{
 						/// Выбираем потомков текущего узла, вложенных или совпадающих с некоторым пользовательским блоком
 						var innerChildren = node.Children.Select((child, idx) => new { child, idx })
-							.Where(p => block.Location.Includes(p.child.Location) || block.Location.Equals(p.child.Location))
+							.Where(p => block.Location.Includes(p.child.Location))
 							.ToList();
 
-						if(innerChildren.Count > 0)
+						if (innerChildren.Count > 0)
 						{
-							var leftBorder = node.Children.Take(innerChildren.First().idx)
-								.LastOrDefault(c => c.Location != null);
+							var newNode = GetNodeFrom(block);
+							foreach (var inner in innerChildren)
+								newNode.InsertChild(inner.child, newNode.Children.Count - 1);
 
-							var rightBorder = node.Children.Skip(innerChildren.Last().idx + 1)
-								.FirstOrDefault(c => c.Location != null);
+							node.Children.RemoveRange(innerChildren.First().idx,
+								innerChildren.Last().idx - innerChildren.First().idx + 1);
 
-							if((leftBorder == null || !leftBorder.Location.Overlaps(block.Location))
-								&& (rightBorder == null || !rightBorder.Location.Overlaps(block.Location)))
-							{
-								var newNode = GetNodeFrom(block);
-								foreach (var inner in innerChildren)
-									newNode.InsertChild(inner.child, newNode.Children.Count - 1);
-
-								node.Children.RemoveRange(innerChildren.First().idx,
-									innerChildren.Last().idx - innerChildren.First().idx + 1);
-
-								node.InsertChild(newNode, innerChildren.First().idx);
-							}
+							node.InsertChild(newNode, innerChildren.First().idx);
 						}
 						else
 						{
-							var insertionIndex = node.Children.Select((child, idx) => new { child, idx })
+							var insertionIndex = node.Children
+								.Select((child, idx) => new { child, idx })
 								.LastOrDefault(pair => pair.child.Location?.Start.Offset > block.EndOffset)?.idx;
+							var newNode = GetNodeFrom(block);
 
-							if(insertionIndex.HasValue)
+							if (insertionIndex.HasValue)
 							{
-								var newNode = GetNodeFrom(block);
 								node.InsertChild(newNode, insertionIndex.Value);
 							}
+							else
+							{
+								node.AddLastChild(newNode);
+							}
 						}
+
+						var index = blocks.IndexOf(block);
+						blocks.RemoveAt(index);
+						blocks.InsertRange(index, block.Children);
 					}
 				}
+
+				var locatedNodes = node.Children.Where(c => c.Location != null).ToList();
+
+				/// Находим вложенные в потомков блоки и блоки, перекрывающиеся ровно с одним потомком,
+				/// обрабатываем их при рекурсивных посещениях
+				for (var i = 0; i < locatedNodes.Count; ++i)
+				{
+					var innerBlocks = blocks
+						.Where(b => locatedNodes[i].Location.Overlaps(b.Location)
+							&& (i == locatedNodes.Count - 1 || !b.Location.Overlaps(locatedNodes[i + 1].Location) && !b.Location.Includes(locatedNodes[i + 1].Location))
+							&& (i == 0 || !b.Location.Overlaps(locatedNodes[i - 1].Location) && !b.Location.Includes(locatedNodes[i - 1].Location))
+							|| locatedNodes[i].Location.Includes(b.Location) && !locatedNodes[i].Location.Equals(b.Location))
+						.ToList();
+
+					foreach (var block in innerBlocks)
+						blocks.Remove(block);
+
+					Visit(locatedNodes[i], innerBlocks);
+				}
+
+				BadBlocks.AddRange(blocks);
+				blocks = blocks.SelectMany(b => b.Children).ToList();
 			}
 		}
 	}
