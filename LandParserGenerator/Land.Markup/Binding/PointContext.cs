@@ -724,7 +724,7 @@ namespace Land.Markup.Binding
 						locations.RemoveAt(indexOfOuter);
 						locations.InsertRange(indexOfOuter, outerLocation.Exclude(current.Location));
 					}
-					/// Произвольные блоки для нас прозрачны при вычислении контекстов
+					/// Пользовательские блоки для нас прозрачны при вычислении контекстов
 					else if(current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
 					{
 						for (var i = current.Children.Count - 2; i >= 1; --i)

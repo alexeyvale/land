@@ -214,7 +214,7 @@ namespace Land.Core.Lexing
 						currentBlock.End.SetLocation(token.Location.Start, token.Location.End);
 						currentBlock.Location.End = token.Location.End;
 
-						/// Добавляем произвольный блок в дерево ПБ
+						/// Добавляем пользовательский блок в дерево ПБ
 						if(CustomBlockStack.Any())
 						{
 							CustomBlockStack.Peek().Children.Add(currentBlock);

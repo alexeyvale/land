@@ -351,11 +351,13 @@ namespace Land.VisualStudioExtension
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
+			var lineEndSymbols = new HashSet<char>(LINE_END_SYMBOLS);
+
 			return doc.StartPoint.Line == doc.EndPoint.Line ? DEFAULT_LINE_END
 				: String.Join("", doc.CreateEditPoint(doc.StartPoint)
 					.GetLines(1, 3)
-					.SkipWhile(c => !LINE_END_SYMBOLS.Contains(c))
-					.TakeWhile(c => LINE_END_SYMBOLS.Contains(c)));
+					.SkipWhile(c => !lineEndSymbols.Contains(c))
+					.TakeWhile(c => lineEndSymbols.Remove(c)));
 		}
 
 		#endregion

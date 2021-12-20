@@ -63,13 +63,13 @@ namespace Land.Core.Parsing.Tree
 				{
 					root.Parent.ReplaceChild(newNode, 1);
 				}
-				newNode.InsertChild(Root, 1);
+				newNode.InsertChild(root, 1);
 
 				var index = blocks.IndexOf(outerBlock);
 				blocks.RemoveAt(index);
 				blocks.InsertRange(index, outerBlock.Children);
 
-				outerBlock = blocks.FirstOrDefault(b => b.Location.Includes(Root.Location));
+				outerBlock = blocks.FirstOrDefault(b => b.Location.Includes(root.Location));
 			}
 
 			Root = root;

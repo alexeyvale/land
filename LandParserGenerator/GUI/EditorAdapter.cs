@@ -79,9 +79,11 @@ namespace Land.GUI
 
 		public string GetDocumentLineEnd(string documentName)
 		{
+			var lineEndSymbols = new HashSet<char>(LINE_END_SYMBOLS);
+
 			var text = String.Join("", GetDocumentText(documentName)
-				?.SkipWhile(c=>!LINE_END_SYMBOLS.Contains(c))
-				.TakeWhile(c=>LINE_END_SYMBOLS.Contains(c))
+				?.SkipWhile(c=>!lineEndSymbols.Contains(c))
+				.TakeWhile(c=> lineEndSymbols.Remove(c))
 			);
 
 			return !String.IsNullOrEmpty(text)
