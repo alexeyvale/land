@@ -701,6 +701,32 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
+		//public static InnerContext GetInnerContext(Node node, ParsedFile file)
+		//{
+		//	var locations = new List<SegmentLocation>();
+		//	var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+		//	while (stack.Any())
+		//	{
+		//		var current = stack.Pop();
+
+		//		if (current.Type != Grammar.ANY_TOKEN_NAME && current.Children.Count > 0)
+		//		{
+		//			if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+		//			{
+		//				locations.Add(current.Location);
+		//			}
+		//			else
+		//			{
+		//				for (var i = current.Children.Count - 2; i >= 1; --i)
+		//					stack.Push(current.Children[i]);
+		//			}
+		//		}
+		//	}
+
+		//	return new InnerContext(locations, file.Text);
+		//}
+
 		public static InnerContext GetInnerContext(Node node, ParsedFile file)
 		{
 			var locations = new List<SegmentLocation> { node.Location };
