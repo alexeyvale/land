@@ -1,0 +1,265 @@
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SystemTextJsonInputFormatter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SystemTextJsonInputFormatter.cs
+*
+[129]	return new TranscodingReadStream(httpContext.Request.Body, encoding);
+[129]	return (inputStream, true);	0,77	[0,30, 0,88, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http1Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http1Connection.cs
+*
+[154]	TrimAndParseHeaders(buffer, ref consumed, out examined);
+[158]	_requestProcessingStatus = RequestProcessingStatus.ParsingHeaders;	0,55	[0,00, 0,69, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteValueDictionaryTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteValueDictionaryTests.cs
+*
+[1870]	object value;
+[1869]	// Act	0,77	[0,00, 0,96, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCachingMiddlewareTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCachingMiddlewareTests.cs
+*
+[433]	await middleware.FinalizeCacheHeadersAsync(context);
+[433]	middleware.FinalizeCacheHeaders(context);	0,84	[0,80, 0,97, False] 433, 469
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HeaderUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HeaderUtilities.cs
+*
+[60]	
+[56]	{	0,61	[0,00, 0,76, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HtmlContentBuilder.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HtmlContentBuilder.cs
+*
+[201]	{
+[197]	{	0,64	[1,00, 0,55, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MemoryPoolSlab.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MemoryPoolSlab.cs
+*
+[45]	var array = new byte[length];
+[31]	var pinnedArray = GC.AllocateUninitializedArray<byte>(length, pinned: true);	0,71	[0,31, 0,81, True] _
+*
+[76]	Dispose(true);
+[39]	PinnedArray = null;	0,40	[0,00, 0,50, True] _
+*
+[77]	GC.SuppressFinalize(this);
+[39]	PinnedArray = null;	0,64	[0,00, 0,79, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManagerTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManagerTests.cs
+*
+[198]	CertificateManager.AspNetHttpsCertificateVersion = 0;
+[201]	_manager.AspNetHttpsCertificateVersion = 0;	0,75	[0,78, 0,62, False] 201, 187
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+[217]	{
+[242]	{	0,91	[1,00, 0,89, True] _
+*
+[927]	}
+[1008]	}	0,79	[1,00, 0,74, True] 1014
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HandshakeProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HandshakeProtocol.cs
+*
+[44]	{
+[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00	[0,00, 0,00, True] 40
+*
+[47]	}
+[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00	[0,00, 0,00, True] 43
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReader.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReader.cs
+*
+[193]	// Send the data back to the caller so they can process it.
+[157]		0,21	[0,00, 0,27, True] 205
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelConfigurationLoader.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelConfigurationLoader.cs
+*
+[271]	
+[239]		0,60	[1,00, 0,50, True] 334
+*
+[257]	
+[237]		0,20	[1,00, 0,00, True] 321
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ObjectModelValidator.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ObjectModelValidator.cs
+*
+[86]	validationState);
+[76]	ValidationStateDictionary validationState,	0,43	[0,37, 0,44, True] 108
+*
+[88]	visitor.Validate(metadata, prefix, model, alwaysValidateAtTopLevel: metadata.IsRequired);
+[80]	=> Validate(actionContext, validationState, prefix, model, metadata, container: null);	0,33	[0,29, 0,35, True] 110
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2MessageBody.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2MessageBody.cs
+*
+[66]	OnAdvance(_readResult, consumed, examined);
+[55]	var newlyExaminedBytes = TrackConsumedAndExaminedBytes(_readResult, consumed, examined);	0,49	[0,47, 0,50, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationVisitor.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationVisitor.cs
+*
+[149]	}
+[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,12	[0,00, 0,15, True] 166
+*
+[141]	// Rationale: We might see the same model state key for two different objects and want to preserve any
+[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,23	[0,26, 0,22, True] 158
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EditContext.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EditContext.cs
+*
+[205]	}
+[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,60	[0,00, 0,75, True] 211
+*
+[204]	_fieldStates.Add(fieldIdentifier, state);
+[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,68	[0,70, 0,67, True] 210
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StackTraceHelperTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StackTraceHelperTest.cs
+*
+[145]	var stackFrames = StackTraceHelper.GetFrames(exception);
+[145]	var stackFrames = StackTraceHelper.GetFrames(exception, out _);	0,93	[0,91, 1,00, False] 145, 178
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MediaTypeHeaderValueTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MediaTypeHeaderValueTest.cs
+*
+[840]	MediaTypeHeaderValue result = null;
+[833]	{	0,77	[0,00, 0,96, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TypedClientBuilder.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TypedClientBuilder.cs
+*
+[93]	
+[99]		0,55	[1,00, 0,44, True] 95
+*
+[90]	method.SetParameters(typeof(IClientProxy));
+[97]	generator.Emit(OpCodes.Ldarg_0);	0,50	[0,26, 0,56, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2ConnectionTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2ConnectionTests.cs
+*
+[3469]	await SendHeadersAsync(1, Http2HeadersFrameFlags.END_HEADERS, headers);
+[4119]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.END_STREAM, headers));	0,73	[0,76, 0,58, False] 4128
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpHeaders.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpHeaders.Generated.cs
+*
+[5983]	}
+[6488]	}	0,86	[1,00, 0,83, True] 6540
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NativeRequestContext.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NativeRequestContext.cs
+*
+[429]	fixed (byte* pMemoryBlob = _backingBuffer)
+[462]	fixed (byte* pMemoryBlob = _backingBuffer.Memory.Span)	0,81	[0,76, 1,00, False] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
+*
+[44]	{
+[50]	{	0,67	[1,00, 0,59, True] 57, 77
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AvoidHtmlPartialAnalyzer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AvoidHtmlPartialAnalyzer.cs
+*
+[24]	var invocationExpression = (InvocationExpressionSyntax)context.Node;
+[25]	var method = ((IInvocationOperation)context.Operation).TargetMethod;	0,69	[0,34, 0,77, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SymbolApiConventionMatcher.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SymbolApiConventionMatcher.cs
+*
+[70]	
+[77]		0,82	[1,00, 0,77, True] 70
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+[389]	var prefixLength = BinaryMessageFormatter.LengthPrefixLength(writer.Length);
+[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00	[0,00, 0,00, True] _
+*
+[397]	writer.CopyTo(span.Slice(prefixLength));
+[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00	[0,00, 0,00, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RedisServerFixture.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RedisServerFixture.cs
+*
+[50]	}
+[71]	}	0,95	[1,00, 0,94, True] 55
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Heartbeat.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Heartbeat.cs
+*
+[34]	_timer = new Timer(OnHeartbeat, state: this, dueTime: _interval, period: _interval);
+[39]	_timerThread.Start(this);	0,85	[0,27, 1,00, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ReactDevelopmentServerMiddleware.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ReactDevelopmentServerMiddleware.cs
+*
+[41]	var portTask = StartCreateReactAppServerAsync(sourcePath, npmScriptName, logger);
+[49]	var portTask = StartCreateReactAppServerAsync(sourcePath, scriptName, pkgManagerCommand, devServerPort, logger, diagnosticSource, applicationStoppingToken);	0,81	[0,57, 0,88, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationAttributeAdapterProvider.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationAttributeAdapterProvider.cs
+*
+[57]	{
+[65]	{	0,88	[1,00, 0,85, True] 57
+*
+[61]	{
+[65]	{	0,86	[1,00, 0,83, True] 61
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
+*
+[82]	{
+[72]	{	0,43	[1,00, 0,29, True] 118
+*
+[84]	}
+[75]	return BinaryPrimitives.ReadUInt64LittleEndian(bytes);	0,66	[0,00, 0,83, True] 121, 91
+*
+[71]	fixed (byte* ptr = &bytes[0])
+[68]	return BinaryPrimitives.ReadUInt32LittleEndian(bytes);	0,35	[0,00, 0,44, True] _
+*
+[428]	HttpVersion.Http11 => Http11Version,
+[419]	Debug.Fail("Unexpected HttpVersion: " + httpVersion);	0,40	[0,31, 0,42, True] _
+*
+[429]	_ => null,
+[420]	return null;	0,69	[0,36, 0,77, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenApiAddURLTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenApiAddURLTests.cs
+*
+[289]	Assert.True(string.IsNullOrEmpty(_error.ToString()), $"Threw error: {_error.ToString()}");
+[281]		0,79	[0,00, 0,99, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthorizationFailure.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthorizationFailure.cs
+*
+[34]	FailedRequirements = new IAuthorizationRequirement[0]
+[34]	FailCalled = true,	0,73	[0,00, 0,91, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\InputBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\InputBase.cs
+*
+[232]	}
+[296]	}	0,47	[1,00, 0,34, True] 290
+*
+[229]	if (EditContext != null)
+[293]	{	0,78	[0,00, 0,97, True] _
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultAntiforgeryTokenStoreTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultAntiforgeryTokenStoreTest.cs
+*
+[403]	Assert.True(cookies.Options.HttpOnly);
+[403]	Assert.True(cookies.Options!.HttpOnly);	0,98	[0,97, 1,00, False] 403, 285
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelServerOptions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelServerOptions.cs
+*
+[171]	return loader;
+[220]	public KestrelConfigurationLoader Configure() => Configure(new ConfigurationBuilder().Build());	0,00	[0,00, 0,00, False] _
+

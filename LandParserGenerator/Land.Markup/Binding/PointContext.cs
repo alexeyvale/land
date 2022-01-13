@@ -1183,6 +1183,52 @@ namespace Land.Markup.Binding
 
 		public LineContext() { }
 
+		//public LineContext(SegmentLocation nodeLocation, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
+		//{
+		//	const int NUM_OF_LINES = 4;
+
+		//	var lineEnd = ContextFinder.GetLineEnd(text);
+
+		//	var beforeSegment = new SegmentLocation()
+		//	{
+		//		Start = nodeLocation.Start,
+		//		End = line.Start
+		//	};
+
+		//	var afterSegment = new SegmentLocation()
+		//	{
+		//		Start = line.End,
+		//		End = nodeLocation.End
+		//	};
+
+		//	var beforeLines = text
+		//		.Substring(beforeSegment.Start.Offset, beforeSegment.Length.Value)
+		//		.Split(new string[] { lineEnd }, StringSplitOptions.None)
+		//		.Select(l => TextOrHash.Preprocess(l))
+		//		.Where(l => !String.IsNullOrWhiteSpace(l))
+		//		.ToList();
+
+		//	var afterLines = text
+		//		.Substring(afterSegment.Start.Offset, afterSegment.Length.Value)
+		//		.Split(new string[] { lineEnd }, StringSplitOptions.None)
+		//		.Select(l => TextOrHash.Preprocess(l))
+		//		.Where(l => !String.IsNullOrWhiteSpace(l))
+		//		.ToList();
+
+		//	var targetLine = TextOrHash.Preprocess(
+		//		text.Substring(line.Start.Offset, line.Length.Value)
+		//	);
+
+		//	HadSame = beforeLines.Count(l => l == targetLine) > 1
+		//		|| afterLines.Count(l => l == targetLine) > 1;
+
+		//	InnerContext = cachedInnerContext ?? new TextOrHash(text.Substring(line.Start.Offset, line.Length.Value));
+		//	OuterContext = new Tuple<TextOrHash, TextOrHash>(
+		//		new TextOrHash(String.Join("", beforeLines.Skip(beforeLines.Count - NUM_OF_LINES))),
+		//		new TextOrHash(String.Join("", afterLines.Take(NUM_OF_LINES)))
+		//	);
+		//}
+
 		public LineContext(SegmentLocation nodeLocation, SegmentLocation line, string text, TextOrHash cachedInnerContext = null)
 		{
 			var lineEnd = ContextFinder.GetLineEnd(text);
@@ -1190,7 +1236,7 @@ namespace Land.Markup.Binding
 			var allLines = text
 				.Substring(nodeLocation.Start.Offset, nodeLocation.Length.Value)
 				.Split(new string[] { lineEnd }, StringSplitOptions.None)
-				.Select(l=>TextOrHash.Preprocess(l))
+				.Select(l => TextOrHash.Preprocess(l))
 				.ToList();
 
 			var targetLine = TextOrHash.Preprocess(

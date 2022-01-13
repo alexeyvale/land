@@ -5,6 +5,7 @@ using Land.Markup.Binding;
 using Land.Markup.CoreExtension;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -869,7 +870,6 @@ namespace Comparison
 				report.WriteLine("");
 				report.WriteLine($"file:///{Path.Combine(BaseFolder, Path.GetFileName(file.Key))}");
 				report.WriteLine($"file:///{Path.Combine(ModifiedFolder, Path.GetFileName(file.Key))}");
-				report.WriteLine("*");
 
 				var hasToCheck = false;
 
@@ -879,11 +879,11 @@ namespace Comparison
 					{
 						totalCount += 1;
 
-						var lineContext = new LineContext(method.Item1.NodeLocation, line, initialFile.Text);
-						var (newLineContext, newLineLocation, score) = markupManager.ContextFinder
-							.FindLine(lineContext, method.Item3.Node, currentFile); //out double score, out double innerSim, out double outerSim, out bool confusionFlag);
+						var lineContext = new LineContext(method.Item1.Location, line, initialFile.Text);
+						var results = markupManager.ContextFinder
+							.FindLine(lineContext, method.Item3.Node, currentFile);
 
-						if (newLineLocation == null || score < TO_CHECK_THRESHOLD)
+						if (results.Count == 0 || results[0].Item3 < TO_CHECK_THRESHOLD)
 						{
 							toCheckCount += 1;
 
@@ -898,9 +898,9 @@ namespace Comparison
 
 							reportToCheck.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
 
-							if (newLineLocation != null)
+							if (results.Count > 0)
 							{
-								reportToCheck.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}");//\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
+								reportToCheck.WriteLine($"[{results[0].Item2.Start.Line}]\t{currentFile.Text.Substring(results[0].Item2.Start.Offset, results[0].Item2.Length.Value).Trim()}\t{results[0].Item3:0.00}");
 							}
 							else
 							{
@@ -910,11 +910,17 @@ namespace Comparison
 
 						if (lineContext.InnerContext.TextLength <= 1) { shortLineCount++; }
 
+						report.WriteLine("*");
 						report.WriteLine($"[{line.Start.Line}]\t{initialFile.Text.Substring(line.Start.Offset, line.Length.Value).Trim()}");
 
-						if (newLineLocation != null)
+						if (results.Count > 0)
 						{
-							report.WriteLine($"[{newLineLocation.Start.Line}]\t{currentFile.Text.Substring(newLineLocation.Start.Offset, newLineLocation.Length.Value).Trim()}\t{score:0.00}");//\t[{innerSim:0.00}, {outerSim:0.00}, {confusionFlag}]");
+							report.WriteLine($"[{results[0].Item2.Start.Line}]\t{currentFile.Text.Substring(results[0].Item2.Start.Offset, results[0].Item2.Length.Value).Trim()}\t{results[0].Item3:0.00}");
+
+							if (results.Count > 1)
+							{
+								report.WriteLine($"[{results[1].Item2.Start.Line}]\t{currentFile.Text.Substring(results[1].Item2.Start.Offset, results[1].Item2.Length.Value).Trim()}\t{results[1].Item3:0.00}");
+							}
 						}
 						else
 						{
@@ -931,6 +937,174 @@ namespace Comparison
 			Console.WriteLine($"Total marked: {totalCount} lines");
 			Console.WriteLine($"To check: {toCheckCount} lines");
 			Console.WriteLine($"Short: {shortLineCount} lines");
+			Console.ReadLine();
+		}
+
+		static void LHDiffComparison()
+		{
+			var resultsFile = new StreamReader(@"D:\Desktop\Учёба\НИР phd\Репозитории\Land Parser Generator\_Experiments\Mapping\_Results\Строки\ros\report 750.txt");
+			var comparedResults = new StreamWriter(@"D:\Desktop\Учёба\НИР phd\Репозитории\Land Parser Generator\_Experiments\Mapping\_Results\Строки\ros\report 750_lhd_diff.txt");
+
+			comparedResults.WriteLine();
+
+			var counter = 0;
+
+			while (!resultsFile.EndOfStream)
+			{
+				var line = resultsFile.ReadLine();
+
+				if (line.StartsWith("file"))
+				{
+					var path1 = line;
+					var path2 = resultsFile.ReadLine();
+					resultsFile.ReadLine();
+
+					var process = new Process();
+					var startInfo = new ProcessStartInfo()
+					{
+						FileName = "cmd.exe",
+						Arguments = $"/C java -jar D:\\Загрузки\\lhdiff_2020.jar -p 0.4 0.0 \"{path1.Substring(8)}\" \"{path2.Substring(8)}\"",
+						CreateNoWindow = true,
+						RedirectStandardOutput = true,
+						RedirectStandardError = true,
+						UseShellExecute = false
+					};
+					process.StartInfo = startInfo;
+					process.Start();
+
+					var outputStream = process.StandardOutput.ReadToEndAsync();
+					var errorStream = process.StandardError.ReadToEndAsync();
+
+					process.WaitForExit();
+
+					var lhResults = outputStream.Result.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+						.Skip(1)
+						.Select(s => s.Trim().Split(','))
+						.GroupBy(e => e[0])
+						.ToDictionary(e => e.Key, e => String.Join(", ", e.Select(el=>el[1])));
+					var fileAdded = false;
+
+					var currentLine = resultsFile.ReadLine();
+
+					while (!String.IsNullOrWhiteSpace(currentLine))
+					{
+						var initialLine = currentLine;
+						var reboundLine = resultsFile.ReadLine();
+
+						var initialLineNumber = System.Text.RegularExpressions.Regex.Match(initialLine, @"\[(\d+)\]").Groups[1].Value;
+						var reboundLineLineNumber = System.Text.RegularExpressions.Regex.Match(reboundLine, @"\[(\d+)\]").Groups[1].Value;
+
+						if(lhResults[initialLineNumber] != reboundLineLineNumber)
+						{
+							++counter;
+
+							if (!fileAdded)
+							{
+								fileAdded = true;
+
+								comparedResults.WriteLine(path1);
+								comparedResults.WriteLine(path2);
+							}
+
+							comparedResults.WriteLine("*");
+							comparedResults.WriteLine(initialLine);
+							comparedResults.WriteLine($"{reboundLine}{(lhResults[initialLineNumber] != reboundLineLineNumber ? $" {lhResults[initialLineNumber]}" : "")}");
+						}
+
+						currentLine = resultsFile.ReadLine();
+					}
+
+					if (fileAdded)
+					{
+						comparedResults.WriteLine();
+					}
+				}
+			}
+
+			resultsFile.Close();
+			comparedResults.Close();
+
+			Console.WriteLine(counter);
+			Console.ReadLine();
+		}
+
+		static void LHDiffLikeComparison()
+		{
+			var resultsOldFile = new StreamReader(@"D:\Desktop\Учёба\НИР phd\Репозитории\Land Parser Generator\_Experiments\Mapping\_Results\Строки\asp\report.txt");
+			var resultsNewFile = new StreamReader(@"D:\Desktop\Учёба\НИР phd\Репозитории\Land Parser Generator\_Experiments\Mapping\_Results\Строки\asp\report_4.txt");
+			var comparedResults = new StreamWriter(@"D:\Desktop\Учёба\НИР phd\Репозитории\Land Parser Generator\_Experiments\Mapping\_Results\Строки\asp\report_4_diff.txt");
+
+			comparedResults.WriteLine();
+
+			var counter = 0;
+
+			while (!resultsOldFile.EndOfStream)
+			{
+				var line = resultsOldFile.ReadLine();
+				resultsNewFile.ReadLine();
+
+				if (line.StartsWith("file"))
+				{
+					var path1 = line;
+					var path2 = resultsOldFile.ReadLine();
+
+					resultsNewFile.ReadLine();
+
+					var currentLine = resultsOldFile.ReadLine();
+					resultsNewFile.ReadLine();
+
+					var fileAdded = false;
+
+					while (!String.IsNullOrWhiteSpace(currentLine))
+					{
+						var initialLine = resultsOldFile.ReadLine();
+						var reboundOldLine = resultsOldFile.ReadLine();
+						resultsNewFile.ReadLine();
+						var reboundNewLine = resultsNewFile.ReadLine();
+
+						var reboundOldLineLineNumber = System.Text.RegularExpressions.Regex.Match(reboundOldLine, @"\[(\d+)\]").Groups[1].Value;
+						var reboundNewLineLineNumber = System.Text.RegularExpressions.Regex.Match(reboundNewLine, @"\[(\d+)\]").Groups[1].Value;
+
+						if(reboundOldLineLineNumber != reboundNewLineLineNumber)
+						{
+							if(!fileAdded)
+							{
+								fileAdded = true;
+
+								comparedResults.WriteLine(path1);
+								comparedResults.WriteLine(path2);			
+							}
+
+							++counter;
+
+							comparedResults.WriteLine("*");
+							comparedResults.WriteLine(initialLine);
+							comparedResults.WriteLine(reboundOldLine);
+							comparedResults.WriteLine(reboundNewLine);
+						}
+
+						currentLine = resultsOldFile.ReadLine();
+						resultsNewFile.ReadLine();
+
+						while(!String.IsNullOrEmpty(currentLine) && currentLine.Trim() != "*")
+						{
+							currentLine = resultsOldFile.ReadLine();
+							resultsNewFile.ReadLine();
+						}
+					}
+
+					if (fileAdded)
+					{
+						comparedResults.WriteLine();
+					}
+				}
+			}
+
+			resultsOldFile.Close();
+			resultsNewFile.Close();
+			comparedResults.Close();
+
+			Console.WriteLine(counter);
 			Console.ReadLine();
 		}
 	}

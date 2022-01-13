@@ -3,2026 +3,3015 @@ file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultAntiforger
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultAntiforgeryTest.cs
 *
 [598]	// Act
-[598]	// Act	1,00	[1,00, 0,99, False]
+[598]	// Act	1,00
+[601]	// Assert	0,57
+*
 [582]	};
-[582]	};	1,00	[1,00, 0,99, False]
+[582]	};	1,00
+[612]	}	0,46
+*
 [1409]	.Setup(o => o.GenerateCookieToken())
-[1409]	.Setup(o => o.GenerateCookieToken())	1,00	[1,00, 1,00, False]
+[1409]	.Setup(o => o.GenerateCookieToken())	1,00
+[1403]	.Setup(o => o.GenerateRequestToken(	0,75
+*
 [1406]	.Returns(testTokenSet.RequestToken);
-[1406]	.Returns(testTokenSet.RequestToken);	1,00	[1,00, 0,99, False]
+[1406]	.Returns(testTokenSet.RequestToken);	1,00
+[1403]	.Setup(o => o.GenerateRequestToken(	0,60
+*
 [644]	context.HttpContext,
-[644]	context.HttpContext,	0,99	[1,00, 0,99, True]
+[644]	context.HttpContext,	0,99
+[642]	context.TokenGenerator	0,70
+*
 [642]	context.TokenGenerator
-[642]	context.TokenGenerator	0,99	[1,00, 0,99, True]
+[642]	context.TokenGenerator	0,99
+[641]	Assert.True(result);	0,76
+*
 [733]	// Act
-[733]	// Act	1,00	[1,00, 0,99, False]
+[733]	// Act	1,00
+[736]	// Assert	0,58
+*
 [725]	context.TestTokenSet.OldCookieToken,
-[725]	context.TestTokenSet.OldCookieToken,	1,00	[1,00, 0,99, False]
+[725]	context.TestTokenSet.OldCookieToken,	1,00
+[726]	context.TestTokenSet.RequestToken,	0,79
+*
 [1324]	return httpContext;
-[1324]	return httpContext;	1,00	[1,00, 0,99, False]
+[1324]	return httpContext;	1,00
+[1318]	var httpContext = new DefaultHttpContext();	0,35
+*
 [1318]	var httpContext = new DefaultHttpContext();
-[1318]	var httpContext = new DefaultHttpContext();	1,00	[1,00, 0,99, False]
+[1318]	var httpContext = new DefaultHttpContext();	1,00
+[1320]	httpContext.Features.Set(antiforgeryFeature);	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StartupAnalyzerTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StartupAnalyzerTest.cs
 *
 [252]	var source = Read(nameof(TestFiles.StartupAnalyzerTest.UseAuthConfiguredCorrectlyChained));
-[252]	var source = Read(nameof(TestFiles.StartupAnalyzerTest.UseAuthConfiguredCorrectlyChained));	0,99	[1,00, 0,93, False]
+[252]	var source = Read(nameof(TestFiles.StartupAnalyzerTest.UseAuthConfiguredCorrectlyChained));	0,99
+[258]	var middlewareAnalysis = Assert.Single(Analyses.OfType<MiddlewareAnalysis>());	0,35
+*
 [258]	var middlewareAnalysis = Assert.Single(Analyses.OfType<MiddlewareAnalysis>());
-[258]	var middlewareAnalysis = Assert.Single(Analyses.OfType<MiddlewareAnalysis>());	1,00	[1,00, 0,98, False]
+[258]	var middlewareAnalysis = Assert.Single(Analyses.OfType<MiddlewareAnalysis>());	1,00
+[259]	Assert.NotEmpty(middlewareAnalysis.Middleware);	0,38
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SystemTextJsonInputFormatter.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SystemTextJsonInputFormatter.cs
 *
 [98]	}
-[97]	}	0,97	[1,00, 0,96, True]
+[97]	}	0,97
+[103]	}	0,92
+*
 [62]	}
-[61]	}	0,99	[1,00, 0,99, True]
+[61]	}	0,99
+[66]	}	0,82
+*
 [125]	{
-[124]	{	0,80	[1,00, 0,75, True]
+[124]	{	0,80
+[122]	{	0,57
+*
 [129]	return new TranscodingReadStream(httpContext.Request.Body, encoding);
-[129]	return (inputStream, true);	0,77	[0,30, 0,88, True]
+[129]	return (inputStream, true);	0,77
+[128]	var inputStream = Encoding.CreateTranscodingStream(httpContext.Request.Body, encoding, Encoding.UTF8, leaveOpen: true);	0,41
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePumpTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePumpTests.cs
 *
 [113]	using (var server = Utilities.CreatePump())
-[113]	using (var server = Utilities.CreatePump())	0,96	[1,00, 0,82, False]
+[113]	using (var server = Utilities.CreatePump())	0,96
+[112]	{	0,18
+*
 [114]	{
-[114]	{	0,86	[1,00, 0,82, True]
+[114]	{	0,86
+[112]	{	0,76
+*
 [102]	{
-[102]	{	0,96	[1,00, 0,95, True]
+[102]	{	0,96
+[101]	using (var server = Utilities.CreatePump())	0,60
+*
 [103]	var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();
-[103]	var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();	1,00	[1,00, 0,99, False]
+[103]	var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();	1,00
+[104]	serverAddressesFeature.Addresses.Add(serverAddress);	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http1Connection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http1Connection.cs
 *
 [154]	TrimAndParseHeaders(buffer, ref consumed, out examined);
-[158]	_requestProcessingStatus = RequestProcessingStatus.ParsingHeaders;	0,55	[0,00, 0,69, True]
+[158]	_requestProcessingStatus = RequestProcessingStatus.ParsingHeaders;	0,55
+[160]	}	0,53
+*
 [141]	case RequestProcessingStatus.RequestPending:
-[145]	case RequestProcessingStatus.RequestPending:	0,89	[1,00, 0,47, False]
+[145]	case RequestProcessingStatus.RequestPending:	0,89
+[155]	case RequestProcessingStatus.ParsingRequestLine:	0,68
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RenderTreeBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RenderTreeBuilder.cs
 *
 [635]	_hasSeenAddMultipleAttributes = false;
-[686]	_hasSeenAddMultipleAttributes = false;	0,93	[1,00, 0,65, False]
+[686]	_hasSeenAddMultipleAttributes = false;	0,93
+[685]	_lastNonAttributeFrameType = null;	0,31
+*
 [632]	_entries.Clear();
-[683]	_entries.Clear();	0,94	[1,00, 0,68, False]
+[683]	_entries.Clear();	0,94
+[684]	_openElementIndices.Clear();	0,57
+*
 [604]	entry = entry.WithRegionSubtreeLength(_entries.Count - indexOfEntryBeingClosed);
-[653]	entry = entry.WithRegionSubtreeLength(_entries.Count - indexOfEntryBeingClosed);	0,87	[1,00, 0,34, False]
+[653]	entry = entry.WithRegionSubtreeLength(_entries.Count - indexOfEntryBeingClosed);	0,87
+[652]	ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];	0,47
+*
 [603]	ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];
-[652]	ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];	0,97	[1,00, 0,83, False]
+[652]	ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];	0,97
+[653]	entry = entry.WithRegionSubtreeLength(_entries.Count - indexOfEntryBeingClosed);	0,45
+*
 [217]	}
-[239]	}	0,81	[1,00, 0,76, True]
+[239]	}	0,81
+[243]	}	0,67
+*
 [214]	if (value != null || _lastNonAttributeFrameType == RenderTreeFrameType.Component)
-[236]	if (value != null || _lastNonAttributeFrameType == RenderTreeFrameType.Component)	0,92	[1,00, 0,60, False]
+[236]	if (value != null || _lastNonAttributeFrameType == RenderTreeFrameType.Component)	0,92
+[235]	AssertCanAddAttribute();	0,11
+*
 [488]	if (!parentFrameIndex.HasValue)
-[525]	if (!parentFrameIndex.HasValue)	0,95	[1,00, 0,76, False]
+[525]	if (!parentFrameIndex.HasValue)	0,95
+[530]	var parentFrameIndexValue = parentFrameIndex.Value;	0,48
+*
 [484]	return;
-[521]	return;	0,97	[1,00, 0,87, False]
+[521]	return;	0,97
+[536]	break;	0,32
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConfigurationChangeTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConfigurationChangeTests.cs
 *
 [88]	var load = Helpers.StressLoad(deploymentResult.HttpClient, "/HelloWorld", response =>
-[88]	var load = Helpers.StressLoad(deploymentResult.HttpClient, "/HelloWorld", response =>	0,99	[1,00, 0,96, False]
+[88]	var load = Helpers.StressLoad(deploymentResult.HttpClient, "/HelloWorld", response =>	0,99
+[87]	await deploymentResult.AssertStarts();	0,41
+*
 [90]	var statusCode = (int)response.StatusCode;
-[90]	var statusCode = (int)response.StatusCode;	0,99	[1,00, 0,95, False]
+[90]	var statusCode = (int)response.StatusCode;	0,99
+[91]	Assert.True(statusCode == 200 || statusCode == 503, "Status code was " + statusCode);	0,46
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ErrorPagesTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ErrorPagesTests.cs
 *
 [95]	
-[95]		0,90	[1,00, 0,88, True]
+[95]		0,90
+[93]		0,87
+*
 [90]	var response = await deploymentResult.HttpClient.GetAsync("HelloWorld");
-[90]	var response = await deploymentResult.HttpClient.GetAsync("HelloWorld");	0,99	[1,00, 0,95, False]
+[90]	var response = await deploymentResult.HttpClient.GetAsync("HelloWorld");	0,99
+[96]	var responseString = await response.Content.ReadAsStringAsync();	0,45
+*
 [37]	await AssertLink(response);
-[37]	await AssertLink(response);	0,99	[1,00, 0,93, False]
+[37]	await AssertLink(response);	0,99
+[35]	VerifyNoExtraTrailingBytes(responseString);	0,42
+*
 [32]	
-[32]		0,93	[1,00, 0,91, True]
+[32]		0,93
+[30]		0,87
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TemplateParserTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TemplateParserTests.cs
 *
 [345]	inlineConstraints: null));
-[345]	inlineConstraints: null));	0,99	[1,00, 0,99, True]
+[345]	inlineConstraints: null));	0,99
+[339]	inlineConstraints: null));	0,90
+*
 [336]	false,
-[336]	false,	0,99	[1,00, 0,99, True]
+[336]	false,	0,99
+[337]	false,	0,97
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePump.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePump.cs
 *
 [293]	}
-[248]	}	0,96	[1,00, 0,95, True]
+[248]	}	0,96
+[249]		0,76
+*
 [294]	
-[249]		0,96	[1,00, 0,95, True]
+[249]		0,96
+[248]	}	0,76
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteValueDictionaryTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteValueDictionaryTests.cs
 *
 [746]	var values = dict.Values;
-[746]	var values = dict.Values;	0,98	[1,00, 0,92, False]
+[746]	var values = dict.Values;	0,98
+[743]	var dict = new RouteValueDictionary(new { key = "value", });	0,39
+*
 [749]	Assert.Equal(new object[] { "value" }, values);
-[749]	Assert.Equal(new object[] { "value" }, values);	1,00	[1,00, 0,99, False]
+[749]	Assert.Equal(new object[] { "value" }, values);	1,00
+[746]	var values = dict.Values;	0,38
+*
 [1345]	// Assert
-[1345]	// Assert	0,98	[1,00, 0,92, False]
+[1345]	// Assert	0,98
+[1342]	// Act	0,54
+*
 [1334]	// Arrange
-[1334]	// Arrange	1,00	[1,00, 0,98, False]
+[1334]	// Arrange	1,00
+[1342]	// Act	0,34
+*
 [623]	var dict = new RouteValueDictionary()
-[623]	var dict = new RouteValueDictionary()	1,00	[1,00, 0,99, False]
+[623]	var dict = new RouteValueDictionary()	1,00
+[629]	dict["key"] = "value";	0,36
+*
 [631]	// Assert
-[631]	// Assert	1,00	[1,00, 0,98, False]
+[631]	// Assert	1,00
+[628]	// Act	0,55
+*
 [65]	// Arrange
-[65]	// Arrange	0,98	[1,00, 0,89, False]
+[65]	// Arrange	0,98
+[68]	// Act	0,37
+*
 [66]	var other = new RouteValueDictionary(new { key = "value" });
-[66]	var other = new RouteValueDictionary(new { key = "value" });	0,99	[1,00, 0,96, False]
+[66]	var other = new RouteValueDictionary(new { key = "value" });	0,99
+[69]	var dict = new RouteValueDictionary(other);	0,63
+*
 [1029]	{ "key", "value" },
-[1029]	{ "key", "value" },	0,98	[1,00, 0,89, False]
+[1029]	{ "key", "value" },	0,98
+[1030]	};	0,16
+*
 [1037]	// Assert
-[1037]	// Assert	0,98	[1,00, 0,91, False]
+[1037]	// Assert	0,98
+[1034]	// Act	0,53
+*
 [1870]	object value;
-[1869]	// Act	0,77	[0,00, 0,96, True]
+[1869]	// Act	0,77
+[1868]		0,75
+*
 [1875]	Assert.Null(value);
-[1874]	Assert.Null(value);	0,99	[1,00, 0,96, False]
+[1874]	Assert.Null(value);	0,99
+[1873]	Assert.False(result);	0,53
+*
 [801]	var dict = new RouteValueDictionary(new { age = 30 });
-[801]	var dict = new RouteValueDictionary(new { age = 30 });	1,00	[1,00, 0,99, False]
+[801]	var dict = new RouteValueDictionary(new { age = 30 });	1,00
+[807]	Assert.Collection(	0,30
+*
 [814]	Assert.Collection(
-[814]	Assert.Collection(	0,97	[1,00, 0,96, True]
+[814]	Assert.Collection(	0,97
+[815]	dict._arrayStorage,	0,69
+*
 [1757]	var dict = new RouteValueDictionary(new { key = "value", });
-[1757]	var dict = new RouteValueDictionary(new { key = "value", });	0,98	[1,00, 0,90, False]
+[1757]	var dict = new RouteValueDictionary(new { key = "value", });	0,98
+[1760]	var result = dict.TryAdd("key", "value");	0,48
+*
 [1760]	var result = dict.TryAdd("key", "value");
-[1760]	var result = dict.TryAdd("key", "value");	0,97	[1,00, 0,87, False]
+[1760]	var result = dict.TryAdd("key", "value");	0,97
+[1757]	var dict = new RouteValueDictionary(new { key = "value", });	0,47
+*
 [690]	Assert.Empty(keys);
-[690]	Assert.Empty(keys);	1,00	[1,00, 0,99, False]
+[690]	Assert.Empty(keys);	1,00
+[687]	var keys = dict.Keys;	0,43
+*
 [686]	// Act
-[686]	// Act	1,00	[1,00, 0,98, False]
+[686]	// Act	1,00
+[689]	// Assert	0,53
+*
 [992]	
-[992]		0,95	[1,00, 0,94, True]
+[992]		0,95
+[994]		0,81
+*
 [994]	
-[994]		0,88	[1,00, 0,85, True]
+[994]		0,88
+[997]		0,75
+*
 [587]	{
-[587]	{	0,99	[1,00, 0,98, True]
+[587]	{	0,99
+[584]	{	0,78
+*
 [589]	};
-[589]	};	1,00	[1,00, 0,98, False]
+[589]	};	1,00
+[600]	}	0,43
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCachingMiddlewareTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCachingMiddlewareTests.cs
 *
 [435]	Assert.False(context.ShouldCacheResponse);
-[435]	Assert.False(context.ShouldCacheResponse);	0,99	[1,00, 0,96, False]
+[435]	Assert.False(context.ShouldCacheResponse);	0,99
+[436]	Assert.Empty(sink.Writes);	0,35
+*
 [433]	await middleware.FinalizeCacheHeadersAsync(context);
-[433]	middleware.FinalizeCacheHeaders(context);	0,84	[0,80, 0,97, False]
+[433]	middleware.FinalizeCacheHeaders(context);	0,84
+[431]	middleware.ShimResponseStream(context);	0,54
+*
 [740]	context.CachedResponse = new CachedResponse();
-[743]	context.CachedResponse = new CachedResponse();	0,99	[1,00, 0,93, False]
+[743]	context.CachedResponse = new CachedResponse();	0,99
+[745]	context.CachedResponseValidFor = TimeSpan.FromSeconds(10);	0,59
+*
 [745]	
-[748]		0,97	[1,00, 0,96, True]
+[748]		0,97
+[746]		0,77
+*
 [509]	};
-[509]	};	0,98	[1,00, 0,89, False]
+[509]	};	0,98
+[514]	});	0,68
+*
 [512]	{
-[512]	{	0,97	[1,00, 0,96, True]
+[512]	{	0,97
+[519]	{	0,75
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HandshakeHelpers.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HandshakeHelpers.cs
 *
 [119]	}
-[129]	}	0,89	[1,00, 0,87, True]
+[129]	}	0,89
+[126]	}	0,52
+*
 [109]	{
-[114]	{	0,70	[1,00, 0,63, True]
+[114]	{	0,70
+[116]	// so this can be hardcoded to 60 bytes for the requestKey + static websocket string	0,56
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RenderTreeDiffBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RenderTreeDiffBuilder.cs
 *
 [753]	while (regionChildFrameIndex < regionChildFrameEndIndexExcl)
-[783]	while (regionChildFrameIndex < regionChildFrameEndIndexExcl)	0,99	[1,00, 0,97, False]
+[783]	while (regionChildFrameIndex < regionChildFrameEndIndexExcl)	0,99
+[781]	var regionChildFrameIndex = newFrameIndex + 1;	0,61
+*
 [740]	case RenderTreeFrameType.Component:
-[770]	case RenderTreeFrameType.Component:	0,99	[1,00, 0,97, False]
+[770]	case RenderTreeFrameType.Component:	0,99
+[771]	case RenderTreeFrameType.Element:	0,85
+*
 [31]	
-[37]		0,80	[1,00, 0,76, True]
+[37]		0,80
+[36]	AppendDiffEntriesForRange(ref diffContext, 0, oldTree.Count, 0, newTree.Count);	0,57
+*
 [26]	var editsBuffer = batchBuilder.EditsBuffer;
-[32]	var editsBuffer = batchBuilder.EditsBuffer;	0,95	[1,00, 0,77, False]
+[32]	var editsBuffer = batchBuilder.EditsBuffer;	0,95
+[33]	var editsBufferStartLength = editsBuffer.Count;	0,58
+*
 [949]	batchBuilder.ComponentDisposalQueue.Enqueue(frame.ComponentId);
-[987]	batchBuilder.ComponentDisposalQueue.Enqueue(frame.ComponentId);	0,98	[1,00, 0,89, False]
+[987]	batchBuilder.ComponentDisposalQueue.Enqueue(frame.ComponentId);	0,98
+[991]	batchBuilder.DisposedEventHandlerIds.Append(frame.AttributeEventHandlerId);	0,39
+*
 [945]	{
-[983]	{	0,87	[1,00, 0,84, True]
+[983]	{	0,87
+[980]	{	0,86
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EnableAuthenticator.cshtml.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EnableAuthenticator.cshtml.cs
 *
 [80]	return Page();
-[80]	return Page();	0,99	[1,00, 0,99, True]
+[80]	return Page();	0,99
+[81]	}	0,76
+*
 [83]	// Strip spaces and hypens
-[83]	// Strip spaces and hyphens	0,97	[0,96, 1,00, False]
+[83]	// Strip spaces and hyphens	0,97
+[82]		0,19
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
 *
 [860]	
-[960]		0,97	[1,00, 0,96, True]
+[960]		0,97
+[959]	}	0,74
+*
 [858]	return true;
-[958]	return true;	0,94	[1,00, 0,92, True]
+[958]	return true;	0,94
+[960]		0,67
+*
 [1056]	return true;
-[1156]	return true;	0,99	[1,00, 0,99, True]
+[1156]	return true;	0,99
+[1155]	value = converted;	0,80
+*
 [1049]	value = default;
-[1149]	value = default;	0,89	[1,00, 0,87, True]
+[1149]	value = default;	0,89
+[1150]	return false;	0,72
+*
 [648]	value = converted;
-[683]	value = converted;	0,99	[1,00, 0,95, False]
+[683]	value = converted;	0,99
+[679]	value = default;	0,52
+*
 [641]	
-[676]		0,89	[1,00, 0,86, True]
+[676]		0,89
+[675]	}	0,72
+*
 [1324]	parser = ConvertToNullableLong;
-[1432]	parser = ConvertToNullableLong;	0,99	[1,00, 0,97, False]
+[1432]	parser = ConvertToNullableLong;	0,99
+[1448]	parser = ConvertToNullableFloat;	0,90
+*
 [1380]	parser = MakeTypeConverterConverter<T>();
-[1496]	parser = MakeTypeConverterConverter<T>();	1,00	[1,00, 0,99, False]
+[1496]	parser = MakeTypeConverterConverter<T>();	1,00
+[1476]	parser = ConvertToDateTime;	0,46
+*
 [372]	if (format != null)
-[407]	if (format != null)	0,99	[1,00, 0,97, False]
+[407]	if (format != null)	0,99
+[406]	{	0,17
+*
 [377]	return value.ToString(culture ?? CultureInfo.CurrentCulture);
-[412]	return value.ToString(culture ?? CultureInfo.CurrentCulture);	0,99	[1,00, 0,95, False]
+[412]	return value.ToString(culture ?? CultureInfo.CurrentCulture);	0,99
+[409]	return value.ToString(format, culture ?? CultureInfo.CurrentCulture);	0,77
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MatcherGithubBenchmarkBase.generated.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MatcherGithubBenchmarkBase.generated.cs
 *
 [922]	Requests[164].RequestServices = CreateServices();
-[922]	Requests[164].RequestServices = CreateServices();	0,95	[1,00, 0,74, False]
+[922]	Requests[164].RequestServices = CreateServices();	0,95
+[914]	Requests[162].RequestServices = CreateServices();	0,94
+*
 [833]	Requests[142] = new DefaultHttpContext();
-[833]	Requests[142] = new DefaultHttpContext();	0,94	[1,00, 0,69, False]
+[833]	Requests[142] = new DefaultHttpContext();	0,94
+[793]	Requests[132] = new DefaultHttpContext();	0,93
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HeaderUtilities.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HeaderUtilities.cs
 *
 [60]	
-[56]	{	0,61	[0,00, 0,76, True]
+[56]	{	0,61
+[57]	var qualityParameter = NameValueHeaderValue.Find(parameters, QualityName);	0,59
+*
 [65]	// separator is considered invalid (even if the current culture would allow it).
-[61]	// separator is considered invalid (even if the current culture would allow it).	0,98	[1,00, 0,88, False]
+[61]	// separator is considered invalid (even if the current culture would allow it).	0,98
+[60]	// Note that the RFC requires decimal '.' regardless of the culture. I.e. using ',' as decimal	0,31
+*
 [82]	if (HttpRuleParser.GetTokenLength(value, 0) != value.Length)
-[77]	if (HttpRuleParser.GetTokenLength(value, 0) != value.Length)	1,00	[1,00, 0,99, False]
+[77]	if (HttpRuleParser.GetTokenLength(value, 0) != value.Length)	1,00
+[72]	if (StringSegment.IsNullOrEmpty(value))	0,32
+*
 [79]	throw new ArgumentException("An empty string is not allowed.", parameterName);
-[74]	throw new ArgumentException("An empty string is not allowed.", parameterName);	1,00	[1,00, 0,98, False]
+[74]	throw new ArgumentException("An empty string is not allowed.", parameterName);	1,00
+[70]	internal static void CheckValidToken(StringSegment value, string parameterName)	0,34
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpParserTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpParserTests.cs
 *
 [74]	Assert.Equal(buffer.Start, consumed);
-[76]	Assert.Equal(buffer.Start, consumed);	1,00	[1,00, 0,99, False]
+[76]	Assert.Equal(buffer.Start, consumed);	1,00
+[77]	Assert.True(buffer.Slice(examined).IsEmpty);	0,48
+*
 [68]	var parser = CreateParser(_nullTrace);
-[70]	var parser = CreateParser(_nullTrace);	0,99	[1,00, 0,95, False]
+[70]	var parser = CreateParser(_nullTrace);	0,99
+[72]	var requestHandler = new RequestHandler();	0,35
+*
 [349]	// Invalid request line
-[359]	// Invalid request line	0,98	[1,00, 0,88, False]
+[359]	// Invalid request line	0,98
+[382]	// Invalid request header	0,71
+*
 [370]	
-[384]		0,81	[1,00, 0,76, True]
+[384]		0,81
+[392]		0,78
+*
 [41]	
-[43]		0,99	[1,00, 0,99, True]
+[43]		0,99
+[45]		0,91
+*
 [39]	var buffer = new ReadOnlySequence<byte>(Encoding.ASCII.GetBytes(requestLine));
-[41]	var buffer = new ReadOnlySequence<byte>(Encoding.ASCII.GetBytes(requestLine));	1,00	[1,00, 0,98, False]
+[41]	var buffer = new ReadOnlySequence<byte>(Encoding.ASCII.GetBytes(requestLine));	1,00
+[42]	var requestHandler = new RequestHandler();	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2StreamTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2StreamTests.cs
 *
 [3466]	
-[3652]		0,99	[1,00, 0,99, True]
+[3652]		0,99
+[3650]		0,97
+*
 [3477]	await appTcs.Task;
-[3663]	await appTcs.Task;	1,00	[1,00, 1,00, False]
+[3663]	await appTcs.Task;	1,00
+[3642]	await clientTcs.Task.DefaultTimeout();	0,45
+*
 [2536]	
-[2722]		0,99	[1,00, 0,99, True]
+[2722]		0,99
+[2720]		0,89
+*
 [2523]	Assert.False(context.Response.HasStarted);
-[2709]	Assert.False(context.Response.HasStarted);	1,00	[1,00, 0,98, False]
+[2709]	Assert.False(context.Response.HasStarted);	1,00
+[2712]	await StartStreamAsync(1, headers, endStream: true);	0,43
+*
 [3005]	Assert.Equal(3, _decodedHeaders.Count);
-[3191]	Assert.Equal(3, _decodedHeaders.Count);	1,00	[1,00, 1,00, False]
+[3191]	Assert.Equal(3, _decodedHeaders.Count);	1,00
+[3193]	Assert.Equal("200", _decodedHeaders[HeaderNames.Status]);	0,61
+*
 [2979]	new KeyValuePair<string, string>(HeaderNames.Scheme, "http"),
-[3165]	new KeyValuePair<string, string>(HeaderNames.Scheme, "http"),	1,00	[1,00, 0,99, False]
+[3165]	new KeyValuePair<string, string>(HeaderNames.Scheme, "http"),	1,00
+[3164]	new KeyValuePair<string, string>(HeaderNames.Path, "/"),	0,83
+*
 [454]	await StopConnectionAsync(expectedLastStreamId: 1, ignoreNonGoAwayFrames: false);
-[455]	await StopConnectionAsync(expectedLastStreamId: 1, ignoreNonGoAwayFrames: false);	1,00	[1,00, 0,99, False]
+[455]	await StopConnectionAsync(expectedLastStreamId: 1, ignoreNonGoAwayFrames: false);	1,00
+[448]	await StartStreamAsync(1, headers, endStream: true);	0,42
+*
 [447]	await StartStreamAsync(1, headers, endStream: true);
-[448]	await StartStreamAsync(1, headers, endStream: true);	1,00	[1,00, 0,99, False]
+[448]	await StartStreamAsync(1, headers, endStream: true);	1,00
+[442]	new KeyValuePair<string, string>(HeaderNames.Scheme, "http"),	0,42
+*
 [1775]	{
-[1788]	{	0,99	[1,00, 0,99, True]
+[1788]	{	0,99
+[1781]	{	0,93
+*
 [1786]	await StartStreamAsync(1, headers, endStream: false);
-[1799]	await StartStreamAsync(1, headers, endStream: false);	1,00	[1,00, 0,99, False]
+[1799]	await StartStreamAsync(1, headers, endStream: false);	1,00
+[1800]	await SendDataAsync(1, new byte[12], endStream: true);	0,65
+*
 [1010]	context.Response.ContentLength = 11;
-[1011]	context.Response.ContentLength = 11;	1,00	[1,00, 0,98, False]
+[1011]	context.Response.ContentLength = 11;	1,00
+[1012]	await context.Response.WriteAsync("hello, world"); // 12	0,52
+*
 [1031]	Assert.Equal(3, _decodedHeaders.Count);
-[1032]	Assert.Equal(3, _decodedHeaders.Count);	1,00	[1,00, 0,99, False]
+[1032]	Assert.Equal(3, _decodedHeaders.Count);	1,00
+[1034]	Assert.Equal("200", _decodedHeaders[HeaderNames.Status]);	0,57
+*
 [594]	read = await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);
-[595]	read = await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);	1,00	[1,00, 0,99, False]
+[595]	read = await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);	1,00
+[593]	var read = await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);	0,90
+*
 [624]	Assert.Equal("0", _decodedHeaders[HeaderNames.ContentLength]);
-[625]	Assert.Equal("0", _decodedHeaders[HeaderNames.ContentLength]);	1,00	[1,00, 0,99, False]
+[625]	Assert.Equal("0", _decodedHeaders[HeaderNames.ContentLength]);	1,00
+[624]	Assert.Equal("200", _decodedHeaders[HeaderNames.Status]);	0,73
+*
 [3314]	new KeyValuePair<string, string>(HeaderNames.Path, "/"),
-[3500]	new KeyValuePair<string, string>(HeaderNames.Path, "/"),	1,00	[1,00, 0,99, False]
+[3500]	new KeyValuePair<string, string>(HeaderNames.Path, "/"),	1,00
+[3499]	new KeyValuePair<string, string>(HeaderNames.Method, "GET"),	0,87
+*
 [3321]	});
-[3507]	});	1,00	[1,00, 0,99, False]
+[3507]	});	1,00
+[3502]	};	0,68
+*
 [2438]	_clientSettings.InitialWindowSize = windowSize;
-[2624]	_clientSettings.InitialWindowSize = windowSize;	1,00	[1,00, 1,00, False]
+[2624]	_clientSettings.InitialWindowSize = windowSize;	1,00
+[2631]	await context.Response.Body.WriteAsync(new byte[windowSize + 1], 0, windowSize + 1);	0,45
+*
 [2477]	
-[2663]		0,99	[1,00, 0,99, True]
+[2663]		0,99
+[2662]	withStreamId: 1);	0,79
+*
 [140]	
-[141]		0,99	[1,00, 0,98, True]
+[141]		0,99
+[139]		0,89
+*
 [139]	_hpackDecoder.Decode(headersFrame.PayloadSequence, endHeaders: false, handler: this);
-[140]	_hpackDecoder.Decode(headersFrame.PayloadSequence, endHeaders: false, handler: this);	1,00	[1,00, 0,99, False]
+[140]	_hpackDecoder.Decode(headersFrame.PayloadSequence, endHeaders: false, handler: this);	1,00
+[135]	withFlags: (byte)(Http2HeadersFrameFlags.END_HEADERS | Http2HeadersFrameFlags.END_STREAM),	0,42
+*
 [1846]	{
-[1859]	{	0,99	[1,00, 0,99, True]
+[1859]	{	0,99
+[1857]	{	0,76
+*
 [1857]	
-[1870]		0,99	[1,00, 0,99, True]
+[1870]		0,99
+[1872]		0,91
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindingInfo.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindingInfo.cs
 *
 [103]	var bindingInfo = new BindingInfo();
-[109]	var bindingInfo = new BindingInfo();	0,99	[1,00, 0,95, False]
+[109]	var bindingInfo = new BindingInfo();	0,99
+[110]	var isBindingInfoPresent = false;	0,54
+*
 [110]	if (binderModelNameAttribute?.Name != null)
-[116]	if (binderModelNameAttribute?.Name != null)	0,99	[1,00, 0,93, False]
+[116]	if (binderModelNameAttribute?.Name != null)	0,99
+[127]	if (binderTypeAttribute.BinderType != null)	0,62
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpClientHttp2InteropTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpClientHttp2InteropTests.cs
 *
 [281]	reader.AdvanceTo(readResult.Buffer.Start, readResult.Buffer.End);
-[281]	reader.AdvanceTo(readResult.Buffer.Start, readResult.Buffer.End);	1,00	[1,00, 0,98, False]
+[281]	reader.AdvanceTo(readResult.Buffer.Start, readResult.Buffer.End);	1,00
+[285]	var sequence = readResult.Buffer.Slice(0, "Hello World".Length);	0,53
+*
 [268]	.ConfigureWebHost(webHostBuilder =>
-[268]	.ConfigureWebHost(webHostBuilder =>	0,99	[1,00, 0,93, False]
+[268]	.ConfigureWebHost(webHostBuilder =>	0,99
+[270]	ConfigureKestrel(webHostBuilder, scheme);	0,66
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BadHttpRequestTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BadHttpRequestTests.cs
 *
 [206]	await connection.SendAll(request);
-[208]	await connection.SendAll(request);	1,00	[1,00, 1,00, False]
+[208]	await connection.SendAll(request);	1,00
+[206]	using (var connection = server.CreateConnection())	0,48
+*
 [207]	await ReceiveBadRequestResponse(connection, expectedResponseStatusCode, server.Context.DateHeaderValue, expectedAllowHeader);
-[209]	await ReceiveBadRequestResponse(connection, expectedResponseStatusCode, server.Context.DateHeaderValue, expectedAllowHeader);	1,00	[1,00, 1,00, False]
+[209]	await ReceiveBadRequestResponse(connection, expectedResponseStatusCode, server.Context.DateHeaderValue, expectedAllowHeader);	1,00
+[204]	await using (var server = new TestServer(context => Task.CompletedTask, new TestServiceContext(LoggerFactory, mockKestrelTrace.Object)))	0,53
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HeaderPropagationMiddlewareTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HeaderPropagationMiddlewareTest.cs
 *
 [169]	Configuration.Headers.Add("in");
-[177]	Configuration.Headers.Add("in");	0,99	[1,00, 0,93, False]
+[177]	Configuration.Headers.Add("in");	0,99
+[179]	Configuration.Headers.Add("in", (context) => "Test");	0,60
+*
 [175]	
-[183]		0,95	[1,00, 0,94, True]
+[183]		0,95
+[184]	// Assert	0,71
+*
 [146]	
-[154]		0,95	[1,00, 0,94, True]
+[154]		0,95
+[155]	// Assert	0,71
+*
 [147]	// Assert
-[155]	// Assert	0,99	[1,00, 0,93, False]
+[155]	// Assert	0,99
+[152]	// Act	0,53
+*
 [50]	Configuration.Headers.Add("in");
-[58]	Configuration.Headers.Add("in");	0,99	[1,00, 0,96, False]
+[58]	Configuration.Headers.Add("in");	0,99
+[55]	public async Task NoHeaderInRequest_DoesNotAddIt()	0,25
+*
 [52]	// Act
-[60]	// Act	0,99	[1,00, 0,96, False]
+[60]	// Act	0,99
+[63]	// Assert	0,50
+*
 [41]	// Assert
-[49]	// Assert	0,99	[1,00, 0,94, False]
+[49]	// Assert	0,99
+[46]	// Act	0,54
+*
 [38]	// Act
-[46]	// Act	0,96	[1,00, 0,81, False]
+[46]	// Act	0,96
+[49]	// Assert	0,54
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IdentityBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IdentityBuilder.cs
 *
 [137]	return this;
-[137]	return this;	1,00	[1,00, 1,00, False]
+[137]	return this;	1,00
+[136]	Services.AddTransient(provider);	0,10
+*
 [132]	Services.Configure<IdentityOptions>(options =>
-[132]	Services.Configure<IdentityOptions>(options =>	1,00	[1,00, 1,00, False]
+[132]	Services.Configure<IdentityOptions>(options =>	1,00
+[136]	Services.AddTransient(provider);	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReaderTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReaderTest.cs
 *
 [172]	Assert.Equal(valueString.Substring(1, valueString.IndexOf('\r') - 1), data);
-[191]	Assert.Equal(valueString.Substring(1, valueString.IndexOf('\r') - 1), data);	0,98	[1,00, 0,88, False]
+[191]	Assert.Equal(valueString.Substring(1, valueString.IndexOf('\r') - 1), data);	0,98
+[183]	var valueString = new string(CharData);	0,37
+*
 [163]	var reader = CreateReader();
-[182]	var reader = CreateReader();	0,88	[1,00, 0,41, False]
+[182]	var reader = CreateReader();	0,88
+[187]	reader.Read(temp, 0, 1);	0,42
+*
 [224]	var mockStream = new Mock<Stream>();
-[373]	var mockStream = new Mock<Stream>();	1,00	[1,00, 1,00, False]
+[373]	var mockStream = new Mock<Stream>();	1,00
+[374]	mockStream.Setup(m => m.CanRead).Returns(false);	0,41
+*
 [229]	});
-[378]	});	1,00	[1,00, 1,00, False]
+[378]	});	1,00
+[379]	}	0,36
+*
 [236]	var httpRequestStreamReader = new HttpRequestStreamReader(new MemoryStream(), Encoding.UTF8, 10, ArrayPool<byte>.Shared, ArrayPool<char>.Shared);
-[385]	var httpRequestStreamReader = new HttpRequestStreamReader(new MemoryStream(), Encoding.UTF8, 10, ArrayPool<byte>.Shared, ArrayPool<char>.Shared);	1,00	[1,00, 1,00, False]
+[385]	var httpRequestStreamReader = new HttpRequestStreamReader(new MemoryStream(), Encoding.UTF8, 10, ArrayPool<byte>.Shared, ArrayPool<char>.Shared);	1,00
+[387]		0,15
+*
 [238]	
-[387]		1,00	[1,00, 1,00, False]
+[387]		1,00
+[386]	httpRequestStreamReader.Dispose();	0,19
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MultipartReaderStream.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MultipartReaderStream.cs
 *
 [242]	var length = _boundary.BoundaryBytes.Length;
-[242]	var length = _boundary.BoundaryBytes!.Length;	0,98	[0,98, 1,00, False]
+[242]	var length = _boundary.BoundaryBytes!.Length;	0,98
+[248]	var boundary = _bytePool.Rent(length);	0,51
+*
 [266]	read = _innerStream.Read(buffer, offset, Math.Min(count, bufferedData.Count));
-[266]	read = _innerStream.Read(buffer, offset, Math.Min(count, bufferedData.Count));	1,00	[1,00, 0,99, False]
+[266]	read = _innerStream.Read(buffer, offset, Math.Min(count, bufferedData.Count));	1,00
+[238]	read = _innerStream.Read(buffer, offset, Math.Min(count, matchOffset - bufferedData.Offset));	0,70
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AddResponseTypeAttributeCodeFixProviderIntegrationTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AddResponseTypeAttributeCodeFixProviderIntegrationTest.cs
 *
 [78]	return DiagnosticProject.Create(GetType().Assembly, new[] { testSource });
-[78]	return MvcDiagnosticAnalyzerRunner.CreateProjectWithReferencesInBinDir(GetType().Assembly, new[] { testSource });	0,80	[0,00, 1,00, True]
+[78]	return MvcDiagnosticAnalyzerRunner.CreateProjectWithReferencesInBinDir(GetType().Assembly, new[] { testSource });	0,80
+[77]	var testSource = Read(testMethod + ".Input");	0,21
+*
 [77]	var testSource = Read(testMethod + ".Input");
-[77]	var testSource = Read(testMethod + ".Input");	0,94	[1,00, 0,71, False]
+[77]	var testSource = Read(testMethod + ".Input");	0,94
+[78]	return MvcDiagnosticAnalyzerRunner.CreateProjectWithReferencesInBinDir(GetType().Assembly, new[] { testSource });	0,32
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCookiesTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCookiesTest.cs
 *
 [48]	Assert.Single(cookieHeaderValues);
-[48]	Assert.Single(cookieHeaderValues);	1,00	[1,00, 0,99, False]
+[48]	Assert.Single(cookieHeaderValues);	1,00
+[50]	Assert.Contains("path=/", cookieHeaderValues[0]);	0,66
+*
 [33]	var testCookie = "TestCookie";
-[33]	var testCookie = "TestCookie";	0,99	[1,00, 0,95, False]
+[33]	var testCookie = "TestCookie";	0,99
+[32]	var cookies = new ResponseCookies(headers);	0,48
+*
 [60]	var headers = new HeaderDictionary();
-[60]	var headers = new HeaderDictionary();	1,00	[1,00, 0,98, False]
+[60]	var headers = new HeaderDictionary();	1,00
+[61]	var cookies = new ResponseCookies(headers);	0,45
+*
 [71]	Assert.Contains("expires=Thu, 01 Jan 1970 00:00:00 GMT", cookieHeaderValues[0]);
-[71]	Assert.Contains("expires=Thu, 01 Jan 1970 00:00:00 GMT", cookieHeaderValues[0]);	1,00	[1,00, 0,99, False]
+[71]	Assert.Contains("expires=Thu, 01 Jan 1970 00:00:00 GMT", cookieHeaderValues[0]);	1,00
+[70]	Assert.Contains("path=/", cookieHeaderValues[0]);	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SpaProxy.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SpaProxy.cs
 *
 [130]	}
-[133]	}	0,95	[1,00, 0,93, True]
+[133]	}	0,95
+[141]	}	0,86
+*
 [142]	requestMessage.RequestUri = uri;
-[150]	requestMessage.RequestUri = uri;	0,99	[1,00, 0,94, False]
+[150]	requestMessage.RequestUri = uri;	0,99
+[149]	requestMessage.Headers.Host = uri.Authority;	0,67
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AnalyzerTestBase.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AnalyzerTestBase.cs
 *
 [55]	return AppContext.BaseDirectory;
-[55]	return AppContext.BaseDirectory;	1,00	[1,00, 0,98, False]
+[55]	return AppContext.BaseDirectory;	1,00
+[64]	return projectDirectory;	0,55
+*
 [52]	// On helix we use the published test files
-[52]	// On helix we use the published test files	0,99	[1,00, 0,96, False]
+[52]	// On helix we use the published test files	0,99
+[58]	// This test code needs to be updated to support distributed testing.	0,32
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LoginWith2fa.cshtml.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LoginWith2fa.cshtml.cs
 *
 [131]	if (result.Succeeded)
-[131]	if (result.Succeeded)	0,97	[1,00, 0,84, False]
+[131]	if (result.Succeeded)	0,97
+[136]	else if (result.IsLockedOut)	0,61
+*
 [140]	}
-[140]	}	0,87	[1,00, 0,84, True]
+[140]	}	0,87
+[135]	}	0,83
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RangeConditionHeaderValue.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RangeConditionHeaderValue.cs
 *
 [91]	var index = 0;
-[92]	var index = 0;	1,00	[1,00, 0,99, False]
+[92]	var index = 0;	1,00
+[91]	{	0,18
+*
 [92]	return Parser.ParseValue(input, ref index);
-[93]	return Parser.ParseValue(input, ref index)!;	0,98	[0,98, 1,00, False]
+[93]	return Parser.ParseValue(input, ref index)!;	0,98
+[92]	var index = 0;	0,09
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HtmlContentBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HtmlContentBuilder.cs
 *
 [203]	return writer.ToString();
-[200]	return writer.ToString();	0,93	[1,00, 0,65, False]
+[200]	return writer.ToString();	0,93
+[198]	using var writer = new StringWriter();	0,40
+*
 [201]	{
-[197]	{	0,64	[1,00, 0,55, True]
+[197]	{	0,64
+[198]	using var writer = new StringWriter();	0,59
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpConnectionDispatcher.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpConnectionDispatcher.cs
 *
 [235]	}
-[238]	}	0,93	[1,00, 0,91, True]
+[238]	}	0,93
+[233]	}	0,93
+*
 [150]	{
-[151]	{	0,97	[1,00, 0,97, True]
+[151]	{	0,97
+[155]	{	0,94
+*
 [469]	return;
-[480]	return;	0,95	[1,00, 0,94, True]
+[480]	return;	0,95
+[482]		0,74
+*
 [473]	if (connection.TransportType != HttpTransportType.LongPolling)
-[484]	if (connection.TransportType != HttpTransportType.LongPolling)	0,99	[1,00, 0,94, False]
+[484]	if (connection.TransportType != HttpTransportType.LongPolling)	0,99
+[483]	// This end point only works for long polling	0,45
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteValueDictionary.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteValueDictionary.cs
 *
 [486]	return false;
-[490]	return false;	0,98	[1,00, 0,91, False]
+[490]	return false;	0,98
+[496]	return true;	0,59
+*
 [481]	ThrowArgumentNullExceptionForKey();
-[485]	ThrowArgumentNullExceptionForKey();	0,98	[1,00, 0,91, False]
+[485]	ThrowArgumentNullExceptionForKey();	0,98
+[494]	_arrayStorage[Count] = new KeyValuePair<string, object?>(key, value);	0,24
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2TimeoutTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2TimeoutTests.cs
 *
 [676]	withFlags: (byte)Http2DataFrameFlags.NONE,
-[677]	withFlags: (byte)Http2DataFrameFlags.NONE,	0,99	[1,00, 0,99, True]
+[677]	withFlags: (byte)Http2DataFrameFlags.NONE,	0,99
+[672]	withFlags: (byte)Http2HeadersFrameFlags.END_HEADERS,	0,89
+*
 [698]	
-[699]		0,99	[1,00, 0,99, True]
+[699]		0,99
+[702]		0,95
+*
 [584]	_mockTimeoutHandler.Verify(h => h.OnTimeout(TimeoutReason.ReadDataRate), Times.Once);
-[585]	_mockTimeoutHandler.Verify(h => h.OnTimeout(TimeoutReason.ReadDataRate), Times.Once);	1,00	[1,00, 1,00, False]
+[585]	_mockTimeoutHandler.Verify(h => h.OnTimeout(TimeoutReason.ReadDataRate), Times.Once);	1,00
+[581]	_mockTimeoutHandler.Verify(h => h.OnTimeout(It.IsAny<TimeoutReason>()), Times.Never);	0,73
+*
 [556]	// Use non-default value to ensure the min request and response rates aren't mixed up.
-[557]	// Use non-default value to ensure the min request and response rates aren't mixed up.	1,00	[1,00, 1,00, False]
+[557]	// Use non-default value to ensure the min request and response rates aren't mixed up.	1,00
+[579]	AdvanceClock(limits.MinRequestBodyDataRate.GracePeriod);	0,33
+*
 [800]	_timeoutControl.Initialize(mockSystemClock.UtcNow.Ticks);
-[801]	_timeoutControl.Initialize(mockSystemClock.UtcNow.Ticks);	1,00	[1,00, 1,00, False]
+[801]	_timeoutControl.Initialize(mockSystemClock.UtcNow.Ticks);	1,00
+[803]	await InitializeConnectionAsync(context =>	0,41
+*
 [836]	withFlags: (byte)Http2DataFrameFlags.END_STREAM,
-[837]	withFlags: (byte)Http2DataFrameFlags.END_STREAM,	1,00	[1,00, 1,00, False]
+[837]	withFlags: (byte)Http2DataFrameFlags.END_STREAM,	1,00
+[821]	withFlags: (byte)Http2DataFrameFlags.NONE,	0,80
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MemoryPoolSlab.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MemoryPoolSlab.cs
 *
 [48]	return new MemoryPoolSlab(array);
-[34]	return new MemoryPoolSlab(pinnedArray);	0,85	[0,84, 0,88, False]
+[34]	return new MemoryPoolSlab(pinnedArray);	0,85
+[28]	public static MemoryPoolSlab Create(int length)	0,28
+*
 [45]	var array = new byte[length];
-[31]	var pinnedArray = GC.AllocateUninitializedArray<byte>(length, pinned: true);	0,71	[0,31, 0,81, True]
+[31]	var pinnedArray = GC.AllocateUninitializedArray<byte>(length, pinned: true);	0,71
+[32]		0,58
+*
 [76]	Dispose(true);
-[39]	PinnedArray = null;	0,40	[0,00, 0,50, True]
+[39]	PinnedArray = null;	0,40
+[38]	{	0,38
+*
 [77]	GC.SuppressFinalize(this);
-[39]	PinnedArray = null;	0,64	[0,00, 0,79, True]
+[39]	PinnedArray = null;	0,64
+[40]	}	0,25
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManagerTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManagerTests.cs
 *
 [273]	if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-[251]	if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))	0,90	[1,00, 0,50, False]
+[251]	if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))	0,90
+[248]	internal void CleanupCertificates()	0,24
+*
 [272]	Manager.RemoveAllCertificates(CertificatePurpose.HTTPS, StoreName.My, StoreLocation.CurrentUser, TestCertificateSubject);
-[250]	Manager.RemoveAllCertificates(StoreName.My, StoreLocation.CurrentUser);	0,66	[0,44, 0,72, True]
+[250]	Manager.RemoveAllCertificates(StoreName.My, StoreLocation.CurrentUser);	0,66
+[249]	{	0,65
+*
 [123]	}
-[123]	}	0,95	[1,00, 0,94, True]
+[123]	}	0,95
+[124]	}	0,57
+*
 [115]	var certificates = store.Certificates;
-[115]	var certificates = store.Certificates;	0,97	[1,00, 0,87, False]
+[115]	var certificates = store.Certificates;	0,97
+[116]	foreach (var certificate in certificates)	0,55
+*
 [212]	now = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, 0, now.Offset);
-[217]	now = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, 0, now.Offset);	0,92	[1,00, 0,59, False]
+[217]	now = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second, 0, now.Offset);	0,92
+[222]		0,13
+*
 [218]	Assert.NotEmpty(httpsCertificateList);
-[225]	Assert.NotEmpty(httpsCertificateList);	0,98	[1,00, 0,89, False]
+[225]	Assert.NotEmpty(httpsCertificateList);	0,98
+[223]	_manager.AspNetHttpsCertificateVersion = 1;	0,43
+*
 [200]	
-[205]		0,89	[1,00, 0,86, True]
+[205]		0,89
+[204]	ListCertificates();	0,67
+*
 [198]	CertificateManager.AspNetHttpsCertificateVersion = 0;
-[201]	_manager.AspNetHttpsCertificateVersion = 0;	0,75	[0,78, 0,62, False]
+[201]	_manager.AspNetHttpsCertificateVersion = 0;	0,75
+[207]	Assert.NotEmpty(httpsCertificateList);	0,42
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HubConnection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HubConnection.cs
 *
 [241]	{
-[240]	{	0,90	[1,00, 0,87, True]
+[240]	{	0,90
+[242]	{	0,73
+*
 [257]	}
-[256]	}	0,99	[1,00, 0,99, True]
+[256]	}	0,99
+[259]	}	0,88
+*
 [1394]	
-[1409]		0,98	[1,00, 0,98, True]
+[1409]		0,98
+[1418]		0,97
+*
 [1380]	RunReconnectedEvent();
-[1395]	RunReconnectedEvent();	1,00	[1,00, 0,98, False]
+[1395]	RunReconnectedEvent();	1,00
+[1354]	RunReconnectingEvent(closeException);	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ErrorNotificationTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ErrorNotificationTest.cs
 *
 [55]	var causeErrorButton = Browser.Exists(By.TagName("button"));
-[57]	var causeErrorButton = Browser.Exists(By.Id("throw-simple-exception"));	0,66	[0,71, 0,50, False]
+[57]	var causeErrorButton = Browser.Exists(By.Id("throw-simple-exception"));	0,66
+[61]	causeErrorButton.Click();	0,36
+*
 [58]	
-[60]		0,89	[1,00, 0,87, True]
+[60]		0,89
+[63]		0,81
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FormFeature.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FormFeature.cs
 *
 [279]	}
-[284]	}	0,86	[1,00, 0,82, True]
+[284]	}	0,86
+[283]	return Encoding.UTF8;	0,60
+*
 [278]	return Encoding.UTF8;
-[283]	return Encoding.UTF8;	0,94	[1,00, 0,71, False]
+[283]	return Encoding.UTF8;	0,94
+[285]	return encoding;	0,64
+*
 [259]	Form = formFields;
-[262]	Form = formFields;	1,00	[1,00, 1,00, False]
+[262]	Form = formFields;	1,00
+[198]	FormFile file;	0,52
+*
 [251]	// Rewind so later readers don't have to.
-[254]	// Rewind so later readers don't have to.	1,00	[1,00, 1,00, False]
+[254]	// Rewind so later readers don't have to.	1,00
+[244]	section = await multipartReader.ReadNextSectionAsync(cancellationToken);	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
 *
 [217]	{
-[242]	{	0,91	[1,00, 0,89, True]
+[242]	{	0,91
+[232]	{	0,90
+*
 [281]	errorCode = Http2ErrorCode.COMPRESSION_ERROR;
-[299]	errorCode = Http2ErrorCode.COMPRESSION_ERROR;	0,97	[1,00, 0,85, False]
+[299]	errorCode = Http2ErrorCode.COMPRESSION_ERROR;	0,97
+[305]	errorCode = Http2ErrorCode.INTERNAL_ERROR;	0,78
+*
 [1222]	headerField = PseudoHeaderFields.None;
-[1341]	headerField = PseudoHeaderFields.None;	0,98	[1,00, 0,90, False]
+[1341]	headerField = PseudoHeaderFields.None;	0,98
+[1350]	headerField = PseudoHeaderFields.Path;	0,78
+*
 [1253]	
-[1372]		0,95	[1,00, 0,94, True]
+[1372]		0,95
+[1371]	}	0,76
+*
 [1345]	Debug.Assert(ReferenceEquals(_callback, _callbackCompleted));
-[1474]	Debug.Assert(ReferenceEquals(_callback, _callbackCompleted));	1,00	[1,00, 1,00, False]
+[1474]	Debug.Assert(ReferenceEquals(_callback, _callbackCompleted));	1,00
+[1475]		0,13
+*
 [1346]	
-[1475]		1,00	[1,00, 1,00, False]
+[1475]		1,00
+[1474]	Debug.Assert(ReferenceEquals(_callback, _callbackCompleted));	0,13
+*
 [927]	}
-[1008]	}	0,79	[1,00, 0,74, True]
+[1008]	}	0,79
+[1014]	}	0,75
+*
 [918]	// All HTTP/2 requests MUST include exactly one valid value for the :method, :scheme, and :path pseudo-header
-[997]	// All HTTP/2 requests MUST include exactly one valid value for the :method, :scheme, and :path pseudo-header	0,91	[1,00, 0,54, False]
+[997]	// All HTTP/2 requests MUST include exactly one valid value for the :method, :scheme, and :path pseudo-header	0,91
+[1024]	throw new Http2StreamErrorException(_currentHeadersStream.StreamId, CoreStrings.Http2TellClientToCalmDown, Http2ErrorCode.ENHANCE_YOUR_CALM);	0,35
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ActualApiResponseMetadataFactory.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ActualApiResponseMetadataFactory.cs
 *
 [145]	var symbolInfo = semanticModel.GetSymbolInfo(identifier, cancellationToken);
-[149]	var symbolInfo = semanticModel.GetSymbolInfo(identifier, cancellationToken);	0,99	[1,00, 0,97, False]
+[149]	var symbolInfo = semanticModel.GetSymbolInfo(identifier, cancellationToken);	0,99
+[134]	CancellationToken cancellationToken)	0,45
+*
 [135]	for (var i = 0; initializer != null && i < initializer.Expressions.Count; i++)
-[139]	for (var i = 0; initializer != null && i < initializer.Expressions.Count; i++)	1,00	[1,00, 0,99, False]
+[139]	for (var i = 0; initializer != null && i < initializer.Expressions.Count; i++)	1,00
+[141]	var expression = initializer.Expressions[i];	0,53
+*
 [204]	return typeInfo.Type;
-[214]	return typeInfo.Type!;	0,94	[0,95, 0,88, False]
+[214]	return typeInfo.Type!;	0,94
+[209]	if (typeInfo.Type == null)	0,45
+*
 [203]	var typeInfo = semanticModel.GetTypeInfo(expression, cancellationToken);
-[207]	var typeInfo = semanticModel.GetTypeInfo(expression, cancellationToken);	0,90	[1,00, 0,50, False]
+[207]	var typeInfo = semanticModel.GetTypeInfo(expression, cancellationToken);	0,90
+[205]	private static ITypeSymbol GetExpressionObjectType(SemanticModel semanticModel, ExpressionSyntax expression, CancellationToken cancellationToken)	0,53
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HandshakeProtocol.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HandshakeProtocol.cs
 *
 [44]	{
-[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00	[0,00, 0,00, True]
+[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00
+*
 [47]	}
-[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00	[0,00, 0,00, True]
+[45]	public static ReadOnlySpan<byte> GetSuccessfulHandshake(IHubProtocol protocol) => _successHandshakeData.Span;	0,00
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ItemsDictionary.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ItemsDictionary.cs
 *
 [122]	return false;
-[123]	return false;	0,93	[1,00, 0,91, True]
+[123]	return false;	0,93
+[121]	return _items.Remove(item.Key);	0,38
+*
 [114]	{
-[115]	{	0,92	[1,00, 0,90, True]
+[115]	{	0,92
+[113]	{	0,78
+*
 [100]	//Delegate to Empty Dictionary to do the argument checking.
-[101]	//Delegate to Empty Dictionary to do the argument checking.	0,97	[1,00, 0,86, False]
+[101]	//Delegate to Empty Dictionary to do the argument checking.	0,97
+[100]	{	0,15
+*
 [104]	_items?.CopyTo(array, arrayIndex);
-[105]	_items?.CopyTo(array, arrayIndex);	0,99	[1,00, 0,95, False]
+[105]	_items?.CopyTo(array, arrayIndex);	0,99
+[102]	EmptyDictionary.Collection.CopyTo(array, arrayIndex);	0,50
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\PipeWriterStream.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\PipeWriterStream.cs
 *
 [96]	}
-[101]	}	0,97	[1,00, 0,97, True]
+[101]	}	0,97
+[100]	}	0,77
+*
 [79]	var task = _pipeWriter.WriteAsync(source);
-[76]	var task = _pipeWriter.WriteAsync(source);	0,99	[1,00, 0,94, False]
+[76]	var task = _pipeWriter.WriteAsync(source);	0,99
+[87]	return WriteSlowAsync(task);	0,44
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ComponentRenderingTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ComponentRenderingTest.cs
 *
 [47]	Assert.Equal("Hello from TextOnlyComponent", appElement.Text);
-[49]	Assert.Equal("Hello from TextOnlyComponent", appElement.Text);	0,96	[1,00, 0,78, False]
+[49]	Assert.Equal("Hello from TextOnlyComponent", appElement.Text);	0,96
+[48]	var appElement = Browser.MountTestComponent<TextOnlyComponent>();	0,28
+*
 [46]	var appElement = Browser.MountTestComponent<TextOnlyComponent>();
-[48]	var appElement = Browser.MountTestComponent<TextOnlyComponent>();	0,93	[1,00, 0,64, False]
+[48]	var appElement = Browser.MountTestComponent<TextOnlyComponent>();	0,93
+[46]	public void CanRenderTextOnlyComponent()	0,38
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\WebSocketsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\WebSocketsTests.cs
 *
 [369]	};
-[405]	};	0,96	[1,00, 0,95, True]
+[405]	};	0,96
+[393]	};	0,90
+*
 [387]	
-[423]		0,98	[1,00, 0,98, True]
+[423]		0,98
+[420]		0,88
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LoggingConnectionMiddlewareTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LoggingConnectionMiddlewareTests.cs
 *
 [34]	var response = await server.HttpClientSlim.GetStringAsync($"https://localhost:{server.Port}/", validateCertificate: false)
-[33]	var response = await server.HttpClientSlim.GetStringAsync($"https://localhost:{server.Port}/", validateCertificate: false)	0,98	[1,00, 0,92, False]
+[33]	var response = await server.HttpClientSlim.GetStringAsync($"https://localhost:{server.Port}/", validateCertificate: false)	0,98
+[17]	public async Task LoggingConnectionMiddlewareCanBeAddedBeforeAndAfterHttps()	0,30
+*
 [20]	await using (var server = new TestServer(context =>
-[19]	await using (var server = new TestServer(context =>	0,93	[1,00, 0,63, False]
+[19]	await using (var server = new TestServer(context =>	0,93
+[28]	listenOptions.UseHttps(TestResources.GetTestCertificate());	0,31
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ChunkedRequestTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ChunkedRequestTests.cs
 *
 [861]	{
-[866]	{	0,92	[1,00, 0,91, True]
+[866]	{	0,92
+[870]	{	0,89
+*
 [874]	
-[879]		0,90	[1,00, 0,87, True]
+[879]		0,90
+[881]		0,87
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.FeatureCollection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.FeatureCollection.cs
 *
 [283]	
-[283]		0,96	[1,00, 0,95, True]
+[283]		0,96
+[288]		0,85
+*
 [288]	
-[288]		0,95	[1,00, 0,94, True]
+[288]		0,95
+[283]		0,84
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KnownHeaders.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KnownHeaders.cs
 *
 [963]	if (flag != 0)
-[1013]	if (flag != 0)	0,99	[1,00, 0,96, False]
+[1013]	if (flag != 0)	0,99
+[1039]	if ((_bits & flag) == 0)	0,60
+*
 [850]	if ({header.TestTempBit()})
-[899]	if ({header.TestTempBit()})	0,99	[1,00, 0,98, True]
+[899]	if ({header.TestTempBit()})	0,99
+[883]	if ({header.TestTempBit()})	0,97
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AsyncAcceptContext.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AsyncAcceptContext.cs
 *
 [116]	// ERROR_INVALID_HANDLE, ERROR_INSUFFICIENT_BUFFER, ERROR_OPERATION_ABORTED
-[88]	// ERROR_INVALID_HANDLE, ERROR_INSUFFICIENT_BUFFER, ERROR_OPERATION_ABORTED	0,94	[1,00, 0,72, False]
+[88]	// ERROR_INVALID_HANDLE, ERROR_INSUFFICIENT_BUFFER, ERROR_OPERATION_ABORTED	0,94
+[87]	// someother bad error, possible(?) return values are:	0,36
+*
 [81]	complete = true;
-[53]	complete = true;	0,87	[1,00, 0,84, True]
+[53]	complete = true;	0,87
+[38]	complete = true;	0,72
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultPageLoader.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultPageLoader.cs
 *
 [99]	ApplyConventions(_conventions, context.PageApplicationModel);
-[102]	ApplyConventions(_conventions, context.PageApplicationModel);	0,98	[1,00, 0,90, False]
+[102]	ApplyConventions(_conventions, context.PageApplicationModel);	0,98
+[104]	var compiled = CompiledPageActionDescriptorBuilder.Build(context.PageApplicationModel, _globalFilters);	0,52
+*
 [119]	
-[133]		0,98	[1,00, 0,97, True]
+[133]		0,98
+[132]	compiled.Endpoint = endpoints.SingleOrDefault();	0,78
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FieldIdentifier.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FieldIdentifier.cs
 *
 [79]	string.Equals(otherIdentifier.FieldName, FieldName, StringComparison.Ordinal);
-[89]	string.Equals(otherIdentifier.FieldName, FieldName, StringComparison.Ordinal);	0,96	[1,00, 0,78, False]
+[89]	string.Equals(otherIdentifier.FieldName, FieldName, StringComparison.Ordinal);	0,96
+[88]	ReferenceEquals(otherIdentifier.Model, Model) &&	0,39
+*
 [78]	otherIdentifier.Model == Model &&
-[88]	ReferenceEquals(otherIdentifier.Model, Model) &&	0,92	[0,59, 1,00, True]
+[88]	ReferenceEquals(otherIdentifier.Model, Model) &&	0,92
+[87]	return	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestStreamReader.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestStreamReader.cs
 *
 [150]	}
-[151]	}	0,60	[1,00, 0,50, True]
+[151]	}	0,60
+[146]	}	0,59
+*
 [193]	// Send the data back to the caller so they can process it.
-[157]		0,21	[0,00, 0,27, True]
+[157]		0,21
+[160]	}	0,15
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EntityTagHeaderValue.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EntityTagHeaderValue.cs
 *
 [160]	return SingleValueParser.TryParseValue(input, ref index, out parsedValue);
-[161]	return SingleValueParser.TryParseValue(input, ref index, out parsedValue!);	0,93	[0,99, 0,69, False]
+[161]	return SingleValueParser.TryParseValue(input, ref index, out parsedValue!);	0,93
+[158]	public static bool TryParse(StringSegment input, [NotNullWhen(true)] out EntityTagHeaderValue parsedValue)	0,26
+*
 [159]	var index = 0;
-[160]	var index = 0;	0,98	[1,00, 0,90, False]
+[160]	var index = 0;	0,98
+[159]	{	0,16
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ComponentProperties.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ComponentProperties.cs
 *
 [198]	string.Join(Environment.NewLine, unmatched.Keys.OrderBy(k => k)));
-[216]	string.Join(Environment.NewLine, unmatched.Keys.OrderBy(k => k)));	0,98	[1,00, 0,91, False]
+[216]	string.Join(Environment.NewLine, unmatched.Keys.OrderBy(k => k)));	0,98
+[217]	}	0,08
+*
 [195]	throw new InvalidOperationException(
-[213]	throw new InvalidOperationException(	0,98	[1,00, 0,90, False]
+[213]	throw new InvalidOperationException(	0,98
+[212]	{	0,17
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultAntiforgeryTokenStore.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultAntiforgeryTokenStore.cs
 *
 [54]	
-[54]		1,00	[1,00, 1,00, True]
+[54]		1,00
+[53]	}	0,79
+*
 [64]	return new AntiforgeryTokenSet(requestToken, cookieToken, _options.FormFieldName, _options.HeaderName);
-[64]	return new AntiforgeryTokenSet(requestToken, cookieToken, _options.FormFieldName, _options.HeaderName);	1,00	[1,00, 0,99, False]
+[64]	return new AntiforgeryTokenSet(requestToken, cookieToken, _options.FormFieldName, _options.HeaderName);	1,00
+[52]	requestToken = httpContext.Request.Headers[_options.HeaderName];	0,40
+*
 [85]	}
-[85]	}	0,99	[1,00, 0,99, True]
+[85]	}	0,99
+[84]	}	0,96
+*
 [86]	
-[86]		0,99	[1,00, 0,99, True]
+[86]		0,99
+[85]	}	0,79
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelConfigurationLoader.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelConfigurationLoader.cs
 *
 [271]	
-[239]		0,60	[1,00, 0,50, True]
+[239]		0,60
+[237]		0,53
+*
 [257]	
-[237]		0,20	[1,00, 0,00, True]
+[237]		0,20
+[239]		0,20
+*
 [286]	}
-[351]	}	0,92	[1,00, 0,90, True]
+[351]	}	0,92
+[352]	}	0,92
+*
 [297]	}
-[363]	}	0,91	[1,00, 0,88, True]
+[363]	}	0,91
+[362]	}	0,71
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpConnectionDispatcherTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpConnectionDispatcherTests.cs
 *
 [1966]	Assert.Equal($"{transportType} transport not supported by this end point type", Encoding.UTF8.GetString(strm.ToArray()));
-[2618]	Assert.Equal($"{transportType} transport not supported by this end point type", Encoding.UTF8.GetString(strm.ToArray()));	1,00	[1,00, 0,98, False]
+[2618]	Assert.Equal($"{transportType} transport not supported by this end point type", Encoding.UTF8.GetString(strm.ToArray()));	1,00
+[2580]	private static async Task CheckTransportSupported(HttpTransportType supportedTransports, HttpTransportType transportType, int status, ILoggerFactory loggerFactory)	0,23
+*
 [1967]	}
-[2619]	}	0,98	[1,00, 0,97, True]
+[2619]	}	0,98
+[2620]	}	0,78
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCachingTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCachingTests.cs
 *
 [106]	}))
-[128]	}))	0,96	[1,00, 0,78, False]
+[128]	}))	0,96
+[134]	}	0,35
+*
 [99]	using (Utilities.CreateHttpServer(out address, httpContext =>
-[121]	using (Utilities.CreateHttpServer(out address, httpContext =>	0,97	[1,00, 0,83, False]
+[121]	using (Utilities.CreateHttpServer(out address, httpContext =>	0,97
+[114]	if (Utilities.IsWin8orLater)	0,36
+*
 [79]	httpContext.Response.ContentLength = 10;
-[79]	httpContext.Response.ContentLength = 10;	0,94	[1,00, 0,71, False]
+[79]	httpContext.Response.ContentLength = 10;	0,94
+[80]	return httpContext.Response.Body.WriteAsync(new byte[10], 0, 10);	0,54
+*
 [82]	{
-[82]	{	0,79	[1,00, 0,74, True]
+[82]	{	0,79
+[83]	address += Guid.NewGuid().ToString(); // Avoid cache collisions for failed tests.	0,76
+*
 [369]	httpContext.Response.Headers["x-request-count"] = (requestCount++).ToString();
-[396]	httpContext.Response.Headers["x-request-count"] = (requestCount++).ToString();	0,98	[1,00, 0,89, False]
+[396]	httpContext.Response.Headers["x-request-count"] = (requestCount++).ToString();	0,98
+[397]	httpContext.Response.Headers["Cache-Control"] = "public, max-age=10";	0,58
+*
 [368]	httpContext.Response.ContentType = "some/thing"; // Http.Sys requires content-type for caching
-[395]	httpContext.Response.ContentType = "some/thing"; // Http.Sys requires content-type for caching	0,99	[1,00, 0,94, False]
+[395]	httpContext.Response.ContentType = "some/thing"; // Http.Sys requires content-type for caching	0,99
+[398]	httpContext.Response.ContentLength = _fileLength;	0,48
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FallbackStaticFileTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FallbackStaticFileTest.cs
 *
 [52]	
-[53]		0,97	[1,00, 0,97, True]
+[53]		0,97
+[46]		0,88
+*
 [53]	using (var server = builder.Start(TestUrlHelper.GetTestUrl(ServerType.Kestrel)))
-[54]	using (var server = builder.Start(TestUrlHelper.GetTestUrl(ServerType.Kestrel)))	1,00	[1,00, 0,98, False]
+[54]	using (var server = builder.Start(TestUrlHelper.GetTestUrl(ServerType.Kestrel)))	1,00
+[57]	using (var client = new HttpClient { BaseAddress = new Uri(Helpers.GetAddress(server)) })	0,43
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ObjectModelValidator.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ObjectModelValidator.cs
 *
 [86]	validationState);
-[76]	ValidationStateDictionary validationState,	0,43	[0,37, 0,44, True]
+[76]	ValidationStateDictionary validationState,	0,43
+[79]	ModelMetadata metadata)	0,39
+*
 [88]	visitor.Validate(metadata, prefix, model, alwaysValidateAtTopLevel: metadata.IsRequired);
-[80]	=> Validate(actionContext, validationState, prefix, model, metadata, container: null);	0,33	[0,29, 0,35, True]
+[80]	=> Validate(actionContext, validationState, prefix, model, metadata, container: null);	0,33
+[79]	ModelMetadata metadata)	0,24
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2MessageBody.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2MessageBody.cs
 *
 [67]	_context.RequestBodyPipe.Reader.AdvanceTo(consumed, examined);
-[58]	_context.RequestBodyPipe.Reader.AdvanceTo(consumed, examined);	0,80	[1,00, 0,00, False]
+[58]	_context.RequestBodyPipe.Reader.AdvanceTo(consumed, examined);	0,80
+[55]	var newlyExaminedBytes = TrackConsumedAndExaminedBytes(_readResult, consumed, examined);	0,39
+*
 [66]	OnAdvance(_readResult, consumed, examined);
-[55]	var newlyExaminedBytes = TrackConsumedAndExaminedBytes(_readResult, consumed, examined);	0,49	[0,47, 0,50, True]
+[55]	var newlyExaminedBytes = TrackConsumedAndExaminedBytes(_readResult, consumed, examined);	0,49
+[54]	{	0,39
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StartupTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StartupTests.cs
 *
 [400]	Assert.Contains("The framework 'Microsoft.NETCore.App', version '2.9.9'", responseContent);
-[406]	Assert.Contains("The framework 'Microsoft.NETCore.App', version '2.9.9'", responseContent);	0,99	[1,00, 0,97, False]
+[406]	Assert.Contains("The framework 'Microsoft.NETCore.App', version '2.9.9'", responseContent);	0,99
+[405]	Assert.Contains("500.31", responseContent);	0,44
+*
 [389]	deploymentParameters.WebConfigBasedEnvironmentVariables["ASPNETCORE_DETAILEDERRORS"] = "TRUE";
-[395]	deploymentParameters.WebConfigBasedEnvironmentVariables["ASPNETCORE_DETAILEDERRORS"] = "TRUE";	0,99	[1,00, 0,97, False]
+[395]	deploymentParameters.WebConfigBasedEnvironmentVariables["ASPNETCORE_DETAILEDERRORS"] = "TRUE";	0,99
+[394]	var deploymentParameters = Fixture.GetBaseDeploymentParameters(Fixture.InProcessTestSite);	0,48
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RoutePatternParserTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RoutePatternParserTest.cs
 *
 [256]	// Act
-[256]	// Act	0,99	[1,00, 0,96, False]
+[256]	// Act	0,99
+[259]	// Assert	0,56
+*
 [249]	Segment(
-[249]	Segment(	1,00	[1,00, 0,98, False]
+[249]	Segment(	1,00
+[250]	ParameterPart("p1"),	0,18
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateAuthenticationHandler.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateAuthenticationHandler.cs
 *
 [148]	// Turn off chain validation, because we have a self signed certificate.
-[183]	// Turn off chain validation, because we have a self signed certificate.	0,98	[1,00, 0,90, False]
+[183]	// Turn off chain validation, because we have a self signed certificate.	0,98
+[196]	chainPolicy.ApplicationPolicy.Add(ClientCertificateOid);	0,40
+*
 [157]	};
-[192]	};	0,97	[1,00, 0,87, False]
+[192]	};	0,97
+[186]	}	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AutobahnTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AutobahnTests.cs
 *
 [53]	.IncludeCase("*")
-[53]	.IncludeCase("*")	1,00	[1,00, 0,99, False]
+[53]	.IncludeCase("*")	1,00
+[54]	.ExcludeCase("9.*", "12.*", "13.*");	0,55
+*
 [57]	cts.CancelAfter(TestTimeout); // These tests generally complete in just over 1 minute.
-[57]	cts.CancelAfter(TestTimeout); // These tests generally complete in just over 1 minute.	1,00	[1,00, 0,99, False]
+[57]	cts.CancelAfter(TestTimeout); // These tests generally complete in just over 1 minute.	1,00
+[62]	using (var tester = new AutobahnTester(loggerFactory, spec))	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AddressBinderTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AddressBinderTests.cs
 *
 [160]	var logger = new MockLogger();
-[181]	var logger = new MockLogger();	0,99	[1,00, 0,93, False]
+[181]	var logger = new MockLogger();	0,99
+[206]	Logger = logger,	0,46
+*
 [176]	}
-[197]	}	0,89	[1,00, 0,86, True]
+[197]	}	0,89
+[198]	});	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationVisitor.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationVisitor.cs
 *
 [149]	}
-[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,12	[0,00, 0,15, True]
+[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,12
+[135]	public virtual bool Validate(ModelMetadata metadata, string key, object model, bool alwaysValidateAtTopLevel)	0,11
+*
 [141]	// Rationale: We might see the same model state key for two different objects and want to preserve any
-[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,23	[0,26, 0,22, True]
+[136]	=> Validate(metadata, key, model, alwaysValidateAtTopLevel, container: null);	0,23
+[135]	public virtual bool Validate(ModelMetadata metadata, string key, object model, bool alwaysValidateAtTopLevel)	0,05
+*
 [422]	return recursifier;
-[452]	return recursifier;	1,00	[1,00, 0,99, False]
+[452]	return recursifier;	1,00
+[450]	visitor.Strategy = strategy;	0,30
+*
 [415]	
-[445]		0,95	[1,00, 0,94, True]
+[445]		0,95
+[444]	var recursifier = new StateManager(visitor, null);	0,65
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EditContext.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EditContext.cs
 *
 [205]	}
-[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,60	[0,00, 0,75, True]
+[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,60
+[203]	}	0,47
+*
 [204]	_fieldStates.Add(fieldIdentifier, state);
-[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,68	[0,70, 0,67, True]
+[201]	_fieldStates.TryGetValue(fieldIdentifier, out var state);	0,68
+[202]	return state;	0,26
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ComponentBase.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ComponentBase.cs
 *
 [288]	await task;
-[288]	await task;	1,00	[1,00, 0,99, False]
+[288]	await task;	1,00
+[286]	try	0,18
+*
 [296]	}
-[296]	}	0,99	[1,00, 0,99, True]
+[296]	}	0,99
+[299]	}	0,87
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NegotiateProtocol.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NegotiateProtocol.cs
 *
 [275]	reader.CheckRead();
-[273]	reader.CheckRead();	0,98	[1,00, 0,91, False]
+[273]	reader.CheckRead();	0,98
+[262]	while (reader.CheckRead())	0,66
+*
 [302]	if (availableTransport.Transport == null)
-[300]	if (availableTransport.Transport == null)	0,99	[1,00, 0,96, False]
+[300]	if (availableTransport.Transport == null)	0,99
+[305]	if (availableTransport.TransferFormats == null)	0,85
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StackTraceHelperTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StackTraceHelperTest.cs
 *
 [142]	var exception = Record.Exception(() => new GenericClass<int>().Throw(0));
-[142]	var exception = Record.Exception(() => new GenericClass<int>().Throw(0));	1,00	[1,00, 0,98, False]
+[142]	var exception = Record.Exception(() => new GenericClass<int>().Throw(0));	1,00
+[148]	var methods = stackFrames.Select(frame => frame.MethodDisplayInfo.ToString()).ToArray();	0,35
+*
 [145]	var stackFrames = StackTraceHelper.GetFrames(exception);
-[145]	var stackFrames = StackTraceHelper.GetFrames(exception, out _);	0,93	[0,91, 1,00, False]
+[145]	var stackFrames = StackTraceHelper.GetFrames(exception, out _);	0,93
+[148]	var methods = stackFrames.Select(frame => frame.MethodDisplayInfo.ToString()).ToArray();	0,42
+*
 [170]	Method("test");
-[170]	Method("test");	1,00	[1,00, 0,98, False]
+[170]	Method("test");	1,00
+[167]	Exception exception = null;	0,38
+*
 [173]	{
-[173]	{	0,89	[1,00, 0,86, True]
+[173]	{	0,89
+[169]	{	0,82
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ActionEndpointFactory.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ActionEndpointFactory.cs
 *
 [48]	
-[48]		0,98	[1,00, 0,97, True]
+[48]		0,98
+[53]		0,89
+*
 [148]	action.AttributeRouteInfo.SuppressLinkGeneration,
-[155]	action.AttributeRouteInfo.SuppressLinkGeneration,	0,99	[1,00, 0,93, False]
+[155]	action.AttributeRouteInfo.SuppressLinkGeneration,	0,99
+[156]	action.AttributeRouteInfo.SuppressPathMatching,	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MediaTypeHeaderValueTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MediaTypeHeaderValueTest.cs
 *
 [375]	mediaType5.Parameters.Add(new NameValueHeaderValue("CHARSET", "UTF-8"));
-[375]	mediaType5.Parameters.Add(new NameValueHeaderValue("CHARSET", "UTF-8"));	1,00	[1,00, 0,99, False]
+[375]	mediaType5.Parameters.Add(new NameValueHeaderValue("CHARSET", "UTF-8"));	1,00
+[377]	mediaType6.Parameters.Add(new NameValueHeaderValue("CHARSET", "UTF-8"));	0,97
+*
 [379]	var mediaType7 = new MediaTypeHeaderValue("text/other");
-[379]	var mediaType7 = new MediaTypeHeaderValue("text/other");	1,00	[1,00, 0,99, False]
+[379]	var mediaType7 = new MediaTypeHeaderValue("text/other");	1,00
+[376]	var mediaType6 = new MediaTypeHeaderValue("TEXT/plain");	0,89
+*
 [842]	Assert.Null(result);
-[835]	Assert.Null(result);	0,97	[1,00, 0,85, False]
+[835]	Assert.Null(result);	0,97
+[834]	Assert.False(MediaTypeHeaderValue.TryParse(input, out var result));	0,25
+*
 [840]	MediaTypeHeaderValue result = null;
-[833]	{	0,77	[0,00, 0,96, True]
+[833]	{	0,77
+[834]	Assert.False(MediaTypeHeaderValue.TryParse(input, out var result));	0,58
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UrlRewriteFileParser.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UrlRewriteFileParser.cs
 *
 [251]	throw new NotSupportedException($"The action type {actionType} wasn't recognized");
-[251]	throw new NotSupportedException($"The action type {actionType} wasn't recognized");	1,00	[1,00, 0,99, False]
+[251]	throw new NotSupportedException($"The action type {actionType} wasn't recognized");	1,00
+[242]	throw new NotSupportedException("Substatus codes are not supported");	0,53
+*
 [206]	if (string.IsNullOrEmpty(url))
-[206]	if (string.IsNullOrEmpty(url))	1,00	[1,00, 0,99, False]
+[206]	if (string.IsNullOrEmpty(url))	1,00
+[203]	if (urlAction.Attribute(RewriteTags.Url) != null)	0,42
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DownloadPersonalData.cshtml.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DownloadPersonalData.cshtml.cs
 *
 [68]	foreach (var p in personalDataProps)
-[68]	foreach (var p in personalDataProps)	0,99	[1,00, 0,93, False]
+[68]	foreach (var p in personalDataProps)	0,99
+[74]	foreach (var l in logins)	0,57
+*
 [66]	var personalDataProps = typeof(TUser).GetProperties().Where(
-[66]	var personalDataProps = typeof(TUser).GetProperties().Where(	0,99	[1,00, 0,93, False]
+[66]	var personalDataProps = typeof(TUser).GetProperties().Where(	0,99
+[65]	var personalData = new Dictionary<string, string>();	0,47
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationPropertiesTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationPropertiesTests.cs
 *
 [92]	Assert.Equal("foo bar", props.Parameters["foo"]);
-[119]	Assert.Equal("foo bar", props.Parameters["foo"]);	1,00	[1,00, 0,98, False]
+[119]	Assert.Equal("foo bar", props.Parameters["foo"]);	1,00
+[118]	Assert.Equal("foo bar", props.GetParameter<string>("foo"));	0,81
+*
 [86]	var props = new AuthenticationProperties();
-[113]	var props = new AuthenticationProperties();	1,00	[1,00, 0,99, False]
+[113]	var props = new AuthenticationProperties();	1,00
+[112]	{	0,19
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AddResponseTypeAttributeCodeFixAction.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AddResponseTypeAttributeCodeFixAction.cs
 *
 [136]	var statusCodeConstants = GetStatusCodeConstants(statusCodesType);
-[158]	var statusCodeConstants = GetStatusCodeConstants(statusCodesType);	0,98	[1,00, 0,91, False]
+[158]	var statusCodeConstants = GetStatusCodeConstants(statusCodesType);	0,98
+[155]	throw new ArgumentNullException(nameof(statusCodesType));	0,48
+*
 [140]	return null;
-[162]	return null;	0,99	[1,00, 0,93, False]
+[162]	return null;	0,99
+[166]	return codeActionContext;	0,35
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionLimitMiddleware.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionLimitMiddleware.cs
 *
 [43]	try
-[43]	try	0,98	[1,00, 0,91, False]
+[43]	try	0,98
+[38]	return;	0,38
+*
 [51]	}
-[51]	}	0,95	[1,00, 0,94, True]
+[51]	}	0,95
+[50]	releasor.ReleaseConnection();	0,57
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KnownStringsBenchmark.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KnownStringsBenchmark.cs
 *
 [98]	int len = 0;
-[98]	int len = 0;	0,98	[1,00, 0,92, False]
+[98]	int len = 0;	0,98
+[104]	len += length;	0,42
+*
 [120]	len += length;
-[120]	len += length;	0,99	[1,00, 0,99, True]
+[120]	len += length;	0,99
+[118]	len += length;	0,90
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultApiDescriptionProviderTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultApiDescriptionProviderTest.cs
 *
 [1766]	
-[1801]		0,79	[1,00, 0,74, True]
+[1801]		0,79
+[1804]		0,75
+*
 [1759]	// Arrange
-[1794]	// Arrange	0,99	[1,00, 0,94, False]
+[1794]	// Arrange	0,99
+[1802]	// Act	0,35
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateTests.cs
 *
 [306]	Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-[351]	Assert.Equal(HttpStatusCode.OK, response.StatusCode);	1,00	[1,00, 0,99, False]
+[351]	Assert.Equal(HttpStatusCode.OK, response.StatusCode);	1,00
+[350]	var response = await client.GetAsync("https://example.com/");	0,09
+*
 [294]	var server = CreateServer(
-[339]	var server = CreateServer(	1,00	[1,00, 0,99, False]
+[339]	var server = CreateServer(	1,00
+[348]	var client = server.CreateClient();	0,52
+*
 [67]	},
-[67]	},	1,00	[1,00, 0,99, False]
+[67]	},	1,00
+[72]	}	0,46
+*
 [62]	var server = CreateServer(
-[62]	var server = CreateServer(	1,00	[1,00, 0,99, False]
+[62]	var server = CreateServer(	1,00
+[70]	var response = await server.CreateClient().GetAsync("https://example.com/");	0,24
+*
 [516]	response.ContentType = "text/xml";
-[638]	response.ContentType = "text/xml";	0,99	[1,00, 0,94, False]
+[638]	response.ContentType = "text/xml";	0,99
+[631]	var response = context.Response;	0,50
+*
 [519]	foreach (Claim claim in context.User.Claims)
-[641]	foreach (Claim claim in context.User.Claims)	0,99	[1,00, 0,94, False]
+[641]	foreach (Claim claim in context.User.Claims)	0,99
+[633]	var authenticationResult = await context.AuthenticateAsync();	0,46
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\WebSocketsTransport.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\WebSocketsTransport.cs
 *
 [121]	
-[141]		0,95	[1,00, 0,94, True]
+[141]		0,95
+[139]		0,92
+*
 [102]	}
-[112]	}	0,96	[1,00, 0,95, True]
+[112]	}	0,96
+[113]		0,75
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RangeHeaderValueTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RangeHeaderValueTest.cs
 *
 [170]	Assert.True(RangeHeaderValue.TryParse(input, out result));
-[169]	Assert.True(RangeHeaderValue.TryParse(input, out var result));	0,93	[0,95, 0,87, False]
+[169]	Assert.True(RangeHeaderValue.TryParse(input, out var result));	0,93
+[170]	Assert.Equal(expectedResult, result);	0,42
+*
 [171]	Assert.Equal(expectedResult, result);
-[170]	Assert.Equal(expectedResult, result);	0,98	[1,00, 0,89, False]
+[170]	Assert.Equal(expectedResult, result);	0,98
+[169]	Assert.True(RangeHeaderValue.TryParse(input, out var result));	0,39
+*
 [71]	var range2 = new RangeHeaderValue(1, 2);
-[71]	var range2 = new RangeHeaderValue(1, 2);	1,00	[1,00, 1,00, False]
+[71]	var range2 = new RangeHeaderValue(1, 2);	1,00
+[70]	var range1 = new RangeHeaderValue(1, 2);	0,93
+*
 [90]	Assert.False(range1.Equals(range7), "bytes=1-2 vs. other=1-2");
-[90]	Assert.False(range1.Equals(range7), "bytes=1-2 vs. other=1-2");	1,00	[1,00, 0,99, False]
+[90]	Assert.False(range1.Equals(range7), "bytes=1-2 vs. other=1-2");	1,00
+[87]	Assert.False(range1.Equals(range4), "bytes=1-2 vs. bytes=-2");	0,81
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpConnectionManagerTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpConnectionManagerTests.cs
 *
 [280]	connection.ApplicationTask = tcs.Task;
-[269]	connection.ApplicationTask = tcs.Task;	0,99	[1,00, 0,96, False]
+[269]	connection.ApplicationTask = tcs.Task;	0,99
+[270]	connection.TransportTask = tcs.Task;	0,73
+*
 [287]	
-[276]		0,97	[1,00, 0,96, True]
+[276]		0,97
+[278]		0,86
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TypedClientBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TypedClientBuilder.cs
 *
 [93]	
-[99]		0,55	[1,00, 0,44, True]
+[99]		0,55
+[95]		0,55
+*
 [90]	method.SetParameters(typeof(IClientProxy));
-[97]	generator.Emit(OpCodes.Ldarg_0);	0,50	[0,26, 0,56, True]
+[97]	generator.Emit(OpCodes.Ldarg_0);	0,50
+[94]	var generator = ctor.GetILGenerator();	0,41
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http1ChunkedEncodingMessageBody.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http1ChunkedEncodingMessageBody.cs
 *
 [524]	}
-[532]	}	0,96	[1,00, 0,96, True]
+[532]	}	0,96
+[533]	}	0,95
+*
 [518]	return currentParsedSize * 0x10 + (extraHexDigit - ('A' - 10));
-[526]	return currentParsedSize * 0x10 + (extraHexDigit - ('A' - 10));	0,98	[1,00, 0,97, True]
+[526]	return currentParsedSize * 0x10 + (extraHexDigit - ('A' - 10));	0,98
+[530]	return currentParsedSize * 0x10 + (extraHexDigit - ('a' - 10));	0,86
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpConnectionTests.Transport.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpConnectionTests.Transport.cs
 *
 [139]	async (connection) =>
-[142]	async (connection) =>	0,99	[1,00, 0,95, False]
+[142]	async (connection) =>	0,99
+[140]	await WithConnectionAsync(	0,53
+*
 [131]	
-[134]		0,96	[1,00, 0,95, True]
+[134]		0,96
+[131]		0,94
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenIdConnectHandler.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenIdConnectHandler.cs
 *
 [864]	return HandleRequestResult.Success(new AuthenticationTicket(principal, properties, Scheme.Name));
-[862]	return HandleRequestResult.Success(new AuthenticationTicket(principal, properties, Scheme.Name));	0,99	[1,00, 0,99, True]
+[862]	return HandleRequestResult.Success(new AuthenticationTicket(principal, properties, Scheme.Name));	0,99
+[867]	return HandleRequestResult.Success(new AuthenticationTicket(principal, properties, Scheme.Name));	0,87
+*
 [913]	foreach (var action in Options.ClaimActions)
-[912]	foreach (var action in Options.ClaimActions)	0,98	[1,00, 0,92, False]
+[912]	foreach (var action in Options.ClaimActions)	0,98
+[904]	Options.ProtocolValidator.ValidateUserInfoResponse(new OpenIdConnectProtocolValidationContext()	0,38
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FragmentString.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FragmentString.cs
 *
 [120]	{
-[120]	{	0,99	[1,00, 0,99, True]
+[120]	{	0,99
+[121]	return !HasValue;	0,70
+*
 [122]	}
-[122]	}	1,00	[1,00, 0,99, True]
+[122]	}	1,00
+[121]	return !HasValue;	0,71
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ApiResponseTypeProvider.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ApiResponseTypeProvider.cs
 *
 [209]	}
-[209]	}	0,99	[1,00, 0,99, True]
+[209]	}	0,99
+[208]	}	0,86
+*
 [178]	foreach (var responseTypeMetadataProvider in responseTypeMetadataProviders)
-[178]	foreach (var responseTypeMetadataProvider in responseTypeMetadataProviders)	1,00	[1,00, 1,00, False]
+[178]	foreach (var responseTypeMetadataProvider in responseTypeMetadataProviders)	1,00
+[195]	Formatter = (IOutputFormatter)responseTypeMetadataProvider,	0,60
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HubConnectionTests.Reconnect.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HubConnectionTests.Reconnect.cs
 *
 [863]	(writeContext.EventId.Name == "ServerDisconnectedWithError" ||
-[859]	(writeContext.EventId.Name == "ServerDisconnectedWithError" ||	1,00	[1,00, 0,99, False]
+[859]	(writeContext.EventId.Name == "ServerDisconnectedWithError" ||	1,00
+[860]	writeContext.EventId.Name == "ReconnectingWithError" ||	0,84
+*
 [912]	{
-[908]	{	0,98	[1,00, 0,98, True]
+[908]	{	0,98
+[914]	{	0,95
+*
 [470]	{
-[466]	{	0,95	[1,00, 0,93, True]
+[466]	{	0,95
+[459]	{	0,82
+*
 [499]	{
-[495]	{	0,98	[1,00, 0,97, True]
+[495]	{	0,98
+[489]	{	0,89
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ApiBehaviorTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ApiBehaviorTest.cs
 *
 [115]	var response = await Client.SendAsync(requestMessage);
-[115]	var response = await Client.SendAsync(requestMessage);	0,99	[1,00, 0,96, False]
+[115]	var response = await Client.SendAsync(requestMessage);	0,99
+[118]	await response.AssertStatusCodeAsync(HttpStatusCode.UnsupportedMediaType);	0,47
+*
 [111]	Content = new StringContent("some content", Encoding.UTF7, "application/json"),
-[111]	Content = new StringContent("some content", Encoding.Latin1, "application/json"),	0,95	[0,93, 1,00, False]
+[111]	Content = new StringContent("some content", Encoding.Latin1, "application/json"),	0,95
+[119]	var content = await response.Content.ReadAsStringAsync();	0,39
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EndToEndTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EndToEndTests.cs
 *
 [40]	{
-[40]	{	0,90	[1,00, 0,87, True]
+[40]	{	0,90
+[38]	{	0,67
+*
 [44]	var connection = new HttpConnection(new Uri(url), HttpTransports.All, LoggerFactory);
-[44]	var connection = new HttpConnection(new Uri(url), HttpTransports.All, LoggerFactory);	0,98	[1,00, 0,89, False]
+[44]	var connection = new HttpConnection(new Uri(url), HttpTransports.All, LoggerFactory);	0,98
+[45]	await connection.StartAsync().OrTimeout();	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthenticationServiceTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthenticationServiceTests.cs
 *
 [108]	Assert.Contains("uber", ex.Message);
-[132]	Assert.Contains("uber", ex.Message);	1,00	[1,00, 1,00, True]
+[132]	Assert.Contains("uber", ex.Message);	1,00
+[131]	ex = await Assert.ThrowsAsync<InvalidOperationException>(() => context.SignInAsync("signout", new ClaimsPrincipal(new ClaimsIdentity("whatever")), null));	0,58
+*
 [93]	{
-[117]	{	1,00	[1,00, 1,00, True]
+[117]	{	1,00
+[118]	o.AddScheme<UberHandler>("uber", "whatever");	0,78
+*
 [20]	o.AddScheme<BaseHandler>("base", "whatever");
-[20]	o.AddScheme<BaseHandler>("base", "whatever");	1,00	[1,00, 1,00, False]
+[20]	o.AddScheme<BaseHandler>("base", "whatever");	1,00
+[25]	await context.AuthenticateAsync("base");	0,35
+*
 [18]	var services = new ServiceCollection().AddOptions().AddAuthenticationCore(o =>
-[18]	var services = new ServiceCollection().AddOptions().AddAuthenticationCore(o =>	1,00	[1,00, 1,00, False]
+[18]	var services = new ServiceCollection().AddOptions().AddAuthenticationCore(o =>	1,00
+[26]	var ex = await Assert.ThrowsAsync<InvalidOperationException>(() => context.AuthenticateAsync("missing"));	0,25
+*
 [165]	await context.ChallengeAsync();
-[189]	await context.ChallengeAsync();	1,00	[1,00, 1,00, False]
+[189]	await context.ChallengeAsync();	1,00
+[188]	await context.AuthenticateAsync();	0,74
+*
 [167]	await context.SignOutAsync();
-[191]	await context.SignOutAsync();	1,00	[1,00, 1,00, False]
+[191]	await context.SignOutAsync();	1,00
+[190]	await context.ForbidAsync();	0,75
+*
 [122]	var context = new DefaultHttpContext();
-[146]	var context = new DefaultHttpContext();	1,00	[1,00, 1,00, False]
+[146]	var context = new DefaultHttpContext();	1,00
+[149]	await context.SignOutAsync("uber");	0,40
+*
 [116]	{
-[140]	{	1,00	[1,00, 1,00, True]
+[140]	{	1,00
+[141]	o.AddScheme<UberHandler>("uber", "whatever");	0,70
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2ConnectionTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2ConnectionTests.cs
 *
 [2661]	await ExpectAsync(Http2FrameType.SETTINGS,
-[3270]	await ExpectAsync(Http2FrameType.SETTINGS,	0,94	[1,00, 0,69, False]
+[3270]	await ExpectAsync(Http2FrameType.SETTINGS,	0,94
+[3278]	var headerFrame = await ExpectAsync(Http2FrameType.HEADERS,	0,62
+*
 [2663]	withFlags: (byte)Http2SettingsFrameFlags.ACK,
-[3272]	withFlags: (byte)Http2SettingsFrameFlags.ACK,	0,93	[1,00, 0,67, False]
+[3272]	withFlags: (byte)Http2SettingsFrameFlags.ACK,	0,93
+[3280]	withFlags: (byte)(Http2HeadersFrameFlags.END_HEADERS | Http2HeadersFrameFlags.END_STREAM),	0,47
+*
 [316]	var stream3DataFrame1 = await ExpectAsync(Http2FrameType.DATA,
-[774]	var stream3DataFrame1 = await ExpectAsync(Http2FrameType.DATA,	1,00	[1,00, 0,98, False]
+[774]	var stream3DataFrame1 = await ExpectAsync(Http2FrameType.DATA,	1,00
+[781]	var stream3DataFrame2 = await ExpectAsync(Http2FrameType.DATA,	0,98
+*
 [315]	withStreamId: 3);
-[773]	withStreamId: 3);	0,98	[1,00, 0,98, True]
+[773]	withStreamId: 3);	0,98
+[777]	withStreamId: 3);	0,96
+*
 [3460]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.NONE, headers));
-[4119]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.END_STREAM, headers));	0,92	[0,90, 0,99, False]
+[4119]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.END_STREAM, headers));	0,92
+[4128]	await SendHeadersAsync(1, Http2HeadersFrameFlags.END_HEADERS | Http2HeadersFrameFlags.END_STREAM, headers);	0,55
+*
 [3469]	await SendHeadersAsync(1, Http2HeadersFrameFlags.END_HEADERS, headers);
-[4119]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.END_STREAM, headers));	0,73	[0,76, 0,58, False]
+[4119]	Assert.True(await SendHeadersAsync(1, Http2HeadersFrameFlags.END_STREAM, headers));	0,73
+[4120]	await SendEmptyContinuationFrameAsync(1, Http2ContinuationFrameFlags.END_HEADERS);	0,55
+*
 [1573]	await InitializeConnectionAsync(_noopApplication);
-[2177]	await InitializeConnectionAsync(_noopApplication);	0,99	[1,00, 0,97, False]
+[2177]	await InitializeConnectionAsync(_noopApplication);	0,99
+[2195]	await WaitForConnectionErrorAsync<HPackDecodingException>(	0,35
+*
 [1578]	frame.PrepareHeaders(Http2HeadersFrameFlags.END_HEADERS, 1);
-[2182]	frame.PrepareHeaders(Http2HeadersFrameFlags.END_HEADERS, 1);	0,99	[1,00, 0,95, False]
+[2182]	frame.PrepareHeaders(Http2HeadersFrameFlags.END_HEADERS, 1);	0,99
+[2180]	var frame = new Http2Frame();	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TransformTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TransformTest.cs
 *
 [38]	var sharedStoreElement = depsElement.NextSibling;
-[38]	var sharedStoreElement = depsElement.NextSibling;	1,00	[1,00, 0,98, False]
+[38]	var sharedStoreElement = depsElement.NextSibling;	1,00
+[43]	var startupAssembliesElement = sharedStoreElement.NextSibling;	0,67
+*
 [44]	Assert.Equal("add", startupAssembliesElement.Name);
-[44]	Assert.Equal("add", startupAssembliesElement.Name);	1,00	[1,00, 0,98, False]
+[44]	Assert.Equal("add", startupAssembliesElement.Name);	1,00
+[39]	Assert.Equal("add", sharedStoreElement.Name);	0,75
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpHeaders.Generated.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpHeaders.Generated.cs
 *
 [5983]	}
-[6488]	}	0,86	[1,00, 0,83, True]
+[6488]	}	0,86
+[6502]	}	0,86
+*
 [5999]	if ((firstTerm15 == 0x452d545045434341uL) && ((Unsafe.ReadUnaligned<uint>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(2 * sizeof(uint)))) & 0xdfdfdfdfu) == 0x444f434eu) && ((Unsafe.ReadUnaligned<ushort>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(6 * sizeof(ushort)))) & 0xdfdfu) == 0x4e49u) && ((Unsafe.AddByteOffset(ref nameStart, (IntPtr)14) & 0xdfu) == 0x47u))
-[6564]	if ((firstTerm15 == 0x452d545045434341uL) && ((Unsafe.ReadUnaligned<uint>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(2 * sizeof(uint)))) & 0xdfdfdfdfu) == 0x444f434eu) && ((Unsafe.ReadUnaligned<ushort>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(6 * sizeof(ushort)))) & 0xdfdfu) == 0x4e49u) && ((Unsafe.AddByteOffset(ref nameStart, (IntPtr)14) & 0xdfu) == 0x47u))	0,96	[1,00, 0,82, False]
+[6564]	if ((firstTerm15 == 0x452d545045434341uL) && ((Unsafe.ReadUnaligned<uint>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(2 * sizeof(uint)))) & 0xdfdfdfdfu) == 0x444f434eu) && ((Unsafe.ReadUnaligned<ushort>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(6 * sizeof(ushort)))) & 0xdfdfu) == 0x4e49u) && ((Unsafe.AddByteOffset(ref nameStart, (IntPtr)14) & 0xdfu) == 0x47u))	0,96
+[6570]	else if ((firstTerm15 == 0x4c2d545045434341uL) && ((Unsafe.ReadUnaligned<uint>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(2 * sizeof(uint)))) & 0xdfdfdfdfu) == 0x55474e41u) && ((Unsafe.ReadUnaligned<ushort>(ref Unsafe.AddByteOffset(ref nameStart, (IntPtr)(6 * sizeof(ushort)))) & 0xdfdfu) == 0x4741u) && ((Unsafe.AddByteOffset(ref nameStart, (IntPtr)14) & 0xdfu) == 0x45u))	0,89
+*
 [1816]	break;
-[2031]	break;	0,98	[1,00, 0,98, True]
+[2031]	break;	0,98
+[2054]	break;	0,93
+*
 [1880]	value = _headers._AccessControlRequestHeaders;
-[2095]	value = _headers._AccessControlRequestHeaders;	0,99	[1,00, 0,99, True]
+[2095]	value = _headers._AccessControlRequestHeaders;	0,99
+[2096]	return true;	0,72
+*
 [10737]	{
-[11509]	{	0,99	[1,00, 0,99, True]
+[11509]	{	0,99
+[11500]	{	0,98
+*
 [10711]	return false;
-[11483]	return false;	0,99	[1,00, 0,99, True]
+[11483]	return false;	0,99
+[11492]	return false;	0,98
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SignInManager.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SignInManager.cs
 *
 [154]	}
-[154]	}	0,85	[1,00, 0,81, True]
+[154]	}	0,85
+[149]	}	0,81
+*
 [156]	{
-[156]	{	0,76	[1,00, 0,70, True]
+[156]	{	0,76
+[151]	{	0,71
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocolTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocolTests.cs
 *
 [41]	var completionMessage = Assert.IsType<CompletionMessage>(hubMessage);
-[46]	var completionMessage = Assert.IsType<CompletionMessage>(hubMessage);	0,93	[1,00, 0,67, False]
+[46]	var completionMessage = Assert.IsType<CompletionMessage>(hubMessage);	0,93
+[48]	var resultDateTime = (DateTime)completionMessage.Result;	0,52
+*
 [46]	// https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type
-[51]	// https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type	0,91	[1,00, 0,56, False]
+[51]	// https://github.com/msgpack/msgpack/blob/master/spec.md#timestamp-extension-type	0,91
+[36]	// https://github.com/neuecc/MessagePack-CSharp/pull/520/files#diff-ed970b3daebc708ce49f55d418075979	0,29
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UnixDomainSocketsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UnixDomainSocketsTests.cs
 *
 [109]	}
-[113]	}	0,98	[1,00, 0,98, True]
+[113]	}	0,98
+[114]	}	0,97
+*
 [65]	Logger.LogDebug("Graceful shutdown triggered for {connectionId}.", connection.ConnectionId);
-[67]	Logger.LogDebug("Graceful shutdown triggered for {connectionId}.", connection.ConnectionId);	0,99	[1,00, 0,93, False]
+[67]	Logger.LogDebug("Graceful shutdown triggered for {connectionId}.", connection.ConnectionId);	0,99
+[56]	Logger.LogDebug("Application receive loop ending for connection {connectionId}.", connection.ConnectionId);	0,70
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UseMiddlewareExtensions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UseMiddlewareExtensions.cs
 *
 [142]	});
-[142]	});	1,00	[1,00, 0,99, False]
+[142]	});	1,00
+[141]	};	0,66
+*
 [138]	{
-[138]	{	0,99	[1,00, 0,99, True]
+[138]	{	0,99
+[137]	finally	0,78
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResourceFile.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResourceFile.cs
 *
 [188]	var normalizedContent = content.Replace("\r", "").Replace("\n", "\r\n");
-[188]	var normalizedContent = content.Replace("\r", "").Replace("\n", "\r\n");	1,00	[1,00, 0,98, False]
+[188]	var normalizedContent = content.Replace("\r", "").Replace("\n", "\r\n");	1,00
+[187]	var normalizedPreviousContent = previousContent?.Replace("\r", "").Replace("\n", "\r\n");	0,81
+*
 [193]	// with the same name as the file name. Need to update this file on disc.
-[193]	// with the same name as the file name. Need to update this file on disc.	1,00	[1,00, 0,99, False]
+[193]	// with the same name as the file name. Need to update this file on disc.	1,00
+[192]	// The build system compiles every file under the resources folder as a resource available at runtime	0,37
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FileBufferingWriteStreamTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FileBufferingWriteStreamTests.cs
 *
 [244]	
-[245]		0,99	[1,00, 0,99, True]
+[245]		0,99
+[247]		0,86
+*
 [239]	var fileStream = bufferingStream.FileStream;
-[240]	var fileStream = bufferingStream.FileStream;	1,00	[1,00, 0,99, False]
+[240]	var fileStream = bufferingStream.FileStream;	1,00
+[239]	var pageBuffer = bufferingStream.PagedByteBuffer;	0,59
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ShutdownTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ShutdownTests.cs
 *
 [138]	Assert.False(requestTask.IsCompleted);
-[137]	Assert.False(requestTask.IsCompleted);	0,99	[1,00, 0,93, False]
+[137]	Assert.False(requestTask.IsCompleted);	0,99
+[138]	await requestStarted.Task.DefaultTimeout();	0,41
+*
 [156]	Assert.DoesNotContain(TestApplicationErrorLogger.Messages, m => m.Message.Contains("Request finished in"));
-[155]	Assert.DoesNotContain(TestApplicationErrorLogger.Messages, m => m.Message.Contains("Request finished in"));	0,97	[1,00, 0,86, False]
+[155]	Assert.DoesNotContain(TestApplicationErrorLogger.Messages, m => m.Message.Contains("Request finished in"));	0,97
+[152]	Assert.Contains(TestApplicationErrorLogger.Messages, m => m.Message.Contains("is closing."));	0,69
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NativeRequestContext.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NativeRequestContext.cs
 *
 [429]	fixed (byte* pMemoryBlob = _backingBuffer)
-[462]	fixed (byte* pMemoryBlob = _backingBuffer.Memory.Span)	0,81	[0,76, 1,00, False]
+[462]	fixed (byte* pMemoryBlob = _backingBuffer.Memory.Span)	0,81
+[464]	var request = (HttpApiTypes.HTTP_REQUEST*)(pMemoryBlob + _bufferAlignment);	0,39
+*
 [427]	else
-[460]	else	0,98	[1,00, 0,92, False]
+[460]	else	0,98
+[459]	}	0,18
+*
 [528]	}
-[561]	}	0,94	[1,00, 0,92, True]
+[561]	}	0,94
+[562]	else	0,71
+*
 [533]	var request = (HttpApiTypes.HTTP_REQUEST_V2*)(pMemoryBlob + _bufferAlignment);
-[566]	var request = (HttpApiTypes.HTTP_REQUEST_V2*)(pMemoryBlob + _bufferAlignment);	0,99	[1,00, 0,94, False]
+[566]	var request = (HttpApiTypes.HTTP_REQUEST_V2*)(pMemoryBlob + _bufferAlignment);	0,99
+[560]	return GetClientCertificate((IntPtr)_nativeRequest, (HttpApiTypes.HTTP_REQUEST_V2*)_nativeRequest);	0,26
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpsTests.cs
 *
 [278]	using (var sslStream = new SslStream(connection.Stream, true, (sender, certificate, chain, errors) => true))
-[280]	using (var sslStream = new SslStream(connection.Stream, true, (sender, certificate, chain, errors) => true))	0,99	[1,00, 0,94, False]
+[280]	using (var sslStream = new SslStream(connection.Stream, true, (sender, certificate, chain, errors) => true))	0,99
+[279]	using (var connection = server.CreateConnection())	0,44
+*
 [280]	await sslStream.AuthenticateAsClientAsync("127.0.0.1", clientCertificates: null,
-[282]	await sslStream.AuthenticateAsClientAsync("127.0.0.1", clientCertificates: null,	0,98	[1,00, 0,88, False]
+[282]	await sslStream.AuthenticateAsClientAsync("127.0.0.1", clientCertificates: null,	0,98
+[280]	using (var sslStream = new SslStream(connection.Stream, true, (sender, certificate, chain, errors) => true))	0,38
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ServerSentEventsBenchmark.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ServerSentEventsBenchmark.cs
 *
 [30]	
-[30]		0,99	[1,00, 0,99, True]
+[30]		0,99
+[31]	if (Protocol == "json")	0,79
+*
 [58]	break;
-[58]	break;	0,96	[1,00, 0,95, True]
+[58]	break;	0,96
+[55]	break;	0,85
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StaticFileContext.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StaticFileContext.cs
 *
 [177]	}
-[177]	}	0,96	[1,00, 0,95, True]
+[177]	}	0,96
+[176]	}	0,83
+*
 [172]	if (etag.Equals(EntityTagHeaderValue.Any) || etag.Compare(_etag, useStrongComparison: true))
-[172]	if (etag.Equals(EntityTagHeaderValue.Any) || etag.Compare(_etag, useStrongComparison: true))	0,94	[1,00, 0,92, True]
+[172]	if (etag.Equals(EntityTagHeaderValue.Any) || etag.Compare(_etag, useStrongComparison: true))	0,94
+[173]	{	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\WebHostBuilderKestrelExtensionsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\WebHostBuilderKestrelExtensionsTests.cs
 *
 [68]	.UseLibuv()
-[69]	.UseLibuv()	0,71	[1,00, 0,64, True]
+[69]	.UseLibuv()	0,71
+[77]	.UseLibuv()	0,58
+*
 [78]	Assert.IsType<LibuvTransportFactory>(hostBuilderReversed.Build().Services.GetService<IConnectionListenerFactory>());
-[82]	Assert.IsType<LibuvTransportFactory>(hostBuilderReversed.Build().Services.GetService<IConnectionListenerFactory>());	0,97	[1,00, 0,87, False]
+[82]	Assert.IsType<LibuvTransportFactory>(hostBuilderReversed.Build().Services.GetService<IConnectionListenerFactory>());	0,97
+[73]	Assert.IsType<LibuvTransportFactory>(hostBuilder.Build().Services.GetService<IConnectionListenerFactory>());	0,72
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RoutingDynamicTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RoutingDynamicTest.cs
 *
 [135]	await response.AssertStatusCodeAsync(HttpStatusCode.OK);
-[135]	await response.AssertStatusCodeAsync(HttpStatusCode.OK);	1,00	[1,00, 0,98, False]
+[135]	await response.AssertStatusCodeAsync(HttpStatusCode.OK);	1,00
+[132]	var response = await client.GetAsync(url);	0,45
+*
 [127]	// Arrange
-[127]	// Arrange	0,98	[1,00, 0,91, False]
+[127]	// Arrange	0,98
+[131]	// Act	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueryHelpers.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueryHelpers.cs
 *
 [67]	if (uri == null)
-[107]	if (uri == null)	0,99	[1,00, 0,94, False]
+[107]	if (uri == null)	0,99
+[112]	if (queryString == null)	0,63
+*
 [89]	
-[129]		0,90	[1,00, 0,88, True]
+[129]		0,90
+[138]		0,88
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueuePolicy.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueuePolicy.cs
 *
 [41]	// _serverSemaphore.Release is *not* called in this method, it is called externally when requests leave the server
-[45]	// _serverSemaphore.Release is *not* called in this method, it is called externally when requests leave the server	0,95	[1,00, 0,75, False]
+[45]	// _serverSemaphore.Release is *not* called in this method, it is called externally when requests leave the server	0,95
+[44]	// a return value of 'true' indicates that the request may proceed	0,37
+*
 [44]	{
-[50]	{	0,67	[1,00, 0,59, True]
+[50]	{	0,67
+[46]		0,55
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Helpers.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Helpers.cs
 *
 [12]	// https://github.com/aspnet/AspNetCore/issues/8343
-[12]	// https://github.com/dotnet/aspnetcore/issues/8343	0,95	[0,94, 1,00, False]
+[12]	// https://github.com/dotnet/aspnetcore/issues/8343	0,95
+[11]	{	0,16
+*
 [16]	return Path.GetFullPath(Path.Combine(solutionDirectory, "samples", "MusicStore"));
-[16]	return Path.GetFullPath(Path.Combine(solutionDirectory, "samples", "MusicStore"));	1,00	[1,00, 0,98, False]
+[16]	return Path.GetFullPath(Path.Combine(solutionDirectory, "samples", "MusicStore"));	1,00
+[14]	var solutionDirectory = TestPathUtilities.GetSolutionRootDirectory("MusicStore");	0,37
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http1MessageBody.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http1MessageBody.cs
 *
 [87]	result = await ReadAsyncInternal();
-[88]	result = await ReadAsyncInternal();	0,99	[1,00, 0,96, False]
+[88]	result = await ReadAsyncInternal();	0,99
+[85]	ReadResult result;	0,40
+*
 [91]	catch (BadHttpRequestException ex)
-[92]	catch (Microsoft.AspNetCore.Http.BadHttpRequestException ex)	0,91	[0,55, 1,00, True]
+[92]	catch (Microsoft.AspNetCore.Http.BadHttpRequestException ex)	0,91
+[94]	_context.SetBadRequestState(ex);	0,80
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenApiAddFileTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenApiAddFileTests.cs
 *
 [23]	var app = GetApplication();
-[22]	var app = GetApplication();	0,97	[1,00, 0,83, False]
+[22]	var app = GetApplication();	0,97
+[23]	var run = app.Execute(new string[] { });	0,38
+*
 [25]	
-[24]		0,83	[1,00, 0,78, True]
+[24]		0,83
+[26]		0,67
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteBase.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteBase.cs
 *
 [271]	return;
-[271]	return;	1,00	[1,00, 0,98, False]
+[271]	return;	1,00
+[272]	}	0,19
+*
 [276]	_logger = factory.CreateLogger(typeof(RouteBase).FullName);
-[276]	_logger = factory.CreateLogger(typeof(RouteBase).FullName);	1,00	[1,00, 0,99, False]
+[276]	_logger = factory.CreateLogger(typeof(RouteBase).FullName);	1,00
+[275]	_constraintLogger = factory.CreateLogger(typeof(RouteConstraintMatcher).FullName);	0,65
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ObjectResultExecutor.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ObjectResultExecutor.cs
 *
 [151]	Logger.NoFormatter(formatterContext, result.ContentTypes);
-[152]	Logger.NoFormatter(formatterContext, result.ContentTypes);	0,99	[1,00, 0,97, False]
+[152]	Logger.NoFormatter(formatterContext, result.ContentTypes);	0,99
+[145]	var selectedFormatter = FormatterSelector.SelectFormatter(	0,48
+*
 [141]	objectType,
-[142]	objectType,	1,00	[1,00, 0,99, False]
+[142]	objectType,	1,00
+[140]	context.HttpContext,	0,45
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ProjectIdResolver.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ProjectIdResolver.cs
 *
 [83]	
-[109]		0,89	[1,00, 0,87, True]
+[109]		0,89
+[104]		0,85
+*
 [66]	_reporter.Verbose($"Invoking '{psi.FileName} {psi.Arguments}'");
-[68]	_reporter.Verbose($"Invoking '{psi.FileName} {psi.Arguments}'");	0,97	[1,00, 0,84, False]
+[68]	_reporter.Verbose($"Invoking '{psi.FileName} {psi.Arguments}'");	0,97
+[99]	_reporter.Verbose(outputBuilder.ToString());	0,50
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\InputTextArea.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\InputTextArea.cs
 *
 [29]	builder.AddAttribute(4, "onchange", EventCallback.Factory.CreateBinder<string>(this, __value => CurrentValueAsString = __value, CurrentValueAsString));
-[30]	builder.AddAttribute(4, "onchange", EventCallback.Factory.CreateBinder<string?>(this, __value => CurrentValueAsString = __value, CurrentValueAsString));	0,94	[0,70, 1,00, True]
+[30]	builder.AddAttribute(4, "onchange", EventCallback.Factory.CreateBinder<string?>(this, __value => CurrentValueAsString = __value, CurrentValueAsString));	0,94
+[29]	builder.AddAttribute(3, "value", BindConverter.FormatValue(CurrentValue));	0,44
+*
 [27]	builder.AddAttribute(2, "class", CssClass);
-[28]	builder.AddAttribute(2, "class", CssClass);	1,00	[1,00, 0,99, False]
+[28]	builder.AddAttribute(2, "class", CssClass);	1,00
+[27]	builder.AddMultipleAttributes(1, AdditionalAttributes);	0,52
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AvoidHtmlPartialAnalyzer.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AvoidHtmlPartialAnalyzer.cs
 *
 [24]	var invocationExpression = (InvocationExpressionSyntax)context.Node;
-[25]	var method = ((IInvocationOperation)context.Operation).TargetMethod;	0,69	[0,34, 0,77, True]
+[25]	var method = ((IInvocationOperation)context.Operation).TargetMethod;	0,69
+[26]	if (!analyzerContext.IsHtmlHelperExtensionMethod(method))	0,61
+*
 [47]	SupportedDiagnostic,
-[41]	SupportedDiagnostic,	0,79	[1,00, 0,73, True]
+[41]	SupportedDiagnostic,	0,79
+[40]	context.ReportDiagnostic(Diagnostic.Create(	0,66
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SetCookieHeaderValue.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SetCookieHeaderValue.cs
 *
 [570]	&& HttpOnly == other.HttpOnly;
-[591]	&& HttpOnly == other.HttpOnly	0,87	[0,96, 0,49, False]
+[591]	&& HttpOnly == other.HttpOnly	0,87
+[589]	&& Secure == other.Secure	0,39
+*
 [568]	&& Secure == other.Secure
-[589]	&& Secure == other.Secure	0,92	[1,00, 0,61, False]
+[589]	&& Secure == other.Secure	0,92
+[590]	&& SameSite == other.SameSite	0,58
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StartupAnalyzer.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StartupAnalyzer.cs
 *
 [69]	}
-[69]	}	0,98	[1,00, 0,98, True]
+[69]	}	0,98
+[76]	}	0,89
+*
 [80]	context.RegisterSymbolEndAction(context =>
-[80]	context.RegisterSymbolEndAction(context =>	0,99	[1,00, 0,94, False]
+[80]	context.RegisterSymbolEndAction(context =>	0,99
+[38]	context.RegisterSymbolStartAction(context =>	0,75
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DataProtectionProviderTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DataProtectionProviderTests.cs
 *
 [121]	var filePath = Path.Combine(GetTestFilesPath(), "TestCert.pfx");
-[121]	var filePath = Path.Combine(GetTestFilesPath(), "TestCert.pfx");	0,94	[1,00, 0,71, False]
+[121]	var filePath = Path.Combine(GetTestFilesPath(), "TestCert.pfx");	0,94
+[146]	var certWithoutKey = new X509Certificate2(Path.Combine(GetTestFilesPath(), "TestCertWithoutPrivateKey.pfx"), "password");	0,40
+*
 [136]	{
-[136]	{	0,97	[1,00, 0,97, True]
+[136]	{	0,97
+[130]	{	0,80
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BinaryBlob.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BinaryBlob.cs
 *
 [95]	_randomNumberGenerator.GetBytes(data);
-[94]	RandomNumberGenerator.Fill(data);	0,81	[0,76, 1,00, False]
+[94]	RandomNumberGenerator.Fill(data);	0,81
+[91]	private static byte[] GenerateNewToken(int bitLength)	0,24
+*
 [94]	var data = new byte[bitLength / 8];
-[93]	var data = new byte[bitLength / 8];	0,98	[1,00, 0,91, False]
+[93]	var data = new byte[bitLength / 8];	0,98
+[91]	private static byte[] GenerateNewToken(int bitLength)	0,29
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SymbolApiConventionMatcher.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SymbolApiConventionMatcher.cs
 *
 [63]	var attribute = symbol.GetAttributes(symbolCache.ApiConventionNameMatchAttribute).FirstOrDefault();
-[63]	var attribute = symbol.GetAttributes(symbolCache.ApiConventionNameMatchAttribute).FirstOrDefault();	0,98	[1,00, 0,92, False]
+[63]	var attribute = symbol.GetAttributes(symbolCache.ApiConventionNameMatchAttribute).FirstOrDefault();	0,98
+[68]	return SymbolApiConventionNameMatchBehavior.Exact;	0,44
+*
 [70]	
-[77]		0,82	[1,00, 0,77, True]
+[77]		0,82
+[70]		0,80
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StackTraceHelper.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StackTraceHelper.cs
 *
 [79]	var methodDisplayInfo = new MethodDisplayInfo();
-[81]	var methodDisplayInfo = new MethodDisplayInfo();	0,98	[1,00, 0,89, False]
+[81]	var methodDisplayInfo = new MethodDisplayInfo();	0,98
+[94]	methodDisplayInfo.SubMethod = methodName;	0,57
+*
 [86]	if (type != null && type.IsDefined(typeof(CompilerGeneratedAttribute)) &&
-[88]	if (type != null && type.IsDefined(typeof(CompilerGeneratedAttribute)) &&	0,99	[1,00, 0,97, False]
+[88]	if (type != null && type.IsDefined(typeof(CompilerGeneratedAttribute)) &&	0,99
+[89]	(typeof(IAsyncStateMachine).IsAssignableFrom(type) || typeof(IEnumerator).IsAssignableFrom(type)))	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpaqueUpgradeTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpaqueUpgradeTests.cs
 *
 [25]	{
-[24]	{	0,92	[1,00, 0,90, True]
+[24]	{	0,92
+[26]	{	0,89
+*
 [29]	Assert.Null(opaqueFeature);
-[28]	Assert.Null(opaqueFeature);	0,98	[1,00, 0,89, False]
+[28]	Assert.Null(opaqueFeature);	0,98
+[38]	Assert.Equal(200, (int)response.StatusCode);	0,46
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CircuitRegistry.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CircuitRegistry.cs
 *
 [223]	
-[223]		1,00	[1,00, 1,00, True]
+[223]		1,00
+[222]	await TerminateAsync(circuitId);	0,79
+*
 [188]	{
-[188]	{	1,00	[1,00, 1,00, True]
+[188]	{	1,00
+[181]	{	0,88
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
 *
 [389]	var prefixLength = BinaryMessageFormatter.LengthPrefixLength(writer.Length);
-[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00	[0,00, 0,00, True]
+[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00
+[71]	=> _worker.GetMessageBytes(message);	0,00
+*
 [397]	writer.CopyTo(span.Slice(prefixLength));
-[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00	[0,00, 0,00, True]
+[70]	public ReadOnlyMemory<byte> GetMessageBytes(HubMessage message)	0,00
+[71]	=> _worker.GetMessageBytes(message);	0,00
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UserManagerSpecificationTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UserManagerSpecificationTests.cs
 *
 [1055]	Assert.Equal(stamp, await manager.GetSecurityStampAsync(user));
-[1055]	Assert.Equal(stamp, await manager.GetSecurityStampAsync(user));	1,00	[1,00, 0,99, False]
+[1055]	Assert.Equal(stamp, await manager.GetSecurityStampAsync(user));	1,00
+[1050]	var stamp = await manager.GetSecurityStampAsync(user);	0,68
+*
 [1052]	IdentityResultAssert.IsFailure(await manager.ResetPasswordAsync(user, "bogus", newPassword), "Invalid token.");
-[1052]	IdentityResultAssert.IsFailure(await manager.ResetPasswordAsync(user, "bogus", newPassword), "Invalid token.");	0,99	[1,00, 0,95, False]
+[1052]	IdentityResultAssert.IsFailure(await manager.ResetPasswordAsync(user, "bogus", newPassword), "Invalid token.");	0,99
+[1053]	IdentityResultAssert.VerifyLogMessage(manager.Logger, $"VerifyUserTokenAsync() failed with purpose: ResetPassword for user.");	0,46
+*
 [395]	var result = await manager.CreateAsync(user);
-[395]	var result = await manager.CreateAsync(user);	0,99	[1,00, 0,96, False]
+[395]	var result = await manager.CreateAsync(user);	0,99
+[392]	var user = CreateTestUser();	0,49
+*
 [391]	manager.UserValidators.Clear();
-[391]	manager.UserValidators.Clear();	0,98	[1,00, 0,90, False]
+[391]	manager.UserValidators.Clear();	0,98
+[393]	manager.UserValidators.Add(new AlwaysBadValidator());	0,59
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RedisServerFixture.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RedisServerFixture.cs
 *
 [48]	_logger.LogError(ex, "Server failed to start.");
-[69]	_logger.LogError(ex, "Server failed to start.");	0,98	[1,00, 0,88, False]
+[69]	_logger.LogError(ex, "Server failed to start.");	0,98
+[61]	private async Task<InProcessTestServer<TStartup>> StartServer()	0,20
+*
 [50]	}
-[71]	}	0,95	[1,00, 0,94, True]
+[71]	}	0,95
+[70]	throw;	0,55
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Heartbeat.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Heartbeat.cs
 *
 [33]	OnHeartbeat();
-[38]	OnHeartbeat();	0,93	[1,00, 0,64, False]
+[38]	OnHeartbeat();	0,93
+[39]	_timerThread.Start(this);	0,31
+*
 [34]	_timer = new Timer(OnHeartbeat, state: this, dueTime: _interval, period: _interval);
-[39]	_timerThread.Start(this);	0,85	[0,27, 1,00, True]
+[39]	_timerThread.Start(this);	0,85
+[38]	OnHeartbeat();	0,23
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StaticWebAssetsFileProvider.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StaticWebAssetsFileProvider.cs
 *
 [56]	}
-[61]	}	0,97	[1,00, 0,96, True]
+[61]	}	0,97
+[57]	}	0,76
+*
 [57]	else if (BasePath.StartsWithSegments(modifiedSub, FilePathComparison, out var remaining))
-[62]	else if (BasePath.StartsWithSegments(modifiedSub, FilePathComparison, out var remaining))	0,99	[1,00, 0,96, False]
+[62]	else if (BasePath.StartsWithSegments(modifiedSub, FilePathComparison, out var remaining))	0,99
+[54]	if (StartsWithBasePath(modifiedSub, out var physicalPath))	0,42
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SpaServicesExtensionsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SpaServicesExtensionsTests.cs
 *
 [38]	
-[133]		1,00	[1,00, 1,00, True]
+[133]		1,00
+[132]	.Returns(serviceProvider);	0,74
+*
 [31]	serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict).Object;
-[126]	serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict).Object;	1,00	[1,00, 1,00, False]
+[126]	serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict).Object;	1,00
+[134]	return applicationbuilderMock.Object;	0,28
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MatcherConformanceTest.SingleEndpoint.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MatcherConformanceTest.SingleEndpoint.cs
 *
 [250]	{ ".!$%", "weirdmatch" },
-[250]	{ ".!$%", "weirdmatch" },	0,99	[1,00, 0,93, False]
+[250]	{ ".!$%", "weirdmatch" },	0,99
+[249]	{ " ", "space" },	0,54
+*
 [254]	// Act
-[254]	// Act	1,00	[1,00, 0,98, False]
+[254]	// Act	1,00
+[257]	// Assert	0,54
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpParserBenchmark.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpParserBenchmark.cs
 *
 [44]	}
-[56]	}	1,00	[1,00, 1,00, True]
+[56]	}	1,00
+[57]	}	0,56
+*
 [42]	InsertData(RequestParsingData.UnicodeRequest);
-[54]	InsertData(RequestParsingData.UnicodeRequest);	1,00	[1,00, 1,00, False]
+[54]	InsertData(RequestParsingData.UnicodeRequest);	1,00
+[52]	for (var i = 0; i < RequestParsingData.InnerLoopCount; i++)	0,42
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FormPipeReaderTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FormPipeReaderTests.cs
 *
 [219]	
-[252]		0,98	[1,00, 0,98, True]
+[252]		0,98
+[254]		0,90
+*
 [220]	KeyValueAccumulator accumulator = default;
-[253]	KeyValueAccumulator accumulator = default;	1,00	[1,00, 0,99, False]
+[253]	KeyValueAccumulator accumulator = default;	1,00
+[262]	Assert.Equal(3, accumulator.KeyCount);	0,38
+*
 [399]	var readOnlySequence = ReadOnlySequenceFactory.CreateSegments(Encoding.UTF8.GetBytes("foo=bar&baz=boo&t="));
-[432]	var readOnlySequence = ReadOnlySequenceFactory.CreateSegments(Encoding.UTF8.GetBytes("foo=bar&baz=boo&t="));	1,00	[1,00, 0,98, False]
+[432]	var readOnlySequence = ReadOnlySequenceFactory.CreateSegments(Encoding.UTF8.GetBytes("foo=bar&baz=boo&t="));	1,00
+[431]	{	0,16
+*
 [407]	Assert.Equal("Form value length limit 2 exceeded.", exception.Message);
-[440]	Assert.Equal("Form value length limit 2 exceeded.", exception.Message);	1,00	[1,00, 0,99, False]
+[440]	Assert.Equal("Form value length limit 2 exceeded.", exception.Message);	1,00
+[437]	formReader.ValueLengthLimit = 2;	0,34
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2OutputProducer.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2OutputProducer.cs
 *
 [227]	{
-[263]	{	0,98	[1,00, 0,97, True]
+[263]	{	0,98
+[261]	{	0,86
+*
 [232]	}
-[268]	}	0,97	[1,00, 0,96, True]
+[268]	}	0,97
+[269]	}	0,57
+*
 [345]	{
-[381]	{	0,91	[1,00, 0,88, True]
+[381]	{	0,91
+[379]	{	0,78
+*
 [344]	if (_completed)
-[380]	if (_streamCompleted)	0,89	[0,70, 0,93, True]
+[380]	if (_streamCompleted)	0,89
+[379]	{	0,68
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CacheControlHeaderValueTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CacheControlHeaderValueTest.cs
 *
 [364]	
-[364]		0,99	[1,00, 0,99, True]
+[364]		0,99
+[368]		0,94
+*
 [350]	cacheControl2.NoCache = true;
-[350]	cacheControl2.NoCache = true;	1,00	[1,00, 0,99, False]
+[350]	cacheControl2.NoCache = true;	1,00
+[345]	cacheControl1.NoCache = true;	0,96
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ReactDevelopmentServerMiddleware.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ReactDevelopmentServerMiddleware.cs
 *
 [38]	// Start create-react-app and attach to middleware pipeline
-[44]	// Start create-react-app and attach to middleware pipeline	0,95	[1,00, 0,75, False]
+[44]	// Start create-react-app and attach to middleware pipeline	0,95
+[52]	// - the requests are always from the local machine (we're not accepting remote	0,37
+*
 [41]	var portTask = StartCreateReactAppServerAsync(sourcePath, npmScriptName, logger);
-[49]	var portTask = StartCreateReactAppServerAsync(sourcePath, scriptName, pkgManagerCommand, devServerPort, logger, diagnosticSource, applicationStoppingToken);	0,81	[0,57, 0,88, True]
+[49]	var portTask = StartCreateReactAppServerAsync(sourcePath, scriptName, pkgManagerCommand, devServerPort, logger, diagnosticSource, applicationStoppingToken);	0,81
+[48]	var diagnosticSource = appBuilder.ApplicationServices.GetRequiredService<DiagnosticSource>();	0,74
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultHubDispatcherBenchmark.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultHubDispatcherBenchmark.cs
 *
 [369]	await _dispatcher.DispatchMessageAsync(_connectionContext, new StreamItemMessage("1", "test"));
-[370]	await _dispatcher.DispatchMessageAsync(_connectionContext, new StreamItemMessage("1", "test"));	0,99	[1,00, 0,95, False]
+[370]	await _dispatcher.DispatchMessageAsync(_connectionContext, new StreamItemMessage("1", "test"));	0,99
+[372]	await _dispatcher.DispatchMessageAsync(_connectionContext, CompletionMessage.Empty("1"));	0,78
+*
 [371]	await _dispatcher.DispatchMessageAsync(_connectionContext, CompletionMessage.Empty("1"));
-[372]	await _dispatcher.DispatchMessageAsync(_connectionContext, CompletionMessage.Empty("1"));	0,99	[1,00, 0,94, False]
+[372]	await _dispatcher.DispatchMessageAsync(_connectionContext, CompletionMessage.Empty("1"));	0,99
+[370]	await _dispatcher.DispatchMessageAsync(_connectionContext, new StreamItemMessage("1", "test"));	0,76
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationAttributeAdapterProvider.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationAttributeAdapterProvider.cs
 *
 [57]	{
-[65]	{	0,88	[1,00, 0,85, True]
+[65]	{	0,88
+[57]	{	0,88
+*
 [61]	{
-[65]	{	0,86	[1,00, 0,83, True]
+[65]	{	0,86
+[61]	{	0,85
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TokenExtensionTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TokenExtensionTests.cs
 *
 [91]	tokens.Add(tok1);
-[91]	tokens.Add(tok1);	1,00	[1,00, 1,00, False]
+[91]	tokens.Add(tok1);	1,00
+[92]	tokens.Add(tok2);	0,94
+*
 [93]	tokens.Add(tok3);
-[93]	tokens.Add(tok3);	1,00	[1,00, 1,00, False]
+[93]	tokens.Add(tok3);	1,00
+[92]	tokens.Add(tok2);	0,94
+*
 [49]	
-[49]		1,00	[1,00, 1,00, True]
+[49]		1,00
+[47]		0,95
+*
 [47]	
-[47]		1,00	[1,00, 1,00, True]
+[47]		1,00
+[49]		0,95
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HubConnectionHandlerTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HubConnectionHandlerTests.cs
 *
 [3117]	Assert.Equal(objects[1].Bar, ((JContainer)result[1])["bar"]);
-[3284]	Assert.Equal(objects[1].Bar, ((JContainer)result[1])["bar"]);	1,00	[1,00, 0,98, False]
+[3284]	Assert.Equal(objects[1].Bar, ((JContainer)result[1])["bar"]);	1,00
+[3282]	Assert.Equal(objects[0].Bar, ((JContainer)result[0])["bar"]);	0,86
+*
 [3111]	var response = (CompletionMessage)await client.ReadAsync().OrTimeout();
-[3278]	var response = (CompletionMessage)await client.ReadAsync().OrTimeout();	1,00	[1,00, 0,98, False]
+[3278]	var response = (CompletionMessage)await client.ReadAsync().OrTimeout();	1,00
+[3277]	await client.SendHubMessageAsync(CompletionMessage.Empty("id")).OrTimeout();	0,47
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRuleParser.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRuleParser.cs
 *
 [133]	
-[131]		0,97	[1,00, 0,97, True]
+[131]		0,97
+[126]		0,89
+*
 [132]	c = input[current];
-[130]	c = input[current];	0,98	[1,00, 0,92, False]
+[130]	c = input[current];	0,98
+[143]	char spaceOrTab = input[current + 2];	0,51
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IdentityUserContext.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IdentityUserContext.cs
 *
 [154]	b.HasMany<TUserToken>().WithOne().HasForeignKey(ut => ut.UserId).IsRequired();
-[154]	b.HasMany<TUserToken>().WithOne().HasForeignKey(ut => ut.UserId).IsRequired();	0,99	[1,00, 0,97, False]
+[154]	b.HasMany<TUserToken>().WithOne().HasForeignKey(ut => ut.UserId).IsRequired();	0,99
+[153]	b.HasMany<TUserLogin>().WithOne().HasForeignKey(ul => ul.UserId).IsRequired();	0,93
+*
 [169]	b.Property(l => l.LoginProvider).HasMaxLength(maxKeyLength);
-[169]	b.Property(l => l.LoginProvider).HasMaxLength(maxKeyLength);	1,00	[1,00, 0,98, False]
+[169]	b.Property(l => l.LoginProvider).HasMaxLength(maxKeyLength);	1,00
+[182]	b.Property(t => t.LoginProvider).HasMaxLength(maxKeyLength);	0,91
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpUtilities.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpUtilities.cs
 *
 [82]	{
-[72]	{	0,43	[1,00, 0,29, True]
+[72]	{	0,43
+[74]		0,31
+*
 [84]	}
-[75]	return BinaryPrimitives.ReadUInt64LittleEndian(bytes);	0,66	[0,00, 0,83, True]
+[75]	return BinaryPrimitives.ReadUInt64LittleEndian(bytes);	0,66
+[76]	}	0,36
+*
 [71]	fixed (byte* ptr = &bytes[0])
-[68]	return BinaryPrimitives.ReadUInt32LittleEndian(bytes);	0,35	[0,00, 0,44, True]
+[68]	return BinaryPrimitives.ReadUInt32LittleEndian(bytes);	0,35
+[69]	}	0,31
+*
 [67]	Debug.Assert(str.Length == 4, "String must be exactly 4 (ASCII) characters long.");
-[65]	Debug.Assert(str.Length == 4, "String must be exactly 4 (ASCII) characters long.");	0,94	[1,00, 0,69, False]
+[65]	Debug.Assert(str.Length == 4, "String must be exactly 4 (ASCII) characters long.");	0,94
+[63]	private static uint GetAsciiStringAsInt(string str)	0,26
+*
 [428]	HttpVersion.Http11 => Http11Version,
-[419]	Debug.Fail("Unexpected HttpVersion: " + httpVersion);	0,40	[0,31, 0,42, True]
+[419]	Debug.Fail("Unexpected HttpVersion: " + httpVersion);	0,40
+[412]	case HttpVersion.Http11:	0,34
+*
 [429]	_ => null,
-[420]	return null;	0,69	[0,36, 0,77, True]
+[420]	return null;	0,69
+[421]	};	0,34
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RouteTableFactory.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RouteTableFactory.cs
 *
 [193]	return false;
-[204]	return false;	0,91	[1,00, 0,89, True]
+[204]	return false;	0,91
+[208]	return false;	0,82
+*
 [189]	return true;
-[200]	return true;	0,98	[1,00, 0,97, True]
+[200]	return true;	0,98
+[199]	{	0,77
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SigningKeysLoaderTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SigningKeysLoaderTests.cs
 *
 [120]	// Assert
-[120]	// Assert	0,97	[1,00, 0,87, False]
+[120]	// Assert	0,97
+[117]	// Act	0,52
+*
 [123]	}
-[123]	}	0,95	[1,00, 0,94, True]
+[123]	}	0,95
+[122]	Assert.Equal("35840DD366107B89D2885A6B4F42CCBBAE6BA8E3", certificate.Thumbprint);	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CommandLineOptionsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CommandLineOptionsTests.cs
 *
 [39]	Assert.Contains("Usage: dotnet watch ", _stdout.ToString());
-[35]	Assert.Contains("Usage: dotnet watch ", _console.GetOutput());	0,82	[0,78, 1,00, False]
+[35]	Assert.Contains("Usage: dotnet watch ", _console.GetOutput());	0,82
+[34]	Assert.True(options.IsHelp);	0,33
+*
 [37]	
-[33]		0,99	[1,00, 0,93, False]
+[33]		0,99
+[32]	var options = CommandLineOptions.Parse(args, _console);	0,16
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OAuthHandler.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OAuthHandler.cs
 *
 [292]	
-[292]		0,99	[1,00, 0,98, True]
+[292]		0,99
+[291]	parameters["state"] = Options.StateDataFormat.Protect(properties);	0,78
+*
 [289]	}
-[289]	}	0,98	[1,00, 0,98, True]
+[289]	}	0,98
+[290]		0,78
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TlsTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TlsTests.cs
 *
 [39]	Assert.Equal(tlsFeature.ApplicationProtocol, SslApplicationProtocol.Http2.Protocol);
-[40]	Assert.Equal(tlsFeature.ApplicationProtocol, SslApplicationProtocol.Http2.Protocol);	0,98	[1,00, 0,89, False]
+[40]	Assert.Equal(tlsFeature.ApplicationProtocol, SslApplicationProtocol.Http2.Protocol);	0,98
+[38]	var tlsFeature = context.Features.Get<ITlsApplicationProtocolFeature>();	0,46
+*
 [62]	}, CancellationToken.None);
-[63]	}, CancellationToken.None);	0,99	[1,00, 0,96, False]
+[63]	}, CancellationToken.None);	0,99
+[65]	var reader = PipeReaderFactory.CreateFromStream(PipeOptions.Default, sslStream, CancellationToken.None);	0,37
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CorsPolicyBuilder.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CorsPolicyBuilder.cs
 *
 [82]	
-[92]		0,97	[1,00, 0,97, True]
+[92]		0,97
+[91]	}	0,77
+*
 [83]	return builder.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);
-[93]	return builder.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);	0,99	[1,00, 0,97, False]
+[93]	return builder.Uri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped);	0,99
+[86]	// a default port value that is specified (e.g. Port = 80 for http://www.example.com:80). Although the HTTP or FETCH spec does not say	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenApiAddURLTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenApiAddURLTests.cs
 *
 [309]	var content = await reader.ReadToEndAsync();
-[301]	var content = await reader.ReadToEndAsync();	0,97	[1,00, 0,96, True]
+[301]	var content = await reader.ReadToEndAsync();	0,97
+[299]	using (var reader = new StreamReader(jsonStream))	0,59
+*
 [289]	Assert.True(string.IsNullOrEmpty(_error.ToString()), $"Threw error: {_error.ToString()}");
-[281]		0,79	[0,00, 0,99, True]
+[281]		0,79
+[282]	AssertNoErrors(run);	0,79
+*
 [335]	}
-[326]	}	0,96	[1,00, 0,95, True]
+[326]	}	0,96
+[327]		0,76
+*
 [340]	using (var reader = new StreamReader(jsonStream))
-[331]	using (var reader = new StreamReader(jsonStream))	0,99	[1,00, 0,96, False]
+[331]	using (var reader = new StreamReader(jsonStream))	0,99
+[320]	using (var reader = new StreamReader(csprojStream))	0,80
+*
 [431]	Assert.Single(Regex.Matches(content, escapedApiRef));
-[419]	Assert.Single(Regex.Matches(content, escapedApiRef));	0,98	[1,00, 0,92, False]
+[419]	Assert.Single(Regex.Matches(content, escapedApiRef));	0,98
+[417]	Assert.Single(Regex.Matches(content, escapedPkgRef));	0,84
+*
 [430]	var escapedApiRef = Regex.Escape($"SourceUrl=\"{FakeOpenApiUrl}\"");
-[418]	var escapedApiRef = Regex.Escape($"SourceUrl=\"{FakeOpenApiUrl}\"");	0,99	[1,00, 0,93, False]
+[418]	var escapedApiRef = Regex.Escape($"SourceUrl=\"{FakeOpenApiUrl}\"");	0,99
+[416]	var escapedPkgRef = Regex.Escape("<PackageReference Include=\"NSwag.ApiDescription.Client\" Version=\"");	0,47
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UserManager.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UserManager.cs
 *
 [1712]	if (tokenProvider == null)
-[1714]	if (tokenProvider == null)	0,99	[1,00, 0,95, False]
+[1714]	if (tokenProvider == null)	0,99
+[1710]	if (user == null)	0,55
+*
 [1715]	}
-[1717]	}	0,94	[1,00, 0,93, True]
+[1717]	}	0,94
+[1722]	}	0,86
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MvcCoreLoggerExtensions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MvcCoreLoggerExtensions.cs
 *
 [1022]	if (logger.IsEnabled(LogLevel.Information))
-[1030]	if (logger.IsEnabled(LogLevel.Information))	0,93	[1,00, 0,63, False]
+[1030]	if (logger.IsEnabled(LogLevel.Information))	0,93
+[1029]	{	0,14
+*
 [1024]	var type = value == null ? "null" : value.GetType().FullName;
-[1033]	var valueType = value == null ? "null" : value.GetType().FullName;	0,87	[0,91, 0,68, False]
+[1033]	var valueType = value == null ? "null" : value.GetType().FullName;	0,87
+[1032]	var objectResultType = result.GetType().Name;	0,45
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MaxRequestBodySizeTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MaxRequestBodySizeTests.cs
 *
 [411]	}
-[430]	}	0,90	[1,00, 0,87, True]
+[430]	}	0,90
+[444]	}	0,79
+*
 [421]	
-[442]		0,95	[1,00, 0,93, True]
+[442]		0,95
+[425]		0,79
+*
 [77]	async () => await context.Request.Body.ReadAsync(buffer, 0, 1));
-[86]	async () => await context.Request.Body.ReadAsync(buffer, 0, 1));	0,98	[1,00, 0,91, False]
+[86]	async () => await context.Request.Body.ReadAsync(buffer, 0, 1));	0,98
+[79]	// Disable the MaxRequestBodySize prior to calling Request.Body.ReadAsync();	0,39
+*
 [87]	"Content-Length: " + (perRequestMaxRequestBodySize + 1),
-[96]	"Content-Length: " + (perRequestMaxRequestBodySize + 1),	0,98	[1,00, 0,92, False]
+[96]	"Content-Length: " + (perRequestMaxRequestBodySize + 1),	0,98
+[80]	feature.MaxRequestBodySize = perRequestMaxRequestBodySize;	0,53
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MediaTypeHeaderValue.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MediaTypeHeaderValue.cs
 *
 [543]	// Caller must remove leading whitespace. If not, we'll return 0.
-[544]	// Caller must remove leading whitespace. If not, we'll return 0.	1,00	[1,00, 0,98, False]
+[544]	// Caller must remove leading whitespace. If not, we'll return 0.	1,00
+[553]	current = current + HttpRuleParser.GetWhitespaceLength(input, current);	0,38
+*
 [548]	return 0;
-[549]	return 0;	0,99	[1,00, 0,98, True]
+[549]	return 0;	0,99
+[541]	return 0;	0,80
+*
 [473]	var index = 0;
-[474]	var index = 0;	1,00	[1,00, 0,99, False]
+[474]	var index = 0;	1,00
+[473]	{	0,18
+*
 [474]	return SingleValueParser.ParseValue(input, ref index);
-[475]	return SingleValueParser.ParseValue(input, ref index)!;	0,98	[0,98, 1,00, False]
+[475]	return SingleValueParser.ParseValue(input, ref index)!;	0,98
+[472]	public static MediaTypeHeaderValue Parse(StringSegment input)	0,21
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\PageBinderFactoryTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\PageBinderFactoryTest.cs
 *
 [845]	return Task.FromResult(ModelBindingResult.Failed());
-[846]	return new ValueTask<ModelBindingResult>(ModelBindingResult.Failed());	0,87	[0,68, 0,92, True]
+[846]	return new ValueTask<ModelBindingResult>(ModelBindingResult.Failed());	0,87
+[843]	return new ValueTask<ModelBindingResult>(ModelBindingResult.Success(result));	0,45
+*
 [840]	if (_args.TryGetValue(parameter.Name, out var result))
-[841]	if (_args.TryGetValue(parameter.Name, out var result))	0,93	[1,00, 0,67, False]
+[841]	if (_args.TryGetValue(parameter.Name, out var result))	0,93
+[839]	Descriptors.Add(parameter);	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CancellationTokenExtensions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CancellationTokenExtensions.cs
 *
 [13]	var tcs = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
-[13]	var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);	0,92	[0,91, 0,94, False]
+[13]	var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);	0,92
+[16]	((TaskCompletionSource)t).SetResult();	0,28
+*
 [14]	token.Register((t) =>
-[14]	token.Register((t) =>	0,96	[1,00, 0,81, False]
+[14]	token.Register((t) =>	0,96
+[16]	((TaskCompletionSource)t).SetResult();	0,31
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ComponentServiceCollectionExtensions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ComponentServiceCollectionExtensions.cs
 *
 [41]	// the chance to modify options further via the builder.
-[41]	// the chance to modify options further via the builder.	1,00	[1,00, 0,99, False]
+[41]	// the chance to modify options further via the builder.	1,00
+[38]	// once. Our AddHubOptions method doesn't do this.	0,43
+*
 [69]	
-[69]		1,00	[1,00, 1,00, True]
+[69]		1,00
+[67]		0,96
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplication.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplication.cs
 *
 [128]	
-[138]		0,90	[1,00, 0,87, True]
+[138]		0,90
+[137]	StartLog = null;	0,80
+*
 [130]	HasDiagnosticListener = false;
-[140]	HasDiagnosticListener = false;	0,96	[1,00, 0,81, False]
+[140]	HasDiagnosticListener = false;	0,96
+[141]	EventLogEnabled = false;	0,35
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NavLink.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NavLink.cs
 *
 [141]	// at http://host/path (with no trailing slash)
-[143]	// at http://host/path (with no trailing slash)	0,99	[1,00, 0,96, False]
+[143]	// at http://host/path (with no trailing slash)	0,99
+[148]	// for http://host/vdir as they do for host://host/vdir/ as it's no	0,38
+*
 [148]	if (_hrefAbsolute[_hrefAbsolute.Length - 1] == '/'
-[150]	if (_hrefAbsolute[_hrefAbsolute.Length - 1] == '/'	0,99	[1,00, 0,96, False]
+[150]	if (_hrefAbsolute[_hrefAbsolute.Length - 1] == '/'	0,99
+[140]	if (currentUriAbsolute.Length == _hrefAbsolute.Length - 1)	0,54
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultClaimUidExtractor.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultClaimUidExtractor.cs
 *
 [53]	continue;
-[53]	continue;	1,00	[1,00, 0,99, False]
+[53]	continue;	1,00
+[64]	subClaim.Issuer	0,35
+*
 [60]	return new string[]
-[60]	return new string[]	0,99	[1,00, 0,99, True]
+[60]	return new string[]	0,99
+[72]	return new string[]	0,83
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RedisProtocol.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RedisProtocol.cs
 *
 [187]	var count = MessagePackUtil.ReadMapHeader(ref data);
-[202]	var count = reader.ReadMapHeader();	0,72	[0,60, 0,75, True]
+[202]	var count = reader.ReadMapHeader();	0,72
+[201]	{	0,59
+*
 [189]	for (var i = 0; i < count; i++)
-[204]	for (var i = 0; i < count; i++)	0,92	[1,00, 0,61, False]
+[204]	for (var i = 0; i < count; i++)	0,92
+[205]	{	0,14
+*
 [177]	MessagePackBinary.WriteString(stream, serializedMessage.ProtocolName);
-[192]	writer.Write(serializedMessage.ProtocolName);	0,78	[0,59, 0,83, True]
+[192]	writer.Write(serializedMessage.ProtocolName);	0,78
+[188]	writer.WriteMapHeader(serializedHubMessages.Count);	0,69
+*
 [175]	foreach (var serializedMessage in serializedHubMessages)
-[190]	foreach (var serializedMessage in serializedHubMessages)	0,96	[1,00, 0,79, False]
+[190]	foreach (var serializedMessage in serializedHubMessages)	0,96
+[188]	writer.WriteMapHeader(serializedHubMessages.Count);	0,50
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ListenerPrimary.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ListenerPrimary.cs
 *
 [232]	{
-[234]	{	0,99	[1,00, 0,99, True]
+[234]	{	0,99
+[235]	// This is an unexpected immediate termination of the dispatch pipe most likely caused by an	0,69
+*
 [236]	
-[238]		0,95	[1,00, 0,93, True]
+[238]		0,95
+[244]		0,81
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ContentDispositionHeaderValue.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ContentDispositionHeaderValue.cs
 *
 [349]	{
-[349]	{	0,99	[1,00, 0,98, True]
+[349]	{	0,99
+[351]	{	0,87
+*
 [343]	var nameParameter = NameValueHeaderValue.Find(_parameters, parameter);
-[343]	var nameParameter = NameValueHeaderValue.Find(_parameters, parameter);	1,00	[1,00, 0,99, False]
+[343]	var nameParameter = NameValueHeaderValue.Find(_parameters, parameter);	1,00
+[341]	private StringSegment GetName(string parameter)	0,35
+*
 [623]	
-[623]		0,99	[1,00, 0,99, True]
+[623]		0,99
+[622]	}	0,79
+*
 [635]	{
-[635]	{	0,98	[1,00, 0,97, True]
+[635]	{	0,98
+[637]	{	0,85
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\JwtBearerPostConfigureOptions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\JwtBearerPostConfigureOptions.cs
 *
 [30]	{
-[30]	{	0,98	[1,00, 0,97, True]
+[30]	{	0,98
+[32]	{	0,95
+*
 [24]	if (string.IsNullOrEmpty(options.TokenValidationParameters.ValidAudience) && !string.IsNullOrEmpty(options.Audience))
-[24]	if (string.IsNullOrEmpty(options.TokenValidationParameters.ValidAudience) && !string.IsNullOrEmpty(options.Audience))	1,00	[1,00, 0,98, False]
+[24]	if (string.IsNullOrEmpty(options.TokenValidationParameters.ValidAudience) && !string.IsNullOrEmpty(options.Audience))	1,00
+[37]	if (string.IsNullOrEmpty(options.MetadataAddress) && !string.IsNullOrEmpty(options.Authority))	0,62
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AuthorizationFailure.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AuthorizationFailure.cs
 *
 [33]	FailCalled = true,
-[34]	FailCalled = true,	0,90	[1,00, 0,50, False]
+[34]	FailCalled = true,	0,90
+[33]	{	0,10
+*
 [34]	FailedRequirements = new IAuthorizationRequirement[0]
-[34]	FailCalled = true,	0,73	[0,00, 0,91, True]
+[34]	FailCalled = true,	0,73
+[35]	};	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Stream.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Stream.cs
 *
 [159]	if (!String.IsNullOrEmpty(RequestHeaders[HeaderNames.Scheme]) || !String.IsNullOrEmpty(RequestHeaders[HeaderNames.Path]))
-[220]	if (!String.IsNullOrEmpty(HttpRequestHeaders.HeaderScheme) || !String.IsNullOrEmpty(HttpRequestHeaders.HeaderPath))	0,92	[0,70, 0,98, True]
+[220]	if (!String.IsNullOrEmpty(HttpRequestHeaders.HeaderScheme) || !String.IsNullOrEmpty(HttpRequestHeaders.HeaderPath))	0,92
+[219]	{	0,78
+*
 [147]	{
-[208]	{	0,98	[1,00, 0,98, True]
+[208]	{	0,98
+[213]	{	0,91
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ModelStateDictionary.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ModelStateDictionary.cs
 *
 [1137]	{
-[1136]	{	0,99	[1,00, 0,99, True]
+[1136]	{	0,99
+[1141]	{	0,93
+*
 [1149]	continue;
-[1148]	continue;	0,99	[1,00, 0,97, False]
+[1148]	continue;	0,99
+[1131]	return true;	0,40
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TotpSecurityStampBasedTokenProvider.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TotpSecurityStampBasedTokenProvider.cs
 *
 [40]	var modifier = await GetUserModifierAsync(purpose, manager, user);
-[40]	var modifier = await GetUserModifierAsync(purpose, manager, user);	1,00	[1,00, 1,00, False]
+[40]	var modifier = await GetUserModifierAsync(purpose, manager, user);	1,00
+[39]	var token = await manager.CreateSecurityTokenAsync(user);	0,47
+*
 [37]	throw new ArgumentNullException(nameof(manager));
-[37]	throw new ArgumentNullException(nameof(manager));	1,00	[1,00, 1,00, False]
+[37]	throw new ArgumentNullException(nameof(manager));	1,00
+[40]	var modifier = await GetUserModifierAsync(purpose, manager, user);	0,37
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpsConnectionMiddlewareTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpsConnectionMiddlewareTests.cs
 *
 [491]	}
-[490]	}	0,93	[1,00, 0,91, True]
+[490]	}	0,93
+[489]	});	0,78
+*
 [487]	options.ClientCertificateMode = ClientCertificateMode.RequireCertificate;
-[486]	options.ClientCertificateMode = ClientCertificateMode.RequireCertificate;	0,99	[1,00, 0,95, False]
+[486]	options.ClientCertificateMode = ClientCertificateMode.RequireCertificate;	0,99
+[487]	options.ClientCertificateValidation = (certificate, x509Chain, sslPolicyErrors) => false;	0,59
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ConnectionLimitTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ConnectionLimitTests.cs
 *
 [218]	return new TestServer(app, serviceContext, listenOptions);
-[217]	return new TestServer(app, serviceContext, listenOptions);	0,99	[1,00, 0,97, False]
+[217]	return new TestServer(app, serviceContext, listenOptions);	0,99
+[208]	var serviceContext = new TestServiceContext(LoggerFactory);	0,35
+*
 [210]	
-[209]		0,97	[1,00, 0,96, True]
+[209]		0,97
+[208]	var serviceContext = new TestServiceContext(LoggerFactory);	0,70
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\IISHttpContext.IO.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\IISHttpContext.IO.cs
 *
 [118]	
-[127]		0,99	[1,00, 0,99, True]
+[127]		0,99
+[129]		0,86
+*
 [100]	
-[109]		0,99	[1,00, 0,99, True]
+[109]		0,99
+[115]		0,88
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ServerFixture.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ServerFixture.cs
 *
 [52]	var projects = _projects.Value;
-[52]	var projects = _projects.Value;	0,99	[1,00, 0,95, False]
+[52]	var projects = _projects.Value;	0,99
+[53]	if (projects.TryGetValue(projectName, out var dir))	0,42
+*
 [55]	return dir;
-[55]	return dir;	0,98	[1,00, 0,89, False]
+[55]	return dir;	0,98
+[56]	}	0,18
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DatabaseErrorPageMiddleware.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DatabaseErrorPageMiddleware.cs
 *
 [115]	var contextType = _localDiagnostic.Value.ContextType;
-[118]	var contextType = _localDiagnostic.Value.ContextType;	0,97	[1,00, 0,84, False]
+[118]	var contextType = _localDiagnostic.Value.ContextType;	0,97
+[119]	var context = (DbContext)httpContext.RequestServices.GetService(contextType);	0,48
+*
 [135]	databaseExists = await relationalDatabaseCreator.HasTablesAsync();
-[138]	databaseExists = await relationalDatabaseCreator.HasTablesAsync();	0,97	[1,00, 0,86, False]
+[138]	databaseExists = await relationalDatabaseCreator.HasTablesAsync();	0,97
+[134]	var databaseExists = await relationalDatabaseCreator.ExistsAsync();	0,83
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RendererSynchronizationContextTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RendererSynchronizationContextTest.cs
 *
 [54]	// Act
-[55]	// Act	0,99	[1,00, 0,97, False]
+[55]	// Act	0,99
+[61]	// Assert	0,55
+*
 [61]	//
-[62]	//	0,99	[1,00, 0,97, False]
+[62]	//	0,99
+[55]	// Act	0,46
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\LinkGenerationDecisionTree.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\LinkGenerationDecisionTree.cs
 *
 [260]	FlattenTree(branchStack, sb, branch.Value);
-[260]	FlattenTree(branchStack, sb, branch.Value);	0,99	[1,00, 0,95, False]
+[260]	FlattenTree(branchStack, sb, branch.Value);	0,99
+[261]	branchStack.Pop();	0,36
+*
 [254]	
-[254]		0,99	[1,00, 0,96, False]
+[254]		0,99
+[252]	sb.AppendLine(")");	0,19
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessageBodyTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessageBodyTests.cs
 *
 [553]	using (var input = new TestInput())
-[563]	using (var input = new TestInput())	0,97	[1,00, 0,87, False]
+[563]	using (var input = new TestInput())	0,97
+[569]	Http1MessageBody.For(HttpVersion.Http11, new HttpRequestHeaders(), input.Http1Connection));	0,30
+*
 [559]	Assert.Equal(StatusCodes.Status411LengthRequired, ex.StatusCode);
-[571]	Assert.Equal(StatusCodes.Status411LengthRequired, ex.StatusCode);	0,98	[1,00, 0,90, False]
+[571]	Assert.Equal(StatusCodes.Status411LengthRequired, ex.StatusCode);	0,98
+[569]	Http1MessageBody.For(HttpVersion.Http11, new HttpRequestHeaders(), input.Http1Connection));	0,35
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EditForm.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EditForm.cs
 *
 [138]	{
-[143]	{	0,96	[1,00, 0,95, True]
+[143]	{	0,96
+[142]	if (!isValid && OnInvalidSubmit.HasDelegate)	0,75
+*
 [126]	}
-[131]	}	0,96	[1,00, 0,95, True]
+[131]	}	0,96
+[133]	{	0,70
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HeaderCollection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HeaderCollection.cs
 *
 [152]	Store[key] = StringValues.Concat(values, value);
-[188]	Store[key] = StringValues.Concat(values, value);	0,99	[1,00, 0,93, False]
+[188]	Store[key] = StringValues.Concat(values, value);	0,99
+[187]	Store.TryGetValue(key, out values);	0,44
+*
 [148]	ValidateHeaderCharacters(key);
-[184]	ValidateHeaderCharacters(key);	0,96	[1,00, 0,82, False]
+[184]	ValidateHeaderCharacters(key);	0,96
+[185]	ValidateHeaderCharacters(value);	0,80
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RemoteJSRuntime.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RemoteJSRuntime.cs
 *
 [80]	
-[83]		0,99	[1,00, 0,99, True]
+[83]		0,99
+[82]	}	0,77
+*
 [78]	$"during the OnAfterRenderAsync lifecycle method.");
-[81]	$"during the OnAfterRenderAsync lifecycle method.");	1,00	[1,00, 0,98, False]
+[81]	$"during the OnAfterRenderAsync lifecycle method.");	1,00
+[80]	$"statically rendered. When prerendering is enabled, JavaScript interop calls can only be performed " +	0,36
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\InputBase.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\InputBase.cs
 *
 [232]	}
-[296]	}	0,47	[1,00, 0,34, True]
+[296]	}	0,47
+[294]	EditContext.OnValidationStateChanged -= _validationStateChangedHandler;	0,40
+*
 [229]	if (EditContext != null)
-[293]	{	0,78	[0,00, 0,97, True]
+[293]	{	0,78
+[294]	EditContext.OnValidationStateChanged -= _validationStateChangedHandler;	0,50
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AppOfflineTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AppOfflineTests.cs
 *
 [89]	Assert.Equal(500, (int)result.StatusCode);
-[89]	Assert.Equal(500, (int)result.StatusCode);	1,00	[1,00, 0,98, False]
+[89]	Assert.Equal(500, (int)result.StatusCode);	1,00
+[90]	Assert.Contains("500.30", await result.Content.ReadAsStringAsync());	0,48
+*
 [90]	Assert.Contains("500.30", await result.Content.ReadAsStringAsync());
-[90]	Assert.Contains("500.30", await result.Content.ReadAsStringAsync());	1,00	[1,00, 0,99, False]
+[90]	Assert.Contains("500.30", await result.Content.ReadAsStringAsync());	1,00
+[89]	Assert.Equal(500, (int)result.StatusCode);	0,48
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\PropertyHelper.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\PropertyHelper.cs
 *
 [398]	
-[400]		0,99	[1,00, 0,95, False]
+[400]		0,99
+[398]	return null;	0,18
+*
 [400]	return getter(ref unboxed);
-[402]	return getter(ref unboxed);	1,00	[1,00, 0,99, False]
+[402]	return getter(ref unboxed);	1,00
+[398]	return null;	0,31
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StaticFileMiddlewareTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StaticFileMiddlewareTests.cs
 *
 [182]	var hostingEnvironment = server.Services.GetService<IWebHostEnvironment>();
-[182]	var hostingEnvironment = server.Services.GetService<IWebHostEnvironment>();	1,00	[1,00, 0,99, False]
+[182]	var hostingEnvironment = server.Services.GetService<IWebHostEnvironment>();	1,00
+[186]	var fileInfo = hostingEnvironment.WebRootFileProvider.GetFileInfo(Path.GetFileName(requestUrl));	0,53
+*
 [192]	Assert.True(response.Content.Headers.ContentLength == fileInfo.Length);
-[192]	Assert.True(response.Content.Headers.ContentLength == fileInfo.Length);	1,00	[1,00, 1,00, False]
+[192]	Assert.True(response.Content.Headers.ContentLength == fileInfo.Length);	1,00
+[191]	Assert.Equal("text/plain", response.Content.Headers.ContentType.ToString());	0,55
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http1ConnectionTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http1ConnectionTests.cs
 *
 [467]	await _application.Output.WriteAsync(Encoding.ASCII.GetBytes($"GET {target} HTTP/1.1\r\n"));
-[513]	await _application.Output.WriteAsync(Encoding.ASCII.GetBytes($"GET {target} HTTP/1.1\r\n"));	0,99	[1,00, 0,95, False]
+[513]	await _application.Output.WriteAsync(Encoding.ASCII.GetBytes($"GET {target} HTTP/1.1\r\n"));	0,99
+[520]	Assert.Equal(CoreStrings.FormatBadRequest_InvalidRequestTarget_Detail(target.EscapeNonPrintable()), exception.Message);	0,29
+*
 [474]	Assert.Equal(CoreStrings.FormatBadRequest_InvalidRequestTarget_Detail(target.EscapeNonPrintable()), exception.Message);
-[520]	Assert.Equal(CoreStrings.FormatBadRequest_InvalidRequestTarget_Detail(target.EscapeNonPrintable()), exception.Message);	0,99	[1,00, 0,95, False]
+[520]	Assert.Equal(CoreStrings.FormatBadRequest_InvalidRequestTarget_Detail(target.EscapeNonPrintable()), exception.Message);	0,99
+[513]	await _application.Output.WriteAsync(Encoding.ASCII.GetBytes($"GET {target} HTTP/1.1\r\n"));	0,30
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ParameterView.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ParameterView.cs
 *
 [58]	return new Enumerator(_frames, _ownerIndex, _cascadingParametersOrNull);
-[59]	return new Enumerator(_frames, _ownerIndex, _cascadingParameters);	0,93	[0,91, 1,00, False]
+[59]	return new Enumerator(_frames, _ownerIndex, _cascadingParameters);	0,93
+[56]	public Enumerator GetEnumerator()	0,24
+*
 [57]	_lifetime.AssertNotExpired();
-[58]	_lifetime.AssertNotExpired();	0,99	[1,00, 0,96, False]
+[58]	_lifetime.AssertNotExpired();	0,99
+[56]	public Enumerator GetEnumerator()	0,29
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DefaultAntiforgeryTokenStoreTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DefaultAntiforgeryTokenStoreTest.cs
 *
 [395]	// Act
-[395]	// Act	1,00	[1,00, 0,99, False]
+[395]	// Act	1,00
+[398]	// Assert	0,58
+*
 [403]	Assert.True(cookies.Options.HttpOnly);
-[403]	Assert.True(cookies.Options!.HttpOnly);	0,98	[0,97, 1,00, False]
+[403]	Assert.True(cookies.Options!.HttpOnly);	0,98
+[404]	Assert.Equal("/vdir1", cookies.Options.Path);	0,59
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UseMiddlewareTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UseMiddlewareTest.cs
 *
 [296]	sp1 = null;
-[296]	sp1 = null;	1,00	[1,00, 0,99, False]
+[296]	sp1 = null;	1,00
+[297]	sp2 = null;	0,87
+*
 [298]	return Task.FromResult(0);
-[298]	return Task.FromResult(0);	0,97	[1,00, 0,84, False]
+[298]	return Task.FromResult(0);	0,97
+[296]	sp1 = null;	0,06
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelServerOptions.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelServerOptions.cs
 *
 [169]	var loader = new KestrelConfigurationLoader(this, new ConfigurationBuilder().Build());
-[220]	public KestrelConfigurationLoader Configure() => Configure(new ConfigurationBuilder().Build());	0,51	[0,63, 0,00, False]
+[220]	public KestrelConfigurationLoader Configure() => Configure(new ConfigurationBuilder().Build());	0,51
+*
 [171]	return loader;
-[220]	public KestrelConfigurationLoader Configure() => Configure(new ConfigurationBuilder().Build());	0,00	[0,00, 0,00, False]
+[220]	public KestrelConfigurationLoader Configure() => Configure(new ConfigurationBuilder().Build());	0,00
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\EntityFrameworkCoreXmlRepository.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\EntityFrameworkCoreXmlRepository.cs
 *
 [43]	using (var scope = _services.CreateScope())
-[48]	using (var scope = _services.CreateScope())	0,92	[1,00, 0,59, False]
+[48]	using (var scope = _services.CreateScope())	0,92
+[50]	var context = scope.ServiceProvider.GetRequiredService<TContext>();	0,32
+*
 [45]	var context = scope.ServiceProvider.GetRequiredService<TContext>();
-[50]	var context = scope.ServiceProvider.GetRequiredService<TContext>();	0,93	[1,00, 0,66, False]
+[50]	var context = scope.ServiceProvider.GetRequiredService<TContext>();	0,93
+[48]	using (var scope = _services.CreateScope())	0,37
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpParser.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpParser.cs
 *
 [434]	_showErrorDetails
-[478]	_showErrorDetails	0,95	[1,00, 0,77, False]
+[478]	_showErrorDetails	0,95
+[477]	reason,	0,16
+*
 [435]	? new Span<byte>(detail, length).GetAsciiStringEscaped(Constants.MaxExceptionDetailSize)
-[479]	? headerLine.GetAsciiStringEscaped(Constants.MaxExceptionDetailSize)	0,78	[0,74, 0,94, False]
+[479]	? headerLine.GetAsciiStringEscaped(Constants.MaxExceptionDetailSize)	0,78
+[476]	=> KestrelBadHttpRequestException.GetException(	0,30
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Hubs.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Hubs.cs
 *
 [524]	tcs.SetException(new InvalidOperationException("Hub OnDisconnected failed."));
-[531]	tcs.SetException(new InvalidOperationException("Hub OnDisconnected failed."));	0,99	[1,00, 0,96, False]
+[531]	tcs.SetException(new InvalidOperationException("Hub OnDisconnected failed."));	0,99
+[532]	return tcs.Task;	0,08
+*
 [523]	var tcs = new TaskCompletionSource<object>();
-[530]	var tcs = new TaskCompletionSource();	0,84	[0,80, 1,00, False]
+[530]	var tcs = new TaskCompletionSource();	0,84
+[531]	tcs.SetException(new InvalidOperationException("Hub OnDisconnected failed."));	0,27
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\KestrelConnection.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\KestrelConnection.cs
 *
 [62]	{
-[56]	{	1,00	[1,00, 1,00, True]
+[56]	{	1,00
+[55]	foreach (var (handler, state) in _heartbeatHandlers)	0,59
+*
 [55]	{
-[49]	{	1,00	[1,00, 1,00, True]
+[49]	{	1,00
+[47]	{	0,68
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MapConnectionHandlerTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MapConnectionHandlerTests.cs
 *
 [323]	await client.ConnectAsync(new Uri(address), CancellationToken.None);
-[325]	await client.ConnectAsync(new Uri(address), CancellationToken.None);	1,00	[1,00, 0,98, False]
+[325]	await client.ConnectAsync(new Uri(address), CancellationToken.None);	1,00
+[327]	await client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).OrTimeout();	0,45
+*
 [322]	client.Options.AddSubProtocol("protocol2");
-[324]	client.Options.AddSubProtocol("protocol2");	1,00	[1,00, 0,98, False]
+[324]	client.Options.AddSubProtocol("protocol2");	1,00
+[323]	client.Options.AddSubProtocol("protocol1");	0,97
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ActualApiResponseMetadataFactoryTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ActualApiResponseMetadataFactoryTest.cs
 *
 [79]	symbolCache,
-[79]	symbolCache,	0,99	[1,00, 0,97, False]
+[79]	symbolCache,	0,99
+[78]	var actualResponseMetadata = ActualApiResponseMetadataFactory.InspectReturnStatementSyntax(	0,18
+*
 [63]	return new DoesNotExist(id);
-[63]	return new DoesNotExist(id);	1,00	[1,00, 0,98, False]
+[63]	return new DoesNotExist(id);	1,00
+[61]	public IActionResult Get(int id)	0,39
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\UpgradeTests.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\UpgradeTests.cs
 *
 [336]	await connection.Receive("HTTP/1.1 101 Switching Protocols",
-[336]	await connection.Receive("HTTP/1.1 101 Switching Protocols",	1,00	[1,00, 0,98, False]
+[336]	await connection.Receive("HTTP/1.1 101 Switching Protocols",	1,00
+[335]	await connection.SendEmptyGetWithUpgrade();	0,51
+*
 [343]	await appCompletedTcs.Task.DefaultTimeout();
-[343]	await appCompletedTcs.Task.DefaultTimeout();	1,00	[1,00, 0,99, False]
+[343]	await appCompletedTcs.Task.DefaultTimeout();	1,00
+[323]	appCompletedTcs.SetResult();	0,52
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\GenerateRecoveryCodes.cshtml.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\GenerateRecoveryCodes.cshtml.cs
 *
 [72]	throw new InvalidOperationException($"Cannot generate recovery codes for user with ID '{userId}' because they do not have 2FA enabled.");
-[71]	throw new InvalidOperationException($"Cannot generate recovery codes for user because they do not have 2FA enabled.");	0,86	[0,45, 0,97, True]
+[71]	throw new InvalidOperationException($"Cannot generate recovery codes for user because they do not have 2FA enabled.");	0,86
+[72]	}	0,70
+*
 [74]	
-[73]		0,93	[1,00, 0,91, True]
+[73]		0,93
+[72]	}	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpResponseHeaders.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpResponseHeaders.cs
 *
 [33]	
-[34]		0,94	[1,00, 0,93, True]
+[34]		0,94
+[35]	var extraHeaders = MaybeUnknown;	0,71
+*
 [56]	}
-[57]	}	0,96	[1,00, 0,95, True]
+[57]	}	0,96
+[56]	}	0,73
 
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CascadingParameterStateTest.cs
 file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CascadingParameterStateTest.cs
 *
 [250]	
-[250]		0,91	[1,00, 0,88, True]
+[250]		0,91
+[249]	new ComponentWithNamedCascadingParam());	0,70
+*
 [252]	var result = CascadingParameterState.FindCascadingParameters(states.Last());
-[252]	var result = CascadingParameterState.FindCascadingParameters(states.Last());	0,97	[1,00, 0,87, False]
+[252]	var result = CascadingParameterState.FindCascadingParameters(states.Last());	0,97
+[249]	new ComponentWithNamedCascadingParam());	0,36

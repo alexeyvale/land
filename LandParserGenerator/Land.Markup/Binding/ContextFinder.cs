@@ -834,7 +834,7 @@ namespace Land.Markup.Binding
 			return overallResult;
 		}
 
-		public (LineContext, SegmentLocation, double) FindLine(
+		public List<(LineContext, SegmentLocation, double)> FindLine(
 			LineContext context,
 			Node outerNode,
 			ParsedFile file)
@@ -850,7 +850,10 @@ namespace Land.Markup.Binding
 				.Substring(outerNode.Location.Start.Offset, outerNode.Location.Length.Value)
 				.Split(new string[] { lineEnd }, StringSplitOptions.None);
 
-			if (rawLines.Length == 0) return (null, null, 0);
+			if (rawLines.Length == 0)
+			{
+				return new List<(LineContext, SegmentLocation, double)> { (null, null, 0) };
+			}
 
 			/// Для каждой строки вычисляем контекст строки и считаем похожести на искомую строку
 			var lines = rawLines.Select((e, i) => {
@@ -894,7 +897,7 @@ namespace Land.Markup.Binding
 				.OrderByDescending(l => totalSimilarities[l])
 				.ToList();
 
-			return (lines[0].Context, lines[0].Location, totalSimilarities[lines[0]]);
+			return lines.Select(e=>(e.Context, e.Location, totalSimilarities[e])).ToList();
 		}
 
 		#region EvalSimilarity

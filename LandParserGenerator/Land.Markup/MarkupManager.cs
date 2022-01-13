@@ -405,7 +405,7 @@ namespace Land.Markup
 					point.LineContext,
 					candidate.Node,
 					candidate.File
-				)
+				)[0]
 				: (null, null, 0);
 
 			point.Relink(context, candidate.Node.Location, lineContext, lineLocation);

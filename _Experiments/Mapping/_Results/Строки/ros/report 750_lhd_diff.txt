@@ -1,0 +1,139 @@
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProximityExpressionsGetterTests.Statements.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProximityExpressionsGetterTests.Statements.cs
+*
+[851]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 7507);
+[851]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 7507, cancellationToken: default);	0,85	[0,27, 1,00, True] 851, 837
+*
+[1243]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 9866);
+[1243]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 9866, cancellationToken: default);	0,80	[0,00, 1,00, True] _
+*
+[1649]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 12761);
+[1649]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 12761, cancellationToken: default);	0,80	[0,00, 1,00, True] _
+*
+[529]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 4801);
+[529]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 4801, cancellationToken: default);	0,89	[0,43, 1,00, True] 529, 207
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForLocalFunctionsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForLocalFunctionsAnalyzerTests.cs
+*
+[397]	{
+[498]	{	0,65	[1,00, 0,57, True] 500
+*
+[392]	@"class C
+[493]	class C	0,59	[0,75, 0,55, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProximityExpressionsGetterTests.Lines.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProximityExpressionsGetterTests.Lines.cs
+*
+[3409]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 14372);
+[3409]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 14372, cancellationToken: default);	0,90	[0,48, 1,00, True] 3409, 3144
+*
+[3062]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 12086);
+[3062]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 12086, cancellationToken: default);	0,80	[0,00, 1,00, True] 3062, 1752
+*
+[1644]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 6421);
+[1644]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 6421, cancellationToken: default);	0,80	[0,00, 1,00, True] _
+*
+[3814]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 15801);
+[3814]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 15801, cancellationToken: default);	0,80	[0,00, 1,00, True] _
+*
+[2609]	var terms = CSharpProximityExpressionsService.TestAccessor.Do(tree, 10108);
+[2609]	var terms = CSharpProximityExpressionsService.GetProximityExpressions(tree, 10108, cancellationToken: default);	0,80	[0,00, 1,00, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForOperatorsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForOperatorsAnalyzerTests.cs
+*
+[107]	await TestInRegularAndScriptAsync(
+[135]	{	0,61	[0,00, 0,76, True] _
+*
+[129]	@"class C
+[169]	class C	0,63	[0,75, 0,60, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+[4380]	}
+[7185]	var src1 = @"class B { ~B() { } }";	0,33	[0,00, 0,42, True] _
+*
+[4396]	edits.VerifyRudeDiagnostics(
+[7194]	edits.VerifySemanticDiagnostics(	0,65	[0,75, 0,24, False] 7194, 10923
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.LastLineCache.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.LastLineCache.cs
+*
+[57]	classifications = null;
+[53]	this.Clear();	0,69	[0,00, 0,86, True] _
+*
+[46]	lock (_gate)
+[42]	{	0,67	[0,00, 0,83, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RenameTrackingTaggerProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RenameTrackingTaggerProvider.cs
+*
+[124]	}
+[127]	}	0,90	[1,00, 0,88, True] 124
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Symbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Symbol.cs
+*
+[857]	if (!diagnostics.IsEmptyWithoutResolution)
+[858]	if (ContainingSymbol is SourceMemberContainerTypeSymbol container)	0,60	[0,31, 0,68, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectChanges.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectChanges.cs
+*
+[197]	}
+[146]	public IEnumerable<DocumentId> GetChangedAnalyzerConfigDocuments()	0,00	[0,00, 0,00, True] _
+*
+[192]	var newState = _newProject.GetAnalyzerConfigDocumentState(doc.Id);
+[146]	public IEnumerable<DocumentId> GetChangedAnalyzerConfigDocuments()	0,21	[0,34, 0,18, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RequestExecutionQueue.DocumentChangeTracker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RequestExecutionQueue.DocumentChangeTracker.cs
+*
+[88]	Contract.ThrowIfFalse(_trackedDocuments.ContainsKey(documentUri), "didClose received for a document that isn't open.");
+[102]	Contract.ThrowIfFalse(_trackedDocuments.ContainsKey(documentUri), $"didClose received for {documentUri} which is not open.");	0,61	[0,52, 1,00, False] 102, 88
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WorkCoordinator.NormalPriorityProcessor.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WorkCoordinator.NormalPriorityProcessor.cs
+*
+[354]	}
+[362]	}	0,97	[1,00, 0,96, True] 356
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RecordTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RecordTests.cs
+*
+[1027]	IL_000a:  callvirt   ""System.Type C.EqualityContract.get""
+[1055]	IL_000e:  callvirt   ""System.Type C.EqualityContract.get""	0,92	[0,98, 0,91, True] 1053, 1055
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RemoteEditAndContinueService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RemoteEditAndContinueService.cs
+*
+[100]	GetService().EndEditSession(out var documentsToReanalyze);
+[87]	GetService().BreakStateEntered(out var documentsToReanalyze);	0,80	[0,76, 0,94, False] 167
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionUpdate.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionUpdate.cs
+*
+[40]	ImmutableArray<IDisposable>.Empty,
+[39]	ImmutableArray<(Guid, ImmutableArray<(ManagedModuleMethodId, NonRemappableRegion)>)>.Empty,	0,69	[0,35, 0,77, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TextViewWindow_OutOfProc.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TextViewWindow_OutOfProc.cs
+*
+[123]	_instance.Workspace.WaitForAsyncOperations(Helper.HangMitigatingTimeout, FeatureAttribute.QuickInfo);
+[118]	=> _textViewWindowInProc.InvokeQuickInfo();	0,17	[0,25, 0,15, True] _
+*
+[122]	_instance.ExecuteCommand(WellKnownCommandNames.Edit_QuickInfo);
+[118]	=> _textViewWindowInProc.InvokeQuickInfo();	0,45	[0,33, 0,48, True] _
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\UseExpressionBodyForConstructorsAnalyzerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\UseExpressionBodyForConstructorsAnalyzerTests.cs
+*
+[41]	await TestInRegularAndScript1Async(
+[47]	var code = @"	0,57	[0,00, 0,71, True] _
+*
+[48]	}",
+[53]	{	0,54	[0,00, 0,67, True] _
+

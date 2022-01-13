@@ -1,0 +1,130 @@
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\PatternsDesugaringVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\PatternsDesugaringVisitor.cs
+*
+[202]	}
+[647]	}	0,84	[1,00, 0,80, True] 640
+*
+[114]	// TODO Patterns: convert to compilation error
+[211]	{	0,72	[0,00, 0,90, True] _
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\syntax_tree_visitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\syntax_tree_visitor.cs
+*
+[2675]	}
+[2725]	}	0,80	[1,00, 0,75, True] 2747
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\NETGenerator.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\NETGenerator.cs
+*
+[5278]	il.Emit(OpCodes.Ldloc, lb);
+[5528]	//il.Emit(OpCodes.Ldloc, lb);	0,97	[0,93, 0,98, True] _
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\DomSyntaxTreeVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\DomSyntaxTreeVisitor.cs
+*
+[3315]	returned_scope = new SetScope(returned_scope as TypeScope);
+[3850]	TypeScope ts = returned_scope as TypeScope;	0,72	[0,65, 0,74, True] _
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ViewOptionsContent.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ViewOptionsContent.cs
+*
+[85]	}
+[85]	}	0,83	[1,00, 0,79, True] 135
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+[49550]	pattern_deconstructor_parameter copy = new pattern_deconstructor_parameter();
+[49938]	pattern_parameter copy = new pattern_parameter();	0,92	[0,62, 1,00, True] _
+*
+[15880]	}
+[15996]	}	0,79	[1,00, 0,74, True] 15986
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SymTable.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SymTable.cs
+*
+[1738]	//SortedDictionary<string,SymInfo> dict = new SortedDictionary<string,SymInfo>();
+[2017]	List<SymInfo> lst = new List<SymInfo>();	0,48	[0,39, 0,50, True] _
+*
+[1739]	return null;
+[2022]	return lst.ToArray();	0,47	[0,35, 0,50, True] _
+*
+[1783]	return null;
+[2072]	return parent.FindNameInAnyOrder(name);	0,57	[0,00, 0,71, True] _
+*
+[1764]	//SortedDictionary<string,SymInfo> dict = new SortedDictionary<string,SymInfo>();
+[2047]	List<SymInfo> lst = new List<SymInfo>();	0,48	[0,39, 0,50, True] _
+*
+[1765]	return new SymInfo[0];
+[2052]	return lst.ToArray();	0,47	[0,35, 0,50, True] _
+*
+[2006]	{
+[2311]	{	0,66	[1,00, 0,58, True] 2314
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\LocalVars.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\LocalVars.cs
+*
+[1167]	{
+[1167]	{	0,92	[1,00, 0,90, True] 1169
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CodeFormatter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CodeFormatter.cs
+*
+[231]	sb.Append(Text.Substring(start_pos, end_pos - start_pos + 1));
+[270]	string node_text = Text.Substring(start_pos, Math.Max(end_pos - start_pos + 1, 0));	0,61	[0,66, 0,42, False] 231
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SymbolTable.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SymbolTable.cs
+*
+[831]	scope = ((ClassMethodScope)scope).MyClass;
+[862]	scope = scope.TopScope;	0,88	[0,40, 1,00, True] _
+*
+[1091]	
+[1169]		0,87	[1,00, 0,84, True] 1183
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamReader.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamReader.cs
+*
+[4049]	else
+[4101]	{	0,39	[0,00, 0,49, True] 4005, 4205
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\ExpressionVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\ExpressionVisitor.cs
+*
+[332]	if (ts != null)
+[389]	//if (ts != null)	0,88	[0,86, 0,98, False] _
+*
+[312]	{
+[371]	{	0,97	[1,00, 0,96, True] 369
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\CapturedVariablesTreeBuilder.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\CapturedVariablesTreeBuilder.cs
+*
+[177]	return;
+[204]	return;	0,67	[1,00, 0,59, True] 312
+*
+[126]	{
+[127]	{	0,49	[1,00, 0,36, True] 129
+*
+[128]	}
+[134]	}	0,74	[1,00, 0,68, True] 132
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\MarkMethodHasYieldVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\MarkMethodHasYieldVisitor.cs
+*
+[75]	{
+[104]	{	0,83	[1,00, 0,79, True] 120
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\static_executors.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\static_executors.cs
+*
+[2489]	}
+[2493]	}	0,96	[1,00, 0,95, True] 2489
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Foreach.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Foreach.cs
+*
+[145]	}
+[202]	// SSM 23.08.16 Закомментировал оптимизацию. Не работает с лямбдами. Лямбды обходят старое дерево. А заменить foreach на for на этом этапе пока не получается - не развита инфраструктура	0,52	[0,00, 0,65, True] 185
+
