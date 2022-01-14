@@ -450,10 +450,23 @@ namespace Land.Core.Specification
 						case ParsingOption.SKIP:
 							errorSymbols = CheckIfTerminals(symbols);
 							if (errorSymbols.Count > 0)
+							{
 								throw new IncorrectGrammarException(
 									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
 										$"не определен{(errorSymbols.Count > 1 ? "ы" : "")} как терминальны{(errorSymbols.Count > 1 ? "е" : "й")}"
 								);
+							}
+
+							errorSymbols = symbols
+								.Where(s => Pairs.Values.Any(e => e.Left.Contains(s) || e.Right.Contains(s)))
+								.ToList();
+							if(errorSymbols.Count > 0)
+							{
+								throw new IncorrectGrammarException(
+									$"Символ{(errorSymbols.Count > 1 ? "ы" : "")} '{String.Join("', '", errorSymbols)}' " +
+										$"участву{(errorSymbols.Count > 1 ? "ют" : "ет")} в определении одной или нескольких пар"
+								);
+							}
 							break;
 						case ParsingOption.RECOVERY:
 							errorSymbols = CheckIfNonterminals(symbols);
