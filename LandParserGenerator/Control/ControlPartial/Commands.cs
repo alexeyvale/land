@@ -25,7 +25,7 @@ namespace Land.Control
 			MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
 		}
 
-		private void Command_MarkupTree_Relink_Executed(object sender, RoutedEventArgs e)
+		private void Command_MarkupTree_RelinkSame_Executed(object sender, RoutedEventArgs e)
 		{
 			/// Переходим к точке, которую хотим перепривязать
 			var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
@@ -40,6 +40,11 @@ namespace Land.Control
 				/// Выбираем сущности всех уровней, к которым можно привязаться в данном месте
 				Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
 			}
+		}
+
+		private void Command_MarkupTree_RelinkCurrent_Executed(object sender, RoutedEventArgs e)
+		{
+			Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
 		}
 
 		private void Command_MissingTree_Delete_Executed(object sender, RoutedEventArgs e)
@@ -497,9 +502,7 @@ namespace Land.Control
 
 				if(candidate != null)
 				{
-					var index = candidates.IndexOf(candidate);
-
-					candidates.Insert(index, new ExistingConcernPointCandidate
+					candidates.Insert(0, new ExistingConcernPointCandidate
 					{
 						Node = candidate.Node,
 						Line = adjustedSelection,

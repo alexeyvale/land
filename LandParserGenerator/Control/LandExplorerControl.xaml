@@ -30,7 +30,8 @@
 		<CommandBinding Command="local:LandExplorerCommands.TurnOn" Executed="Command_MarkupTree_TurnOn_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.TurnOff" Executed="Command_MarkupTree_TurnOff_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Delete_Markup" Executed="Command_MarkupTree_Delete_Executed" CanExecute="Command_MarkupTree_HasSelectedItem_CanExecute"/>
-		<CommandBinding Command="local:LandExplorerCommands.Relink_Markup" Executed="Command_MarkupTree_Relink_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.RelinkSame_Markup" Executed="Command_MarkupTree_RelinkSame_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.RelinkCurrent_Markup" Executed="Command_MarkupTree_RelinkCurrent_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.OpenConcernGraph" Executed="Command_OpenConcernGraph_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
@@ -50,9 +51,9 @@
 		</Grid.Resources>
 
 		<Grid.RowDefinitions>
-            <RowDefinition Height="60*"></RowDefinition>
+			<RowDefinition Height="60*" MinHeight="100"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="40*" MaxHeight="300"></RowDefinition>
+            <RowDefinition Height="40*" MaxHeight="320"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -91,16 +92,18 @@
 				
                 <Separator Margin="7"></Separator>
 
-				<Button Content="&#xf03a;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
-						Command="local:LandExplorerCommands.SelectPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf067;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf65e;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" 
 						Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				<Button Content="&#xf0ac;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
-						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf03a;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.SelectPoint" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<!--<Button Content="&#xf0ac;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.AddLand" CommandTarget="{Binding ElementName=LandExplorer}"></Button>-->
 				<Button Content="&#xf0c1;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
-						Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+						Command="local:LandExplorerCommands.RelinkSame_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+				<Button Content="&#xf074;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.RelinkCurrent_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf2ed;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				
@@ -162,8 +165,10 @@
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Command="local:LandExplorerCommands.AddPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.SelectPoint" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.AddConcern" CommandTarget="{Binding ElementName=LandExplorer}"/>
-									<MenuItem Command="local:LandExplorerCommands.Relink_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.RelinkSame_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
+									<MenuItem Command="local:LandExplorerCommands.RelinkCurrent_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
 									<MenuItem Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"/>
 								</ContextMenu>
                             </StackPanel.ContextMenu>
@@ -213,7 +218,7 @@
 							</StackPanel>
 							<ListBox       
 								FontSize="12pt"
-								Height="80"
+								Height="100"
 								Name="ConcernPointCandidatesList"
 								SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
 								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
