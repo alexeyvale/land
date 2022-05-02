@@ -139,11 +139,18 @@ namespace Land.Core.Parsing.LR
 						LexingStream.CurrentToken.Location.Start,
 						addInfo: new Dictionary<MessageAddInfoKey, object>
 						{
-							{ MessageAddInfoKey.UnexpectedToken, LexingStream.CurrentToken.Name },
-							{ MessageAddInfoKey.UnexpectedLexeme, LexingStream.CurrentToken.Text },
+							{ 
+								MessageAddInfoKey.UnexpectedToken, 
+								LexingStream.CurrentToken.Name 
+							},
+							{ 
+								MessageAddInfoKey.UnexpectedLexeme, 
+								LexingStream.CurrentToken.Text 
+							},
 							{ 
 								MessageAddInfoKey.ExpectedTokens, 
-								Table.Items[Stack.PeekState()].Where(i=>i.Lookahead != null).Select(e => e.Lookahead).ToList() 
+								Table.Items[Stack.PeekState()].Markers
+									.Where(i=>i.Lookahead != null).Select(e => e.Lookahead).ToList() 
 							}
 						}
 					));
@@ -230,7 +237,9 @@ namespace Land.Core.Parsing.LR
 			}
 
 			/// Берём опции из нужного вхождения Any
-			var marker = Table.Items[Stack.PeekState()].First(i => i.Next == Grammar.ANY_TOKEN_NAME);
+			var marker = Table.Items[Stack.PeekState()].Markers
+				.First(i => i.Next == Grammar.ANY_TOKEN_NAME);
+
 			anyNode.Options = marker.Alternative[marker.Position].Options;
 			anyNode.Arguments = marker.Alternative[marker.Position].Arguments;
 
@@ -458,7 +467,7 @@ namespace Land.Core.Parsing.LR
 					/// Выбираем пункты, продукции которых потенциально могут участвовать
 					/// в выводе текущего префикса из стартового символа
 					initialDerivationProds = new HashSet<PathFragment>(
-						Table.Items[Stack.PeekState()]
+						Table.Items[Stack.PeekState()].Markers
 							.Where
 							(i =>
 								/// Точка должна стоять перед символом, только что снятым со стека
@@ -479,7 +488,7 @@ namespace Land.Core.Parsing.LR
 						oldCount = derivationProds.Count;
 
 						/// Добавляем к списку пункты, порождающие уже добавленные пункты
-						derivationProds.UnionWith(Table.Items[Stack.PeekState()]
+						derivationProds.UnionWith(Table.Items[Stack.PeekState()].Markers
 							.Where(i => derivationProds.Any(p => p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
 						);
@@ -562,7 +571,7 @@ namespace Land.Core.Parsing.LR
 		{
 			if (oldStopTokens != null && LexingStream.GetPairsCount() == NestingStack.Peek())
 			{
-				var anyArgs = Table.Items[Stack.PeekState()]
+				var anyArgs = Table.Items[Stack.PeekState()].Markers
 					.Where(i => i.Position == 0 && i.Next == Grammar.ANY_TOKEN_NAME)
 					.Select(i => i.Alternative[0].Arguments)
 					.FirstOrDefault();

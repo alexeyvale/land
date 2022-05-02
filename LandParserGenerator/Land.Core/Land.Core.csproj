@@ -64,7 +64,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Parsing\LR\Item.cs" />
     <Compile Include="Core\Parsing\Tree\Visitors\GrammarProvidedTreeVisitor.cs" />
+    <Compile Include="Core\Specification\SetBuilders\ClosureGotoBuilder.cs" />
+    <Compile Include="Core\Specification\SetBuilders\FollowBuilder.cs" />
+    <Compile Include="Core\Specification\SetBuilders\FirstBuilder.cs" />
     <Compile Include="Core\Specification\IGrammarProvided.cs" />
     <Compile Include="Core\Lexing\AntlrTokenAdapter.cs" />
     <Compile Include="Core\Builder.cs" />

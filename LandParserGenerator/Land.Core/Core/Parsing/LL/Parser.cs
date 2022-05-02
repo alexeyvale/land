@@ -13,6 +13,7 @@ namespace Land.Core.Parsing.LL
 	public class Parser: BaseParser
 	{
 		private TableLL1 Table { get; set; }
+		private FirstBuilder FirstBuilder { get; set; }
 
 		private Stack<Node> Stack { get; set; }
 		private string StackString => String.Join(" ", Stack.Select(s => GrammarObject.Developerify(s.Symbol)));
@@ -35,10 +36,7 @@ namespace Land.Core.Parsing.LL
 			BaseNodeRetypingVisitor retypingVisitor = null) : base(g, lexer, nodeGen, retypingVisitor)
 		{
 			Table = new TableLL1(g);
-
-			/// В ходе парсинга потребуется First,
-			/// учитывающее возможную пустоту ANY
-			GrammarObject.UseModifiedFirst = true;
+			FirstBuilder = new FirstBuilder(g, true);
 
 			RecoveryCache = new Dictionary<string, Tuple<SymbolArguments, Stack<string>>>();
 
@@ -141,7 +139,7 @@ namespace Land.Core.Parsing.LL
 							/// Поддерживаем свойство immediate error detection для Any
 							var runtimeFirst = Stack.Select(e => e.Symbol).ToList();
 
-							if (GrammarObject.First(runtimeFirst).Contains(Grammar.ANY_TOKEN_NAME))
+							if (FirstBuilder.First(runtimeFirst).Contains(Grammar.ANY_TOKEN_NAME))
 								token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 							else
 							{
@@ -227,7 +225,7 @@ namespace Land.Core.Parsing.LL
 			if (!args.AnyArguments.ContainsKey(AnyArgument.Except))
 			{
 				/// Определяем множество токенов, которые могут идти после Any
-				var tokensAfterText = GrammarObject.First(followSequence.ToList());
+				var tokensAfterText = FirstBuilder.First(followSequence.ToList());
 				/// Само Any во входном потоке нам и так не встретится, а вывод сообщения об ошибке будет красивее
 				tokensAfterText.Remove(Grammar.ANY_TOKEN_NAME);
 

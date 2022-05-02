@@ -19,6 +19,9 @@ namespace Land.Core.Parsing.LL
 
 		public TableLL1(Grammar g): base(g)
 		{
+			var firstBuilder = new FirstBuilder(g, false);
+			var followBuilder = new FollowBuilder(g, firstBuilder);
+
 			Table = new List<Alternative>[g.Rules.Count, g.Tokens.Count];
 
 			NonterminalSymbols = g.Rules
@@ -39,7 +42,7 @@ namespace Land.Core.Parsing.LL
 				/// Проходим по всем продукциям
 				foreach (var alt in g.Rules[nt])
 				{
-					var altFirst = g.First(alt);
+					var altFirst = firstBuilder.First(alt);
 					var altContainsEmpty = altFirst.Remove(null);
 
 					/// Для каждого токена, с которого может начинаться альтернатива
@@ -52,14 +55,14 @@ namespace Land.Core.Parsing.LL
 					/// Если альтернатива может быть пустой
 					if (altContainsEmpty)
 					{
-						var ntFollow = g.Follow(nt);
+						var ntFollow = followBuilder.Follow(nt);
 
 						/// её следует выбрать для токена, который может идти следом,
 						/// при этом если нетерминал порождён квантификаторами ?! или *!,
 						/// данный токен не должен встречаться явно в First для текущего нетерминала,
 						/// так как у пустой ветки самый низкий приоритет
 						foreach (var tk in ntFollow.Where(t => 
-							g.NonEmptyPrecedence.Contains(nt) && !g.First(nt).Contains(t)
+							g.NonEmptyPrecedence.Contains(nt) && !firstBuilder.First(nt).Contains(t)
 							/// если Contains, то уже и так добавили эту ветку в таблицу
 							|| !g.NonEmptyPrecedence.Contains(nt) && !altFirst.Contains(t)))
 						{

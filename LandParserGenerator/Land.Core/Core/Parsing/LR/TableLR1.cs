@@ -17,15 +17,19 @@ namespace Land.Core.Parsing.LR
 		/// <summary>
 		/// Множества состояний (множество множеств пунктов)
 		/// </summary>
-		public List<HashSet<Marker>> Items { get; set; }
+		public List<Item> Items { get; set; }
+
 		/// <summary>
 		/// Действия, которые надо совершать при встрече различных терминалов
 		/// </summary>
 		private HashSet<Action>[,] Actions { get; set; }
+
 		/// <summary>
 		/// Переходы между состояниями
 		/// </summary>
 		public List<Dictionary<string, int>> Transitions { get; private set; }
+
+		public List<HashSet<string>> AfterAnyTokens { get; private set; }
 
 		public TableLR1(Grammar g): base(g)
 		{
@@ -33,17 +37,24 @@ namespace Land.Core.Parsing.LR
 				.Zip(Enumerable.Range(0, g.Tokens.Count), (a, b) => new { smb = a, idx = b })
 				.ToDictionary(e => e.smb, e => e.idx);
 
+			var builder = new ClosureGotoBuilder(g);
+
 			/// Строим набор множеств пунктов
-			BuildItems(g);
+			BuildItems(builder);
 
 			Actions = new HashSet<Action>[Items.Count, Lookaheads.Count];
+			AfterAnyTokens = new List<HashSet<string>>();
 
-			for(var i=0; i<Items.Count;++i)
+			for (var i=0; i<Items.Count;++i)
 			{
-				foreach (var lookahead in Lookaheads)
-					this[i, lookahead.Key] = new HashSet<Action>();
+				AfterAnyTokens.Add(new HashSet<string>());
 
-				foreach(var marker in Items[i])
+				foreach (var lookahead in Lookaheads)
+				{
+					this[i, lookahead.Key] = new HashSet<Action>();
+				}
+
+				foreach(var marker in Items[i].Markers)
 				{
 					/// A => alpha * a beta
 					if(g[marker.Next] is TerminalSymbol)
@@ -52,6 +63,12 @@ namespace Land.Core.Parsing.LR
 						{
 							TargetItemIndex = Transitions[i][marker.Next]
 						});
+
+						if (marker.Next == Grammar.ANY_TOKEN_NAME)
+						{
+							var firsts = builder.First(marker);
+							AfterAnyTokens[i].UnionWith(firsts.Item2);
+						}
 					}
 
 					/// A => alpha *
@@ -65,8 +82,21 @@ namespace Land.Core.Parsing.LR
 					}
 				}
 
+				foreach (var marker in Items[i].AnyProvokedMarkers)
+				{
+					if (String.IsNullOrEmpty(marker.Next))
+					{
+						AfterAnyTokens[i].Add(marker.Lookahead);
+					}
+					else if (g[marker.Next] is TerminalSymbol)
+					{
+						var firsts = builder.First(marker);
+						AfterAnyTokens[i].UnionWith(firsts.Item2);
+					}
+				}
+
 				/// S => ...*, $
-				if (Items[i].Any(item=>item.Alternative.NonterminalSymbolName == g.StartSymbol 
+				if (Items[i].Markers.Any(item=>item.Alternative.NonterminalSymbolName == g.StartSymbol 
 					&& String.IsNullOrEmpty(item.Next)
 					&& item.Lookahead == Grammar.EOF_TOKEN_NAME))
 				{
@@ -75,13 +105,18 @@ namespace Land.Core.Parsing.LR
 			}
 		}
 
-		private void BuildItems(Grammar g)
+		private void BuildItems(ClosureGotoBuilder builder)
 		{
-			Items = new List<HashSet<Marker>>()
+			Items = new List<Item>()
 			{
-				g.BuildClosure(new HashSet<Marker>(
-					(g[g.StartSymbol] as NonterminalSymbol).Alternatives.Select(a=>new Marker(a, 0, Grammar.EOF_TOKEN_NAME))
-				))
+				builder.BuildClosure(new Item
+				{ 
+					Markers = new HashSet<Marker>(
+						(GrammarObject[GrammarObject.StartSymbol] as NonterminalSymbol)
+							.Alternatives.Select(a=>new Marker(a, 0, Grammar.EOF_TOKEN_NAME))
+					),
+					AnyProvokedMarkers = new HashSet<Marker>()
+				})
 			};
 
 			Transitions = new List<Dictionary<string, int>>();
@@ -90,20 +125,23 @@ namespace Land.Core.Parsing.LR
 			{
 				Transitions.Add(new Dictionary<string, int>());
 
-				foreach (var smb in g.Tokens.Keys.Union(g.Rules.Keys))
+				foreach (var smb in GrammarObject.Tokens.Keys.Union(GrammarObject.Rules.Keys))
 				{
-					var gotoSet = g.Goto(Items[i], smb);
+					var gotoSet = builder.Goto(Items[i], smb);
 
-					if (gotoSet.Count > 0)
+					if (gotoSet.Markers.Count > 0)
 					{
 						/// Проверяем, не совпадает ли полученное множество 
 						/// с каким-либо из имеющихся
 						var j = 0;
 						for (; j < Items.Count; ++j)
-							if (EqualMarkerSets(Items[j], gotoSet))
+						{
+							if (EqualMarkerSets(Items[j].Markers, gotoSet.Markers)
+								&& EqualMarkerSets(Items[j].AnyProvokedMarkers, gotoSet.AnyProvokedMarkers))
 							{
 								break;
 							}
+						}
 
 						/// Если не нашли совпадение
 						if (j == Items.Count)
@@ -183,7 +221,7 @@ namespace Land.Core.Parsing.LR
 			/// Проверяем состояния на наличие нескольких пунктов перед Any
 			for(var i=0; i<Items.Count; ++i)
 			{
-				if(Items[i].GroupBy(m=>new { m.Alternative, m.Position })
+				if(Items[i].Markers.GroupBy(m=>new { m.Alternative, m.Position })
 					.Where(g=>g.First().Next == Grammar.ANY_TOKEN_NAME).Count() > 1)
 				{
 					errors.Add(Message.Error(
@@ -221,7 +259,7 @@ namespace Land.Core.Parsing.LR
 
 		public string ToString(int state, string lookahead = null, string padding = "")
 		{
-			var altPosGroups = Items[state]
+			var altPosGroups = Items[state].Markers
 				.Where(i=>String.IsNullOrEmpty(lookahead) || i.Lookahead == lookahead)
 				.GroupBy(i => new { i.Alternative, i.Position });
 			var strings = new List<string>();
@@ -244,7 +282,9 @@ namespace Land.Core.Parsing.LR
 		public HashSet<string> GetExpectedTokens(int state)
 		{
 			return new HashSet<string>(
-				Lookaheads.Keys.Where(l => this[state, l].Count > 0)
+				Lookaheads.Keys
+					.Where(l => this[state, l].Count > 0)
+					.Union(AfterAnyTokens[state])
 			);
 		}
 	}

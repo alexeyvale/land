@@ -116,8 +116,6 @@ namespace Land.Core.Specification
 			/// её корректность нужно перепроверить,
 			/// а множества FIRST и FOLLOW - перестроить
 			State = GrammarState.Unknown;
-			FirstCacheConsistent = false;
-			FollowCacheConsistent = false;
 			SentenceTokensCacheConsistent = false;
 		}
 
@@ -723,9 +721,11 @@ namespace Land.Core.Specification
 					/// Проверяем наличие левой рекурсии для случая LL
 					if (Type == GrammarType.LL)
 					{
+						var firstBuilder = new FirstBuilder(this, false);
+
 						var emptyElementsRepetition = AutoRuleQuantifier.Where(kvp =>
 							(kvp.Value.Quantifier == Quantifier.ZERO_OR_MORE || kvp.Value.Quantifier == Quantifier.ONE_OR_MORE)
-							&& First(kvp.Value.Element).Contains(null)).Select(kvp => kvp.Key).ToList();
+							&& firstBuilder.First(kvp.Value.Element).Contains(null)).Select(kvp => kvp.Key).ToList();
 
 						foreach (var nt in emptyElementsRepetition)
 						{
@@ -736,7 +736,7 @@ namespace Land.Core.Specification
 							));
 						}
 
-						foreach (var nt in FindLeftRecursion().Except(emptyElementsRepetition))
+						foreach (var nt in FindLeftRecursion(firstBuilder).Except(emptyElementsRepetition))
 						{
 							messages.Add(Message.Error(
 								$"Определение нетерминала {Developerify(nt)} допускает левую рекурсию",
@@ -757,7 +757,9 @@ namespace Land.Core.Specification
 				messages.AddRange(LocalOptionsCheck());
 
 				/// Грамматика валидна или невалидна в зависимости от наличия сообщений об ошибках
-				State = messages.Any(m => m.Type == MessageType.Error) ? GrammarState.Invalid : GrammarState.Valid;
+				State = messages.Any(m => m.Type == MessageType.Error) 
+					? GrammarState.Invalid 
+					: GrammarState.Valid;
 			}
 
 			return messages;
@@ -792,7 +794,7 @@ namespace Land.Core.Specification
 		}
 
 		/// Возвращает леворекурсивно определённые нетерминалы
-		private List<string> FindLeftRecursion()
+		private List<string> FindLeftRecursion(FirstBuilder firstBuilder)
 		{
 			List<string> recursive = new List<string>();
 
@@ -810,7 +812,7 @@ namespace Land.Core.Specification
 					{
 						graph[nt].Add(altStartingNonterminals[i]);
 
-						if (!First(altStartingNonterminals[i]).Contains(null))
+						if (!firstBuilder.First(altStartingNonterminals[i]).Contains(null))
 							break;
 					}
 				}
@@ -912,19 +914,20 @@ namespace Land.Core.Specification
 							Tokens.Add(newName, new TerminalSymbol(newName, String.Empty));
 						}
 					}
-			BuildFirst();
-			BuildFollow();
+
+			var firstBuilder = new FirstBuilder(this, false);
+			var followBuilder = new FollowBuilder(this, firstBuilder);
 
 			/// Для каждого Any, не являющегося AnyExcept, 
 			/// находим Any, которые могут идти после него 
 			/// и не являются этим же самым Any
 			foreach(var pair in anys.Where(kvp=>!kvp.Key.Contains(AnyArgument.Except.ToString())).Select(kvp=>kvp.Value))
 			{
-				var nextTokens = First(pair.Item1.Subsequence(pair.Item2 + 1));
+				var nextTokens = firstBuilder.First(pair.Item1.Subsequence(pair.Item2 + 1));
 				if (nextTokens.Contains(null))
 				{
 					nextTokens.Remove(null);
-					nextTokens.UnionWith(Follow(pair.Item1.NonterminalSymbolName));
+					nextTokens.UnionWith(followBuilder.Follow(pair.Item1.NonterminalSymbolName));
 				}
 
 				/// Множество токенов Any, о которых надо предупредить разработчика грамматики
@@ -1041,232 +1044,6 @@ namespace Land.Core.Specification
 
 		#endregion
 
-		#region Построение FIRST
-
-		/// Нужно ли использовать модифицированный алгоритм First
-		/// (с учётом пустого Any)
-		private bool _useModifiedFirst = false;
-        public bool UseModifiedFirst
-        {
-            get { return _useModifiedFirst; }
-            set
-            {
-                if(value != _useModifiedFirst)
-                {
-                    FirstCacheConsistent = false;
-                    FollowCacheConsistent = false;
-                    _useModifiedFirst = value;
-                }
-            }
-        }
-		private bool FirstCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<string>> _first;
-		private Dictionary<string, HashSet<string>> FirstCache
-		{
-			get
-			{
-				if (_first == null || !FirstCacheConsistent)
-				{
-					FirstCacheConsistent = true;
-					try
-					{
-						BuildFirst();
-					}
-					catch
-					{
-						FirstCacheConsistent = false;
-						throw;
-					}
-				}
-
-				return _first;
-			}
-
-			set { _first = value; }
-		}
-
-		/// <summary>
-		/// Построение множеств FIRST для нетерминалов
-		/// </summary>
-		private void BuildFirst()
-		{
-			_first = new Dictionary<string, HashSet<string>>();
-
-			/// Изначально множества пустые
-			foreach (var nt in Rules)
-			{
-				_first[nt.Key] = new HashSet<string>();
-			}
-
-			var changed = true;
-
-			/// Пока итеративно вносятся изменения
-			while (changed)
-			{
-				changed = false;
-
-				/// Проходим по всем альтернативам и пересчитываем FIRST 
-				foreach (var nt in Rules)
-				{
-					var oldCount = _first[nt.Key].Count;
-
-					foreach (var alt in nt.Value)
-					{
-						_first[nt.Key].UnionWith(First(alt));
-					}
-
-					if (!changed)
-					{
-						changed = oldCount != _first[nt.Key].Count;
-					}
-				}
-			}			
-		}
-
-		public HashSet<string> First(List<string> sequence)
-		{
-			/// FIRST последовательности - это либо FIRST для первого символа,
-			/// либо, если последовательность пустая, null
-			if (sequence.Count > 0)
-			{
-				var first = new HashSet<string>();
-				var elementsCounter = 0;
-
-				/// Если первый элемент - нетерминал, из которого выводится пустая строка,
-				/// нужно взять first от следующего элемента
-				for (; elementsCounter < sequence.Count; ++elementsCounter)
-				{
-					var elemFirst = First(sequence[elementsCounter]);
-					var containsEmpty = elemFirst.Remove(null);
-
-					first.UnionWith(elemFirst);
-
-					/// Если из текущего элемента нельзя вывести пустую строку
-					/// и (для модифицированной версии First) он не равен ANY
-					if (!containsEmpty
-						&& (!UseModifiedFirst || sequence[elementsCounter] != ANY_TOKEN_NAME))
-						break;
-				}
-
-				if (elementsCounter == sequence.Count)
-					first.Add(null);
-
-				return first;
-			}
-			else
-			{
-				return new HashSet<string>() { null };
-			}
-		}
-
-		public HashSet<string> First(Alternative alt)
-		{
-			return First(alt.Elements.Select(e => e.Symbol).ToList());
-		}
-
-		public HashSet<string> First(string symbol)
-		{
-            var gramSymbol = this[symbol];
-
-            if (gramSymbol is NonterminalSymbol)
-				return new HashSet<string>(FirstCache[gramSymbol.Name]);
-			else
-				return new HashSet<string>() { gramSymbol.Name };
-		}
-
-		#endregion
-
-		#region Построение FOLLOW
-
-		private bool FollowCacheConsistent { get; set; } = false;
-		private Dictionary<string, HashSet<string>> _follow;
-		private Dictionary<string, HashSet<string>> FollowCache
-		{
-			get
-			{
-				if (_follow == null || !FollowCacheConsistent)
-				{
-					FollowCacheConsistent = true;
-					try
-					{
-						BuildFollow();
-					}
-					catch
-					{
-						FollowCacheConsistent = false;
-						throw;
-					}
-				}
-
-				return _follow;
-			}
-
-			set { _follow = value; }
-		}
-
-		/// <summary>
-		/// Построение FOLLOW
-		/// </summary>
-		private void BuildFollow()
-		{
-			_follow = new Dictionary<string, HashSet<string>>();
-
-			foreach (var nt in Rules)
-			{
-				_follow[nt.Key] = new HashSet<string>();
-			}
-
-			_follow[StartSymbol].Add(EOF_TOKEN_NAME);
-
-			var changed = true;
-
-			while (changed)
-			{
-				changed = false;
-
-				/// Проходим по всем продукциям и по всем элементам веток
-				foreach (var nt in this.Rules)
-					foreach (var alt in nt.Value)
-					{
-						for (var i = 0; i < alt.Count; ++i)
-						{
-							var elem = alt[i];
-
-							/// Если встретили в ветке нетерминал
-							if (Rules.ContainsKey(elem))
-							{
-								var oldCount = _follow[elem].Count;
-
-								/// Добавляем в его FOLLOW всё, что может идти после него
-								_follow[elem].UnionWith(First(alt.Subsequence(i + 1)));
-
-								/// Если в FIRST(подпоследовательность) была пустая строка
-								if (_follow[elem].Contains(null))
-								{
-									/// Исключаем пустую строку из FOLLOW
-									_follow[elem].Remove(null);
-									/// Объединяем FOLLOW текущего нетерминала
-									/// с FOLLOW определяемого данной веткой
-									_follow[elem].UnionWith(_follow[nt.Key]);
-								}
-
-								if (!changed)
-								{
-									changed = oldCount != _follow[elem].Count;
-								}
-							}
-						}
-					}
-			}
-		}
-
-		public HashSet<string> Follow(string nonterminal)
-		{
-			return FollowCache[nonterminal];
-		}
-
-		#endregion
-
 		#region Построение SentenceTokens
 
 		private bool SentenceTokensCacheConsistent { get; set; } = false;
@@ -1362,63 +1139,6 @@ namespace Land.Core.Specification
 				return new HashSet<string>(SentenceTokensCache[gramSymbol.Name]);
 			else
 				return new HashSet<string>() { gramSymbol.Name };
-		}
-
-		#endregion
-
-		#region Замыкание пунктов и Goto
-
-		/// <summary>
-		/// Построение замыкания множества пунктов
-		/// </summary>
-		public HashSet<Marker> BuildClosure(HashSet<Marker> markers)
-		{
-			var closedMarkers = new HashSet<Marker>(markers);
-
-			int oldCount;
-
-			do
-			{
-				oldCount = closedMarkers.Count;
-
-				var newMarkers = new HashSet<Marker>();
-
-				/// Проходим по всем пунктам, которые предшествуют нетерминалам
-				foreach (var marker in closedMarkers
-					.Where(m => Rules.ContainsKey(m.Next)))
-				{
-					var nt = Rules[marker.Next];
-					/// Будем брать FIRST от того, что идёт после этого нетерминала + символ предпросмотра
-					var sequenceAfterNt = marker.Alternative
-						.Subsequence(marker.Position + 1)
-						.Add(marker.Lookahead);
-
-					foreach (var alt in nt)
-					{
-						foreach (var t in First(sequenceAfterNt))
-						{
-							newMarkers.Add(new Marker(alt, 0, t));
-						}
-					}
-				}
-
-				closedMarkers.UnionWith(newMarkers);
-			}
-			while (oldCount != closedMarkers.Count);
-
-			return closedMarkers;
-		}
-
-		public HashSet<Marker> Goto(HashSet<Marker> I, string smb)
-		{
-			var res = new HashSet<Marker>();
-
-			foreach(var marker in I.Where(m=>m.Next == smb))
-			{
-				res.Add(marker.ShiftNext());
-			}
-
-			return BuildClosure(res);
 		}
 
 		#endregion
