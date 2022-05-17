@@ -499,19 +499,55 @@ namespace Land.Markup.Binding
 		private void SelectOptimalBests(
 			Dictionary<PointContext, List<RemapCandidateInfo>> evaluationResults)
 		{
-			Parallel.ForEach(
-				evaluationResults.Keys.ToList(),
-				key =>
-				{
-					evaluationResults[key] = evaluationResults[key].OrderByDescending(c => c.Similarity).ToList();
-				}
-			);
+			/// Для старого алгоритма сортируем один раз
+			if(UseOldApproach)
+			{
+				Parallel.ForEach(
+					evaluationResults.Keys.ToList(),
+					key =>
+					{
+						/// Сортируем результаты по похожести
+						evaluationResults[key] = evaluationResults[key]
+							.OrderByDescending(c => c.Similarity)
+							.ToList();
+					}
+				);
+			}
 
 			var unmapped = new HashSet<PointContext>(evaluationResults.Keys);
 			var oldCount = unmapped.Count;
 
 			do
 			{
+				/// Для нового алгоритма после очередных перепривязок надо пересчитать оценки
+				/// и отсортировать кандидатов заново
+				if (!UseOldApproach)
+				{
+					Parallel.ForEach(
+						unmapped,
+						unmappedContext =>
+						{
+							/// Пересчитываем похожесть ближайших соседей
+							if (LocationManager != null)
+							{
+								foreach (var c in evaluationResults[unmappedContext].Where(c => !c.Deleted))
+								{
+									c.SiblingsNearestSimilarity =
+										LocationManager.GetSimilarity(unmappedContext, c.Context);
+								}
+							}
+
+							/// Пересчитываем общую похожесть
+							ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
+
+							/// Сортируем результаты по похожести
+							evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
+								.OrderByDescending(c => c.Similarity)
+								.ToList();
+						}
+					);
+				}
+
 				oldCount = unmapped.Count;
 
 				foreach (var context in unmapped.ToList())
@@ -531,14 +567,14 @@ namespace Land.Markup.Binding
 							.Where(e => e != context)
 							.Select(e => evaluationResults[e].First(r => !r.Deleted))
 							.Where(e => e.Context == first.Context)
-							.OrderByDescending(e => e.Similarity)
-							.FirstOrDefault();
+							.Max(e => e.Similarity);
 
 						/// Автоматически перепривязываемся, если выполняются локальные условия
 						/// и этот элемент не похож в большей степени на что-то другое
 						if (IsSimilarEnough(first)
-							&& AreDistantEnough(first, second, true ? GAP_MAX : (double?)null)
-							&& AreDistantEnough(first, otherBestMatch, true ? GAP_MAX : (double?)null))
+							&& AreDistantEnough(first, second, GAP_MAX)
+							&& (otherBestMatch == null 
+								|| AreDistantEnough(first.Similarity.Value, otherBestMatch.Value, GAP_MAX)))
 						{
 							first.IsAuto = true;
 
@@ -549,30 +585,6 @@ namespace Land.Markup.Binding
 							if (!UseOldApproach)
 							{
 								LocationManager?.Mapped(context, first.Context);
-
-								foreach (var unmappedContext in unmapped)
-								{
-									if (LocationManager != null)
-									{
-										Parallel.ForEach(
-											evaluationResults[unmappedContext].Where(c => !c.Deleted),
-											c =>
-											{
-												c.SiblingsNearestSimilarity =
-													LocationManager.GetSimilarity(unmappedContext, c.Context);
-											}
-										);
-									}
-
-									ComputeTotalSimilarities(unmappedContext, evaluationResults[unmappedContext]);
-								}
-
-								foreach (var unmappedContext in unmapped)
-								{
-									evaluationResults[unmappedContext] = evaluationResults[unmappedContext]
-										.OrderByDescending(c => c.Similarity)
-										.ToList();
-								}
 							}
 
 							foreach (var unmappedContext in unmapped)

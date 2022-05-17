@@ -633,7 +633,14 @@ namespace Land.Markup.Binding
 			var headerCoreTypes = new HashSet<string>(node.Options.GetHeaderCore());
 			List<Node> sequence;
 
-			if (node.Value.Count > 0)
+			if(node.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
+			{
+				sequence = new List<Node> { 
+					node.Children.First(),
+					node.Children.Last()
+				};
+			}
+			else if (node.Value.Count > 0)
 			{
 				sequence = new List<Node>() { node };
 			}
@@ -701,22 +708,68 @@ namespace Land.Markup.Binding
 			return context;
 		}
 
+		public static InnerContext GetInnerContext(Node node, ParsedFile file)
+		{
+			var locations = new List<SegmentLocation>();
+
+			if(node.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
+			{
+				locations.Add(node.Location
+					.Exclude(node.Children.First().Location)[0]
+					.Exclude(node.Children.Last().Location)[0]
+				);
+			}
+			else
+			{
+				var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
+
+				while (stack.Any())
+				{
+					var current = stack.Pop();
+
+					if (current.Type != Grammar.ANY_TOKEN_NAME && current.Children.Count > 0)
+					{
+						if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+						{
+							locations.Add(current.Location);
+						}
+						else
+						{
+							for (var i = current.Children.Count - 2; i >= 1; --i)
+								stack.Push(current.Children[i]);
+						}
+					}
+				}
+			}
+
+			return new InnerContext(locations, file.Text);
+		}
+
 		//public static InnerContext GetInnerContext(Node node, ParsedFile file)
 		//{
-		//	var locations = new List<SegmentLocation>();
+		//	var locations = new List<SegmentLocation> { node.Location };
 		//	var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
 
 		//	while (stack.Any())
 		//	{
 		//		var current = stack.Pop();
 
-		//		if (current.Type != Grammar.ANY_TOKEN_NAME && current.Children.Count > 0)
+		//		if (current.Location != null)
 		//		{
-		//			if (current.Type != Grammar.CUSTOM_BLOCK_RULE_NAME)
+		//			/// Удаляем элементы, которые попадут в контекст заголовка
+		//			if (current.Options.GetPriority() > 0 
+		//				&& (current.Children.Count == 0 || current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)))
 		//			{
-		//				locations.Add(current.Location);
+		//				/// Находим область, включающую в себя текущий рассматриваемый лист
+		//				var outerLocation = locations.FirstOrDefault(l => l.Includes(current.Location));
+		//				var indexOfOuter = locations.IndexOf(outerLocation);
+
+		//				/// Вычитаем из неё участок, соответствующий листу
+		//				locations.RemoveAt(indexOfOuter);
+		//				locations.InsertRange(indexOfOuter, outerLocation.Exclude(current.Location));
 		//			}
-		//			else
+		//			/// Пользовательские блоки для нас прозрачны при вычислении контекстов
+		//			else if(current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
 		//			{
 		//				for (var i = current.Children.Count - 2; i >= 1; --i)
 		//					stack.Push(current.Children[i]);
@@ -726,41 +779,6 @@ namespace Land.Markup.Binding
 
 		//	return new InnerContext(locations, file.Text);
 		//}
-
-		public static InnerContext GetInnerContext(Node node, ParsedFile file)
-		{
-			var locations = new List<SegmentLocation> { node.Location };
-			var stack = new Stack<Node>(Enumerable.Reverse(node.Children));
-
-			while (stack.Any())
-			{
-				var current = stack.Pop();
-
-				if (current.Location != null)
-				{
-					/// Удаляем элементы, которые попадут в контекст заголовка
-					if (current.Options.GetPriority() > 0 
-						&& (current.Children.Count == 0 || current.Children.All(c => c.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)))
-					{
-						/// Находим область, включающую в себя текущий рассматриваемый лист
-						var outerLocation = locations.FirstOrDefault(l => l.Includes(current.Location));
-						var indexOfOuter = locations.IndexOf(outerLocation);
-
-						/// Вычитаем из неё участок, соответствующий листу
-						locations.RemoveAt(indexOfOuter);
-						locations.InsertRange(indexOfOuter, outerLocation.Exclude(current.Location));
-					}
-					/// Пользовательские блоки для нас прозрачны при вычислении контекстов
-					else if(current.Type == Grammar.CUSTOM_BLOCK_RULE_NAME)
-					{
-						for (var i = current.Children.Count - 2; i >= 1; --i)
-							stack.Push(current.Children[i]);
-					}
-				}
-			}
-
-			return new InnerContext(locations, file.Text);
-		}
 
 		#region Old
 

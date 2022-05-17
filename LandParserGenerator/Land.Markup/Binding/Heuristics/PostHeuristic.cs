@@ -121,7 +121,6 @@ namespace Land.Markup.Binding
 			var goodCore = shouldSetCore
 				? candidates
 					.Where(c => c.HeaderCoreSimilarity >= MIN_SIM)
-					.OrderByDescending(c => c.HeaderCoreSimilarity)
 					.ToList()
 				: null;
 
@@ -129,7 +128,6 @@ namespace Land.Markup.Binding
 			var goodNonCore = shouldSetNonCore
 				? (goodCore?.Count > 0 ? goodCore : candidates)
 					.Where(c => c.HeaderNonCoreSimilarity >= MIN_SIM)
-					.OrderByDescending(c => c.HeaderNonCoreSimilarity)
 					.ToList()
 				: null;
 
@@ -147,18 +145,26 @@ namespace Land.Markup.Binding
 			if (goodCore?.Count > 0)
 			{
 				weights[ContextType.HeaderCore] = 
-					GetWeight(MIN_W_CORE, MAX_W_CORE, MIN_SIM, MAX_SIM, goodCore[0].HeaderCoreSimilarity);
+					GetWeight(MIN_W_CORE, MAX_W_CORE, MIN_SIM, MAX_SIM, goodCore.Max(c=>c.HeaderCoreSimilarity));
 			}
 
 			/// Подстраиваем вес остальной части, если есть "хорошие" кандидаты среди хороших по ядру заголовка 
 			/// или, если хороших по ядру нет, среди всех кандидатов.
 			/// Дополнительно проверяем, что первый и второй по похожести кандидаты не совпадают
-			if (goodNonCore?.Count > 0 
-				&& (goodNonCore.Count == 1 
-					|| ContextFinder.AreDistantEnough(goodNonCore[0].HeaderNonCoreSimilarity, goodNonCore[1].HeaderNonCoreSimilarity)))
+			if (goodNonCore?.Count > 0)
 			{
-				weights[ContextType.HeaderNonCore] =
-					GetWeight(MIN_W_NON_CORE, MAX_W_NON_CORE, MIN_SIM, MAX_SIM, goodNonCore[0].HeaderNonCoreSimilarity);
+				/// Получаем лучшие похожести не ядер
+				var nonCoreSims = goodNonCore.Select(e => e.HeaderNonCoreSimilarity).ToList();
+				var bestNonCoreSimilarity = nonCoreSims.Max();
+				nonCoreSims.Remove(bestNonCoreSimilarity);
+				var secondBestNonCoreSimilarity = nonCoreSims.Count > 0 ? nonCoreSims.Max() : 0;
+
+				if (goodNonCore.Count == 1
+					|| ContextFinder.AreDistantEnough(bestNonCoreSimilarity, secondBestNonCoreSimilarity))
+				{
+					weights[ContextType.HeaderNonCore] =
+						GetWeight(MIN_W_NON_CORE, MAX_W_NON_CORE, MIN_SIM, MAX_SIM, goodNonCore.Max(c => c.HeaderNonCoreSimilarity));
+				}
 			}
 
 			return weights;
@@ -182,11 +188,10 @@ namespace Land.Markup.Binding
 			var distinctSimilarities = candidates
 				.Select(c => c.AncestorSimilarity)
 				.Distinct()
-				.OrderByDescending(e => e)
 				.ToList();
 
 			weights[ContextType.Ancestors] = distinctSimilarities.Count == 1 
-				? MIN_W : GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, distinctSimilarities[0]);
+				? MIN_W : GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, distinctSimilarities.Max());
 
 			return weights;
 		}
@@ -208,10 +213,10 @@ namespace Land.Markup.Binding
 			{
 				if (weights[ContextType.Inner].HasValue) return weights;
 
-				candidates = candidates.OrderByDescending(c => c.InnerSimilarity).ToList();
-
-				weights[ContextType.Inner] =
-					GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, candidates[0].InnerSimilarity);
+				weights[ContextType.Inner] = GetWeight(
+					MIN_W, MAX_W, MIN_SIM, MAX_SIM, 
+					candidates.Max(c=>c.InnerSimilarity)
+				);
 			}
 
 			return weights;
@@ -239,16 +244,14 @@ namespace Land.Markup.Binding
 					/// Отбираем кандидатов с наилучшей похожестью предков
 					var bestAncestorCandidates = candidates
 						.GroupBy(c => c.Context.AncestorsContext)
-						.OrderByDescending(g => g.First().AncestorSimilarity)
-						.First()
+						.Aggregate((g1, g2) => g1.First().AncestorSimilarity > g1.First().AncestorSimilarity ? g1 : g2)
 						.ToList();
 					/// Среди них отбираем наиболее похожих
 					var bestCandidates = bestAncestorCandidates
 						.GroupBy(c => c.HeaderCoreSimilarity * (weights[ContextType.HeaderCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderCore)) 
 							+ c.HeaderNonCoreSimilarity * (weights[ContextType.HeaderNonCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderNonCore))
 							+ c.InnerSimilarity * (weights[ContextType.Inner] ?? DefaultWeightsProvider.Get(ContextType.Inner)))
-						.OrderByDescending(g => g.Key)
-						.First()
+						.Aggregate((g1, g2) => g1.Key > g1.Key ? g1 : g2)
 						.ToList();
 					
 					if (bestCandidates.Count > 1)
@@ -285,10 +288,10 @@ namespace Land.Markup.Binding
 			{
 				if (weights[ContextType.SiblingsNearest].HasValue) return weights;
 
-				var maxSimilarity = candidates.Max(c => c.SiblingsNearestSimilarity);
-
-				weights[ContextType.SiblingsNearest] = 
-					GetWeight(MIN_W, MAX_W, MIN_SIM, MAX_SIM, maxSimilarity);
+				weights[ContextType.SiblingsNearest] = GetWeight(
+					MIN_W, MAX_W, MIN_SIM, MAX_SIM,
+					candidates.Max(c => c.SiblingsNearestSimilarity)
+				);
 			}
 
 			return weights;
