@@ -10,7 +10,7 @@ file		=	xml_prolog? (element|Any)*
 xml_prolog	=	'<?xml' attribute* '?>'
 element			=	'<' name attribute* ('>' (element|Any)* closing_tag | '/>')
 closing_tag	=	'</' name '>'
-attribute	=	name '=' STRING
+attribute	=	name ('=' STRING)?
 name		=	ID (':' ID)*
 
 %%

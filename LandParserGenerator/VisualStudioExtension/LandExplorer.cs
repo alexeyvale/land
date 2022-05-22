@@ -32,6 +32,16 @@ namespace Land.VisualStudioExtension
 			var adapter = new EditorAdapter();
 
 			control.Initialize(adapter);
+
+			if (!control.AreSettingsSet())
+			{
+				var path = System.IO.Path.GetDirectoryName(
+					System.Reflection.Assembly.GetExecutingAssembly().Location
+				);
+
+				control.ImportSettings($"{path}/Resources/DefaultSettings.xml");
+			}
+
 			this.Content = control;
 		}
 	}

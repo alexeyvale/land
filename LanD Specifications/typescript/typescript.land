@@ -8,60 +8,53 @@ STRING_INT	: '`' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '`'
 STRING_INT_CODE : '${' (STRING|CHAR|.)*? '}'
 
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
-MODIFIER	: 'public'|'private'|'export'
-ID			: [_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+MODIFIER	: 'public'|'private'|'export'|'static'
+ID			: '$'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
  
 CURVE_BRACKETED : %left '{' %right '}'
 ROUND_BRACKETED : %left '(' %right ')'
 SQUARE_BRACKETED : %left '[' %right ']'
-IMPORT_SECTION : %left 'import' %right 'from'
 
 
-file_content = entity*
-entity	=	enum | class_struct_interface | method | field | property | water_entity
-
-enum			=	common_beginning 'enum' name Any '{' Any '}' ';'?
-class_struct_interface	=	common_beginning ('class'|'struct'|'interface') name Any '{' entity* '}' ';'?
-method			=	common_beginning name arguments (':' type)? Any (init_expression? ';' | block)
-field			=	common_beginning name (':' type)? init_value? ';'
-property		=	common_beginning 'get' method | common_beginning 'set' method
-water_entity	=	AnyInclude('import')
-
-common_beginning	=	entity_attribute? MODIFIER*
-init_expression		=	'=>' Any
-init_value			=	'=' init_part+
-init_part			=	Any | type
+file_content = (Any | module)*
+module = 'module' name '{' (class | Any)* '}'
+class = MODIFIER* ('class'|'interface') name Any '{' (field | method | class | Any)* '}'
+field = MODIFIER* name ':' type init_value? ';'
+method = MODIFIER* name arguments (':' type)? block
 
 name_atom	=	ID type_parameters?
 name		=	name_atom (('.'|'::') name_atom)*
 names_list	=	name (',' name)*
 
-tuple			=	'(' type name? (',' type name?)* ')'
-type_atom		=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
+type_atom		=	ID type_parameters? '?'? '*'*
 type			=	type_atom ((('.'|'::') type_atom) | ('[' Any ']'))*!
 type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
 
-entity_attribute	=	'@' ID Any
+init_value			=	'=' init_part+
+init_part			=	Any | type
+
+entity_attribute	=	'[' Any ']'
 arguments			=	'(' Any ')'
 block				=	'{' Any '}'
 
 %%
 
 %parsing {
-	recovery entity init_part
+	recovery
 	fragment STRING_INT_CODE
 	start file_content
 	skip COMMENT STRING
 }
 
 %nodes {
-	ghost names_list entity common_beginning
-	leaf name type init_expression init_value
+	ghost names_list
+	leaf name type
 }
 
 %markup {
-	land enum class_struct_interface method field property
+	land method field class
 	priority(5) name
 	priority(0.5) arguments
+	priority(0.1) init_value
 	exactmatch MODIFIER
 }
