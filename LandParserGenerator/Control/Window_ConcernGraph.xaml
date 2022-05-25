@@ -73,7 +73,7 @@
 							<Setter.Value>
 								<MultiBinding Converter="{StaticResource MarkupTreeIconVisibilityConverter}">
 									<Binding RelativeSource="{RelativeSource Self}" Mode="OneTime"/>
-									<Binding Path="." />
+									<Binding Path="HasMissingLocation"/>
 									<Binding Path="Location" />
 								</MultiBinding>
 							</Setter.Value>
