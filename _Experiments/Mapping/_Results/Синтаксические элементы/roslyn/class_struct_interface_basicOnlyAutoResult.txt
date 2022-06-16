@@ -1,0 +1,14 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+internal abstract class InteractiveEvaluator     39
+*
+internal sealed class CSharpInteractiveEvaluator     32
+	0,790  [HC=0,77;  H=0,72;  I=0,50;  S=1,00] *
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+internal sealed class CSharpInteractiveEvaluator     32
+	0,596  [HC=0,50;  HNC=0,67;  I=0,44;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

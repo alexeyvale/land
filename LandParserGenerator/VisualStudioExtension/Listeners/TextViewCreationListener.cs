@@ -39,7 +39,7 @@ namespace Land.VisualStudioExtension.Listeners
 			if(TextDocumentFactoryService.TryGetTextDocument(sender as ITextBuffer, 
 				out ITextDocument textDocument))
 			{
-				ServiceEventAggregator.Instance.OnDocumentChanged(textDocument.FilePath);
+				ServiceEventAggregator.Instance?.OnDocumentChanged(textDocument.FilePath);
 			}
 		}
 	}

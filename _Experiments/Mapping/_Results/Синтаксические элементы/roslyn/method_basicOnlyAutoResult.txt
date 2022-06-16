@@ -1,0 +1,408 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     50
+*
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,691  [HC=0,35;  H=0,79;  I=1,00;  S=1,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,684  [HC=0,35;  H=0,74;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,666  [HC=0,30;  H=0,76;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,660  [HC=0,30;  H=0,72;  I=1,00;  S=1,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,605  [HC=0,35;  H=0,18;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,873  [HC=1,00;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,542  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,541  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,508  [HC=0,33;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,502  [HC=0,33;  HNC=0,73;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     53
+*
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,691  [HC=0,35;  H=0,79;  I=1,00;  S=1,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,684  [HC=0,35;  H=0,74;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,666  [HC=0,30;  H=0,76;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,660  [HC=0,30;  H=0,72;  I=1,00;  S=1,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,605  [HC=0,35;  H=0,18;  I=1,00;  S=1,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,873  [HC=1,00;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,542  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,541  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,508  [HC=0,33;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,502  [HC=0,33;  HNC=0,73;  I=0,00;  S=1,00;  NN=0,74;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     62
+*
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,994  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,828  [HC=0,69;  H=0,74;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,822  [HC=0,69;  H=0,69;  I=1,00;  S=1,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,625  [HC=0,40;  H=0,18;  I=1,00;  S=1,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,690  [HC=0,35;  H=0,78;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,682  [HC=0,35;  H=0,73;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,873  [HC=1,00;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,674  [HC=0,67;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,640  [HC=0,67;  HNC=0,65;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,541  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,502  [HC=0,33;  HNC=0,73;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     65
+*
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,994  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,828  [HC=0,69;  H=0,74;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,822  [HC=0,69;  H=0,69;  I=1,00;  S=1,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,625  [HC=0,40;  H=0,18;  I=1,00;  S=1,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,690  [HC=0,35;  H=0,78;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,682  [HC=0,35;  H=0,73;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,873  [HC=1,00;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,674  [HC=0,67;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,640  [HC=0,67;  HNC=0,65;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,541  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,502  [HC=0,33;  HNC=0,73;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     89
+*
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,994  [HC=1,00;  H=0,96;  I=1,00;  S=1,00] *
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,638  [HC=0,44;  H=0,15;  I=1,00;  S=1,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,827  [HC=0,69;  H=0,73;  I=1,00;  S=1,00] #
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,820  [HC=0,69;  H=0,68;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,665  [HC=0,30;  H=0,75;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,658  [HC=0,30;  H=0,70;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,878  [HC=1,00;  HNC=0,84;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,674  [HC=0,67;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,640  [HC=0,67;  HNC=0,65;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,542  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,508  [HC=0,33;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPersistentStorage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPersistentStorage.cs
+*
+public Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     92
+*
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,994  [HC=1,00;  H=0,96;  I=1,00;  S=1,00] *
+public abstract ValueTask DisposeAsync ( )     38
+	0,638  [HC=0,44;  H=0,15;  I=1,00;  S=1,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] #
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,827  [HC=0,69;  H=0,73;  I=1,00;  S=1,00] #
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,820  [HC=0,69;  H=0,68;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,665  [HC=0,30;  H=0,75;  I=1,00;  S=1,00] #
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,658  [HC=0,30;  H=0,70;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public abstract Task < bool > WriteStreamAsync ( DocumentKey documentKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     49
+	0,913  [HC=1,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > WriteStreamAsync ( ProjectKey projectKey , string name , Stream stream , Checksum ? checksum , CancellationToken cancellationToken )     48
+	0,878  [HC=1,00;  HNC=0,84;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( DocumentKey documentKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     47
+	0,674  [HC=0,67;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < Stream ? > ReadStreamAsync ( ProjectKey projectKey , string name , Checksum ? checksum , CancellationToken cancellationToken )     46
+	0,640  [HC=0,67;  HNC=0,65;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( DocumentKey documentKey , string name , Checksum checksum , CancellationToken cancellationToken )     45
+	0,542  [HC=0,33;  HNC=0,83;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract Task < bool > ChecksumMatchesAsync ( ProjectKey projectKey , string name , Checksum checksum , CancellationToken cancellationToken )     44
+	0,508  [HC=0,33;  HNC=0,74;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract ValueTask DisposeAsync ( )     38
+	0,258  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AccessCheck.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AccessCheck.cs
+*
+public static bool IsSymbolAccessible ( Symbol symbol , AssemblySymbol within , ref HashSet < DiagnosticInfo > useSiteDiagnostics )     24
+*
+public static bool IsSymbolAccessible ( Symbol symbol , AssemblySymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo )     24
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] *
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , TypeSymbol throughTypeOpt = null )     37
+	0,951  [HC=1,00;  H=0,66;  I=1,00;  S=1,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , TypeSymbol throughTypeOpt , out bool failedThroughTypeCheck , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , ConsList < TypeSymbol > basesBeingResolved = null )     52
+	0,923  [HC=1,00;  H=0,46;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,88;  S=0,50;  NN=0,57;  NA=0,00]
+public static bool IsSymbolAccessible ( Symbol symbol , AssemblySymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo )     24
+	0,932  [HC=1,00;  HNC=0,74;  I=0,88;  S=1,00;  NN=0,93;  NA=0,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , TypeSymbol throughTypeOpt = null )     37
+	0,873  [HC=1,00;  HNC=0,58;  I=0,71;  S=1,00;  NN=0,93;  NA=0,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , TypeSymbol throughTypeOpt , out bool failedThroughTypeCheck , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , ConsList < TypeSymbol > basesBeingResolved = null )     52
+	0,873  [HC=1,00;  HNC=0,49;  I=0,77;  S=1,00;  NN=0,86;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AccessCheck.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AccessCheck.cs
+*
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , ref HashSet < DiagnosticInfo > useSiteDiagnostics , TypeSymbol throughTypeOpt = null )     37
+*
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , TypeSymbol throughTypeOpt = null )     37
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] *
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , TypeSymbol throughTypeOpt , out bool failedThroughTypeCheck , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , ConsList < TypeSymbol > basesBeingResolved = null )     52
+	0,942  [HC=1,00;  H=0,60;  I=1,00;  S=1,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , AssemblySymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo )     24
+	0,951  [HC=1,00;  H=0,66;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=1,28;  I=1,78;  S=0,50;  NN=0,57;  NA=0,00]
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , TypeSymbol throughTypeOpt = null )     37
+	0,935  [HC=1,00;  HNC=0,82;  I=0,86;  S=1,00;  NN=0,93;  NA=0,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , AssemblySymbol within , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo )     24
+	0,886  [HC=1,00;  HNC=0,59;  I=0,80;  S=1,00;  NN=0,93;  NA=0,00] 
+public static bool IsSymbolAccessible ( Symbol symbol , NamedTypeSymbol within , TypeSymbol throughTypeOpt , out bool failedThroughTypeCheck , ref CompoundUseSiteInfo < AssemblySymbol > useSiteInfo , ConsList < TypeSymbol > basesBeingResolved = null )     52
+	0,875  [HC=1,00;  HNC=0,58;  I=0,77;  S=1,00;  NN=0,86;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ClassificationUtilities.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ClassificationUtilities.cs
+*
+public static void Convert ( ClassificationTypeMap typeMap , ITextSnapshot snapshot , List < ClassifiedSpan > list , Action < ITagSpan < IClassificationTag > > addTag )     40
+*
+public static List < ITagSpan < IClassificationTag > > Convert ( ClassificationTypeMap typeMap , ITextSnapshot snapshot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     24
+	0,904  [HC=1,00;  H=0,33;  I=1,00;  S=1,00] *
+*
+HC=4;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public static List < ITagSpan < IClassificationTag > > Convert ( ClassificationTypeMap typeMap , ITextSnapshot snapshot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     24
+	0,851  [HC=1,00;  HNC=0,46;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ICocoaDifferenceViewerExtensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ICocoaDifferenceViewerExtensions.cs
+*
+private void CalculateSize ( )     85
+*
+private async Task CalculateSizeAsync ( CancellationToken cancellationToken )     86
+	0,805  [HC=0,72;  H=0,47;  I=1,00;  S=1,00] *
+private async Task < IProjectionSnapshot > GetInlineBufferSnapshotAsync ( CancellationToken cancellationToken )     51
+	0,532  [HC=0,14;  H=0,30;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,82;  S=0,50;  NN=0,00;  NA=0,00]
+private async Task CalculateSizeAsync ( CancellationToken cancellationToken )     86
+	0,658  [HC=0,67;  HNC=0,10;  I=0,86;  S=1,00;  NN=0,75;  NA=0,00] 
+private async Task < IProjectionSnapshot > GetInlineBufferSnapshotAsync ( CancellationToken cancellationToken )     51
+	0,348  [HC=0,00;  HNC=0,10;  I=0,69;  S=1,00;  NN=0,75;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PackageInstallerServiceFactory.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PackageInstallerServiceFactory.cs
+*
+protected override void EnableService ( )     214
+*
+protected override async Task EnableServiceAsync ( CancellationToken cancellationToken )     227
+	0,813  [HC=0,72;  H=0,52;  I=1,00;  S=1,00] *
+private async ValueTask < IVsPackageSourceProvider > GetPackageSourceProviderAsync ( )     214
+	0,594  [HC=0,28;  H=0,33;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,92;  S=0,50;  NN=2,00;  NA=0,00]
+protected override async Task EnableServiceAsync ( CancellationToken cancellationToken )     227
+	0,719  [HC=0,67;  HNC=0,15;  I=0,68;  S=1,00;  NN=1,00;  NA=0,00] 
+private async ValueTask < IVsPackageSourceProvider > GetPackageSourceProviderAsync ( )     214
+	0,563  [HC=0,00;  HNC=0,67;  I=0,49;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Project.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Project.cs
+*
+private static SourceGeneratedDocument CreateSourceGeneratedDocument ( DocumentId documentId , ( SourceGeneratedDocumentState , Project ) stateAndProject )     376
+*
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,845  [HC=0,85;  H=0,35;  I=1,00;  S=1,00] *
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,594  [HC=0,28;  H=0,33;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,630  [HC=0,67;  HNC=0,48;  I=0,42;  S=1,00;  NN=0,00;  NA=0,00] 
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,245  [HC=0,00;  HNC=0,33;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PullDiagnosticTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PullDiagnosticTests.cs
+*
+private TestWorkspace CreateTestWorkspaceWithDiagnostics ( string markup , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     623
+*
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string markup , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     557
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string [ ] markups , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     564
+	0,976  [HC=1,00;  H=0,83;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,50;  S=0,50;  NN=1,26;  NA=0,00]
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string markup , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     557
+	0,939  [HC=1,00;  HNC=0,86;  I=0,49;  S=1,00;  NN=0,96;  NA=0,00] 
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string [ ] markups , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     564
+	0,928  [HC=1,00;  HNC=0,83;  I=0,38;  S=1,00;  NN=0,96;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PullDiagnosticTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PullDiagnosticTests.cs
+*
+private TestWorkspace CreateTestWorkspaceWithDiagnostics ( string [ ] markups , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     630
+*
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string [ ] markups , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     564
+	0,994  [HC=1,00;  H=0,96;  I=1,00;  S=1,00] *
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string markup , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     557
+	0,976  [HC=1,00;  H=0,83;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,50;  S=0,50;  NN=1,26;  NA=0,00]
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string markup , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     557
+	0,936  [HC=1,00;  HNC=0,83;  I=0,49;  S=1,00;  NN=0,96;  NA=0,00] 
+private TestLspServer CreateTestWorkspaceWithDiagnostics ( string [ ] markups , BackgroundAnalysisScope scope , bool pullDiagnostics = true )     564
+	0,931  [HC=1,00;  HNC=0,86;  I=0,38;  S=1,00;  NN=0,96;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxTreeIndex_Persistence.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxTreeIndex_Persistence.cs
+*
+private static async Task < SyntaxTreeIndex ? > LoadAsync ( Document document , Checksum checksum , CancellationToken cancellationToken )     22
+*
+private static Task < SyntaxTreeIndex ? > LoadAsync ( Document document , Checksum checksum , CancellationToken cancellationToken )     23
+	0,992  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] *
+public static async Task < SyntaxTreeIndex ? > LoadAsync ( Workspace workspace , DocumentKey documentKey , Checksum ? checksum , StringTable stringTable , CancellationToken cancellationToken )     26
+	0,954  [HC=1,00;  H=0,68;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,06;  I=1,77;  S=0,50;  NN=2,00;  NA=0,00]
+public static async Task < SyntaxTreeIndex ? > LoadAsync ( Workspace workspace , DocumentKey documentKey , Checksum ? checksum , StringTable stringTable , CancellationToken cancellationToken )     26
+	0,876  [HC=1,00;  HNC=0,63;  I=0,85;  S=1,00;  NN=1,00;  NA=0,00] 
+private static Task < SyntaxTreeIndex ? > LoadAsync ( Document document , Checksum checksum , CancellationToken cancellationToken )     23
+	0,872  [HC=1,00;  HNC=0,94;  I=0,29;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\VisualStudioSymbolNavigationService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\VisualStudioSymbolNavigationService.cs
+*
+public bool TrySymbolNavigationNotify ( ISymbol symbol , Project project , CancellationToken cancellationToken )     175
+*
+public async Task < bool > TrySymbolNavigationNotifyAsync ( ISymbol symbol , Project project , CancellationToken cancellationToken )     176
+	0,894  [HC=0,83;  H=0,75;  I=1,00;  S=1,00] *
+*
+HC=2;  HNC=1,36;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task < bool > TrySymbolNavigationNotifyAsync ( ISymbol symbol , Project project , CancellationToken cancellationToken )     176
+	0,739  [HC=0,80;  HNC=0,82;  I=0,00;  S=1,00;  NN=0,83;  NA=0,00] 
+
+**************************************************************
+

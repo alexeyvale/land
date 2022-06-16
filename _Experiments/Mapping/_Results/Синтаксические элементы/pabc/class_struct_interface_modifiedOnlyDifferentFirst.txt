@@ -1,0 +1,38 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public partial class pattern_deconstructor_parameter     49535
+*
+public partial class wild_card_deconstructor_parameter     51921
+	0,871  [HC=0,77;  H=0,94;  I=0,86;  S=1,00] 
+public partial class pattern_parameter     49923
+	0,771  [HC=0,55;  H=0,89;  I=0,86;  S=1,00] 
+public partial class const_pattern_parameter     51772
+	0,754  [HC=0,52;  H=0,87;  I=0,86;  S=1,00] 
+public partial class recursive_collection_parameter     52531
+	0,739  [HC=0,48;  H=0,87;  I=0,86;  S=1,00] 
+public partial class recursive_pattern_parameter     52661
+	0,709  [HC=0,41;  H=0,86;  I=0,86;  S=1,00] 
+public partial class recursive_tuple_parameter     53144
+	0,709  [HC=0,41;  H=0,86;  I=0,86;  S=1,00] 
+public partial class tuple_pattern_var_parameter     52962
+	0,703  [HC=0,45;  H=0,86;  I=0,71;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,88;  S=0,50;  NN=2,00;  NA=0,00]
+public partial class pattern_parameter     49923
+	0,878  [HC=0,67;  HNC=1,00;  I=0,88;  S=1,00;  NN=1,00;  NA=0,00] *
+public partial class collection_pattern_gap_parameter     52165
+	0,552  [HC=0,50;  HNC=1,00;  I=0,84;  S=1,00;  NN=0,00;  NA=0,00] 
+public partial class wild_card_deconstructor_parameter     51921
+	0,531  [HC=0,50;  HNC=1,00;  I=0,75;  S=1,00;  NN=0,00;  NA=0,00] 
+public partial class tuple_pattern_wild_card     51680
+	0,482  [HC=0,25;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,00;  NA=0,00] 
+public partial class collection_pattern_wild_card     52257
+	0,475  [HC=0,25;  HNC=1,00;  I=0,80;  S=1,00;  NN=0,00;  NA=0,00] 
+public partial class collection_pattern_var_parameter     52349
+	0,456  [HC=0,50;  HNC=1,00;  I=0,46;  S=1,00;  NN=0,00;  NA=0,00] 
+public partial class recursive_collection_parameter     52531
+	0,451  [HC=0,33;  HNC=1,00;  I=0,62;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

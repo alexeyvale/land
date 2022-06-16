@@ -1,0 +1,508 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static string FormatValue ( string value , CultureInfo culture = null )     38
+*
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,983  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTime value , CultureInfo ? culture = null )     309
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTimeOffset value , CultureInfo ? culture = null )     391
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , CultureInfo ? culture = null )     99
+	0,975  [HC=1,00;  H=0,82;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,42;  I=1,56;  S=0,50;  NN=2,00;  NA=0,00]
+public static string ? FormatValue ( string ? value , CultureInfo ? culture = null )     38
+	0,989  [HC=1,00;  HNC=0,96;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,778  [HC=1,00;  HNC=0,89;  I=0,90;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,775  [HC=1,00;  HNC=0,89;  I=0,87;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string ? FormatValue ( int value , CultureInfo ? culture = null )     99
+	0,773  [HC=1,00;  HNC=0,87;  I=0,90;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,772  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,771  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string ? FormatValue ( double value , CultureInfo ? culture = null )     239
+	0,766  [HC=1,00;  HNC=0,87;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static string FormatValue ( int value , CultureInfo culture = null )     99
+*
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTimeOffset value , CultureInfo ? culture = null )     391
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , CultureInfo ? culture = null )     99
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTime value , CultureInfo ? culture = null )     309
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,44;  S=0,50;  NN=2,00;  NA=0,00]
+public static string ? FormatValue ( int value , CultureInfo ? culture = null )     99
+	0,997  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,751  [HC=1,00;  HNC=0,89;  I=0,92;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,747  [HC=1,00;  HNC=0,89;  I=0,89;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,747  [HC=1,00;  HNC=0,89;  I=0,89;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string ? FormatValue ( int ? value , CultureInfo ? culture = null )     114
+	0,743  [HC=1,00;  HNC=0,96;  I=0,82;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,740  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string ? FormatValue ( string ? value , CultureInfo ? culture = null )     38
+	0,744  [HC=1,00;  HNC=0,86;  I=0,90;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static string FormatValue ( double value , CultureInfo culture = null )     204
+*
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , CultureInfo ? culture = null )     239
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTime value , CultureInfo ? culture = null )     309
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTimeOffset value , CultureInfo ? culture = null )     391
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,56;  S=0,50;  NN=2,00;  NA=0,00]
+public static string ? FormatValue ( double value , CultureInfo ? culture = null )     239
+	0,997  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public static string ? FormatValue ( double ? value , CultureInfo ? culture = null )     254
+	0,746  [HC=1,00;  HNC=0,96;  I=0,83;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( decimal value , CultureInfo ? culture = null )     274
+	0,741  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( short value , CultureInfo ? culture = null )     169
+	0,740  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] 
+public static string FormatValue ( long value , CultureInfo ? culture = null )     134
+	0,745  [HC=1,00;  HNC=0,89;  I=0,87;  S=1,00;  NN=0,00;  NA=0,00] #
+public static string FormatValue ( float value , CultureInfo ? culture = null )     204
+	0,740  [HC=1,00;  HNC=0,89;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] #
+public static string ? FormatValue ( int value , CultureInfo ? culture = null )     99
+	0,738  [HC=1,00;  HNC=0,87;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BindConverter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BindConverter.cs
+*
+public static string FormatValue ( DateTime ? value , string format , CultureInfo culture = null )     321
+*
+public static string FormatValue ( DateTime value , string format , CultureInfo ? culture = null )     320
+	0,983  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( DateTimeOffset ? value , string format , CultureInfo ? culture = null )     439
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTimeOffset value , string format , CultureInfo ? culture = null )     403
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( DateTime ? value , string ? format , CultureInfo ? culture = null )     356
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTime value , CultureInfo ? culture = null )     309
+	0,960  [HC=1,00;  H=0,72;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( DateTime ? value , CultureInfo ? culture = null )     345
+	0,960  [HC=1,00;  H=0,72;  I=1,00;  S=1,00] 
+public static string FormatValue ( DateTimeOffset value , CultureInfo ? culture = null )     391
+	0,957  [HC=1,00;  H=0,70;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,79;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+public static string ? FormatValue ( DateTime ? value , string ? format , CultureInfo ? culture = null )     356
+	0,988  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,84;  NA=0,00] *
+public static string ? FormatValue ( DateTimeOffset ? value , string format , CultureInfo ? culture = null )     439
+	0,949  [HC=1,00;  HNC=0,91;  I=0,90;  S=1,00;  NN=0,84;  NA=0,00] 
+public static string FormatValue ( DateTimeOffset value , string format , CultureInfo ? culture = null )     403
+	0,924  [HC=1,00;  HNC=0,92;  I=0,75;  S=1,00;  NN=0,84;  NA=0,00] 
+public static string ? FormatValue ( DateTimeOffset ? value , CultureInfo ? culture = null )     428
+	0,880  [HC=1,00;  HNC=0,76;  I=0,84;  S=1,00;  NN=0,84;  NA=0,00] 
+public static string FormatValue ( DateTime value , string format , CultureInfo ? culture = null )     320
+	0,967  [HC=1,00;  HNC=0,99;  I=0,86;  S=1,00;  NN=0,84;  NA=0,00] #
+public static string ? FormatValue ( DateTime ? value , CultureInfo ? culture = null )     345
+	0,921  [HC=1,00;  HNC=0,83;  I=0,92;  S=1,00;  NN=0,84;  NA=0,00] #
+public static string FormatValue ( DateTime value , CultureInfo ? culture = null )     309
+	0,896  [HC=1,00;  HNC=0,84;  I=0,77;  S=1,00;  NN=0,84;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpsConnectionMiddlewareTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpsConnectionMiddlewareTests.cs
+*
+public async Task DoesNotSupportTls10 ( )     364
+*
+public void Http2DoesNotThrowOnCompatibleWindowsVersions ( )     670
+	0,613  [HC=0,25;  H=0,54;  I=1,00;  S=1,00] 
+public void Http1AndHttp2DoesNotDowngradeOnCompatibleWindowsVersions ( )     641
+	0,589  [HC=0,20;  H=0,53;  I=1,00;  S=1,00] 
+public async Task Tls10CanBeDisabled ( )     364
+	0,571  [HC=0,05;  H=0,84;  I=1,00;  S=1,00] 
+public void Http2ThrowsOnIncompatibleWindowsVersions ( )     656
+	0,568  [HC=0,15;  H=0,53;  I=1,00;  S=1,00] 
+public void Http1AndHttp2DowngradeToHttp1ForHttpsOnIncompatibleWindowsVersions ( )     626
+	0,562  [HC=0,14;  H=0,52;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+public async Task Tls10CanBeDisabled ( )     364
+	0,793  [HC=0,00;  HNC=1,00;  I=0,91;  S=1,00;  NN=1,00;  NA=0,00] *
+public void Http2DoesNotThrowOnCompatibleWindowsVersions ( )     670
+	0,466  [HC=0,22;  HNC=0,73;  I=0,51;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Http1AndHttp2DoesNotDowngradeOnCompatibleWindowsVersions ( )     641
+	0,437  [HC=0,17;  HNC=0,73;  I=0,41;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Http2ThrowsOnIncompatibleWindowsVersions ( )     656
+	0,424  [HC=0,00;  HNC=0,73;  I=0,51;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Http1AndHttp2DowngradeToHttp1ForHttpsOnIncompatibleWindowsVersions ( )     626
+	0,423  [HC=0,03;  HNC=0,73;  I=0,47;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static string FormatValue ( double value , System . Globalization . CultureInfo culture = null )     14
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double ? value , System . Globalization . CultureInfo ? culture = null )     24
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static bool FormatValue ( bool value , System . Globalization . CultureInfo ? culture = null )     8
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,48;  S=1,00;  NN=1,89;  NA=0,00]
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] *
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,989  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,987  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,983  [HC=1,00;  HNC=0,89;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] #
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,968  [HC=1,00;  HNC=0,80;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static string FormatValue ( int value , System . Globalization . CultureInfo culture = null )     15
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int ? value , System . Globalization . CultureInfo ? culture = null )     26
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,977  [HC=1,00;  H=0,84;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,48;  S=1,00;  NN=1,89;  NA=0,00]
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] *
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,989  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,987  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] #
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,983  [HC=1,00;  HNC=0,89;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] #
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,968  [HC=1,00;  HNC=0,80;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static string FormatValue ( System . DateTime ? value , string format , System . Globalization . CultureInfo culture = null )     21
+*
+public static string FormatValue ( System . DateTime value , string format , System . Globalization . CultureInfo ? culture = null )     10
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTimeOffset ? value , string format , System . Globalization . CultureInfo ? culture = null )     20
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTimeOffset value , string format , System . Globalization . CultureInfo ? culture = null )     12
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTime ? value , string ? format , System . Globalization . CultureInfo ? culture = null )     22
+	0,984  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,969  [HC=1,00;  H=0,78;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTime ? value , System . Globalization . CultureInfo ? culture = null )     21
+	0,969  [HC=1,00;  H=0,78;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTimeOffset value , System . Globalization . CultureInfo ? culture = null )     11
+	0,966  [HC=1,00;  H=0,76;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,84;  I=0,48;  S=1,00;  NN=1,05;  NA=0,00]
+public static string ? FormatValue ( System . DateTime ? value , string ? format , System . Globalization . CultureInfo ? culture = null )     22
+	0,985  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] *
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,892  [HC=1,00;  HNC=0,72;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] 
+public static string ? FormatValue ( decimal ? value , System . Globalization . CultureInfo ? culture = null )     23
+	0,887  [HC=1,00;  HNC=0,71;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] 
+public static string ? FormatValue ( System . DateTimeOffset ? value , string format , System . Globalization . CultureInfo ? culture = null )     20
+	0,969  [HC=1,00;  HNC=0,93;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string ? FormatValue ( System . DateTime ? value , System . Globalization . CultureInfo ? culture = null )     21
+	0,946  [HC=1,00;  HNC=0,87;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string ? FormatValue ( System . DateTimeOffset ? value , System . Globalization . CultureInfo ? culture = null )     19
+	0,927  [HC=1,00;  HNC=0,82;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , string format , System . Globalization . CultureInfo ? culture = null )     10
+	0,895  [HC=1,00;  HNC=0,99;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netcoreapp.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netcoreapp.cs
+*
+public static string FormatValue ( string value , System . Globalization . CultureInfo culture = null )     28
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,987  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,977  [HC=1,00;  H=0,84;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,50;  I=0,48;  S=1,00;  NN=0,00;  NA=0,00]
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,987  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] *
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,960  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,960  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static string FormatValue ( double value , System . Globalization . CultureInfo culture = null )     14
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double ? value , System . Globalization . CultureInfo ? culture = null )     24
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static bool FormatValue ( bool value , System . Globalization . CultureInfo ? culture = null )     8
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=1,00;  I=0,48;  S=1,00;  NN=1,89;  NA=0,00]
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] *
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,989  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,987  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,983  [HC=1,00;  HNC=0,89;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] #
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,968  [HC=1,00;  HNC=0,80;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static string FormatValue ( int value , System . Globalization . CultureInfo culture = null )     15
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int ? value , System . Globalization . CultureInfo ? culture = null )     26
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,977  [HC=1,00;  H=0,84;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,48;  S=1,00;  NN=1,89;  NA=0,00]
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,996  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] *
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,989  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,987  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,99;  NA=0,00] #
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,983  [HC=1,00;  HNC=0,89;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] #
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,983  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,968  [HC=1,00;  HNC=0,80;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static string FormatValue ( System . DateTime ? value , string format , System . Globalization . CultureInfo culture = null )     21
+*
+public static string FormatValue ( System . DateTime value , string format , System . Globalization . CultureInfo ? culture = null )     10
+	0,988  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTimeOffset ? value , string format , System . Globalization . CultureInfo ? culture = null )     20
+	0,986  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTimeOffset value , string format , System . Globalization . CultureInfo ? culture = null )     12
+	0,985  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTime ? value , string ? format , System . Globalization . CultureInfo ? culture = null )     22
+	0,984  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTime value , System . Globalization . CultureInfo ? culture = null )     9
+	0,969  [HC=1,00;  H=0,78;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( System . DateTime ? value , System . Globalization . CultureInfo ? culture = null )     21
+	0,969  [HC=1,00;  H=0,78;  I=1,00;  S=1,00] 
+public static string FormatValue ( System . DateTimeOffset value , System . Globalization . CultureInfo ? culture = null )     11
+	0,966  [HC=1,00;  H=0,76;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,84;  I=0,48;  S=1,00;  NN=1,05;  NA=0,00]
+public static string ? FormatValue ( System . DateTime ? value , string ? format , System . Globalization . CultureInfo ? culture = null )     22
+	0,985  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] *
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,892  [HC=1,00;  HNC=0,72;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] 
+public static string ? FormatValue ( decimal ? value , System . Globalization . CultureInfo ? culture = null )     23
+	0,887  [HC=1,00;  HNC=0,71;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] 
+public static string ? FormatValue ( System . DateTimeOffset ? value , string format , System . Globalization . CultureInfo ? culture = null )     20
+	0,969  [HC=1,00;  HNC=0,93;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string ? FormatValue ( System . DateTime ? value , System . Globalization . CultureInfo ? culture = null )     21
+	0,946  [HC=1,00;  HNC=0,87;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string ? FormatValue ( System . DateTimeOffset ? value , System . Globalization . CultureInfo ? culture = null )     19
+	0,927  [HC=1,00;  HNC=0,82;  I=1,00;  S=1,00;  NN=0,95;  NA=0,00] #
+public static string FormatValue ( System . DateTime value , string format , System . Globalization . CultureInfo ? culture = null )     10
+	0,895  [HC=1,00;  HNC=0,99;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Microsoft.AspNetCore.Components.netstandard2.0.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Microsoft.AspNetCore.Components.netstandard2.0.cs
+*
+public static string FormatValue ( string value , System . Globalization . CultureInfo culture = null )     28
+*
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,987  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,985  [HC=1,00;  H=0,90;  I=1,00;  S=1,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,980  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,977  [HC=1,00;  H=0,84;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,50;  I=0,48;  S=1,00;  NN=0,00;  NA=0,00]
+public static string ? FormatValue ( string ? value , System . Globalization . CultureInfo ? culture = null )     30
+	0,987  [HC=1,00;  HNC=0,97;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] *
+public static string FormatValue ( decimal value , System . Globalization . CultureInfo ? culture = null )     13
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( short value , System . Globalization . CultureInfo ? culture = null )     15
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( long value , System . Globalization . CultureInfo ? culture = null )     17
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string FormatValue ( float value , System . Globalization . CultureInfo ? culture = null )     29
+	0,967  [HC=1,00;  HNC=0,92;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string ? FormatValue ( double value , System . Globalization . CultureInfo ? culture = null )     14
+	0,960  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+public static string ? FormatValue ( int value , System . Globalization . CultureInfo ? culture = null )     16
+	0,960  [HC=1,00;  HNC=0,90;  I=1,00;  S=1,00;  NN=0,89;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueryHelpers.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueryHelpers.cs
+*
+private static string AddQueryString ( string uri , IEnumerable < KeyValuePair < string , string > > queryString )     63
+*
+public static string AddQueryString ( string uri , IEnumerable < KeyValuePair < string , StringValues > > queryString )     80
+	0,989  [HC=1,00;  H=0,92;  I=1,00;  S=1,00] 
+public static string AddQueryString ( string uri , IEnumerable < KeyValuePair < string , string ? > > queryString )     103
+	0,987  [HC=1,00;  H=0,91;  I=1,00;  S=1,00] 
+public static string AddQueryString ( string uri , IDictionary < string , string ? > queryString )     57
+	0,964  [HC=1,00;  H=0,75;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=1,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+public static string AddQueryString ( string uri , IEnumerable < KeyValuePair < string , string ? > > queryString )     103
+	0,982  [HC=1,00;  HNC=0,93;  I=0,97;  S=1,00;  NN=0,75;  NA=0,00] *
+public static string AddQueryString ( string uri , IEnumerable < KeyValuePair < string , StringValues > > queryString )     80
+	0,819  [HC=1,00;  HNC=0,87;  I=0,39;  S=1,00;  NN=0,75;  NA=0,00] 
+public static string AddQueryString ( string uri , IDictionary < string , string ? > queryString )     57
+	0,693  [HC=1,00;  HNC=0,70;  I=0,00;  S=1,00;  NN=0,75;  NA=0,00] #
+
+**************************************************************
+

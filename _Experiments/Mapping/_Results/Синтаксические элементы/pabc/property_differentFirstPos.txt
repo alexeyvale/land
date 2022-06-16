@@ -1,0 +1,38 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public int Count     49380
+*
+public int Count     51277
+	0,972  [HC=1,00;  H=1,00;  I=1,00;  S=0,90] 
+public int Count     48328
+	0,971  [HC=1,00;  H=1,00;  I=1,00;  S=0,90] 
+public override Int32 subnodes_count     51612
+	0,607  [HC=0,31;  H=0,42;  I=1,00;  S=0,95] 
+public override Int32 subnodes_count     52108
+	0,605  [HC=0,31;  H=0,42;  I=1,00;  S=0,95] 
+public override Int32 subnodes_count     51973
+	0,604  [HC=0,31;  H=0,42;  I=1,00;  S=0,94] 
+public override Int32 subnodes_count     52905
+	0,602  [HC=0,31;  H=0,42;  I=1,00;  S=0,93] 
+public override Int32 subnodes_count     51870
+	0,600  [HC=0,31;  H=0,42;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=1,20;  S=1,00;  NN=2,00;  NA=0,00]
+public int Count     48328
+	0,743  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,64;  NN=0,00;  NA=0,00] 
+public int Count     51277
+	0,704  [HC=1,00;  HNC=1,00;  I=0,70;  S=0,64;  NN=0,00;  NA=0,00] 
+public override Int32 subnodes_count     51612
+	0,380  [HC=0,40;  HNC=0,40;  I=0,57;  S=0,82;  NN=0,00;  NA=0,00] 
+public override Int32 subnodes_count     52108
+	0,380  [HC=0,40;  HNC=0,40;  I=0,57;  S=0,82;  NN=0,00;  NA=0,00] 
+public override Int32 subnodes_count     52905
+	0,380  [HC=0,40;  HNC=0,40;  I=0,57;  S=0,82;  NN=0,00;  NA=0,00] 
+public override Int32 subnodes_count     51870
+	0,361  [HC=0,40;  HNC=0,40;  I=0,47;  S=0,76;  NN=0,00;  NA=0,00] 
+public override Int32 subnodes_count     52759
+	0,361  [HC=0,40;  HNC=0,40;  I=0,47;  S=0,76;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

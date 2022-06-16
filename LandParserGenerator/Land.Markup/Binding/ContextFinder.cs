@@ -916,14 +916,11 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(HeaderContextElement a, HeaderContextElement b)
 		{
-			if (a.EqualsIgnoreValue(b))
-			{
-				return a.ExactMatch
+			return a.EqualsIgnoreValue(b)
+				? a.ExactMatch
 					? a.Value.SequenceEqual(b.Value) ? 1 : 0
-					: Levenshtein(a.Value, b.Value);
-			}
-			else
-				return double.MinValue;
+					: Levenshtein(a.Value, b.Value)
+				: double.MinValue;
 		}
 
 		public double EvalSimilarity(InnerContext a, InnerContext b)
@@ -933,13 +930,16 @@ namespace Land.Markup.Binding
 
 		public double EvalSimilarity(AncestorsContextElement a, AncestorsContextElement b)
 		{
-			return a.Type == b.Type ? Levenshtein(a.HeaderContext.Sequence, b.HeaderContext.Sequence) : 0;
+			return a.Type == b.Type 
+				? Levenshtein(a.HeaderContext.Sequence, b.HeaderContext.Sequence) 
+				: double.MinValue;
 		}
 
 		public double EvalSimilarity(PrioritizedWord a, PrioritizedWord b)
 		{
 			return a.Priority == b.Priority 
-				? Levenshtein(a.Text, b.Text, true) : 0;
+				? Levenshtein(a.Text, b.Text, true)
+				: double.MinValue;
 		}
 
 		public double EvalSimilarity(TextOrHash a, TextOrHash b)

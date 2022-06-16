@@ -1,0 +1,56 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\RunnerManagerHandlers.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\RunnerManagerHandlers.cs
+*
+void RunnerManager_Started_Sync_Thread ( object fileName )     53
+*
+void ButtonsEnableDisable_RunStart ( )     27
+	0,606  [HC=0,23;  H=0,54;  I=1,00;  S=1,00] 
+void ButtonsEnableDisable_RunStop ( )     35
+	0,591  [HC=0,20;  H=0,54;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,47;  S=0,50;  NN=0,00;  NA=0,00]
+void ButtonsEnableDisable_RunStart ( )     27
+	0,196  [HC=0,00;  HNC=0,28;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+void ButtonsEnableDisable_RunStop ( )     35
+	0,196  [HC=0,00;  HNC=0,28;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public deconstructor_pattern Add ( pattern_deconstructor_parameter elem , SourceContext sc = null )     49247
+*
+public pattern_node Add ( pattern_parameter elem , SourceContext sc = null )     48195
+	0,956  [HC=1,00;  H=0,89;  I=1,00;  S=0,90] 
+public semantic_check_sugared_var_def_statement_node Add ( syntax_tree_node elem , SourceContext sc = null )     51144
+	0,953  [HC=1,00;  H=0,87;  I=1,00;  S=0,90] 
+public void AddMany ( params syntax_tree_node [ ] els )     51172
+	0,632  [HC=0,43;  H=0,33;  I=1,00;  S=0,90] 
+public void AddMany ( params pattern_parameter [ ] els )     48223
+	0,631  [HC=0,43;  H=0,33;  I=1,00;  S=0,90] 
+public void AddFirst ( pattern_parameter el )     48205
+	0,614  [HC=0,38;  H=0,37;  I=1,00;  S=0,90] 
+public void AddFirst ( syntax_tree_node el )     51154
+	0,611  [HC=0,38;  H=0,34;  I=1,00;  S=0,90] 
+public void AddFirst ( IEnumerable < syntax_tree_node > els )     51162
+	0,608  [HC=0,38;  H=0,33;  I=1,00;  S=0,90] 
+*
+HC=4;  HNC=1,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+public pattern_node Add ( pattern_parameter elem , SourceContext sc = null )     48195
+	0,917  [HC=1,00;  HNC=0,70;  I=1,00;  S=0,64;  NN=0,00;  NA=0,00] 
+public semantic_check_sugared_var_def_statement_node Add ( syntax_tree_node elem , SourceContext sc = null )     51144
+	0,872  [HC=1,00;  HNC=0,53;  I=0,91;  S=0,64;  NN=0,00;  NA=0,00] 
+public void AddFirst ( syntax_tree_node el )     51154
+	0,458  [HC=0,50;  HNC=0,13;  I=0,45;  S=0,64;  NN=0,00;  NA=0,00] 
+public void AddMany ( params syntax_tree_node [ ] els )     51172
+	0,456  [HC=0,50;  HNC=0,13;  I=0,44;  S=0,64;  NN=0,00;  NA=0,00] 
+public void AddMany ( params pattern_parameter [ ] els )     48223
+	0,498  [HC=0,50;  HNC=0,20;  I=0,57;  S=0,64;  NN=0,00;  NA=0,00] #
+public void AddFirst ( pattern_parameter el )     48205
+	0,472  [HC=0,50;  HNC=0,30;  I=0,42;  S=0,64;  NN=0,00;  NA=0,00] #
+public void AddFirst ( IEnumerable < pattern_parameter > els )     48213
+	0,454  [HC=0,50;  HNC=0,11;  I=0,44;  S=0,64;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+

@@ -1,0 +1,1524 @@
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static readonly byte [ ] _schemeBytes     39
+*
+private readonly Http2PeerSettings _serverSettings     45
+	0,565  [HC=0,29;  H=0,35;  I=1,00;  S=0,88] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,560  [HC=0,27;  H=0,35;  I=1,00;  S=0,88] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,560  [HC=0,31;  H=0,23;  I=1,00;  S=0,88] #
+private readonly HttpConnectionContext _context     36
+	0,559  [HC=0,27;  H=0,35;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _clientSettings     46
+	0,533  [HC=0,21;  H=0,34;  I=1,00;  S=0,88] #
+private readonly StreamCloseAwaitable _streamCompletionAwaitable     64
+	0,526  [HC=0,20;  H=0,33;  I=1,00;  S=0,88] #
+private int _highestOpenedStreamId     56
+	0,526  [HC=0,24;  H=0,22;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,44;  S=1,00;  NN=0,00;  NA=0,00]
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,359  [HC=0,00;  HNC=0,50;  I=0,32;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,315  [HC=0,00;  HNC=0,33;  I=0,25;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HttpConnectionContext _context     36
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Pipe _input     38
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly int _minAllocBufferSize     40
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HPackDecoder _hpackDecoder     41
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SelfHostDeployer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SelfHostDeployer.cs
+*
+private const int RetryCount     25
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HubConnectionContext.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HubConnectionContext.cs
+*
+private long _lastReceivedTimeStamp     40
+*
+private long _receivedMessageTimestamp     52
+	0,743  [HC=0,46;  H=0,83;  I=1,00;  S=1,00] 
+private bool _receivedMessageTimeoutEnabled     50
+	0,637  [HC=0,31;  H=0,53;  I=1,00;  S=1,00] 
+private long _receivedMessageElapsedTicks     51
+	0,613  [HC=0,19;  H=0,74;  I=1,00;  S=1,00] 
+private readonly object _receiveMessageTimeoutLock     38
+	0,604  [HC=0,28;  H=0,39;  I=1,00;  S=1,00] 
+private readonly ISystemClock _systemClock     39
+	0,563  [HC=0,19;  H=0,37;  I=1,00;  S=1,00] 
+private readonly CancellationTokenRegistration _closedRegistration     40
+	0,563  [HC=0,19;  H=0,37;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,22;  S=0,50;  NN=0,00;  NA=0,00]
+private long _receivedMessageTimestamp     52
+	0,521  [HC=0,22;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private long _receivedMessageElapsedTicks     51
+	0,403  [HC=0,00;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly object _receiveMessageTimeoutLock     38
+	0,265  [HC=0,14;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly ISystemClock _systemClock     39
+	0,188  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationTokenRegistration _closedRegistration     40
+	0,188  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private bool _receivedMessageTimeoutEnabled     50
+	0,278  [HC=0,14;  HNC=0,25;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private const int VoidResult     28
+*
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,564  [HC=0,20;  H=0,35;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,02;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,199  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static readonly byte [ ] _methodBytes     37
+*
+private bool _isMethodConnect     55
+	0,599  [HC=0,40;  H=0,24;  I=1,00;  S=0,88] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,560  [HC=0,31;  H=0,23;  I=1,00;  S=0,88] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,548  [HC=0,21;  H=0,47;  I=1,00;  S=0,88] #
+private readonly int _minAllocBufferSize     40
+	0,539  [HC=0,22;  H=0,36;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _serverSettings     45
+	0,533  [HC=0,21;  H=0,34;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _clientSettings     46
+	0,533  [HC=0,21;  H=0,34;  I=1,00;  S=0,88] #
+private Http2Stream _currentHeadersStream     50
+	0,530  [HC=0,25;  H=0,21;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,44;  S=1,00;  NN=0,00;  NA=0,00]
+private bool _isMethodConnect     55
+	0,378  [HC=0,28;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,352  [HC=0,00;  HNC=0,50;  I=0,25;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,315  [HC=0,00;  HNC=0,33;  I=0,25;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HttpConnectionContext _context     36
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Pipe _input     38
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly int _minAllocBufferSize     40
+	0,290  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\InitCommandTest.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\InitCommandTest.cs
+*
+private StringBuilder _textOutput     20
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BinaryBlob.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BinaryBlob.cs
+*
+private static readonly RandomNumberGenerator _randomNumberGenerator     18
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TransportConnection.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TransportConnection.Generated.cs
+*
+private static readonly Type IMemoryPoolFeatureType     18
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ResponseCachingStream.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ResponseCachingStream.cs
+*
+private readonly Func < Task > _startResponseCallbackAsync     18
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Rfc6238AuthenticationService.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Rfc6238AuthenticationService.cs
+*
+private static readonly DateTime _unixEpoch     15
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpRequestFeatureType     16
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TransportConnection.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TransportConnection.Generated.cs
+*
+private static readonly Type IConnectionIdFeatureType     15
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.cs
+*
+protected string _parsedRawTarget     139
+*
+private string _httpProtocol     65
+	0,500  [HC=0,00;  H=0,50;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,05;  S=0,50;  NN=0,00;  NA=0,00]
+private string _httpProtocol     65
+	0,352  [HC=0,00;  HNC=0,75;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private static readonly string MacOSUserKeyChain     33
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,539  [HC=0,18;  H=0,49;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,529  [HC=0,16;  H=0,48;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,522  [HC=0,14;  H=0,48;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,516  [HC=0,13;  H=0,48;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,502  [HC=0,15;  H=0,31;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,499  [HC=0,17;  H=0,22;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,486  [HC=0,12;  H=0,30;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,369  [HC=0,17;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,348  [HC=0,13;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,119  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SetCookieHeaderValue.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SetCookieHeaderValue.cs
+*
+internal static bool SuppressSameSiteNone     29
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static readonly byte [ ] _connectionBytes     41
+*
+private readonly HttpConnectionContext _context     36
+	0,586  [HC=0,33;  H=0,35;  I=1,00;  S=0,88] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,557  [HC=0,27;  H=0,35;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _clientSettings     46
+	0,557  [HC=0,27;  H=0,35;  I=1,00;  S=0,88] #
+private readonly StreamCloseAwaitable _streamCompletionAwaitable     64
+	0,544  [HC=0,24;  H=0,34;  I=1,00;  S=0,88] #
+private int _clientActiveStreamCount     59
+	0,536  [HC=0,26;  H=0,22;  I=1,00;  S=0,88] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,535  [HC=0,18;  H=0,47;  I=1,00;  S=0,88] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,532  [HC=0,25;  H=0,22;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,38;  S=1,00;  NN=0,00;  NA=0,00]
+private readonly HttpConnectionContext _context     36
+	0,408  [HC=0,25;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly StreamCloseAwaitable _streamCompletionAwaitable     64
+	0,370  [HC=0,17;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,332  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,294  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Pipe _input     38
+	0,294  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly int _minAllocBufferSize     40
+	0,294  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HPackDecoder _hpackDecoder     41
+	0,294  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NullParser.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NullParser.cs
+*
+private readonly byte [ ] _target     14
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingLoggerExtensions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingLoggerExtensions.cs
+*
+private readonly Activity _activity     100
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AsyncAcceptContext.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AsyncAcceptContext.cs
+*
+private const int DefaultBufferSize     21
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private IFormatterResolver _resolver     28
+*
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,648  [HC=0,38;  H=0,41;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,200  [HC=0,00;  HNC=0,20;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttp2StreamIdFeatureType     31
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private static readonly string MacOSTrustCertificateCommandLineArguments     42
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,580  [HC=0,27;  H=0,50;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,557  [HC=0,22;  H=0,49;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,556  [HC=0,22;  H=0,49;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,546  [HC=0,20;  H=0,49;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,510  [HC=0,17;  H=0,31;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,508  [HC=0,20;  H=0,22;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,488  [HC=0,12;  H=0,30;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,119  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpRequestIdentifierFeatureType     20
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MemoryPoolSlab.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MemoryPoolSlab.cs
+*
+private bool _isDisposed     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePump.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePump.cs
+*
+private IHttpApplication < object > _application     23
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Heartbeat.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Heartbeat.cs
+*
+private int _executingOnHeartbeat     20
+*
+private Thread _timerThread     19
+	0,597  [HC=0,25;  H=0,43;  I=1,00;  S=1,00] 
+private volatile bool _stopped     20
+	0,517  [HC=0,10;  H=0,32;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private Thread _timerThread     19
+	0,214  [HC=0,00;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,86;  NA=0,00] 
+private volatile bool _stopped     20
+	0,200  [HC=0,00;  HNC=0,20;  I=1,00;  S=1,00;  NN=0,86;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSFindCertificateCommandLine     34
+*
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,600  [HC=0,22;  H=0,80;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,595  [HC=0,21;  H=0,80;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,575  [HC=0,16;  H=0,79;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,560  [HC=0,13;  H=0,78;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,524  [HC=0,13;  H=0,53;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,520  [HC=0,16;  H=0,41;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,509  [HC=0,10;  H=0,52;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSDeleteCertificateCommandLineArgumentsFormat     40
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,616  [HC=0,25;  H=0,81;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,587  [HC=0,19;  H=0,80;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,582  [HC=0,18;  H=0,79;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,568  [HC=0,15;  H=0,79;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,551  [HC=0,19;  H=0,55;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,523  [HC=0,17;  H=0,41;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,513  [HC=0,10;  H=0,53;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,227  [HC=0,06;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private static readonly TimeSpan MaxRegexTimeout     30
+*
+public const int RSAMinimumKeySizeInBits     27
+	0,512  [HC=0,22;  H=0,19;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,475  [HC=0,10;  H=0,27;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,473  [HC=0,10;  H=0,27;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,473  [HC=0,10;  H=0,27;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,456  [HC=0,12;  H=0,10;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,450  [HC=0,05;  H=0,26;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,434  [HC=0,07;  H=0,09;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,24;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,172  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,172  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,172  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,172  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,128  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,128  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,128  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private const int NonVoidResult     29
+*
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,546  [HC=0,15;  H=0,36;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,02;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,199  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\QueryString.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\QueryString.cs
+*
+private readonly string _value     22
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSDeleteCertificateCommandLine     39
+*
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,591  [HC=0,20;  H=0,80;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,584  [HC=0,18;  H=0,80;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,583  [HC=0,18;  H=0,79;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,570  [HC=0,15;  H=0,79;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,535  [HC=0,15;  H=0,54;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,535  [HC=0,15;  H=0,54;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,516  [HC=0,15;  H=0,41;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IQueryFeatureType     28
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\SessionMiddleware.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\SessionMiddleware.cs
+*
+private static readonly RandomNumberGenerator CryptoRandom     23
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private static readonly string MacOSFindCertificateCommandLineArgumentsFormat     35
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,566  [HC=0,24;  H=0,50;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,547  [HC=0,20;  H=0,49;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,537  [HC=0,17;  H=0,48;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,517  [HC=0,13;  H=0,48;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,512  [HC=0,17;  H=0,31;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,499  [HC=0,17;  H=0,22;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,472  [HC=0,09;  H=0,29;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,286  [HC=0,00;  HNC=0,67;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,244  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,151  [HC=0,06;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpWebSocketFeatureType     36
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TransportConnection.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TransportConnection.Generated.cs
+*
+private static readonly Type IConnectionLifetimeFeatureType     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSRemoveCertificateTrustCommandLineArgumentsFormat     38
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,605  [HC=0,23;  H=0,81;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,596  [HC=0,21;  H=0,80;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,570  [HC=0,15;  H=0,79;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,570  [HC=0,15;  H=0,79;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,543  [HC=0,17;  H=0,54;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,524  [HC=0,17;  H=0,41;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,508  [HC=0,09;  H=0,52;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,223  [HC=0,06;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CookieOptions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CookieOptions.cs
+*
+internal static bool SuppressSameSiteNone     15
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MediaTypeHeaderValueComparer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MediaTypeHeaderValueComparer.cs
+*
+private static readonly MediaTypeHeaderValueComparer _mediaTypeComparer     15
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TestPortHelper.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TestPortHelper.cs
+*
+private const int MaxPort     61
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type ITlsConnectionFeatureType     35
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\OpenIdConnectHandler.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\OpenIdConnectHandler.cs
+*
+private static readonly RandomNumberGenerator CryptoRandom     37
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ManagedGenRandomImpl.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ManagedGenRandomImpl.cs
+*
+private static readonly RandomNumberGenerator _rng     11
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const int UserCancelledErrorCode     43
+*
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,567  [HC=0,20;  H=0,63;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,560  [HC=0,18;  H=0,63;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,521  [HC=0,10;  H=0,61;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,512  [HC=0,15;  H=0,37;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,504  [HC=0,14;  H=0,37;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,497  [HC=0,05;  H=0,59;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,490  [HC=0,04;  H=0,55;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,05;  S=0,50;  NN=0,00;  NA=0,00]
+public const int RSAMinimumKeySizeInBits     27
+	0,360  [HC=0,00;  HNC=0,80;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,247  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,247  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,247  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,247  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Hubs.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Hubs.cs
+*
+public SelfRef Self     199
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingRequestFinishedLog.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingRequestFinishedLog.cs
+*
+private readonly HttpContext _httpContext     16
+*
+private readonly HostingApplication . Context _context     18
+	0,739  [HC=0,55;  H=0,54;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly HostingApplication . Context _context     18
+	0,557  [HC=0,43;  HNC=0,59;  I=1,00;  S=1,00;  NN=0,67;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\AsyncAcceptContext.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\AsyncAcceptContext.cs
+*
+private HttpSysListener _server     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IRequestBodyPipeFeatureType     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FunctionalTestBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FunctionalTestBase.cs
+*
+List < IDisposable > _disposables     47
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpResponseTrailersFeatureType     32
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpRequestHeaders.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpRequestHeaders.cs
+*
+private readonly bool _reuseHeaderValues     17
+*
+private KnownHeaderType _currentKnownType     158
+	0,435  [HC=0,12;  H=0,36;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private KnownHeaderType _currentKnownType     158
+	0,152  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\NewtonsoftJsonInputFormatter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\NewtonsoftJsonInputFormatter.cs
+*
+private const int DefaultMemoryThreshold     25
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TransportConnection.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TransportConnection.Generated.cs
+*
+private static readonly Type IConnectionTransportFeatureType     16
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.cs
+*
+protected string _parsedPath     133
+*
+private string _httpProtocol     65
+	0,540  [HC=0,08;  H=0,53;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,05;  S=0,50;  NN=0,00;  NA=0,00]
+private string _httpProtocol     65
+	0,352  [HC=0,00;  HNC=0,75;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplicationTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplicationTests.cs
+*
+private readonly bool _isEnabled     464
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CircuitIdFactory.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CircuitIdFactory.cs
+*
+private readonly RandomNumberGenerator _generator     23
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpRequestLifetimeFeatureType     22
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StringWithQualityHeaderValueComparer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StringWithQualityHeaderValueComparer.cs
+*
+private static readonly StringWithQualityHeaderValueComparer _qualityComparer     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\FormPipeReader.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\FormPipeReader.cs
+*
+private byte [ ] _otherAndEncoding     37
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpResetFeatureType     42
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IServiceProvidersFeatureType     21
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CommandLineOptionsTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CommandLineOptionsTests.cs
+*
+private readonly StringBuilder _stdout     17
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Rfc6238AuthenticationService.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Rfc6238AuthenticationService.cs
+*
+private static readonly RandomNumberGenerator _rng     18
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ChunkWriter.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ChunkWriter.cs
+*
+private static readonly byte [ ] _hex     14
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationVisitor.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationVisitor.cs
+*
+private readonly object _newModel     404
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\ValidationStateDictionary.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\ValidationStateDictionary.cs
+*
+private static readonly bool IsMono     131
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSRemoveCertificateTrustCommandLine     37
+*
+private const string LocalhostHttpsDnsName     24
+	0,586  [HC=0,18;  H=0,80;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,586  [HC=0,18;  H=0,80;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,582  [HC=0,18;  H=0,79;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,548  [HC=0,10;  H=0,78;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,525  [HC=0,13;  H=0,53;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,525  [HC=0,13;  H=0,53;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,519  [HC=0,16;  H=0,41;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.cs
+*
+protected string _parsedQueryString     136
+*
+private string _httpProtocol     65
+	0,556  [HC=0,12;  H=0,54;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,05;  S=0,50;  NN=0,00;  NA=0,00]
+private string _httpProtocol     65
+	0,352  [HC=0,00;  HNC=0,75;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BrowserTestBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BrowserTestBase.cs
+*
+private static readonly SemaphoreSlim _semaphore     26
+*
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,528  [HC=0,14;  H=0,26;  I=1,00;  S=1,00] 
+private IWebDriver _browser     22
+	0,513  [HC=0,11;  H=0,26;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,40;  S=0,50;  NN=0,00;  NA=0,00]
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,171  [HC=0,00;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,60;  NA=0,00] 
+private IWebDriver _browser     22
+	0,171  [HC=0,00;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,60;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocolOptions.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocolOptions.cs
+*
+private IList < IFormatterResolver > _formatterResolvers     12
+*
+private MessagePackSerializerOptions _messagePackSerializerOptions     12
+	0,553  [HC=0,21;  H=0,23;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private MessagePackSerializerOptions _messagePackSerializerOptions     12
+	0,214  [HC=0,00;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IRouteValuesFeatureType     24
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static readonly byte [ ] _pathBytes     38
+*
+private readonly Http2FrameWriter _frameWriter     37
+	0,560  [HC=0,27;  H=0,35;  I=1,00;  S=0,88] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,560  [HC=0,31;  H=0,23;  I=1,00;  S=0,88] #
+private readonly HPackDecoder _hpackDecoder     41
+	0,549  [HC=0,25;  H=0,34;  I=1,00;  S=0,88] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,535  [HC=0,18;  H=0,47;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _clientSettings     46
+	0,533  [HC=0,21;  H=0,34;  I=1,00;  S=0,88] #
+private readonly InputFlowControl _inputFlowControl     42
+	0,520  [HC=0,19;  H=0,33;  I=1,00;  S=0,88] #
+private readonly OutputFlowControl _outputFlowControl     43
+	0,515  [HC=0,18;  H=0,33;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,42;  S=1,00;  NN=0,00;  NA=0,00]
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,353  [HC=0,00;  HNC=0,50;  I=0,25;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HttpConnectionContext _context     36
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Pipe _input     38
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly int _minAllocBufferSize     40
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HPackDecoder _hpackDecoder     41
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly InputFlowControl _inputFlowControl     42
+	0,291  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IItemsFeatureType     34
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingApplicationTests.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingApplicationTests.cs
+*
+private readonly bool _isEnabled     447
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DateHeaderValueManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DateHeaderValueManager.cs
+*
+private static readonly byte [ ] _datePreambleBytes     17
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\PagedByteBuffer.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\PagedByteBuffer.cs
+*
+private byte [ ] _currentPage     17
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpMinResponseDataRateFeatureType     40
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpMinRequestBodyDataRateFeatureType     39
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MemoryPoolSlab.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MemoryPoolSlab.cs
+*
+private GCHandle _gcHandle     18
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private readonly IList < IFormatterResolver > _resolvers     738
+*
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,529  [HC=0,33;  H=0,37;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,210  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSTrustCertificateCommandLine     41
+*
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,609  [HC=0,24;  H=0,81;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,607  [HC=0,23;  H=0,81;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,602  [HC=0,22;  H=0,80;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,587  [HC=0,19;  H=0,80;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,537  [HC=0,16;  H=0,54;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,522  [HC=0,13;  H=0,53;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,518  [HC=0,16;  H=0,41;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private const int ErrorResult     24
+*
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,601  [HC=0,27;  H=0,39;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,02;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,199  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Heartbeat.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Heartbeat.cs
+*
+private Timer _timer     19
+*
+private Thread _timerThread     19
+	0,711  [HC=0,45;  H=0,61;  I=1,00;  S=1,00] 
+private volatile bool _stopped     20
+	0,605  [HC=0,29;  H=0,38;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private Thread _timerThread     19
+	0,500  [HC=0,50;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,86;  NA=0,00] 
+private volatile bool _stopped     20
+	0,200  [HC=0,00;  HNC=0,20;  I=1,00;  S=1,00;  NN=0,86;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\CertificateManager.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\CertificateManager.cs
+*
+private const string MacOSFindCertificateOutputRegex     36
+*
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,583  [HC=0,18;  H=0,79;  I=1,00;  S=0,88] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,573  [HC=0,16;  H=0,79;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDnsName     24
+	0,560  [HC=0,13;  H=0,78;  I=1,00;  S=0,88] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,545  [HC=0,10;  H=0,77;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOid     18
+	0,539  [HC=0,16;  H=0,54;  I=1,00;  S=0,88] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,509  [HC=0,10;  H=0,52;  I=1,00;  S=0,88] #
+public const int RSAMinimumKeySizeInBits     27
+	0,505  [HC=0,13;  H=0,40;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,00;  NA=0,00]
+private const string ServerAuthenticationEnhancedKeyUsageOid     21
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string ServerAuthenticationEnhancedKeyUsageOidFriendlyName     22
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDnsName     24
+	0,429  [HC=0,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private const string LocalhostHttpsDistinguishedName     25
+	0,417  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOid     18
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal const string AspNetHttpsOidFriendlyName     19
+	0,372  [HC=0,00;  HNC=0,80;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public const int RSAMinimumKeySizeInBits     27
+	0,191  [HC=0,00;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\RemoteAuthenticationHandler.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\RemoteAuthenticationHandler.cs
+*
+private static readonly RandomNumberGenerator CryptoRandom     21
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\TestPortHelper.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\TestPortHelper.cs
+*
+private static int NextPort     62
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\StackPolicy.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\StackPolicy.cs
+*
+private readonly static ValueTask < bool > _trueTask     24
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePump.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePump.cs
+*
+private Action < object > _processRequest     27
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HostingRequestFinishedLog.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HostingRequestFinishedLog.cs
+*
+private readonly TimeSpan _elapsed     17
+*
+private readonly HostingApplication . Context _context     18
+	0,484  [HC=0,00;  H=0,39;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly HostingApplication . Context _context     18
+	0,257  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,67;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BlazorPackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BlazorPackHubProtocol.cs
+*
+private const int ErrorResult     27
+*
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,601  [HC=0,27;  H=0,39;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,02;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly BlazorPackHubProtocolWorker _worker     22
+	0,199  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IEndpointFeatureType     25
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MicrosoftAccountHandler.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MicrosoftAccountHandler.cs
+*
+private static readonly RandomNumberGenerator CryptoRandom     23
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type ISessionFeatureType     37
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IHttpResponseFeatureType     17
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\MessagePackHubProtocol.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\MessagePackHubProtocol.cs
+*
+private const int NonVoidResult     26
+*
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,546  [HC=0,15;  H=0,36;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,02;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly DefaultMessagePackHubProtocolWorker _worker     22
+	0,199  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\Http2Connection.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\Http2Connection.cs
+*
+private static readonly byte [ ] _trailersBytes     43
+*
+private readonly Http2FrameWriter _frameWriter     37
+	0,610  [HC=0,38;  H=0,36;  I=1,00;  S=0,88] #
+private readonly ConcurrentQueue < Http2Stream > _completedStreams     63
+	0,560  [HC=0,31;  H=0,23;  I=1,00;  S=0,88] #
+private Http2HeadersFrameFlags _headerFlags     53
+	0,556  [HC=0,31;  H=0,22;  I=1,00;  S=0,88] #
+private bool _gracefulCloseStarted     57
+	0,554  [HC=0,30;  H=0,23;  I=1,00;  S=0,88] #
+private readonly StreamCloseAwaitable _streamCompletionAwaitable     64
+	0,544  [HC=0,24;  H=0,34;  I=1,00;  S=0,88] #
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,535  [HC=0,18;  H=0,47;  I=1,00;  S=0,88] #
+private readonly Http2PeerSettings _serverSettings     45
+	0,533  [HC=0,21;  H=0,34;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=0,36;  S=1,00;  NN=0,00;  NA=0,00]
+private static readonly PseudoHeaderFields _mandatoryRequestPseudoHeaderFields     33
+	0,334  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private Http2Stream _currentHeadersStream     50
+	0,334  [HC=0,17;  HNC=0,17;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly StreamCloseAwaitable _streamCompletionAwaitable     64
+	0,318  [HC=0,00;  HNC=0,33;  I=0,28;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly HttpConnectionContext _context     36
+	0,295  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Http2FrameWriter _frameWriter     37
+	0,295  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly Pipe _input     38
+	0,295  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private readonly int _minAllocBufferSize     40
+	0,295  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\DistributedSession.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\DistributedSession.cs
+*
+private static readonly RandomNumberGenerator CryptoRandom     19
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\BrowserTestBase.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\BrowserTestBase.cs
+*
+private readonly static int MaxConcurrentBrowsers     25
+*
+private IWebDriver _browser     22
+	0,591  [HC=0,29;  H=0,28;  I=1,00;  S=1,00] 
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,465  [HC=0,00;  H=0,26;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,29;  S=0,50;  NN=0,00;  NA=0,00]
+private IWebDriver _browser     22
+	0,308  [HC=0,25;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,60;  NA=0,00] 
+private ExceptionDispatchInfo _exceptionDispatchInfo     21
+	0,176  [HC=0,00;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,60;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\base\HttpProtocol.Generated.cs
+file:///D:\Repositories\_mapping\ASP.NET Core\3551\Common\modified\HttpProtocol.Generated.cs
+*
+private static readonly Type IFormFeatureType     29
+*
+*
+
+**************************************************************
+

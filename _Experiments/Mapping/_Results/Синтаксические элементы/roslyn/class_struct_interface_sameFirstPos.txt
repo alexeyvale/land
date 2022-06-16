@@ -1,0 +1,140 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractEditAndContinueAnalyzer.cs
+*
+internal readonly struct UpdatedMemberInfo     859
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractNavigateToTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractNavigateToTests.cs
+*
+public sealed class TestDocumentTrackingServiceFactory     226
+*
+public class Factory     219
+	0,429  [HC=0,21;  H=0,55;  I=0,50;  S=0,67] 
+public class Factory     253
+	0,429  [HC=0,21;  H=0,55;  I=0,50;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=1,78;  S=0,50;  NN=0,00;  NA=0,00]
+public class Factory     219
+	0,554  [HC=0,20;  HNC=0,67;  I=0,86;  S=0,67;  NN=0,00;  NA=0,00] 
+public class Factory     253
+	0,544  [HC=0,20;  HNC=0,67;  I=0,83;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CommonDiagnosticAnalyzers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CommonDiagnosticAnalyzers.cs
+*
+public sealed class AnalyzerWithAsyncMethodRegistration     844
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CommonDiagnosticAnalyzers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CommonDiagnosticAnalyzers.cs
+*
+public sealed class AnalyzerWithAsyncLambdaRegistration     870
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpProximityExpressionsService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpProximityExpressionsService.cs
+*
+internal static class TestAccessor     114
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DocumentKey.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DocumentKey.cs
+*
+internal readonly struct SerializableDocumentKey     41
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSessionActiveStatementsTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSessionActiveStatementsTests.cs
+*
+private sealed class Validator     84
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\INavigateToSearchService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\INavigateToSearchService.cs
+*
+internal interface INavigateToSeINavigateToSearchService_RemoveInterfaceAboveAndRenameThisAfterInternalsVisibleToUsersUpdatearchService     22
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ManagedEditAndContinueLanguageService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ManagedEditAndContinueLanguageService.cs
+*
+private sealed class DebuggerService     37
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectKey.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectKey.cs
+*
+internal readonly struct SerializableProjectKey     46
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectState.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectState.cs
+*
+private sealed class DocumentIdComparer     885
+*
+private sealed class WorkspaceAnalyzerConfigOptions     314
+	0,390  [HC=0,20;  H=0,80;  I=0,00;  S=0,67] #
+*
+HC=2;  HNC=4,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private sealed class WorkspaceAnalyzerConfigOptions     314
+	0,619  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionKey.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionKey.cs
+*
+internal readonly struct SerializableSolutionKey     41
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionState.CompilationTracker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionState.CompilationTracker.cs
+*
+private class WeakSymbolComparer     169
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TupleFieldSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TupleFieldSymbol.cs
+*
+internal class TupleFieldSymbol     15
+*
+*
+
+**************************************************************
+

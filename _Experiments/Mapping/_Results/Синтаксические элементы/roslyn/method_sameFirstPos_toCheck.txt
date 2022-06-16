@@ -1,0 +1,2141 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpSyntaxGenerator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpSyntaxGenerator.cs
+*
+internal override SyntaxTrivia EndOfLine ( string text )     49
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private async Task UpdateLastParsedDocumentAsync ( Solution newSolution , CancellationToken cancellationToken )     493
+*
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,650  [HC=0,31;  H=0,62;  I=1,00;  S=1,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,601  [HC=0,24;  H=0,48;  I=1,00;  S=1,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,598  [HC=0,31;  H=0,25;  I=1,00;  S=1,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,568  [HC=0,26;  H=0,19;  I=1,00;  S=1,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,557  [HC=0,24;  H=0,17;  I=1,00;  S=1,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,553  [HC=0,21;  H=0,25;  I=1,00;  S=1,00] 
+internal void DecrementReferenceCount ( )     160
+	0,548  [HC=0,21;  H=0,21;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,57;  S=0,50;  NN=0,95;  NA=0,00]
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,548  [HC=0,20;  HNC=0,61;  I=0,61;  S=1,00;  NN=0,95;  NA=0,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,377  [HC=0,20;  HNC=0,09;  I=0,00;  S=1,00;  NN=0,95;  NA=0,00] 
+private IEnumerable < ITagSpan < IClassificationTag > > ? GetTagsWorker ( NormalizedSnapshotSpanCollection spans )     354
+	0,370  [HC=0,00;  HNC=0,14;  I=0,55;  S=1,00;  NN=0,95;  NA=0,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,354  [HC=0,00;  HNC=0,08;  I=0,53;  S=1,00;  NN=0,95;  NA=0,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,346  [HC=0,00;  HNC=0,07;  I=0,46;  S=1,00;  NN=0,95;  NA=0,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,295  [HC=0,00;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,95;  NA=0,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,289  [HC=0,13;  HNC=0,35;  I=0,61;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ManagedEditAndContinueLanguageService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ManagedEditAndContinueLanguageService.cs
+*
+public void EnterBreakState ( Dbg . IManagedActiveStatementProvider activeStatementProvider )     98
+*
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,543  [HC=0,17;  H=0,29;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,129  [HC=0,00;  HNC=0,02;  I=0,00;  S=1,00;  NN=0,58;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource.cs
+*
+private void RaiseResumed ( )     300
+*
+private void Dispose ( )     192
+	0,695  [HC=0,33;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=0,45;  S=0,50;  NN=0,00;  NA=0,00]
+private void Dispose ( )     192
+	0,647  [HC=0,00;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpEditAndContinueAnalyzer.cs
+*
+private static bool ClassifyMethodModifierUpdate ( SyntaxTokenList oldModifiers , SyntaxTokenList newModifiers )     2594
+*
+private static bool AreModifiersEquivalent ( SyntaxTokenList oldModifiers , SyntaxTokenList newModifiers , SyntaxKind ignore , SyntaxKind ? ignore2 = null )     2938
+	0,593  [HC=0,21;  H=0,51;  I=1,00;  S=1,00] 
+private static bool IsPropertyDeclarationMatchingPrimaryConstructorParameter ( SyntaxNode declaration , INamedTypeSymbol newContainingType )     1121
+	0,512  [HC=0,20;  H=0,66;  I=1,00;  S=0,67] 
+private static IEnumerable < SyntaxNode > GetChildNodes ( SyntaxNode root , SyntaxNode body )     614
+	0,477  [HC=0,18;  H=0,47;  I=1,00;  S=0,67] 
+internal override bool IsRecordDeclaration ( SyntaxNode node )     1102
+	0,464  [HC=0,18;  H=0,38;  I=1,00;  S=0,67] 
+internal override bool IsPropertyAccessorDeclarationMatchingPrimaryConstructorParameter ( SyntaxNode declaration , INamedTypeSymbol newContainingType , out bool isFirstAccessor )     1142
+	0,458  [HC=0,17;  H=0,36;  I=1,00;  S=0,67] 
+internal override bool IsRecordPrimaryConstructorParameter ( SyntaxNode declaration )     1118
+	0,446  [HC=0,14;  H=0,36;  I=1,00;  S=0,67] 
+protected override Match < SyntaxNode > ComputeTopLevelDeclarationMatch ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration )     554
+	0,445  [HC=0,13;  H=0,39;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+private static bool AreModifiersEquivalent ( SyntaxTokenList oldModifiers , SyntaxTokenList newModifiers , SyntaxKind ignore , SyntaxKind ? ignore2 = null )     2938
+	0,477  [HC=0,22;  HNC=0,70;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static bool IsPropertyDeclarationMatchingPrimaryConstructorParameter ( SyntaxNode declaration , INamedTypeSymbol newContainingType )     1121
+	0,287  [HC=0,00;  HNC=0,40;  I=0,44;  S=0,67;  NN=0,00;  NA=0,00] 
+protected override Match < SyntaxNode > ComputeTopLevelDeclarationMatch ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration )     554
+	0,247  [HC=0,00;  HNC=0,28;  I=0,33;  S=0,67;  NN=0,00;  NA=0,00] 
+private static IEnumerable < SyntaxNode > GetChildNodes ( SyntaxNode root , SyntaxNode body )     614
+	0,245  [HC=0,00;  HNC=0,28;  I=0,31;  S=0,67;  NN=0,00;  NA=0,00] 
+internal override bool IsPropertyAccessorDeclarationMatchingPrimaryConstructorParameter ( SyntaxNode declaration , INamedTypeSymbol newContainingType , out bool isFirstAccessor )     1142
+	0,210  [HC=0,00;  HNC=0,28;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+internal override bool IsRecordDeclaration ( SyntaxNode node )     1102
+	0,210  [HC=0,00;  HNC=0,28;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+protected override void GetUpdatedDeclarationBodies ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration , out SyntaxNode ? oldBody , out SyntaxNode ? newBody )     1218
+	0,224  [HC=0,00;  HNC=0,12;  I=0,44;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ManagedEditAndContinueLanguageService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ManagedEditAndContinueLanguageService.cs
+*
+public void DiscardUpdates ( )     110
+*
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,544  [HC=0,10;  H=0,50;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,304  [HC=0,00;  HNC=0,71;  I=0,00;  S=1,00;  NN=0,58;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource.cs
+*
+public void Disconnect ( )     254
+*
+private void Dispose ( )     192
+	0,747  [HC=0,50;  H=0,73;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=2,93;  I=1,20;  S=0,50;  NN=0,00;  NA=0,00]
+private void Dispose ( )     192
+	0,771  [HC=0,50;  HNC=0,93;  I=0,74;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void StaticCtor_Partial_Insert ( )     4807
+*
+public void StaticCtor_Partial_DeleteInsert ( )     7505
+	0,906  [HC=0,79;  H=0,96;  I=1,00;  S=1,00] 
+public void StaticCtor_Partial_InsertDelete ( )     7599
+	0,906  [HC=0,79;  H=0,96;  I=1,00;  S=1,00] 
+public void AutoIndexer_Partial_InsertDelete ( )     12301
+	0,772  [HC=0,50;  H=0,91;  I=1,00;  S=1,00] 
+public void PartialDeclaration_Insert ( )     8261
+	0,771  [HC=0,50;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_Implicit_Update ( )     8133
+	0,751  [HC=0,45;  H=0,89;  I=1,00;  S=1,00] 
+public void AutoProperty_Partial_InsertDelete ( )     11422
+	0,750  [HC=0,45;  H=0,90;  I=1,00;  S=1,00] 
+public void EventField_Partial_InsertDelete ( )     10625
+	0,749  [HC=0,45;  H=0,90;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,72;  S=0,50;  NN=1,62;  NA=0,00]
+public void StaticCtor_Partial_DeleteInsert ( )     7505
+	0,897  [HC=0,80;  HNC=1,00;  I=0,84;  S=1,00;  NN=0,98;  NA=0,00] 
+public void StaticCtor_Partial_InsertDelete ( )     7599
+	0,894  [HC=0,80;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,98;  NA=0,00] 
+public void InstanceCtor_Partial_InsertPrivateDeletePrivate ( )     7647
+	0,789  [HC=0,43;  HNC=1,00;  I=0,84;  S=1,00;  NN=0,98;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePublicInsertPublic ( )     7553
+	0,788  [HC=0,43;  HNC=1,00;  I=0,84;  S=1,00;  NN=0,98;  NA=0,00] 
+public void InstanceCtor_Partial_InsertPublicDeletePublic ( )     7623
+	0,782  [HC=0,43;  HNC=1,00;  I=0,82;  S=1,00;  NN=0,98;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPublic ( )     7577
+	0,772  [HC=0,43;  HNC=1,00;  I=0,77;  S=1,00;  NN=0,98;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPrivate ( )     7529
+	0,764  [HC=0,43;  HNC=1,00;  I=0,74;  S=1,00;  NN=0,98;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+internal void DecrementReferenceCountAndDisposeIfNecessary ( )     125
+*
+internal void DecrementReferenceCount ( )     160
+	0,782  [HC=0,52;  H=0,90;  I=1,00;  S=1,00] 
+private IClassificationService ? TryGetClassificationService ( ITextSnapshot snapshot )     112
+	0,549  [HC=0,18;  H=0,30;  I=1,00;  S=1,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,541  [HC=0,14;  H=0,38;  I=1,00;  S=1,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,538  [HC=0,16;  H=0,29;  I=1,00;  S=1,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,537  [HC=0,20;  H=0,15;  I=1,00;  S=1,00] 
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,520  [HC=0,16;  H=0,16;  I=1,00;  S=1,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,515  [HC=0,14;  H=0,20;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=0,50;  S=0,50;  NN=0,95;  NA=0,00]
+internal void DecrementReferenceCount ( )     160
+	0,820  [HC=0,43;  HNC=1,00;  I=0,52;  S=1,00;  NN=0,95;  NA=0,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,430  [HC=0,13;  HNC=0,67;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,422  [HC=0,00;  HNC=0,71;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,200  [HC=0,10;  HNC=0,22;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,179  [HC=0,00;  HNC=0,23;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,174  [HC=0,00;  HNC=0,22;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,173  [HC=0,00;  HNC=0,22;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private void ReportChangedSpan ( SnapshotSpan changeSpan )     231
+*
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,630  [HC=0,37;  H=0,30;  I=1,00;  S=1,00] 
+private IClassificationService ? TryGetClassificationService ( ITextSnapshot snapshot )     112
+	0,574  [HC=0,19;  H=0,46;  I=1,00;  S=1,00] 
+internal void DecrementReferenceCount ( )     160
+	0,568  [HC=0,17;  H=0,45;  I=1,00;  S=1,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,565  [HC=0,20;  H=0,35;  I=1,00;  S=1,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,565  [HC=0,18;  H=0,41;  I=1,00;  S=1,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,547  [HC=0,17;  H=0,32;  I=1,00;  S=1,00] 
+private IEnumerable < ITagSpan < IClassificationTag > > ? GetTagsWorker ( NormalizedSnapshotSpanCollection spans )     354
+	0,544  [HC=0,18;  H=0,28;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,304  [HC=0,29;  HNC=0,14;  I=0,00;  S=1,00;  NN=0,89;  NA=0,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,294  [HC=0,00;  HNC=0,44;  I=0,47;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,282  [HC=0,13;  HNC=0,36;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,263  [HC=0,00;  HNC=0,40;  I=0,30;  S=1,00;  NN=0,00;  NA=0,00] 
+private IEnumerable < ITagSpan < IClassificationTag > > ? GetTagsWorker ( NormalizedSnapshotSpanCollection spans )     354
+	0,239  [HC=0,00;  HNC=0,46;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void DecrementReferenceCount ( )     160
+	0,221  [HC=0,00;  HNC=0,25;  I=0,27;  S=1,00;  NN=0,00;  NA=0,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,216  [HC=0,00;  HNC=0,36;  I=0,00;  S=1,00;  NN=0,89;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceServiceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceServiceTests.cs
+*
+private static Project AddDefaultTestProject ( TestWorkspace workspace , string source )     66
+*
+private static Solution AddDefaultTestProject ( Solution solution , string [ ] sources , ISourceGenerator generator = null , string additionalFileText = null , ( string key , string value ) [ ] analyzerConfig = null )     90
+	0,860  [HC=1,00;  H=0,22;  I=1,00;  S=0,90] 
+private static ( Solution , Document ) AddDefaultTestProject ( Solution solution , string source , ISourceGenerator generator = null , string additionalFileText = null , ( string key , string value ) [ ] analyzerConfig = null )     79
+	0,860  [HC=1,00;  H=0,22;  I=1,00;  S=0,90] 
+private static void GenerateSource ( GeneratorExecutionContext context )     2195
+	0,584  [HC=0,29;  H=0,43;  I=1,00;  S=0,90] 
+public void ParseCapabilities_CaseSensitive ( )     3333
+	0,550  [HC=0,27;  H=0,25;  I=1,00;  S=0,90] 
+public void ParseCapabilities_IgnoreInvalid ( )     3343
+	0,550  [HC=0,27;  H=0,25;  I=1,00;  S=0,90] 
+private static DocumentInfo CreateDesignTimeOnlyDocument ( ProjectId projectId , string name = "design-time-only.cs" , string path = "design-time-only.cs" )     345
+	0,547  [HC=0,21;  H=0,39;  I=1,00;  S=0,90] 
+private static SourceText CreateSourceTextFromFile ( string path )     318
+	0,598  [HC=0,29;  H=0,51;  I=1,00;  S=0,90] #
+*
+HC=4;  HNC=1,00;  I=0,50;  S=1,00;  NN=2,00;  NA=0,00]
+private static Solution AddDefaultTestProject ( Solution solution , string [ ] sources , ISourceGenerator generator = null , string additionalFileText = null , ( string key , string value ) [ ] analyzerConfig = null )     90
+	0,871  [HC=1,00;  HNC=0,19;  I=0,50;  S=0,96;  NN=1,00;  NA=0,00] 
+private static ( Solution , Document ) AddDefaultTestProject ( Solution solution , string source , ISourceGenerator generator = null , string additionalFileText = null , ( string key , string value ) [ ] analyzerConfig = null )     79
+	0,859  [HC=1,00;  HNC=0,19;  I=0,30;  S=0,96;  NN=1,00;  NA=0,00] 
+private static SourceText GetAnalyzerConfigText ( ( string key , string value ) [ ] analyzerConfig )     76
+	0,367  [HC=0,00;  HNC=0,16;  I=0,00;  S=0,96;  NN=1,00;  NA=0,00] 
+private static SourceText CreateSourceTextFromFile ( string path )     318
+	0,283  [HC=0,15;  HNC=0,28;  I=0,00;  S=0,96;  NN=0,00;  NA=0,00] #
+private static TextSpan GetSpan ( string str , string substr )     324
+	0,270  [HC=0,13;  HNC=0,30;  I=0,00;  S=0,96;  NN=0,00;  NA=0,00] #
+private Guid EmitAndLoadLibraryToDebuggee ( string source , string sourceFilePath = null , Encoding encoding = null , string assemblyName = "" )     229
+	0,236  [HC=0,11;  HNC=0,13;  I=0,00;  S=0,96;  NN=0,00;  NA=0,00] #
+private EditAndContinueWorkspaceService GetEditAndContinueService ( Workspace workspace )     137
+	0,233  [HC=0,00;  HNC=0,34;  I=0,43;  S=0,96;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void MethodDelete_WithAttribute ( )     2473
+*
+public void MethodDelete_WithParameterAndAttribute ( )     5060
+	0,852  [HC=0,68;  H=0,94;  I=1,00;  S=1,00] 
+public void Record_DeleteProperty_Primary ( )     2188
+	0,728  [HC=0,41;  H=0,88;  I=1,00;  S=1,00] 
+public void Record_DeleteProperty_NotPrimary ( )     2199
+	0,725  [HC=0,40;  H=0,88;  I=1,00;  S=1,00] 
+public void PartialMethod_DeleteInsert_DefinitionPart ( )     6643
+	0,717  [HC=0,38;  H=0,87;  I=1,00;  S=1,00] 
+public void PartialMethod_DeleteInsertBoth ( )     6750
+	0,715  [HC=0,38;  H=0,87;  I=1,00;  S=1,00] 
+public void MethodUpdate_AddYieldReturn_NotSupported ( )     6421
+	0,711  [HC=0,37;  H=0,88;  I=1,00;  S=1,00] 
+public void MethodInsert_NotSupportedByRuntime ( )     5125
+	0,710  [HC=0,36;  H=0,88;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,62;  S=0,50;  NN=1,96;  NA=0,00]
+public void MethodDelete_WithParameterAndAttribute ( )     5060
+	0,865  [HC=0,67;  HNC=1,00;  I=0,82;  S=1,00;  NN=1,00;  NA=0,00] 
+public void PartialMethod_DeleteBoth ( )     6730
+	0,466  [HC=0,38;  HNC=1,00;  I=0,65;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteImplementation ( )     6710
+	0,437  [HC=0,25;  HNC=1,00;  I=0,67;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteInsertBoth ( )     6750
+	0,435  [HC=0,40;  HNC=1,00;  I=0,48;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Type_Delete ( )     1370
+	0,433  [HC=0,25;  HNC=1,00;  I=0,66;  S=1,00;  NN=0,00;  NA=0,00] 
+public void InstanceCtorDelete_Public_PartialWithInitializerUpdate ( )     7271
+	0,421  [HC=0,25;  HNC=1,00;  I=0,60;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteInsert_DefinitionPart ( )     6643
+	0,417  [HC=0,33;  HNC=1,00;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+private void ClearReportedRunModeDiagnostics ( out ImmutableArray < DocumentId > documentsToReanalyze )     335
+*
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,633  [HC=0,19;  H=0,85;  I=1,00;  S=1,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,619  [HC=0,23;  H=0,66;  I=1,00;  S=1,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,586  [HC=0,23;  H=0,42;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,561  [HC=0,23;  H=0,25;  I=1,00;  S=1,00] 
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,553  [HC=0,23;  H=0,20;  I=1,00;  S=1,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,526  [HC=0,16;  H=0,20;  I=1,00;  S=1,00] 
+internal void SetReportTelemetry ( Action < DebuggingSessionTelemetry . Data > value )     568
+	0,517  [HC=0,29;  H=0,41;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=2,93;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,579  [HC=0,00;  HNC=0,93;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,515  [HC=0,00;  HNC=0,69;  I=0,56;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void SetReportTelemetry ( Action < DebuggingSessionTelemetry . Data > value )     568
+	0,256  [HC=0,15;  HNC=0,23;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,252  [HC=0,00;  HNC=0,17;  I=0,27;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,242  [HC=0,00;  HNC=0,19;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void SetOutputProvider ( Func < Project , CompilationOutputs > value )     567
+	0,213  [HC=0,00;  HNC=0,24;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,171  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractGoToDefinitionHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractGoToDefinitionHandler.cs
+*
+public abstract Task < LSP . Location [ ] > HandleRequestAsync ( LSP . TextDocumentPositionParams request , RequestContext context , CancellationToken cancellationToken )     30
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SynthesizedEntryPointSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SynthesizedEntryPointSymbol.cs
+*
+private static void ReportUseSiteDiagnostics ( Symbol symbol , DiagnosticBag diagnostics )     291
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DiagnosticTestUtilities.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DiagnosticTestUtilities.cs
+*
+public static void VerifyErrorCodes ( CSharpCompilation comp , params ErrorDescription [ ] expectedErrors )     39
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionUpdate.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionUpdate.cs
+*
+public static SolutionUpdate Blocked ( ImmutableArray < ( ProjectId ProjectId , ImmutableArray < Diagnostic > Diagnostics ) > diagnostics )     37
+*
+public static SolutionUpdate Blocked ( ImmutableArray < ( ProjectId , ImmutableArray < Diagnostic > ) > diagnostics , ImmutableArray < ( DocumentId , ImmutableArray < RudeEditDiagnostic > ) > documentsWithRudeEdits )     34
+	0,936  [HC=1,00;  H=0,55;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,62;  S=0,50;  NN=0,00;  NA=0,00]
+public static SolutionUpdate Blocked ( ImmutableArray < ( ProjectId , ImmutableArray < Diagnostic > ) > diagnostics , ImmutableArray < ( DocumentId , ImmutableArray < RudeEditDiagnostic > ) > documentsWithRudeEdits )     34
+	0,902  [HC=1,00;  HNC=0,59;  I=0,82;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCodeCleanupFixer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCodeCleanupFixer.cs
+*
+private async Task < Project > FixProjectAsync ( Project project , FixIdContainer enabledFixIds , ProgressTracker progressTracker , bool addProgressItemsForDocuments , CancellationToken cancellationToken )     270
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private void OnDocumentOpened ( object sender , DocumentEventArgs args )     441
+*
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,679  [HC=0,32;  H=0,80;  I=1,00;  S=1,00] 
+internal void DecrementReferenceCount ( )     160
+	0,606  [HC=0,30;  H=0,33;  I=1,00;  S=1,00] 
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,520  [HC=0,11;  H=0,33;  I=1,00;  S=1,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,514  [HC=0,12;  H=0,23;  I=1,00;  S=1,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,511  [HC=0,11;  H=0,26;  I=1,00;  S=1,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,508  [HC=0,11;  H=0,23;  I=1,00;  S=1,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,504  [HC=0,10;  H=0,23;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,481  [HC=0,25;  HNC=0,78;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,208  [HC=0,00;  HNC=0,33;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,204  [HC=0,00;  HNC=0,32;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,200  [HC=0,00;  HNC=0,30;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void DecrementReferenceCount ( )     160
+	0,184  [HC=0,00;  HNC=0,24;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private IClassificationService ? TryGetClassificationService ( ITextSnapshot snapshot )     112
+	0,149  [HC=0,00;  HNC=0,09;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) GetLastProcessedData ( )     338
+	0,149  [HC=0,00;  HNC=0,09;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.Tagger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.Tagger.cs
+*
+internal static NormalizedSnapshotSpanCollection CoalesceSpans ( NormalizedSnapshotSpanCollection normalizedSpans )     202
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectState.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectState.cs
+*
+public int Compare ( DocumentId ? x , DocumentId ? y )     893
+*
+public AnalyzerConfigOptions GetOptionsForSourcePath ( string path )     311
+	0,483  [HC=0,13;  H=0,29;  I=1,00;  S=0,85] 
+public override AnalyzerConfigOptions GetOptions ( SyntaxTree tree )     302
+	0,459  [HC=0,10;  H=0,21;  I=1,00;  S=0,85] #
+public override AnalyzerConfigOptions GetOptions ( AdditionalText textFile )     305
+	0,459  [HC=0,10;  H=0,21;  I=1,00;  S=0,85] #
+public override bool TryGetValue ( string key , [ NotNullWhen ( true ) ] out string ? value )     321
+	0,457  [HC=0,18;  H=0,25;  I=1,00;  S=0,70] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,95;  NN=0,00;  NA=0,00]
+public AnalyzerConfigOptions GetOptionsForSourcePath ( string path )     311
+	0,114  [HC=0,00;  HNC=0,09;  I=0,00;  S=0,73;  NN=0,00;  NA=0,00] 
+public override AnalyzerConfigOptions GetOptions ( SyntaxTree tree )     302
+	0,175  [HC=0,00;  HNC=0,09;  I=0,00;  S=0,73;  NN=0,00;  NA=0,00] #
+public override AnalyzerConfigOptions GetOptions ( AdditionalText textFile )     305
+	0,175  [HC=0,00;  HNC=0,09;  I=0,00;  S=0,73;  NN=0,00;  NA=0,00] #
+public override bool TryGetValue ( string key , [ NotNullWhen ( true ) ] out string ? value )     321
+	0,141  [HC=0,00;  HNC=0,09;  I=0,00;  S=0,57;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private static SourceReferenceResolver CreateSourceReferenceResolver ( ImmutableArray < string > searchPaths , string baseDirectory )     257
+*
+public bool CanExecuteCode ( string text )     174
+	0,532  [HC=0,24;  H=0,28;  I=1,00;  S=0,86] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,528  [HC=0,21;  H=0,35;  I=1,00;  S=0,86] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,528  [HC=0,21;  H=0,35;  I=1,00;  S=0,86] #
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,516  [HC=0,14;  H=0,47;  I=1,00;  S=0,86] #
+private IInteractiveWindow GetInteractiveWindow ( )     144
+	0,513  [HC=0,21;  H=0,24;  I=1,00;  S=0,86] #
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,499  [HC=0,14;  H=0,35;  I=1,00;  S=0,86] #
+private IInteractiveWindowCommands GetInteractiveCommands ( )     147
+	0,497  [HC=0,17;  H=0,24;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,227  [HC=0,00;  HNC=0,31;  I=0,43;  S=0,77;  NN=0,00;  NA=0,00] #
+async Task < ExecutionResult > IInteractiveEvaluator . ResetAsync ( bool initialize )     199
+	0,157  [HC=0,10;  HNC=0,05;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,128  [HC=0,00;  HNC=0,13;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public bool CanExecuteCode ( string text )     174
+	0,120  [HC=0,00;  HNC=0,09;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private IInteractiveWindow GetInteractiveWindow ( )     144
+	0,117  [HC=0,00;  HNC=0,08;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private IInteractiveWindowCommands GetInteractiveCommands ( )     147
+	0,117  [HC=0,00;  HNC=0,08;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,117  [HC=0,00;  HNC=0,08;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AutomaticLineEnderCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AutomaticLineEnderCommandHandler.cs
+*
+protected override void FormatAndApply ( Document document , int position , CancellationToken cancellationToken )     84
+*
+protected override Document FormatAndApplyBasedOnEndToken ( Document document , int position , CancellationToken cancellationToken )     100
+	0,728  [HC=0,48;  H=0,90;  I=1,00;  S=0,88] 
+private static TextSpan ? GetFormattedTextSpan ( SyntaxNode root , SyntaxToken endToken )     122
+	0,607  [HC=0,40;  H=0,30;  I=1,00;  S=0,88] 
+private void InsertBraceAndMoveCaret ( ITextView textView , Document document , int insertionPosition , CancellationToken cancellationToken )     608
+	0,576  [HC=0,22;  H=0,63;  I=1,00;  S=0,88] 
+protected override bool TreatAsReturn ( Document document , int caretPosition , CancellationToken cancellationToken )     66
+	0,639  [HC=0,29;  H=0,86;  I=1,00;  S=0,88] #
+private static string WrapInType ( string textToParse )     200
+	0,552  [HC=0,29;  H=0,26;  I=1,00;  S=0,88] #
+private static bool LocatedAtTheEndOfLine ( TextLine line , SyntaxToken lastToken )     287
+	0,551  [HC=0,24;  H=0,39;  I=1,00;  S=0,88] #
+protected override string ? GetEndingString ( Document document , int position , CancellationToken cancellationToken )     146
+	0,538  [HC=0,07;  H=0,82;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,00;  I=1,10;  S=0,50;  NN=2,00;  NA=0,00]
+protected override Document FormatAndApplyBasedOnEndToken ( Document document , int position , CancellationToken cancellationToken )     100
+	0,746  [HC=0,43;  HNC=0,80;  I=0,72;  S=0,95;  NN=1,00;  NA=0,00] 
+private static TextSpan ? GetFormattedTextSpan ( SyntaxNode root , SyntaxToken endToken )     122
+	0,552  [HC=0,17;  HNC=0,18;  I=0,59;  S=0,95;  NN=1,00;  NA=0,00] 
+protected override ( SyntaxNode selectedNode , bool addBrace ) ? GetValidNodeToModifyBraces ( Document document , int caretPosition , CancellationToken cancellationToken )     626
+	0,274  [HC=0,00;  HNC=0,72;  I=0,56;  S=0,95;  NN=0,00;  NA=0,00] 
+protected override bool TreatAsReturn ( Document document , int caretPosition , CancellationToken cancellationToken )     66
+	0,483  [HC=0,17;  HNC=0,72;  I=0,63;  S=0,95;  NN=0,00;  NA=0,00] #
+protected override string ? GetEndingString ( Document document , int position , CancellationToken cancellationToken )     146
+	0,420  [HC=0,00;  HNC=0,80;  I=0,59;  S=0,95;  NN=0,00;  NA=0,00] #
+private static bool CheckLocation ( SourceText text , int position , SyntaxNode owningNode , SyntaxToken lastToken )     206
+	0,278  [HC=0,00;  HNC=0,22;  I=0,53;  S=0,95;  NN=0,00;  NA=0,00] #
+private static bool TryGetLastToken ( SourceText text , int position , SyntaxNode owningNode , out SyntaxToken lastToken )     263
+	0,260  [HC=0,00;  HNC=0,20;  I=0,47;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceServiceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceServiceTests.cs
+*
+public async Task GetDocumentTextChangesAsync ( )     2200
+*
+public async Task BreakMode_ValidSignificantChange_PartialTypes ( )     2109
+	0,635  [HC=0,26;  H=0,87;  I=1,00;  S=0,90] 
+public async Task StartDebuggingSession_CapturingDocuments ( )     366
+	0,623  [HC=0,23;  H=0,87;  I=1,00;  S=0,90] 
+public async Task RunMode_DifferentDocumentWithSameContent ( )     562
+	0,658  [HC=0,31;  H=0,88;  I=1,00;  S=0,90] #
+public async Task BreakMode_RudeEdits_DocumentWithoutSequencePoints ( )     1295
+	0,644  [HC=0,28;  H=0,88;  I=1,00;  S=0,90] #
+public async Task BreakMode_ValidSignificantChange_EmitError ( )     1527
+	0,632  [HC=0,25;  H=0,87;  I=1,00;  S=0,90] #
+internal static void SetDocumentsState ( DebuggingSession session , Solution solution , CommittedSolution . DocumentState state )     204
+	0,630  [HC=0,48;  H=0,17;  I=1,00;  S=0,90] #
+public async Task BreakMode_DesignTimeOnlyDocument_Dynamic ( )     623
+	0,626  [HC=0,24;  H=0,87;  I=1,00;  S=0,90] #
+*
+HC=2;  HNC=1,00;  I=0,58;  S=1,00;  NN=0,00;  NA=0,00]
+public async Task BreakMode_ValidSignificantChange_PartialTypes ( )     2109
+	0,535  [HC=0,12;  HNC=1,00;  I=0,41;  S=0,96;  NN=0,00;  NA=0,00] 
+public async Task WatchHotReloadServiceTest ( )     3267
+	0,484  [HC=0,00;  HNC=1,00;  I=0,44;  S=0,96;  NN=0,00;  NA=0,00] 
+public async Task BreakMode_ValidSignificantChange_BaselineCreationFailed_NoStream ( )     2667
+	0,543  [HC=0,09;  HNC=1,00;  I=0,62;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task RunMode_DifferentDocumentWithSameContent ( )     562
+	0,534  [HC=0,14;  HNC=1,00;  I=0,35;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_ValidSignificantChange_BaselineCreationFailed_AssemblyReadError ( )     2692
+	0,503  [HC=0,08;  HNC=1,00;  I=0,33;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_ProjectThatDoesNotSupportEnC ( )     598
+	0,493  [HC=0,06;  HNC=1,00;  I=0,33;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task RunMode_ProjectThatDoesNotSupportEnC ( )     483
+	0,486  [HC=0,06;  HNC=1,00;  I=0,27;  S=0,96;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpTestBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpTestBase.cs
+*
+protected static CSharpCompilationOptions WithNonNullTypesTrue ( CSharpCompilationOptions options = null )     572
+*
+protected static CSharpCompilationOptions WithNullableEnable ( CSharpCompilationOptions options = null )     573
+	0,756  [HC=0,45;  H=0,95;  I=1,00;  S=1,00] 
+protected static CSharpCompilationOptions WithNullableDisable ( CSharpCompilationOptions options = null )     578
+	0,756  [HC=0,45;  H=0,95;  I=1,00;  S=1,00] 
+protected static CSharpCompilationOptions WithNullable ( CSharpCompilationOptions options , NullableContextOptions nullableContextOptions )     588
+	0,721  [HC=0,45;  H=0,69;  I=1,00;  S=1,00] 
+protected static CSharpCompilationOptions WithNullable ( NullableContextOptions nullableContextOptions )     583
+	0,709  [HC=0,45;  H=0,61;  I=1,00;  S=1,00] 
+private static void VerifyUsedAssemblyReferences ( Func < CSharpCompilation > createCompilationLambda )     1139
+	0,558  [HC=0,18;  H=0,37;  I=1,00;  S=1,00] 
+private static void ValidateCompilation ( Func < CSharpCompilation > createCompilationLambda )     1133
+	0,479  [HC=0,00;  H=0,36;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,95;  S=0,50;  NN=1,78;  NA=0,00]
+protected static CSharpCompilationOptions WithNullableEnable ( CSharpCompilationOptions options = null )     573
+	0,774  [HC=0,30;  HNC=1,00;  I=0,89;  S=1,00;  NN=0,99;  NA=0,00] 
+protected static CSharpCompilationOptions WithNullableDisable ( CSharpCompilationOptions options = null )     578
+	0,762  [HC=0,30;  HNC=1,00;  I=0,84;  S=1,00;  NN=0,99;  NA=0,00] 
+private static void ValidateCompilation ( Func < CSharpCompilation > createCompilationLambda )     1133
+	0,117  [HC=0,00;  HNC=0,35;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static void VerifyUsedAssemblyReferences ( Func < CSharpCompilation > createCompilationLambda )     1139
+	0,117  [HC=0,00;  HNC=0,35;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+protected static CSharpCompilationOptions WithNullable ( NullableContextOptions nullableContextOptions )     583
+	0,599  [HC=0,30;  HNC=0,35;  I=0,67;  S=1,00;  NN=0,97;  NA=0,00] #
+protected static CSharpCompilationOptions WithNullable ( CSharpCompilationOptions options , NullableContextOptions nullableContextOptions )     588
+	0,591  [HC=0,30;  HNC=0,67;  I=0,48;  S=1,00;  NN=0,97;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.Tagger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.Tagger.cs
+*
+public IEnumerable < ITagSpan < TTag > > GetAllTags ( NormalizedSnapshotSpanCollection requestedSpans , CancellationToken cancellationToken )     222
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Project.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Project.cs
+*
+private static Document CreateDocument ( DocumentId documentId , Project project )     352
+*
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,661  [HC=0,44;  H=0,31;  I=1,00;  S=1,00] 
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,648  [HC=0,41;  H=0,30;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,420  [HC=0,33;  HNC=0,26;  I=0,51;  S=1,00;  NN=0,00;  NA=0,00] 
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,392  [HC=0,33;  HNC=0,18;  I=0,44;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RequestExecutionQueue.RequestTelemetryLogger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RequestExecutionQueue.RequestTelemetryLogger.cs
+*
+public void LogFailure ( string methodName )     44
+*
+private static double ComputeLogValue ( double durationInMS )     76
+	0,625  [HC=0,33;  H=0,38;  I=1,00;  S=1,00] 
+public void UpdateTelemetryData ( string methodName , TimeSpan queuedDuration , TimeSpan requestDuration , Result result )     59
+	0,528  [HC=0,11;  H=0,38;  I=1,00;  S=1,00] 
+public void IncrementCount ( Result result )     140
+	0,473  [HC=0,07;  H=0,60;  I=1,00;  S=0,75] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+private static double ComputeLogValue ( double durationInMS )     76
+	0,462  [HC=0,52;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,33;  NA=0,00] 
+public void UpdateTelemetryData ( string methodName , TimeSpan queuedDuration , TimeSpan requestDuration , Result result )     59
+	0,354  [HC=0,00;  HNC=0,46;  I=0,28;  S=1,00;  NN=0,33;  NA=0,00] 
+public void IncrementCount ( Result result )     140
+	0,282  [HC=0,00;  HNC=0,33;  I=0,37;  S=0,75;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompletionTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompletionTests.cs
+*
+public async Task TestGetRegexCompletionsTargetTypedAsync ( )     177
+*
+public async Task TestGetRegexCompletionsReplaceTextAsync ( )     261
+	0,872  [HC=0,72;  H=0,95;  I=1,00;  S=1,00] 
+public async Task TestGetRegexLiteralCompletionsAsync ( )     224
+	0,791  [HC=0,54;  H=0,92;  I=1,00;  S=1,00] 
+public async Task TestGetCompletionsWithDeletionInvokeKindAsync ( )     362
+	0,769  [HC=0,49;  H=0,91;  I=1,00;  S=1,00] 
+public async Task TestDoNotProvideOverrideTextEditsOrInsertTextAsync ( )     391
+	0,701  [HC=0,34;  H=0,89;  I=1,00;  S=1,00] 
+public async Task TestDoNotProvidePartialMethodTextEditsOrInsertTextAsync ( )     418
+	0,696  [HC=0,33;  H=0,89;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,65;  S=0,50;  NN=2,00;  NA=0,00]
+public async Task TestGetRegexCompletionsReplaceTextAsync ( )     261
+	0,862  [HC=0,71;  HNC=1,00;  I=0,75;  S=1,00;  NN=1,00;  NA=0,00] 
+public async Task TestGetRegexLiteralCompletionsAsync ( )     224
+	0,821  [HC=0,57;  HNC=1,00;  I=0,74;  S=1,00;  NN=1,00;  NA=0,00] 
+public async Task TestGetCompletionsWithDeletionInvokeKindAsync ( )     362
+	0,525  [HC=0,44;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,00;  NA=0,00] 
+public async Task TestDoNotProvideOverrideTextEditsOrInsertTextAsync ( )     391
+	0,465  [HC=0,23;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,00;  NA=0,00] 
+public async Task TestDoNotProvidePartialMethodTextEditsOrInsertTextAsync ( )     418
+	0,452  [HC=0,21;  HNC=1,00;  I=0,80;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTaggerEventSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTaggerEventSource.cs
+*
+protected virtual void RaiseUIUpdatesResumed ( )     30
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractCompletionProviderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractCompletionProviderTests.cs
+*
+private protected Task VerifyAtPositionAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string inlineDescription = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     905
+*
+private protected Task VerifyAtPositionAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     964
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+private protected Task VerifyAtPositionAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     946
+	0,976  [HC=1,00;  H=0,83;  I=1,00;  S=1,00] 
+private protected Task VerifyAtEndOfFileAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     1018
+	0,825  [HC=0,64;  H=0,86;  I=1,00;  S=1,00] 
+private protected async Task VerifyAtEndOfFileAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     979
+	0,818  [HC=0,64;  H=0,82;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,98;  S=0,50;  NN=1,67;  NA=0,00]
+private protected Task VerifyAtPositionAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     964
+	0,964  [HC=1,00;  HNC=0,90;  I=0,90;  S=1,00;  NN=0,98;  NA=0,00] 
+private protected Task VerifyAtPositionAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     946
+	0,948  [HC=1,00;  HNC=0,88;  I=0,83;  S=1,00;  NN=0,98;  NA=0,00] 
+private protected async Task VerifyAtEndOfFileAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     979
+	0,667  [HC=0,50;  HNC=0,82;  I=0,64;  S=1,00;  NN=0,97;  NA=0,00] #
+private protected Task VerifyAtEndOfFileAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     1018
+	0,576  [HC=0,50;  HNC=0,90;  I=0,85;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource_ProduceTags.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource_ProduceTags.cs
+*
+private static bool TryStealTagsFromRelatedTagSource ( TextContentChangedEventArgs e )     222
+*
+private async Task RecomputeTagsForegroundAsync ( bool initialTags , CancellationToken cancellationToken )     213
+	0,569  [HC=0,22;  H=0,33;  I=1,00;  S=1,00] 
+private void EnqueueWork ( bool initialTags )     171
+	0,543  [HC=0,13;  H=0,43;  I=1,00;  S=1,00] 
+private ImmutableDictionary < ITextBuffer , TagSpanIntervalTree < TTag > > ComputeNewTagTrees ( ImmutableDictionary < ITextBuffer , TagSpanIntervalTree < TTag > > oldTagTrees , TaggerContext < TTag > context )     298
+	0,541  [HC=0,22;  H=0,13;  I=1,00;  S=1,00] 
+public IEnumerable < ITagSpan < TTag > > GetTags ( NormalizedSnapshotSpanCollection requestedSpans )     543
+	0,526  [HC=0,16;  H=0,21;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,77;  S=0,50;  NN=0,52;  NA=0,00]
+private async Task RecomputeTagsForegroundAsync ( bool initialTags , CancellationToken cancellationToken )     213
+	0,387  [HC=0,14;  HNC=0,08;  I=0,65;  S=1,00;  NN=0,93;  NA=0,00] 
+private void EnqueueWork ( bool initialTags )     171
+	0,319  [HC=0,00;  HNC=0,14;  I=0,53;  S=1,00;  NN=0,93;  NA=0,00] 
+public IEnumerable < ITagSpan < TTag > > GetTags ( NormalizedSnapshotSpanCollection requestedSpans )     543
+	0,254  [HC=0,14;  HNC=0,02;  I=0,53;  S=1,00;  NN=0,00;  NA=0,00] 
+private ImmutableDictionary < ITextBuffer , TagSpanIntervalTree < TTag > > ComputeNewTagTrees ( ImmutableDictionary < ITextBuffer , TagSpanIntervalTree < TTag > > oldTagTrees , TaggerContext < TTag > context )     298
+	0,312  [HC=0,14;  HNC=0,11;  I=0,69;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Symbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Symbol.cs
+*
+private DiagnosticInfo GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( )     1007
+*
+private UseSiteInfo < AssemblySymbol > GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( )     1062
+	0,935  [HC=1,00;  H=0,54;  I=1,00;  S=1,00] 
+private void GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( ref UseSiteInfo < AssemblySymbol > info )     1049
+	0,911  [HC=1,00;  H=0,38;  I=1,00;  S=1,00] 
+internal virtual UseSiteInfo < AssemblySymbol > GetUseSiteInfo ( )     894
+	0,588  [HC=0,27;  H=0,31;  I=1,00;  S=1,00] 
+internal bool MergeUseSiteInfo ( ref UseSiteInfo < AssemblySymbol > result , UseSiteInfo < AssemblySymbol > info )     983
+	0,564  [HC=0,27;  H=0,14;  I=1,00;  S=1,00] 
+internal static bool ReportUseSiteDiagnostic ( DiagnosticInfo info , BindingDiagnosticBag diagnostics , Location location )     1030
+	0,545  [HC=0,21;  H=0,18;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromParameter ( ref UseSiteInfo < AssemblySymbol > result , ParameterSymbol param )     1075
+	0,543  [HC=0,21;  H=0,16;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromParameters ( ref UseSiteInfo < AssemblySymbol > result , ImmutableArray < ParameterSymbol > parameters )     1084
+	0,538  [HC=0,21;  H=0,13;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,40;  I=1,13;  S=0,50;  NN=2,00;  NA=0,00]
+private UseSiteInfo < AssemblySymbol > GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( )     1062
+	0,893  [HC=1,00;  HNC=0,83;  I=0,36;  S=1,00;  NN=1,00;  NA=0,00] 
+private void GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( ref UseSiteInfo < AssemblySymbol > info )     1049
+	0,824  [HC=1,00;  HNC=0,09;  I=0,73;  S=1,00;  NN=1,00;  NA=0,00] 
+internal bool MergeUseSiteInfo ( ref UseSiteInfo < AssemblySymbol > result , UseSiteInfo < AssemblySymbol > info )     983
+	0,257  [HC=0,33;  HNC=0,01;  I=0,42;  S=1,00;  NN=0,00;  NA=0,00] 
+internal virtual UseSiteInfo < AssemblySymbol > GetUseSiteInfo ( )     894
+	0,455  [HC=0,44;  HNC=0,71;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+internal bool DeriveUseSiteInfoFromType ( ref UseSiteInfo < AssemblySymbol > result , TypeSymbol type )     1038
+	0,340  [HC=0,11;  HNC=0,01;  I=0,34;  S=1,00;  NN=0,98;  NA=0,00] #
+internal bool DeriveUseSiteInfoFromType ( ref UseSiteInfo < AssemblySymbol > result , TypeWithAnnotations type , AllowedRequiredModifierType allowedRequiredModifierType )     1069
+	0,200  [HC=0,11;  HNC=0,01;  I=0,31;  S=1,00;  NN=0,91;  NA=0,00] #
+internal bool DeriveUseSiteInfoFromParameter ( ref UseSiteInfo < AssemblySymbol > result , ParameterSymbol param )     1075
+	0,193  [HC=0,11;  HNC=0,01;  I=0,26;  S=1,00;  NN=0,91;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTableEntriesSnapshot.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTableEntriesSnapshot.cs
+*
+protected static string GetFileName ( string original , string mapped )     197
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\IEditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\IEditAndContinueWorkspaceService.cs
+*
+void StartDebuggingSession ( Solution solution )     26
+*
+ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     25
+	0,821  [HC=0,81;  H=0,32;  I=1,00;  S=1,00] 
+void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     26
+	0,523  [HC=0,10;  H=0,37;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,04;  S=0,50;  NN=0,18;  NA=0,00]
+ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     25
+	0,616  [HC=0,75;  HNC=0,09;  I=1,00;  S=1,00;  NN=0,91;  NA=0,00] 
+void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     26
+	0,223  [HC=0,00;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,82;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxGenerator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxGenerator.cs
+*
+internal abstract SyntaxTrivia EndOfLine ( string text )     44
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractNavigateToSearchService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractNavigateToSearchService.cs
+*
+private static ValueTask < ImmutableArray < INavigateToSearchResult > > RehydrateAsync ( Optional < ImmutableArray < SerializableNavigateToSearchResult > > result , Solution solution , CancellationToken cancellationToken )     72
+*
+private static async Task SearchFullyLoadedProjectAsync ( Project project , ImmutableArray < Document > priorityDocuments , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     98
+	0,648  [HC=0,38;  H=0,40;  I=1,00;  S=1,00] 
+private static async Task SearchCachedDocumentsAsync ( ImmutableArray < Document > documents , ImmutableArray < Document > priorityDocuments , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     127
+	0,634  [HC=0,35;  H=0,40;  I=1,00;  S=1,00] 
+private static async Task SearchFullyLoadedDocumentAsync ( Document document , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     58
+	0,620  [HC=0,33;  H=0,34;  I=1,00;  S=1,00] 
+private static Func < RoslynNavigateToItem , Task > GetOnItemFoundCallback ( Solution solution , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     33
+	0,567  [HC=0,18;  H=0,42;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,52;  S=0,50;  NN=2,00;  NA=0,00]
+private static async Task SearchFullyLoadedProjectAsync ( Project project , ImmutableArray < Document > priorityDocuments , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     98
+	0,566  [HC=0,20;  HNC=0,36;  I=0,28;  S=1,00;  NN=1,00;  NA=0,00] 
+private static async Task SearchCachedDocumentsAsync ( ImmutableArray < Document > documents , ImmutableArray < Document > priorityDocuments , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     127
+	0,556  [HC=0,25;  HNC=0,35;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+private static Func < RoslynNavigateToItem , Task > GetOnItemFoundCallback ( Solution solution , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     33
+	0,220  [HC=0,00;  HNC=0,51;  I=0,60;  S=1,00;  NN=0,00;  NA=0,00] 
+private static async Task SearchFullyLoadedDocumentAsync ( Document document , string searchPattern , IImmutableSet < string > kinds , Func < INavigateToSearchResult , Task > onResultFound , CancellationToken cancellationToken )     58
+	0,213  [HC=0,20;  HNC=0,38;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\IRemoteFindUsagesService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\IRemoteFindUsagesService.cs
+*
+ValueTask ReportProgressAsync ( RemoteServiceCallbackId callbackId , int current , int maximum )     28
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void PropertyAccessorReorder ( )     7691
+*
+public void PropertyAccessorReorder_GetSet ( )     10958
+	0,905  [HC=0,79;  H=0,95;  I=1,00;  S=1,00] 
+public void PropertyAccessorReorder_GetInit ( )     10972
+	0,893  [HC=0,77;  H=0,95;  I=1,00;  S=1,00] 
+public void AutoPropertyAccessor_SetToInit ( )     11255
+	0,826  [HC=0,62;  H=0,92;  I=1,00;  S=1,00] 
+public void AutoPropertyAccessor_InitToSet ( )     11271
+	0,810  [HC=0,59;  H=0,91;  I=1,00;  S=1,00] 
+public void PrivateAutoPropertyAccessorDelete_Get ( )     11240
+	0,771  [HC=0,50;  H=0,90;  I=1,00;  S=1,00] 
+public void PrivateAutoPropertyAccessorDelete_Set ( )     11287
+	0,771  [HC=0,50;  H=0,90;  I=1,00;  S=1,00] 
+public void PrivateAutoPropertyAccessorDelete_Init ( )     11301
+	0,765  [HC=0,49;  H=0,89;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+public void PropertyAccessorReorder_GetSet ( )     10958
+	0,893  [HC=0,60;  HNC=1,00;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void PropertyAccessorReorder_GetInit ( )     10972
+	0,836  [HC=0,60;  HNC=1,00;  I=0,79;  S=1,00;  NN=1,00;  NA=0,00] 
+public void PropertyDelete ( )     10915
+	0,475  [HC=0,33;  HNC=1,00;  I=0,70;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PrivateAutoPropertyAccessorDelete_Get ( )     11240
+	0,463  [HC=0,33;  HNC=1,00;  I=0,65;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PrivateAutoPropertyAccessorAdd_Init ( )     11227
+	0,461  [HC=0,33;  HNC=1,00;  I=0,65;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PrivateAutoPropertyAccessorDelete_Init ( )     11301
+	0,451  [HC=0,33;  HNC=1,00;  I=0,61;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PrivateAutoPropertyAccessorDelete_Set ( )     11287
+	0,439  [HC=0,33;  HNC=1,00;  I=0,56;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SymbolCompletionItem.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SymbolCompletionItem.cs
+*
+public static CompletionItem CreateWithSymbolId ( string displayText , IReadOnlyList < ISymbol > symbols , CompletionItemRules rules , int contextPosition , string sortText = null , string insertionText = null , string filterText = null , SupportedPlatformData supportedPlatforms = null , ImmutableDictionary < string , string > properties = null , ImmutableArray < string > tags = default )     260
+*
+public static CompletionItem CreateWithSymbolId ( string displayText , IReadOnlyList < ISymbol > symbols , CompletionItemRules rules , int contextPosition , string sortText = null , string insertionText = null , string filterText = null , SupportedPlatformData supportedPlatforms = null , ImmutableDictionary < string , string > properties = null , ImmutableArray < string > tags = default , bool isComplexTextEdit = false )     266
+	0,989  [HC=1,00;  H=0,92;  I=1,00;  S=1,00] 
+public static CompletionItem CreateWithSymbolId ( string displayText , string displayTextSuffix , IReadOnlyList < ISymbol > symbols , CompletionItemRules rules , int contextPosition , string sortText = null , string insertionText = null , string filterText = null , string displayTextPrefix = null , string inlineDescription = null , Glyph ? glyph = null , SupportedPlatformData supportedPlatforms = null , ImmutableDictionary < string , string > properties = null , ImmutableArray < string > tags = default , bool isComplexTextEdit = false )     297
+	0,958  [HC=1,00;  H=0,71;  I=1,00;  S=1,00] 
+public static async Task < CompletionDescription > GetDescriptionForSymbolsAsync ( CompletionItem item , Document document , ImmutableArray < ISymbol > symbols , CancellationToken cancellationToken )     180
+	0,594  [HC=0,31;  H=0,23;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=2,86;  I=0,50;  S=0,50;  NN=1,17;  NA=0,00]
+public static CompletionItem CreateWithSymbolId ( string displayText , IReadOnlyList < ISymbol > symbols , CompletionItemRules rules , int contextPosition , string sortText = null , string insertionText = null , string filterText = null , SupportedPlatformData supportedPlatforms = null , ImmutableDictionary < string , string > properties = null , ImmutableArray < string > tags = default , bool isComplexTextEdit = false )     266
+	0,946  [HC=1,00;  HNC=0,92;  I=0,56;  S=1,00;  NN=0,96;  NA=0,00] 
+public static CompletionItem CreateWithSymbolId ( string displayText , string displayTextSuffix , IReadOnlyList < ISymbol > symbols , CompletionItemRules rules , int contextPosition , string sortText = null , string insertionText = null , string filterText = null , string displayTextPrefix = null , string inlineDescription = null , Glyph ? glyph = null , SupportedPlatformData supportedPlatforms = null , ImmutableDictionary < string , string > properties = null , ImmutableArray < string > tags = default , bool isComplexTextEdit = false )     297
+	0,903  [HC=1,00;  HNC=0,79;  I=0,57;  S=1,00;  NN=0,96;  NA=0,00] 
+public static async Task < CompletionDescription > GetDescriptionForSymbolsAsync ( CompletionItem item , Document document , ImmutableArray < ISymbol > symbols , CancellationToken cancellationToken )     180
+	0,208  [HC=0,17;  HNC=0,24;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSymbolCompletionProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSymbolCompletionProvider.cs
+*
+protected static OptionSet GetUpdatedRecommendationOptions ( OptionSet options , string language )     389
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CodeCleanupTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CodeCleanupTests.cs
+*
+public async Task CodeCleaners_NoSpans ( )     46
+*
+public async Task CodeCleanersCSharp_NoSpans ( )     37
+	0,892  [HC=0,76;  H=0,96;  I=1,00;  S=1,00] 
+public async Task CodeCleanersCSharp_Spans ( )     64
+	0,881  [HC=0,74;  H=0,95;  I=1,00;  S=1,00] 
+public async Task CodeCleanersCSharp_Span ( )     55
+	0,855  [HC=0,68;  H=0,94;  I=1,00;  S=1,00] 
+public async Task CodeCleanersVisualBasic_NoSpans ( )     87
+	0,834  [HC=0,63;  H=0,94;  I=1,00;  S=1,00] 
+public async Task CodeCleanersVisualBasic_Spans ( )     117
+	0,822  [HC=0,61;  H=0,93;  I=1,00;  S=1,00] 
+public async Task CodeCleanersVisualBasic_Span ( )     107
+	0,798  [HC=0,56;  H=0,92;  I=1,00;  S=1,00] 
+public async Task CodeCleanersCSharp_Document ( )     46
+	0,792  [HC=0,54;  H=0,93;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task CodeCleanersCSharp_NoSpans ( )     37
+	0,879  [HC=0,67;  HNC=1,00;  I=1,00;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersVisualBasic_NoSpans ( )     87
+	0,829  [HC=0,67;  HNC=1,00;  I=0,86;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersVisualBasic_Spans ( )     117
+	0,792  [HC=0,60;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersCSharp_Spans ( )     64
+	0,783  [HC=0,60;  HNC=1,00;  I=0,80;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersCSharp_Span ( )     55
+	0,779  [HC=0,56;  HNC=1,00;  I=0,83;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersVisualBasic_Span ( )     107
+	0,768  [HC=0,56;  HNC=1,00;  I=0,80;  S=1,00;  NN=0,83;  NA=0,00] 
+public async Task CodeCleanersCSharp_Document ( )     46
+	0,685  [HC=0,40;  HNC=1,00;  I=0,73;  S=1,00;  NN=0,83;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxComparer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxComparer.cs
+*
+protected internal sealed override bool TreesEqual ( SyntaxNode oldNode , SyntaxNode newNode )     23
+*
+public override bool ValuesEqual ( SyntaxNode left , SyntaxNode right )     650
+	0,758  [HC=0,64;  H=0,62;  I=1,00;  S=0,89] 
+private bool Equal ( SwitchSectionSyntax left , SwitchSectionSyntax right )     703
+	0,671  [HC=0,50;  H=0,42;  I=1,00;  S=0,89] 
+protected override bool Equals ( SyntaxNode oldElement , SyntaxNode newElement )     1595
+	0,585  [HC=0,40;  H=0,71;  I=1,00;  S=0,59] 
+protected override bool Equals ( SyntaxToken oldElement , SyntaxToken newElement )     1587
+	0,579  [HC=0,40;  H=0,67;  I=1,00;  S=0,59] 
+protected override bool TryComputeWeightedDistance ( SyntaxNode leftNode , SyntaxNode rightNode , out double distance )     719
+	0,548  [HC=0,19;  H=0,48;  I=1,00;  S=0,89] 
+internal bool HasLabel ( SyntaxKind kind )     637
+	0,538  [HC=0,20;  H=0,38;  I=1,00;  S=0,89] 
+public sealed override double GetDistance ( SyntaxNode oldNode , SyntaxNode newNode )     1422
+	0,542  [HC=0,09;  H=0,74;  I=1,00;  S=0,89] #
+*
+HC=2;  HNC=1,00;  I=0,41;  S=0,50;  NN=0,89;  NA=0,00]
+public override bool ValuesEqual ( SyntaxNode left , SyntaxNode right )     650
+	0,595  [HC=0,50;  HNC=0,54;  I=0,00;  S=0,95;  NN=0,94;  NA=0,00] 
+private bool Equal ( SwitchSectionSyntax left , SwitchSectionSyntax right )     703
+	0,524  [HC=0,50;  HNC=0,20;  I=0,00;  S=0,95;  NN=0,94;  NA=0,00] 
+protected override bool IsLambdaBodyStatementOrExpression ( SyntaxNode node )     40
+	0,379  [HC=0,00;  HNC=0,50;  I=0,00;  S=0,95;  NN=0,94;  NA=0,00] 
+protected override bool Equals ( SyntaxNode oldElement , SyntaxNode newElement )     1595
+	0,526  [HC=0,42;  HNC=0,74;  I=0,26;  S=0,64;  NN=0,00;  NA=0,00] #
+protected override bool Equals ( SyntaxToken oldElement , SyntaxToken newElement )     1587
+	0,494  [HC=0,42;  HNC=0,60;  I=0,26;  S=0,64;  NN=0,00;  NA=0,00] #
+public sealed override double GetDistance ( SyntaxNode oldNode , SyntaxNode newNode )     1422
+	0,377  [HC=0,00;  HNC=0,71;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+internal static double ComputeValueDistance ( SyntaxNode ? oldNode , SyntaxNode ? newNode )     1444
+	0,360  [HC=0,00;  HNC=0,63;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PEModuleBuilder.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PEModuleBuilder.cs
+*
+internal sealed override Cci . INamedTypeReference GetSystemType ( SyntaxNode syntaxOpt , DiagnosticBag diagnostics )     695
+*
+public sealed override ImmutableArray < NamedTypeSymbol > GetEmbeddedTypes ( DiagnosticBag diagnostics )     1688
+	0,704  [HC=0,50;  H=0,43;  I=1,00;  S=1,00] 
+internal virtual ImmutableArray < NamedTypeSymbol > GetEmbeddedTypes ( BindingDiagnosticBag diagnostics )     1693
+	0,697  [HC=0,50;  H=0,38;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public sealed override ImmutableArray < NamedTypeSymbol > GetEmbeddedTypes ( DiagnosticBag diagnostics )     1688
+	0,542  [HC=0,60;  HNC=0,47;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal virtual ImmutableArray < NamedTypeSymbol > GetEmbeddedTypes ( BindingDiagnosticBag diagnostics )     1693
+	0,526  [HC=0,60;  HNC=0,40;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TaskExtensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TaskExtensions.cs
+*
+public static Task SafeContinueWithFromAsync < TInput > ( this Task < TInput > task , Func < Task < TInput > , Task > continuationFunction , CancellationToken cancellationToken , TaskScheduler scheduler )     420
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\StructureTaggerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\StructureTaggerTests.cs
+*
+public async Task CSharpOutliningTagger_RegionIsDefinition ( )     26
+*
+public async Task CSharpOutliningTagger ( bool collapseRegionsWhenCollapsingToDefinitions )     26
+	0,758  [HC=0,54;  H=0,69;  I=1,00;  S=1,00] 
+private static int GetCollapsedHintLineCount ( IStructureTag tag )     158
+	0,550  [HC=0,18;  H=0,31;  I=1,00;  S=1,00] 
+private static string GetHeaderText ( IStructureTag namespaceTag )     153
+	0,538  [HC=0,15;  H=0,31;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,17;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task CSharpOutliningTagger ( bool collapseRegionsWhenCollapsingToDefinitions )     26
+	0,611  [HC=0,57;  HNC=0,35;  I=0,73;  S=1,00;  NN=0,75;  NA=0,00] 
+private static int GetCollapsedHintLineCount ( IStructureTag tag )     158
+	0,114  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static string GetHeaderText ( IStructureTag namespaceTag )     153
+	0,113  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableContextTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableContextTests.cs
+*
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data ( )     457
+*
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,989  [HC=0,98;  H=1,00;  I=1,00;  S=1,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data2 ( )     497
+	0,989  [HC=0,98;  H=1,00;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,842  [HC=0,90;  H=0,20;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,842  [HC=0,90;  H=0,20;  I=1,00;  S=1,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,823  [HC=0,86;  H=0,18;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,725  [HC=0,63;  H=0,20;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_B ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2183
+	0,725  [HC=0,63;  H=0,20;  I=1,00;  S=1,00] 
+*
+HC=2,88888888888889;  HNC=1,00;  I=0,50;  S=0,50;  NN=2,00;  NA=0,00]
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,881  [HC=0,89;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data2 ( )     497
+	0,881  [HC=0,89;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,741  [HC=0,88;  HNC=0,08;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,741  [HC=0,88;  HNC=0,08;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,335  [HC=0,60;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,745  [HC=0,88;  HNC=0,08;  I=0,38;  S=1,00;  NN=0,98;  NA=0,00] #
+private static void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_Execute ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2191
+	0,361  [HC=0,60;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Symbols.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Symbols.cs
+*
+internal static bool ReportUseSiteDiagnostics ( Symbol symbol , DiagnosticBag diagnostics , Location location )     1526
+*
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,795  [HC=0,54;  H=0,94;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxToken token )     1538
+	0,780  [HC=0,54;  H=0,84;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxNode node )     1533
+	0,778  [HC=0,54;  H=0,82;  I=1,00;  S=1,00] 
+internal NamedTypeSymbol GetSpecialType ( SpecialType typeId , BindingDiagnosticBag diagnostics , SyntaxNode node )     1463
+	0,614  [HC=0,25;  H=0,55;  I=1,00;  S=1,00] #
+internal static NamedTypeSymbol GetSpecialType ( CSharpCompilation compilation , SpecialType typeId , Location location , BindingDiagnosticBag diagnostics )     1476
+	0,609  [HC=0,25;  H=0,51;  I=1,00;  S=1,00] #
+internal static NamedTypeSymbol GetSpecialType ( CSharpCompilation compilation , SpecialType typeId , SyntaxNode node , BindingDiagnosticBag diagnostics )     1468
+	0,597  [HC=0,25;  H=0,43;  I=1,00;  S=1,00] #
+internal NamedTypeSymbol GetWellKnownType ( WellKnownType type , BindingDiagnosticBag diagnostics , Location location )     1567
+	0,594  [HC=0,17;  H=0,66;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=2,81;  I=0,75;  S=0,50;  NN=1,42;  NA=0,00]
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,843  [HC=0,75;  HNC=0,92;  I=0,45;  S=1,00;  NN=0,97;  NA=0,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxNode node )     1533
+	0,746  [HC=0,75;  HNC=0,72;  I=0,25;  S=1,00;  NN=0,97;  NA=0,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxToken token )     1538
+	0,721  [HC=0,75;  HNC=0,72;  I=0,00;  S=1,00;  NN=0,97;  NA=0,00] 
+private static UseSiteInfo < AssemblySymbol > GetUseSiteInfoForWellKnownMemberOrContainingType ( Symbol symbol )     1518
+	0,465  [HC=0,18;  HNC=0,26;  I=0,65;  S=1,00;  NN=0,97;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , BindingDiagnosticBag diagnostics , Location ? location = null )     2493
+	0,331  [HC=0,00;  HNC=0,60;  I=0,40;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag ? diagnostics , Location location )     2508
+	0,433  [HC=0,00;  HNC=0,64;  I=0,42;  S=1,00;  NN=0,00;  NA=0,00] #
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag ? diagnostics , Location ? location = null )     2498
+	0,410  [HC=0,00;  HNC=0,61;  I=0,35;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ManagedEditAndContinueLanguageService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ManagedEditAndContinueLanguageService.cs
+*
+public void ExitBreakState ( )     101
+*
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,560  [HC=0,14;  H=0,51;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,304  [HC=0,00;  HNC=0,71;  I=0,00;  S=1,00;  NN=0,58;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCodeCleanupFixer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCodeCleanupFixer.cs
+*
+private static bool CanCleanupProject ( Project project )     306
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectKey.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectKey.cs
+*
+public SerializableProjectKey Dehydrate ( )     42
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.Tagger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.Tagger.cs
+*
+private void NotifyEditors ( NormalizedSnapshotSpanCollection changes , TaggerDelay delay )     153
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceServiceTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceServiceTests.cs
+*
+public async Task BreakMode_RudeEdits ( )     1049
+*
+public async Task BreakMode_RudeEdits_SourceGenerators ( )     1156
+	0,759  [HC=0,53;  H=0,92;  I=1,00;  S=0,90] 
+public async Task RudeEdits ( bool breakMode )     1091
+	0,712  [HC=0,50;  H=0,68;  I=1,00;  S=0,90] 
+public async Task BreakMode_Encodings ( )     1051
+	0,796  [HC=0,61;  H=0,94;  I=1,00;  S=0,90] #
+public async Task BreakMode_RudeEdits_DelayLoadedModule ( )     1341
+	0,752  [HC=0,51;  H=0,92;  I=1,00;  S=0,90] #
+public async Task BreakMode_SyntaxError ( )     1402
+	0,746  [HC=0,50;  H=0,92;  I=1,00;  S=0,90] #
+public async Task BreakMode_ErrorReadingPdbFile ( )     802
+	0,730  [HC=0,46;  H=0,91;  I=1,00;  S=0,90] #
+public async Task BreakMode_SemanticError ( )     1444
+	0,725  [HC=0,45;  H=0,91;  I=1,00;  S=0,90] #
+*
+HC=2;  HNC=1,00;  I=2,00;  S=1,00;  NN=1,64;  NA=0,00]
+public async Task BreakMode_RudeEdits_SourceGenerators ( )     1156
+	0,808  [HC=0,67;  HNC=1,00;  I=0,64;  S=0,96;  NN=0,98;  NA=0,00] 
+public async Task RudeEdits ( bool breakMode )     1091
+	0,748  [HC=0,50;  HNC=0,38;  I=0,89;  S=0,96;  NN=0,98;  NA=0,00] 
+public async Task BreakMode_SemanticError ( )     1444
+	0,800  [HC=0,50;  HNC=1,00;  I=0,92;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_RudeEdits_DelayLoadedModule ( )     1341
+	0,792  [HC=0,57;  HNC=1,00;  I=0,83;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_RudeEdits_DocumentWithoutSequencePoints ( )     1295
+	0,768  [HC=0,50;  HNC=1,00;  I=0,82;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_SyntaxError ( )     1402
+	0,754  [HC=0,50;  HNC=1,00;  I=0,78;  S=0,96;  NN=0,00;  NA=0,00] #
+public async Task BreakMode_ModuleDisallowsEditAndContinue ( )     984
+	0,754  [HC=0,40;  HNC=1,00;  I=0,88;  S=0,96;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractCompletionProviderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractCompletionProviderTests.cs
+*
+private protected Task VerifyAtPositionAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string inlineDescription = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     887
+*
+private protected Task VerifyAtPositionAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     946
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] 
+private protected Task VerifyAtPositionAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     964
+	0,975  [HC=1,00;  H=0,83;  I=1,00;  S=1,00] 
+private protected async Task VerifyAtEndOfFileAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     979
+	0,824  [HC=0,64;  H=0,86;  I=1,00;  S=1,00] 
+private protected Task VerifyAtEndOfFileAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     1018
+	0,819  [HC=0,64;  H=0,82;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,63;  S=0,50;  NN=1,67;  NA=0,00]
+private protected Task VerifyAtPositionAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     946
+	0,954  [HC=1,00;  HNC=0,91;  I=0,83;  S=1,00;  NN=0,98;  NA=0,00] 
+private protected Task VerifyAtPositionAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     964
+	0,935  [HC=1,00;  HNC=0,87;  I=0,75;  S=1,00;  NN=0,98;  NA=0,00] 
+private protected async Task VerifyAtEndOfFileAsync ( string code , int position , string insertText , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     979
+	0,715  [HC=0,50;  HNC=0,85;  I=0,85;  S=1,00;  NN=0,97;  NA=0,00] #
+private protected Task VerifyAtEndOfFileAsync ( string code , int position , bool usePreviousCharAsTrigger , string expectedItemOrNull , string expectedDescriptionOrNull , SourceCodeKind sourceCodeKind , bool checkForAbsence , int ? glyph , int ? matchPriority , bool ? hasSuggestionItem , string displayTextSuffix , string displayTextPrefix , string inlineDescription = null , bool ? isComplexTextEdit = null , List < CompletionFilter > matchingFilters = null , CompletionItemFlags ? flags = null )     1018
+	0,541  [HC=0,50;  HNC=0,87;  I=0,73;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompilingTestBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompilingTestBase.cs
+*
+public static string DumpDiagnostic ( Diagnostic diagnostic )     46
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\StatementEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\StatementEditingTests.cs
+*
+public void Lambdas_Signature_SemanticErrors ( )     3120
+*
+public void Lambdas_Signature_NonMatchingErrorType ( )     3272
+	0,835  [HC=0,64;  H=0,93;  I=1,00;  S=1,00] 
+public void Lambdas_Signature_MatchingErrorType ( )     3233
+	0,834  [HC=0,64;  H=0,93;  I=1,00;  S=1,00] 
+public void Queries_Update_Signature_GroupBy_MatchingErrorTypes ( )     7968
+	0,728  [HC=0,40;  H=0,88;  I=1,00;  S=1,00] 
+public void Queries_Update_Signature_GroupBy_NonMatchingErrorTypes ( )     8008
+	0,726  [HC=0,40;  H=0,88;  I=1,00;  S=1,00] 
+public void Lambdas_Insert_Second_NotSupported ( )     2661
+	0,706  [HC=0,35;  H=0,88;  I=1,00;  S=1,00] 
+public void Lambdas_Insert_NotSupported ( )     2629
+	0,696  [HC=0,33;  H=0,88;  I=1,00;  S=1,00] 
+public void Lambdas_Insert_FirstInClass_NotSupported ( )     2697
+	0,691  [HC=0,32;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,88;  S=0,50;  NN=2,00;  NA=0,00]
+public void Lambdas_Signature_NonMatchingErrorType ( )     3272
+	0,790  [HC=0,47;  HNC=1,00;  I=0,68;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Lambdas_Signature_MatchingErrorType ( )     3233
+	0,788  [HC=0,57;  HNC=1,00;  I=0,45;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Queries_Update_Signature_GroupBy_NonMatchingErrorTypes ( )     8008
+	0,362  [HC=0,20;  HNC=1,00;  I=0,45;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Queries_Update_Signature_GroupBy_MatchingErrorTypes ( )     7968
+	0,361  [HC=0,23;  HNC=1,00;  I=0,39;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Lambdas_Insert_Second_NotSupported ( )     2661
+	0,344  [HC=0,20;  HNC=1,00;  I=0,33;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Lambdas_Insert_NotSupported ( )     2629
+	0,313  [HC=0,25;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public void Lambdas_Insert_FirstInClass_NotSupported ( )     2697
+	0,280  [HC=0,14;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private Project CreateSubmissionProjectNoLock ( Solution solution , ProjectId ? previousSubmissionProjectId , string languageName , ImmutableArray < string > imports , ImmutableArray < MetadataReference > references )     333
+*
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,582  [HC=0,38;  H=0,21;  I=1,00;  S=0,86] #
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,514  [HC=0,17;  H=0,36;  I=1,00;  S=0,86] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,499  [HC=0,17;  H=0,25;  I=1,00;  S=0,86] #
+public bool CanExecuteCode ( string text )     174
+	0,498  [HC=0,21;  H=0,14;  I=1,00;  S=0,86] #
+public string GetPrompt ( )     267
+	0,491  [HC=0,21;  H=0,09;  I=1,00;  S=0,86] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,485  [HC=0,17;  H=0,16;  I=1,00;  S=0,86] #
+private IInteractiveWindow GetInteractiveWindow ( )     144
+	0,481  [HC=0,17;  H=0,13;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,229  [HC=0,20;  HNC=0,13;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,175  [HC=0,11;  HNC=0,08;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,172  [HC=0,00;  HNC=0,04;  I=0,53;  S=0,77;  NN=0,00;  NA=0,00] #
+async Task < ExecutionResult > IInteractiveEvaluator . ResetAsync ( bool initialize )     199
+	0,163  [HC=0,00;  HNC=0,01;  I=0,52;  S=0,77;  NN=0,00;  NA=0,00] #
+private void CaptureClassificationSpans ( )     159
+	0,159  [HC=0,00;  HNC=0,08;  I=0,34;  S=0,77;  NN=0,00;  NA=0,00] #
+public string GetPrompt ( )     267
+	0,155  [HC=0,11;  HNC=0,01;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,126  [HC=0,00;  HNC=0,12;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ManagedEditAndContinueLanguageService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ManagedEditAndContinueLanguageService.cs
+*
+public async Task < ManagedEditAndContinueAvailability > GetAvailabilityAsync ( Guid mvid , CancellationToken cancellationToken )     54
+*
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,447  [HC=0,21;  H=0,17;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private Solution GetCurrentCompileTimeSolution ( )     56
+	0,189  [HC=0,20;  HNC=0,02;  I=0,00;  S=0,67;  NN=0,58;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SolutionState.CompilationTracker.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SolutionState.CompilationTracker.cs
+*
+private void RecordAssemblySymbols ( Compilation compilation , Dictionary < MetadataReference , ProjectId > metadataReferenceToProjectId )     880
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void InstanceCtorDelete_Private1 ( )     4494
+*
+public void InstanceCtorDelete_NonPublic ( string visibility )     7253
+	0,810  [HC=0,67;  H=0,67;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPublic ( )     7577
+	0,801  [HC=0,57;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPrivate ( )     7529
+	0,796  [HC=0,56;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_InsertPublicDeletePrivate ( )     7719
+	0,791  [HC=0,55;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_InsertPrivateDeletePrivate ( )     7647
+	0,785  [HC=0,53;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_InsertInternalDeletePrivate ( )     7740
+	0,780  [HC=0,52;  H=0,90;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_DeletePublicInsertPublic ( )     7553
+	0,765  [HC=0,49;  H=0,89;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,40;  S=0,50;  NN=1,83;  NA=0,00]
+public void InstanceCtorDelete_NonPublic ( string visibility )     7253
+	0,710  [HC=0,60;  HNC=0,35;  I=0,65;  S=1,00;  NN=0,99;  NA=0,00] 
+public void InstanceCtorDelete_Public_PartialWithInitializerUpdate ( )     7271
+	0,670  [HC=0,38;  HNC=1,00;  I=0,32;  S=1,00;  NN=0,99;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPublic ( )     7577
+	0,515  [HC=0,57;  HNC=1,00;  I=0,59;  S=1,00;  NN=0,00;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePrivateInsertPrivate ( )     7529
+	0,488  [HC=0,57;  HNC=1,00;  I=0,46;  S=1,00;  NN=0,00;  NA=0,00] 
+public void InstanceCtor_Partial_InsertPrivateDeletePrivate ( )     7647
+	0,452  [HC=0,43;  HNC=1,00;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+public void InstanceCtor_Partial_DeletePublicInsertPublic ( )     7553
+	0,447  [HC=0,43;  HNC=1,00;  I=0,47;  S=1,00;  NN=0,00;  NA=0,00] 
+public void EventDelete ( )     12413
+	0,444  [HC=0,20;  HNC=1,00;  I=0,78;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+internal static IEnumerable < TextSpan > GetSpansInNewDocument ( IEnumerable < TextChange > changes )     306
+*
+internal TestAccessor GetTestAccessor ( )     553
+	0,566  [HC=0,24;  H=0,25;  I=1,00;  S=1,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,553  [HC=0,19;  H=0,30;  I=1,00;  S=1,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,543  [HC=0,10;  H=0,52;  I=1,00;  S=1,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,538  [HC=0,14;  H=0,34;  I=1,00;  S=1,00] 
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,531  [HC=0,19;  H=0,14;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,514  [HC=0,09;  H=0,34;  I=1,00;  S=1,00] 
+internal EditSession ? GetEditSession ( )     566
+	0,471  [HC=0,24;  H=0,25;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+internal TestAccessor GetTestAccessor ( )     553
+	0,339  [HC=0,20;  HNC=0,13;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,271  [HC=0,00;  HNC=0,22;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,257  [HC=0,00;  HNC=0,16;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,248  [HC=0,00;  HNC=0,11;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,238  [HC=0,00;  HNC=0,07;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,257  [HC=0,20;  HNC=0,09;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+internal EditSession ? GetEditSession ( )     566
+	0,257  [HC=0,20;  HNC=0,09;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+public void StartDebuggingSession ( Solution solution )     100
+*
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,824  [HC=0,81;  H=0,34;  I=1,00;  S=1,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,721  [HC=0,81;  H=0,28;  I=1,00;  S=0,67] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,675  [HC=0,48;  H=0,29;  I=1,00;  S=1,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,598  [HC=0,29;  H=0,33;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,561  [HC=0,17;  H=0,40;  I=1,00;  S=1,00] 
+internal EditSession ? GetEditSession ( )     566
+	0,551  [HC=0,43;  H=0,24;  I=1,00;  S=0,67] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,549  [HC=0,19;  H=0,27;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,52;  NA=0,00]
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,674  [HC=0,75;  HNC=0,14;  I=0,52;  S=1,00;  NN=0,93;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,506  [HC=0,52;  HNC=0,23;  I=0,53;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,301  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,93;  NA=0,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,260  [HC=0,00;  HNC=0,30;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,212  [HC=0,00;  HNC=0,06;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,411  [HC=0,67;  HNC=0,06;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+internal EditSession ? GetEditSession ( )     566
+	0,279  [HC=0,33;  HNC=0,06;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpCodeCleanupFixer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpCodeCleanupFixer.cs
+*
+public override Task < bool > FixAsync ( ICodeCleanUpScope scope , ICodeCleanUpExecutionContext context )     58
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BlockStructureServiceWithProviders.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BlockStructureServiceWithProviders.cs
+*
+public override BlockStructure GetBlockStructure ( Document document , CancellationToken cancellationToken )     56
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSessionActiveStatementsTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSessionActiveStatementsTests.cs
+*
+private static string Delete ( string src , string marker )     140
+*
+private static Solution AddDefaultTestSolution ( TestWorkspace workspace , string [ ] markedSources )     68
+	0,606  [HC=0,23;  H=0,56;  I=1,00;  S=1,00] 
+private static EditSession CreateEditSession ( Solution solution , ImmutableArray < ManagedActiveStatementDebugInfo > activeStatements , ImmutableDictionary < ManagedMethodId , ImmutableArray < NonRemappableRegion > > nonRemappableRegions = null , CommittedSolution . DocumentState initialState = CommittedSolution . DocumentState . MatchesBuildOutput )     36
+	0,553  [HC=0,24;  H=0,16;  I=1,00;  S=1,00] 
+private static ImmutableArray < DocumentId > GetDocumentIds ( Solution solution )     90
+	0,564  [HC=0,21;  H=0,30;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private static Solution AddDefaultTestSolution ( TestWorkspace workspace , string [ ] markedSources )     68
+	0,213  [HC=0,00;  HNC=0,35;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static EditSession CreateEditSession ( Solution solution , ImmutableArray < ManagedActiveStatementDebugInfo > activeStatements , ImmutableDictionary < ManagedMethodId , ImmutableArray < NonRemappableRegion > > nonRemappableRegions = null , CommittedSolution . DocumentState initialState = CommittedSolution . DocumentState . MatchesBuildOutput )     36
+	0,160  [HC=0,00;  HNC=0,14;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private static ImmutableArray < DocumentId > GetDocumentIds ( Solution solution )     90
+	0,166  [HC=0,00;  HNC=0,16;  I=0,00;  S=1,00;  NN=0,35;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TaskExtensions.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TaskExtensions.cs
+*
+public static Task < TResult > SafeContinueWith < TInput , TResult > ( this Task < TInput > task , Func < Task < TInput > , TResult > continuationFunction , TaskScheduler scheduler )     245
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveWindow_OutOfProc.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveWindow_OutOfProc.cs
+*
+public void SetTimeout ( int milliseconds )     95
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BlockStructureServiceWithProviders.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BlockStructureServiceWithProviders.cs
+*
+public async Task < BlockStructure > GetBlockStructureAsync ( SyntaxTree syntaxTree , OptionSet options , bool isMetadataAsSource , CancellationToken cancellationToken )     64
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private void AddSubmissionProjectNoLock ( ITextBuffer submissionBuffer , string languageName )     274
+*
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,657  [HC=0,42;  H=0,61;  I=1,00;  S=0,86] #
+public void AbortExecution ( )     256
+	0,536  [HC=0,23;  H=0,34;  I=1,00;  S=0,86] #
+public bool CanExecuteCode ( string text )     174
+	0,507  [HC=0,15;  H=0,36;  I=1,00;  S=0,86] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,502  [HC=0,12;  H=0,45;  I=1,00;  S=0,86] #
+public void Dispose ( )     90
+	0,502  [HC=0,15;  H=0,33;  I=1,00;  S=0,86] #
+public string GetPrompt ( )     267
+	0,490  [HC=0,15;  H=0,25;  I=1,00;  S=0,86] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,488  [HC=0,15;  H=0,23;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,290  [HC=0,20;  HNC=0,37;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,229  [HC=0,11;  HNC=0,30;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private void CaptureClassificationSpans ( )     159
+	0,172  [HC=0,00;  HNC=0,30;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public string GetPrompt ( )     267
+	0,158  [HC=0,11;  HNC=0,02;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,157  [HC=0,00;  HNC=0,10;  I=0,29;  S=0,77;  NN=0,00;  NA=0,00] #
+public void Dispose ( )     90
+	0,154  [HC=0,00;  HNC=0,23;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+public void AbortExecution ( )     256
+	0,154  [HC=0,00;  HNC=0,23;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CommonSemanticQuickInfoProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CommonSemanticQuickInfoProvider.cs
+*
+private static ImmutableArray < TaggedText > GetValueDocumentationContent ( ISymbol documentedSymbol , IDictionary < SymbolDescriptionGroups , ImmutableArray < TaggedText > > sections , SemanticModel semanticModel , SyntaxToken token , IDocumentationCommentFormattingService formatter , CancellationToken cancellationToken )     400
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpEditAndContinueTestHelpers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpEditAndContinueTestHelpers.cs
+*
+internal static CSharpEditAndContinueTestHelpers CreateInstance ( Action < SyntaxNode > faultInjector = null )     31
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LogMessage.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LogMessage.cs
+*
+public static LogMessage Create ( Func < string > messageGetter )     18
+*
+public static LogMessage Create ( Func < string > messageGetter , LogLevel logLevel )     20
+	0,969  [HC=1,00;  H=0,79;  I=1,00;  S=1,00] 
+public static LogMessage Create ( string message , LogLevel logLevel )     17
+	0,940  [HC=1,00;  H=0,58;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,36;  S=0,50;  NN=1,26;  NA=0,00]
+public static LogMessage Create ( Func < string > messageGetter , LogLevel logLevel )     20
+	0,925  [HC=1,00;  HNC=0,68;  I=0,82;  S=1,00;  NN=0,96;  NA=0,00] 
+public static LogMessage Create ( string message , LogLevel logLevel )     17
+	0,884  [HC=1,00;  HNC=0,45;  I=0,74;  S=1,00;  NN=0,96;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSession.cs
+*
+public void Dispose ( )     82
+*
+internal TestAccessor GetTestAccessor ( )     1131
+	0,547  [HC=0,13;  H=0,43;  I=1,00;  S=1,00] 
+internal static ProjectChanges GetProjectChanges ( Compilation oldCompilation , Compilation newCompilation , ImmutableArray < DocumentAnalysisResults > changedDocumentAnalyses , CancellationToken cancellationToken )     585
+	0,497  [HC=0,12;  H=0,13;  I=1,00;  S=1,00] 
+private static ProjectAnalysisSummary GetProjectAnalysisSymmary ( ImmutableArray < DocumentAnalysisResults > documentAnalyses )     542
+	0,495  [HC=0,08;  H=0,23;  I=1,00;  S=1,00] 
+internal static void MergePartialEdits ( Compilation oldCompilation , Compilation newCompilation , IReadOnlyList < SemanticEditInfo > edits , out ImmutableArray < SemanticEdit > mergedEdits , out ImmutableHashSet < ISymbol > addedSymbols , CancellationToken cancellationToken )     636
+	0,468  [HC=0,06;  H=0,10;  I=1,00;  S=1,00] 
+public PendingSolutionUpdate ? GetPendingSolutionUpdate ( )     1141
+	0,465  [HC=0,13;  H=0,54;  I=1,00;  S=0,67] #
+*
+HC=2;  HNC=1,00;  I=0,32;  S=1,00;  NN=0,00;  NA=0,00]
+internal TestAccessor GetTestAccessor ( )     1131
+	0,341  [HC=0,00;  HNC=0,71;  I=0,28;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static void MergePartialEdits ( Compilation oldCompilation , Compilation newCompilation , IReadOnlyList < SemanticEditInfo > edits , out ImmutableArray < SemanticEdit > mergedEdits , out ImmutableHashSet < ISymbol > addedSymbols , CancellationToken cancellationToken )     636
+	0,184  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public PendingSolutionUpdate ? GetPendingSolutionUpdate ( )     1141
+	0,357  [HC=0,00;  HNC=0,79;  I=0,28;  S=0,67;  NN=0,00;  NA=0,00] #
+private static ProjectAnalysisSummary GetProjectAnalysisSymmary ( ImmutableArray < DocumentAnalysisResults > documentAnalyses )     542
+	0,236  [HC=0,00;  HNC=0,02;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+internal static ProjectChanges GetProjectChanges ( Compilation oldCompilation , Compilation newCompilation , ImmutableArray < DocumentAnalysisResults > changedDocumentAnalyses , CancellationToken cancellationToken )     585
+	0,233  [HC=0,00;  HNC=0,01;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BuildClient.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BuildClient.cs
+*
+private Task < BuildResponse > RunServerCompilationAsync ( List < string > arguments , BuildPaths buildPaths , string sessionKey , string keepAlive , string libDirectory , CancellationToken cancellationToken )     269
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BuildClient.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BuildClient.cs
+*
+private static Task < BuildResponse > RunServerCompilationCoreAsync ( RequestLanguage language , List < string > arguments , BuildPaths buildPaths , string pipeName , string keepAlive , string libEnvVariable , int ? timeoutOverride , CreateServerFunc createServerFunc , ICompilerServerLogger logger , CancellationToken cancellationToken )     280
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private void AddClassifiedSpansForCurrentTree ( IClassificationService classificationService , SnapshotSpan span , Document document , List < ClassifiedSpan > classifiedSpans )     331
+*
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,777  [HC=0,59;  H=0,66;  I=1,00;  S=1,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,707  [HC=0,39;  H=0,77;  I=1,00;  S=1,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,630  [HC=0,22;  H=0,75;  I=1,00;  S=1,00] 
+private IClassificationService ? TryGetClassificationService ( ITextSnapshot snapshot )     112
+	0,577  [HC=0,28;  H=0,20;  I=1,00;  S=1,00] 
+private IEnumerable < ITagSpan < IClassificationTag > > ? GetTagsWorker ( NormalizedSnapshotSpanCollection spans )     354
+	0,546  [HC=0,22;  H=0,17;  I=1,00;  S=1,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,539  [HC=0,16;  H=0,30;  I=1,00;  S=1,00] 
+private async Task ProcessChangesAsync ( ImmutableArray < ITextSnapshot > snapshots , CancellationToken cancellationToken )     268
+	0,526  [HC=0,16;  H=0,21;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,95;  S=0,50;  NN=0,00;  NA=0,00]
+private void AddClassifiedSpansForPreviousDocument ( IClassificationService classificationService , SnapshotSpan span , ITextSnapshot lastProcessedSnapshot , Document lastProcessedDocument , SyntaxNode ? lastProcessedRoot , ArrayBuilder < ClassifiedSpan > classifiedSpans )     436
+	0,663  [HC=0,67;  HNC=0,64;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddSyntacticClassificationsForDocument ( IClassificationService classificationService , SnapshotSpan span , Document document , SyntaxNode ? root , ArrayBuilder < ClassifiedSpan > classifiedSpans )     414
+	0,592  [HC=0,33;  HNC=0,81;  I=0,69;  S=1,00;  NN=0,00;  NA=0,00] 
+private void AddLexicalClassifications ( IClassificationService classificationService , SnapshotSpan span , ArrayBuilder < ClassifiedSpan > classifiedSpans )     406
+	0,491  [HC=0,17;  HNC=0,86;  I=0,52;  S=1,00;  NN=0,00;  NA=0,00] 
+private IEnumerable < ITagSpan < IClassificationTag > > ? GetTagsWorker ( NormalizedSnapshotSpanCollection spans )     354
+	0,251  [HC=0,00;  HNC=0,21;  I=0,43;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void DecrementReferenceCount ( )     160
+	0,222  [HC=0,00;  HNC=0,22;  I=0,28;  S=1,00;  NN=0,00;  NA=0,00] 
+private async Task SwitchToMainThreadAndHookupWorkspaceAsync ( )     124
+	0,190  [HC=0,00;  HNC=0,08;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+private void OnSubjectBufferChanged ( object ? sender , TextContentChangedEventArgs args )     215
+	0,185  [HC=0,00;  HNC=0,32;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BlockStructureProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BlockStructureProvider.cs
+*
+public abstract Task ProvideBlockStructureAsync ( BlockStructureContext context )     13
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WorkspaceTestBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WorkspaceTestBase.cs
+*
+protected static string GetParentDirOfParentDirOfContainingDir ( string fileName )     283
+*
+protected static FileSet GetSimpleCSharpSolutionWithAdditionaFile ( )     107
+	0,589  [HC=0,20;  H=0,53;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+protected static FileSet GetSimpleCSharpSolutionWithAdditionaFile ( )     107
+	0,224  [HC=0,11;  HNC=0,18;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\VisualStudioDiagnosticAnalyzerService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\VisualStudioDiagnosticAnalyzerService.cs
+*
+private bool IsBuildActive ( )     331
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+private static ImmutableArray < DiagnosticData > ToDiagnosticData ( Solution solution , ImmutableArray < ( ProjectId ProjectId , ImmutableArray < Diagnostic > Diagnostics ) > diagnosticsByProject )     392
+*
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,552  [HC=0,19;  H=0,29;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,524  [HC=0,17;  H=0,15;  I=1,00;  S=1,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,517  [HC=0,11;  H=0,28;  I=1,00;  S=1,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,492  [HC=0,06;  H=0,27;  I=1,00;  S=1,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,489  [HC=0,06;  H=0,25;  I=1,00;  S=1,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,469  [HC=0,06;  H=0,10;  I=1,00;  S=1,00] 
+internal void SetReportTelemetry ( Action < DebuggingSessionTelemetry . Data > value )     568
+	0,412  [HC=0,11;  H=0,22;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,285  [HC=0,00;  HNC=0,08;  I=0,41;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,259  [HC=0,00;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,254  [HC=0,00;  HNC=0,14;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,244  [HC=0,00;  HNC=0,10;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,239  [HC=0,00;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,224  [HC=0,00;  HNC=0,01;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void SetOutputProvider ( Func < Project , CompilationOutputs > value )     567
+	0,162  [HC=0,00;  HNC=0,06;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractRemoveUnusedMembersDiagnosticAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractRemoveUnusedMembersDiagnosticAnalyzer.cs
+*
+private bool IsEntryPoint ( IMethodSymbol methodSymbol )     702
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+private static async Task < IEnumerable < TextSpan > > GetChangedSpansAsync ( Document ? oldDocument , SyntaxTree newSyntaxTree , CancellationToken cancellationToken )     249
+*
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,625  [HC=0,35;  H=0,34;  I=1,00;  S=1,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,557  [HC=0,25;  H=0,15;  I=1,00;  S=1,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,554  [HC=0,25;  H=0,13;  I=1,00;  S=1,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,525  [HC=0,15;  H=0,22;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,512  [HC=0,13;  H=0,19;  I=1,00;  S=1,00] 
+public void BreakStateEntered ( out ImmutableArray < DocumentId > documentsToReanalyze )     146
+	0,498  [HC=0,10;  H=0,18;  I=1,00;  S=1,00] 
+internal EditSession ? GetEditSession ( )     566
+	0,481  [HC=0,30;  H=0,13;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,430  [HC=0,25;  HNC=0,20;  I=0,47;  S=1,00;  NN=0,00;  NA=0,00] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,341  [HC=0,25;  HNC=0,04;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,259  [HC=0,00;  HNC=0,17;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,250  [HC=0,00;  HNC=0,00;  I=0,26;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,238  [HC=0,00;  HNC=0,07;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,261  [HC=0,25;  HNC=0,01;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+internal EditSession ? GetEditSession ( )     566
+	0,261  [HC=0,25;  HNC=0,01;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.Tagger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.Tagger.cs
+*
+private void OnTagsChangedForBuffer ( ICollection < KeyValuePair < ITextBuffer , DiffResult > > changes , bool initialTags )     128
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractBlockStructureProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractBlockStructureProvider.cs
+*
+private void ProvideBlockStructureWorker ( BlockStructureContext context , SyntaxNode syntaxRoot )     67
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SemanticClassifierTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SemanticClassifierTests.cs
+*
+public async Task TestGetTagsOnBufferTagger ( )     2630
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RequestExecutionQueue.RequestTelemetryLogger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RequestExecutionQueue.RequestTelemetryLogger.cs
+*
+public void LogCancel ( string methodName )     39
+*
+private static double ComputeLogValue ( double durationInMS )     76
+	0,595  [HC=0,27;  H=0,37;  I=1,00;  S=1,00] 
+public void UpdateTelemetryData ( string methodName , TimeSpan queuedDuration , TimeSpan requestDuration , Result result )     59
+	0,528  [HC=0,11;  H=0,38;  I=1,00;  S=1,00] 
+public void IncrementCount ( Result result )     140
+	0,473  [HC=0,07;  H=0,60;  I=1,00;  S=0,75] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+private static double ComputeLogValue ( double durationInMS )     76
+	0,377  [HC=0,33;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,33;  NA=0,00] 
+public void UpdateTelemetryData ( string methodName , TimeSpan queuedDuration , TimeSpan requestDuration , Result result )     59
+	0,357  [HC=0,00;  HNC=0,46;  I=0,31;  S=1,00;  NN=0,33;  NA=0,00] 
+public void IncrementCount ( Result result )     140
+	0,292  [HC=0,00;  HNC=0,33;  I=0,46;  S=0,75;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ExpressionCompilerTestHelpers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ExpressionCompilerTestHelpers.cs
+*
+internal static AssemblyIdentity GetAssemblyIdentity ( this MetadataReference reference )     502
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpEditAndContinueTestHelpers.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpEditAndContinueTestHelpers.cs
+*
+public override Compilation CreateLibraryCompilation ( string name , IEnumerable < SyntaxTree > trees )     39
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveWindow_InProc.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveWindow_InProc.cs
+*
+public int GetTimeoutInMilliseconds ( )     62
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Controller.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Controller.cs
+*
+internal static Controller GetInstance ( IThreadingContext threadingContext , EditorCommandArgs args , IIntelliSensePresenter < ISignatureHelpPresenterSession , ISignatureHelpSession > presenter , IAsynchronousOperationListener asyncListener , IList < Lazy < ISignatureHelpProvider , OrderableLanguageMetadata > > allProviders , IAsyncCompletionBroker completionBroker )     72
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CommandLineTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CommandLineTests.cs
+*
+public void OptimizationLevelAdded_Canary ( )     1812
+*
+*
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\StructureTaggerTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\StructureTaggerTests.cs
+*
+public async Task CSharpOutliningTagger_RegionIsNotDefinition ( )     68
+*
+public async Task CSharpOutliningTagger ( bool collapseRegionsWhenCollapsingToDefinitions )     26
+	0,741  [HC=0,50;  H=0,69;  I=1,00;  S=1,00] 
+private static int GetCollapsedHintLineCount ( IStructureTag tag )     158
+	0,555  [HC=0,19;  H=0,31;  I=1,00;  S=1,00] 
+private static string GetHeaderText ( IStructureTag namespaceTag )     153
+	0,534  [HC=0,14;  H=0,31;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,93;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task CSharpOutliningTagger ( bool collapseRegionsWhenCollapsingToDefinitions )     26
+	0,562  [HC=0,50;  HNC=0,35;  I=0,69;  S=1,00;  NN=0,75;  NA=0,00] 
+private static int GetCollapsedHintLineCount ( IStructureTag tag )     158
+	0,196  [HC=0,00;  HNC=0,03;  I=0,36;  S=1,00;  NN=0,00;  NA=0,00] 
+private static string GetHeaderText ( IStructureTag namespaceTag )     153
+	0,119  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Logger.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Logger.cs
+*
+public static void Log ( FunctionId functionId , string ? message = null )     45
+*
+public static void Log ( FunctionId functionId , string ? message = null , LogLevel logLevel = LogLevel . Debug )     45
+	0,952  [HC=1,00;  H=0,67;  I=1,00;  S=1,00] 
+public static void Log ( FunctionId functionId , Func < string > messageGetter , LogLevel logLevel = LogLevel . Debug )     65
+	0,936  [HC=1,00;  H=0,56;  I=1,00;  S=1,00] 
+public static IDisposable LogBlock ( FunctionId functionId , string ? message , CancellationToken token , LogLevel logLevel = LogLevel . Trace )     207
+	0,665  [HC=0,38;  H=0,53;  I=1,00;  S=1,00] 
+public static IDisposable LogBlock ( FunctionId functionId , Func < string > messageGetter , CancellationToken token , LogLevel logLevel = LogLevel . Trace )     227
+	0,650  [HC=0,38;  H=0,42;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,35;  S=0,50;  NN=0,89;  NA=0,00]
+public static void Log ( FunctionId functionId , string ? message = null , LogLevel logLevel = LogLevel . Debug )     45
+	0,911  [HC=1,00;  HNC=0,67;  I=0,77;  S=1,00;  NN=0,94;  NA=0,00] 
+public static void Log ( FunctionId functionId , Func < string > messageGetter , LogLevel logLevel = LogLevel . Debug )     65
+	0,897  [HC=1,00;  HNC=0,60;  I=0,74;  S=1,00;  NN=0,94;  NA=0,00] 
+public static IDisposable LogBlock ( FunctionId functionId , string ? message , CancellationToken token , LogLevel logLevel = LogLevel . Trace )     207
+	0,461  [HC=0,50;  HNC=0,39;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public static IDisposable LogBlock ( FunctionId functionId , Func < string > messageGetter , CancellationToken token , LogLevel logLevel = LogLevel . Trace )     227
+	0,457  [HC=0,50;  HNC=0,36;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private static RuntimeMetadataReferenceResolver CreateMetadataReferenceResolver ( IMetadataService metadataService , InteractiveHostPlatformInfo platformInfo , ImmutableArray < string > searchPaths , string baseDirectory )     247
+*
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,551  [HC=0,19;  H=0,55;  I=1,00;  S=0,86] #
+public bool CanExecuteCode ( string text )     174
+	0,513  [HC=0,23;  H=0,19;  I=1,00;  S=0,86] #
+private IInteractiveWindow GetInteractiveWindow ( )     144
+	0,511  [HC=0,23;  H=0,17;  I=1,00;  S=0,86] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,508  [HC=0,19;  H=0,25;  I=1,00;  S=0,86] #
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,502  [HC=0,13;  H=0,40;  I=1,00;  S=0,86] #
+async Task < ExecutionResult > IInteractiveEvaluator . InitializeAsync ( )     184
+	0,497  [HC=0,19;  H=0,19;  I=1,00;  S=0,86] #
+private IInteractiveWindowCommands GetInteractiveCommands ( )     147
+	0,496  [HC=0,19;  H=0,17;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private void ProcessInitialized ( InteractiveHostPlatformInfo platformInfo , InteractiveHostOptions options , RemoteExecutionResult result )     103
+	0,213  [HC=0,00;  HNC=0,28;  I=0,38;  S=0,77;  NN=0,00;  NA=0,00] #
+async Task < ExecutionResult > IInteractiveEvaluator . ResetAsync ( bool initialize )     199
+	0,193  [HC=0,10;  HNC=0,03;  I=0,32;  S=0,77;  NN=0,00;  NA=0,00] #
+private void CaptureClassificationSpans ( )     159
+	0,177  [HC=0,00;  HNC=0,07;  I=0,50;  S=0,77;  NN=0,00;  NA=0,00] #
+public async Task < ExecutionResult > ExecuteCodeAsync ( string text )     221
+	0,165  [HC=0,00;  HNC=0,06;  I=0,42;  S=0,77;  NN=0,00;  NA=0,00] #
+public Task SetPathsAsync ( ImmutableArray < string > referenceSearchPaths , ImmutableArray < string > sourceSearchPaths , string workingDirectory )     275
+	0,151  [HC=0,00;  HNC=0,22;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private void SubmissionBufferAdded ( object sender , SubmissionBufferAddedEventArgs args )     153
+	0,148  [HC=0,00;  HNC=0,08;  I=0,26;  S=0,77;  NN=0,00;  NA=0,00] #
+private IInteractiveWindow GetInteractiveWindow ( )     144
+	0,115  [HC=0,00;  HNC=0,07;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LocalReferenceResolver.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LocalReferenceResolver.cs
+*
+public static DirectoryInfo GetArtifactsDirectory ( )     122
+*
+public string GetCachedReferencePath ( MetadataReferenceInfo referenceInfo )     78
+	0,579  [HC=0,23;  H=0,37;  I=1,00;  S=1,00] 
+public IEnumerable < AssemblyInfo > GetCachedAssemblyInfos ( string fileName )     72
+	0,560  [HC=0,18;  H=0,37;  I=1,00;  S=1,00] 
+public bool TryGetCachedAssemblyInfo ( Guid mvid , [ NotNullWhen ( true ) ] out AssemblyInfo ? assemblyInfo )     76
+	0,527  [HC=0,17;  H=0,19;  I=1,00;  S=1,00] 
+public bool TryResolveReferences ( MetadataReferenceInfo metadataReferenceInfo , [ NotNullWhen ( true ) ] out MetadataReference ? metadataReference )     88
+	0,498  [HC=0,10;  H=0,20;  I=1,00;  S=1,00] 
+public bool TryGetAssemblyInfo ( MetadataReferenceInfo metadataReferenceInfo , [ NotNullWhen ( true ) ] out AssemblyInfo ? assemblyInfo )     115
+	0,498  [HC=0,10;  H=0,20;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public string GetCachedReferencePath ( MetadataReferenceInfo referenceInfo )     78
+	0,337  [HC=0,25;  HNC=0,09;  I=0,51;  S=1,00;  NN=0,25;  NA=0,00] 
+public IEnumerable < AssemblyInfo > GetCachedAssemblyInfos ( string fileName )     72
+	0,326  [HC=0,25;  HNC=0,16;  I=0,30;  S=1,00;  NN=0,25;  NA=0,00] 
+public bool TryGetAssemblyInfo ( MetadataReferenceInfo metadataReferenceInfo , [ NotNullWhen ( true ) ] out AssemblyInfo ? assemblyInfo )     115
+	0,313  [HC=0,25;  HNC=0,08;  I=0,35;  S=1,00;  NN=0,25;  NA=0,00] 
+public bool TryGetCachedAssemblyInfo ( Guid mvid , [ NotNullWhen ( true ) ] out AssemblyInfo ? assemblyInfo )     76
+	0,244  [HC=0,20;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,25;  NA=0,00] 
+public bool TryResolveReferences ( MetadataReferenceInfo metadataReferenceInfo , [ NotNullWhen ( true ) ] out MetadataReference ? metadataReference )     88
+	0,144  [HC=0,00;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,25;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Project.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Project.cs
+*
+internal TextDocumentState ? GetAdditionalDocumentState ( DocumentId documentId )     330
+*
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,655  [HC=0,42;  H=0,31;  I=1,00;  S=1,00] 
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,624  [HC=0,29;  H=0,49;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+internal async ValueTask < Document ? > GetDocumentAsync ( DocumentId documentId , bool includeSourceGenerated = false , CancellationToken cancellationToken = default )     247
+	0,441  [HC=0,50;  HNC=0,26;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal SourceGeneratedDocument GetOrCreateSourceGeneratedDocument ( SourceGeneratedDocumentState state )     294
+	0,309  [HC=0,17;  HNC=0,22;  I=0,36;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RecordKeywordRecommenderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RecordKeywordRecommenderTests.cs
+*
+public async Task TestInsideRecord ( )     200
+*
+public async Task TestInsideRecord1 ( )     200
+	0,973  [HC=0,94;  H=0,99;  I=1,00;  S=1,00] 
+public async Task TestInsideRecord2 ( )     210
+	0,973  [HC=0,94;  H=0,99;  I=1,00;  S=1,00] 
+public async Task TestInsideRecord3 ( )     221
+	0,973  [HC=0,94;  H=0,99;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+public async Task TestInsideRecord1 ( )     200
+	0,933  [HC=0,75;  HNC=1,00;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public async Task TestInsideRecord3 ( )     221
+	0,908  [HC=0,75;  HNC=1,00;  I=0,90;  S=1,00;  NN=1,00;  NA=0,00] 
+public async Task TestInsideRecord2 ( )     210
+	0,902  [HC=0,75;  HNC=1,00;  I=0,88;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void MethodDelete_WithParameters ( )     2440
+*
+public void MethodDelete_WithParameterAndAttribute ( )     5060
+	0,852  [HC=0,68;  H=0,94;  I=1,00;  S=1,00] 
+public void MethodWithExpressionBody_Update_LiftedParameter ( )     4882
+	0,736  [HC=0,42;  H=0,89;  I=1,00;  S=1,00] 
+public void PartialMethod_DeleteInsert_ImplementationPart ( )     6664
+	0,723  [HC=0,40;  H=0,88;  I=1,00;  S=1,00] 
+public void PartialMethod_DeleteImplementation ( )     6710
+	0,722  [HC=0,39;  H=0,87;  I=1,00;  S=1,00] 
+public void IndexerWithExpressionBody_Update_LiftedParameter_2 ( )     11580
+	0,718  [HC=0,38;  H=0,88;  I=1,00;  S=1,00] 
+public void IndexerWithExpressionBody_Update_LiftedParameter_3 ( )     11608
+	0,718  [HC=0,38;  H=0,88;  I=1,00;  S=1,00] 
+public void IndexerWithExpressionBody_Update_LiftedParameter_4 ( )     11636
+	0,718  [HC=0,38;  H=0,88;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,17;  S=0,50;  NN=1,96;  NA=0,00]
+public void MethodDelete_WithParameterAndAttribute ( )     5060
+	0,838  [HC=0,65;  HNC=1,00;  I=0,68;  S=1,00;  NN=1,00;  NA=0,00] 
+public void PartialMethod_DeleteBoth ( )     6730
+	0,452  [HC=0,38;  HNC=1,00;  I=0,64;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteInsertBoth ( )     6750
+	0,442  [HC=0,40;  HNC=1,00;  I=0,54;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteInsert_ImplementationPart ( )     6664
+	0,435  [HC=0,33;  HNC=1,00;  I=0,61;  S=1,00;  NN=0,00;  NA=0,00] 
+public void EventDelete ( )     12413
+	0,425  [HC=0,25;  HNC=1,00;  I=0,70;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMember_DeleteInsert_ConstructorWithInitializers ( )     4783
+	0,422  [HC=0,29;  HNC=1,00;  I=0,62;  S=1,00;  NN=0,00;  NA=0,00] 
+public void PartialMethod_DeleteInsert_DefinitionPart ( )     6643
+	0,421  [HC=0,33;  HNC=1,00;  I=0,53;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AddDebuggerDisplayTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AddDebuggerDisplayTests.cs
+*
+protected override CodeRefactoringProvider CreateCodeRefactoringProvider ( Workspace workspace , TestParameters parameters )     19
+*
+public async Task SupportsConstantInterpolatedStrings ( )     37
+	0,534  [HC=0,17;  H=0,22;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task SupportsConstantInterpolatedStrings ( )     37
+	0,131  [HC=0,00;  HNC=0,03;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectKey.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectKey.cs
+*
+public ProjectKey Rehydrate ( )     73
+*
+*
+
+**************************************************************
+

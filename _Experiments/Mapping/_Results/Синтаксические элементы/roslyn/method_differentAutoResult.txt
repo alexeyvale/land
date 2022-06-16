@@ -1,0 +1,134 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAutomaticLineEnderTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAutomaticLineEnderTests.cs
+*
+protected void Test ( string expected , string code , bool completionActive = false , bool assertNextHandlerInvoked = false )     30
+*
+protected void Test ( string expected , string markupCode , bool completionActive = false , bool assertNextHandlerInvoked = false )     30
+	0,995  [HC=1,00;  H=0,97;  I=1,00;  S=1,00] *
+private void Test ( string expected , string code , int position , bool completionActive = false , bool assertNextHandlerInvoked = false )     44
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,15;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+private void Test ( string expected , string code , int position , bool completionActive = false , bool assertNextHandlerInvoked = false )     44
+	0,944  [HC=1,00;  HNC=0,84;  I=0,93;  S=1,00;  NN=1,00;  NA=0,00] *
+protected void Test ( string expected , string markupCode , bool completionActive = false , bool assertNextHandlerInvoked = false )     30
+	0,813  [HC=1,00;  HNC=0,94;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Symbols.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Symbols.cs
+*
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag diagnostics , Location ? location = null )     2459
+*
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , BindingDiagnosticBag diagnostics , Location ? location = null )     2493
+	0,998  [HC=1,00;  H=0,98;  I=1,00;  S=1,00] *
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag ? diagnostics , Location ? location = null )     2498
+	0,993  [HC=1,00;  H=0,95;  I=1,00;  S=1,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , BindingDiagnosticBag diagnostics , Location location )     2503
+	0,967  [HC=1,00;  H=0,77;  I=1,00;  S=1,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag ? diagnostics , Location location )     2508
+	0,962  [HC=1,00;  H=0,74;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,600  [HC=0,21;  H=0,57;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxToken token )     1538
+	0,589  [HC=0,21;  H=0,50;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxNode node )     1533
+	0,589  [HC=0,21;  H=0,50;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=3,92;  I=2,00;  S=0,50;  NN=1,13;  NA=0,00]
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag ? diagnostics , Location ? location = null )     2498
+	0,994  [HC=1,00;  HNC=0,99;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] *
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , BindingDiagnosticBag diagnostics , Location ? location = null )     2493
+	0,931  [HC=1,00;  HNC=0,95;  I=0,72;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag ? diagnostics , Location location )     2508
+	0,843  [HC=1,00;  HNC=0,83;  I=0,46;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , BindingDiagnosticBag diagnostics , Location location )     2503
+	0,748  [HC=1,00;  HNC=0,78;  I=0,00;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,253  [HC=0,00;  HNC=0,62;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxNode node )     1533
+	0,217  [HC=0,00;  HNC=0,51;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+protected AssemblySymbol GetForwardedToAssembly ( string fullName , BindingDiagnosticBag diagnostics , Location location )     2394
+	0,233  [HC=0,00;  HNC=0,28;  I=0,00;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Binder_Symbols.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Binder_Symbols.cs
+*
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag diagnostics , Location location )     2464
+*
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , BindingDiagnosticBag diagnostics , Location location )     2503
+	0,997  [HC=1,00;  H=0,98;  I=1,00;  S=1,00] *
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag ? diagnostics , Location location )     2508
+	0,992  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] 
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag ? diagnostics , Location ? location = null )     2498
+	0,964  [HC=1,00;  H=0,75;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,612  [HC=0,21;  H=0,66;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxToken token )     1538
+	0,599  [HC=0,21;  H=0,57;  I=1,00;  S=1,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , SyntaxNode node )     1533
+	0,598  [HC=0,21;  H=0,56;  I=1,00;  S=1,00] 
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , BindingDiagnosticBag diagnostics , Location ? location = null )     2493
+	0,967  [HC=1,00;  H=0,77;  I=1,00;  S=1,00] #
+*
+HC=4;  HNC=3,91;  I=2,00;  S=0,50;  NN=1,13;  NA=0,00]
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , DiagnosticBag ? diagnostics , Location location )     2508
+	0,986  [HC=1,00;  HNC=0,99;  I=0,96;  S=1,00;  NN=0,96;  NA=0,00] *
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , BindingDiagnosticBag diagnostics , Location ? location = null )     2493
+	0,827  [HC=1,00;  HNC=0,80;  I=0,42;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxTree tree , MessageID feature , BindingDiagnosticBag diagnostics , Location location )     2503
+	0,804  [HC=1,00;  HNC=0,95;  I=0,00;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static bool ReportUseSite ( Symbol symbol , BindingDiagnosticBag diagnostics , Location location )     1549
+	0,262  [HC=0,00;  HNC=0,65;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool CheckFeatureAvailability ( SyntaxNode syntax , MessageID feature , DiagnosticBag ? diagnostics , Location ? location = null )     2498
+	0,843  [HC=1,00;  HNC=0,83;  I=0,45;  S=1,00;  NN=0,96;  NA=0,00] #
+protected AssemblySymbol GetForwardedToAssembly ( string fullName , BindingDiagnosticBag diagnostics , Location location )     2394
+	0,296  [HC=0,00;  HNC=0,31;  I=0,30;  S=1,00;  NN=0,96;  NA=0,00] #
+protected AssemblySymbol GetForwardedToAssembly ( string name , int arity , ref NamespaceOrTypeSymbol qualifierOpt , BindingDiagnosticBag diagnostics , Location location )     2442
+	0,265  [HC=0,00;  HNC=0,22;  I=0,31;  S=1,00;  NN=0,96;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\IDefinitionsAndReferencesFactory.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\IDefinitionsAndReferencesFactory.cs
+*
+private static async Task < DefinitionItem > ToDefinitionItemAsync ( this ISymbol definition , Solution solution , bool isPrimary , bool includeHiddenLocations , bool includeClassifiedSpans , FindReferencesSearchOptions options , CancellationToken cancellationToken )     86
+*
+private static Task < DefinitionItem > ToDefinitionItemAsync ( ISymbol definition , Solution solution , bool isPrimary , bool includeHiddenLocations , bool includeClassifiedSpans , FindReferencesSearchOptions options , CancellationToken cancellationToken )     95
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] *
+private static async Task < DefinitionItem > ToDefinitionItemAsync ( ISymbol definition , ImmutableArray < Location > locations , Solution solution , bool isPrimary , bool includeHiddenLocations , bool includeClassifiedSpans , FindReferencesSearchOptions options , CancellationToken cancellationToken )     101
+	0,972  [HC=1,00;  H=0,81;  I=1,00;  S=1,00] 
+public static Task < DefinitionItem > ToClassifiedDefinitionItemAsync ( this SymbolGroup group , Solution solution , bool isPrimary , bool includeHiddenLocations , FindReferencesSearchOptions options , CancellationToken cancellationToken )     87
+	0,831  [HC=0,68;  H=0,78;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+private static async Task < DefinitionItem > ToDefinitionItemAsync ( ISymbol definition , ImmutableArray < Location > locations , Solution solution , bool isPrimary , bool includeHiddenLocations , bool includeClassifiedSpans , FindReferencesSearchOptions options , CancellationToken cancellationToken )     101
+	0,984  [HC=1,00;  HNC=0,89;  I=0,98;  S=1,00;  NN=1,00;  NA=0,00] *
+private static Task < DefinitionItem > ToDefinitionItemAsync ( ISymbol definition , Solution solution , bool isPrimary , bool includeHiddenLocations , bool includeClassifiedSpans , FindReferencesSearchOptions options , CancellationToken cancellationToken )     95
+	0,780  [HC=1,00;  HNC=0,91;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public static Task < DefinitionItem > ToClassifiedDefinitionItemAsync ( this SymbolGroup group , Solution solution , bool isPrimary , bool includeHiddenLocations , FindReferencesSearchOptions options , CancellationToken cancellationToken )     87
+	0,675  [HC=0,80;  HNC=0,71;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SwitchExpressionArmBinder.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SwitchExpressionArmBinder.cs
+*
+internal override BoundSwitchExpressionArm BindSwitchExpressionArm ( SwitchExpressionArmSyntax node , DiagnosticBag diagnostics )     37
+*
+internal BoundSwitchExpressionArm BindSwitchExpressionArm ( SwitchExpressionArmSyntax node , BindingDiagnosticBag diagnostics )     29
+	0,982  [HC=1,00;  H=0,88;  I=1,00;  S=1,00] *
+internal override BoundSwitchExpressionArm BindSwitchExpressionArm ( SwitchExpressionArmSyntax node , TypeSymbol switchGoverningType , uint switchGoverningValEscape , BindingDiagnosticBag diagnostics )     36
+	0,947  [HC=1,00;  H=0,63;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,92;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+internal override BoundSwitchExpressionArm BindSwitchExpressionArm ( SwitchExpressionArmSyntax node , TypeSymbol switchGoverningType , uint switchGoverningValEscape , BindingDiagnosticBag diagnostics )     36
+	0,901  [HC=1,00;  HNC=0,62;  I=0,95;  S=1,00;  NN=0,00;  NA=0,00] *
+internal BoundSwitchExpressionArm BindSwitchExpressionArm ( SwitchExpressionArmSyntax node , BindingDiagnosticBag diagnostics )     29
+	0,800  [HC=1,00;  HNC=0,86;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

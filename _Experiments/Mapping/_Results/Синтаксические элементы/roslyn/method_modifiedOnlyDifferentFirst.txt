@@ -1,0 +1,450 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractEditAndContinueAnalyzer.cs
+*
+private void AnalyzeUpdatedActiveMethodBodies ( EditScript < SyntaxNode > topEditScript , int editOrdinal , Dictionary < SyntaxNode , EditKind > editMap , SourceText oldText , SourceText newText , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , [ Out ] ActiveStatement [ ] newActiveStatements , [ Out ] ImmutableArray < LinePositionSpan > [ ] newExceptionRegions , [ Out ] List < UpdatedMemberInfo > updatedMembers , [ Out ] List < RudeEditDiagnostic > diagnostics )     911
+*
+private void AnalyzeUnchangedMemberBodies ( ArrayBuilder < RudeEditDiagnostic > diagnostics , Match < SyntaxNode > topMatch , SourceText oldText , SourceText newText , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , [ In , Out ] ImmutableArray < ActiveStatement > . Builder newActiveStatements , [ In , Out ] ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions )     715
+	0,734  [HC=0,53;  H=0,54;  I=1,00;  S=1,00] 
+private void AnalyzeChangedMemberBody ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration , SyntaxNode oldBody , SyntaxNode ? newBody , SourceText oldText , SourceText newText , SemanticModel oldModel , SemanticModel newModel , ISymbol oldSymbol , ISymbol newSymbol , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , EditAndContinueCapabilities capabilities , [ Out ] ImmutableArray < ActiveStatement > . Builder newActiveStatements , [ Out ] ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions , [ Out ] ArrayBuilder < RudeEditDiagnostic > diagnostics , out Func < SyntaxNode , SyntaxNode ? > ? syntaxMap , CancellationToken cancellationToken )     903
+	0,686  [HC=0,44;  H=0,49;  I=1,00;  S=1,00] 
+protected virtual void GetUpdatedDeclarationBodies ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration , out SyntaxNode ? oldBody , out SyntaxNode ? newBody )     121
+	0,649  [HC=0,47;  H=0,14;  I=1,00;  S=1,00] 
+private async Task < ImmutableArray < SemanticEditInfo > > AnalyzeSemanticsAsync ( EditScript < SyntaxNode > editScript , IReadOnlyDictionary < SyntaxNode , EditKind > editMap , SourceText oldText , SourceText newText , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , IReadOnlyList < ( SyntaxNode OldNode , SyntaxNode NewNode ) > triviaEdits , Project oldProject , Document ? oldDocument , Document newDocument , ArrayBuilder < RudeEditDiagnostic > diagnostics , ImmutableArray < ActiveStatement > . Builder newActiveStatements , ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions , EditAndContinueCapabilities capabilities , CancellationToken cancellationToken )     2208
+	0,622  [HC=0,31;  H=0,42;  I=1,00;  S=1,00] 
+private static IEnumerable < ISymbol > GetRecordUpdatedSynthesizedMembers ( Compilation compilation , INamedTypeSymbol record )     2912
+	0,567  [HC=0,29;  H=0,09;  I=1,00;  S=1,00] 
+internal virtual void ReportDeclarationInsertDeleteRudeEdits ( ArrayBuilder < RudeEditDiagnostic > diagnostics , SyntaxNode oldNode , SyntaxNode newNode , ISymbol oldSymbol , ISymbol newSymbol )     674
+	0,563  [HC=0,26;  H=0,15;  I=1,00;  S=1,00] 
+internal abstract void ReportTypeDeclarationInsertDeleteRudeEdits ( ArrayBuilder < RudeEditDiagnostic > diagnostics , INamedTypeSymbol oldSymbol , INamedTypeSymbol newSymbol , SyntaxNode newDeclaration , CancellationToken cancellationToken )     368
+	0,562  [HC=0,26;  H=0,15;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=2,00;  S=1,00;  NN=2,00;  NA=0,00]
+private void AnalyzeChangedMemberBody ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration , SyntaxNode oldBody , SyntaxNode ? newBody , SourceText oldText , SourceText newText , SemanticModel oldModel , SemanticModel newModel , ISymbol oldSymbol , ISymbol newSymbol , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , EditAndContinueCapabilities capabilities , [ Out ] ImmutableArray < ActiveStatement > . Builder newActiveStatements , [ Out ] ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions , [ Out ] ArrayBuilder < RudeEditDiagnostic > diagnostics , out Func < SyntaxNode , SyntaxNode ? > ? syntaxMap , CancellationToken cancellationToken )     903
+	0,754  [HC=0,30;  HNC=0,58;  I=0,93;  S=1,00;  NN=1,00;  NA=0,00] *
+private void AnalyzeUnchangedMemberBodies ( ArrayBuilder < RudeEditDiagnostic > diagnostics , Match < SyntaxNode > topMatch , SourceText oldText , SourceText newText , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , [ In , Out ] ImmutableArray < ActiveStatement > . Builder newActiveStatements , [ In , Out ] ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions )     715
+	0,420  [HC=0,40;  HNC=0,64;  I=0,46;  S=1,00;  NN=0,00;  NA=0,00] 
+private Match < SyntaxNode > ComputeBodyMatch ( SyntaxNode oldBody , SyntaxNode newBody , ActiveNode [ ] activeNodes , ArrayBuilder < RudeEditDiagnostic > diagnostics , out bool oldHasStateMachineSuspensionPoint , out bool newHasStateMachineSuspensionPoint )     1355
+	0,262  [HC=0,00;  HNC=0,17;  I=0,46;  S=1,00;  NN=0,00;  NA=0,00] 
+protected virtual void GetUpdatedDeclarationBodies ( SyntaxNode oldDeclaration , SyntaxNode newDeclaration , out SyntaxNode ? oldBody , out SyntaxNode ? newBody )     121
+	0,259  [HC=0,40;  HNC=0,28;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private async Task < ImmutableArray < SemanticEditInfo > > AnalyzeSemanticsAsync ( EditScript < SyntaxNode > editScript , IReadOnlyDictionary < SyntaxNode , EditKind > editMap , SourceText oldText , SourceText newText , ImmutableArray < ActiveStatement > oldActiveStatements , ImmutableArray < TextSpan > newActiveStatementSpans , IReadOnlyList < ( SyntaxNode OldNode , SyntaxNode NewNode ) > triviaEdits , Project oldProject , Document ? oldDocument , Document newDocument , ArrayBuilder < RudeEditDiagnostic > diagnostics , ImmutableArray < ActiveStatement > . Builder newActiveStatements , ImmutableArray < ImmutableArray < LinePositionSpan > > . Builder newExceptionRegions , EditAndContinueCapabilities capabilities , CancellationToken cancellationToken )     2208
+	0,221  [HC=0,20;  HNC=0,37;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void ReportTopLevelSyntacticRudeEdits ( ArrayBuilder < RudeEditDiagnostic > diagnostics , EditScript < SyntaxNode > syntacticEdits , Dictionary < SyntaxNode , EditKind > editMap )     661
+	0,191  [HC=0,08;  HNC=0,36;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private void ReportTypeLayoutUpdateRudeEdits ( ArrayBuilder < RudeEditDiagnostic > diagnostics , ISymbol symbol , SyntaxNode syntax )     3012
+	0,186  [HC=0,08;  HNC=0,32;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractNavigateToTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractNavigateToTests.cs
+*
+public IWorkspaceService CreateService ( HostWorkspaceServices workspaceServices )     241
+*
+public IWorkspaceService CreateService ( HostWorkspaceServices workspaceServices )     228
+	0,897  [HC=1,00;  H=1,00;  I=1,00;  S=0,64] 
+public IWorkspaceService CreateService ( HostWorkspaceServices workspaceServices )     262
+	0,897  [HC=1,00;  H=1,00;  I=1,00;  S=0,64] 
+private protected TestWorkspace CreateWorkspace ( XElement workspaceElement , TestHost testHost , TestComposition composition )     99
+	0,629  [HC=0,60;  H=0,27;  I=1,00;  S=0,67] 
+private protected TestWorkspace CreateWorkspace ( string content , TestHost testHost , TestComposition composition )     111
+	0,627  [HC=0,60;  H=0,26;  I=1,00;  S=0,67] 
+private async Task TestAsync ( string content , Func < TestWorkspace , Task > body , TestHost testHost , TestComposition composition )     91
+	0,453  [HC=0,23;  H=0,15;  I=1,00;  S=0,67] #
+protected async Task TestAsync ( TestHost testHost , Composition composition , string content , Func < TestWorkspace , Task > body )     78
+	0,453  [HC=0,23;  H=0,14;  I=1,00;  S=0,67] #
+*
+HC=4;  HNC=1,00;  I=0,43;  S=0,92;  NN=2,00;  NA=0,00]
+public IWorkspaceService CreateService ( HostWorkspaceServices workspaceServices )     262
+	0,923  [HC=1,00;  HNC=1,00;  I=0,40;  S=0,58;  NN=1,00;  NA=0,00] *
+public IWorkspaceService CreateService ( HostWorkspaceServices workspaceServices )     228
+	0,685  [HC=1,00;  HNC=1,00;  I=0,43;  S=0,58;  NN=0,00;  NA=0,00] 
+private protected TestWorkspace CreateWorkspace ( string content , TestHost testHost , TestComposition composition )     111
+	0,331  [HC=0,50;  HNC=0,15;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+private protected TestWorkspace CreateWorkspace ( XElement workspaceElement , TestHost testHost , TestComposition composition )     99
+	0,329  [HC=0,50;  HNC=0,14;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+protected async Task TestAsync ( TestHost testHost , Composition composition , string content , Func < TestWorkspace , Task > body )     78
+	0,085  [HC=0,00;  HNC=0,10;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+private async Task TestAsync ( string content , Func < TestWorkspace , Task > body , TestHost testHost , TestComposition composition )     91
+	0,082  [HC=0,00;  HNC=0,08;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractRecommendationServiceRunner.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractRecommendationServiceRunner.cs
+*
+public abstract ImmutableArray < ISymbol > GetSymbols ( )     40
+*
+protected ImmutableArray < ISymbol > GetMemberSymbols ( ISymbol container , int position , bool excludeInstance , bool useBaseReferenceAccessibility )     298
+	0,740  [HC=0,63;  H=0,31;  I=1,00;  S=1,00] 
+public abstract RecommendedSymbols GetRecommendedSymbols ( )     40
+	0,709  [HC=0,48;  H=0,53;  I=1,00;  S=1,00] 
+private ImmutableArray < ISymbol > GetMemberSymbolsForParameter ( IParameterSymbol parameter , int position , bool useBaseReferenceAccessibility )     47
+	0,631  [HC=0,36;  H=0,34;  I=1,00;  S=1,00] 
+private ImmutableArray < ISymbol > TryGetMemberSymbolsForLambdaParameter ( IParameterSymbol parameter , int position )     55
+	0,604  [HC=0,27;  H=0,42;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,61;  I=0,04;  S=0,50;  NN=2,00;  NA=0,00]
+public abstract RecommendedSymbols GetRecommendedSymbols ( )     40
+	0,850  [HC=0,67;  HNC=0,84;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+protected ImmutableArray < ISymbol > GetMemberSymbols ( ISymbol container , int position , bool excludeInstance , bool useBaseReferenceAccessibility )     298
+	0,353  [HC=0,67;  HNC=0,21;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private ImmutableArray < ISymbol > GetMemberSymbolsForParameter ( IParameterSymbol parameter , int position , bool useBaseReferenceAccessibility )     47
+	0,267  [HC=0,40;  HNC=0,21;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private ImmutableArray < ISymbol > TryGetMemberSymbolsForLambdaParameter ( IParameterSymbol parameter , int position )     55
+	0,232  [HC=0,29;  HNC=0,22;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractRecommendationServiceRunner.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractRecommendationServiceRunner.cs
+*
+protected ImmutableArray < ISymbol > GetSymbols ( IParameterSymbol parameter , int position )     47
+*
+protected ImmutableArray < ISymbol > GetMemberSymbols ( ISymbol container , int position , bool excludeInstance , bool useBaseReferenceAccessibility )     298
+	0,781  [HC=0,63;  H=0,59;  I=1,00;  S=1,00] 
+private ImmutableArray < ISymbol > GetMemberSymbolsForParameter ( IParameterSymbol parameter , int position , bool useBaseReferenceAccessibility )     47
+	0,687  [HC=0,36;  H=0,74;  I=1,00;  S=1,00] 
+private ImmutableArray < ISymbol > TryGetMemberSymbolsForLambdaParameter ( IParameterSymbol parameter , int position )     55
+	0,673  [HC=0,27;  H=0,90;  I=1,00;  S=1,00] 
+public abstract RecommendedSymbols GetRecommendedSymbols ( )     40
+	0,668  [HC=0,48;  H=0,25;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=2,93;  I=1,93;  S=0,50;  NN=2,00;  NA=0,00]
+private ImmutableArray < ISymbol > TryGetMemberSymbolsForLambdaParameter ( IParameterSymbol parameter , int position )     55
+	0,802  [HC=0,29;  HNC=0,93;  I=0,89;  S=1,00;  NN=1,00;  NA=0,00] *
+private ImmutableArray < ISymbol > GetMemberSymbolsForParameter ( IParameterSymbol parameter , int position , bool useBaseReferenceAccessibility )     47
+	0,543  [HC=0,40;  HNC=0,61;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+protected ImmutableArray < ISymbol > GetMemberSymbols ( ISymbol container , int position , bool excludeInstance , bool useBaseReferenceAccessibility )     298
+	0,340  [HC=0,67;  HNC=0,46;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public abstract RecommendedSymbols GetRecommendedSymbols ( )     40
+	0,215  [HC=0,67;  HNC=0,06;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BackgroundCompiler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BackgroundCompiler.cs
+*
+private Task BuildCompilationsAsync ( Solution solution , ProjectId initialProject , ISet < ProjectId > projectsToBuild , CancellationToken cancellationToken )     139
+*
+private Task BuildCompilationsAsync ( Solution solution , ProjectId initialProject , ISet < ProjectId > allOpenProjects , ProjectId activeProject )     130
+	0,981  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+private Task BuildCompilationsAsync ( Solution solution , ProjectId initialProject , ISet < ProjectId > projectsToBuild , ProjectId activeProject , CancellationToken cancellationToken )     143
+	0,981  [HC=1,00;  H=0,86;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,98;  I=1,98;  S=0,50;  NN=0,00;  NA=0,00]
+private Task BuildCompilationsAsync ( Solution solution , ProjectId initialProject , ISet < ProjectId > projectsToBuild , ProjectId activeProject , CancellationToken cancellationToken )     143
+	0,944  [HC=1,00;  HNC=0,87;  I=0,90;  S=1,00;  NN=0,86;  NA=0,00] *
+private Task BuildCompilationsAsync ( Solution solution , ProjectId initialProject , ISet < ProjectId > allOpenProjects , ProjectId activeProject )     130
+	0,792  [HC=1,00;  HNC=0,72;  I=0,39;  S=1,00;  NN=0,86;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CSharpRecommendationServiceRunner.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CSharpRecommendationServiceRunner.cs
+*
+public override ImmutableArray < ISymbol > GetSymbols ( )     31
+*
+private ImmutableArray < ISymbol > GetUnnamedSymbols ( ExpressionSyntax originalExpression )     507
+	0,727  [HC=0,59;  H=0,57;  I=1,00;  S=0,88] 
+public override RecommendedSymbols GetRecommendedSymbols ( )     30
+	0,673  [HC=0,48;  H=0,53;  I=1,00;  S=0,88] 
+private ImmutableArray < ISymbol > GetSymbolsForLabelContext ( )     183
+	0,668  [HC=0,40;  H=0,73;  I=1,00;  S=0,88] #
+private ImmutableArray < ISymbol > GetSymbolsForCurrentContext ( )     65
+	0,655  [HC=0,37;  H=0,72;  I=1,00;  S=0,88] #
+private RecommendedSymbols GetSymbolsOffOfName ( NameSyntax name )     250
+	0,646  [HC=0,53;  H=0,20;  I=1,00;  S=0,88] #
+private RecommendedSymbols GetSymbolsOffOffAlias ( IdentifierNameSyntax alias )     172
+	0,625  [HC=0,48;  H=0,19;  I=1,00;  S=0,88] #
+private RecommendedSymbols GetSymbolsOffOfContainer ( )     106
+	0,617  [HC=0,42;  H=0,32;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=1,61;  I=1,47;  S=0,50;  NN=2,00;  NA=0,00]
+public override RecommendedSymbols GetRecommendedSymbols ( )     30
+	0,835  [HC=0,67;  HNC=0,84;  I=0,79;  S=0,95;  NN=1,00;  NA=0,00] *
+private ImmutableArray < ISymbol > GetSymbolsForCurrentContext ( )     65
+	0,565  [HC=0,40;  HNC=0,87;  I=0,45;  S=0,95;  NN=0,00;  NA=0,00] #
+private ImmutableArray < ISymbol > GetSymbolsForLabelContext ( )     183
+	0,528  [HC=0,40;  HNC=0,87;  I=0,33;  S=0,95;  NN=0,00;  NA=0,00] #
+private ImmutableArray < ISymbol > GetSymbolsForTypeOrNamespaceContext ( )     194
+	0,512  [HC=0,29;  HNC=0,87;  I=0,43;  S=0,95;  NN=0,00;  NA=0,00] #
+private ImmutableArray < ISymbol > GetSymbolsForTypeArgumentOfConstraintClause ( )     157
+	0,451  [HC=0,25;  HNC=0,87;  I=0,27;  S=0,95;  NN=0,00;  NA=0,00] #
+private ImmutableArray < ISymbol > GetSymbolsForGlobalStatementContext ( )     126
+	0,405  [HC=0,33;  HNC=0,87;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+private RecommendedSymbols GetSymbolsOffOfContainer ( )     106
+	0,400  [HC=0,40;  HNC=0,71;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditAndContinueWorkspaceService.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditAndContinueWorkspaceService.cs
+*
+internal EditSession ? Test_GetEditSession ( )     79
+*
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,815  [HC=0,83;  H=0,21;  I=1,00;  S=1,00] 
+internal EditSession ? GetEditSession ( )     566
+	0,803  [HC=0,78;  H=0,96;  I=1,00;  S=0,67] 
+internal TestAccessor GetTestAccessor ( )     553
+	0,683  [HC=0,39;  H=0,62;  I=1,00;  S=1,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,677  [HC=0,53;  H=0,83;  I=1,00;  S=0,67] 
+public async ValueTask StartDebuggingSessionAsync ( Solution solution , IManagedEditAndContinueDebuggerService debuggerService , bool captureMatchingDocuments , CancellationToken cancellationToken )     82
+	0,614  [HC=0,38;  H=0,14;  I=1,00;  S=1,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,601  [HC=0,26;  H=0,42;  I=1,00;  S=1,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,520  [HC=0,11;  H=0,30;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=0,15;  S=1,00;  NN=0,00;  NA=0,00]
+internal EditSession ? GetEditSession ( )     566
+	0,870  [HC=0,75;  HNC=1,00;  I=0,36;  S=0,67;  NN=0,00;  NA=0,00] *
+internal TestAccessor GetTestAccessor ( )     553
+	0,658  [HC=0,25;  HNC=0,79;  I=0,40;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void RestartEditSession ( bool inBreakState , out ImmutableArray < DocumentId > documentsToReanalyze )     137
+	0,326  [HC=0,50;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static EditAndContinueCapabilities ParseCapabilities ( ImmutableArray < string > capabilities )     104
+	0,221  [HC=0,00;  HNC=0,15;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool SupportsEditAndContinue ( DocumentState documentState )     153
+	0,195  [HC=0,00;  HNC=0,10;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal void SetOutputProvider ( Func < Project , CompilationOutputs > value )     567
+	0,194  [HC=0,17;  HNC=0,10;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+internal DebuggingSession ? GetDebuggingSession ( )     565
+	0,746  [HC=0,50;  HNC=0,90;  I=0,48;  S=0,67;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableContextTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableContextTests.cs
+*
+public void AnalyzeMethodsInEnabledContextOnly_01 ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     498
+*
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,988  [HC=0,97;  H=1,00;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,988  [HC=0,97;  H=1,00;  I=1,00;  S=1,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,913  [HC=0,84;  H=0,88;  I=1,00;  S=1,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,833  [HC=0,88;  H=0,20;  I=1,00;  S=1,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data2 ( )     497
+	0,833  [HC=0,88;  H=0,20;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,806  [HC=0,58;  H=0,91;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_B ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2183
+	0,806  [HC=0,58;  H=0,91;  I=1,00;  S=1,00] 
+*
+HC=2,75;  HNC=1,00;  I=2,00;  S=0,50;  NN=1,51;  NA=0,00]
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,931  [HC=0,88;  HNC=0,87;  I=0,99;  S=1,00;  NN=0,98;  NA=0,00] *
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,693  [HC=0,88;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,98;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,693  [HC=0,88;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,98;  NA=0,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,540  [HC=0,78;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,98;  NA=0,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data2 ( )     497
+	0,540  [HC=0,78;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,98;  NA=0,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_Execute ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2191
+	0,522  [HC=0,60;  HNC=0,77;  I=0,57;  S=1,00;  NN=0,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,392  [HC=0,60;  HNC=0,89;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NullableContextTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NullableContextTests.cs
+*
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2142
+*
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,992  [HC=0,98;  H=1,00;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_B ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2183
+	0,992  [HC=0,98;  H=1,00;  I=1,00;  S=1,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_Execute ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2191
+	0,937  [HC=0,89;  H=0,88;  I=1,00;  S=1,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,818  [HC=0,64;  H=0,81;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,810  [HC=0,59;  H=0,91;  I=1,00;  S=1,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,810  [HC=0,59;  H=0,91;  I=1,00;  S=1,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,730  [HC=0,64;  H=0,20;  I=1,00;  S=1,00] 
+*
+HC=3;  HNC=1,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+private static void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_Execute ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2191
+	0,949  [HC=0,90;  HNC=0,87;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_A ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2175
+	0,729  [HC=0,90;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_SpeculativeSemanticModel_B ( NullableContextOptions ? projectContext , NullableDirectives sourceDirectives , NullableDirectives speculativeDirectives )     2183
+	0,729  [HC=0,90;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01A ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     518
+	0,399  [HC=0,67;  HNC=0,89;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public void AnalyzeMethodsInEnabledContextOnly_01B ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     526
+	0,399  [HC=0,67;  HNC=0,89;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public static IEnumerable < object [ ] > AnalyzeMethodsInEnabledContextOnly_01_Data1 ( )     477
+	0,389  [HC=0,67;  HNC=0,08;  I=0,36;  S=1,00;  NN=0,00;  NA=0,00] 
+private static void AnalyzeMethodsInEnabledContextOnly_01_Execute ( NullableContextOptions ? projectContext , NullableDirectives classDirectives , NullableDirectives methodDirectives )     534
+	0,518  [HC=0,67;  HNC=0,77;  I=0,57;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\RemoveUnnecessaryCastTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\RemoveUnnecessaryCastTests.cs
+*
+public async Task DoNotCrashWhenTypeCantBeDetermined ( )     1817
+*
+public async Task DoRemoveNativeIntCastsToInt ( )     8195
+	0,641  [HC=0,21;  H=0,87;  I=1,00;  S=1,00] 
+public async Task RemoveUnneededTargetTypedCast ( )     1784
+	0,614  [HC=0,15;  H=0,86;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,43;  S=0,50;  NN=2,00;  NA=0,00]
+public async Task RemoveUnneededTargetTypedCast ( )     1784
+	0,723  [HC=0,19;  HNC=1,00;  I=0,79;  S=1,00;  NN=1,00;  NA=0,00] *
+public async Task DoRemoveNativeIntCastsToInt ( )     8195
+	0,367  [HC=0,20;  HNC=1,00;  I=0,45;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\Symbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\Symbol.cs
+*
+internal virtual DiagnosticInfo GetUseSiteDiagnostic ( )     882
+*
+internal static bool ReportUseSiteDiagnostic ( DiagnosticInfo info , BindingDiagnosticBag diagnostics , Location location )     1030
+	0,824  [HC=0,83;  H=0,29;  I=1,00;  S=1,00] 
+internal virtual UseSiteInfo < AssemblySymbol > GetUseSiteInfo ( )     894
+	0,742  [HC=0,55;  H=0,55;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromType ( ref UseSiteInfo < AssemblySymbol > result , TypeSymbol type )     1038
+	0,612  [HC=0,36;  H=0,20;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromType ( ref UseSiteInfo < AssemblySymbol > result , TypeWithAnnotations type , AllowedRequiredModifierType allowedRequiredModifierType )     1069
+	0,607  [HC=0,36;  H=0,17;  I=1,00;  S=1,00] 
+internal bool MergeUseSiteInfo ( ref UseSiteInfo < AssemblySymbol > result , UseSiteInfo < AssemblySymbol > info )     983
+	0,604  [HC=0,35;  H=0,18;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromParameter ( ref UseSiteInfo < AssemblySymbol > result , ParameterSymbol param )     1075
+	0,600  [HC=0,33;  H=0,20;  I=1,00;  S=1,00] 
+internal bool DeriveUseSiteInfoFromCustomModifiers ( ref UseSiteInfo < AssemblySymbol > result , ImmutableArray < CustomModifier > customModifiers , AllowedRequiredModifierType allowedRequiredModifierType )     1108
+	0,591  [HC=0,33;  H=0,14;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=1,58;  I=0,24;  S=0,50;  NN=1,63;  NA=0,00]
+internal virtual UseSiteInfo < AssemblySymbol > GetUseSiteInfo ( )     894
+	0,855  [HC=0,75;  HNC=0,84;  I=0,69;  S=1,00;  NN=0,98;  NA=0,00] *
+private UseSiteInfo < AssemblySymbol > GetSymbolSpecificUnsupportedMetadataUseSiteErrorInfo ( )     1062
+	0,383  [HC=0,33;  HNC=0,71;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal static bool ReportUseSiteDiagnostic ( DiagnosticInfo info , BindingDiagnosticBag diagnostics , Location location )     1030
+	0,358  [HC=0,75;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal bool MergeUseSiteInfo ( ref UseSiteInfo < AssemblySymbol > result , UseSiteInfo < AssemblySymbol > info )     983
+	0,272  [HC=0,50;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal bool DeriveUseSiteInfoFromType ( ref UseSiteInfo < AssemblySymbol > result , TypeSymbol type )     1038
+	0,217  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal bool DeriveUseSiteInfoFromParameter ( ref UseSiteInfo < AssemblySymbol > result , ParameterSymbol param )     1075
+	0,217  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal bool DeriveUseSiteInfoFromParameters ( ref UseSiteInfo < AssemblySymbol > result , ImmutableArray < ParameterSymbol > parameters )     1084
+	0,217  [HC=0,33;  HNC=0,08;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TaggedText.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TaggedText.cs
+*
+public static ImmutableArray < TaggedText > ToTaggedText ( this IEnumerable < SymbolDisplayPart > displayParts , TaggedTextStyle style )     93
+*
+public static ImmutableArray < TaggedText > ToTaggedText ( this IEnumerable < SymbolDisplayPart > displayParts , Func < ISymbol , string > getNavigationHint = null )     90
+	0,951  [HC=1,00;  H=0,66;  I=1,00;  S=1,00] 
+public static ImmutableArray < TaggedText > ToTaggedText ( this IEnumerable < SymbolDisplayPart > displayParts , TaggedTextStyle style , Func < ISymbol , string > getNavigationHint = null )     93
+	0,949  [HC=1,00;  H=0,64;  I=1,00;  S=1,00] 
+private static string GetNavigationHint ( ISymbol symbol )     120
+	0,536  [HC=0,18;  H=0,22;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,55;  S=0,50;  NN=1,44;  NA=0,00]
+public static ImmutableArray < TaggedText > ToTaggedText ( this IEnumerable < SymbolDisplayPart > displayParts , TaggedTextStyle style , Func < ISymbol , string > getNavigationHint = null )     93
+	0,929  [HC=1,00;  HNC=0,73;  I=0,81;  S=1,00;  NN=0,97;  NA=0,00] *
+private static string GetNavigationHint ( ISymbol symbol )     120
+	0,246  [HC=0,00;  HNC=0,18;  I=0,00;  S=1,00;  NN=0,97;  NA=0,00] 
+public static ImmutableArray < TaggedText > ToTaggedText ( this IEnumerable < SymbolDisplayPart > displayParts , Func < ISymbol , string > getNavigationHint = null )     90
+	0,776  [HC=1,00;  HNC=0,69;  I=0,00;  S=1,00;  NN=0,97;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\TopLevelEditingTests.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\TopLevelEditingTests.cs
+*
+public void Interface_AddMembersWithImplementation ( )     868
+*
+public void PartialMethod_DeleteImplementation ( )     6710
+	0,765  [HC=0,49;  H=0,89;  I=1,00;  S=1,00] 
+public void PartialMethod_DeleteInsert_ImplementationPart ( )     6664
+	0,745  [HC=0,44;  H=0,89;  I=1,00;  S=1,00] 
+public void Interface_InsertDelete ( )     1298
+	0,729  [HC=0,41;  H=0,88;  I=1,00;  S=1,00] 
+public void Interface_InsertMembers ( )     1207
+	0,716  [HC=0,38;  H=0,88;  I=1,00;  S=1,00] 
+public void Record_AddField_WithInitializer ( )     2117
+	0,679  [HC=0,30;  H=0,86;  I=1,00;  S=1,00] 
+public void Indexer_InitUpdate ( )     11518
+	0,678  [HC=0,30;  H=0,85;  I=1,00;  S=1,00] 
+public void InstanceCtor_Partial_InsertInternalDeleteInternal_WithBody ( )     7695
+	0,675  [HC=0,29;  H=0,86;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+public void Interface_InsertMembers ( )     1207
+	0,838  [HC=0,40;  HNC=1,00;  I=0,99;  S=1,00;  NN=1,00;  NA=0,00] *
+public void Record_AddField_WithInitializer ( )     2117
+	0,573  [HC=0,40;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Record_AddField_WithExplicitMembers ( )     2085
+	0,556  [HC=0,33;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Record_AddField_WithExistingInitializer ( )     2137
+	0,556  [HC=0,33;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Record_AddProperty_NotPrimary_WithConstructor ( )     1950
+	0,543  [HC=0,29;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Record_AddProperty_NotPrimary_WithInitializer ( )     2042
+	0,543  [HC=0,29;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public void Record_AddProperty_NotPrimary_WithExplicitMembers ( )     1983
+	0,533  [HC=0,25;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\VisualStudioProjectFactory.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\VisualStudioProjectFactory.cs
+*
+public VisualStudioProject CreateAndAddToWorkspace ( string projectSystemName , string language , VisualStudioProjectCreationInfo creationInfo )     46
+*
+public Task < VisualStudioProject > CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , CancellationToken cancellationToken )     54
+	0,883  [HC=0,82;  H=0,71;  I=1,00;  S=1,00] 
+public async Task < VisualStudioProject > CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , VisualStudioProjectCreationInfo creationInfo , CancellationToken cancellationToken )     57
+	0,872  [HC=0,82;  H=0,64;  I=1,00;  S=1,00] 
+async ValueTask < VSTypeScriptVisualStudioProjectWrapper > IVsTypeScriptVisualStudioProjectFactory . CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , string projectFilePath , IVsHierarchy hierarchy , Guid projectGuid , CancellationToken cancellationToken )     156
+	0,627  [HC=0,34;  H=0,38;  I=1,00;  S=1,00] 
+*
+HC=2,33333333333333;  HNC=1,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+public async Task < VisualStudioProject > CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , VisualStudioProjectCreationInfo creationInfo , CancellationToken cancellationToken )     57
+	0,869  [HC=0,83;  HNC=0,72;  I=0,95;  S=1,00;  NN=0,50;  NA=0,00] *
+public Task < VisualStudioProject > CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , CancellationToken cancellationToken )     54
+	0,527  [HC=0,83;  HNC=0,63;  I=0,00;  S=1,00;  NN=0,50;  NA=0,00] 
+async ValueTask < VSTypeScriptVisualStudioProjectWrapper > IVsTypeScriptVisualStudioProjectFactory . CreateAndAddToWorkspaceAsync ( string projectSystemName , string language , string projectFilePath , IVsHierarchy hierarchy , Guid projectGuid , CancellationToken cancellationToken )     156
+	0,287  [HC=0,35;  HNC=0,35;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\WithReferencesFindUsagesContext.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\WithReferencesFindUsagesContext.cs
+*
+private async Task CreateMissingReferenceEntriesIfNecessaryAsync ( bool whenGroupingByDefinition )     179
+*
+private async Task CreateMissingReferenceEntriesIfNecessaryAsync ( CancellationToken cancellationToken )     187
+	0,969  [HC=1,00;  H=0,78;  I=1,00;  S=1,00] 
+private async Task CreateMissingReferenceEntriesIfNecessaryAsync ( bool whenGroupingByDefinition , CancellationToken cancellationToken )     193
+	0,961  [HC=1,00;  H=0,73;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,72;  S=0,50;  NN=0,00;  NA=0,00]
+private async Task CreateMissingReferenceEntriesIfNecessaryAsync ( bool whenGroupingByDefinition , CancellationToken cancellationToken )     193
+	0,912  [HC=1,00;  HNC=0,71;  I=0,64;  S=1,00;  NN=0,80;  NA=0,00] *
+private async Task CreateMissingReferenceEntriesIfNecessaryAsync ( CancellationToken cancellationToken )     187
+	0,847  [HC=1,00;  HNC=0,36;  I=0,57;  S=1,00;  NN=0,80;  NA=0,00] #
+
+**************************************************************
+

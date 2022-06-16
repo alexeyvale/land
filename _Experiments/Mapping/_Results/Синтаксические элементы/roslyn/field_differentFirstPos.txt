@@ -1,0 +1,772 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.cs
+*
+private readonly IForegroundNotificationService _notificationService     30
+*
+public readonly NormalizedSnapshotSpanCollection Removed     216
+	0,430  [HC=0,11;  H=0,36;  I=1,00;  S=0,67] 
+public readonly NormalizedSnapshotSpanCollection Added     215
+	0,405  [HC=0,05;  H=0,35;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+public readonly NormalizedSnapshotSpanCollection Added     215
+	0,152  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,67;  NN=0,00;  NA=0,00] 
+public readonly NormalizedSnapshotSpanCollection Removed     216
+	0,152  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource.cs
+*
+private readonly AsynchronousSerialWorkQueue _workQueue     38
+*
+private Task _eventWorkQueue     66
+	0,735  [HC=0,57;  H=0,43;  I=1,00;  S=1,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,607  [HC=0,28;  H=0,41;  I=1,00;  S=1,00] 
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,606  [HC=0,21;  H=0,61;  I=1,00;  S=1,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,598  [HC=0,26;  H=0,41;  I=1,00;  S=1,00] 
+private bool _firstTagsRequest     109
+	0,591  [HC=0,25;  H=0,39;  I=1,00;  S=1,00] 
+private readonly CancellationSeries _cancellationSeries     72
+	0,561  [HC=0,11;  H=0,60;  I=1,00;  S=1,00] 
+private const int CoalesceDifferenceCount     50
+	0,554  [HC=0,17;  H=0,35;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=2,00;  NA=0,00]
+private const int CoalesceDifferenceCount     50
+	0,491  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+private Task _eventWorkQueue     66
+	0,339  [HC=0,58;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,263  [HC=0,20;  HNC=0,55;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,263  [HC=0,20;  HNC=0,55;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationSeries _cancellationSeries     72
+	0,182  [HC=0,00;  HNC=0,50;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,164  [HC=0,00;  HNC=0,40;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+private bool _firstTagsRequest     109
+	0,127  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource.cs
+*
+private readonly IEqualityComparer < ITagSpan < TTag > > _tagSpanComparer     42
+*
+private readonly CancellationSeries _cancellationSeries     72
+	0,584  [HC=0,28;  H=0,25;  I=1,00;  S=1,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,568  [HC=0,17;  H=0,45;  I=1,00;  S=1,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,562  [HC=0,16;  H=0,45;  I=1,00;  S=1,00] 
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,530  [HC=0,16;  H=0,24;  I=1,00;  S=1,00] 
+private const int CoalesceDifferenceCount     50
+	0,505  [HC=0,13;  H=0,14;  I=1,00;  S=1,00] 
+private Task _eventWorkQueue     66
+	0,477  [HC=0,07;  H=0,14;  I=1,00;  S=1,00] 
+private bool _firstTagsRequest     109
+	0,476  [HC=0,06;  H=0,14;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,318  [HC=0,10;  HNC=0,41;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,318  [HC=0,10;  HNC=0,41;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationSeries _cancellationSeries     72
+	0,257  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private Task _eventWorkQueue     66
+	0,210  [HC=0,00;  HNC=0,24;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private const int CoalesceDifferenceCount     50
+	0,200  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,257  [HC=0,00;  HNC=0,40;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+private bool _firstTagsRequest     109
+	0,200  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractAsynchronousTaggerProvider.TagSource.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractAsynchronousTaggerProvider.TagSource.cs
+*
+private ImmutableDictionary < ITextBuffer , TagSpanIntervalTree < TTag > > _previousCachedTagTrees     70
+*
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,561  [HC=0,20;  H=0,33;  I=1,00;  S=1,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,550  [HC=0,17;  H=0,33;  I=1,00;  S=1,00] 
+private bool _firstTagsRequest     109
+	0,544  [HC=0,23;  H=0,12;  I=1,00;  S=1,00] 
+private readonly CancellationSeries _cancellationSeries     72
+	0,528  [HC=0,18;  H=0,15;  I=1,00;  S=1,00] 
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,528  [HC=0,18;  H=0,15;  I=1,00;  S=1,00] 
+private Task _eventWorkQueue     66
+	0,506  [HC=0,14;  H=0,13;  I=1,00;  S=1,00] 
+private const int CoalesceDifferenceCount     50
+	0,465  [HC=0,04;  H=0,13;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _highPriTagsChangedQueue     77
+	0,301  [HC=0,15;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly AsyncBatchingWorkQueue < NormalizedSnapshotSpanCollection > _normalPriTagsChangedQueue     82
+	0,301  [HC=0,15;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationSeries _cancellationSeries     72
+	0,271  [HC=0,13;  HNC=0,20;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private Task _eventWorkQueue     66
+	0,224  [HC=0,00;  HNC=0,28;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private const int CoalesceDifferenceCount     50
+	0,200  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private bool _firstTagsRequest     109
+	0,321  [HC=0,19;  HNC=0,25;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+private readonly CancellationTokenSource _disposalTokenSource     61
+	0,200  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractEditAndContinueAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractEditAndContinueAnalyzer.cs
+*
+public readonly IReadOnlyDictionary < SyntaxNode , LambdaInfo > ? ActiveOrMatchedLambdas     874
+*
+private static readonly SymbolDisplayFormat s_fullyQualifiedMemberDisplayFormat     50
+	0,410  [HC=0,15;  H=0,10;  I=1,00;  S=0,67] 
+private static readonly SymbolDisplayFormat s_unqualifiedMemberDisplayFormat     34
+	0,402  [HC=0,13;  H=0,09;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private static readonly SymbolDisplayFormat s_unqualifiedMemberDisplayFormat     34
+	0,143  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+private static readonly SymbolDisplayFormat s_fullyQualifiedMemberDisplayFormat     50
+	0,143  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BuildProtocol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BuildProtocol.cs
+*
+public readonly uint ProtocolVersion     48
+*
+public readonly Guid RequestId     56
+	0,571  [HC=0,13;  H=0,60;  I=1,00;  S=1,00] 
+private const int MaximumRequestSize     54
+	0,521  [HC=0,11;  H=0,31;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=2,00;  NA=0,00]
+private const int MaximumRequestSize     54
+	0,536  [HC=0,00;  HNC=0,45;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public readonly Guid RequestId     56
+	0,527  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSession.cs
+*
+private readonly CancellationTokenSource _cancellationSource     25
+*
+internal readonly bool InBreakState     46
+	0,570  [HC=0,22;  H=0,32;  I=1,00;  S=1,00] 
+private readonly EditSession _instance     1136
+	0,540  [HC=0,28;  H=0,61;  I=1,00;  S=0,67] 
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,523  [HC=0,11;  H=0,32;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,06;  S=1,00;  NN=0,00;  NA=0,00]
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,296  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal readonly bool InBreakState     46
+	0,296  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly EditSession _instance     1136
+	0,263  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSession.cs
+*
+internal readonly IManagedEditAndContinueDebuggerService DebuggerService     29
+*
+internal readonly bool InBreakState     46
+	0,563  [HC=0,13;  H=0,54;  I=1,00;  S=1,00] 
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,544  [HC=0,07;  H=0,61;  I=1,00;  S=1,00] 
+private readonly EditSession _instance     1136
+	0,438  [HC=0,13;  H=0,33;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00]
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,393  [HC=0,00;  HNC=0,57;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal readonly bool InBreakState     46
+	0,350  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly EditSession _instance     1136
+	0,238  [HC=0,00;  HNC=0,29;  I=1,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\EditSession.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\EditSession.cs
+*
+private bool _changesApplied     61
+*
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,536  [HC=0,21;  H=0,11;  I=1,00;  S=1,00] 
+internal readonly bool InBreakState     46
+	0,530  [HC=0,14;  H=0,28;  I=1,00;  S=1,00] 
+private readonly EditSession _instance     1136
+	0,479  [HC=0,21;  H=0,38;  I=1,00;  S=0,67] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=1,00;  NN=2,00;  NA=0,00]
+private readonly EditSession _instance     1136
+	0,478  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,67;  NN=1,00;  NA=0,00] 
+internal readonly bool InBreakState     46
+	0,267  [HC=0,00;  HNC=0,60;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal readonly EditAndContinueDocumentAnalysesCache Analyses     44
+	0,167  [HC=0,00;  HNC=0,00;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private readonly string _responseFileName     43
+*
+private readonly InteractiveSession _session     43
+	0,584  [HC=0,25;  H=0,62;  I=1,00;  S=0,86] 
+private readonly InteractiveEvaluatorLanguageInfoProvider _languageInfo     36
+	0,525  [HC=0,13;  H=0,58;  I=1,00;  S=0,86] 
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,559  [HC=0,20;  H=0,59;  I=1,00;  S=0,86] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,555  [HC=0,19;  H=0,60;  I=1,00;  S=0,86] #
+private IInteractiveWindowCommands ? _lazyInteractiveCommands     46
+	0,534  [HC=0,22;  H=0,36;  I=1,00;  S=0,86] #
+private readonly IThreadingContext _threadingContext     38
+	0,529  [HC=0,13;  H=0,60;  I=1,00;  S=0,86] #
+private const string CommandPrefix     34
+	0,527  [HC=0,13;  H=0,59;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly InteractiveEvaluatorLanguageInfoProvider _languageInfo     36
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,89;  NA=0,00] 
+private const string CommandPrefix     34
+	0,339  [HC=0,00;  HNC=0,80;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly ImmutableArray < IInteractiveWindowCommand > _commands     41
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly List < ITextBuffer > _submittedBuffers     55
+	0,225  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IThreadingContext _threadingContext     38
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private readonly string _hostDirectory     47
+*
+private readonly InteractiveSession _session     43
+	0,576  [HC=0,23;  H=0,61;  I=1,00;  S=0,86] 
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,652  [HC=0,40;  H=0,64;  I=1,00;  S=0,86] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,605  [HC=0,30;  H=0,61;  I=1,00;  S=0,86] #
+private readonly IThreadingContext _threadingContext     38
+	0,558  [HC=0,19;  H=0,62;  I=1,00;  S=0,86] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,540  [HC=0,15;  H=0,59;  I=1,00;  S=0,86] #
+private IInteractiveWindowCommands ? _lazyInteractiveCommands     46
+	0,514  [HC=0,17;  H=0,35;  I=1,00;  S=0,86] #
+private const string CommandPrefix     34
+	0,505  [HC=0,08;  H=0,58;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly InteractiveEvaluatorLanguageInfoProvider _languageInfo     36
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,89;  NA=0,00] 
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,383  [HC=0,28;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private const string CommandPrefix     34
+	0,339  [HC=0,00;  HNC=0,80;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly ImmutableArray < IInteractiveWindowCommand > _commands     41
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly List < ITextBuffer > _submittedBuffers     55
+	0,225  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IThreadingContext _threadingContext     38
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private readonly IContentType _contentType     50
+*
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,559  [HC=0,20;  H=0,59;  I=1,00;  S=0,86] #
+private readonly ImmutableArray < IInteractiveWindowCommand > _commands     41
+	0,557  [HC=0,27;  H=0,36;  I=1,00;  S=0,86] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,556  [HC=0,18;  H=0,62;  I=1,00;  S=0,86] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,537  [HC=0,15;  H=0,59;  I=1,00;  S=0,86] #
+private readonly IThreadingContext _threadingContext     38
+	0,527  [HC=0,13;  H=0,59;  I=1,00;  S=0,86] #
+private IInteractiveWindow ? _lazyInteractiveWindow     45
+	0,520  [HC=0,19;  H=0,35;  I=1,00;  S=0,86] #
+private readonly List < ITextBuffer > _submittedBuffers     55
+	0,518  [HC=0,19;  H=0,34;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly InteractiveEvaluatorLanguageInfoProvider _languageInfo     36
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] 
+private readonly IThreadingContext _threadingContext     38
+	0,282  [HC=0,00;  HNC=0,60;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly List < ITextBuffer > _submittedBuffers     55
+	0,265  [HC=0,00;  HNC=0,54;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,259  [HC=0,00;  HNC=0,52;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,259  [HC=0,00;  HNC=0,52;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly ImmutableArray < IInteractiveWindowCommand > _commands     41
+	0,252  [HC=0,00;  HNC=0,50;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\InteractiveEvaluator.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\InteractiveEvaluator.cs
+*
+private readonly CancellationTokenSource _shutdownCancellationSource     54
+*
+private readonly InteractiveEvaluatorLanguageInfoProvider _languageInfo     36
+	0,561  [HC=0,19;  H=0,62;  I=1,00;  S=0,86] 
+private readonly InteractiveSession _session     43
+	0,559  [HC=0,19;  H=0,61;  I=1,00;  S=0,86] 
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,577  [HC=0,23;  H=0,63;  I=1,00;  S=0,86] #
+private readonly IThreadingContext _threadingContext     38
+	0,559  [HC=0,19;  H=0,61;  I=1,00;  S=0,86] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,543  [HC=0,15;  H=0,61;  I=1,00;  S=0,86] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,524  [HC=0,12;  H=0,60;  I=1,00;  S=0,86] #
+private IInteractiveWindow ? _lazyInteractiveWindow     45
+	0,521  [HC=0,19;  H=0,35;  I=1,00;  S=0,86] #
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=2,00;  NA=0,00]
+private readonly InteractiveSession _session     43
+	0,507  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=1,00;  NA=0,00] 
+private readonly ImmutableArray < IInteractiveWindowCommand > _commands     41
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly List < ITextBuffer > _submittedBuffers     55
+	0,225  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IThreadingContext _threadingContext     38
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IViewClassifierAggregatorService _classifierAggregator     39
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly IInteractiveWindowCommandsFactory _commandsFactory     40
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+private readonly InteractiveWindowWorkspace _workspace     42
+	0,225  [HC=0,00;  HNC=0,40;  I=1,00;  S=0,77;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\LocalReferenceResolver.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\LocalReferenceResolver.cs
+*
+private readonly Dictionary < Guid , string > _cache     25
+*
+private readonly Dictionary < string , List < AssemblyInfo > > _nameMap     37
+	0,568  [HC=0,14;  H=0,55;  I=1,00;  S=1,00] 
+private readonly Dictionary < Guid , AssemblyInfo > _mvidMap     30
+	0,544  [HC=0,00;  H=0,81;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,29;  S=0,50;  NN=2,00;  NA=0,00]
+private readonly Dictionary < Guid , AssemblyInfo > _mvidMap     30
+	0,556  [HC=0,00;  HNC=0,72;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+private readonly Dictionary < string , List < AssemblyInfo > > _nameMap     37
+	0,541  [HC=0,00;  HNC=0,54;  I=0,31;  S=1,00;  NN=1,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PredefinedCodeFixProviderNames.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PredefinedCodeFixProviderNames.cs
+*
+public const string ConfigureCodeStyleOption     18
+*
+public const string InlineDeclaration     122
+	0,710  [HC=0,38;  H=0,84;  I=1,00;  S=1,00] 
+public const string ConflictMarkerResolution     132
+	0,710  [HC=0,38;  H=0,84;  I=1,00;  S=1,00] 
+public const string ConvertSwitchStatementToExpression     103
+	0,672  [HC=0,29;  H=0,82;  I=1,00;  S=1,00] 
+public const string SimplifyObjectCreation     80
+	0,671  [HC=0,29;  H=0,82;  I=1,00;  S=1,00] 
+public const string UseDeconstruction     113
+	0,671  [HC=0,29;  H=0,82;  I=1,00;  S=1,00] 
+public const string ConsecutiveStatementPlacement     101
+	0,664  [HC=0,28;  H=0,82;  I=1,00;  S=1,00] 
+public const string ConstructorInitializerPlacement     108
+	0,656  [HC=0,26;  H=0,81;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,33;  S=0,50;  NN=0,00;  NA=0,00]
+public const string UseImplicitObjectCreation     115
+	0,500  [HC=0,13;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string SimplifyObjectCreation     80
+	0,499  [HC=0,13;  HNC=1,00;  I=0,48;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseLocalFunction     121
+	0,499  [HC=0,13;  HNC=1,00;  I=0,48;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseExpressionBodyForLambda     139
+	0,473  [HC=0,10;  HNC=1,00;  I=0,34;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string InlineDeclaration     122
+	0,441  [HC=0,00;  HNC=1,00;  I=0,58;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string ConflictMarkerResolution     132
+	0,441  [HC=0,00;  HNC=1,00;  I=0,58;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseDeconstruction     113
+	0,439  [HC=0,00;  HNC=1,00;  I=0,55;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PredefinedCodeFixProviderNames.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PredefinedCodeFixProviderNames.cs
+*
+public const string ConfigureSeverity     19
+*
+public const string ConflictMarkerResolution     132
+	0,710  [HC=0,38;  H=0,84;  I=1,00;  S=1,00] 
+public const string DisambiguateSameVariable     128
+	0,690  [HC=0,33;  H=0,83;  I=1,00;  S=1,00] 
+public const string RemoveConfusingSuppression     110
+	0,679  [HC=0,31;  H=0,83;  I=1,00;  S=1,00] 
+public const string UseInferredMemberName     97
+	0,668  [HC=0,29;  H=0,82;  I=1,00;  S=1,00] 
+public const string ConsecutiveBracePlacement     123
+	0,666  [HC=0,28;  H=0,82;  I=1,00;  S=1,00] 
+public const string ConsecutiveStatementPlacement     101
+	0,664  [HC=0,28;  H=0,82;  I=1,00;  S=1,00] 
+public const string AddAnonymousTypeMemberName     126
+	0,661  [HC=0,27;  H=0,82;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,26;  S=0,50;  NN=0,00;  NA=0,00]
+public const string DisambiguateSameVariable     128
+	0,437  [HC=0,00;  HNC=1,00;  I=0,55;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string ConflictMarkerResolution     132
+	0,437  [HC=0,00;  HNC=1,00;  I=0,55;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string FileHeader     84
+	0,436  [HC=0,00;  HNC=1,00;  I=0,54;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseInferredMemberName     97
+	0,434  [HC=0,00;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseAutoProperty     100
+	0,434  [HC=0,00;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseIndexOperator     116
+	0,434  [HC=0,00;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string RemoveConfusingSuppression     110
+	0,433  [HC=0,00;  HNC=1,00;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\PredefinedCodeFixProviderNames.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\PredefinedCodeFixProviderNames.cs
+*
+public const string Suppression     65
+*
+public const string UseExpressionBody     107
+	0,754  [HC=0,47;  H=0,87;  I=1,00;  S=1,00] 
+public const string UseIsNotExpression     106
+	0,742  [HC=0,44;  H=0,86;  I=1,00;  S=1,00] 
+public const string RemoveConfusingSuppression     110
+	0,732  [HC=0,42;  H=0,86;  I=1,00;  S=1,00] 
+public const string UseCoalesceExpression     92
+	0,713  [HC=0,38;  H=0,85;  I=1,00;  S=1,00] 
+public const string PopulateSwitchExpression     140
+	0,710  [HC=0,38;  H=0,84;  I=1,00;  S=1,00] 
+public const string SimplifyConditionalExpression     90
+	0,696  [HC=0,34;  H=0,84;  I=1,00;  S=1,00] 
+public const string SimplifyObjectCreation     80
+	0,683  [HC=0,32;  H=0,83;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,38;  S=0,50;  NN=0,00;  NA=0,00]
+public const string RemoveConfusingSuppression     110
+	0,614  [HC=0,33;  HNC=1,00;  I=0,57;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseExpressionBody     107
+	0,579  [HC=0,24;  HNC=1,00;  I=0,69;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseCoalesceExpression     92
+	0,570  [HC=0,24;  HNC=1,00;  I=0,60;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string PopulateSwitchExpression     140
+	0,565  [HC=0,24;  HNC=1,00;  I=0,55;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string SimplifyConditionalExpression     90
+	0,560  [HC=0,24;  HNC=1,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseIsNotExpression     106
+	0,546  [HC=0,18;  HNC=1,00;  I=0,67;  S=1,00;  NN=0,00;  NA=0,00] 
+public const string UseExpressionBodyForLambda     139
+	0,512  [HC=0,15;  HNC=1,00;  I=0,51;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceGeneratedFileManager.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceGeneratedFileManager.cs
+*
+private readonly Type _generatorType     242
+*
+internal static readonly Option2 < bool ? > EnableOpeningInWorkspace     77
+	0,463  [HC=0,25;  H=0,15;  I=1,00;  S=0,67] 
+private readonly SourceGeneratedDocumentIdentity _documentIdentity     232
+	0,532  [HC=0,06;  H=0,54;  I=1,00;  S=1,00] #
+*
+HC=2;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,23;  NA=0,00]
+private readonly SourceGeneratedDocumentIdentity _documentIdentity     232
+	0,494  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,96;  NA=0,00] 
+internal static readonly Option2 < bool ? > EnableOpeningInWorkspace     77
+	0,159  [HC=0,00;  HNC=0,17;  I=0,00;  S=0,67;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceMemberContainerSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceMemberContainerSymbol.cs
+*
+internal readonly ImmutableArray < SyntaxReference > IndexerDeclarations     925
+*
+internal readonly ImmutableArray < Symbol > NonTypeMembers     931
+	0,628  [HC=0,21;  H=0,76;  I=1,00;  S=1,00] 
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,601  [HC=0,21;  H=0,62;  I=1,00;  S=0,98] 
+internal readonly bool HaveIndexers     934
+	0,565  [HC=0,21;  H=0,33;  I=1,00;  S=1,00] 
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,549  [HC=0,21;  H=0,37;  I=1,00;  S=0,92] 
+public readonly bool HaveIndexers     2564
+	0,539  [HC=0,21;  H=0,18;  I=1,00;  S=0,98] 
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,532  [HC=0,21;  H=0,23;  I=1,00;  S=0,93] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,524  [HC=0,17;  H=0,21;  I=1,00;  S=0,98] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=1,00;  NN=2,00;  NA=0,00]
+internal readonly bool HaveIndexers     934
+	0,567  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public readonly bool HaveIndexers     2564
+	0,190  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,94;  NN=0,00;  NA=0,00] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,190  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,94;  NN=0,00;  NA=0,00] 
+internal readonly ImmutableArray < Symbol > NonTypeMembers     931
+	0,286  [HC=0,00;  HNC=0,71;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] #
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,242  [HC=0,00;  HNC=0,51;  I=1,00;  S=0,94;  NN=0,00;  NA=0,00] #
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,175  [HC=0,00;  HNC=0,14;  I=1,00;  S=0,91;  NN=0,00;  NA=0,00] #
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,169  [HC=0,00;  HNC=0,14;  I=0,00;  S=0,87;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceMemberContainerSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceMemberContainerSymbol.cs
+*
+public readonly ArrayBuilder < SyntaxReference > IndexerDeclarations     2459
+*
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,607  [HC=0,21;  H=0,62;  I=1,00;  S=1,00] 
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,591  [HC=0,21;  H=0,63;  I=1,00;  S=0,94] 
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,582  [HC=0,21;  H=0,48;  I=1,00;  S=0,98] 
+internal readonly ImmutableArray < Symbol > NonTypeMembers     931
+	0,566  [HC=0,21;  H=0,49;  I=1,00;  S=0,92] 
+public bool HaveIndexers     2499
+	0,549  [HC=0,21;  H=0,21;  I=1,00;  S=1,00] 
+public readonly bool HaveIndexers     2564
+	0,548  [HC=0,21;  H=0,33;  I=1,00;  S=0,94] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,533  [HC=0,17;  H=0,36;  I=1,00;  S=0,94] 
+*
+HC=2;  HNC=1,00;  I=0,44;  S=1,00;  NN=2,00;  NA=0,00]
+public bool HaveIndexers     2499
+	0,497  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public readonly bool HaveIndexers     2564
+	0,205  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,92;  NN=0,00;  NA=0,00] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,205  [HC=0,00;  HNC=0,40;  I=0,00;  S=0,92;  NN=0,00;  NA=0,00] 
+public SynthesizedRecordConstructor ? RecordPrimaryConstructor     2501
+	0,186  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,311  [HC=0,00;  HNC=0,51;  I=0,70;  S=1,00;  NN=0,00;  NA=0,00] #
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,211  [HC=0,00;  HNC=0,51;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] #
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,196  [HC=0,00;  HNC=0,43;  I=0,00;  S=0,92;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceMemberContainerSymbol.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceMemberContainerSymbol.cs
+*
+public readonly ImmutableArray < SyntaxReference > IndexerDeclarations     2530
+*
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,628  [HC=0,21;  H=0,76;  I=1,00;  S=1,00] 
+internal readonly ImmutableArray < Symbol > NonTypeMembers     931
+	0,601  [HC=0,21;  H=0,62;  I=1,00;  S=0,98] 
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,574  [HC=0,21;  H=0,51;  I=1,00;  S=0,94] 
+public readonly bool HaveIndexers     2564
+	0,565  [HC=0,21;  H=0,33;  I=1,00;  S=1,00] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,551  [HC=0,17;  H=0,36;  I=1,00;  S=1,00] 
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,547  [HC=0,21;  H=0,37;  I=1,00;  S=0,91] 
+internal readonly bool HaveIndexers     934
+	0,539  [HC=0,21;  H=0,18;  I=1,00;  S=0,98] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=1,00;  NN=2,00;  NA=0,00]
+public readonly bool HaveIndexers     2564
+	0,567  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public readonly SynthesizedRecordConstructor ? RecordPrimaryConstructor     2566
+	0,233  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal readonly bool HaveIndexers     934
+	0,190  [HC=0,00;  HNC=0,20;  I=1,00;  S=0,94;  NN=0,00;  NA=0,00] 
+public readonly ImmutableArray < Symbol > NonTypeMembers     2561
+	0,286  [HC=0,00;  HNC=0,71;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] #
+internal readonly ImmutableArray < Symbol > NonTypeMembers     931
+	0,242  [HC=0,00;  HNC=0,51;  I=1,00;  S=0,94;  NN=0,00;  NA=0,00] #
+public ArrayBuilder < Symbol > NonTypeMembers     2496
+	0,211  [HC=0,00;  HNC=0,34;  I=0,00;  S=0,92;  NN=0,00;  NA=0,00] #
+public ArrayBuilder < Symbol > ? NonTypeMembers     2640
+	0,198  [HC=0,00;  HNC=0,34;  I=1,00;  S=0,85;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourcePropertySymbolBase.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourcePropertySymbolBase.cs
+*
+private DiagnosticBag ? _lazyDiagnosticBag     49
+*
+private string _lazySourceName     58
+	0,610  [HC=0,29;  H=0,39;  I=1,00;  S=1,00] 
+private readonly SourcePropertyAccessorSymbol ? _getMethod     46
+	0,518  [HC=0,06;  H=0,45;  I=1,00;  S=1,00] 
+private readonly SourcePropertyAccessorSymbol ? _setMethod     47
+	0,518  [HC=0,06;  H=0,45;  I=1,00;  S=1,00] 
+protected const string DefaultIndexerName     23
+	0,502  [HC=0,11;  H=0,18;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly SourcePropertyAccessorSymbol ? _getMethod     46
+	0,204  [HC=0,00;  HNC=0,21;  I=1,00;  S=1,00;  NN=0,90;  NA=0,00] 
+private readonly SourcePropertyAccessorSymbol ? _setMethod     47
+	0,204  [HC=0,00;  HNC=0,21;  I=1,00;  S=1,00;  NN=0,90;  NA=0,00] 
+protected const string DefaultIndexerName     23
+	0,143  [HC=0,00;  HNC=0,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private string _lazySourceName     58
+	0,405  [HC=0,33;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private const int ReportChangeDelayInMilliseconds     45
+*
+private readonly CancellationTokenSource _disposalCancellationSource     46
+	0,580  [HC=0,23;  H=0,38;  I=1,00;  S=1,00] 
+private readonly TimeSpan _diffTimeout     58
+	0,523  [HC=0,10;  H=0,37;  I=1,00;  S=1,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) _lastProcessedData     71
+	0,499  [HC=0,13;  H=0,11;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,27;  S=0,50;  NN=0,00;  NA=0,00]
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) _lastProcessedData     71
+	0,186  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly TimeSpan _diffTimeout     58
+	0,186  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationTokenSource _disposalCancellationSource     46
+	0,186  [HC=0,00;  HNC=0,20;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntacticClassificationTaggerProvider.TagComputer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntacticClassificationTaggerProvider.TagComputer.cs
+*
+private readonly IForegroundNotificationService _notificationService     69
+*
+private readonly CancellationTokenSource _disposalCancellationSource     46
+	0,670  [HC=0,35;  H=0,65;  I=1,00;  S=1,00] 
+private readonly TimeSpan _diffTimeout     58
+	0,603  [HC=0,21;  H=0,59;  I=1,00;  S=1,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) _lastProcessedData     71
+	0,488  [HC=0,11;  H=0,10;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00]
+private readonly TimeSpan _diffTimeout     58
+	0,257  [HC=0,00;  HNC=0,40;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private ( ITextSnapshot ? lastSnapshot , Document ? lastDocument , SyntaxNode ? lastRoot ) _lastProcessedData     71
+	0,213  [HC=0,00;  HNC=0,25;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+private readonly CancellationTokenSource _disposalCancellationSource     46
+	0,257  [HC=0,00;  HNC=0,40;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxComparer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxComparer.cs
+*
+protected const double ExactMatchDist     16
+*
+internal static readonly SyntaxComparer Statement     20
+	0,546  [HC=0,29;  H=0,18;  I=1,00;  S=0,89] 
+internal static readonly LcsNodes Instance     1593
+	0,428  [HC=0,21;  H=0,16;  I=1,00;  S=0,59] 
+internal static readonly LcsTokens Instance     1585
+	0,427  [HC=0,21;  H=0,16;  I=1,00;  S=0,59] 
+internal static readonly SyntaxComparer TopLevel     19
+	0,415  [HC=0,00;  H=0,12;  I=1,00;  S=0,89] 
+*
+HC=2;  HNC=1,00;  I=0,04;  S=1,00;  NN=0,00;  NA=0,00]
+internal static readonly SyntaxComparer TopLevel     19
+	0,135  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,50;  NA=0,00] 
+internal static readonly SyntaxComparer Statement     20
+	0,135  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,50;  NA=0,00] 
+internal static readonly LcsTokens Instance     1585
+	0,158  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,64;  NN=0,00;  NA=0,00] #
+internal static readonly LcsNodes Instance     1593
+	0,158  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,64;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxComparer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxComparer.cs
+*
+protected const double EpsilonDist     17
+*
+internal static readonly SyntaxComparer Statement     20
+	0,456  [HC=0,09;  H=0,14;  I=1,00;  S=0,89] 
+internal static readonly SyntaxComparer TopLevel     19
+	0,415  [HC=0,00;  H=0,12;  I=1,00;  S=0,89] 
+internal static readonly LcsNodes Instance     1593
+	0,413  [HC=0,18;  H=0,16;  I=1,00;  S=0,59] 
+internal static readonly LcsTokens Instance     1585
+	0,412  [HC=0,18;  H=0,15;  I=1,00;  S=0,59] 
+*
+HC=2;  HNC=1,00;  I=0,08;  S=1,00;  NN=0,00;  NA=0,00]
+internal static readonly SyntaxComparer TopLevel     19
+	0,133  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,50;  NA=0,00] 
+internal static readonly SyntaxComparer Statement     20
+	0,133  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,95;  NN=0,50;  NA=0,00] 
+internal static readonly LcsTokens Instance     1585
+	0,156  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,64;  NN=0,00;  NA=0,00] #
+internal static readonly LcsNodes Instance     1593
+	0,156  [HC=0,00;  HNC=0,00;  I=0,00;  S=0,64;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+

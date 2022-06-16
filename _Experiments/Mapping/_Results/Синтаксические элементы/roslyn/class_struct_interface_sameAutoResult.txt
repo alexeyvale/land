@@ -1,0 +1,280 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractConvertAnonymousTypeToClassCodeRefactoringProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractConvertAnonymousTypeToClassCodeRefactoringProvider.cs
+*
+internal abstract class AbstractConvertAnonymousTypeToClassCodeRefactoringProvider < TExpressionSyntax , TNameSyntax , TIdentifierNameSyntax , TObjectCreationExpressionSyntax , TAnonymousObjectCreationExpressionSyntax , TNamespaceDeclarationSyntax >     27
+*
+internal abstract class AbstractConvertAnonymousTypeToClassCodeRefactoringProvider < TExpressionSyntax , TNameSyntax , TIdentifierNameSyntax , TObjectCreationExpressionSyntax , TAnonymousObjectCreationExpressionSyntax , TNamespaceDeclarationSyntax >     27
+	0,918  [HC=1,00;  H=1,00;  I=1,00;  S=0,71] *
+private class MyCodeAction     423
+	0,136  [HC=0,05;  H=0,08;  I=0,00;  S=0,36] 
+*
+HC=4;  HNC=4,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+internal abstract class AbstractConvertAnonymousTypeToClassCodeRefactoringProvider < TExpressionSyntax , TNameSyntax , TIdentifierNameSyntax , TObjectCreationExpressionSyntax , TAnonymousObjectCreationExpressionSyntax , TNamespaceDeclarationSyntax >     27
+	0,982  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,80;  NN=0,00;  NA=0,00] *
+private class MyCodeAction     423
+	0,173  [HC=0,04;  HNC=0,33;  I=0,00;  S=0,40;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractConvertAnonymousTypeToClassCodeRefactoringProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractConvertAnonymousTypeToClassCodeRefactoringProvider.cs
+*
+private class MyCodeAction     423
+*
+private class MyCodeAction     423
+	0,959  [HC=1,00;  H=1,00;  I=1,00;  S=0,86] *
+internal abstract class AbstractConvertAnonymousTypeToClassCodeRefactoringProvider < TExpressionSyntax , TNameSyntax , TIdentifierNameSyntax , TObjectCreationExpressionSyntax , TAnonymousObjectCreationExpressionSyntax , TNamespaceDeclarationSyntax >     27
+	0,136  [HC=0,05;  H=0,08;  I=0,00;  S=0,36] #
+*
+HC=4;  HNC=4,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+private class MyCodeAction     423
+	0,991  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,90;  NN=0,00;  NA=0,00] *
+internal abstract class AbstractConvertAnonymousTypeToClassCodeRefactoringProvider < TExpressionSyntax , TNameSyntax , TIdentifierNameSyntax , TObjectCreationExpressionSyntax , TAnonymousObjectCreationExpressionSyntax , TNamespaceDeclarationSyntax >     27
+	0,173  [HC=0,04;  HNC=0,33;  I=0,00;  S=0,40;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractDocumentationCommentCommandHandler.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractDocumentationCommentCommandHandler.cs
+*
+internal abstract class AbstractDocumentationCommentCommandHandler < TDocumentationComment , TMemberNode >     23
+*
+internal abstract class AbstractDocumentationCommentCommandHandler     23
+	0,726  [HC=0,55;  H=0,44;  I=1,00;  S=1,00] *
+*
+HC=2;  HNC=4,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+internal abstract class AbstractDocumentationCommentCommandHandler     23
+	0,869  [HC=0,44;  HNC=1,00;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractPreprocessorCompletionProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractPreprocessorCompletionProvider.cs
+*
+internal abstract class AbstractPreprocessorCompletionProvider     17
+*
+internal abstract class AbstractPreprocessorCompletionProvider     16
+	0,937  [HC=1,00;  H=1,00;  I=1,00;  S=0,78] *
+*
+HC=4;  HNC=4,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+internal abstract class AbstractPreprocessorCompletionProvider     16
+	0,986  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,72;  NN=0,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSimplifyInterpolationCodeFixProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSimplifyInterpolationCodeFixProvider.cs
+*
+internal abstract class AbstractSimplifyInterpolationCodeFixProvider < TInterpolationSyntax , TExpressionSyntax , TInterpolationAlignmentClause , TInterpolationFormatClause , TInterpolatedStringExpressionSyntax , TConditionalExpressionSyntax , TParenthesizedExpressionSyntax >     21
+*
+internal abstract class AbstractSimplifyInterpolationCodeFixProvider < TInterpolationSyntax , TExpressionSyntax , TInterpolationAlignmentClause , TInterpolationFormatClause , TInterpolatedStringExpressionSyntax >     21
+	0,847  [HC=0,75;  H=0,79;  I=0,90;  S=1,00] *
+private class MyCodeAction     109
+	0,171  [HC=0,04;  H=0,07;  I=0,00;  S=0,50] 
+*
+HC=2;  HNC=4,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+internal abstract class AbstractSimplifyInterpolationCodeFixProvider < TInterpolationSyntax , TExpressionSyntax , TInterpolationAlignmentClause , TInterpolationFormatClause , TInterpolatedStringExpressionSyntax >     21
+	0,939  [HC=0,76;  HNC=1,00;  I=0,97;  S=1,00;  NN=0,00;  NA=0,00] *
+private class MyCodeAction     109
+	0,210  [HC=0,03;  HNC=0,33;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSimplifyInterpolationCodeFixProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSimplifyInterpolationCodeFixProvider.cs
+*
+private class MyCodeAction     109
+*
+private class MyCodeAction     109
+	0,970  [HC=1,00;  H=1,00;  I=1,00;  S=0,89] *
+internal abstract class AbstractSimplifyInterpolationCodeFixProvider < TInterpolationSyntax , TExpressionSyntax , TInterpolationAlignmentClause , TInterpolationFormatClause , TInterpolatedStringExpressionSyntax >     21
+	0,180  [HC=0,06;  H=0,09;  I=0,00;  S=0,50] #
+*
+HC=4;  HNC=4,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+private class MyCodeAction     109
+	0,992  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,91;  NN=0,00;  NA=0,00] *
+internal abstract class AbstractSimplifyInterpolationCodeFixProvider < TInterpolationSyntax , TExpressionSyntax , TInterpolationAlignmentClause , TInterpolationFormatClause , TInterpolatedStringExpressionSyntax >     21
+	0,181  [HC=0,04;  HNC=0,33;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractSimplifyInterpolationDiagnosticAnalyzer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractSimplifyInterpolationDiagnosticAnalyzer.cs
+*
+internal abstract class AbstractSimplifyInterpolationDiagnosticAnalyzer < TInterpolationSyntax , TExpressionSyntax , TConditionalExpressionSyntax , TParenthesizedExpressionSyntax >     16
+*
+internal abstract class AbstractSimplifyInterpolationDiagnosticAnalyzer < TInterpolationSyntax , TExpressionSyntax >     16
+	0,781  [HC=0,59;  H=0,69;  I=1,00;  S=1,00] *
+*
+HC=2;  HNC=4,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+internal abstract class AbstractSimplifyInterpolationDiagnosticAnalyzer < TInterpolationSyntax , TExpressionSyntax >     16
+	0,891  [HC=0,58;  HNC=1,00;  I=0,96;  S=1,00;  NN=0,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTypeImportCompletionProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTypeImportCompletionProvider.cs
+*
+internal abstract class AbstractTypeImportCompletionProvider     18
+*
+internal abstract class AbstractTypeImportCompletionProvider < AliasDeclarationTypeNode >     20
+	0,730  [HC=0,58;  H=0,57;  I=0,80;  S=1,00] *
+private class TelemetryCounter     164
+	0,299  [HC=0,25;  H=0,34;  I=0,00;  S=0,50] 
+*
+HC=2;  HNC=4,00;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00]
+internal abstract class AbstractTypeImportCompletionProvider < AliasDeclarationTypeNode >     20
+	0,850  [HC=0,54;  HNC=1,00;  I=0,58;  S=1,00;  NN=0,00;  NA=0,00] *
+private class TelemetryCounter     164
+	0,269  [HC=0,00;  HNC=0,33;  I=0,37;  S=0,50;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\AbstractTypeImportCompletionProvider.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\AbstractTypeImportCompletionProvider.cs
+*
+private class TelemetryCounter     73
+*
+private class TelemetryCounter     164
+	0,939  [HC=1,00;  H=1,00;  I=1,00;  S=0,79] *
+internal abstract class AbstractTypeImportCompletionProvider < AliasDeclarationTypeNode >     20
+	0,233  [HC=0,15;  H=0,20;  I=0,00;  S=0,50] #
+*
+HC=4;  HNC=4,00;  I=2,00;  S=1,00;  NN=0,00;  NA=0,00]
+private class TelemetryCounter     164
+	0,985  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,83;  NN=0,00;  NA=0,00] *
+internal abstract class AbstractTypeImportCompletionProvider < AliasDeclarationTypeNode >     20
+	0,167  [HC=0,00;  HNC=0,33;  I=0,00;  S=0,50;  NN=0,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BoundExpression.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BoundExpression.cs
+*
+internal partial class BoundInterpolatedString     289
+*
+internal partial class BoundInterpolatedStringBase     290
+	0,788  [HC=0,85;  H=0,96;  I=0,00;  S=1,00] *
+*
+HC=2;  HNC=4,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+internal partial class BoundInterpolatedStringBase     290
+	0,938  [HC=0,75;  HNC=1,00;  I=0,93;  S=1,00;  NN=1,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BoundNodes.xml.Generated.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BoundNodes.xml.Generated.cs
+*
+internal abstract partial class BoundTreeVisitor < A , R >     7954
+*
+internal abstract partial class BoundTreeVisitor < A , R >     7996
+	1,000  [HC=1,00;  H=1,00;  I=1,00;  S=1,00] *
+internal abstract partial class BoundTreeVisitor < A , R >     8414
+	0,857  [HC=1,00;  H=1,00;  I=0,00;  S=1,00] 
+internal abstract partial class BoundInterpolatedStringBase     7167
+	0,474  [HC=0,30;  H=0,43;  I=0,00;  S=1,00] 
+internal sealed partial class BoundUnconvertedInterpolatedString     7185
+	0,448  [HC=0,26;  H=0,34;  I=0,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=2,00;  S=0,50;  NN=1,91;  NA=0,00]
+internal abstract partial class BoundTreeVisitor < A , R >     7996
+	0,997  [HC=1,00;  HNC=1,00;  I=0,99;  S=1,00;  NN=1,00;  NA=0,00] *
+internal abstract partial class BoundTreeVisitor < A , R >     8414
+	0,932  [HC=1,00;  HNC=1,00;  I=0,68;  S=1,00;  NN=1,00;  NA=0,00] 
+internal abstract partial class BoundInterpolatedStringBase     7167
+	0,240  [HC=0,19;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal sealed partial class BoundUnconvertedInterpolatedString     7185
+	0,213  [HC=0,19;  HNC=0,75;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\BoundNodes.xml.Generated.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\BoundNodes.xml.Generated.cs
+*
+internal abstract partial class BoundTreeVisitor < A , R >     8370
+*
+internal abstract partial class BoundTreeVisitor < A , R >     8414
+	1,000  [HC=1,00;  H=1,00;  I=1,00;  S=1,00] *
+internal abstract partial class BoundInterpolatedStringBase     7167
+	0,474  [HC=0,30;  H=0,43;  I=0,00;  S=1,00] 
+internal sealed partial class BoundUnconvertedInterpolatedString     7185
+	0,448  [HC=0,26;  H=0,34;  I=0,00;  S=1,00] 
+internal abstract partial class BoundTreeVisitor < A , R >     7996
+	0,857  [HC=1,00;  H=1,00;  I=0,00;  S=1,00] #
+*
+HC=4;  HNC=1,00;  I=2,00;  S=0,50;  NN=1,91;  NA=0,00]
+internal abstract partial class BoundTreeVisitor < A , R >     8414
+	0,997  [HC=1,00;  HNC=1,00;  I=0,99;  S=1,00;  NN=1,00;  NA=0,00] *
+internal abstract partial class BoundInterpolatedStringBase     7167
+	0,240  [HC=0,19;  HNC=1,00;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal sealed partial class BoundUnconvertedInterpolatedString     7185
+	0,213  [HC=0,19;  HNC=0,75;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+internal abstract partial class BoundTreeVisitor < A , R >     7996
+	0,932  [HC=1,00;  HNC=1,00;  I=0,68;  S=1,00;  NN=1,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\NamedTypeSymbolAdapter.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\NamedTypeSymbolAdapter.cs
+*
+internal partial class NamedTypeSymbol     22
+*
+internal partial class NamedTypeSymbol     22
+	1,000  [HC=1,00;  H=1,00;  I=1,00;  S=1,00] *
+*
+HC=4;  HNC=4,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+internal partial class NamedTypeSymbol     22
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\ProjectState.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\ProjectState.cs
+*
+private sealed class WorkspaceAnalyzerConfigOptions     324
+*
+private sealed class WorkspaceAnalyzerConfigOptions     314
+	0,976  [HC=1,00;  H=1,00;  I=1,00;  S=0,92] *
+*
+HC=4;  HNC=4,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+private sealed class WorkspaceAnalyzerConfigOptions     314
+	0,999  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,97;  NN=1,00;  NA=0,00] *
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxComparer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxComparer.cs
+*
+private sealed class LcsTokens     198
+*
+private sealed class LcsTokens     1583
+	0,969  [HC=1,00;  H=1,00;  I=1,00;  S=0,89] *
+private sealed class LcsNodes     1591
+	0,671  [HC=0,67;  H=0,92;  I=0,00;  S=0,89] 
+*
+HC=4;  HNC=4,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+private sealed class LcsTokens     1583
+	0,998  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,50;  NA=0,00] *
+private sealed class LcsNodes     1591
+	0,828  [HC=0,75;  HNC=1,00;  I=0,61;  S=0,95;  NN=0,50;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SyntaxComparer.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SyntaxComparer.cs
+*
+private sealed class LcsNodes     206
+*
+private sealed class LcsNodes     1591
+	0,969  [HC=1,00;  H=1,00;  I=1,00;  S=0,89] *
+private sealed class LcsTokens     1583
+	0,671  [HC=0,67;  H=0,92;  I=0,00;  S=0,89] #
+*
+HC=4;  HNC=4,00;  I=2,00;  S=0,50;  NN=0,00;  NA=0,00]
+private sealed class LcsNodes     1591
+	0,998  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,95;  NN=0,50;  NA=0,00] *
+private sealed class LcsTokens     1583
+	0,828  [HC=0,75;  HNC=1,00;  I=0,61;  S=0,95;  NN=0,50;  NA=0,00] #
+
+**************************************************************
+

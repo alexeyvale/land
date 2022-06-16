@@ -386,15 +386,18 @@ namespace Land.Control
 		{
 			LogAction(() =>
 			{
+				var searchType = sender == ApplyMappingLocal
+					? ContextFinder.SearchType.Local
+					: ContextFinder.SearchType.Global;
+
 				ProcessAmbiguities(
 					MarkupManager.Remap(
-						GetPointSearchArea()
-							.Select(f=> TryParse(f, null, out bool success, true))
+						GetPointSearchArea(searchType)
+							.Select(f => TryParse(f, null, out bool success, true))
+							.Where(f => f != null)
 							.ToList(),
 						true,
-						sender == ApplyMappingLocal 
-							? ContextFinder.SearchType.Local 
-							: ContextFinder.SearchType.Global
+						searchType
 					),
 					true
 				);

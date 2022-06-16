@@ -11,6 +11,10 @@ namespace Land.Markup.Binding
 		RemapCandidateInfo GetSameElement(
 			PointContext point,
 			List<RemapCandidateInfo> candidates);
+
+		RemapCandidateInfo GetSameElement_old(
+			PointContext point,
+			List<RemapCandidateInfo> candidates);
 	}
 
 	public class ContextsEqualityHeuristic: IPreHeuristic
@@ -89,6 +93,41 @@ namespace Land.Markup.Binding
 					{
 						return similarCandidates.FirstOrDefault();
 					}
+				}
+			}
+
+			return null;
+		}
+
+		public RemapCandidateInfo GetSameElement_old(
+			PointContext point,
+			List<RemapCandidateInfo> candidates)
+		{
+			if (point.HeaderContext.Sequence.Count == 0)
+			{
+				return null;
+			}
+
+			/// Проверяем, были ли в исходном файле элементы,
+			/// совпадающие с искомым при легковесном сравнении
+			var wereAlmostSame = point.ClosestContext != null
+				? point.ClosestContext.Where(e => AncestorsSequencePredicate(e, point)).ToList()
+				: new List<PointContext>();
+
+			wereAlmostSame = wereAlmostSame
+				.Where(e => HeaderSequencePredicate(e, point))
+				.ToList();
+
+			if (wereAlmostSame.Count == 0)
+			{
+				var similarCandidates = candidates
+					.Where(c => HeaderSequencePredicate(point, c.Context)
+						&& AncestorsSequencePredicate(c.Context, point))
+					.ToList();
+
+				if (similarCandidates.Count <= 1)
+				{
+					return similarCandidates.FirstOrDefault();
 				}
 			}
 

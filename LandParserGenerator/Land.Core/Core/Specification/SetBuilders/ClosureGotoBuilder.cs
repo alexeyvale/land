@@ -30,11 +30,13 @@ namespace Land.Core.Specification
 			var closedMarkers = item.Markers;
 			var anyMarkers = item.AnyProvokedMarkers;
 
-			int oldCount;
+			int oldUsualMarkersCount, oldAnyProvokedMarkersCount;
 
 			do
 			{
-				oldCount = closedMarkers.Count;
+				oldUsualMarkersCount = closedMarkers.Count;
+				oldAnyProvokedMarkersCount = anyMarkers.Count;
+
 				var newMarkers = new HashSet<Marker>();
 
 				/// Обрабатываем пункты, которые появились за счёт First'
@@ -88,7 +90,8 @@ namespace Land.Core.Specification
 
 				closedMarkers.UnionWith(newMarkers);
 			}
-			while (oldCount != closedMarkers.Count);
+			while (oldUsualMarkersCount != closedMarkers.Count
+				|| oldAnyProvokedMarkersCount != anyMarkers.Count);
 
 			anyMarkers.ExceptWith(closedMarkers);
 

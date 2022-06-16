@@ -1,0 +1,48 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\CompilationDiff.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\CompilationDiff.cs
+*
+public string OriginalPath     17
+*
+public string MiscErrorMessage     80
+	0,548  [HC=0,13;  H=0,71;  I=1,00;  S=0,88] 
+public RebuildResult Result     67
+	0,524  [HC=0,17;  H=0,41;  I=1,00;  S=0,88] 
+public bool Succeeded     69
+	0,440  [HC=0,00;  H=0,33;  I=1,00;  S=0,88] 
+public MetadataReader AssemblyMetadataReader     46
+	0,404  [HC=0,09;  H=0,39;  I=1,00;  S=0,58] 
+public ImmutableArray < Diagnostic > Diagnostics     71
+	0,495  [HC=0,17;  H=0,22;  I=1,00;  S=0,88] #
+*
+HC=2;  HNC=4,00;  I=0,24;  S=1,00;  NN=0,00;  NA=0,00]
+public string MiscErrorMessage     80
+	0,684  [HC=0,00;  HNC=1,00;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] *
+public RebuildResult Result     67
+	0,303  [HC=0,00;  HNC=0,25;  I=1,00;  S=0,95;  NN=0,00;  NA=0,00] 
+public bool Succeeded     69
+	0,270  [HC=0,00;  HNC=0,25;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] 
+public ImmutableArray < Diagnostic > Diagnostics     71
+	0,270  [HC=0,00;  HNC=0,25;  I=0,00;  S=0,95;  NN=0,00;  NA=0,00] 
+public MetadataReader AssemblyMetadataReader     46
+	0,226  [HC=0,00;  HNC=0,25;  I=0,00;  S=0,64;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\DocumentAnalysisResults.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\DocumentAnalysisResults.cs
+*
+public bool HasChangesAndCompilationErrors     137
+*
+public bool HasChangesAndSyntaxErrors     143
+	0,841  [HC=0,67;  H=0,89;  I=1,00;  S=1,00] 
+public DocumentId DocumentId     22
+	0,529  [HC=0,10;  H=0,40;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=0,41;  S=0,50;  NN=2,00;  NA=0,00]
+public bool HasChangesAndSyntaxErrors     143
+	0,909  [HC=0,80;  HNC=1,00;  I=0,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public DocumentId DocumentId     22
+	0,168  [HC=0,00;  HNC=0,25;  I=0,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

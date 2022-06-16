@@ -447,14 +447,22 @@ namespace Land.Control
 
 		#region Other helpers
 
-		private HashSet<string> GetPointSearchArea()
+		private HashSet<string> GetPointSearchArea(ContextFinder.SearchType searchType)
 		{
-			var searchArea = GetFileSet(Editor.GetWorkingSet())
-				?? new HashSet<string>();
-
-			searchArea.UnionWith(MarkupManager.GetReferencedFiles());
-
-			return searchArea;
+			switch(searchType)
+			{
+				case ContextFinder.SearchType.Local:
+					/// При локальном поиске будем искать в тех же файлах, где находятся точки
+					return MarkupManager.GetReferencedFiles();
+				case ContextFinder.SearchType.Global:
+					/// При глобальном поиске берём все файлы проекта
+					var searchArea = GetFileSet(Editor.GetWorkingSet()) 
+						?? new HashSet<string>();
+					searchArea.UnionWith(MarkupManager.GetReferencedFiles());
+					return searchArea;
+				default:
+					return new HashSet<string>();
+			}
 		}
 
 		private HashSet<string> GetFileSet(HashSet<string> paths)
@@ -566,7 +574,7 @@ namespace Land.Control
 					MarkupManager.Remap(
 						cp.Context.Type,
 						TryParse(
-							GetPointSearchArea().FirstOrDefault(e => e == cp.Context.FileName),
+							GetPointSearchArea(ContextFinder.SearchType.Local).FirstOrDefault(e => e == cp.Context.FileName),
 							null, 
 							out bool success, 
 							true

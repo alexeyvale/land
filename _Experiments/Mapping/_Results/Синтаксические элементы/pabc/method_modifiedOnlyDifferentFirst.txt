@@ -1,0 +1,532 @@
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\AbstractVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\AbstractVisitor.cs
+*
+public virtual void visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     1156
+*
+public virtual void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1206
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] 
+public virtual void visit ( pattern_parameter _pattern_parameter )     1156
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public virtual void visit ( const_pattern_parameter _const_pattern_parameter )     1201
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void visit ( recursive_collection_parameter _recursive_collection_parameter )     1231
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void visit ( recursive_pattern_parameter _recursive_pattern_parameter )     1236
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1246
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void visit ( recursive_tuple_parameter _recursive_tuple_parameter )     1251
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,68;  S=0,50;  NN=2,00;  NA=0,00]
+public virtual void visit ( pattern_parameter _pattern_parameter )     1156
+	0,924  [HC=1,00;  HNC=0,78;  I=0,71;  S=1,00;  NN=1,00;  NA=0,00] *
+public virtual void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1206
+	0,718  [HC=1,00;  HNC=0,67;  I=0,84;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1246
+	0,683  [HC=1,00;  HNC=0,67;  I=0,65;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     1226
+	0,681  [HC=1,00;  HNC=0,67;  I=0,64;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     1216
+	0,677  [HC=1,00;  HNC=0,67;  I=0,62;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void visit ( const_pattern_parameter _const_pattern_parameter )     1201
+	0,676  [HC=1,00;  HNC=0,57;  I=0,67;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void visit ( recursive_collection_parameter _recursive_collection_parameter )     1231
+	0,676  [HC=1,00;  HNC=0,57;  I=0,67;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+public virtual void pre_do_visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     1840
+*
+public virtual void pre_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1920
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( pattern_parameter _pattern_parameter )     1840
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( const_pattern_parameter _const_pattern_parameter )     1912
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1960
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( recursive_pattern_parameter _recursive_pattern_parameter )     1968
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1984
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void pre_do_visit ( recursive_tuple_parameter _recursive_tuple_parameter )     1992
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,08;  S=0,50;  NN=1,97;  NA=0,00]
+public virtual void pre_do_visit ( pattern_parameter _pattern_parameter )     1840
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public virtual void post_do_visit ( pattern_parameter _pattern_parameter )     1844
+	0,795  [HC=0,67;  HNC=0,78;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] 
+public virtual void pre_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1920
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void pre_do_visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     1936
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void pre_do_visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     1952
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void pre_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1984
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void pre_do_visit ( const_pattern_parameter _const_pattern_parameter )     1912
+	0,682  [HC=1,00;  HNC=0,57;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+public virtual void post_do_visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     1844
+*
+public virtual void post_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1924
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( pattern_parameter _pattern_parameter )     1844
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( const_pattern_parameter _const_pattern_parameter )     1916
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( recursive_collection_parameter _recursive_collection_parameter )     1964
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( recursive_pattern_parameter _recursive_pattern_parameter )     1972
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1988
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public virtual void post_do_visit ( recursive_tuple_parameter _recursive_tuple_parameter )     1996
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,08;  S=0,50;  NN=1,97;  NA=0,00]
+public virtual void post_do_visit ( pattern_parameter _pattern_parameter )     1844
+	0,971  [HC=1,00;  HNC=0,78;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+public virtual void post_do_visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     1924
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void post_do_visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     1940
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void post_do_visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     1956
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void post_do_visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     1988
+	0,696  [HC=1,00;  HNC=0,67;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void post_do_visit ( const_pattern_parameter _const_pattern_parameter )     1916
+	0,682  [HC=1,00;  HNC=0,57;  I=1,00;  S=1,00;  NN=0,00;  NA=0,00] 
+public virtual void pre_do_visit ( pattern_parameter _pattern_parameter )     1840
+	0,795  [HC=0,67;  HNC=0,78;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\HierarchyVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\HierarchyVisitor.cs
+*
+public override void visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     3847
+*
+public override void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4084
+	0,991  [HC=1,00;  H=0,94;  I=1,00;  S=1,00] 
+public override void visit ( pattern_parameter _pattern_parameter )     4004
+	0,984  [HC=1,00;  H=0,89;  I=1,00;  S=1,00] 
+public override void visit ( const_pattern_parameter _const_pattern_parameter )     4076
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public override void visit ( recursive_collection_parameter _recursive_collection_parameter )     4121
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public override void visit ( recursive_pattern_parameter _recursive_pattern_parameter )     4128
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public override void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     4143
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public override void visit ( recursive_tuple_parameter _recursive_tuple_parameter )     4152
+	0,981  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=0,90;  S=0,50;  NN=2,00;  NA=0,00]
+public override void visit ( pattern_parameter _pattern_parameter )     4004
+	0,910  [HC=1,00;  HNC=0,78;  I=0,40;  S=1,00;  NN=1,00;  NA=0,00] *
+public override void visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     4098
+	0,685  [HC=1,00;  HNC=0,67;  I=0,64;  S=1,00;  NN=0,00;  NA=0,00] 
+public override void visit ( const_pattern_parameter _const_pattern_parameter )     4076
+	0,676  [HC=1,00;  HNC=0,57;  I=0,68;  S=1,00;  NN=0,00;  NA=0,00] 
+public override void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     4143
+	0,675  [HC=1,00;  HNC=0,67;  I=0,55;  S=1,00;  NN=0,00;  NA=0,00] 
+public override void visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     4112
+	0,665  [HC=1,00;  HNC=0,67;  I=0,45;  S=1,00;  NN=0,00;  NA=0,00] 
+public override void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4084
+	0,658  [HC=1,00;  HNC=0,67;  I=0,39;  S=1,00;  NN=0,00;  NA=0,00] 
+public override void visit ( recursive_pattern_parameter _recursive_pattern_parameter )     4128
+	0,656  [HC=1,00;  HNC=0,57;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\PatternsDesugaringVisitor.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\PatternsDesugaringVisitor.cs
+*
+private DeconstructionDesugaringResult DesugarPattern ( deconstructor_pattern pattern , expression matchingExpression )     161
+*
+private TupleDesugaringResult DesugarTuplePattern ( tuple_pattern pattern , expression matchingExpression )     578
+	0,870  [HC=0,74;  H=0,88;  I=1,00;  S=1,00] 
+private CollectionDesugaringResult DesugarCollectionPattern ( collection_pattern pattern , expression matchingExpression )     503
+	0,806  [HC=0,58;  H=0,89;  I=1,00;  S=1,00] 
+private void DefaultDesugarPattern ( expression matchingExpression , pattern_case patternCase )     220
+	0,791  [HC=0,67;  H=0,54;  I=1,00;  S=1,00] 
+private DeconstructionDesugaringResult DesugarDeconstructorPattern ( deconstructor_pattern pattern , expression matchingExpression )     475
+	0,787  [HC=0,52;  H=0,95;  I=1,00;  S=1,00] 
+private void DesugarConstPatternCase ( expression matchingExpression , pattern_case patternCase )     307
+	0,766  [HC=0,61;  H=0,53;  I=1,00;  S=1,00] 
+private expression DesugarRecursiveParameters ( expression expression , pattern_node pattern )     656
+	0,703  [HC=0,46;  H=0,54;  I=1,00;  S=1,00] 
+private expression DesugarDeconstructorPatternParameters ( deconstructor_pattern pattern )     250
+	0,670  [HC=0,38;  H=0,55;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=2,00;  S=0,50;  NN=2,00;  NA=0,00]
+private DeconstructionDesugaringResult DesugarDeconstructorPattern ( deconstructor_pattern pattern , expression matchingExpression )     475
+	0,937  [HC=0,67;  HNC=1,00;  I=1,00;  S=1,00;  NN=1,00;  NA=0,00] *
+private TupleDesugaringResult DesugarTuplePattern ( tuple_pattern pattern , expression matchingExpression )     578
+	0,819  [HC=0,67;  HNC=0,82;  I=0,75;  S=1,00;  NN=1,00;  NA=0,00] 
+private CollectionDesugaringResult DesugarCollectionPattern ( collection_pattern pattern , expression matchingExpression )     503
+	0,794  [HC=0,67;  HNC=0,82;  I=0,62;  S=1,00;  NN=1,00;  NA=0,00] 
+private expression DesugarDeconstructorPatternParameters ( deconstructor_pattern pattern )     250
+	0,442  [HC=0,50;  HNC=0,43;  I=0,70;  S=1,00;  NN=0,00;  NA=0,00] 
+private void DesugarConstPatternCase ( expression matchingExpression , pattern_case patternCase )     307
+	0,341  [HC=0,50;  HNC=0,18;  I=0,68;  S=1,00;  NN=0,00;  NA=0,00] 
+private List < statement > ProcessDesugaringForConstPattern ( is_pattern_expr isExpression )     740
+	0,330  [HC=0,34;  HNC=0,32;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+private void DefaultDesugarPattern ( expression matchingExpression , pattern_case patternCase )     220
+	0,325  [HC=0,67;  HNC=0,18;  I=0,43;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamReader.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamReader.cs
+*
+public void visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     4062
+*
+public void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4252
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  S=1,00] 
+public void visit ( pattern_parameter _pattern_parameter )     4108
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public void visit ( const_pattern_parameter _const_pattern_parameter )     4240
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_collection_parameter _recursive_collection_parameter )     4309
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_pattern_parameter _recursive_pattern_parameter )     4320
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     4343
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_tuple_parameter _recursive_tuple_parameter )     4356
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,46;  S=0,50;  NN=1,96;  NA=0,00]
+public void visit ( pattern_parameter _pattern_parameter )     4108
+	0,911  [HC=1,00;  HNC=0,77;  I=0,62;  S=1,00;  NN=1,00;  NA=0,00] *
+public void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4252
+	0,707  [HC=1,00;  HNC=0,65;  I=0,79;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     4343
+	0,665  [HC=1,00;  HNC=0,65;  I=0,53;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     4296
+	0,663  [HC=1,00;  HNC=0,65;  I=0,52;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     4274
+	0,658  [HC=1,00;  HNC=0,65;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( const_pattern_parameter _const_pattern_parameter )     4240
+	0,657  [HC=1,00;  HNC=0,54;  I=0,56;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( recursive_collection_parameter _recursive_collection_parameter )     4309
+	0,657  [HC=1,00;  HNC=0,54;  I=0,56;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamReader.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamReader.cs
+*
+public void read_pattern_deconstructor_parameter ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     4067
+*
+public void read_wild_card_deconstructor_parameter ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4257
+	0,898  [HC=0,79;  H=0,90;  I=1,00;  S=1,00] 
+public void read_pattern_parameter ( pattern_parameter _pattern_parameter )     4113
+	0,805  [HC=0,61;  H=0,82;  I=1,00;  S=1,00] 
+public void read_const_pattern_parameter ( const_pattern_parameter _const_pattern_parameter )     4245
+	0,788  [HC=0,58;  H=0,79;  I=1,00;  S=1,00] 
+public void read_recursive_collection_parameter ( recursive_collection_parameter _recursive_collection_parameter )     4314
+	0,775  [HC=0,55;  H=0,79;  I=1,00;  S=1,00] 
+public void read_tuple_pattern_var_parameter ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     4348
+	0,761  [HC=0,52;  H=0,78;  I=1,00;  S=1,00] 
+public void read_recursive_pattern_parameter ( recursive_pattern_parameter _recursive_pattern_parameter )     4325
+	0,748  [HC=0,48;  H=0,78;  I=1,00;  S=1,00] 
+public void read_recursive_tuple_parameter ( recursive_tuple_parameter _recursive_tuple_parameter )     4361
+	0,748  [HC=0,48;  H=0,78;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,29;  S=0,50;  NN=1,96;  NA=0,00]
+public void read_pattern_parameter ( pattern_parameter _pattern_parameter )     4113
+	0,845  [HC=0,75;  HNC=0,77;  I=0,76;  S=1,00;  NN=1,00;  NA=0,00] *
+public void read_wild_card_deconstructor_parameter ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     4257
+	0,468  [HC=0,60;  HNC=0,65;  I=0,62;  S=1,00;  NN=0,00;  NA=0,00] 
+public void read_collection_pattern_gap_parameter ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     4279
+	0,431  [HC=0,60;  HNC=0,65;  I=0,43;  S=1,00;  NN=0,00;  NA=0,00] 
+public void read_recursive_tuple_parameter ( recursive_tuple_parameter _recursive_tuple_parameter )     4361
+	0,396  [HC=0,50;  HNC=0,54;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+public void read_recursive_collection_parameter ( recursive_collection_parameter _recursive_collection_parameter )     4314
+	0,395  [HC=0,50;  HNC=0,54;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+public void read_const_pattern_parameter ( const_pattern_parameter _const_pattern_parameter )     4245
+	0,379  [HC=0,50;  HNC=0,54;  I=0,40;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( pattern_parameter _pattern_parameter )     4108
+	0,573  [HC=0,00;  HNC=0,77;  I=0,50;  S=1,00;  NN=1,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamWriter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamWriter.cs
+*
+public void visit ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     6368
+*
+public void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     6634
+	0,990  [HC=1,00;  H=0,93;  I=1,00;  S=1,00] 
+public void visit ( pattern_parameter _pattern_parameter )     6416
+	0,982  [HC=1,00;  H=0,87;  I=1,00;  S=1,00] 
+public void visit ( const_pattern_parameter _const_pattern_parameter )     6613
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_collection_parameter _recursive_collection_parameter )     6712
+	0,979  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_pattern_parameter _recursive_pattern_parameter )     6724
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     6757
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+public void visit ( recursive_tuple_parameter _recursive_tuple_parameter )     6787
+	0,978  [HC=1,00;  H=0,85;  I=1,00;  S=1,00] 
+*
+HC=4;  HNC=1,00;  I=1,64;  S=0,50;  NN=1,96;  NA=0,00]
+public void visit ( pattern_parameter _pattern_parameter )     6416
+	0,921  [HC=1,00;  HNC=0,77;  I=0,71;  S=1,00;  NN=1,00;  NA=0,00] *
+public void visit ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     6634
+	0,716  [HC=1,00;  HNC=0,65;  I=0,83;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     6757
+	0,678  [HC=1,00;  HNC=0,65;  I=0,62;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( collection_pattern_var_parameter _collection_pattern_var_parameter )     6682
+	0,676  [HC=1,00;  HNC=0,65;  I=0,61;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     6658
+	0,672  [HC=1,00;  HNC=0,65;  I=0,59;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( const_pattern_parameter _const_pattern_parameter )     6613
+	0,670  [HC=1,00;  HNC=0,54;  I=0,64;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( recursive_collection_parameter _recursive_collection_parameter )     6712
+	0,670  [HC=1,00;  HNC=0,54;  I=0,64;  S=1,00;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\SyntaxTreeStreamWriter.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\SyntaxTreeStreamWriter.cs
+*
+public void write_pattern_deconstructor_parameter ( pattern_deconstructor_parameter _pattern_deconstructor_parameter )     6374
+*
+public void write_wild_card_deconstructor_parameter ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     6640
+	0,900  [HC=0,80;  H=0,90;  I=1,00;  S=1,00] 
+public void write_pattern_parameter ( pattern_parameter _pattern_parameter )     6422
+	0,810  [HC=0,62;  H=0,82;  I=1,00;  S=1,00] 
+public void write_const_pattern_parameter ( const_pattern_parameter _const_pattern_parameter )     6619
+	0,794  [HC=0,59;  H=0,79;  I=1,00;  S=1,00] 
+public void write_recursive_collection_parameter ( recursive_collection_parameter _recursive_collection_parameter )     6718
+	0,781  [HC=0,56;  H=0,79;  I=1,00;  S=1,00] 
+public void write_tuple_pattern_var_parameter ( tuple_pattern_var_parameter _tuple_pattern_var_parameter )     6763
+	0,767  [HC=0,53;  H=0,78;  I=1,00;  S=1,00] 
+public void write_recursive_pattern_parameter ( recursive_pattern_parameter _recursive_pattern_parameter )     6730
+	0,754  [HC=0,50;  H=0,78;  I=1,00;  S=1,00] 
+public void write_recursive_tuple_parameter ( recursive_tuple_parameter _recursive_tuple_parameter )     6793
+	0,754  [HC=0,50;  H=0,78;  I=1,00;  S=1,00] 
+*
+HC=2;  HNC=1,00;  I=1,31;  S=0,50;  NN=1,96;  NA=0,00]
+public void write_pattern_parameter ( pattern_parameter _pattern_parameter )     6422
+	0,845  [HC=0,75;  HNC=0,77;  I=0,76;  S=1,00;  NN=1,00;  NA=0,00] *
+public void write_wild_card_deconstructor_parameter ( wild_card_deconstructor_parameter _wild_card_deconstructor_parameter )     6640
+	0,469  [HC=0,60;  HNC=0,65;  I=0,63;  S=1,00;  NN=0,00;  NA=0,00] 
+public void write_collection_pattern_gap_parameter ( collection_pattern_gap_parameter _collection_pattern_gap_parameter )     6664
+	0,433  [HC=0,60;  HNC=0,65;  I=0,44;  S=1,00;  NN=0,00;  NA=0,00] 
+public void write_recursive_tuple_parameter ( recursive_tuple_parameter _recursive_tuple_parameter )     6793
+	0,398  [HC=0,50;  HNC=0,54;  I=0,50;  S=1,00;  NN=0,00;  NA=0,00] 
+public void write_recursive_collection_parameter ( recursive_collection_parameter _recursive_collection_parameter )     6718
+	0,397  [HC=0,50;  HNC=0,54;  I=0,49;  S=1,00;  NN=0,00;  NA=0,00] 
+public void write_recursive_pattern_parameter ( recursive_pattern_parameter _recursive_pattern_parameter )     6730
+	0,357  [HC=0,50;  HNC=0,54;  I=0,29;  S=1,00;  NN=0,00;  NA=0,00] 
+public void visit ( pattern_parameter _pattern_parameter )     6416
+	0,574  [HC=0,00;  HNC=0,77;  I=0,51;  S=1,00;  NN=1,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override syntax_tree_node Clone ( )     49548
+*
+public override syntax_tree_node Clone ( )     51934
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  S=0,97] 
+public override syntax_tree_node Clone ( )     49936
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override syntax_tree_node Clone ( )     51823
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override syntax_tree_node Clone ( )     52563
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override syntax_tree_node Clone ( )     52712
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override syntax_tree_node Clone ( )     53033
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override syntax_tree_node Clone ( )     53176
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=1,45;  S=1,00;  NN=1,96;  NA=0,00]
+public override syntax_tree_node Clone ( )     49936
+	0,950  [HC=1,00;  HNC=1,00;  I=0,76;  S=0,88;  NN=1,00;  NA=0,00] *
+public override syntax_tree_node Clone ( )     51934
+	0,740  [HC=1,00;  HNC=1,00;  I=0,79;  S=0,82;  NN=0,00;  NA=0,00] 
+public override syntax_tree_node Clone ( )     52178
+	0,738  [HC=1,00;  HNC=1,00;  I=0,78;  S=0,82;  NN=0,00;  NA=0,00] 
+public override syntax_tree_node Clone ( )     52712
+	0,706  [HC=1,00;  HNC=1,00;  I=0,61;  S=0,76;  NN=0,00;  NA=0,00] 
+public override syntax_tree_node Clone ( )     52270
+	0,703  [HC=1,00;  HNC=1,00;  I=0,61;  S=0,73;  NN=0,00;  NA=0,00] 
+public override syntax_tree_node Clone ( )     53176
+	0,702  [HC=1,00;  HNC=1,00;  I=0,59;  S=0,76;  NN=0,00;  NA=0,00] 
+public override syntax_tree_node Clone ( )     52563
+	0,701  [HC=1,00;  HNC=1,00;  I=0,58;  S=0,76;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public new pattern_deconstructor_parameter TypedClone ( )     49558
+*
+public new wild_card_deconstructor_parameter TypedClone ( )     51944
+	0,986  [HC=1,00;  H=0,96;  I=1,00;  S=0,97] 
+public new pattern_parameter TypedClone ( )     49946
+	0,973  [HC=1,00;  H=0,92;  I=1,00;  S=0,94] 
+public new const_pattern_parameter TypedClone ( )     51838
+	0,969  [HC=1,00;  H=0,91;  I=1,00;  S=0,94] 
+public new recursive_collection_parameter TypedClone ( )     52578
+	0,969  [HC=1,00;  H=0,91;  I=1,00;  S=0,94] 
+public new recursive_pattern_parameter TypedClone ( )     52727
+	0,967  [HC=1,00;  H=0,91;  I=1,00;  S=0,93] 
+public new tuple_pattern_var_parameter TypedClone ( )     53053
+	0,967  [HC=1,00;  H=0,91;  I=1,00;  S=0,93] 
+public new recursive_tuple_parameter TypedClone ( )     53191
+	0,967  [HC=1,00;  H=0,91;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=1,68;  S=1,00;  NN=1,96;  NA=0,00]
+public new pattern_parameter TypedClone ( )     49946
+	0,930  [HC=1,00;  HNC=0,93;  I=0,71;  S=0,88;  NN=1,00;  NA=0,00] *
+public new wild_card_deconstructor_parameter TypedClone ( )     51944
+	0,740  [HC=1,00;  HNC=0,90;  I=0,84;  S=0,82;  NN=0,00;  NA=0,00] 
+public new tuple_pattern_var_parameter TypedClone ( )     53053
+	0,707  [HC=1,00;  HNC=0,90;  I=0,65;  S=0,82;  NN=0,00;  NA=0,00] 
+public new collection_pattern_var_parameter TypedClone ( )     52440
+	0,705  [HC=1,00;  HNC=0,90;  I=0,64;  S=0,82;  NN=0,00;  NA=0,00] 
+public new collection_pattern_gap_parameter TypedClone ( )     52188
+	0,701  [HC=1,00;  HNC=0,90;  I=0,62;  S=0,82;  NN=0,00;  NA=0,00] 
+public new const_pattern_parameter TypedClone ( )     51838
+	0,701  [HC=1,00;  HNC=0,87;  I=0,67;  S=0,76;  NN=0,00;  NA=0,00] 
+public new recursive_collection_parameter TypedClone ( )     52578
+	0,701  [HC=1,00;  HNC=0,87;  I=0,67;  S=0,76;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void FillParentsInDirectChilds ( )     49564
+*
+public override void FillParentsInDirectChilds ( )     51950
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  S=0,97] 
+public override void FillParentsInDirectChilds ( )     49952
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInDirectChilds ( )     51844
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInDirectChilds ( )     52584
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInDirectChilds ( )     52733
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void FillParentsInDirectChilds ( )     53059
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void FillParentsInDirectChilds ( )     53197
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=0,08;  S=1,00;  NN=1,96;  NA=0,00]
+public override void FillParentsInDirectChilds ( )     49952
+	0,984  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,88;  NN=1,00;  NA=0,00] *
+public override void FillParentsInAllChilds ( )     49957
+	0,875  [HC=0,80;  HNC=1,00;  I=0,00;  S=0,88;  NN=1,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     51950
+	0,734  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     52194
+	0,734  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     52446
+	0,724  [HC=1,00;  HNC=1,00;  I=0,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     53059
+	0,724  [HC=1,00;  HNC=1,00;  I=0,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     51709
+	0,723  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,73;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void FillParentsInAllChilds ( )     49569
+*
+public override void FillParentsInAllChilds ( )     51955
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  S=0,97] 
+public override void FillParentsInAllChilds ( )     49957
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInAllChilds ( )     51851
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInAllChilds ( )     52591
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void FillParentsInAllChilds ( )     52740
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void FillParentsInAllChilds ( )     53068
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void FillParentsInAllChilds ( )     53204
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=1,20;  S=1,00;  NN=1,96;  NA=0,00]
+public override void FillParentsInAllChilds ( )     49957
+	0,986  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,88;  NN=1,00;  NA=0,00] *
+public override void FillParentsInAllChilds ( )     51955
+	0,766  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInAllChilds ( )     52199
+	0,766  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void FillParentsInAllChilds ( )     51714
+	0,756  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,73;  NN=0,00;  NA=0,00] 
+public override void FillParentsInAllChilds ( )     52291
+	0,756  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,73;  NN=0,00;  NA=0,00] 
+public override void FillParentsInAllChilds ( )     52591
+	0,690  [HC=1,00;  HNC=1,00;  I=0,47;  S=0,76;  NN=0,00;  NA=0,00] 
+public override void FillParentsInDirectChilds ( )     49952
+	0,768  [HC=0,80;  HNC=1,00;  I=0,00;  S=0,88;  NN=1,00;  NA=0,00] #
+
+**************************************************************
+
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\base\Tree.cs
+file:///D:\Repositories\_mapping\PascalABC\1462\Common\modified\Tree.cs
+*
+public override void visit ( IVisitor visitor )     49616
+*
+public override void visit ( IVisitor visitor )     52002
+	0,991  [HC=1,00;  H=1,00;  I=1,00;  S=0,97] 
+public override void visit ( IVisitor visitor )     50004
+	0,984  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void visit ( IVisitor visitor )     51910
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void visit ( IVisitor visitor )     52650
+	0,982  [HC=1,00;  H=1,00;  I=1,00;  S=0,94] 
+public override void visit ( IVisitor visitor )     52799
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void visit ( IVisitor visitor )     53133
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+public override void visit ( IVisitor visitor )     53263
+	0,980  [HC=1,00;  H=1,00;  I=1,00;  S=0,93] 
+*
+HC=4;  HNC=1,00;  I=0,88;  S=1,00;  NN=1,96;  NA=0,00]
+public override void visit ( IVisitor visitor )     50004
+	0,986  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,88;  NN=1,00;  NA=0,00] *
+public override void visit ( IVisitor visitor )     52002
+	0,758  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void visit ( IVisitor visitor )     52246
+	0,758  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void visit ( IVisitor visitor )     52520
+	0,758  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void visit ( IVisitor visitor )     53133
+	0,758  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,82;  NN=0,00;  NA=0,00] 
+public override void visit ( IVisitor visitor )     51910
+	0,751  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,76;  NN=0,00;  NA=0,00] 
+public override void visit ( IVisitor visitor )     52650
+	0,751  [HC=1,00;  HNC=1,00;  I=1,00;  S=0,76;  NN=0,00;  NA=0,00] 
+
+**************************************************************
+

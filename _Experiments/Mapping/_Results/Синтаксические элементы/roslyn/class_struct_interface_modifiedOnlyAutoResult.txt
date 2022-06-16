@@ -1,0 +1,14 @@
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\base\SourceGeneratedFileManager.cs
+file:///D:\Repositories\_mapping\Roslyn\3459\Common\modified\SourceGeneratedFileManager.cs
+*
+private class GeneratedFileDirectoryInfo     69
+*
+private class OptionProvider     510
+	0,454  [HC=0,15;  H=0,72;  I=0,00;  S=1,00] 
+*
+HC=2;  HNC=4,00;  I=0,50;  S=0,50;  NN=0,00;  NA=0,00]
+private class OptionProvider     510
+	0,663  [HC=0,00;  HNC=1,00;  I=0,28;  S=1,00;  NN=0,00;  NA=0,00] *
+
+**************************************************************
+
