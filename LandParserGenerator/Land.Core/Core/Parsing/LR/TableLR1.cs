@@ -224,9 +224,11 @@ namespace Land.Core.Parsing.LR
 				var anys = Items[i].Markers
 					.GroupBy(m => new { m.Alternative, m.Position })
 					.Where(g => g.First().Next == Grammar.ANY_TOKEN_NAME)
+					.Select(e => e.First().Alternative[e.First().Position].Arguments)
 					.ToList();
 
-				if (anys.Count > 1 && anys.Any(e=>e.First().Alternative[e.First().Position].Arguments.AnyArguments.Count > 0))
+				if (anys.Count > 1 
+					&& !anys.Skip(1).All(e=>e.Equals(anys[0])))
 				{
 					errors.Add(Message.Error(
 						$"Any-конфликт: согласно состоянию{Environment.NewLine}" + $"\t\t{ToString(i, null, "\t\t")}{Environment.NewLine}" 
