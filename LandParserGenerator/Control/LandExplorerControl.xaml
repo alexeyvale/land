@@ -51,9 +51,9 @@
 		</Grid.Resources>
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="60*" MinHeight="100"></RowDefinition>
+			<RowDefinition Height="70*" MinHeight="200"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="40*" MaxHeight="320"></RowDefinition>
+            <RowDefinition Height="30*" MinHeight="200"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -199,10 +199,10 @@
 			<TabItem Header="Текущая точка" Name="MarkupElementTab">
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
-						<StackPanel Orientation="Vertical" Name="ConcernPointPanel" Visibility="Collapsed">
-							<StackPanel.Resources>
+						<Grid Name="ConcernPointPanel" Visibility="Collapsed">
+							<Grid.Resources>
 								<Style TargetType="Button">
-									<Setter Property="Width" Value="80"></Setter>
+									<Setter Property="Padding" Value="5 5 5 5"></Setter>
 								</Style>
 
 								<Style TargetType="{x:Type Button}" x:Key="IconButton">
@@ -211,44 +211,50 @@
 									<Setter Property="Background" Value="White"/>
 									<Setter Property="BorderBrush" Value="White"/>
 								</Style>
-							</StackPanel.Resources>
-							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 5" Height="25">
+							</Grid.Resources>
+							<Grid.RowDefinitions>
+								<RowDefinition></RowDefinition>
+								<RowDefinition Height="60*"></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition Height="40*"></RowDefinition>
+							</Grid.RowDefinitions>
+							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 5" Grid.Row="0">
 								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
 								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
 							</StackPanel>
-							<ListBox       
+							<ListBox
+								Grid.Row="1"
 								FontSize="12pt"
-								Height="100"
 								Name="ConcernPointCandidatesList"
 								SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
 								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
 							</ListBox>
-							<StackPanel Orientation="Vertical">
-								<Label Content="Имя"/>
-								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="100*"></ColumnDefinition>
-										<ColumnDefinition Width="25"></ColumnDefinition>
-									</Grid.ColumnDefinitions>
-									<TextBox Name="ConcernPointNameText" PreviewKeyDown="ConcernPointNameText_PreviewKeyDown" Grid.Column="0"/>
-									<Button Click="ConcernPointNameText_Reset_Click" 
+							<Label Content="Имя" Grid.Row="2"/>
+							<Grid Grid.Row="3">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="100*"></ColumnDefinition>
+									<ColumnDefinition Width="25"></ColumnDefinition>
+								</Grid.ColumnDefinitions>
+								<TextBox Name="ConcernPointNameText" PreviewKeyDown="ConcernPointNameText_PreviewKeyDown" Grid.Column="0"/>
+								<Button Click="ConcernPointNameText_Reset_Click" 
 											Content="&#xf060;" 
 											Style="{StaticResource IconButton}"
 											ToolTip="Заменить на стандартное имя кандидата"
 											Grid.Column="1"/>
-								</Grid>
-							</StackPanel>
-							<StackPanel Orientation="Vertical">
-								<Label Content="Комментарий"/>
-								<TextBox TextWrapping="Wrap" 
-										 AcceptsReturn="True"
-										 Height="60"
-										 ScrollViewer.VerticalScrollBarVisibility="Auto"
-										 Name="ConcernPointCommentText"/>
-							</StackPanel>
-						</StackPanel>
-						<StackPanel Name="MarkupElementPanel" Orientation="Vertical">
-							<StackPanel.Resources>
+							</Grid>
+							<Label Content="Комментарий" Grid.Row="4" />
+							<TextBox 
+								Grid.Row="5"
+								TextWrapping="Wrap" 
+								AcceptsReturn="True"
+								ScrollViewer.VerticalScrollBarVisibility="Auto"
+								Name="ConcernPointCommentText"/>
+						</Grid>
+
+						<Grid Name="MarkupElementPanel">
+							<Grid.Resources>
 								<Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
 									<Style.Triggers>
 										<Trigger Property="IsReadOnly" Value="true">
@@ -259,30 +265,40 @@
 										</Trigger>
 									</Style.Triggers>
 								</Style>
-							</StackPanel.Resources>
-			
-							<Label Content="Имя"/>
-							<TextBox Name="MarkupElementNameText"
-									 Margin="5 0 5 0"
-									 IsReadOnly="True"
-									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
-									 LostFocus="MarkupElementText_LostFocus"
-									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}">
+							</Grid.Resources>
+
+							<Grid.RowDefinitions>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition Height="100*"></RowDefinition>
+							</Grid.RowDefinitions>
+
+							<Label Content="Имя" Grid.Row="0" />
+							<TextBox
+								Grid.Row="1"
+								Name="MarkupElementNameText"
+								Margin="5 0 5 0"
+								IsReadOnly="True"
+								MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+								LostFocus="MarkupElementText_LostFocus"
+								Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}">
 							</TextBox>
 
-							<Label Content="Комментарий"/>
-							<TextBox TextWrapping="Wrap" 
-									 AcceptsReturn="True"
-									 Name="MarkupElementCommentText"
-									 Height="150"
-									 ScrollViewer.VerticalScrollBarVisibility="Auto"
-									 Margin="5 0 5 10"
-									 IsReadOnly="True"
-									 MouseDoubleClick="MarkupElementText_MouseDoubleClick"
-									 LostFocus="MarkupElementText_LostFocus"
-									 Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}">
+							<Label Content="Комментарий" Grid.Row="2"/>
+							<TextBox 
+								Grid.Row="3"
+								TextWrapping="Wrap" 
+								AcceptsReturn="True"
+								Name="MarkupElementCommentText"
+								ScrollViewer.VerticalScrollBarVisibility="Auto"
+								Margin="5 0 5 10"
+								IsReadOnly="True"
+								MouseDoubleClick="MarkupElementText_MouseDoubleClick"
+								LostFocus="MarkupElementText_LostFocus"
+								Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}">
 							</TextBox>
-						</StackPanel>
+						</Grid>
 					</Grid>
 				</ScrollViewer>
 			</TabItem>
