@@ -30,5 +30,28 @@ namespace Land.Core.Specification
 			{
 				AnyArguments = AnyArguments.ToDictionary(e => e.Key, e => new HashSet<string>(e.Value))
 			};
+
+		public override bool Equals(object obj)
+		{
+			/// Если у обоих наборов аргументов ключи одинаковые
+			if (obj is SymbolArguments args
+				&& this.AnyArguments.Keys.SequenceEqual(args.AnyArguments.Keys))
+			{
+				/// Проверяем множества символов, связанные с каждым ключом
+				foreach (var key in this.AnyArguments.Keys)
+				{
+					if (!args.AnyArguments[key].SequenceEqual(this.AnyArguments[key]))
+					{
+						return false;
+					}
+				}
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 }
