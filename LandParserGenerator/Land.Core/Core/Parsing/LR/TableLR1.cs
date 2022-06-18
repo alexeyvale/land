@@ -221,8 +221,12 @@ namespace Land.Core.Parsing.LR
 			/// Проверяем состояния на наличие нескольких пунктов перед Any
 			for(var i=0; i<Items.Count; ++i)
 			{
-				if(Items[i].Markers.GroupBy(m=>new { m.Alternative, m.Position })
-					.Where(g=>g.First().Next == Grammar.ANY_TOKEN_NAME).Count() > 1)
+				var anys = Items[i].Markers
+					.GroupBy(m => new { m.Alternative, m.Position })
+					.Where(g => g.First().Next == Grammar.ANY_TOKEN_NAME)
+					.ToList();
+
+				if (anys.Count > 1 && anys.Any(e=>e.First().Alternative[e.First().Position].Arguments.AnyArguments.Count > 0))
 				{
 					errors.Add(Message.Error(
 						$"Any-конфликт: согласно состоянию{Environment.NewLine}" + $"\t\t{ToString(i, null, "\t\t")}{Environment.NewLine}" 
