@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.Win32;
 using Task = System.Threading.Tasks.Task;
 using Land.VisualStudioExtension.Listeners;
+using System.Windows;
 
 namespace Land.VisualStudioExtension
 {
@@ -70,6 +71,33 @@ namespace Land.VisualStudioExtension
 
 			base.Dispose(disposing);
 			ServiceEventAggregator.DisposeInstance();
+		}
+
+		protected override int QueryClose(out bool pfCanClose)
+		{
+			var toolWindow = (LandExplorer)this.FindToolWindow(typeof(LandExplorer), 0, false);
+
+			if(toolWindow != null
+				&& toolWindow.Control.IsLoaded
+				&& toolWindow.Control.HasUnsavedChanges)
+			{
+				switch (MessageBox.Show(
+					"Сохранить изменения текущей разметки?",
+					"Закрытие панели разметки",
+					MessageBoxButton.YesNoCancel,
+					MessageBoxImage.Question))
+				{
+					case MessageBoxResult.Yes:
+						toolWindow.Control.Save();
+						break;
+					case MessageBoxResult.Cancel:
+						pfCanClose = false;
+						return VSConstants.S_OK;
+				}
+			}
+
+			pfCanClose = true;
+			return VSConstants.S_OK;
 		}
 
 		#endregion
