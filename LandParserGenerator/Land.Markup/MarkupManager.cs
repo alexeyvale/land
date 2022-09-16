@@ -166,9 +166,16 @@ namespace Land.Markup
 		/// <summary>
 		/// Добавление функциональности
 		/// </summary>
-		public Concern AddConcern(string name, string comment = null, Concern parent = null)
+		public Concern AddConcern(
+			string name, 
+			string comment = null, 
+			MarkupElement targetElement = null)
 		{
+			var parent = targetElement is ConcernPoint concernPoint
+				? concernPoint.Parent
+				: targetElement as Concern;
 			var concern = new Concern(name, comment, parent);
+
 			AddElement(concern);
 
 			OnMarkupChanged?.Invoke();
@@ -184,9 +191,13 @@ namespace Land.Markup
 			ParsedFile file, 
 			string name = null, 
 			string comment = null, 
-			Concern parent = null)
+			MarkupElement targetElement = null)
 		{
 			Remap(node.Type, file, true);
+
+			var parent = targetElement is ConcernPoint concernPoint
+				? concernPoint.Parent
+				: targetElement as Concern;
 
 			var siblingsArgs = new SiblingsConstructionArgs
 			{

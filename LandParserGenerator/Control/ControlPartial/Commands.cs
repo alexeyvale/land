@@ -173,8 +173,13 @@ namespace Land.Control
 						parsedFile,
 						candidate.ViewHeader,
 						null,
-						State.SelectedItem_MarkupTreeView?.DataContext as Concern
+						State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
 					);
+
+					if (State.SelectedItem_MarkupTreeView != null)
+					{
+						State.SelectedItem_MarkupTreeView.IsExpanded = true;
+					}
 
 					SetStatus("Привязка произведена", ControlStatus.Success);
 				}
@@ -194,13 +199,13 @@ namespace Land.Control
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			var parent = MarkupTreeView.SelectedItem != null 
-				&& MarkupTreeView.SelectedItem is Concern
-					? (Concern)MarkupTreeView.SelectedItem : null;
+			MarkupManager.AddConcern(
+				"Новая функциональность", 
+				null,
+				State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
+			);
 
-			MarkupManager.AddConcern("Новая функциональность", null, parent);
-
-			if (parent != null)
+			if (State.SelectedItem_MarkupTreeView != null)
 			{
 				State.SelectedItem_MarkupTreeView.IsExpanded = true;
 			}
@@ -211,6 +216,8 @@ namespace Land.Control
 			if(!String.IsNullOrWhiteSpace(MarkupFilePath))
 			{
 				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
+
+				SetStatus("Разметка сохранена", ControlStatus.Success);
 			}
 			else
 			{
@@ -233,6 +240,8 @@ namespace Land.Control
 			{
 				MarkupFilePath = saveFileDialog.FileName;
 				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
+
+				SetStatus("Разметка сохранена", ControlStatus.Success);
 			}
 		}
 
@@ -287,6 +296,8 @@ namespace Land.Control
 
             MarkupManager.Clear();
             MarkupFilePath = null;
+
+			SetStatus("Создана новая разметка", ControlStatus.Success);
         }
 
         private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
@@ -488,6 +499,8 @@ namespace Land.Control
 			});
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
+
+			SetStatus("Разметка загружена", ControlStatus.Success);
 		}
 
 		private List<ConcernPointCandidate> GetConcernPointCandidates(

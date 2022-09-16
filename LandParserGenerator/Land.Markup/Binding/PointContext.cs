@@ -1111,7 +1111,7 @@ namespace Land.Markup.Binding
 			ClosestConstructionArgs args)
 		{
 			//const double CLOSE_ELEMENT_THRESHOLD = 0.7;
-			const int MAX_COUNT = 5;
+			//const int MAX_COUNT = 5;
 
 			var candidates = new List<RemapCandidateInfo>();
 

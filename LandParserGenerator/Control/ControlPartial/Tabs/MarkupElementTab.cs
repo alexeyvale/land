@@ -150,7 +150,7 @@ namespace Land.Control
 							State.PendingCommand.Document,
 							ConcernPointNameText.Text,
 							ConcernPointCommentText.Text,
-							State.PendingCommand.Target?.DataContext as Concern
+							State.PendingCommand.Target?.DataContext as MarkupElement
 						);
 
 						if (State.PendingCommand.Target != null)
