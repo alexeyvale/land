@@ -166,10 +166,7 @@ namespace Land.Control
 			{
 				if (target != null)
 				{
-					if (target.Parent != source.Parent)
-					{
-						MarkupManager.MoveTo(target.Parent, source);
-					}
+					MarkupManager.MoveTo(target, source);
 				}
 				else
 				{

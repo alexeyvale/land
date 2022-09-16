@@ -18,6 +18,11 @@ namespace Land.Control
 		}
 	}
 
+	public class StringConcernPointCandidate : ExistingConcernPointCandidate
+	{
+		public StringConcernPointCandidate(): base() { }
+	}
+
 	public class ExistingConcernPointCandidate : ConcernPointCandidate
 	{
 		public Node Node { get; set; }

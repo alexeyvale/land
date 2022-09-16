@@ -109,10 +109,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-	<Content Include="Resources\Libraries\Typescript\typescript.dll">
-		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		<IncludeInVSIX>true</IncludeInVSIX>
-	</Content>
     <Content Include="Resources\Libraries\Yacc\yacc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

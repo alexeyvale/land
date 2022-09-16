@@ -1171,12 +1171,25 @@ namespace Land.Markup.Binding
 			args.ContextFinder.ComputeCoreContextSimilarities(nodeContext, candidates);
 			args.ContextFinder.ComputeTotalSimilarities(nodeContext, candidates);
 
-			var result = candidates
-				.OrderByDescending(c => c.Similarity)
-				.ThenByDescending(c => c.AncestorSimilarity)
-				.Take(MAX_COUNT)
-				//.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
-				.ToList();
+			var result = new List<RemapCandidateInfo>();
+			var prevSimilarity = 0.0;
+
+			foreach(var c in candidates.OrderByDescending(c => c.Similarity))
+			{
+				if(c.Similarity >= ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD
+					&& !ContextFinder.AreDistantEnough(prevSimilarity, c.Similarity.Value)){
+					result.Add(c);
+				}
+
+				prevSimilarity = c.Similarity.Value;
+			}
+
+			//var result = candidates
+			//	.OrderByDescending(c => c.Similarity)
+			//	.ThenByDescending(c => c.AncestorSimilarity)
+			//	//.Take(MAX_COUNT)
+			//	.TakeWhile(c => c.Similarity >= CLOSE_ELEMENT_THRESHOLD)
+			//	.ToList();
 
 			if (mayBeConfused.Any() && result.Any())
 			{
@@ -1185,11 +1198,6 @@ namespace Land.Markup.Binding
 				/// из-за полной похожести предков и заголовка
 				if(!result.Contains(mayBeConfused[0]))
 				{
-					if (result.Count == MAX_COUNT)
-					{
-						result.RemoveAt(result.Count - 1);
-					}
-
 					result.Add(mayBeConfused[0]);
 				}
 			}

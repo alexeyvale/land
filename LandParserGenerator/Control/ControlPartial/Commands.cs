@@ -85,6 +85,8 @@ namespace Land.Control
 					(parent.DataContext as RemapCandidates).Point,
 					State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
 				);
+
+				SetStatus("Точка перепривязана", ControlStatus.Success);
 			}
 		}
 
@@ -173,6 +175,8 @@ namespace Land.Control
 						null,
 						State.SelectedItem_MarkupTreeView?.DataContext as Concern
 					);
+
+					SetStatus("Привязка произведена", ControlStatus.Success);
 				}
 			}
 		}
@@ -505,7 +509,7 @@ namespace Land.Control
 
 				if(candidate != null)
 				{
-					candidates.Insert(0, new ExistingConcernPointCandidate
+					candidates.Insert(0, new StringConcernPointCandidate
 					{
 						Node = candidate.Node,
 						Line = adjustedSelection,

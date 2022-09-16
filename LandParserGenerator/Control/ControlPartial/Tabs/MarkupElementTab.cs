@@ -24,7 +24,14 @@ namespace Land.Control
 	{
 		private void ConcernPointCandidatesList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			if (ConcernPointCandidatesList.SelectedItem is ExistingConcernPointCandidate candidate)
+			if (ConcernPointCandidatesList.SelectedItem is StringConcernPointCandidate strCandidate)
+			{
+				Editor.SetActiveDocumentAndOffset(
+					State.PendingCommand.Document.Name,
+					strCandidate.Line.Start
+				);
+			}
+			else if (ConcernPointCandidatesList.SelectedItem is ExistingConcernPointCandidate candidate)
 			{
 				var node = candidate.Node;
 
@@ -70,7 +77,7 @@ namespace Land.Control
 
 				/// Формируем границы блока
 				var customBlockStart = $"{indentationString}{startBorders.ElementAtOrDefault(0)} {pointName} {startBorders.ElementAtOrDefault(1)}{expectedLineEnd}";
-				var customBlockEnd = $"{expectedLineEnd}{indentationString}{endBorders.ElementAtOrDefault(0)}{endBorders.ElementAtOrDefault(1)}";
+				var customBlockEnd = $"{expectedLineEnd}{indentationString}{endBorders.ElementAtOrDefault(0)} {pointName} {endBorders.ElementAtOrDefault(1)}";
 
 				/// Вставляем их в текст
 				Editor.InsertText(State.PendingCommand.Document.Name, customBlockStart, 

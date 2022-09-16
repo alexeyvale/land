@@ -48,8 +48,8 @@ block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recove
 }
 
 %customblock {
-	start("/// land start")
-	end("/// land end")
+	start("//+")
+	end("//-")
 	basetoken COMMENT
 }
 

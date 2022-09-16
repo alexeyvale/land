@@ -75,6 +75,10 @@ namespace Land.Control
 				Tabs.SelectedItem = MissingPointsTab;
 				SetStatus("Не удалось перепривязать некоторые точки", ControlStatus.Error);
 			}
+			else
+			{
+				SetStatus("Выполнена автоматическая перепривязка", ControlStatus.Success);
+			}
 		}
 
 		private void MissingTreeViewItem_Selected(object sender, RoutedEventArgs e)

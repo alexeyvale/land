@@ -461,6 +461,41 @@ namespace Land.Markup
 			OnMarkupChanged?.Invoke();
 		}
 
+		/// <summary>
+		/// Поместить элемент разметки после указанного элемента разметки
+		/// </summary>
+		public void MoveTo(MarkupElement before, MarkupElement elem)
+		{
+			var beforeIndex = before.Parent != null
+				? before.Parent.Elements.IndexOf(before)
+				: Markup.IndexOf(before);
+			var collectionToInsert = before.Parent != null
+				? before.Parent.Elements
+				: Markup;
+
+			if (elem.Parent != null)
+			{
+				elem.Parent.Elements.Remove(elem);
+			}
+			else
+			{
+				Markup.Remove(elem);
+			}
+
+			elem.Parent = before.Parent;
+
+			if (collectionToInsert.Count == beforeIndex + 1)
+			{
+				collectionToInsert.Add(elem);
+			}
+			else
+			{
+				collectionToInsert.Insert(beforeIndex + 1, elem);
+			}
+
+			OnMarkupChanged?.Invoke();
+		}
+
 		public void Serialize(string fileName, bool useRelativePaths)
 		{
 			var pointContexts = GetPointContexts();

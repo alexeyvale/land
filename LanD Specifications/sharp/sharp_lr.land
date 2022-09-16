@@ -71,8 +71,8 @@ block				=	'{' Any '}'
 }
 
 %customblock {
-	start("/// land start")
-	end("/// land end")
+	start("//+")
+	end("//-")
 	basetoken COMMENT
 }
 
