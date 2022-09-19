@@ -18,3 +18,5 @@ _Experiments/ML/__pycache__/
 _Experiments/ML/.idea/
 _Experiments/ML/train_data/*.csv
 LandParserGenerator/components/TLSH/tlsh/Windows/tlsh_dll/x64/Release/
+LandParserGenerator/components/TLSH/tlsh/Windows/Release/
+LandParserGenerator/components/TLSH/tlsh/Windows/x64/
