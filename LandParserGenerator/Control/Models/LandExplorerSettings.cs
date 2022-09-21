@@ -66,7 +66,7 @@ namespace Land.Control
 	public class LandExplorerSettings: IExtensibleDataObject
 	{
 		[DataMember]
-		public Guid Id { get; set; }
+		public Guid? Id { get; set; }
 
 		[DataMember]
 		public bool SaveAbsolutePath { get; set; }

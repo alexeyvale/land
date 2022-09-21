@@ -177,24 +177,6 @@ namespace Land.Control
 			SetStatus("Привязка отменена", ControlStatus.Ready);
 		}
 
-		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			if (textBox.IsReadOnly)
-			{
-				textBox.IsReadOnly = false;
-				textBox.Select(0, 0);
-			}
-		}
-
-		private void MarkupElementText_LostFocus(object sender, RoutedEventArgs e)
-		{
-			var textBox = (TextBox)sender;
-
-			textBox.IsReadOnly = true;
-		}
-
 		private void ConfigureMarkupElementTab(bool mappingMode, ConcernPoint pointToRemap = null)
 		{
 			Tabs.SelectedItem = MarkupElementTab;
@@ -227,5 +209,104 @@ namespace Land.Control
 		{
 			CustomConcernPointNameEntered = true;
 		}
+
+		#region Редактирование имени существующей точки и комментария
+
+		private void MarkupElementNameEdit_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementNameEditState(true);
+
+			State.TextsBeingEdited[nameof(MarkupElementNameText)] = MarkupElementNameText.Text;
+		}
+
+		private void MarkupElementNameSave_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementNameEditState(false);
+
+			var data = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+			data.Name = MarkupElementNameText.Text;
+		}
+
+		private void MarkupElementNameCancel_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementNameEditState(false);
+
+			MarkupElementNameText.Text = State.TextsBeingEdited[nameof(MarkupElementNameText)];
+		}
+
+		private void MarkupElementCommentEdit_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementCommentEditState(true);
+
+			State.TextsBeingEdited[nameof(MarkupElementCommentText)] = MarkupElementCommentText.Text;
+		}
+
+		private void MarkupElementCommentSave_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementCommentEditState(false);
+
+			var data = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+			data.Comment = MarkupElementCommentText.Text;
+		}
+
+		private void MarkupElementCommentCancel_Click(object sender, RoutedEventArgs e)
+		{
+			SetMarkupElementCommentEditState(false);
+
+			MarkupElementCommentText.Text = State.TextsBeingEdited[nameof(MarkupElementCommentText)];
+		}
+
+		private void SetMarkupElementCommentEditState(bool state)
+		{
+			SetCurrentPointEditState(
+				MarkupElementCommentText,
+				CurrentPointCommentEditButton,
+				CurrentPointCommentEditSaveButton,
+				CurrentPointCommentEditCancelButton,
+				state
+			);
+		}
+
+		private void SetMarkupElementNameEditState(bool state)
+		{
+			SetCurrentPointEditState(
+				MarkupElementNameText,
+				CurrentPointNameEditButton,
+				CurrentPointNameEditSaveButton,
+				CurrentPointNameEditCancelButton,
+				state
+			);
+		}
+
+		private void SetCurrentPointEditState(TextBox text, Button editButton, Button saveButton, Button cancelButton, bool state)
+		{
+			if(state)
+			{
+				editButton.Visibility = Visibility.Hidden;
+
+				saveButton.Visibility = Visibility.Visible;
+				saveButton.Width = CurrentPointCommentEditSaveButton.Height;
+				cancelButton.Visibility = Visibility.Visible;
+				cancelButton.Width = cancelButton.Height;
+
+				State.TextsBeingEdited[nameof(MarkupElementCommentText)] = MarkupElementCommentText.Text;
+
+				text.IsReadOnly = !state;
+				text.Select(0, 0);
+			}
+			else
+			{
+				editButton.Visibility = Visibility.Visible;
+
+				saveButton.Visibility = Visibility.Hidden;
+				saveButton.Width = 0;
+				cancelButton.Visibility = Visibility.Hidden;
+				cancelButton.Width = 0;
+
+				text.IsReadOnly = true;
+			}
+		}
+
+		#endregion
 	}
 }

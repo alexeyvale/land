@@ -201,12 +201,26 @@ namespace Land.Control
 		{
 			State.SelectedItem_MarkupTreeView = (TreeViewItem)sender;
 
+			var data = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+
+			Tabs.SelectedItem = (data is ConcernPoint p && p.HasMissingLocation) 
+				? MissingPointsTab : MarkupElementTab;
+
+			MarkupElementNameText.Text = data.Name;
+			MarkupElementCommentText.Text = data.Comment;
+
 			e.Handled = true;
 		}
 
 		private void MarkupTreeViewItem_Unselected(object sender, RoutedEventArgs e)
 		{
 			State.SelectedItem_MarkupTreeView = null;
+
+			MarkupElementNameText.Text = null;
+			MarkupElementCommentText.Text = null;
+
+			SetMarkupElementNameEditState(false);
+			SetMarkupElementCommentEditState(false);
 
 			e.Handled = true;
 		}

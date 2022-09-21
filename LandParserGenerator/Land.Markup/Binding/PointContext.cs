@@ -1176,9 +1176,13 @@ namespace Land.Markup.Binding
 
 			foreach(var c in candidates.OrderByDescending(c => c.Similarity))
 			{
-				if(c.Similarity >= ContextFinder.CANDIDATE_SIMILARITY_THRESHOLD
-					&& !ContextFinder.AreDistantEnough(prevSimilarity, c.Similarity.Value)){
+				if(!ContextFinder.AreDistantEnough(prevSimilarity, c.Similarity.Value))
+				{
 					result.Add(c);
+				}
+				else
+				{
+					break;
 				}
 
 				prevSimilarity = c.Similarity.Value;

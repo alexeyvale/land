@@ -30,7 +30,7 @@ namespace Land.Markup.Binding
 
 		public override string ToString()
 		{
-			return $"{String.Format("{0:f4}", Similarity)} [Core(H): {String.Format("{0:f2}", HeaderCoreSimilarity)}; " +
+			return $"{String.Format("{0:f4}", Similarity)}\t[Core(H): {String.Format("{0:f2}", HeaderCoreSimilarity)}; " +
 				$"NotCore(H): {String.Format("{0:f2}", HeaderNonCoreSimilarity)}; " +
 				$"S: {String.Format("{0:f2}", AncestorSimilarity)}; " +
 				$"I: {String.Format("{0:f2}", InnerSimilarity)}; " +

@@ -243,15 +243,16 @@ namespace Land.Markup.Binding
 
 					/// Отбираем кандидатов с наилучшей похожестью предков
 					var bestAncestorCandidates = candidates
-						.GroupBy(c => c.Context.AncestorsContext)
-						.Aggregate((g1, g2) => g1.First().AncestorSimilarity > g1.First().AncestorSimilarity ? g1 : g2)
+						.GroupBy(c => c.AncestorSimilarity)
+						.Aggregate((g1, g2) => g1.Key > g2.Key ? g1 : g2)
 						.ToList();
+
 					/// Среди них отбираем наиболее похожих
 					var bestCandidates = bestAncestorCandidates
 						.GroupBy(c => c.HeaderCoreSimilarity * (weights[ContextType.HeaderCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderCore)) 
 							+ c.HeaderNonCoreSimilarity * (weights[ContextType.HeaderNonCore] ?? DefaultWeightsProvider.Get(ContextType.HeaderNonCore))
 							+ c.InnerSimilarity * (weights[ContextType.Inner] ?? DefaultWeightsProvider.Get(ContextType.Inner)))
-						.Aggregate((g1, g2) => g1.Key > g1.Key ? g1 : g2)
+						.Aggregate((g1, g2) => g1.Key > g2.Key ? g1 : g2)
 						.ToList();
 					
 					if (bestCandidates.Count > 1)

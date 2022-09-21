@@ -1,4 +1,5 @@
-﻿using Land.Control.Properties;
+﻿using Land.Control.Helpers;
+using Land.Control.Properties;
 using Land.Core;
 using Land.Core.Parsing.Tree;
 using Land.Markup;
@@ -10,35 +11,50 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using SWF = System.Windows.Forms;
 
+#pragma warning disable CA1031 // Do not catch general exception types
+
 namespace Land.Control
 {
-    public partial class LandExplorerControl: UserControl, INotifyPropertyChanged
+	public partial class LandExplorerControl : UserControl, INotifyPropertyChanged
 	{
 		private void Command_MarkupTree_Delete_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
+			try
+			{
+				MarkupManager.RemoveElement((MarkupElement)MarkupTreeView.SelectedItem);
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
 		}
 
 		private void Command_MarkupTree_RelinkSame_Executed(object sender, RoutedEventArgs e)
 		{
-			/// Переходим к точке, которую хотим перепривязать
-			var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
-
-			if (EnsureLocationValid(point))
+			try
 			{
-				Editor.SetActiveDocumentAndOffset(
-					point.Context.FileName,
-					point.Location.Start
-				);
+				/// Переходим к точке, которую хотим перепривязать
+				var point = (ConcernPoint)State.SelectedItem_MarkupTreeView.DataContext;
 
-				/// Выбираем сущности всех уровней, к которым можно привязаться в данном месте
-				Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
+				if (EnsureLocationValid(point))
+				{
+					Editor.SetActiveDocumentAndOffset(
+						point.Context.FileName,
+						point.Location.Start
+					);
+
+					/// Выбираем сущности всех уровней, к которым можно привязаться в данном месте
+					Command_Relink_Executed(State.SelectedItem_MarkupTreeView);
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
@@ -49,25 +65,38 @@ namespace Land.Control
 
 		private void Command_MissingTree_Delete_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.RemoveElement(((RemapCandidates)MissingTreeView.SelectedItem).Point);
+			try
+			{
+				MarkupManager.RemoveElement(((RemapCandidates)MissingTreeView.SelectedItem).Point);
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
 		}
 
 		private void Command_MarkupTree_DeleteWithSource_Executed(object sender, RoutedEventArgs e)
 		{
-			var points = GetLinearSequenceVisitor.GetPoints(
-				new List<MarkupElement> { (MarkupElement)MarkupTreeView.SelectedItem }
-			);
-
+			try
+			{
+				var points = GetLinearSequenceVisitor.GetPoints(
+					new List<MarkupElement> { (MarkupElement)MarkupTreeView.SelectedItem }
+				);
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
 		}
 
 		private void Command_MarkupTree_TurnOn_Executed(object sender, RoutedEventArgs e)
 		{
-			
+
 		}
 
 		private void Command_MarkupTree_TurnOff_Executed(object sender, RoutedEventArgs e)
 		{
-			
+
 		}
 
 		private void Command_MissingTree_Relink_Executed(object sender, RoutedEventArgs e)
@@ -77,250 +106,334 @@ namespace Land.Control
 
 		private void Command_MissingTree_Accept_Executed(object sender, RoutedEventArgs e)
 		{
-			var parent = GetTreeViewItemParent(State.SelectedItem_MissingTreeView);
-
-			if (parent != null)
+			try
 			{
-				MarkupManager.RelinkConcernPoint(
-					(parent.DataContext as RemapCandidates).Point,
-					State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
-				);
+				var parent = GetTreeViewItemParent(State.SelectedItem_MissingTreeView);
 
-				SetStatus("Точка перепривязана", ControlStatus.Success);
+				if (parent != null)
+				{
+					MarkupManager.RelinkConcernPoint(
+						(parent.DataContext as RemapCandidates).Point,
+						State.SelectedItem_MissingTreeView.DataContext as RemapCandidateInfo
+					);
+
+					SetStatus("Точка перепривязана", ControlStatus.Success);
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_Relink_Executed(TreeViewItem target)
 		{
-			var fileName = Editor.GetActiveDocumentName();
-			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
-
-			if (parsedFile != null)
+			try
 			{
-				State.PendingCommand = new PendingCommandInfo()
+				var fileName = Editor.GetActiveDocumentName();
+				var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
+
+				if (parsedFile != null)
 				{
-					Target = target,
-					Command = LandExplorerCommand.Relink,
-					Document = parsedFile
-				};
+					State.PendingCommand = new PendingCommandInfo()
+					{
+						Target = target,
+						Command = LandExplorerCommand.Relink,
+						Document = parsedFile
+					};
 
-				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(
-						parsedFile, 
-						Editor.GetActiveDocumentSelection(false), 
-						Editor.GetActiveDocumentSelection(true)
-					);
+					ConcernPointCandidatesList.ItemsSource =
+						GetConcernPointCandidates(
+							parsedFile,
+							Editor.GetActiveDocumentSelection(false),
+							Editor.GetActiveDocumentSelection(true)
+						);
 
-				var point = target.DataContext is RemapCandidates pair
-					? pair.Point
-					: (ConcernPoint)target.DataContext;
+					var point = target.DataContext is RemapCandidates pair
+						? pair.Point
+						: (ConcernPoint)target.DataContext;
 
-				ConfigureMarkupElementTab(true, point);
+					ConfigureMarkupElementTab(true, point);
 
-				SetStatus("Перепривязка точки", ControlStatus.Pending);
+					SetStatus("Перепривязка точки", ControlStatus.Pending);
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_SelectPoint_Executed(object sender, RoutedEventArgs e)
 		{
-			var fileName = Editor.GetActiveDocumentName();
-			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
-
-			if (parsedFile != null)
+			try
 			{
-				State.PendingCommand = new PendingCommandInfo()
+				var fileName = Editor.GetActiveDocumentName();
+				var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
+
+				if (parsedFile != null)
 				{
-					Target = State.SelectedItem_MarkupTreeView,
-					Document = parsedFile,
-					Command = LandExplorerCommand.SelectPoint
-				};
+					State.PendingCommand = new PendingCommandInfo()
+					{
+						Target = State.SelectedItem_MarkupTreeView,
+						Document = parsedFile,
+						Command = LandExplorerCommand.SelectPoint
+					};
 
-				ConcernPointCandidatesList.ItemsSource =
-					GetConcernPointCandidates(
-						parsedFile,
-						Editor.GetActiveDocumentSelection(false), 
-						Editor.GetActiveDocumentSelection(true)
-					);
+					ConcernPointCandidatesList.ItemsSource =
+						GetConcernPointCandidates(
+							parsedFile,
+							Editor.GetActiveDocumentSelection(false),
+							Editor.GetActiveDocumentSelection(true)
+						);
 
-				ConfigureMarkupElementTab(true);
+					ConfigureMarkupElementTab(true);
 
-				SetStatus("Добавление точки", ControlStatus.Pending);
+					SetStatus("Добавление точки", ControlStatus.Pending);
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_AddPoint_Executed(object sender, RoutedEventArgs e)
 		{
-			var fileName = Editor.GetActiveDocumentName();
-			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
-
-			if (parsedFile != null)
+			try
 			{
-				var candidate = GetConcernPointCandidates(
-					parsedFile,
-					Editor.GetActiveDocumentSelection(false),
-					Editor.GetActiveDocumentSelection(true)
-				)
-				.OfType<ExistingConcernPointCandidate>()
-				.FirstOrDefault(c => c.Line == null
-					&& c.Node.Type != Land.Core.Specification.Grammar.CUSTOM_BLOCK_RULE_NAME
-				);
+				var fileName = Editor.GetActiveDocumentName();
+				var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
 
-				if (candidate != null)
+				if (parsedFile != null)
 				{
-					MarkupManager.AddConcernPoint(
-						candidate.Node,
-						null,
+					var candidate = GetConcernPointCandidates(
 						parsedFile,
-						candidate.ViewHeader,
-						null,
-						State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
+						Editor.GetActiveDocumentSelection(false),
+						Editor.GetActiveDocumentSelection(true)
+					)
+					.OfType<ExistingConcernPointCandidate>()
+					.FirstOrDefault(c => c.Line == null
+						&& c.Node.Type != Land.Core.Specification.Grammar.CUSTOM_BLOCK_RULE_NAME
 					);
 
-					if (State.SelectedItem_MarkupTreeView != null)
+					if (candidate != null)
 					{
-						State.SelectedItem_MarkupTreeView.IsExpanded = true;
-					}
+						MarkupManager.AddConcernPoint(
+							candidate.Node,
+							null,
+							parsedFile,
+							candidate.ViewHeader,
+							null,
+							State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
+						);
 
-					SetStatus("Привязка произведена", ControlStatus.Success);
+						if (State.SelectedItem_MarkupTreeView != null)
+						{
+							State.SelectedItem_MarkupTreeView.IsExpanded = true;
+						}
+
+						SetStatus("Привязка произведена", ControlStatus.Success);
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_AddLand_Executed(object sender, RoutedEventArgs e)
 		{
-			var fileName = Editor.GetActiveDocumentName();
-			var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
-
-			if (parsedFile != null)
+			try
 			{
-				MarkupManager.AddLand(parsedFile);
+				var fileName = Editor.GetActiveDocumentName();
+				var parsedFile = LogFunction(() => GetParsed(fileName), true, false);
+
+				if (parsedFile != null)
+				{
+					MarkupManager.AddLand(parsedFile);
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_AddConcern_Executed(object sender, RoutedEventArgs e)
 		{
-			MarkupManager.AddConcern(
-				"Новая функциональность", 
-				null,
-				State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
-			);
-
-			if (State.SelectedItem_MarkupTreeView != null)
+			try
 			{
-				State.SelectedItem_MarkupTreeView.IsExpanded = true;
+				MarkupManager.AddConcern(
+					"Новая функциональность",
+					null,
+					State.SelectedItem_MarkupTreeView?.DataContext as MarkupElement
+				);
+
+				if (State.SelectedItem_MarkupTreeView != null)
+				{
+					State.SelectedItem_MarkupTreeView.IsExpanded = true;
+				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_Save_Executed(object sender, RoutedEventArgs e)
 		{
-			if(!String.IsNullOrWhiteSpace(MarkupFilePath))
+			try
 			{
-				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
+				if (!String.IsNullOrWhiteSpace(MarkupFilePath))
+				{
+					MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
 
-				SetStatus("Разметка сохранена", ControlStatus.Success);
+					SetStatus("Разметка сохранена", ControlStatus.Success);
+				}
+				else
+				{
+					Command_SaveAs_Executed(sender, e);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				Command_SaveAs_Executed(sender, e);
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_SaveAs_Executed(object sender, RoutedEventArgs e)
 		{
-			var saveFileDialog = new SaveFileDialog()
+			try
 			{
-				AddExtension = true,
-				DefaultExt = "landmark",
-				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*",
-				InitialDirectory = Path.GetDirectoryName(MarkupFilePath),
-				FileName = Path.GetFileName(MarkupFilePath)
-			};
+				var saveFileDialog = new SaveFileDialog()
+				{
+					AddExtension = true,
+					DefaultExt = "landmark",
+					Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*",
+					InitialDirectory = Path.GetDirectoryName(MarkupFilePath),
+					FileName = Path.GetFileName(MarkupFilePath)
+				};
 
-			if (saveFileDialog.ShowDialog() == true)
+				if (saveFileDialog.ShowDialog() == true)
+				{
+					MarkupFilePath = saveFileDialog.FileName;
+					MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
+
+					SetStatus("Разметка сохранена", ControlStatus.Success);
+				}
+			}
+			catch (Exception ex)
 			{
-				MarkupFilePath = saveFileDialog.FileName;
-				MarkupManager.Serialize(MarkupFilePath, !SettingsObject.SaveAbsolutePath);
-
-				SetStatus("Разметка сохранена", ControlStatus.Success);
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_Open_Executed(object sender, RoutedEventArgs e)
 		{
-			if (HasUnsavedChanges)
+			try
 			{
-				switch (SWF.MessageBox.Show(
-					"Сохранить изменения текущей разметки?",
-					"Создание новой разметки",
-					SWF.MessageBoxButtons.YesNoCancel,
-					SWF.MessageBoxIcon.Question))
+				if (HasUnsavedChanges)
 				{
-					case SWF.DialogResult.Yes:
-						Command_Save_Executed(sender, e);
-						break;
-					case SWF.DialogResult.Cancel:
-						return;
+					switch (SWF.MessageBox.Show(
+						"Сохранить изменения текущей разметки?",
+						"Создание новой разметки",
+						SWF.MessageBoxButtons.YesNoCancel,
+						SWF.MessageBoxIcon.Question))
+					{
+						case SWF.DialogResult.Yes:
+							Command_Save_Executed(sender, e);
+							break;
+						case SWF.DialogResult.Cancel:
+							return;
+					}
+				}
+
+				var openFileDialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					DefaultExt = "landmark",
+					Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
+				};
+
+				if (openFileDialog.ShowDialog() == true)
+				{
+					OpenFile(openFileDialog.FileName);
 				}
 			}
-
-			var openFileDialog = new OpenFileDialog()
+			catch (Exception ex)
 			{
-				AddExtension = true,
-				DefaultExt = "landmark",
-				Filter = "Файлы LANDMARK (*.landmark)|*.landmark|Все файлы (*.*)|*.*"
-			};
-
-			if (openFileDialog.ShowDialog() == true)
-			{
-				OpenFile(openFileDialog.FileName);
+				ShowExceptionWindow(ex);
 			}
 		}
 
-        private void Command_New_Executed(object sender, RoutedEventArgs e)
-        {
-            if (HasUnsavedChanges)
-            {
-                switch (SWF.MessageBox.Show(
-                    "Сохранить изменения текущей разметки?",
-                    "Создание новой разметки",
-                    SWF.MessageBoxButtons.YesNoCancel,
-                    SWF.MessageBoxIcon.Question))
-                {
-                    case SWF.DialogResult.Yes:
-                        Command_Save_Executed(sender, e);
-                        break;
-                    case SWF.DialogResult.Cancel:
-                        return;
-                }
-            }
-
-            MarkupManager.Clear();
-            MarkupFilePath = null;
-
-			SetStatus("Создана новая разметка", ControlStatus.Success);
-        }
-
-        private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
+		private void Command_New_Executed(object sender, RoutedEventArgs e)
 		{
-			State.HighlightConcerns = !State.HighlightConcerns;
+			try
+			{
+				if (HasUnsavedChanges)
+				{
+					switch (SWF.MessageBox.Show(
+						"Сохранить изменения текущей разметки?",
+						"Создание новой разметки",
+						SWF.MessageBoxButtons.YesNoCancel,
+						SWF.MessageBoxIcon.Question))
+					{
+						case SWF.DialogResult.Yes:
+							Command_Save_Executed(sender, e);
+							break;
+						case SWF.DialogResult.Cancel:
+							return;
+					}
+				}
 
-			if(!State.HighlightConcerns)
-				Editor.ResetSegments();		
+				MarkupManager.Clear();
+				MarkupFilePath = null;
+
+				SetStatus("Создана новая разметка", ControlStatus.Success);
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
+		}
+
+		private void Command_Highlight_Executed(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				State.HighlightConcerns = !State.HighlightConcerns;
+
+				if (!State.HighlightConcerns)
+					Editor.ResetSegments();
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
 		}
 
 		private void Command_OpenConcernGraph_Executed(object sender, RoutedEventArgs e)
 		{
-			if (MarkupManager.IsValid)
+			try
 			{
-				var graphWindow = new Window_ConcernGraph(MarkupManager);
-				graphWindow.Show();
+				if (MarkupManager.IsValid)
+				{
+					var graphWindow = new Window_ConcernGraph(MarkupManager);
+					graphWindow.Show();
+				}
+				else
+				{
+					SetStatus(
+						"Для работы с отношениями необходимо синхронизировать разметку с кодом",
+						ControlStatus.Error
+					);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				SetStatus(
-					"Для работы с отношениями необходимо синхронизировать разметку с кодом", 
-					ControlStatus.Error
-				);
+				ShowExceptionWindow(ex);
 			}
 		}
 
@@ -330,13 +443,13 @@ namespace Land.Control
 		}
 
 		private void Command_HasUnsavedChanges_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
+		{
 			e.CanExecute = MarkupManager?.HasUnsavedChanges ?? false;
 		}
 
 		private void Command_MarkupTree_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MarkupTreeView != null 
+			e.CanExecute = MarkupTreeView != null
 				&& MarkupTreeView.SelectedItem != null;
 		}
 
@@ -378,21 +491,17 @@ namespace Land.Control
 
 				LogAction(() => ReloadParsers(), true, true);
 
-				var serializer = new DataContractSerializer(
-					typeof(LandExplorerSettings),
-					new Type[] { typeof(ParserSettingsItem) }
-				);
-
-				using (var memStm = new MemoryStream())
+				if (File.Exists(Settings.Default.SettingsFilePath))
 				{
-					serializer.WriteObject(memStm, SettingsObject);
-					memStm.Seek(0, SeekOrigin.Begin);
-
-					using (var streamReader = new StreamReader(memStm))
-					{
-						Settings.Default.SerializedSettings = streamReader.ReadToEnd();
-						Settings.Default.Save();
-					}
+					File.WriteAllText(
+						Settings.Default.SettingsFilePath,
+						SettingsSerializer.Serialize(SettingsObject)
+					);
+				}
+				else
+				{
+					Settings.Default.SerializedSettings = SettingsSerializer.Serialize(SettingsObject);
+					Settings.Default.Save();
 				}
 			}
 		}
@@ -423,43 +532,57 @@ namespace Land.Control
 
 		private void Command_Copy_Executed(object sender, RoutedEventArgs e)
 		{
-			if (MarkupTreeView.IsKeyboardFocusWithin && State.SelectedItem_MarkupTreeView != null)
+			try
 			{
-				State.BufferedDataContext = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
-				SetStatus("Элемент скопирован", ControlStatus.Pending);
+				if (MarkupTreeView.IsKeyboardFocusWithin && State.SelectedItem_MarkupTreeView != null)
+				{
+					State.BufferedDataContext = (MarkupElement)State.SelectedItem_MarkupTreeView.DataContext;
+					SetStatus("Элемент скопирован", ControlStatus.Pending);
+				}
+				else if (RelationSource.IsKeyboardFocusWithin && RelationSource.Tag != null)
+				{
+					State.BufferedDataContext = (MarkupElement)RelationSource.Tag;
+					SetStatus("Элемент скопирован", ControlStatus.Pending);
+				}
+				else if (RelationTarget.IsKeyboardFocusWithin && RelationTarget.Tag != null)
+				{
+					State.BufferedDataContext = (MarkupElement)RelationTarget.Tag;
+					SetStatus("Элемент скопирован", ControlStatus.Pending);
+				}
 			}
-			else if(RelationSource.IsKeyboardFocusWithin && RelationSource.Tag != null)
+			catch (Exception ex)
 			{
-				State.BufferedDataContext = (MarkupElement)RelationSource.Tag;
-				SetStatus("Элемент скопирован", ControlStatus.Pending);
-			}
-			else if(RelationTarget.IsKeyboardFocusWithin && RelationTarget.Tag != null)
-			{
-				State.BufferedDataContext = (MarkupElement)RelationTarget.Tag;
-				SetStatus("Элемент скопирован", ControlStatus.Pending);
+				ShowExceptionWindow(ex);
 			}
 		}
 
 		private void Command_Paste_Executed(object sender, RoutedEventArgs e)
 		{
-			if (State.BufferedDataContext != null)
+			try
 			{
-				if (RelationSource.IsKeyboardFocusWithin)
+				if (State.BufferedDataContext != null)
 				{
-					RelationSource.Tag = State.BufferedDataContext;
-					RefreshRelationCandidates();
-					State.BufferedDataContext = null;
+					if (RelationSource.IsKeyboardFocusWithin)
+					{
+						RelationSource.Tag = State.BufferedDataContext;
+						RefreshRelationCandidates();
+						State.BufferedDataContext = null;
 
-					SetStatus("Элемент вставлен", ControlStatus.Ready);
-				}
-				else if (RelationTarget.IsKeyboardFocusWithin)
-				{
-					RelationTarget.Tag = State.BufferedDataContext;
-					RefreshRelationCandidates();
-					State.BufferedDataContext = null;
+						SetStatus("Элемент вставлен", ControlStatus.Ready);
+					}
+					else if (RelationTarget.IsKeyboardFocusWithin)
+					{
+						RelationTarget.Tag = State.BufferedDataContext;
+						RefreshRelationCandidates();
+						State.BufferedDataContext = null;
 
-					SetStatus("Элемент вставлен", ControlStatus.Ready);
+						SetStatus("Элемент вставлен", ControlStatus.Ready);
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
 			}
 		}
 
@@ -468,7 +591,7 @@ namespace Land.Control
 		#region Methods
 
 		private void OpenFile(string fileName)
-        {
+		{
 			MarkupManager.Deserialize(fileName, Parsers.Grammars);
 			MarkupFilePath = fileName;
 
@@ -485,7 +608,7 @@ namespace Land.Control
 						End = new PointLocation(0, 0, 0)
 					};
 
-					if(p.LineContext != null)
+					if (p.LineContext != null)
 					{
 						p.LineLocation = new SegmentLocation
 						{
@@ -504,8 +627,8 @@ namespace Land.Control
 		}
 
 		private List<ConcernPointCandidate> GetConcernPointCandidates(
-			ParsedFile file, 
-			SegmentLocation realSelection, 
+			ParsedFile file,
+			SegmentLocation realSelection,
 			SegmentLocation adjustedSelection)
 		{
 			/// Для выделения находим сущности, объемлющие его
@@ -514,19 +637,19 @@ namespace Land.Control
 				.ToList();
 
 			/// Проверяем, можно ли привязаться к строке
-			if(adjustedSelection.Start.Line == adjustedSelection.End.Line)
+			if (adjustedSelection.Start.Line == adjustedSelection.End.Line)
 			{
 				var candidate = candidates
 					.OfType<ExistingConcernPointCandidate>()
 					.FirstOrDefault(c => c.Node.Location.Includes(adjustedSelection));
 
-				if(candidate != null)
+				if (candidate != null)
 				{
 					candidates.Insert(0, new StringConcernPointCandidate
 					{
 						Node = candidate.Node,
 						Line = adjustedSelection,
-						ViewHeader = "строка: " 
+						ViewHeader = "строка: "
 							+ file.Text.Substring(adjustedSelection.Start.Offset, adjustedSelection.Length.Value).Trim()
 					});
 				}
@@ -541,6 +664,12 @@ namespace Land.Control
 			}
 
 			return candidates;
+		}
+
+		private void ShowExceptionWindow(Exception ex)
+		{
+			var exceptionWindow = new Window_Exception(ex.ToString());
+			exceptionWindow.ShowDialog();
 		}
 
 		#endregion

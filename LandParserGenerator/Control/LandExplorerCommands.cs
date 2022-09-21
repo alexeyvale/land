@@ -95,14 +95,14 @@ namespace Land.Control
 
 		public static RoutedUICommand RelinkSame_Markup { get; } = new RoutedUICommand
 			(
-				"Перепривязать к другому элементу в этом же месте",
+				"Перепривязаться к объемлющему или вложенному элементу",
 				"RelinkSame",
 				typeof(LandExplorerCommands)
 			);
 
 		public static RoutedUICommand RelinkCurrent_Markup { get; } = new RoutedUICommand
 			(
-				"Перепривязать к текущему месту",
+				"Перепривязаться к текущему месту в коде",
 				"RelinkCurrent",
 				typeof(LandExplorerCommands)
 			);
@@ -116,7 +116,7 @@ namespace Land.Control
 
 		public static RoutedUICommand Relink_Missing { get; } = new RoutedUICommand
 			(
-				"Перепривязать к текущему месту",
+				"Перепривязаться к текущему месту в коде",
 				"Relink",
 				typeof(LandExplorerCommands)
 			);

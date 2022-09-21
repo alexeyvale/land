@@ -34,5 +34,17 @@ namespace Land.Control.Properties {
                 this["SerializedSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SettingsFilePath {
+            get {
+                return ((string)(this["SettingsFilePath"]));
+            }
+            set {
+                this["SettingsFilePath"] = value;
+            }
+        }
     }
 }

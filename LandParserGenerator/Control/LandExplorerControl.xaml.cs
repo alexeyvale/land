@@ -50,6 +50,9 @@ namespace Land.Control
 			public PendingCommandInfo PendingCommand { get; set; }		
 
 			public bool HighlightConcerns { get; set; }
+
+			public Dictionary<string, string> TextsBeingEdited { get; set; } = 
+				new Dictionary<string, string>(); 
 		}
 
 		private static readonly int CACHE_DIRECTORY_DAYS = 30;
@@ -166,13 +169,13 @@ namespace Land.Control
 
         #region API
 
-        public void Initialize(IEditorAdapter adapter)
+        public void Initialize(IEditorAdapter adapter, string settingsFilePath = null)
 		{
 			Editor = adapter;
 			Editor.RegisterOnDocumentChanged(DocumentChangedHandler);
 
 			/// Загружаем настройки панели разметки
-			LoadSettings();
+			LoadSettings(settingsFilePath);
 
 			/// В TreeView будем показывать текущее дерево разметки
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
@@ -301,11 +304,22 @@ namespace Land.Control
 		public void ImportSettings(string fileName)
 		{
 			var settingsId = SettingsObject.Id;
+
 			SettingsObject = SettingsSerializer.Deserialize(fileName, true);
 			SettingsObject.Id = settingsId;
 
-			Settings.Default.SerializedSettings = SettingsSerializer.Serialize(SettingsObject);
-			Settings.Default.Save();
+			if(File.Exists(Settings.Default.SettingsFilePath))
+			{
+				File.WriteAllText(
+					Settings.Default.SettingsFilePath,
+					SettingsSerializer.Serialize(SettingsObject)
+				);
+			}
+			else
+			{
+				Settings.Default.SerializedSettings = SettingsSerializer.Serialize(SettingsObject);
+				Settings.Default.Save();
+			}
 
 			LogAction(() => ReloadParsers(), true, true);
 		}
@@ -418,19 +432,29 @@ namespace Land.Control
 
 		#region Settings
 
-		private void LoadSettings()
+		private void LoadSettings(string settingsFilePath = null)
 		{
-			var serializer = new DataContractSerializer(
-				typeof(LandExplorerSettings),
-				new Type[] { typeof(ParserSettingsItem) }
-			);
+			settingsFilePath = settingsFilePath ?? Settings.Default.SettingsFilePath;
 
-			if (String.IsNullOrEmpty(Settings.Default.SerializedSettings))
+			if (File.Exists(settingsFilePath))
+			{
+				SettingsObject = SettingsSerializer.Deserialize(settingsFilePath, false);
+
+				Settings.Default.SettingsFilePath = settingsFilePath;
+				Settings.Default.SerializedSettings = null;
+				Settings.Default.Save();
+			}
+			else if (String.IsNullOrEmpty(Settings.Default.SerializedSettings))
 			{
 				SettingsObject = new LandExplorerSettings() { Id = Guid.NewGuid() };
 			}
 			else
 			{
+				var serializer = new DataContractSerializer(
+					typeof(LandExplorerSettings),
+					new Type[] { typeof(ParserSettingsItem) }
+				);
+
 				using (var memStm = new MemoryStream(Encoding.UTF8.GetBytes(Settings.Default.SerializedSettings)))
 				{
 					SettingsObject = (LandExplorerSettings)serializer.ReadObject(memStm);
@@ -439,8 +463,6 @@ namespace Land.Control
 
 			/// Перегенерируем парсеры для зарегистрированных в настройках типов файлов
 			LogAction(() => ReloadParsers(), true, true);
-
-			SetStatus("Настройки панели перезагружены", ControlStatus.Success);
 		}
 
 		#endregion
@@ -588,6 +610,6 @@ namespace Land.Control
 			return !cp.HasInvalidLocation;
 		}
 
-		#endregion
+		#endregion	
 	}
 }

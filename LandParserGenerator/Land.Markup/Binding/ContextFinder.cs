@@ -669,7 +669,7 @@ namespace Land.Markup.Binding
 					{
 						c.SiblingsNearestSimilarity = LocationManager.GetSimilarity(point, c.Context);
 
-						if (checkAllSiblings)
+						if (checkAllSiblings && point.SiblingsContext.Before?.All != null)
 						{
 							c.SiblingsAllSimilarity = EvalSimilarity(point.SiblingsContext, c.Context.SiblingsContext);
 						}

@@ -28,14 +28,14 @@ namespace Land.Control.Helpers
 						settingsObject = (LandExplorerSettings)serializer.ReadObject(fs);
 					}
 
-					if (generateNewGuids)
+					if (generateNewGuids || !settingsObject.Id.HasValue)
 					{
-						settingsObject.Id = new Guid();
+						settingsObject.Id = Guid.NewGuid();
+					}
 
-						foreach (var parser in settingsObject.Parsers)
-						{
-							parser.Id = new Guid();
-						}
+					foreach (var parser in settingsObject.Parsers.Where(p => generateNewGuids || !p.Id.HasValue))
+					{
+						parser.Id = Guid.NewGuid();
 					}
 
 					/// Если в файле прописаны относительные пути, 

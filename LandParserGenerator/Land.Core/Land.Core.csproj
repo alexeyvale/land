@@ -47,8 +47,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\components\Antlr\Antlr4.Runtime.Standard.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="QUT.ShiftReduceParser">
       <HintPath>..\components\GPPG\QUT.ShiftReduceParser.dll</HintPath>
@@ -125,13 +125,11 @@
     <None Include="App.config" />
     <None Include="Core\Specification\Parsing\_ymc\Land.lex" />
     <None Include="Core\Specification\Parsing\_ymc\Land.y" />
-    <None Include="packages.config" />
     <Content Include="Resources\Models\cs.pkl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\apply_ml.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\apply_ml.py" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\antlr-4.7-complete.jar">

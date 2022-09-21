@@ -1,12 +1,10 @@
 <LandExplorerSettings xmlns="http://schemas.datacontract.org/2004/07/Land.Control" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-	<Id>b961829e-8bb0-4ae2-935a-ad523b86cf9a</Id>
 	<Parsers>
 		<ParserSettingsItem>
 			<Extensions xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
 				<a:string>.cs</a:string>
 			</Extensions>
 			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>da768431-9c84-4210-b9ce-ac63a21c0b15</Id>
 			<ParserPath>.\Libraries\Sharp\sharp.dll</ParserPath>
 			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
 				<a:string>.\Libraries\Sharp\sharp_preprocessor.dll</a:string>
@@ -25,7 +23,6 @@
 				<a:string>.md</a:string>
 			</Extensions>
 			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>21d470dd-28ad-4383-a0e8-b8de629688ff</Id>
 			<ParserPath>.\Libraries\Markdown\markdown.dll</ParserPath>
 			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
 			<PreprocessorPath>.\Libraries\Markdown\MarkdownPreprocessing.TreePostprocessing.dll</PreprocessorPath>
@@ -37,7 +34,6 @@
 				<a:string>.yacc</a:string>
 			</Extensions>
 			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>a2b45d17-aa63-47fd-be4d-920d32a4175f</Id>
 			<ParserPath>.\Libraries\Yacc\yacc.dll</ParserPath>
 			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
 			<PreprocessorPath i:nil="true"/>
@@ -48,19 +44,7 @@
 				<a:string>.lex</a:string>
 			</Extensions>
 			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>3ad62966-446c-43a0-bca9-b9d7ded86f61</Id>
 			<ParserPath>.\Libraries\Lex\lex.dll</ParserPath>
-			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<PreprocessorPath i:nil="true"/>
-			<PreprocessorProperties/>
-		</ParserSettingsItem>
-		<ParserSettingsItem>
-			<Extensions xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
-				<a:string>.ts</a:string>
-			</Extensions>
-			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>10ad3745-deb3-4211-8592-a5b681a6fb11</Id>
-			<ParserPath>.\Libraries\Typescript\typescript.dll</ParserPath>
 			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
 			<PreprocessorPath i:nil="true"/>
 			<PreprocessorProperties/>
@@ -70,7 +54,6 @@
 				<a:string>.xml</a:string>
 			</Extensions>
 			<ParserDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
-			<Id>48373fe1-9188-49e3-936d-760f777c3e10</Id>
 			<ParserPath>.\Libraries\Xml\xml.dll</ParserPath>
 			<PreprocessorDependencies xmlns:a="http://schemas.microsoft.com/2003/10/Serialization/Arrays"/>
 			<PreprocessorPath i:nil="true"/>

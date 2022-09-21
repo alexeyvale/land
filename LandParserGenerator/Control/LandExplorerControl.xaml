@@ -51,9 +51,9 @@
 		</Grid.Resources>
 
 		<Grid.RowDefinitions>
-			<RowDefinition Height="70*" MinHeight="200"></RowDefinition>
+			<RowDefinition Height="65*" MinHeight="200"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
-            <RowDefinition Height="30*" MinHeight="200"></RowDefinition>
+            <RowDefinition Height="35*" MinHeight="200"></RowDefinition>
             <RowDefinition Height="30"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -120,7 +120,7 @@
 				<Button Content="&#xf0b2;" ToolTip="Обновить привязки глобально" Click="ApplyMapping_Click" Name="ApplyMappingGlobal"></Button>
 				<Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
             </ToolBar>
-            <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="14pt" AllowDrop="True"
+            <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="12pt" AllowDrop="True"
                 MouseLeftButtonUp="MarkupTreeView_MouseLeftButtonUp"
                 PreviewMouseLeftButtonDown="MarkupTreeView_PreviewMouseLeftButtonDown"
                 PreviewMouseRightButtonDown="MarkupTreeView_PreviewMouseRightButtonDown"
@@ -160,7 +160,7 @@
 								<Label Name="MissingIcon"  Content="&#xf111;" FontFamily="{StaticResource FontAwesomeRegular}"/>
 							</Grid>
 							<Grid>
-								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+								<TextBlock Text="{Binding Path=Name, Mode=OneWay}" VerticalAlignment="Center"/>
 							</Grid>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
@@ -196,22 +196,26 @@
         </Grid>
         <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
 		<TabControl Grid.Row="2" Name="Tabs">
+			<TabControl.Resources>
+				<Style TargetType="Button">
+					<Setter Property="Padding" Value="5 5 5 5"></Setter>
+				</Style>
+
+				<Style TargetType="{x:Type Button}" x:Key="IconButton">
+					<Setter Property="FontSize" Value="10pt"/>
+					<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
+					<Setter Property="Background" Value="White"/>
+					<Setter Property="BorderBrush" Value="White"/>
+					<Setter Property="Foreground" Value="DarkBlue"/>
+					<Setter Property="Height" Value="25px"/>
+					<Setter Property="Width" Value="25px"/>
+				</Style>
+			</TabControl.Resources>
+			
 			<TabItem Header="Текущая точка" Name="MarkupElementTab">
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<Grid Name="ConcernPointPanel" Visibility="Collapsed">
-							<Grid.Resources>
-								<Style TargetType="Button">
-									<Setter Property="Padding" Value="5 5 5 5"></Setter>
-								</Style>
-
-								<Style TargetType="{x:Type Button}" x:Key="IconButton">
-									<Setter Property="FontSize" Value="12pt"/>
-									<Setter Property="FontFamily" Value="{StaticResource FontAwesomeSolid}"/>
-									<Setter Property="Background" Value="White"/>
-									<Setter Property="BorderBrush" Value="White"/>
-								</Style>
-							</Grid.Resources>
 							<Grid.RowDefinitions>
 								<RowDefinition></RowDefinition>
 								<RowDefinition Height="60*"></RowDefinition>
@@ -220,10 +224,22 @@
 								<RowDefinition></RowDefinition>
 								<RowDefinition Height="40*"></RowDefinition>
 							</Grid.RowDefinitions>
+							
 							<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 0 5" Grid.Row="0">
-								<Button Name="ConcernPointSaveButton" Click="ConcernPointSaveButton_Click" Margin="0, 0, 20, 0">Сохранить</Button>
-								<Button Name="ConcernPointCancelButton" Click="ConcernPointCancelButton_Click">Отменить</Button>
+								<Button Style="{StaticResource IconButton}" 
+										Name="ConcernPointSaveButton" 
+										Click="ConcernPointSaveButton_Click" 
+										Content="&#xf00c;" 
+										ToolTip="Сохранить">
+								</Button>
+								<Button Style="{StaticResource IconButton}" 
+										Name="ConcernPointCancelButton" 
+										Click="ConcernPointCancelButton_Click" 
+										Content="&#xf00d;" 
+										ToolTip="Отменить">
+								</Button>
 							</StackPanel>
+							
 							<ListBox
 								Grid.Row="1"
 								FontSize="12pt"
@@ -231,19 +247,23 @@
 								SelectionChanged="ConcernPointCandidatesList_SelectionChanged"
 								MouseDoubleClick="ConcernPointCandidatesList_MouseDoubleClick">
 							</ListBox>
-							<Label Content="Имя" Grid.Row="2"/>
-							<Grid Grid.Row="3">
+							<Grid Grid.Row="2">
 								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="100*"></ColumnDefinition>
-									<ColumnDefinition Width="25"></ColumnDefinition>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="Auto" />
 								</Grid.ColumnDefinitions>
-								<TextBox Name="ConcernPointNameText" PreviewKeyDown="ConcernPointNameText_PreviewKeyDown" Grid.Column="0"/>
-								<Button Click="ConcernPointNameText_Reset_Click" 
-											Content="&#xf060;" 
-											Style="{StaticResource IconButton}"
-											ToolTip="Заменить на стандартное имя кандидата"
-											Grid.Column="1"/>
+								<Label Content="Имя" Grid.Column="0"/>
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 10 5" Grid.Column="2">
+									<Button Style="{StaticResource IconButton}" 
+											Click="ConcernPointNameText_Reset_Click" 
+											Content="&#xf021;"
+											ToolTip="Заменить на имя по умолчанию" 
+											VerticalAlignment="Bottom">
+									</Button>
+								</StackPanel>
 							</Grid>
+							<TextBox Grid.Row="3" Name="ConcernPointNameText" PreviewKeyDown="ConcernPointNameText_PreviewKeyDown" />
 							<Label Content="Комментарий" Grid.Row="4" />
 							<TextBox 
 								Grid.Row="5"
@@ -274,18 +294,40 @@
 								<RowDefinition Height="100*"></RowDefinition>
 							</Grid.RowDefinitions>
 
-							<Label Content="Имя" Grid.Row="0" />
+							<Grid Grid.Row="0">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Label Content="Имя" Grid.Column="0"/>
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 10 5" Grid.Column="2">
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointNameEditButton" Click="MarkupElementNameEdit_Click" Content="&#xf304;" ToolTip="Редактировать" VerticalAlignment="Bottom"></Button>
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointNameEditSaveButton" Click="MarkupElementNameSave_Click" Content="&#xf00c;" ToolTip="Сохранить" Width="0px" Visibility="Hidden"></Button>
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointNameEditCancelButton" Click="MarkupElementNameCancel_Click" Content="&#xf00d;" ToolTip="Отменить" Width="0px" Visibility="Hidden"></Button>
+								</StackPanel>
+							</Grid>
 							<TextBox
-								Grid.Row="1"
-								Name="MarkupElementNameText"
-								Margin="5 0 5 0"
-								IsReadOnly="True"
-								MouseDoubleClick="MarkupElementText_MouseDoubleClick"
-								LostFocus="MarkupElementText_LostFocus"
-								Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Name, Mode=TwoWay}">
+									Grid.Row="1"
+									Name="MarkupElementNameText"
+									Margin="5 0 5 0"
+									IsReadOnly="True">
 							</TextBox>
 
-							<Label Content="Комментарий" Grid.Row="2"/>
+							<Grid Grid.Row="2">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Label Content="Комментарий" />
+								<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 5 10 5" Grid.Column="2">
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointCommentEditButton" Click="MarkupElementCommentEdit_Click" Content="&#xf304;" ToolTip="Редактировать" VerticalAlignment="Bottom"></Button>
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointCommentEditSaveButton" Click="MarkupElementCommentSave_Click" Content="&#xf00c;" ToolTip="Сохранить" Width="0px" Visibility="Hidden"></Button>
+									<Button Style="{StaticResource IconButton}" Name="CurrentPointCommentEditCancelButton" Click="MarkupElementCommentCancel_Click" Content="&#xf00d;" ToolTip="Отменить" Width="0px" Visibility="Hidden"></Button>
+								</StackPanel>
+							</Grid>
+
 							<TextBox 
 								Grid.Row="3"
 								TextWrapping="Wrap" 
@@ -293,10 +335,7 @@
 								Name="MarkupElementCommentText"
 								ScrollViewer.VerticalScrollBarVisibility="Auto"
 								Margin="5 0 5 10"
-								IsReadOnly="True"
-								MouseDoubleClick="MarkupElementText_MouseDoubleClick"
-								LostFocus="MarkupElementText_LostFocus"
-								Text="{Binding ElementName=MarkupTreeView, Path=SelectedItem.Comment, Mode=TwoWay}">
+								IsReadOnly="True">
 							</TextBox>
 						</Grid>
 					</Grid>

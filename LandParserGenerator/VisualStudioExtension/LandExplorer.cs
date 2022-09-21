@@ -36,16 +36,11 @@ namespace Land.VisualStudioExtension
 			var control = new LandExplorerControl();
 			var adapter = new EditorAdapter();
 
-			control.Initialize(adapter);
+			var path = System.IO.Path.GetDirectoryName(
+                System.Reflection.Assembly.GetExecutingAssembly().Location
+            );
 
-			if (!control.AreSettingsSet())
-			{
-				var path = System.IO.Path.GetDirectoryName(
-					System.Reflection.Assembly.GetExecutingAssembly().Location
-				);
-
-				control.ImportSettings($"{path}/Resources/DefaultSettings.xml");
-			}
+            control.Initialize(adapter, $"{path}/Resources/Settings.xml");
 
 			this.Content = Control = control;
 		}

@@ -16,10 +16,14 @@ namespace Land.Markup
 		{
 			var jo = Newtonsoft.Json.Linq.JObject.Load(reader);
 
-			if (jo.ContainsKey("Elements"))
+			if (jo.TryGetValue("Elements", out Newtonsoft.Json.Linq.JToken value))
+			{
 				return jo.ToObject<Concern>(serializer);
+			}
 			else
+			{
 				return jo.ToObject<ConcernPoint>(serializer);
+			}
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
