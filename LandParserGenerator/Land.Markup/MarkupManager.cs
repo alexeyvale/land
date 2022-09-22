@@ -512,6 +512,25 @@ namespace Land.Markup
 			var pointContexts = GetPointContexts();
 			var fileGroups = pointContexts.GroupBy(e => e.FileName);
 
+			/// Правим связи, убираем из ближайших потерянные или удалённые точки
+			var concernPointsDict = GetConcernPoints()
+				.ToDictionary(cp => cp.Id, cp => cp);
+
+			foreach(var cp in concernPointsDict.Values)
+			{
+				cp.Context.LinkedClosestPoints.IntersectWith(
+					cp.Context.LinkedClosestPoints.Where(id => concernPointsDict.ContainsKey(id))
+				);
+
+				cp.Context.LinkedBeforeNeighbours.IntersectWith(
+					cp.Context.LinkedBeforeNeighbours.Where(id => concernPointsDict.ContainsKey(id))
+				);
+
+				cp.Context.LinkedAfterNeighbours.IntersectWith(
+					cp.Context.LinkedAfterNeighbours.Where(id => concernPointsDict.ContainsKey(id))
+				);
+			}
+
 			/// Если нужно сохранить в файле разметки относиельные пути
 			if (useRelativePaths)
 			{
