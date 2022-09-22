@@ -212,6 +212,11 @@ namespace Land.Control
 
 		#region Редактирование имени существующей точки и комментария
 
+		private void MarkupElementText_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			MarkupElementNameEdit_Click(null, null);
+		}
+
 		private void MarkupElementNameEdit_Click(object sender, RoutedEventArgs e)
 		{
 			SetMarkupElementNameEditState(true);
