@@ -65,6 +65,13 @@ namespace Land.Control
 				typeof(LandExplorerCommands)
 			);
 
+		public static RoutedUICommand CollapseAll { get; } = new RoutedUICommand
+			(
+				"Свернуть всё",
+				"CollapseAll",
+				typeof(LandExplorerCommands)
+			);
+
 		public static RoutedUICommand DeleteWithSource { get; } = new RoutedUICommand
 			(
 				"Удалить вместе с исходным кодом",

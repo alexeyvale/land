@@ -263,7 +263,7 @@ namespace Land.Control
 		/// </summary>
 		public void Open(string fileName)
         {
-			OpenFile(fileName);
+			LoadFromFile(fileName);
 		}
 
 		/// <summary>
@@ -446,7 +446,11 @@ namespace Land.Control
 			}
 			else if (String.IsNullOrEmpty(Settings.Default.SerializedSettings))
 			{
-				SettingsObject = new LandExplorerSettings() { Id = Guid.NewGuid() };
+				SettingsObject = new LandExplorerSettings()
+				{
+					Id = Guid.NewGuid(),
+					EnableAutosave = true
+				};
 			}
 			else
 			{

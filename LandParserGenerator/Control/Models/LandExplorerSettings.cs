@@ -69,6 +69,9 @@ namespace Land.Control
 		public Guid? Id { get; set; }
 
 		[DataMember]
+		public bool EnableAutosave { get; set; }
+
+		[DataMember]
 		public bool SaveAbsolutePath { get; set; }
 
 		[DataMember]
@@ -83,6 +86,7 @@ namespace Land.Control
 			{
 				Id = Id,
 				SaveAbsolutePath = SaveAbsolutePath,
+				EnableAutosave = EnableAutosave,
 				PreserveIndentation = PreserveIndentation,
 				Parsers = new ObservableCollection<ParserSettingsItem>(Parsers.Select(g => g.Clone()))
 			};

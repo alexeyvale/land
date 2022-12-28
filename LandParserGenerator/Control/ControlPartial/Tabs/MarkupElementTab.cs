@@ -158,6 +158,11 @@ namespace Land.Control
 					}
 
 					SetStatus($"Привязка завершена", ControlStatus.Success);
+
+					if (SettingsObject.EnableAutosave)
+					{
+						Command_Save_Executed(sender, e);
+					}
 				}
 				else
 				{

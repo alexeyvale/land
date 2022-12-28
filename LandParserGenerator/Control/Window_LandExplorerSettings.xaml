@@ -27,10 +27,15 @@
 			<RowDefinition Height="30"></RowDefinition>
 		</Grid.RowDefinitions>
 
-		<StackPanel Grid.Row="0" Name="AutoPropertiesStack">
+		<StackPanel Grid.Row="0" Name="AutoPropertiesStack" Orientation="Horizontal">
+			<CheckBox Name="EnableAutosaveBool" 
+					  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.EnableAutosave, Mode=TwoWay}"
+					  Margin="0, 5, 0, 10"
+					  Content="Автосохранение разметки">
+			</CheckBox>
 			<CheckBox Name="SaveAbsolutePathBool" 
 					  IsChecked="{Binding ElementName=SettingsWindowObject, Path=SettingsObject.SaveAbsolutePath, Mode=TwoWay}"
-					  Margin="0, 5, 0, 10"
+					  Margin="20, 5, 0, 10"
 					  Content="Сохранять в разметке абсолютные пути к файлам">
 			</CheckBox>
 		</StackPanel>

@@ -234,6 +234,11 @@ namespace Land.Control
 						}
 
 						SetStatus("Привязка произведена", ControlStatus.Success);
+
+						if (SettingsObject.EnableAutosave)
+						{
+							Command_Save_Executed(sender, e);
+						}
 					}
 				}
 			}
@@ -253,6 +258,11 @@ namespace Land.Control
 				if (parsedFile != null)
 				{
 					MarkupManager.AddLand(parsedFile);
+
+					if (SettingsObject.EnableAutosave)
+					{
+						Command_Save_Executed(sender, e);
+					}
 				}
 			}
 			catch (Exception ex)
@@ -274,6 +284,11 @@ namespace Land.Control
 				if (State.SelectedItem_MarkupTreeView != null)
 				{
 					State.SelectedItem_MarkupTreeView.IsExpanded = true;
+				}
+
+				if (SettingsObject.EnableAutosave)
+				{
+					Command_Save_Executed(sender, e);
 				}
 			}
 			catch (Exception ex)
@@ -359,7 +374,7 @@ namespace Land.Control
 
 				if (openFileDialog.ShowDialog() == true)
 				{
-					OpenFile(openFileDialog.FileName);
+					LoadFromFile(openFileDialog.FileName);
 				}
 			}
 			catch (Exception ex)
@@ -437,6 +452,18 @@ namespace Land.Control
 			}
 		}
 
+		private void Command_CollapseAll_Executed(object sender, RoutedEventArgs e)
+		{
+			try
+			{
+				CollapseOrExpand(MarkupTreeView, false);
+			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}
+		}
+
 		private void Command_AlwaysEnabled_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = true;
@@ -449,34 +476,29 @@ namespace Land.Control
 
 		private void Command_MarkupTree_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MarkupTreeView != null
-				&& MarkupTreeView.SelectedItem != null;
+			e.CanExecute = MarkupTreeView?.SelectedItem != null;
 		}
 
 		private void Command_MarkupTree_HasSelectedConcernPoint_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MarkupTreeView != null
-				&& MarkupTreeView.SelectedItem != null
+			e.CanExecute = MarkupTreeView?.SelectedItem != null
 				&& MarkupTreeView.SelectedItem is ConcernPoint;
 		}
 
 		private void Command_MissingTree_HasSelectedItem_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MissingTreeView != null
-				&& MissingTreeView.SelectedItem != null;
+			e.CanExecute = MissingTreeView?.SelectedItem != null;
 		}
 
 		private void Command_MissingTree_HasSelectedConcernPoint_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MissingTreeView != null
-				&& MissingTreeView.SelectedItem != null
+			e.CanExecute = MissingTreeView?.SelectedItem != null
 				&& MissingTreeView.SelectedItem is RemapCandidates;
 		}
 
 		private void Command_MissingTree_HasSelectedCandidate_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = MissingTreeView != null
-				&& MissingTreeView.SelectedItem != null
+			e.CanExecute = MissingTreeView?.SelectedItem != null
 				&& MissingTreeView.SelectedItem is RemapCandidateInfo;
 		}
 
@@ -590,7 +612,7 @@ namespace Land.Control
 
 		#region Methods
 
-		private void OpenFile(string fileName)
+		private void LoadFromFile(string fileName)
 		{
 			MarkupManager.Deserialize(fileName, Parsers.Grammars);
 			MarkupFilePath = fileName;
@@ -622,6 +644,8 @@ namespace Land.Control
 			});
 
 			MarkupTreeView.ItemsSource = MarkupManager.Markup;
+
+			CollapseOrExpand(MarkupTreeView, true);
 
 			SetStatus("Разметка загружена", ControlStatus.Success);
 		}
@@ -664,6 +688,22 @@ namespace Land.Control
 			}
 
 			return candidates;
+		}
+
+		private void CollapseOrExpand(ItemsControl control, bool expand)
+		{
+			for (var i = 0; i < control.Items.Count; ++i)
+			{
+				var treeViewItem = (TreeViewItem)control.ItemContainerGenerator.ContainerFromIndex(i);
+
+				if (treeViewItem != null)
+				{
+					treeViewItem.IsExpanded = expand;
+					treeViewItem.UpdateLayout();
+
+					CollapseOrExpand(treeViewItem, expand);
+				}
+			}
 		}
 
 		private void ShowExceptionWindow(Exception ex)

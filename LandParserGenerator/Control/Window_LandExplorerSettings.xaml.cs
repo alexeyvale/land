@@ -77,6 +77,7 @@ namespace Land.Control
 				SettingsObject.Parsers = deserialized.Parsers;
 				SettingsObject.PreserveIndentation = deserialized.PreserveIndentation;
 				SettingsObject.SaveAbsolutePath = deserialized.SaveAbsolutePath;
+				SettingsObject.EnableAutosave = deserialized.EnableAutosave;
 
 				GrammarsGrid.ItemsSource = SettingsObject.Parsers;
 			}

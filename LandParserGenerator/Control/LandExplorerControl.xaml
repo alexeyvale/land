@@ -34,6 +34,7 @@
 		<CommandBinding Command="local:LandExplorerCommands.RelinkCurrent_Markup" Executed="Command_MarkupTree_RelinkCurrent_Executed" CanExecute="Command_MarkupTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Highlight" Executed="Command_Highlight_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.OpenConcernGraph" Executed="Command_OpenConcernGraph_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
+		<CommandBinding Command="local:LandExplorerCommands.CollapseAll" Executed="Command_CollapseAll_Executed" CanExecute="Command_AlwaysEnabled_CanExecute"/>
 
 		<CommandBinding Command="local:LandExplorerCommands.Delete_Missing" Executed="Command_MissingTree_Delete_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
 		<CommandBinding Command="local:LandExplorerCommands.Relink_Missing" Executed="Command_MissingTree_Relink_Executed" CanExecute="Command_MissingTree_HasSelectedConcernPoint_CanExecute"/>
@@ -106,9 +107,11 @@
 						Command="local:LandExplorerCommands.RelinkCurrent_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<Button Content="&#xf2ed;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
 						Command="local:LandExplorerCommands.Delete_Markup" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
-				
-                <Separator Margin="7"></Separator>
 
+				<Separator Margin="7"></Separator>
+
+				<Button Content="&#xf2d2;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
+						Command="local:LandExplorerCommands.CollapseAll" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
 				<ToggleButton Content="&#xf1fc;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" Name="ToolBar_HighlightButton"
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
 				<Button Content="&#xf0e8;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"

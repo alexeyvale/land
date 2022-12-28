@@ -152,7 +152,9 @@ namespace Land.Control
 			}
 
 			foreach (var item in ExpandedWhileDrag)
+			{
 				item.IsExpanded = false;
+			}
 		}
 
 		private void DropItem(MarkupElement source, MarkupElement target)
