@@ -112,12 +112,12 @@
 				<ToggleButton Content="&#xf1fc;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}" Name="ToolBar_HighlightButton"
 							  Command="local:LandExplorerCommands.Highlight" CommandTarget="{Binding ElementName=LandExplorer}"></ToggleButton>
 				<Button Content="&#xf0e8;" ToolTip="{Binding Command.Text, RelativeSource={RelativeSource Self}}"
-						Command="local:LandExplorerCommands.OpenConcernGraph" CommandTarget="{Binding ElementName=LandExplorer}"></Button>
+						Command="local:LandExplorerCommands.OpenConcernGraph" CommandTarget="{Binding ElementName=LandExplorer}" Visibility="Hidden" Width="0"></Button>
 				
                 <Separator Margin="7"></Separator>
 
-				<Button Content="&#xf337;" ToolTip="Обновить привязки локально" Click="ApplyMapping_Click" Name="ApplyMappingLocal"></Button>
-				<Button Content="&#xf0b2;" ToolTip="Обновить привязки глобально" Click="ApplyMapping_Click" Name="ApplyMappingGlobal"></Button>
+				<Button Content="&#xf337;" ToolTip="Обновить привязки" Click="ApplyMapping_Click" Name="ApplyMappingLocal"></Button>
+				<Button Content="&#xf0b2;" ToolTip="Обновить привязки глобально" Click="ApplyMapping_Click" Name="ApplyMappingGlobal" Visibility="Hidden" Width="0"></Button>
 				<Button Content="&#xf013;" ToolTip="Настройки" Click="Settings_Click"></Button>
             </ToolBar>
             <TreeView Grid.Row="1" Name="MarkupTreeView" FontSize="12pt" AllowDrop="True"
@@ -409,7 +409,7 @@
 					</TreeView.ItemContainerStyle>
 				</TreeView>
 			</TabItem>
-			<TabItem Header="Отношения" Name="RelationTab">
+			<TabItem Header="Отношения" Name="RelationTab" Visibility="Hidden" Width="0px">
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<Grid.Resources>

@@ -107,6 +107,20 @@ namespace Land.Control
 				typeof(LandExplorerCommands)
 			);
 
+		public static RoutedUICommand Export{ get; } = new RoutedUICommand
+			(
+				"Экспортировать...",
+				"Export",
+				typeof(LandExplorerCommands)
+			);
+
+		public static RoutedUICommand Import { get; } = new RoutedUICommand
+			(
+				"Импортировать...",
+				"Import",
+				typeof(LandExplorerCommands)
+			);
+
 		public static RoutedUICommand Delete_Missing { get; } = new RoutedUICommand
 			(
 				"Удалить",
