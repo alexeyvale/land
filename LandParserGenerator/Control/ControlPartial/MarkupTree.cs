@@ -1,4 +1,5 @@
 ﻿using Land.Markup;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +19,7 @@ namespace Land.Control
 			if (Keyboard.PrimaryDevice.Modifiers == ModifierKeys.Control)
 			{
 				e.Handled = true;
-				var oldSize = snd.FontSize;
+
 				if (e.Delta > 0)
 				{
 					if (snd.FontSize < MAX_TEXT_SIZE)
@@ -141,20 +142,27 @@ namespace Land.Control
 
 		private void MarkupTreeViewItem_PreviewMouseLeftButtonDown_Highlight(object sender, MouseButtonEventArgs e)
 		{
-			var item = (TreeViewItem)sender;
-
-			if (State.HighlightConcerns)
+			try
 			{
-				Editor.ResetSegments();
+				var item = (TreeViewItem)sender;
 
-				Editor.SetSegments(
-					GetSegments(
-						(MarkupElement)item.DataContext,
-						item.DataContext is Concern
-					),
-					HighlightingColor
-				);
+				if (State.HighlightConcerns)
+				{
+					Editor.ResetSegments();
+
+					Editor.SetSegments(
+						GetSegments(
+							(MarkupElement)item.DataContext,
+							item.DataContext is Concern
+						),
+						HighlightingColor
+					);
+				}
 			}
+			catch (Exception ex)
+			{
+				ShowExceptionWindow(ex);
+			}		
 		}
 
 		#region displaying element
