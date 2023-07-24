@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Land.GUI"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-        xmlns:landcontrol="clr-namespace:Land.Control;assembly=LandExplorerControl"
         mc:Ignorable="d"
         Title="LanD Test IDE" Height="600" Width="1000"
         Closed="Window_Closed"
@@ -35,33 +34,33 @@
 	</Window.Resources>
 	
 	<Grid>
-        <TabControl SelectionChanged="MainPerspectiveTabs_SelectionChanged" Name="MainPerspectiveTabs">
-            <TabItem Header="Парсинг">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30*"></ColumnDefinition>
-                        <ColumnDefinition Width="5"></ColumnDefinition>
-                        <ColumnDefinition Width="70*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
+        <TabControl Name="MainPerspectiveTabs">
+			<TabItem Header="Парсинг">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="30*"></ColumnDefinition>
+						<ColumnDefinition Width="5"></ColumnDefinition>
+						<ColumnDefinition Width="70*"></ColumnDefinition>
+					</Grid.ColumnDefinitions>
 
-                    <TabControl Grid.Column="2" Name="MainTabs">
-                        <TabItem Header="Грамматика .land">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="75*"></RowDefinition>
-                                    <RowDefinition Height="5"></RowDefinition>
-                                    <RowDefinition Height="25*"></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="35"></RowDefinition>
-                                        <RowDefinition Height="100*"></RowDefinition>
-                                        <RowDefinition Height="31"></RowDefinition>
-                                    </Grid.RowDefinitions>
+					<TabControl Grid.Column="2" Name="MainTabs">
+						<TabItem Header="Грамматика .land">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="75*"></RowDefinition>
+									<RowDefinition Height="5"></RowDefinition>
+									<RowDefinition Height="25*"></RowDefinition>
+								</Grid.RowDefinitions>
+								<Grid Grid.Row="0">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="35"></RowDefinition>
+										<RowDefinition Height="100*"></RowDefinition>
+										<RowDefinition Height="31"></RowDefinition>
+									</Grid.RowDefinitions>
 									<ToolBar Grid.Row="0">
 										<Label Padding="10,7,10,0">ГРАММАТИКА</Label>
 										<Button Name="Grammar_LoadGrammarButton" Click="Grammar_LoadGrammarButton_Click" ToolTip="Открыть" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
-                                        <Separator></Separator>
+										<Separator></Separator>
 										<Button Name="Grammar_SaveButton" Click="Grammar_SaveButton_Click" Content="&#xf0c7;" ToolTip="Сохранить" Style="{StaticResource IconButtonStyle}"/>
 										<Separator></Separator>
 										<Button Name="Grammar_NewButton" Click="Grammar_NewGrammarButton_Click" Content="&#xf15b;" ToolTip="Новая" Style="{StaticResource IconButtonStyle}"/>
@@ -84,7 +83,7 @@
 										<Separator></Separator>
 										<ToggleButton Name="Grammar_DisablePreprocButton" ToolTip="Отключить препроцессор" Content="&#xf057;" Checked="Grammar_DisablePreprocButton_Checked" Unchecked="Grammar_DisablePreprocButton_Checked" Style="{StaticResource IconToggleButtonStyle}"/>
 									</ToolBar>
-                                    <avalonedit:TextEditor
+									<avalonedit:TextEditor
                                         Grid.Row="1"
                                         Name="Grammar_Editor"
                                         ShowLineNumbers="True"
@@ -92,25 +91,25 @@
                                         TextChanged="Grammar_Editor_TextChanged"
 										PreviewMouseWheel="Control_PreviewMouseWheel"
                                         FontSize="12pt">
-                                    </avalonedit:TextEditor>
-                                    <StatusBar Name="Grammar_StatusBar" Grid.Row="2">
-                                        <Label Name="Grammar_StatusBarLabel"></Label>
-                                    </StatusBar>
-                                </Grid>
-                                <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-                                <TabControl Grid.Row="2">
-                                    <TabItem>
-                                        <TabItem.Header>Лог</TabItem.Header>
-                                        <TextBox
+									</avalonedit:TextEditor>
+									<StatusBar Name="Grammar_StatusBar" Grid.Row="2">
+										<Label Name="Grammar_StatusBarLabel"></Label>
+									</StatusBar>
+								</Grid>
+								<GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
+								<TabControl Grid.Row="2">
+									<TabItem>
+										<TabItem.Header>Лог</TabItem.Header>
+										<TextBox
                                             Name="Grammar_LogList"
                                             IsReadOnly="True"
                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
                                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                             FontSize="14pt">
-                                        </TextBox>
-                                    </TabItem>
-                                    <TabItem>
-                                        <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
+										</TextBox>
+									</TabItem>
+									<TabItem>
+										<TabItem.Header>Ошибки и предупреждения</TabItem.Header>
 										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox
 												Name="Grammar_ErrorsList"
@@ -119,58 +118,58 @@
 											</ListBox>
 										</ScrollViewer>
 									</TabItem>
-                                </TabControl>
-                            </Grid>
-                        </TabItem>
+								</TabControl>
+							</Grid>
+						</TabItem>
 						<TabItem>
 							<TabItem.Header>
 								<Label>Тестовый файл</Label>
 							</TabItem.Header>
 							<Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="65*"></RowDefinition>
-                                    <RowDefinition Height="5"></RowDefinition>
-                                    <RowDefinition Height="45*"></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="35"></RowDefinition>
-                                        <RowDefinition Height="100*"></RowDefinition>
-                                        <RowDefinition Height="31"></RowDefinition>
-                                    </Grid.RowDefinitions>
-                                    <ToolBar Grid.Row="0">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="65*"></RowDefinition>
+									<RowDefinition Height="5"></RowDefinition>
+									<RowDefinition Height="45*"></RowDefinition>
+								</Grid.RowDefinitions>
+								<Grid Grid.Row="0">
+									<Grid.RowDefinitions>
+										<RowDefinition Height="35"></RowDefinition>
+										<RowDefinition Height="100*"></RowDefinition>
+										<RowDefinition Height="31"></RowDefinition>
+									</Grid.RowDefinitions>
+									<ToolBar Grid.Row="0">
 										<Button Name="File_OpenButton" Click="File_OpenButton_Click" ToolTip="Открыть" Content="&#xf07c;" Style="{StaticResource IconButtonStyle}"/>
-                                        <Separator></Separator>
+										<Separator></Separator>
 										<Button Name="File_SaveButton" Click="File_SaveButton_Click" Content="&#xf0c7;" ToolTip="Сохранить" Style="{StaticResource IconButtonStyle}"/>
-                                        <Separator></Separator>
+										<Separator></Separator>
 										<Button Name="File_ClearButton" Click="File_ClearButton_Click" Content="&#xf15b;" ToolTip="Очистить" Style="{StaticResource IconButtonStyle}"/>
-                                        <Separator></Separator>
-                                        <Button Name="File_ParseButton" Click="File_ParseButton_Click">Запустить парсер</Button>
+										<Separator></Separator>
+										<Button Name="File_ParseButton" Click="File_ParseButton_Click">Запустить парсер</Button>
 										<Separator></Separator>
 										<Label Name="File_NameLabel"></Label>
-                                    </ToolBar>
-                                    <avalonedit:TextEditor
+									</ToolBar>
+									<avalonedit:TextEditor
                                         Name="File_Editor"
                                         Grid.Row="1"
                                         ShowLineNumbers="True"
                                         FontFamily="Consolas"
                                         FontSize="12pt"
 										PreviewMouseWheel="Control_PreviewMouseWheel">
-                                    </avalonedit:TextEditor>
-                                    <StatusBar Name="File_StatusBar" Grid.Row="2">
-                                        <Label Name="File_StatusBarLabel"></Label>
-                                    </StatusBar>
-                                </Grid>
-                                <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-                                <TabControl Grid.Row="2">
-                                    <TabItem>
-                                        <TabItem.Header>Лог</TabItem.Header>
+									</avalonedit:TextEditor>
+									<StatusBar Name="File_StatusBar" Grid.Row="2">
+										<Label Name="File_StatusBarLabel"></Label>
+									</StatusBar>
+								</Grid>
+								<GridSplitter Grid.Row="1" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
+								<TabControl Grid.Row="2">
+									<TabItem>
+										<TabItem.Header>Лог</TabItem.Header>
 										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox Name="File_LogList" MouseDoubleClick="File_ListBox_MouseDoubleClick" FontSize="14pt"/>
 										</ScrollViewer>
 									</TabItem>
-                                    <TabItem>
-                                        <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
+									<TabItem>
+										<TabItem.Header>Ошибки и предупреждения</TabItem.Header>
 										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 											<ListBox
 												Name="File_ErrorsList"
@@ -179,233 +178,82 @@
 											</ListBox>
 										</ScrollViewer>
 									</TabItem>
-                                    <TabItem>
-                                        <TabItem.Header>Статистика</TabItem.Header>
-                                        <TextBox
+									<TabItem>
+										<TabItem.Header>Статистика</TabItem.Header>
+										<TextBox
                                             Name="File_Statistics"
                                             IsReadOnly="True"
                                             FontSize="14pt">
-                                        </TextBox>
-                                    </TabItem>
-                                </TabControl>
-                            </Grid>
-                        </TabItem>
-                        <TabItem Header="Массовый парсинг">
-                            <Grid >
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"></RowDefinition>
-                                    <RowDefinition Height="100*"></RowDefinition>
-                                    <RowDefinition Height="31"></RowDefinition>
-                                </Grid.RowDefinitions>
-                                <ToolBar Grid.Row="0">
-                                    <Button Name="Batch_ChooseFolderButton" Content="Выбрать каталог" Click="Batch_ChooseFolderButton_Click"/>
-                                    <Separator></Separator>
-                                    <Label>Целевые расширения</Label>
-                                    <TextBox Width="60" BorderBrush="Black" Name="Batch_TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
-                                    <Separator></Separator>
-                                    <Button Name="Batch_StartOrStopPackageParsingButton" Content="Запуск/Остановка" Click="Batch_StartOrStopPackageParsingButton_Click"/>
+										</TextBox>
+									</TabItem>
+								</TabControl>
+							</Grid>
+						</TabItem>
+						<TabItem Header="Массовый парсинг">
+							<Grid >
+								<Grid.RowDefinitions>
+									<RowDefinition Height="30"></RowDefinition>
+									<RowDefinition Height="100*"></RowDefinition>
+									<RowDefinition Height="31"></RowDefinition>
+								</Grid.RowDefinitions>
+								<ToolBar Grid.Row="0">
+									<Button Name="Batch_ChooseFolderButton" Content="Выбрать каталог" Click="Batch_ChooseFolderButton_Click"/>
+									<Separator></Separator>
+									<Label>Целевые расширения</Label>
+									<TextBox Width="60" BorderBrush="Black" Name="Batch_TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
+									<Separator></Separator>
+									<Label>Целевые типы</Label>
+									<TextBox Width="60" BorderBrush="Black" Name="Batch_TargetEntityTypes" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
+									<Separator></Separator>
+									<Button Name="Batch_StartOrStopPackageParsingButton" Content="Запуск/Остановка" Click="Batch_StartOrStopPackageParsingButton_Click"/>
 									<Separator></Separator>
 									<Separator></Separator>
 									<ComboBox MinWidth="90" MaxWidth="90" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
-                                </ToolBar>
+								</ToolBar>
 								<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 									<ListBox FontSize="14pt" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick"></ListBox>
 								</ScrollViewer>
 								<StatusBar Name="Batch_StatusBar" Grid.Row="2">
-                                    <Label Name="Batch_PathLabel"></Label>
-                                    <Label Name="Batch_StatusBarLabel"></Label>
-                                    <ProgressBar Width="200" Height="20" Name="Batch_ParsingProgress" Minimum="0" Maximum="100"></ProgressBar>
-                                </StatusBar>
-                            </Grid>
-                        </TabItem>
-                    </TabControl>
+									<Label Name="Batch_PathLabel"></Label>
+									<Label Name="Batch_StatusBarLabel"></Label>
+									<ProgressBar Width="200" Height="20" Name="Batch_ParsingProgress" Minimum="0" Maximum="100"></ProgressBar>
+								</StatusBar>
+							</Grid>
+						</TabItem>
+					</TabControl>
 
-                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
+					<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
 
-                    <TabControl Grid.Column="0">
+					<TabControl Grid.Column="0">
 						<TabItem Header="AST">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="100*"></RowDefinition>
-                                    <RowDefinition Height="30"></RowDefinition>
-                                </Grid.RowDefinitions>
-							    <TreeView
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="100*"></RowDefinition>
+									<RowDefinition Height="30"></RowDefinition>
+								</Grid.RowDefinitions>
+								<TreeView
                                     Grid.Row="0"
                                     Name="AstView"        
                                     FontSize="14pt"
                                     SelectedItemChanged="AstView_SelectedItemChanged">
-								    <TreeView.ItemTemplate>
-									    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-										    <TextBlock Text="{Binding .}" />
-									    </HierarchicalDataTemplate>
-								    </TreeView.ItemTemplate>
-							    </TreeView>
-                                <CheckBox 
+									<TreeView.ItemTemplate>
+										<HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+											<TextBlock Text="{Binding .}" />
+										</HierarchicalDataTemplate>
+									</TreeView.ItemTemplate>
+								</TreeView>
+								<CheckBox 
                                     Grid.Row="1" 
                                     Content="Выделить Any-области" 
                                     Margin="10, 8, 10, 0"
                                     Checked="AstView_SelectAny_StateChanged"
                                     Unchecked="AstView_SelectAny_StateChanged">
-                                </CheckBox>
-                            </Grid>
-                        </TabItem>
-					</TabControl>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Разметка">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30*"></ColumnDefinition>
-                        <ColumnDefinition Width="5"></ColumnDefinition>
-                        <ColumnDefinition Width="70*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-
-
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30"></RowDefinition>
-                            <RowDefinition Height="65*"></RowDefinition>
-                            <RowDefinition Height="5"></RowDefinition>
-                            <RowDefinition Height="35*"></RowDefinition>
-                        </Grid.RowDefinitions>
-
-                        <ToolBar Grid.Row="0">
-                            <Button Name="NewDocumentButton" Content="Новый" Click="NewDocumentButton_Click"/>
-                            <Separator></Separator>
-                            <Button Name="OpenDocumentButton" Content="Открыть" Click="OpenDocumentButton_Click"/>
-                            <Separator></Separator>
-                            <Button Name="SaveDocumentButton" Content="Сохранить" Click="SaveDocumentButton_Click"/>
-                            <Separator></Separator>
-							<Button Name="CloseDocumentButton" Content="Закрыть" Click="CloseDocumentButton_Click"/>
-						</ToolBar>
-
-                        <TabControl Grid.Row="1" Name="DocumentTabs" Background="WhiteSmoke">
-                        </TabControl>
-
-                        <GridSplitter Grid.Row="2" ShowsPreview="False" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" />
-                        <TabControl Grid.Row="3" Name="MarkupTestOutputTabs">
-                            <TabItem Name="MarkupTestLogTab">
-                                <TabItem.Header>Лог</TabItem.Header>
-								<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-									<ListBox
-										Name="MarkupTestLog"
-										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
-										FontSize="14pt">
-									</ListBox>
-								</ScrollViewer>
-							</TabItem>
-                            <TabItem Name="MarkupTestErrorsTab">
-                                <TabItem.Header>Ошибки и предупреждения</TabItem.Header>
-								<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-									<ListBox
-										Name="MarkupTestErrors"
-										MouseDoubleClick="DocumentsListBox_MouseDoubleClick"
-										FontSize="14pt">
-									</ListBox>
-								</ScrollViewer>
-							</TabItem>
-                        </TabControl>
-                    </Grid>
-
-                    <GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-
-                    <landcontrol:LandExplorerControl Name="LandExplorer"  Grid.Column="0"></landcontrol:LandExplorerControl>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Тестирование перепривязки" Name="MappingDebugTab">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"></RowDefinition>
-                        <RowDefinition Height="100*"></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <ToolBar Grid.Row="0">
-                        <Button Name="ReplaceNewWithOldButton" Content="Заменить изменённый текст исходным" Click="ReplaceNewWithOldButton_Click"></Button>
-                    </ToolBar>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="15*"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="15*"></ColumnDefinition>
-							<ColumnDefinition Width="Auto"></ColumnDefinition>
-							<ColumnDefinition Width="30*"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="30*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"></RowDefinition>
-                                <RowDefinition Height="100*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0">Разметка</Label>
-                            <TreeView Grid.Row="1"
-                                      Name="MappingDebug_MarkupTreeView" 
-                                      SelectedItemChanged="MappingDebug_MarkupTreeView_SelectedItemChanged"
-                                      MouseDoubleClick="MappingDebug_MarkupTreeView_MouseDoubleClick">
-                                <TreeView.Resources>
-                                    <Style TargetType="{x:Type TreeViewItem}"/>
-                                </TreeView.Resources>
-                                <TreeView.ItemTemplate>
-                                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Elements}">
-                                        <TextBlock Text="{Binding Name}" />
-                                    </HierarchicalDataTemplate>
-                                </TreeView.ItemTemplate>
-                            </TreeView>
-                        </Grid>
-						<GridSplitter Grid.Column="1" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-						<Grid Grid.Column="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"></RowDefinition>
-                                <RowDefinition Height="100*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0">Перепривязка</Label>
-							<Grid Grid.Row="1">
-								<Grid.RowDefinitions>
-									<RowDefinition Height="50*"></RowDefinition>
-									<RowDefinition Height="50*"></RowDefinition>
-								</Grid.RowDefinitions>
-								<ListBox Grid.Row="0" Name="MappingDebug_SimilaritiesList" SelectionChanged="MappingDebug_SimilaritiesList_SelectionChanged"></ListBox>
-								<TextBox Grid.Row="1" Name="MappingDebug_SimilarityInfo"></TextBox>
+								</CheckBox>
 							</Grid>
-                        </Grid>
-                        <GridSplitter Grid.Column="3" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="4">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"></RowDefinition>
-                                <RowDefinition Height="100*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0">Исходный текст</Label>
-                            <avalonedit:TextEditor 
-                                Grid.Row="1" 
-                                IsReadOnly="True"
-                                Name="MappingDebug_OldTextEditor"
-                                ShowLineNumbers="True"
-                                FontFamily="Consolas"
-                                FontSize="12pt">
-                            </avalonedit:TextEditor>
-                        </Grid>
-                        <GridSplitter Grid.Column="5" ShowsPreview="False" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="White" />
-                        <Grid Grid.Column="6">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"></RowDefinition>
-                                <RowDefinition Height="100*"></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0">Изменённый текст</Label>
-                            <avalonedit:TextEditor 
-                                Grid.Row="1" 
-                                Name="MappingDebug_NewTextEditor"
-                                ShowLineNumbers="True"
-                                FontFamily="Consolas"
-                                FontSize="12pt"
-                                TextChanged="NewTextEditor_TextChanged">
-                            </avalonedit:TextEditor>
-                        </Grid>
-                    </Grid>
-                    <StatusBar Grid.Row="2" Name="MappingDebug_StatusBar">
-                        <Label Name="MappingDebug_StatusLabel"></Label>
-                    </StatusBar>
-                </Grid>
-            </TabItem>
-        </TabControl>
+						</TabItem>
+					</TabControl>
+				</Grid>
+			</TabItem>
+		</TabControl>
     </Grid>
 </Window>

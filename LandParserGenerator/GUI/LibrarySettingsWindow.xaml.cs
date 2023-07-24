@@ -30,32 +30,32 @@ namespace Land.GUI
 			DialogResult = false;
 		}
 
-		private void Button_KeysFileSelect_Click(object sender, RoutedEventArgs e)
-		{
-			var openFileDialog = new OpenFileDialog()
-			{
-				AddExtension = true,
-				Filter = "Файл ключей (*.snk)|*.snk|Все файлы (*.*)|*.*",
-				Title = "Выберите файл ключей"
-			};
+		//private void Button_KeysFileSelect_Click(object sender, RoutedEventArgs e)
+		//{
+		//	var openFileDialog = new OpenFileDialog()
+		//	{
+		//		AddExtension = true,
+		//		Filter = "Файл ключей (*.snk)|*.snk|Все файлы (*.*)|*.*",
+		//		Title = "Выберите файл ключей"
+		//	};
 
-			if (Directory.Exists(Input_OutputDirectory.Text))
-				openFileDialog.InitialDirectory = Input_OutputDirectory.Text;
+		//	if (Directory.Exists(Input_OutputDirectory.Text))
+		//		openFileDialog.InitialDirectory = Input_OutputDirectory.Text;
 
-			if (openFileDialog.ShowDialog() == true)
-			{
-				Input_KeysFile.Text = openFileDialog.FileName;
-			}
-		}
+		//	if (openFileDialog.ShowDialog() == true)
+		//	{
+		//		Input_KeysFile.Text = openFileDialog.FileName;
+		//	}
+		//}
 
-		private void Input_IsSignedAssembly_Checked(object sender, RoutedEventArgs e)
-		{
-			if(String.IsNullOrWhiteSpace(Input_KeysFile.Text) 
-				&& !String.IsNullOrWhiteSpace(Input_OutputDirectory.Text) 
-				&& !String.IsNullOrWhiteSpace(Input_Namespace.Text))
-			{
-				Input_KeysFile.Text = Path.Combine(Input_OutputDirectory.Text, $"{Input_Namespace.Text}.snk");
-			}
-		}
+		//private void Input_IsSignedAssembly_Checked(object sender, RoutedEventArgs e)
+		//{
+		//	if(String.IsNullOrWhiteSpace(Input_KeysFile.Text) 
+		//		&& !String.IsNullOrWhiteSpace(Input_OutputDirectory.Text) 
+		//		&& !String.IsNullOrWhiteSpace(Input_Namespace.Text))
+		//	{
+		//		Input_KeysFile.Text = Path.Combine(Input_OutputDirectory.Text, $"{Input_Namespace.Text}.snk");
+		//	}
+		//}
 	}
 }

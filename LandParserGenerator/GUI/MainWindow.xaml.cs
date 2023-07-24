@@ -18,10 +18,6 @@ using Land.Core.Specification;
 using Land.Core.Parsing;
 using Land.Core.Parsing.Preprocessing;
 using Land.Core.Parsing.Tree;
-using Land.Markup;
-using Land.Markup.CoreExtension;
-using Land.Markup.Binding;
-using Land.Control;
 
 namespace Land.GUI
 {
@@ -110,9 +106,6 @@ namespace Land.GUI
 					}
 				}
 			}
-
-			/// Загружаем настройки панели разметки
-			EditorAdapter = new EditorAdapter(this, LandExplorer);
 
 			/// Инициализирующие действия для массового парсинга
 			InitPackageParsing();
@@ -271,25 +264,25 @@ namespace Land.GUI
 			if (librarySettings.ShowDialog() == true)
 			{
 				/// Для генерации подписанной библиотеки понадобятся права администратора
-				if (librarySettings.Input_IsSignedAssembly.IsChecked == true)
-				{
-					var pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
-					if(!pricipal.IsInRole(WindowsBuiltInRole.Administrator))
-					{
-						Grammar_StatusBar.Background = LightRed;
-						Grammar_StatusBarLabel.Content =
-							"Для генерации строго именованной сборки необходимы права администратора";
-						return;
-					}
+				//if (librarySettings.Input_IsSignedAssembly.IsChecked == true)
+				//{
+				//	var pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+				//	if(!pricipal.IsInRole(WindowsBuiltInRole.Administrator))
+				//	{
+				//		Grammar_StatusBar.Background = LightRed;
+				//		Grammar_StatusBarLabel.Content =
+				//			"Для генерации строго именованной сборки необходимы права администратора";
+				//		return;
+				//	}
 
-					if(!File.Exists(librarySettings.Input_KeysFile.Text))
-                    {
-						Grammar_StatusBar.Background = LightRed;
-						Grammar_StatusBarLabel.Content =
-							"Отсутствует файл ключа, указанный в настройках генерации строго именованной сборки";
-						return;
-					}
-				}
+				//	if(!File.Exists(librarySettings.Input_KeysFile.Text))
+				//	{
+				//		Grammar_StatusBar.Background = LightRed;
+				//		Grammar_StatusBarLabel.Content =
+				//			"Отсутствует файл ключа, указанный в настройках генерации строго именованной сборки";
+				//		return;
+				//	}
+				//}
 
 				var messages = new List<Message>();
 				var success = Builder.GenerateLibrary(
@@ -297,11 +290,12 @@ namespace Land.GUI
 					Grammar_Editor.Text,
 					librarySettings.Input_Namespace.Text,
 					librarySettings.Input_OutputDirectory.Text,
-					librarySettings.Input_IsSignedAssembly.IsChecked == true
-						? String.IsNullOrWhiteSpace(librarySettings.Input_KeysFile.Text)
-							? Path.Combine(librarySettings.Input_OutputDirectory.Text, $"{librarySettings.Input_Namespace.Text}.snk")
-							: librarySettings.Input_KeysFile.Text
-						: null,
+					null,
+					//librarySettings.Input_IsSignedAssembly.IsChecked == true
+					//	? String.IsNullOrWhiteSpace(librarySettings.Input_KeysFile.Text)
+					//		? Path.Combine(librarySettings.Input_OutputDirectory.Text, $"{librarySettings.Input_Namespace.Text}.snk")
+					//		: librarySettings.Input_KeysFile.Text
+					//	: null,
 					messages
 				);
 
@@ -659,7 +653,6 @@ namespace Land.GUI
 		public class GetWaterSegmentsVisitor
 		{
 			public List<Tuple<int, int>> AnySegments { get; set; } = new List<Tuple<int, int>>();
-			public List<Tuple<int, int>> TypedWaterSegments { get; set; } = new List<Tuple<int, int>>();
 
 			public void Visit(Node node)
 			{
@@ -669,11 +662,6 @@ namespace Land.GUI
 					{
 						if (child.Location != null)
 							AnySegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
-					}
-					else
-					{
-						if (!child.Options.IsSet(MarkupOption.GROUP_NAME, MarkupOption.LAND) && child.Location != null)
-							TypedWaterSegments.Add(new Tuple<int, int>(child.Location.Start.Offset, child.Location.End.Offset));
 					}
 
 					Visit(child);
@@ -712,7 +700,7 @@ namespace Land.GUI
 		public class FileLandPair
 		{
 			public string File { get; set; }
-			public List<CountLandNodesVisitor.TypeValuePair> Land { get; set; }
+			public List<CountEntitiesVisitor.TypeValuePair> Land { get; set; }
 		}
 
 		private System.ComponentModel.BackgroundWorker PackageParsingWorker;
@@ -784,11 +772,6 @@ namespace Land.GUI
 					{
 						root = File_Parse(argument.Files[counter], 
 							File.ReadAllText(argument.Files[counter], GetEncoding(argument.Files[counter])));
-
-						if (root != null)
-						{
-							root.Accept(new MarkupOptionsProcessingVisitor(Parser.GrammarObject));
-						}
 					}));
 
 					timeSpent += Parser.Statistics.GeneralTimeSpent;
@@ -805,7 +788,12 @@ namespace Land.GUI
 					{
 						statsPerFile[argument.Files[counter]] = Parser.Statistics;
 
-						var visitor = new CountLandNodesVisitor(true, "name");
+						var visitor = new CountEntitiesVisitor(
+							true, 
+							argument.TargetEntityTypes,
+							new List<string> { "name" }
+						);
+
 						root.Accept(visitor);
 
 						landLists.Add(new FileLandPair()
@@ -952,6 +940,7 @@ namespace Land.GUI
 		{
 			public string DirectoryPath { get; set; }
 			public List<string> Files { get; set; }
+			public List<string> TargetEntityTypes { get; set; }
 		}
 
 		private void Batch_StartOrStopPackageParsingButton_Click(object sender, RoutedEventArgs e)
@@ -982,7 +971,11 @@ namespace Land.GUI
 					PackageParsingWorker.RunWorkerAsync(new BatchWorkerArgument()
 					{
 						DirectoryPath = PackageSource,
-						Files = package
+						Files = package,
+						TargetEntityTypes = Batch_TargetEntityTypes.Text
+							.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+							.Select(s => s.Trim())
+							.ToList()
 					});
 					Batch_ParsingProgress.Foreground = Brushes.MediumSeaGreen;
 				}
@@ -991,321 +984,6 @@ namespace Land.GUI
 			{
 				PackageParsingWorker.CancelAsync();
 				Batch_ParsingProgress.Foreground = Brushes.IndianRed;
-			}
-		}
-
-		#endregion
-
-		#region Отладка перепривязки
-
-		private Node NewTreeRoot { get; set; }
-		private bool NewTextChanged { get; set; }
-
-		private void ReplaceNewWithOldButton_Click(object sender, RoutedEventArgs e)
-		{
-			MappingDebug_NewTextEditor.Text = MappingDebug_OldTextEditor.Text;
-		}
-
-		private void MappingDebug_MarkupTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			if (MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint point)
-			{
-				if (!point.HasInvalidLocation)
-				{
-					MappingDebug_OldTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
-
-					if (String.IsNullOrEmpty(MappingDebug_NewTextEditor.Text))
-					{
-						MappingDebug_NewTextEditor.Text = LandExplorer.GetText(point.Context.FileName);
-					}
-
-					MoveCaretToSource(point.Location, MappingDebug_OldTextEditor, true);
-				}
-			}
-		}
-
-		private void MainPerspectiveTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			MappingDebug_MarkupTreeView.ItemsSource = LandExplorer.GetMarkup();
-		}
-
-		private void MappingDebug_MarkupTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			if(MappingDebug_MarkupTreeView.SelectedItem is ConcernPoint)
-			{
-				MapPoint((ConcernPoint)MappingDebug_MarkupTreeView.SelectedItem);
-			}
-		}
-
-		private void MapPoint(ConcernPoint point)
-		{
-			/// Если текст, к которому пытаемся перепривязаться, изменился
-			if (NewTextChanged)
-			{
-				var parser = LandExplorer.Parsers[Path.GetExtension(point.Context.FileName)];
-
-				/// и при этом парсер сгенерирован
-				if (parser != null)
-				{
-					/// пытаемся распарсить текст
-					NewTreeRoot = parser.Parse(MappingDebug_NewTextEditor.Text);
-					var noErrors = parser.Log.All(l => l.Type != MessageType.Error);
-
-					MappingDebug_StatusBar.Background = noErrors ? Brushes.LightGreen : LightRed;
-					MappingDebug_StatusLabel.Content = noErrors ? String.Empty : "Ошибка при разборе нового текста";
-
-					/// Если текст распарсился, ищем отображение из старого текста в новый
-					if (noErrors)
-					{
-						NewTextChanged = false;
-					}
-				}
-			}
-
-			/// Если для текущего нового текста построено дерево и просчитано отображение
-			if (!NewTextChanged)
-			{
-				var candidates = 
-					LandExplorer.GetRebindingCandidates(point, MappingDebug_NewTextEditor.Text, NewTreeRoot)
-					.ToList();
-
-				MappingDebug_SimilaritiesList.ItemsSource = candidates;
-
-				if (candidates.Any())
-				{
-					var weights = candidates.First().Weights;
-					MappingDebug_SimilarityInfo.Text = weights != null
-						? String.Join(Environment.NewLine, 
-							new List<string>{
-								$"wCore(H) = {weights[ContextType.HeaderCore]}",
-								$"wNotCore(H) = {weights[ContextType.HeaderNonCore]}",
-								$"wS = {weights[ContextType.Ancestors]}",
-								$"wI = {weights[ContextType.Inner]}",
-								$"wNearest(N) = {weights[ContextType.SiblingsNearest]}",
-								$"wAll(N) = {weights[ContextType.SiblingsAll]}"
-							}
-						)
-						: "Simple rebinding";
-				}
-
-				MoveCaretToSource(point.Location, MappingDebug_OldTextEditor);
-
-				/// Если есть узлы в новом дереве, с которыми мы сравнивали выбранный узел старого дерева
-				if (MappingDebug_SimilaritiesList.ItemsSource != null)
-				{
-					/// значит, в какой-то новый узел мы отобразили старый
-					MappingDebug_SimilaritiesList.SelectedItem = candidates.FirstOrDefault();
-					if(MappingDebug_SimilaritiesList.SelectedItem != null)
-						MoveCaretToSource(((RemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node.Location, MappingDebug_NewTextEditor);
-				}
-			}
-		}
-
-		private void MappingDebug_SimilaritiesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if(MappingDebug_SimilaritiesList.SelectedItem != null)
-			{
-				var node = ((RemapCandidateInfo)MappingDebug_SimilaritiesList.SelectedItem).Node;
-				MoveCaretToSource(node.Location, MappingDebug_NewTextEditor);
-			}
-		}
-
-		private void NewTextEditor_TextChanged(object sender, EventArgs e)
-		{
-			NewTextChanged = true;
-		}
-
-		#endregion
-
-		#region Тестирование панели разметки
-
-		//public delegate void DocumentChangedHandler(string documentName);
-		public Action<string> DocumentChangedCallback;
-
-		public class DocumentTab
-		{
-			#region Editor
-
-			private TextEditor _editor;
-
-			private EditorSearchHandler QuickSearch { get; set; }
-
-			public TextEditor Editor
-			{
-				get { return _editor; }
-
-				set
-				{
-					_editor = value;
-
-					if (_editor != null)
-					{
-						QuickSearch = new EditorSearchHandler(_editor.TextArea);
-					}
-					else
-					{
-						QuickSearch = null;
-					}
-				}
-			}
-
-			#endregion
-
-			public string DocumentName { get; set; }
-
-			public SegmentsBackgroundRenderer SegmentsColorizer { get; set; }	
-		}
-
-		public EditorAdapter EditorAdapter { get; set; }
-
-		public Dictionary<TabItem, DocumentTab> Documents { get; set; } = new Dictionary<TabItem, DocumentTab>();
-
-		private int NewDocumentCounter { get; set; } = 1;
-
-		public DocumentTab CreateDocument(string documentName)
-		{
-			var tab = new TabItem();
-			DocumentTabs.Items.Add(tab);
-
-			Documents[tab] = new DocumentTab()
-			{
-				DocumentName = documentName,
-				Editor = new TextEditor()
-				{
-					ShowLineNumbers = true,
-					FontSize = 16,
-					FontFamily = new FontFamily("Consolas")
-				}
-			};
-
-			Documents[tab].Editor.TextArea.TextView.BackgroundRenderers
-				.Add(Documents[tab].SegmentsColorizer = new SegmentsBackgroundRenderer(Documents[tab].Editor.TextArea));
-			Documents[tab].Editor.TextChanged += Editor_TextChanged;
-
-			tab.Content = Documents[tab].Editor;
-			tab.Header = Path.GetFileName(Documents[tab].DocumentName);
-
-			DocumentTabs.SelectedItem = tab;
-
-			return Documents[tab];
-		}
-
-		private void Editor_TextChanged(object sender, EventArgs e)
-		{
-			var document = Documents.Values.FirstOrDefault(d => d.Editor == sender);
-
-			if (document != null && !String.IsNullOrEmpty(document.DocumentName) 
-				&& DocumentChangedCallback != null)
-				DocumentChangedCallback(document.DocumentName);
-		}
-
-		public DocumentTab OpenDocument(string documentName)
-		{
-			if (File.Exists(documentName))
-			{
-				var stream = new StreamReader(documentName, Encoding.Default, true);
-				var document = CreateDocument(documentName);
-
-				document.Editor.Text = stream.ReadToEnd();
-				document.Editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager
-					.Instance.GetDefinitionByExtension(Path.GetExtension(documentName));
-
-				stream.Close();
-
-				return document;
-			}
-
-			return null;
-		}
-
-		private void NewDocumentButton_Click(object sender, RoutedEventArgs e)
-		{
-			CreateDocument($"Новый документ {NewDocumentCounter++}");
-		}
-
-		private void SaveDocumentButton_Click(object sender, RoutedEventArgs e)
-		{
-			var activeTab = (TabItem)DocumentTabs.SelectedItem;
-
-			if (activeTab != null)
-			{
-				if (!File.Exists(Documents[activeTab].DocumentName))
-				{
-					var saveFileDialog = new SaveFileDialog();
-					if (saveFileDialog.ShowDialog() == true)
-					{
-						File.WriteAllText(saveFileDialog.FileName, Documents[activeTab].Editor.Text);
-						Documents[activeTab].DocumentName = saveFileDialog.FileName;
-						activeTab.Header = Path.GetFileName(saveFileDialog.FileName);
-					}
-				}
-				else
-				{
-					File.WriteAllText(
-						Documents[activeTab].DocumentName, 
-						Documents[activeTab].Editor.Text
-					);
-				}
-			}
-		}
-
-		private void CloseDocumentButton_Click(object sender, RoutedEventArgs e)
-		{
-			var activeTab = (TabItem)DocumentTabs.SelectedItem;
-
-			if (activeTab != null)
-			{
-				/// Если файла для закрываемого таба не существует, и закрываемый текст непуст
-				if ((String.IsNullOrEmpty(Documents[activeTab].DocumentName) 
-					|| !File.Exists(Documents[activeTab].DocumentName)) 
-					&& !String.IsNullOrEmpty(Documents[activeTab].Editor.Text)
-					/// или если файл существует и его текст не совпадает с текстом в табе
-					|| !String.IsNullOrEmpty(Documents[activeTab].DocumentName) 
-					&& File.Exists(Documents[activeTab].DocumentName) 
-					&& File.ReadAllText(Documents[activeTab].DocumentName) != Documents[activeTab].Editor.Text)
-				{
-					switch (MessageBox.Show(
-						"В файле имеются несохранённые изменения. Сохранить текущую версию?",
-						"Предупреждение",
-						MessageBoxButton.YesNoCancel,
-						MessageBoxImage.Question))
-					{
-						case MessageBoxResult.Yes:
-							SaveDocumentButton_Click(null, null);
-							break;
-						case MessageBoxResult.No:
-							break;
-						case MessageBoxResult.Cancel:
-							return;
-					}
-				}
-
-				DocumentTabs.Items.Remove(activeTab);
-				Documents.Remove(activeTab);
-			}
-		}
-
-		private void OpenDocumentButton_Click(object sender, RoutedEventArgs e)
-		{
-			var openFileDialog = new OpenFileDialog();
-			if (openFileDialog.ShowDialog() == true)
-			{
-				OpenDocument(openFileDialog.FileName);
-			}
-		}
-
-		private void DocumentsListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-		{
-			var lb = sender as ListBox;
-
-			if (lb.SelectedIndex != -1)
-			{
-				var msg = (Message)lb.SelectedItem;
-
-				if (!String.IsNullOrEmpty(msg.FileName))
-				{
-					EditorAdapter.SetActiveDocumentAndOffset(msg.FileName, msg.Location);
-				}
 			}
 		}
 

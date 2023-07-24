@@ -8,8 +8,6 @@ using ICSharpCode.AvalonEdit.Editing;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 
-using Land.Control;
-
 namespace Land.GUI
 {
 	public class SegmentsBackgroundRenderer : IBackgroundRenderer

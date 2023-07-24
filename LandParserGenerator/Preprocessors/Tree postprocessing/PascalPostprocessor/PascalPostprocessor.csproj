@@ -50,6 +50,10 @@
       <Project>{f1276a3b-a504-47a3-b858-8224ef265795}</Project>
       <Name>Land.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Preprocessor.Core\Preprocessor.Core.csproj">
+      <Project>{ccb3a7c5-989c-4431-89d5-9909ada6f765}</Project>
+      <Name>Preprocessor.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Conditional compilation\PascalPreprocessor\PascalPreprocessor.csproj">
       <Project>{9d1f2e8f-dcf1-44bf-a515-1e7d97fec1db}</Project>
       <Name>PascalPreprocessor</Name>
