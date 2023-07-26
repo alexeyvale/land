@@ -1,16 +1,33 @@
 using BaseTest;
 
-namespace TestNamespace
+#define SYMBOL_A
+#define SYMBOL_B
+
+namespace DirectivesTest
 {
-	public enum TestEnum { Val1=1, Val2=2, Val3=3 }
-	
 	public class TestClass: BaseTestClass
-	{
-		public int TestField = 42;
+	{       
+		#if SYMBOL_A
 		
-		public int? TestMethod(int a, int b)
+		public int? TestMethodA(int a, int b)
 		{
 			return a+b;
 		}
+		
+		#elif SYMBOL_B
+		
+		public int? TestMethodB(int a, int b)
+		{
+			return a+b;
+		}
+		
+		#else
+		
+		public int? TestMethodC(int a, int b)
+		{
+			return a+b;
+		}
+		
+		#endif
 	}
 }

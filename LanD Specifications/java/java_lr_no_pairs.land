@@ -1,0 +1,54 @@
+COMMENT		: '//' ~[\n\r]* | '/*' .*? '*/'
+STRING		: '"' ('\\"'|'\\\\'|.)*? '"'
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+
+MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
+ 
+file_content	=	entity*
+entity	=	enum | class_interface | method | field_declaration | water_entity
+
+enum			=	common_beginning 'enum' name Any block ';'?
+class_interface	=	common_beginning ('class'|'interface') name Any '{' entity* '}' ';'?
+method			=	common_beginning type name arguments Any (';' | block)	
+field_declaration	=	common_beginning type field (',' field)* ';'
+field			=	name init_value?
+water_entity	=	AnyInclude('@interface', 'import', 'package') (block | ';')+
+
+common_beginning	=	(annotation|MODIFIER)*
+init_value			=	'=' init_part+
+init_part			=	water | type
+
+name	=	name_type
+type	=	name_type
+name_type_atom	=	type_parameter? ID type_parameter?
+name_type	=	name_type_atom ((('.'|'::') name_type_atom) | '['']')*
+type_parameter	=	'<' (AnyAvoid(';') | type_parameter)* '>'
+
+arguments	=	'(' (Any|arguments)+ ')'
+annotation	=	'@' name arguments?
+block		=	'{' (Any|block)+ '}'
+
+round_bracketed_water	=	'(' (Any|round_bracketed_water)+ ')'
+curve_bracketed_water	=	'{' (Any|curve_bracketed_water)+ '}'
+water					=	(Any | curve_bracketed_water | round_bracketed_water)+
+
+%%
+
+%parsing {
+	recovery entity init_part
+	fragment STRING_INT_CODE
+	start file_content
+	skip COMMENT STRING
+}
+
+%nodes {
+	ghost common_beginning entity
+	leaf name type type_parameter init_value
+}
+
+%markup {
+	land enum class_interface method field field_declaration
+	priority(3) name
+}
+ 

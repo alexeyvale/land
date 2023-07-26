@@ -1,0 +1,92 @@
+DIRECTIVE	: '#' ~[\n\r]*
+
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+
+STRING		: STRING_STD|STRING_VERB|STRING_INT
+STRING_STD	: '"' ('\\"'|'\\\\'|.)*? '"'
+STRING_VERB	: '@'('"' (~["]|'""')* '"')+
+STRING_INT	: '$"' ('\\"'|'\\\\'|'{{'|STRING_INT_CODE|.)*? '"' | '$@' ('"' ('""'|'{{'|STRING_INT_CODE|.)*? '"')+
+STRING_INT_CODE : '{' (STRING|CHAR|.)*? '}'
+
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+MODIFIER	: 'ref'|'fixed'|'public'|'private'|'protected'|'internal'|'static'|'virtual'|'const'|'override'|'new'|'sealed'|'unsafe'|'readonly'|'abstract'|'volatile'|'async'|'partial'
+CLASS_STRUCT_INTERFACE : 'class'|'struct'|'record'|'interface'
+ID			: '@'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+GENERAL_ATTRIBUTE_START	:	'[' [ \t\r\f\n]*? ('assembly'|'module')
+ 
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
+
+ 
+namespace_content	=	opening_directive*! (namespace|entity|general_attribute)*
+opening_directive	=	('using'|'extern') Any ';'
+namespace			=	'namespace' name '{' namespace_content '}'
+
+entity =
+		entity_attribute* modifier*
+		(
+		 	'enum' name Any '{' Any '}' ';'?											=> enum		|
+			CLASS_STRUCT_INTERFACE name Any '{' entity* '}' ';'?						=> class_struct_interface	|
+			type name
+			(
+		  		arguments Any (init_expression? ';' | block)							=> method	|
+		  		('[' Any ']')? init_value? (',' name ('[' Any ']')? init_value?)* ';'	=> field	|
+		  		(block (init_value ';')? | init_expression ';')							=> property
+		  	)
+		) | AnyInclude('delegate', 'operator', 'this') (block | ';')+
+
+modifier			=	MODIFIER | 'extern'
+init_expression		=	'=>' Any
+init_value			=	'=' init_part+
+init_part			=	Any | type
+
+name_atom	=	ID type_parameters?
+name		=	name_atom (('.'|'::') name_atom)*
+names_list	=	name (',' name)*
+
+tuple		=	'(' type name? (',' type name?)* ')'
+type_atom	=	('unsigned'? ID | tuple) type_parameters? '?'? '*'*
+type		=	type_atom ((('.'|'::') type_atom) | ('[' Any ']'))*!
+type_parameters	=	'<' (AnyAvoid(';') | type_parameters)* '>'
+
+entity_attribute	=	'[' Any ']'
+general_attribute	=	GENERAL_ATTRIBUTE_START Any ']'
+arguments			=	'(' Any ')'
+block				=	'{' Any '}'
+
+%%
+
+%parsing {
+	recovery entity init_part
+	fragment STRING_INT_CODE
+	start namespace_content
+	skip COMMENT STRING DIRECTIVE
+}
+
+%nodes {
+	ghost names_list
+	leaf name type modifier arguments entity_attribute
+}
+
+%customblock {
+	start("/// land start")
+	end("/// land end")
+	basetoken COMMENT
+}
+
+%markup {
+	land namespace enum class_struct_interface method field property
+	
+	priority(0.1) modifier CLASS_STRUCT_INTERFACE
+	priority(0.8) name
+	priority(0.5) arguments
+	priority(0.3) type
+	priority(0.1) init_value
+	priority(0) '{' '}' ';' ',' '=>' '=' 'namespace' entity_attribute
+	
+	exactmatch modifier CLASS_STRUCT_INTERFACE	
+	headercore(name) namespace enum class_struct_interface method field property
+}

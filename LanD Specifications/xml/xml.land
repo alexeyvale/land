@@ -1,0 +1,32 @@
+COMMENT			: '<!--' .*? '-->'
+DOCTYPE_DECL	: '<!' (DOCTYPE_DECL|STRING|.)*? '>'
+CDATA			: '<![CDATA[' .*? ']]>'
+PROCESS_INSTR	: %left ('<?'|'<?xml')	%right '?>'
+
+ID		: [_a-zA-Z\u0430-\u044F\u0410-\u042F][-._a-zA-Z\u0430-\u044F\u0410-\u042F0-9]*
+STRING	: '"' ~[<"]*? '"' | '\'' ~[<']*? '\''
+
+file		=	xml_prolog? (element|Any)*
+xml_prolog	=	'<?xml' attribute* '?>'
+element			=	'<' name attribute* ('>' (element|Any)* closing_tag | '/>')
+closing_tag	=	'</' name '>'
+attribute	=	name ('=' STRING)?
+name		=	ID (':' ID)*
+
+%%
+
+%parsing {
+	skip COMMENT DOCTYPE_DECL CDATA STRING
+	start file
+}
+
+%nodes {
+	leaf name attribute closing_tag
+}
+
+%markup {
+	land element
+	headercore(name) element
+	priority(0) '<' '>' '/>' closing_tag
+	notUnique element
+}

@@ -1,0 +1,57 @@
+COMMENT		: '//' ~[\n\r]* | '/*' .*? '*/'
+STRING		: '"' ('\\"'|'\\\\'|.)*? '"'
+CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
+
+MODIFIER	: 'transient'|'strictfp'|'native'|'public'|'private'|'protected'|'static'|'final'|'synchronized'|'abstract'|'volatile'|'default'
+ID			: [_$a-zA-Z][_$0-9a-zA-Z]*
+ 
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left '[' %right ']'
+
+ 
+file_content	=	entity*
+
+entity	=	
+	(annotation|MODIFIER)*
+	(
+	 	'enum' name Any '{' Any '}' ';'?					=> enum				|
+		('class'|'interface') name Any '{' entity* '}' ';'?	=> class_interface	|
+		%markup(priority(2)) type name
+		(
+	  		arguments Any (';' | block)						=> method	|
+	  		init_value? (',' name init_value?)* ';'			=> field
+	  	)
+	) | AnyInclude('@interface', 'import', 'package') (block | ';')+
+	
+init_value	=	'=' init_part+
+init_part	=	Any | name
+
+name	=	name_type
+type	=	name_type
+name_type_atom	=	type_parameter? ID type_parameter?!
+name_type	=	name_type_atom ((('.'|'::') name_type_atom) | '['']')*
+type_parameter	=	'<' (AnyAvoid(';') | type_parameter)* '>'
+
+arguments	=	'(' Any ')'
+annotation	=	'@' name arguments?
+block		=	'{' Any '}'
+
+%%
+
+%parsing {
+	recovery entity init_part
+	fragment STRING_INT_CODE
+	start file_content
+	skip COMMENT STRING
+}
+
+%nodes {
+	leaf name type type_parameter annotation
+}
+
+%markup {
+	land enum class_interface method field
+	priority(3) name
+}
+ 

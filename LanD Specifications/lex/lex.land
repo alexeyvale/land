@@ -1,0 +1,78 @@
+COMMENT		: COMMENT_L|COMMENT_ML
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML	: '/*' .*? '*/'
+STRING_ESC	: '@'('"' ~["]* '"')+
+
+SECTIONS_SEPARATOR	: %linestart '%%'
+CATEGORY_NAME	:	%linestart ID
+STATE_TYPE		:	%linestart ('%x'|'%s')
+DECLARATION_START		:	%linestart '%'
+STATES_START			:	%linestart '<'
+INNER_STATES_START		:	'<'
+STATES_END				:	'>'
+
+ID	: [a-zA-Z0-9_]+
+
+REGEX_REPETITION : '{'[0-9]+(','[0-9]*)?'}'
+REGEX_CLASS : '{'ID'}'
+REGEX_PREDEFINED_CHAR_CLASS	: '['':'ID':'']'
+REGEX_CHAR_CLASS : '['(~[[\]\r\n]|REGEX_PREDEFINED_CHAR_CLASS)+']'
+REGEX_ESCAPE_CHAR : '\\'~[\r\n]
+REGEX_LITERAL_STR : '"'(~["]|'\\"')*'"'
+REGEX_SET_OP : '{-}'|'{+}'|'{*}'
+REGEX_ITEM :  REGEX_REPETITION|REGEX_CLASS|REGEX_PREDEFINED_CHAR_CLASS|REGEX_CHAR_CLASS|REGEX_ESCAPE_CHAR|REGEX_LITERAL_STR|REGEX_SET_OP|'<<EOF>>'
+
+LINE_END	: '\r'?'\n'
+SPACE		: [\r\t ]
+
+file	=	declarations SECTIONS_SEPARATOR rules SECTIONS_SEPARATOR Any
+
+declarations			=	(state_declaration | category_declaration | other_declaration | direct_code | Any)*
+state_declaration		=	STATE_TYPE id_list LINE_END
+other_declaration		=	DECLARATION_START Any LINE_END
+category_declaration	=	CATEGORY_NAME regex_from_declaration LINE_END
+regex_from_declaration	=	Any
+
+rules			=	(group | rule | direct_code | Any LINE_END)*
+states			=	(STATES_START | INNER_STATES_START) (id_list|'*') STATES_END
+id_list			=	ID (','? ID)*
+group			=	states? '{' (group|rule)* '}'
+rule			=	states? regex_list_from_rule context_code 
+regex_from_rule	=	(REGEX_ITEM | CATEGORY_NAME | STATE_TYPE | DECLARATION_START | STATES_END | ID | STRING_ESC | UNDEFINED)+
+regex_list_from_rule	=	regex_from_rule ('|' regex_from_rule)* (SPACE|LINE_END)+
+
+direct_code		=	'%{' AnyAvoid(STATES_START, SECTIONS_SEPARATOR) '%}' // Recovery when closing %} is missing
+context_code	=	block | Any LINE_END
+block			=	'{' (Any(Include('\'{\'', '\'}\''), Avoid(STATES_START, SECTIONS_SEPARATOR)) | block)* '}' // Recovery when closing } is missing
+
+%%
+
+%parsing {
+	start file
+	skip COMMENT LINE_END SPACE
+	fragment REGEX_REPETITION REGEX_CLASS REGEX_PREDEFINED_CHAR_CLASS REGEX_CHAR_CLASS REGEX_ESCAPE_CHAR REGEX_LITERAL_STR REGEX_SET_OP
+	recovery
+	
+	userify("идентификатор") ID
+	userify("разделитель секций") SECTIONS_SEPARATOR
+	userify("наименование категории") CATEGORY_NAME
+	userify("тип состояния анализатора") STATE_TYPE
+	userify("начало объявления") DECLARATION_START
+	userify("начало списка состояний") STATES_START
+	userify("начало вложенного списка состояний") INNER_STATES_START
+	userify("конец списка состояний") STATES_END
+	
+	userify("группа правил") group
+	userify("правило") rule
+}
+
+%nodes {
+	leaf regex_from_declaration regex_from_rule states
+	ghost regex_list_from_rule
+	void LINE_END SPACE
+}
+
+%markup {
+	land group rule
+	priority(0) STATES_START INNER_STATES_START STATES_END ','
+}

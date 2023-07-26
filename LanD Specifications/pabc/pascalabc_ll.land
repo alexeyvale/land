@@ -1,0 +1,69 @@
+COMMENT		: COMMENT_L|COMMENT_ML1|COMMENT_ML2
+COMMENT_L	: '//' ~[\n\r]*
+COMMENT_ML1	: '{' (COMMENT_ML2|.)*? '}'
+COMMENT_ML2 : '(*' (COMMENT_ML1|.)*? '*)'
+STRING_SKIP	: '\'\'' | '\\\\'
+STRING		: '\'' (STRING_SKIP|.)*? '\''
+
+ACCESS_MODIFIER		: 'internal'|'private'|'protected'|'public'
+OTHER_MODIFIER		: 'external'|'forward'|'override'|'abstract'|'overload'|'reintroduce'|'virtual'|'where'|'extensionmethod'
+ROUTINE_TYPE		: 'procedure'|'function'|'constructor'|'destructor'
+
+ID					: '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+OPERATOR_ACCESS		: '.operator'
+CLASS_MEMBER_ACCESS	: '.' '&'?[_a-zA-Z\u0430-\u044F\u0410-\u042F][_0-9a-zA-Z\u0430-\u044F\u0410-\u042F]*
+
+SQUARE_BRACKETED : %left '[' %right ']'
+ROUND_BRACKETED : %left '(' %right ')'
+
+file	=	(interface_declarations|declaration)* 'end'? '.'?
+
+interface_declarations	=	'interface' declaration* 'implementation'
+declaration		=	const|type|var|attribute* routine ';'|routine_element ';'|block|Any
+
+const			=	'const' (const_atom ';'|Any)+!
+type			=	'type' (type_atom ';'|Any)+!
+var				=	'var' (var_atom ';'|Any)+!
+const_atom		=	name (':' Any class?)? '=' Any
+var_atom		=	names_list (':' Any class?)? (':=' Any)?
+type_atom		=	attribute* name '=' Any (class => class_type |)
+
+class			=	('record'|'class'|'interface') Any (OTHER_MODIFIER Any ';')?! (section? (ACCESS_MODIFIER section?)* 'end')?!
+section			=	(class_member | routine_element | block | Any) (';' section)? | (const | type | var) section?
+
+class_member	=	attribute* ('class'|'static')? 
+					(
+						%nodes(ghost) var_atom					=> field	|
+						'property' name Any ':' (block|Any)+	=> property	|
+						%nodes(ghost) routine					=> method
+					)
+
+routine				=	routine_header routine_init? // начало процедуры, к которому на этапе постобработки приконкатенируем остальное
+routine_element		=	OTHER_MODIFIER Any (=> modifier_headed_part | routine_init	=> routine_tail)
+routine_header		=	ROUTINE_TYPE %markup(priority(2)) name? Any ('(' Any ')')? (':' Any)?
+routine_init		=	':=' (Any|block)
+
+name_atom			=	'^'? ID
+name_tail_element	=	'::' name_atom | CLASS_MEMBER_ACCESS
+name		=	(('array'|'sequence'|'set') Any 'of')* name_atom (name_tail_element | '<' Any '>' | '[' Any ']')* (OPERATOR_ACCESS Any)? | 'operator' Any
+names_list	=	name (',' name)*
+
+block		=	('begin'|'case'|'try'|'match') (block|Any)+ 'end'
+attribute	=	'[' Any ']'
+
+%%
+
+%parsing {
+	recovery
+	start file
+	ignorecase
+	skip COMMENT
+}
+
+%nodes {
+	leaf name
+	ghost declaration class names_list routine_header
+	list section
+}
+
+%markup land class_type field property routine method

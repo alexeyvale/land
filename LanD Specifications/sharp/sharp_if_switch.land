@@ -14,23 +14,35 @@ STRING_INT_CODE : '{' (STRING|CHAR|STRING_INT_CODE|.)*? '}'
 CHAR		: '\'' ('\\\''|'\\\\'|.)*? '\''
 ID			: '@'?[_a-zA-Z][_0-9a-zA-Z]*
 
-program		=	(island|Any)*
-island		=	if|switch
-if			=	'if' round_bracketed (block | island | (Any|round_bracketed)+ (block|';')) (else)?!
-else		=	'else' (block | island | (Any|round_bracketed)+ (block|';'))
+CURVE_BRACKETED : %left '{' %right '}'
+ROUND_BRACKETED : %left '(' %right ')'
+SQUARE_BRACKETED : %left ('['|GENERAL_ATTRIBUTE_START) %right ']'
+
+
+program			=	program_element*
+program_element	=	island | AnyIgnorePairs
+
+island		=	if | switch
+if			=	'if' round_bracketed (block | island | Any (block|';')) (else)?!
+else		=	'else' (block | island | Any (block|';'))
 switch		=	'switch' round_bracketed '{' case+ '}'
 case		=	('case' Any |'default') ':' (Any ';' |block|island)+
 
-round_bracketed		=	'(' (Any|round_bracketed)* ')'
-curve_bracketed		=	'{'	(Any|curve_bracketed)* '}'
+round_bracketed		=	'(' Any ')'
+curve_bracketed		=	'{'	Any '}'
 
-block				=	'{'	(Any|block|island)* '}'
+block				=	'{'	program_element* '}'
 
 %%
 
-%parsing fragment STRING_INT_CODE
-%parsing skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
-%parsing start program
+%parsing {
+	recovery program_element
+	fragment STRING_INT_CODE
+	skip COMMENT STRING DIRECTIVE DIRECTIVE_ELSE
+	start program
+}
 
-%nodes ghost island
-%nodes leaf round_bracketed
+%nodes {
+	ghost island
+	leaf round_bracketed
+}

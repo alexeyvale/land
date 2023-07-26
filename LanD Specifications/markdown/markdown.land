@@ -1,0 +1,33 @@
+//вспомогательные токены
+LINE_END : '\r'?'\n' | '\r' | '\f'
+REST_OF_LINE : ~[\n\r\f]*? LINE_END
+
+//вставки кода
+CODE_LINE : %linestart ('    '|'\t') REST_OF_LINE
+CODE_BORDER_1 : %linestart ' '*? '~~~' REST_OF_LINE
+CODE_BORDER_2 : %linestart ' '*? '```' REST_OF_LINE
+CODE_1 : %left CODE_BORDER_1 %right CODE_BORDER_1
+CODE_2 : %left CODE_BORDER_2 %right CODE_BORDER_2
+
+//заголовки, в начале допускается от 1 до 3-х пробелов, строки с большим количеством захватываются CODE_LINE
+HEADER_ANY : %linestart ' '*? '#'+ REST_OF_LINE
+HEADER_H1_BORDER :  %linestart ' '*? '='+ [ \t]*? LINE_END
+HEADER_H2_BORDER :  %linestart ' '*? '-'+ [ \t]*? LINE_END
+
+LINE : %linestart REST_OF_LINE
+
+file			=	(element|Any)*
+element			=	HEADER_ANY	=> header_any	|
+					LINE 
+					(
+						HEADER_H1_BORDER => header_h1 | 
+						HEADER_H2_BORDER => header_h2 | 
+						=> text
+					)
+
+%%
+
+%parsing fragment LINE_END REST_OF_LINE
+%parsing start file
+
+%nodes leaf element

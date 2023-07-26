@@ -8,24 +8,61 @@ STRING_ESC	: '@'('"' ~["]* '"')+
 LITERAL		: '\'' ('\\\''|'\\\\'|.)*? '\''
 DECLARATION_CODE : '%{' (STRING|COMMENT|.)*? '%}'
 
-ID : [_a-zA-Z][_0-9a-zA-Z]*
-DECLARATION_NAME : '%'ID
+RULE_HEADER	: %linestart ID
+ID	: [_a-zA-Z][_0-9a-zA-Z]*
+DECLARATION_NAME	: '%'ID
+SECTIONS_SEPARATOR	: %linestart '%%'
 
-grammar 		=	declaration* '%%' rule* grammar_ending
-grammar_ending	=	('%%' Any)?
+grammar 		=	(declaration | Any)* SECTIONS_SEPARATOR (rule | Any)* (SECTIONS_SEPARATOR Any)?
+
 declaration		=	symbol_declaration | other_declaration
-symbol_declaration = ('%token' | '%left' | '%nonassoc' | '%right' | '%type') ('<' ID '>')? (ID|LITERAL)+
+symbol_declaration = symbol_declaration_header symbol_declaration_element+
+symbol_declaration_header = ('%token' | '%left' | '%nonassoc' | '%right' | '%type' | '%start') ('<' ID '>')?
+symbol_declaration_element = ID | LITERAL
 other_declaration = DECLARATION_NAME Any
-rule			=	ID ':' alternative ('|' alternative)* ';'
-alternative		=	(ID | block | LITERAL | '%prec')*
-block			=	'{' (Any|block)+ '}'
+
+rule			=	RULE_HEADER ':' (alternative ('|' alternative)* ';')
+alternative		=   (alternative_element | block)* | AnyError // Recovery when ; is missing
+alternative_element    =	ID | LITERAL | '%prec'
+block			=	'{' (AnyAvoid(RULE_HEADER, SECTIONS_SEPARATOR) | block)+ '}' // Recovery when closing } is missing
 
 %%
 
-%parsing ignoreundefined
-%parsing start grammar
-%parsing skip COMMENT STRING DECLARATION_CODE
+%parsing {
+	ignoreundefined
+	start grammar
+	skip COMMENT STRING DECLARATION_CODE
+	recovery
+	
+	userify("заголовок правила") RULE_HEADER
+	userify("идентификатор") ID
+	userify("литерал") LITERAL
+	userify("разделитель секций") SECTIONS_SEPARATOR
+	userify("начало описания") DECLARATION_NAME
+	
+	userify("описание") symbol_declaration
+	userify("элемент описания") symbol_declaration_element
+	userify("правило") rule
+	userify("альтернатива") alternative
+	userify("вхождение символа в альтернативу") alternative_element
+}
 
-%nodes ghost declaration
+%customblock {
+	start("//+")
+	end("//-")
+	basetoken COMMENT
+}
 
-%mapping land symbol_declaration rule alternative
+%nodes {
+	ghost declaration
+	leaf alternative_element symbol_declaration_element symbol_declaration_header
+}
+
+%markup {
+	land symbol_declaration symbol_declaration_element rule alternative alternative_element
+	priority(0) ':' ';' '|'
+	notUnique alternative_element
+	headerCore(RULE_HEADER) rule
+	headerCore(alternative_element) alternative
+	headerCore(symbol_declaration_header) symbol_declaration
+}
