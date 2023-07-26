@@ -164,9 +164,11 @@
 								<TabControl Grid.Row="2">
 									<TabItem>
 										<TabItem.Header>Лог</TabItem.Header>
-										<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-											<ListBox Name="File_LogList" MouseDoubleClick="File_ListBox_MouseDoubleClick" FontSize="14pt"/>
-										</ScrollViewer>
+										<ListBox Name="File_LogList" 
+													MouseDoubleClick="File_ListBox_MouseDoubleClick" 
+													FontSize="14pt" 
+													VirtualizingPanel.IsVirtualizing="true"
+													VirtualizingPanel.VirtualizationMode="Recycling"/>
 									</TabItem>
 									<TabItem>
 										<TabItem.Header>Ошибки и предупреждения</TabItem.Header>
