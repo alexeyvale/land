@@ -125,10 +125,6 @@
     <None Include="App.config" />
     <None Include="Core\Specification\Parsing\_ymc\Land.lex" />
     <None Include="Core\Specification\Parsing\_ymc\Land.y" />
-    <Content Include="Resources\Models\cs.pkl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\apply_ml.py" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
