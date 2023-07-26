@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Land.GUI"
         xmlns:avalonedit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
         mc:Ignorable="d"
-        Title="LanD Test IDE" Height="600" Width="1000"
+        Title="LanD Test IDE" MinHeight="600" MinWidth="1000"
         Closed="Window_Closed"
         Closing="Window_Closing"
         Icon="AppIcon.png">
@@ -205,12 +205,12 @@
 									<TextBox Width="60" BorderBrush="Black" Name="Batch_TargetExtentions" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
 									<Separator></Separator>
 									<Label>Целевые типы</Label>
-									<TextBox Width="60" BorderBrush="Black" Name="Batch_TargetEntityTypes" ToolTip="Вводить через запятую, например: y, yacc"></TextBox>
+									<TextBox MinWidth="70" MaxWidth="120" BorderBrush="Black" Name="Batch_TargetEntityTypes" ToolTip="Вводить через запятую, например: method, class"></TextBox>
 									<Separator></Separator>
 									<Button Name="Batch_StartOrStopPackageParsingButton" Content="Запуск/Остановка" Click="Batch_StartOrStopPackageParsingButton_Click"/>
 									<Separator></Separator>
 									<Separator></Separator>
-									<ComboBox MinWidth="90" MaxWidth="90" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
+									<ComboBox MinWidth="80" MaxWidth="150" Margin="10, 0, 0, 0" Name="Batch_RecentDirectories" ToolTip="Недавние каталоги" SelectionChanged="RecentItems_SelectionChanged"></ComboBox>
 								</ToolBar>
 								<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
 									<ListBox FontSize="14pt" Name="Batch_Log" MouseDoubleClick="Batch_ListBox_MouseDoubleClick"></ListBox>
