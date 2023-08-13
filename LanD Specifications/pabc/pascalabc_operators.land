@@ -26,7 +26,7 @@ var_atom		=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
 type_atom		=	ID '=' (record_or_class | Any) ';'
 outer_routine	=	routine_header ';' Any (outer_declaration* (block ';'))?!
 inner_routine	=	routine_header ';' Any (inner_declaration* (block ';'))?!
-routine_header	=	('procedure'|'function'|'constructor'|'destructor') %priority(2) name %priority(2) routine_arguments? (':' name)?
+routine_header	=	('procedure'|'function'|'constructor'|'destructor')  name routine_arguments? (':' name)?
 routine_arguments	=	'(' routine_arguments_atom (';' routine_arguments_atom)*  ')'
 routine_arguments_atom = ('var'|'const'|'params')? ID (',' ID)* ':' Any
 record_or_class	=	('record'|'class') Any ('public'|'protected'|'private'|inner_routine|Any)+ 'end'
