@@ -7,8 +7,8 @@
     <ProjectGuid>{8F271B4E-CC67-4661-B856-88ECA83464A4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestGUI</RootNamespace>
-    <AssemblyName>TestGUI</AssemblyName>
+    <RootNamespace>Land.GUI</RootNamespace>
+    <AssemblyName>Land.GUI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -68,16 +68,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="VisualHelpers\ColumnSettingsAttribute.cs" />
     <Compile Include="ConsoleWriter.cs" />
     <Compile Include="CountEntitiesVisitor.cs" />
-    <Compile Include="DocumentSegment.cs" />
+    <Compile Include="VisualHelpers\Models\DocumentSegment.cs" />
     <Compile Include="EditorSearchHandler.cs" />
     <Compile Include="LibrarySettingsWindow.xaml.cs">
       <DependentUpon>LibrarySettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SegmentsBackgroundRenderer.cs" />
-    <Compile Include="CurrentLineBackgroundRenderer.cs" />
-    <Compile Include="SelectedTextColorizer.cs" />
+    <Compile Include="VisualHelpers\Models\LogMessage.cs" />
+    <Compile Include="VisualHelpers\SegmentsBackgroundRenderer.cs" />
+    <Compile Include="VisualHelpers\CurrentLineBackgroundRenderer.cs" />
+    <Compile Include="VisualHelpers\SelectedTextColorizer.cs" />
     <Page Include="LibrarySettingsWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
