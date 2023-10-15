@@ -143,7 +143,7 @@ namespace Land.Core.Parsing.LL
 								token = SkipAny(NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME), true);
 							else
 							{
-								Log.Add(LastRecoveryMessage = Message.Warning(
+								Log.Add(LastRecoveryMessage = Message.Trace(
 									$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", runtimeFirst.Select(t => this.Developerify(t)))}",
 									token.Location.Start,
 									addInfo: new Dictionary<MessageAddInfoKey, object>
@@ -170,7 +170,7 @@ namespace Land.Core.Parsing.LL
 				/// ни найти ветку правила для нетерминала на вершине стека
 				if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(LastRecoveryMessage = Message.Warning(
+					Log.Add(LastRecoveryMessage = Message.Trace(
 						GrammarObject.Tokens.ContainsKey(stackTop.Symbol) ?
 							$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидался {this.Developerify(stackTop.Symbol)}" :
 							$"Неожиданный токен {this.Developerify(LexingStream.CurrentToken)}, ожидались {String.Join(", ", Table[stackTop.Symbol].Where(t => t.Value.Count > 0).Select(t => this.Developerify(t.Key)))}",
@@ -425,7 +425,7 @@ namespace Land.Core.Parsing.LL
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
-			Log.Add(Message.Warning(
+			Log.Add(Message.Trace(
 				$"Процесс восстановления запущен в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
@@ -496,12 +496,12 @@ namespace Land.Core.Parsing.LL
 					);
 				}
 
-				Log.Add(Message.Warning(
+				Log.Add(Message.Trace(
 					$"Найдено предполагаемое начало {Grammar.ANY_TOKEN_NAME}",
 					anyNode.Location?.Start ?? LexingStream.CurrentToken.Location.Start
 				));
 
-				Log.Add(Message.Warning(
+				Log.Add(Message.Trace(
 					$"Попытка продолжить разбор на нетерминале {GrammarObject.Developerify(currentNode.Symbol)} в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));
@@ -513,7 +513,7 @@ namespace Land.Core.Parsing.LL
 				/// возвращаем токен, с которого разбор продолжается
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
-					Log.Add(Message.Warning(
+					Log.Add(Message.Trace(
 						$"Произведено восстановление на уровне {GrammarObject.Developerify(currentNode.Symbol)}, разбор продолжен с токена {this.Developerify(token)}",
 						token.Location.Start
 					));

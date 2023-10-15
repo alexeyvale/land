@@ -134,7 +134,7 @@ namespace Land.Core.Parsing.LR
 				}
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(LastRecoveryMessage = Message.Warning(
+					Log.Add(LastRecoveryMessage = Message.Trace(
 						$"Неожиданный символ {this.Developerify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						LexingStream.CurrentToken.Location.Start,
 						addInfo: new Dictionary<MessageAddInfoKey, object>
@@ -422,7 +422,7 @@ namespace Land.Core.Parsing.LR
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
-			Log.Add(Message.Warning(
+			Log.Add(Message.Trace(
 				$"Процесс восстановления запущен в позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 				LexingStream.CurrentToken.Location.Start
 			));
@@ -526,12 +526,12 @@ namespace Land.Core.Parsing.LR
 					anyNode.SetLocation(startLocation, endLocation);
 				anyNode.Value = value.ToList();
 
-				Log.Add(Message.Warning(
+				Log.Add(Message.Trace(
 					$"Найдено предполагаемое начало {Grammar.ANY_TOKEN_NAME}",
 					anyNode.Location?.Start ?? LexingStream.CurrentToken.Location.Start
 				));
 
-				Log.Add(Message.Warning(
+				Log.Add(Message.Trace(
 					$"Попытка продолжить разбор в состоянии {Environment.NewLine}\t\t{Table.ToString(Stack.PeekState(), null, "\t\t")}\tв позиции токена {this.Developerify(LexingStream.CurrentToken)}",
 					LexingStream.CurrentToken.Location.Start
 				));		
