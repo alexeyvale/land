@@ -16,7 +16,7 @@ const				=	'const' const_atom+
 const_atom			=	ID '=' Any ';'
 var					=	'var' var_atom+
 var_atom			=	(ID (',' ID)* (':' Any)? (':=' Any)? ';')
-procedure			=	'procedure' %markup(priority(2)) name %markup(priority(2)) arguments? ';' block ';'
+procedure			=	'procedure' name arguments? ';' block ';'
 arguments			=	'(' (arguments_element (';' arguments_element)*)? ')'
 arguments_element	=	('var'|'const')? ID (',' ID)* ':' Any
 
