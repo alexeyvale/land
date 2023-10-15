@@ -17,7 +17,7 @@ namespace Land.Core.Parsing.LR
 		private Stack<int> NestingStack { get; set; }
 
 		private HashSet<int> PositionsWhereRecoveryStarted { get; set; }
-		private Message LastRecoveryMessage { get; set; }
+		private Message PotentialErrorMessage { get; set; }
 
 		public Parser(
 			Grammar g,
@@ -134,7 +134,7 @@ namespace Land.Core.Parsing.LR
 				}
 				else if (token.Name == Grammar.ANY_TOKEN_NAME)
 				{
-					Log.Add(LastRecoveryMessage = Message.Trace(
+					Log.Add(PotentialErrorMessage = Message.Trace(
 						$"Неожиданный символ {this.Developerify(LexingStream.CurrentToken)} для состояния{Environment.NewLine}\t\t" + Table.ToString(Stack.PeekState(), null, "\t\t"),
 						LexingStream.CurrentToken.Location.Start,
 						addInfo: new Dictionary<MessageAddInfoKey, object>
@@ -245,9 +245,9 @@ namespace Land.Core.Parsing.LR
 
 			/// Проверяем, не происходит ли восстановление в действительно некорректной программе
 			if (anyNode.Arguments.Contains(AnyArgument.Error)
-				&& LastRecoveryMessage != null)
+				&& PotentialErrorMessage != null)
 			{
-				LastRecoveryMessage.Type = MessageType.Error;
+				PotentialErrorMessage.Type = MessageType.Error;
 			}
 
 			/// Производим перенос
@@ -326,18 +326,17 @@ namespace Land.Core.Parsing.LR
 						}
 					);
 
+					Log.Add(message);
+
 					if (GrammarObject.Options.IsRecoveryEnabled())
 					{
 						++Statistics.RecoveryTimesAny;
 						Statistics.LongestRollback = 
-							Math.Max(Statistics.LongestRollback, LexingStream.CurrentIndex - tokenIndex);
-
-						message.Type = MessageType.Warning;
-						Log.Add(message);
+							Math.Max(Statistics.LongestRollback, LexingStream.CurrentIndex - tokenIndex);		
 
 						LexingStream.MoveTo(tokenIndex, nestingCopy);
 
-						LastRecoveryMessage = message;
+						PotentialErrorMessage = message;
 
 						return ErrorRecovery(stopTokens,
 							anyNode.Arguments.Contains(AnyArgument.Avoid, token.Name) ? token.Name : null);
@@ -345,13 +344,12 @@ namespace Land.Core.Parsing.LR
 					else
 					{
 						message.Type = MessageType.Error;
-						Log.Add(message);
 						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 					}
 				}
 				else
 				{
-					Log.Add(Message.Error(
+					Log.Add(Message.Trace(
 						$"Ошибка при пропуске {Grammar.ANY_TOKEN_NAME} в процессе восстановления: неожиданный токен {this.Developerify(token)}, ожидались {String.Join(", ", stopTokens.Select(t => this.Developerify(t)))}",
 						token.Location.Start,
 						addInfo: new Dictionary<MessageAddInfoKey, object>
@@ -362,6 +360,7 @@ namespace Land.Core.Parsing.LR
 						}
 					));
 
+					PotentialErrorMessage.Type = MessageType.Error;
 					return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 				}
 			}
@@ -402,18 +401,18 @@ namespace Land.Core.Parsing.LR
 
 		private IToken ErrorRecovery(HashSet<string> stopTokens = null, string avoidedToken = null)
 		{
+			// Если восстановление от ошибок отключено на уровне грамматики
 			if (!GrammarObject.Options.IsRecoveryEnabled())
 			{
-				Log.Add(Message.Error(
-					$"Возобновление разбора в случае ошибки отключено",
-					LexingStream.CurrentToken.Location.Start
-				));
-
+				PotentialErrorMessage.Type = MessageType.Error;
 				return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 			}
 
+			// Если в текущей позиции уже запускалось восстановление
 			if (!PositionsWhereRecoveryStarted.Add(LexingStream.CurrentIndex))
 			{
+				PotentialErrorMessage.Type = MessageType.Error;
+
 				Log.Add(Message.Error(
 					$"Возобновление разбора невозможно: восстановление в позиции токена {this.Developerify(LexingStream.CurrentToken)} уже проводилось",
 					LexingStream.CurrentToken.Location.Start
@@ -429,16 +428,20 @@ namespace Land.Core.Parsing.LR
 
 			var recoveryStartTime = DateTime.Now;
 
+			// Координаты начала и конца уже сопоставленной последовательности токенов,
+			// которую теперь будем интерпретировать как Any
 			PointLocation startLocation = null;
 			PointLocation endLocation = null;
+
+			// Лексемы, соответствующие этой последовательности токенов
 			var value = new List<string>();
 
 			var previouslyMatched = (Node)null;
 			var derivationProds = new HashSet<PathFragment>();
 			var initialDerivationProds = new HashSet<PathFragment>();
 
-			/// Снимаем со стека состояния до тех пор, пока не находим состояние,
-			/// в котором есть пункт A -> * Any ...
+			// Снимаем со стека состояния до тех пор, пока не находим состояние,
+			// в котором есть пункт A -> * Any ...
 			do
 			{
 				if (Stack.CountSymbols > 0)
@@ -455,7 +458,7 @@ namespace Land.Core.Parsing.LR
 					value = Stack.PeekSymbol().GetValue()
 						.Concat(value).ToList();
 
-					/// Запоминаем снятый со стека символ - это то, что было успешно распознано
+					// Запоминаем снятый со стека символ - это то, что было успешно распознано
 					previouslyMatched = Stack.PeekSymbol();
 				}
 
@@ -464,16 +467,16 @@ namespace Land.Core.Parsing.LR
 
 				if (Stack.CountStates > 0)
 				{
-					/// Выбираем пункты, продукции которых потенциально могут участвовать
-					/// в выводе текущего префикса из стартового символа
+					// Выбираем пункты, продукции которых потенциально могут участвовать
+					// в выводе текущего префикса из стартового символа
 					initialDerivationProds = new HashSet<PathFragment>(
 						Table.Items[Stack.PeekState()].Markers
 							.Where
 							(i =>
-								/// Точка должна стоять перед символом, только что снятым со стека
+								// Точка должна стоять перед символом, только что снятым со стека
 								i.Next == previouslyMatched.Symbol &&
-								/// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
-								/// с той же альтернативой, но точкой на один символ дальше
+								// Если это не первая выборка, на предыдущем шаге в выборке должен был быть пункт
+								// с той же альтернативой, но точкой на один символ дальше
 								(derivationProds.Count == 0 || derivationProds.Any(p => p.Alt.Equals(i.Alternative) && p.Pos == i.Position + 1))
 							)
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
@@ -487,7 +490,7 @@ namespace Land.Core.Parsing.LR
 					{
 						oldCount = derivationProds.Count;
 
-						/// Добавляем к списку пункты, порождающие уже добавленные пункты
+						// Добавляем к списку пункты, порождающие уже добавленные пункты
 						derivationProds.UnionWith(Table.Items[Stack.PeekState()].Markers
 							.Where(i => derivationProds.Any(p => p.Pos == 0 && p.Alt.NonterminalSymbolName == i.Next))
 							.Select(i => new PathFragment { Alt = i.Alternative, Pos = i.Position })
@@ -507,20 +510,30 @@ namespace Land.Core.Parsing.LR
 				{
 					var skippedBuffer = new List<IToken>();
 
-					/// Запоминаем токен, на котором произошла ошибка
+					// Запоминаем токен, на котором произошла ошибка
 					var currentToken = LexingStream.CurrentToken;
-					/// Пропускаем токены, пока не поднимемся на тот же уровень вложенности,
-					/// на котором раскрывали нетерминал
-					LexingStream.GetNextToken(NestingStack.Peek(), out skippedBuffer);
-					skippedBuffer.Insert(0, currentToken);
 
-					value.AddRange(skippedBuffer.Select(t=>t.Text));
-					endLocation = skippedBuffer.Last().Location.End;
+					// Пропускаем токены, пока не поднимемся на тот же уровень вложенности, 
+					// на котором раскрывали нетерминал
+					var nonterminalLevelToken = LexingStream.GetNextToken(NestingStack.Peek(), out skippedBuffer);
+
+					if (nonterminalLevelToken.Name != Grammar.ERROR_TOKEN_NAME)
+					{
+						skippedBuffer.Insert(0, currentToken);
+
+						value.AddRange(skippedBuffer.Select(t => t.Text));
+						endLocation = skippedBuffer.Last().Location.End;
+					}
+					else
+					{
+						PotentialErrorMessage.Type = MessageType.Error;
+						return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
+					}	
 				}
 
-				/// Пытаемся пропустить Any в этом месте,
-				/// Any захватывает участок с начала последнего 
-				/// снятого со стека символа до места восстановления
+				// Пытаемся пропустить Any в этом месте,
+				// Any захватывает участок с начала последнего 
+				// снятого со стека символа до места восстановления
 				var anyNode = NodeGenerator.Generate(Grammar.ANY_TOKEN_NAME);
 				if(startLocation != null)
 					anyNode.SetLocation(startLocation, endLocation);
@@ -538,9 +551,8 @@ namespace Land.Core.Parsing.LR
 
 				var token = SkipAny(anyNode, false);
 
-				/// Если Any успешно пропустили и возобновили разбор,
-				/// возвращаем токен, с которого разбор продолжается
-
+				// Если Any успешно пропустили и возобновили разбор,
+				// возвращаем токен, с которого разбор продолжается
 				if (token.Name != Grammar.ERROR_TOKEN_NAME)
 				{
 					Statistics.RecoveryTimes += 1;
@@ -550,11 +562,7 @@ namespace Land.Core.Parsing.LR
 				}
 			}
 
-			Log.Add(Message.Error(
-				$"Не удалось продолжить разбор",
-				null
-			));
-
+			PotentialErrorMessage.Type = MessageType.Error;
 			return Lexer.CreateToken(Grammar.ERROR_TOKEN_NAME);
 		}
 
