@@ -11,20 +11,17 @@ namespace Land.GUI
 	{
 		public PointLocation Location { get; set; }
 
-		[ColumnSettings("Источник", 4)]
+		[ColumnSettings("Источник")]
 		public string Source { get; set; }
 
-		[ColumnSettings("Описание", 1)]
+		[ColumnSettings("Описание")]
 		public string Text { get; set; }
 
-		[ColumnSettings("Тип", 0)]
+		[ColumnSettings("Тип")]
 		public MessageType Type { get; set; }
 
-		[ColumnSettings("Строка", 2)]
-		public int? Line => Location?.Line;
-
-		[ColumnSettings("Столбец", 3)]
-		public int? Column => Location?.Column;
+		[ColumnSettings("(Стр, Столб)")]
+		public string Coords => $"({Location?.Line},{Location?.Column})";
 
 		public LogMessage(Message msg)
 		{
